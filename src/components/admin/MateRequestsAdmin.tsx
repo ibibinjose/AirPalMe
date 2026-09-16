@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { collection, doc, getDocs, limit, orderBy, query, updateDoc } from "firebase/firestore";
+import { collection, doc, getDocs, limit, orderBy, query, updateDoc, where } from "firebase/firestore";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCompanion } from "@/contexts/CompanionContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { logAdminAction } from "@/lib/admin-audit";
+import { ChatBox } from "@/components/messaging/ChatBox";
 import { cn } from "@/lib/cn";
 import {
   MATE_REQUEST_STATUSES,
@@ -38,6 +39,23 @@ export function MateRequestsAdmin() {
   const [note, setNote] = useState("");
   const [matePick, setMatePick] = useState("");
   const [busy, setBusy] = useState(false);
+  const [bookingFor, setBookingFor] = useState<Record<string, string>>({});
+
+  async function loadBooking(requestId: string) {
+    if (bookingFor[requestId] !== undefined) return;
+    const db = getFirebaseDb();
+    if (!db) return;
+    try {
+      const snap = await getDocs(query(collection(db, "bookings"), where("requestId", "==", requestId), limit(5)));
+      const first = snap.docs[0];
+      setBookingFor((m) => ({
+        ...m,
+        [requestId]: first ? String((first.data() as { status?: string }).status ?? "unknown") : "none",
+      }));
+    } catch {
+      setBookingFor((m) => ({ ...m, [requestId]: "unavailable" }));
+    }
+  }
 
   const approvedMates = useMemo(
     () =>
@@ -158,7 +176,13 @@ export function MateRequestsAdmin() {
         <ul className="mt-3 space-y-2">
           {visible.map((r) => (
             <li key={r.id} className="rounded-2xl bg-paper p-3 ring-1 ring-line">
-              <button onClick={() => setOpenId(openId === r.id ? null : r.id)} className="flex w-full items-center gap-2 text-left">
+              <button
+                onClick={() => {
+                  setOpenId(openId === r.id ? null : r.id);
+                  void loadBooking(r.id);
+                }}
+                className="flex w-full items-center gap-2 text-left"
+              >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold">{r.what}</span>
                   <span className="block text-xs text-mute">
@@ -177,7 +201,16 @@ export function MateRequestsAdmin() {
                   {r.matchedMateName && (
                     <p className="mt-1 font-semibold">Delivering: {r.matchedMateName}</p>
                   )}
+                  {bookingFor[r.id] && bookingFor[r.id] !== "none" && (
+                    <p className="mt-1 text-mute">Booking: {bookingFor[r.id]} (pay later — Stripe pending)</p>
+                  )}
                   {r.adminNote && <p className="mt-1">Note: {r.adminNote}</p>}
+                  {(r.status === "matched" || r.status === "completed") && (
+                    <div className="mt-2">
+                      <p className="mb-1 text-xs font-semibold text-mute">Conversation transcript (read-only)</p>
+                      <ChatBox requestId={r.id} readOnly />
+                    </div>
+                  )}
                   <label className="mt-2 block">
                     <span className="text-xs font-semibold text-mute">Assign an approved Mate</span>
                     <select

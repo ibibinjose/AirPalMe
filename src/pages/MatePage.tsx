@@ -5,6 +5,8 @@ import { ArrowRight, BadgeCheck, CalendarDays, ShieldCheck, Sparkles, Star, User
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
+import { ChatBox } from "@/components/messaging/ChatBox";
+import { BookingsSection, createBookingForRequest } from "@/components/booking/BookingsSection";
 import { MATE_USE_CASES, reviewValid, type MateRequest, type MateRequestStatus } from "@shared/mate-request";
 
 const STEPS = [
@@ -24,6 +26,29 @@ export function MatePage() {
   const { user } = useAuth();
   const [, nav] = useLocation();
   const [requests, setRequests] = useState<MateRequest[] | null>(null);
+  const [chatFor, setChatFor] = useState<string | null>(null);
+  const [booked, setBooked] = useState<Record<string, boolean>>({});
+  const [bookingBusy, setBookingBusy] = useState(false);
+
+  async function book(r: MateRequest) {
+    if (!user || !r.matchedMateUid) return;
+    setBookingBusy(true);
+    try {
+      await createBookingForRequest({
+        requestId: r.id,
+        providerUid: r.matchedMateUid,
+        providerName: r.matchedMateName || "Your Mate",
+        title: r.what,
+        suburb: r.suburb,
+        date: r.date,
+        time: r.time,
+        customerUid: user.uid,
+      });
+      setBooked((b) => ({ ...b, [r.id]: true }));
+    } finally {
+      setBookingBusy(false);
+    }
+  }
   const [ratingFor, setRatingFor] = useState<string | null>(null);
   const [stars, setStars] = useState(5);
   const [reviewText, setReviewText] = useState("");
@@ -87,6 +112,8 @@ export function MatePage() {
         </Link>
       </div>
 
+      {user && <BookingsSection />}
+
       {user && requests !== null && (
         <section className="mt-6 rounded-2xl border border-line bg-card p-4">
           <h2 className="font-display text-base font-bold">Your requests</h2>
@@ -110,6 +137,35 @@ export function MatePage() {
                       {STATUS_LABEL[r.status] ?? r.status}
                     </span>
                   </span>
+                  {(r.status === "matched" || r.status === "completed") && r.matchedMateUid && (
+                    <span className="mt-1.5 block">
+                      <span className="flex flex-wrap items-center gap-2">
+                        <button
+                          onClick={() => setChatFor(chatFor === r.id ? null : r.id)}
+                          className="text-xs font-semibold text-brand"
+                        >
+                          {chatFor === r.id ? "Hide chat" : `Chat with ${r.matchedMateName || "your Mate"}`}
+                        </button>
+                        {r.status === "matched" &&
+                          (booked[r.id] ? (
+                            <span className="text-xs font-semibold text-emerald-700">Booked ✓ see below</span>
+                          ) : (
+                            <button
+                              onClick={() => void book(r)}
+                              disabled={bookingBusy}
+                              className="rounded-full bg-ink px-3 py-1 text-xs font-semibold text-white disabled:opacity-50"
+                            >
+                              Book — pay later
+                            </button>
+                          ))}
+                      </span>
+                      {chatFor === r.id && (
+                        <span className="mt-1.5 block">
+                          <ChatBox requestId={r.id} />
+                        </span>
+                      )}
+                    </span>
+                  )}
                   {r.status === "completed" &&
                     (r.rating ? (
                       <span className="mt-1 flex items-center gap-1 text-xs text-mute">

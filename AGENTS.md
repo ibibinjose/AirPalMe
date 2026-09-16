@@ -104,3 +104,92 @@ Future B2B operating layer: listings, experiences, campaigns, offers, events, cu
 ## 20. Admin Dashboard
 
 First-class application: overview, users, active Mates, requests, matches, bookings, GMV, revenue, reports, incidents; user search/profile/verification/status/activity; mate applications lifecycle; marketplace requests/matches/bookings/cancellations/disputes; experiences providers/listings/moderation/bookings; stay partners/properties/rooms/availability/bookings; fashion items/owners/rentals/returns/disputes; daily content/events/promotions/moderation; finance payments/fees/payouts/refunds/disputes; safety reports/incidents/suspensions/evidence/notes/escalations; analytics funnel/retention/repeat/GMV/revenue/supply/demand/geography. Every status/payment/listing/booking/safety action auditable.
+
+## 21. Data Model
+
+Shared marketplace collections: users, profiles, verification, preferences, mates, mate_applications, mate_requests (`mate_requests`), matches, messages (`request_chats`), conversations, experiences (`campaigns`), experience_providers, experience_slots, businesses, business_members, business_listings (`listings`, `partnerVenues`), stays (`properties`), stay_rooms, stay_rates, stay_availability, fashion_*, events, daily_content, offers, bookings, booking_items, payments, payouts, refunds, disputes, reviews (`rating` on requests), ratings, saved_items, reports (`safety_reports`), incidents, moderation_cases, admin_notes, audit_logs (`admin_audits`), notifications, promotions, campaigns. One AirPal account across the platform — never separate user systems per vertical.
+
+## 22. Technical Architecture
+
+Stack: React + TypeScript + Tailwind + Lucide + Firebase Auth/Firestore/Storage/Functions (+ Stripe Connect when payments land; maps/location; email/SMS/push). NOTE — recorded deviation: this repo ships Vite SPA, not Next.js App Router; kept deliberately per §36 (no rewrites of working systems). Server-side validation for sensitive operations. Never trust client prices, fees, permissions, booking ownership, payout amounts, admin status, verification state.
+
+## 23. Firestore Principles
+
+Ownership/access patterns: users touch only permitted data; admin ops protected; financial records restricted; reports restricted; internal notes never public; verification private; providers limited to own listings/bookings; users cannot change approval/suspension state or payment records. Privileged mutations via Cloud Functions. Never weaken rules to make development work.
+
+## 24. Design System
+
+AirPal.me, Life Made Easy. Modern, human, clean, energetic, trustworthy, premium but accessible. AirPal blue, white/light backgrounds, dark neutral text, limited accents, generous spacing, rounded-not-childish. The logo's .me stays distinctive; expressive script as brand accent only, never the whole interface.
+
+## 25. UX Rules
+
+Every screen answers: what is this, why care, what next. One primary CTA, short forms, progressive disclosure, mobile-first, clear status/pricing/cancellation/trust. Avoid: feature overload, long onboarding, empty dashboards, generic AI chat, excessive animation, dark patterns, hidden fees, ambiguous buttons.
+
+## 26. Notifications
+
+Useful, event-driven: match, accepted, message, booking confirmed/reminder, cancellation, payment, payout, review request, safety check-in, application status. No spam; user controls required.
+
+## 27. Reviews & Reputation
+
+Linked to completed legitimate transactions: overall rating, written review, category ratings, both sides, reportable, moderated. Badges: Identity Verified, AirPal Approved, Reliable, Top Rated, Experienced. No unexplained algorithmic score.
+
+## 28. Marketplace Economics
+
+Configurable: platform/provider commission, payment/booking/cancellation fees, refunds, deposits, promotions, coupons. Monetisation: transaction commission, partnership fees, experience/stay/fashion commissions, membership, sponsored discovery, software subscriptions. No ad optimisation before liquidity.
+
+## 29. MVP Scope
+
+Must build: auth, profiles, mate application, admin approval, mate discovery, mate request, matching, messaging, booking, payments, payouts, reviews, reports, block, notifications, admin dashboard, audit logs. Later: full Stay/Fashion/Travel, recommendations, ads, loyalty, complex AI, full Studio.
+
+## 30. MVP Acceptance Test
+
+A real user can: sign up → profile → apply → approved → request → discover → match → message → book → pay → complete → review → report/block if needed; admin inspects and intervenes at every stage.
+
+## 31. Key Metrics
+
+North-star: Completed AirPal Experiences. Track users, Mates, applications, approval rate, requests, matches, match rate, booking conversion, completed/repeat bookings, GMV, revenue, AOV, CAC, retention, cancellations, response rate, ratings, reports, incidents, refunds, disputes. Early king: completed experiences per active user per month.
+
+## 32. Development Priorities
+
+P0 transaction (auth → safety) → P1 usability (search, notifications, reviews, saved, cancellations) → P2 growth → P3 expansion (Stay, Experiences, Fashion, Daily, Travel) → P4 infrastructure (Studio, analytics, ads). Never P3/P4 while P0 broken.
+
+## 33. AI Rules
+
+AI assists: matching suggestions, search, descriptions, moderation help, support, personalisation. Never autonomously: removals, incident closure, payment disputes, verification approval, legal conclusions. Human review always available.
+
+## 34. Security
+
+Never commit keys, credentials, service accounts, passwords, secrets (.env stays out). Validate external input. Defend: XSS, CSRF, IDOR, privilege escalation, payment manipulation, abuse, spam, fakes, duplicates, fraud. Log security events.
+
+## 35. Privacy
+
+Minimal collection. Never expose: home addresses, verification docs, phones, emails, moderation notes, payment credentials. Sensible location precision. Controls for visibility, location, notifications, messages, marketing, data requests. Australian privacy/consumer compliance + specialist legal advice before launch.
+
+## 36. Code Quality
+
+Production quality: strict TS, reusable components, domain boundaries, server validation, error/loading/empty states, responsive, accessible, critical-flow tests. No duplicated marketplace logic, hard-coded business rules, fake production data, or security TODOs. No needless rewrites; check existing stack before new deps.
+
+## 37. Git Rules
+
+Small logical commits (`feat:`, `fix:` …). Never commit secrets. No force-push shared branches without authorisation.
+
+## 38. Agent Behaviour
+
+Read this file first. Inspect before changing architecture. Reuse components/patterns. Smallest change that solves. Preserve functionality. Test affected flows + mobile + auth/permissions + Firestore/payment implications. Report changes and tests. Conflicts resolve: Safety → Security → Correctness → Transaction integrity → UX → Performance → Growth.
+
+## 39. Product Guardrails
+
+Never become: social network, dating app, hotel clone, fashion marketplace, news site, ride-share clone, AI chatbot with marketplace attached. Advantage is the connection layer: PEOPLE→Mate, PLACES→Stay, EXPERIENCES→Experiences, THINGS→Fashion, DISCOVERY→Daily, TRIPS→Travel — all on Identity → Trust → Discovery → Matching → Booking → Payment → Experience → Reputation.
+
+## 40. Final Product Principle
+
+One trusted marketplace engine, six eventual verticals. Proof: someone wants to do something → AirPal finds the right person/place/experience → safe transaction → good experience → they come back. That is the AirPal loop.
+
+## 41. Repo Operations Annex (pre-existing, still binding)
+
+- Sydney time: never `new Date().toISOString().slice(0,10)` for calendar dates — use `toZonedDateStr`/LocalNow. `useLocalNow` clock: today/time/day/timeZone/city/here/anchor. Weather at `here` via Open-Meteo. Tonight/live parsed against zoned clock, never seed flags. Open-now via hours lib; null means don't guess.
+- Maps: `@vis.gl/react-google-maps`, build-time `VITE_GOOGLE_MAPS_API_KEY`, referrer-restricted; missing key shows embed, never dev cards on guest surfaces. `VITE_*` bakes at build — rebuild to change.
+- Guests browse free; never gate Stay/Explore/Scan behind auth. No secrets/PII in analytics. Seeds are migration sources, never rendered. Demo stay `properties/harbour-hotel`.
+- Provider order in `src/app/providers.tsx` (LocalNow after Stay). Shared function types live in `shared/`.
+- Live Firestore reads with honest empty states; `hoursVerifiedAt`/`scheduleVerifiedAt` freshness SLAs; city-only presence; legal copy in pages + `src/lib/legal.ts` (bump `LEGAL.updated` on change); tickets via callables not localStorage; `/host` reads live property; `unknownProperty` for missing stays.
+- Env: Firebase `VITE_FIREBASE_*`, Maps key, `PLATFORM_ADMIN_EMAILS`; never commit `.env`. Deploy: hosting/functions/rules scripts. Native: Capacitor `me.airpal.app`.

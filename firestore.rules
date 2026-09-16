@@ -384,6 +384,58 @@ service cloud.firestore {
       );
     }
 
+    // §9 shared booking engine. Money deferred until Stripe (§10).
+    match /bookings/{bookingId} {
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.customerUid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.paymentStatus == 'deferred'
+        && request.resource.data.keys().hasAny(['updatedAt']);
+      allow read: if signedIn() && (
+        resource.data.customerUid == request.auth.uid ||
+        resource.data.providerUid == request.auth.uid ||
+        platformAdmin()
+      );
+      allow update: if signedIn() && (
+        platformAdmin() ||
+        (resource.data.customerUid == request.auth.uid
+          && request.resource.data.customerUid == request.auth.uid) ||
+        (resource.data.providerUid == request.auth.uid
+          && request.resource.data.providerUid == request.auth.uid)
+      );
+      allow delete: if false;
+    }
+
+    // §8 messaging: one chat per matched request, parties only (+ admins for moderation).
+    match /request_chats/{requestId} {
+      function chatParty() {
+        return signedIn() && !isAnonymous() && (
+          get(/databases/$(database)/documents/mate_requests/$(requestId)).data.ownerUid == request.auth.uid ||
+          get(/databases/$(database)/documents/mate_requests/$(requestId)).data.matchedMateUid == request.auth.uid
+        );
+      }
+      allow create: if chatParty()
+        && request.resource.data.requestId == requestId
+        && request.resource.data.keys().hasAny(['updatedAt']);
+      allow read: if chatParty() || (signedIn() && platformAdmin());
+      allow update: if chatParty();
+      allow delete: if false;
+
+      match /messages/{messageId} {
+        allow create: if chatParty()
+          && request.resource.data.senderUid == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() >= 1
+          && request.resource.data.text.size() <= 1000
+          && request.resource.data.keys().hasAny(['updatedAt']);
+        allow get, list: if chatParty() || (signedIn() && platformAdmin());
+        allow update: if chatParty()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readBy']);
+        allow delete: if false;
+      }
+    }
+
     // Trust moat: safety reports open admin cases; blocks are private to the blocker.
     match /safety_reports/{reportId} {
       allow read: if signedIn() && (
@@ -410,6 +462,7 @@ service cloud.firestore {
     match /mate_requests/{requestId} {
       allow read: if signedIn() && (
         resource.data.ownerUid == request.auth.uid ||
+        resource.data.matchedMateUid == request.auth.uid ||
         platformAdmin()
       );
       allow create: if signedIn()
@@ -419,7 +472,12 @@ service cloud.firestore {
       allow update: if signedIn() && (
         platformAdmin() ||
         (resource.data.ownerUid == request.auth.uid
-          && request.resource.data.ownerUid == request.auth.uid)
+          && request.resource.data.ownerUid == request.auth.uid) ||
+        // Assigned Mate closes the loop: matched → completed only, nothing else.
+        (resource.data.matchedMateUid == request.auth.uid
+          && resource.data.status == 'matched'
+          && request.resource.data.status == 'completed'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt', 'completedAt']))
       );
       allow delete: if signedIn() && (
         resource.data.ownerUid == request.auth.uid ||
