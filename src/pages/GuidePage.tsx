@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Share2 } from "lucide-react";
 import { TourCard } from "@/components/guide/TourCard";
 import { PlaceCard } from "@/components/discovery/PlaceCard";
-import { activePlaces, toursForPrecinct, withWalk } from "@/lib/catalog";
+import { activePlaces, placesInCity, toursForPrecinct, withWalk } from "@/lib/catalog";
 import { fetchTours } from "@/lib/tours-store";
 import { shareCuratedGuide } from "@/lib/share";
 import type { WalkingTour } from "@shared/tours";
@@ -42,11 +42,13 @@ export function GuidePage() {
 
   const sights = useMemo(
     () =>
-      activePlaces()
-        .filter((p) => p.category === "things")
+      placesInCity(
+        activePlaces().filter((p) => p.category === "things"),
+        city,
+      )
         .map((p) => withWalk(p, here))
         .sort((a, b) => a.meters - b.meters),
-    [here, version],
+    [here, city, version],
   );
 
   const handleShareGuide = () => {

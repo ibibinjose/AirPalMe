@@ -114,6 +114,15 @@ export type BioCatalogItem = {
 export const BIO_KINDS = ["person", "business"] as const;
 export type BioKind = (typeof BIO_KINDS)[number];
 
+/** Account-type identifier shown on profiles: every profile is either an Individual or a Business. */
+export function isBusinessKind(kind?: BioKind | null): boolean {
+  return kind === "business";
+}
+
+export function bioKindLabel(kind?: BioKind | null): "Individual" | "Business" {
+  return isBusinessKind(kind) ? "Business" : "Individual";
+}
+
 export type AvailabilityStatus =
   | "available"
   | "busy"

@@ -26,7 +26,7 @@ import { mapsEmbedSrc, mapsKey, mapsMapId, mapsPlaceUrl, mapsWalkUrl } from "@/l
 import { isOpenAt } from "@/lib/hours";
 import { freshnessOf } from "@shared/freshness";
 import { useLocalNow } from "@/hooks/useLocalNow";
-import { activePlaces } from "@/lib/catalog";
+import { activePlaces, placesInCity } from "@/lib/catalog";
 import { useListings } from "@/contexts/ListingsContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import { trackMapClick } from "@/lib/analytics";
@@ -83,7 +83,7 @@ function MapCameraController({
 export function LocalFavorites() {
   const { t } = useLocale();
   const { property, marker } = useStay();
-  const { now, timeZone } = useLocalNow();
+  const { now, timeZone, here, city, source } = useLocalNow();
   const { version } = useListings();
   const apiKey = mapsKey();
   const mapId = mapsMapId();
@@ -97,9 +97,11 @@ export function LocalFavorites() {
   const [geoNotice, setGeoNotice] = useState<string | null>(null);
 
   const activeGeo = useMemo(() => {
+    // Browsing a chosen city: anchor distances to that city, not the stay.
+    if (source === "city") return here;
     if (geoMode === "device" && deviceGeo) return deviceGeo;
     return stayGeo;
-  }, [geoMode, deviceGeo, stayGeo]);
+  }, [source, here, geoMode, deviceGeo, stayGeo]);
 
   // Filters
   const [category, setCategory] = useState<FavoriteCategory>("all");
@@ -111,8 +113,9 @@ export function LocalFavorites() {
   const [cameraTarget, setCameraTarget] = useState<Geo | null>(null);
 
   // Places pool: live listings only — no third-party directory content.
+  // Filtered to the guest's active city so Kovalam never shows The Rocks.
   const curatedItems = useMemo<LocalFavoriteItem[]>(() => {
-    const pool = activePlaces();
+    const pool = placesInCity(activePlaces(), city);
     const items: LocalFavoriteItem[] = [];
 
     for (const p of pool) {
@@ -166,7 +169,7 @@ export function LocalFavorites() {
     }
 
     return items;
-  }, [activeGeo, now, timeZone, version]);
+  }, [activeGeo, city, now, timeZone, version]);
 
   // Live listings, nearest first. Empty DB → empty list, honestly.
   const allFavorites = useMemo(() => {

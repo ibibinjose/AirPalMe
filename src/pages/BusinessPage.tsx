@@ -22,6 +22,7 @@ import { Link } from "wouter";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase";
 import { HostFreshnessBanner } from "@/components/host/HostFreshnessBanner";
+import { fieldInput, fieldTextarea } from "@/components/forms/ValidField";
 
 function BusinessOverviewStrip({ listingActive, dealLive }: { listingActive: boolean; dealLive: boolean }) {
   const { user } = useAuth();
@@ -226,7 +227,7 @@ export function BusinessPage() {
               });
             }}
           />
-          <input value={name} onChange={(e) => setName(e.target.value)} className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
+          <input value={name} onChange={(e) => setName(e.target.value)} className={fieldInput} />
           <div className="flex flex-wrap gap-2">
             {BUSINESS_CATEGORIES.map((c) => (
               <button
@@ -270,7 +271,7 @@ export function BusinessPage() {
             {locating ? "Locating…" : geo ? `Pinned ${formatGps(geo.lat, geo.lng)} · update` : "Use current location"}
           </Button>
           <AddressFields value={address} onChange={setAddress} />
-          <input value={hours} onChange={(e) => setHours(e.target.value)} placeholder="Hours" className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
+          <input value={hours} onChange={(e) => setHours(e.target.value)} placeholder="Hours" className={fieldInput} />
           <HostFreshnessBanner
             kind="hours"
             at={mine.hoursVerifiedAt || mine.updatedAt}
@@ -279,7 +280,7 @@ export function BusinessPage() {
               toast.success("Hours confirmed");
             }}
           />
-          <input value={shortWhy} onChange={(e) => setShortWhy(e.target.value)} className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
+          <input value={shortWhy} onChange={(e) => setShortWhy(e.target.value)} className={fieldInput} />
           <PhoneField value={phone} onChange={setPhone} />
           <Button type="submit" className="w-full" disabled={busy} loading={busy}>
             Save
@@ -293,12 +294,12 @@ export function BusinessPage() {
 
       {tab === "offer" && (
         <form className="mt-5 space-y-3" onSubmit={onDeal}>
-          <input value={badge} onChange={(e) => setBadge(e.target.value)} placeholder="15% off" className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
+          <input value={badge} onChange={(e) => setBadge(e.target.value)} placeholder="15% off" className={fieldInput} />
           <textarea
             value={detail}
             onChange={(e) => setDetail(e.target.value)}
             placeholder="Show this stay at the till."
-            className="h-28 w-full rounded-2xl bg-card p-4 ring-1 ring-line outline-none"
+            className={fieldTextarea}
           />
           <Button type="submit" className="w-full" disabled={busy} loading={busy}>
             Publish

@@ -57,7 +57,7 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
     <footer
       role="contentinfo"
       className={cn(
-        "mt-16 border-t border-line/80 bg-paper px-4 pt-10 md:px-6",
+        "mt-16 border-t-2 border-ink bg-paper px-4 pt-10 md:px-6",
         hasTabBar
           ? "pb-[calc(6rem+env(safe-area-inset-bottom,0px))] lg:pb-10"
           : "pb-[max(2rem,env(safe-area-inset-bottom,0px))]",
@@ -69,55 +69,29 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-5 lg:gap-8">
           {/* Brand & Description Column */}
           <div className="lg:col-span-2">
-            <div className="flex items-center justify-between">
-              <Link href="/" className="inline-flex items-center transition hover:opacity-85" aria-label="AirPal Home">
-                <BrandMark compact={false} withTagline />
-              </Link>
-              {/* Back to top on mobile */}
-              <button
-                type="button"
-                onClick={handleScrollTop}
-                className="flex items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1.5 text-xs font-medium text-mute shadow-xs transition hover:border-ink/30 hover:text-ink active:scale-95 sm:hidden"
-                aria-label="Back to top"
-              >
-                <ArrowUp size={13} />
-                <span>Top</span>
-              </button>
-            </div>
+            <Link href="/" className="inline-flex items-center transition hover:opacity-85" aria-label="AirPal Home">
+              <BrandMark compact={false} withTagline />
+            </Link>
 
             <p className="mt-3 max-w-md text-sm text-mute leading-relaxed">
               Life Made Easy. People, places, things and experiences — made easier.
             </p>
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
-              {/* Status Indicator */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-line/80 bg-card px-3 py-1 text-xs font-medium text-mute">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-                </span>
-                <span>All Systems Operational</span>
-              </div>
-
-              {/* Platform & Version badge */}
-              <button
-                type="button"
-                onClick={openDebugOverlay}
-                title="View client diagnostics and build info"
-                className="inline-flex items-center gap-1.5 rounded-full border border-line/80 bg-card px-3 py-1 text-xs text-mute transition hover:border-brand/40 hover:text-ink active:scale-95 cursor-pointer select-none"
-              >
+              {/* Platform badge (display only — build version below opens diagnostics) */}
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-ink/25 bg-card px-3 py-1 text-xs text-mute select-none">
                 {isNative ? (
                   <>
                     <Smartphone size={12} className="text-gold" />
-                    <span className="capitalize">{platform === "ios" ? "iOS App" : "Android App"} · v{buildInfo.versionName}</span>
+                    <span className="capitalize">{platform === "ios" ? "iOS App" : "Android App"}</span>
                   </>
                 ) : (
                   <>
                     <Globe size={12} className="text-gold" />
-                    <span>Web · v{buildInfo.versionName}</span>
+                    <span>Web</span>
                   </>
                 )}
-              </button>
+              </span>
             </div>
           </div>
 
@@ -174,6 +148,8 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
               © {new Date().getFullYear()} {LEGAL.brand}
             </span>
             <span>·</span>
+            <span className="text-mute/80">{LEGAL.location}</span>
+            <span>·</span>
             <button
               type="button"
               onClick={openDebugOverlay}
@@ -184,19 +160,15 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
             </button>
           </div>
 
-          <div className="flex items-center gap-4">
-            <span className="text-mute/80">{LEGAL.location}</span>
-            {/* Desktop Back to top */}
-            <button
-              type="button"
-              onClick={handleScrollTop}
-              className="hidden items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1 text-xs font-medium text-mute shadow-xs transition hover:border-ink/30 hover:text-ink active:scale-95 sm:flex"
-              aria-label="Back to top"
-            >
-              <ArrowUp size={12} />
-              <span>Back to top</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleScrollTop}
+            className="flex items-center gap-1.5 rounded-full border border-ink/25 bg-card px-3 py-1 text-xs font-medium text-mute shadow-xs transition hover:border-ink hover:text-ink active:scale-95"
+            aria-label="Back to top"
+          >
+            <ArrowUp size={12} />
+            <span>Back to top</span>
+          </button>
         </div>
       </div>
     </footer>

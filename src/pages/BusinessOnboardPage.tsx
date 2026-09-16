@@ -228,7 +228,7 @@ export function BusinessOnboardPage() {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Harbour View Hotel…"
-                    className="w-full rounded-xl border border-line bg-paper py-2.5 pl-9 pr-3 text-sm outline-none placeholder:text-mute focus:border-brand"
+                    className="w-full rounded-xl border border-ink bg-paper py-2.5 pl-9 pr-3 text-sm outline-none placeholder:text-mute focus:border-brand"
                   />
                 </span>
               </label>

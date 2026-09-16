@@ -293,7 +293,7 @@ export function ConciergePage() {
           onChange={(e) => setTicket(e.target.value)}
           placeholder="Towels, extra pillow, AC…"
           aria-label="Describe your request for the front desk"
-          className="h-28 w-full rounded-2xl bg-paper p-3 text-[15px] outline-none ring-1 ring-line transition focus:ring-2 focus:ring-brand"
+          className="h-28 w-full rounded-2xl bg-paper p-3 text-[15px] outline-none border border-ink transition focus:ring-2 focus:ring-brand focus:border-brand"
         />
         <div className="mt-3 grid grid-cols-3 gap-2">
           {["Towels", "Clean", "Late checkout", "Extra night", "Room move", "Early check-in"].map((quick) => {

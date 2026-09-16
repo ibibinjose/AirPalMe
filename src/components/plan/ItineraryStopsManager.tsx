@@ -458,7 +458,7 @@ export function ItineraryStopsManager({
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       placeholder="Venue / stop name"
-                      className="h-10 flex-1 rounded-2xl bg-paper px-3.5 text-xs sm:text-sm font-medium text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+                      className="h-10 flex-1 rounded-2xl bg-paper px-3.5 text-xs sm:text-sm font-medium text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                     />
 
                     <div className="flex items-center gap-1.5 rounded-2xl bg-paper px-3 h-10 ring-1 ring-line shrink-0">
@@ -486,7 +486,7 @@ export function ItineraryStopsManager({
                         value={editAddress}
                         onChange={(e) => setEditAddress(e.target.value)}
                         placeholder="Address / Landmark (e.g. 100 George St, The Rocks)"
-                        className="h-9 w-full rounded-xl bg-paper pl-8 pr-3 text-xs text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+                        className="h-9 w-full rounded-xl bg-paper pl-8 pr-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                       />
                     </div>
                     <div className="relative">
@@ -496,7 +496,7 @@ export function ItineraryStopsManager({
                         value={editNotes}
                         onChange={(e) => setEditNotes(e.target.value)}
                         placeholder="Host Notes (e.g. Table booked under Sarah)"
-                        className="h-9 w-full rounded-xl bg-paper pl-8 pr-3 text-xs text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+                        className="h-9 w-full rounded-xl bg-paper pl-8 pr-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                       />
                     </div>
                   </div>
@@ -742,7 +742,7 @@ export function ItineraryStopsManager({
                   handleAddSubmit();
                 }
               }}
-              className="h-11 flex-1 rounded-2xl bg-paper px-3.5 text-xs sm:text-sm font-medium ring-1 ring-line outline-none focus:ring-2 focus:ring-brand text-ink"
+              className="h-11 flex-1 rounded-2xl bg-paper px-3.5 text-xs sm:text-sm font-medium border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
             />
 
             <div className="flex items-center gap-2">
@@ -803,7 +803,7 @@ export function ItineraryStopsManager({
                   value={newAddress}
                   onChange={(e) => setNewAddress(e.target.value)}
                   placeholder="Address / Landmark (e.g. 1 Macquarie St, Sydney)"
-                  className="h-10 w-full rounded-xl bg-paper pl-9 pr-3 text-xs text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+                  className="h-10 w-full rounded-xl bg-paper pl-9 pr-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                 />
               </div>
               <div className="relative">
@@ -813,7 +813,7 @@ export function ItineraryStopsManager({
                   value={newNotes}
                   onChange={(e) => setNewNotes(e.target.value)}
                   placeholder="Host Notes (e.g. Meet in lobby, dress code smart casual)"
-                  className="h-10 w-full rounded-xl bg-paper pl-9 pr-3 text-xs text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+                  className="h-10 w-full rounded-xl bg-paper pl-9 pr-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                 />
               </div>
             </div>

@@ -193,7 +193,7 @@ export function ScanPage() {
           value={manualCode}
           onChange={(e) => setManualCode(e.target.value)}
           placeholder="Enter room # (e.g. 101), invite code, or @handle..."
-          className="h-11 flex-1 rounded-2xl bg-card px-4 text-xs md:text-sm font-medium text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-brand placeholder:text-mute"
+          className="h-11 flex-1 rounded-2xl bg-card px-4 text-xs md:text-sm font-medium text-ink border border-ink outline-none focus:ring-2 focus:ring-brand placeholder:text-mute focus:border-brand"
         />
         <button
           type="submit"

@@ -102,7 +102,7 @@ export function CampaignInboxAdmin() {
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="Team note (terms agreed, launch plan…)"
-                    className="mt-2 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
+                    className="mt-2 w-full rounded-xl border border-ink bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
                   />
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {(["live", "completed", "cancelled"] as CampaignStatus[])

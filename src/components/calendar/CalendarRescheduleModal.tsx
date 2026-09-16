@@ -257,7 +257,7 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full rounded-xl bg-paper px-3 py-2 text-xs text-ink ring-1 ring-line/80 outline-none focus:ring-2 focus:ring-brand"
+              className="w-full rounded-xl bg-paper px-3 py-2 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
             />
           </div>
 

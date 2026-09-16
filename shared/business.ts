@@ -22,6 +22,12 @@ export function placeCategoryFor(id: string): PlaceCategory {
   return (hit?.place || "eat") as PlaceCategory;
 }
 
+/** Reverse map: a place category → the listing category that shelves it. */
+export function businessCategoryForPlace(place: string): BusinessCategoryId {
+  const hit = BUSINESS_CATEGORIES.find((c) => c.place === place);
+  return (hit?.id || "things") as BusinessCategoryId;
+}
+
 export type BusinessListing = {
   id: string;
   placeId: string;

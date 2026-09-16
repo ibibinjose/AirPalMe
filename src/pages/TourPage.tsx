@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useRoute } from "wouter";
-import { Share2 } from "lucide-react";
+import { useLocation, useRoute } from "wouter";
+import { ArrowLeft, Share2 } from "lucide-react";
 import { getTour } from "@/lib/catalog";
 import { fetchTours } from "@/lib/tours-store";
 import { shareTour } from "@/lib/share";
@@ -31,11 +31,20 @@ export function TourPage() {
     if (!checked) return <div className="mx-auto max-w-lg px-4 py-16 text-center text-sm text-mute">Loading…</div>;
     return <NotFoundPage />;
   }
+  const [, nav] = useLocation();
   const [step, setStep] = useState(0);
   const stop = tour.stops[step];
   return (
     <div className="mx-auto max-w-lg px-4 pb-10">
-      <div className="flex items-center justify-between pt-4">
+      <div className="flex items-center gap-3 pt-4">
+        <button
+          type="button"
+          onClick={() => nav("/guide")}
+          aria-label="Back to all walks"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-card transition hover:border-brand active:scale-95"
+        >
+          <ArrowLeft size={16} />
+        </button>
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-gold">
           {step + 1} / {tour.stops.length} · {tour.duration}
         </p>
@@ -45,7 +54,7 @@ export function TourPage() {
             void trackFeatureEngagement("guide", "share_tour", { tourId: tour.id, title: tour.title });
             void shareTour({ id: tour.id, title: tour.title, duration: tour.duration });
           }}
-          className="inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-xs font-medium text-ink ring-1 ring-line hover:bg-paper hover:ring-brand/40 transition active:scale-95 cursor-pointer shadow-xs"
+          className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-xs font-medium text-ink ring-1 ring-line hover:bg-paper hover:ring-brand/40 transition active:scale-95 cursor-pointer shadow-xs"
           title={`Share "${tour.title}" walk`}
           aria-label={`Share "${tour.title}" walk`}
         >

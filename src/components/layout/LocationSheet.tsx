@@ -223,7 +223,7 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search cities (e.g. Sydney, Melbourne, Gold Coast)..."
-                className="h-10 w-full rounded-2xl bg-paper pl-9 pr-8 text-xs text-ink placeholder:text-mute ring-1 ring-line outline-none transition focus:bg-card focus:ring-brand"
+                className="h-10 w-full rounded-2xl bg-paper pl-9 pr-8 text-xs text-ink placeholder:text-mute border border-ink outline-none transition focus:bg-card focus:ring-brand focus:border-brand"
               />
               {search && (
                 <button

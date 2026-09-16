@@ -101,7 +101,7 @@ export function EmojiRate({ target, eventId, stallId, stallName, propertyId }: P
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="A line for the host"
-            className="mt-3 h-11 w-full rounded-full bg-paper px-4 text-[15px] outline-none ring-1 ring-line"
+            className="mt-3 h-11 w-full rounded-full bg-paper px-4 text-[15px] outline-none border border-ink focus:border-brand"
           />
           <Button className="mt-3 w-full" disabled={!mood} onClick={() => void send()}>
             Send

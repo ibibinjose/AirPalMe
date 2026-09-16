@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import { BIO_CATALOG_KINDS, BIO_CATALOG_MAX, type BioCatalogItem, type BioCatalogKind } from "@shared/bio";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
+import { fieldInput } from "@/components/forms/ValidField";
 
 export function BioCatalogEditor({
   products,
@@ -61,18 +62,18 @@ export function BioCatalogEditor({
         ))}
       </div>
       <form className="space-y-2" onSubmit={add}>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" required className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
-        <input value={detail} onChange={(e) => setDetail(e.target.value)} placeholder="Short line" className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
+        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" required className={fieldInput} />
+        <input value={detail} onChange={(e) => setDetail(e.target.value)} placeholder="Short line" className={fieldInput} />
         <div className="grid grid-cols-2 gap-2">
-          <input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" className="h-12 rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
+          <input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" className={`h-12 ${fieldInput}`} />
           {kind === "deal" ? (
-            <input value={badge} onChange={(e) => setBadge(e.target.value)} placeholder="Badge" className="h-12 rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
+            <input value={badge} onChange={(e) => setBadge(e.target.value)} placeholder="Badge" className={`h-12 ${fieldInput}`} />
           ) : (
-            <input value={href} onChange={(e) => setHref(e.target.value)} placeholder="Link" className="h-12 rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
+            <input value={href} onChange={(e) => setHref(e.target.value)} placeholder="Link" className={`h-12 ${fieldInput}`} />
           )}
         </div>
         {kind === "deal" && (
-          <input value={href} onChange={(e) => setHref(e.target.value)} placeholder="Link" className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
+          <input value={href} onChange={(e) => setHref(e.target.value)} placeholder="Link" className={fieldInput} />
         )}
         <Button type="submit" className="w-full" disabled={rows.length >= BIO_CATALOG_MAX}>
           Add {kind}

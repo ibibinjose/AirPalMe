@@ -150,7 +150,7 @@ export function PlanRsvpSheet({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Alex or Jordan"
-                className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+                className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
               />
             </div>
           </div>
@@ -163,7 +163,7 @@ export function PlanRsvpSheet({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. Bringing drinks, arriving by 7pm!"
-              className="h-11 w-full rounded-2xl bg-paper px-4 text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+              className="h-11 w-full rounded-2xl bg-paper px-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
             />
           </div>
 

@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { LEGAL } from "@/lib/legal";
+import { fieldInput, fieldTextarea } from "@/components/forms/ValidField";
 
 const TOPICS = [
   { id: "general", label: "General" },
@@ -56,7 +57,7 @@ export function ContactPage() {
             onChange={(e) => setName(e.target.value)}
             placeholder="Name"
             required
-            className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none"
+            className={fieldInput}
           />
           <input
             type="email"
@@ -67,7 +68,7 @@ export function ContactPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
             required
-            className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none"
+            className={fieldInput}
           />
           <div className="flex flex-wrap gap-2">
             {TOPICS.map((t) => (
@@ -86,7 +87,7 @@ export function ContactPage() {
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Message"
             required
-            className="h-36 w-full rounded-2xl bg-card p-4 ring-1 ring-line outline-none"
+            className={`h-36 ${fieldTextarea}`}
           />
           <Button type="submit" className="w-full">
             Open email

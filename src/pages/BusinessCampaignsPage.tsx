@@ -17,7 +17,7 @@ import {
 } from "@shared/campaign";
 
 const inputCls =
-  "mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm outline-none placeholder:text-mute focus:border-brand";
+  "mt-1 w-full rounded-xl border border-ink bg-paper px-3 py-2.5 text-sm outline-none placeholder:text-mute focus:border-brand";
 
 interface RsvpRow {
   id: string;

@@ -16,7 +16,7 @@ import { tonightCalendarEvents } from "@/lib/remote-events";
 import { useEvents } from "@/contexts/EventsContext";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { noteQrContext, track } from "@/lib/analytics";
-import { Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 
 export function MarkerPage() {
   const [path, nav] = useLocation();
@@ -98,9 +98,24 @@ export function MarkerPage() {
     );
   }
 
+  function goBack() {
+    if (window.history.length > 1) window.history.back();
+    else nav("/");
+  }
+
   return (
     <div className="mx-auto max-w-lg px-4 pb-10">
-      <p className="pt-3 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">{marker?.city || PRECINCT.name}</p>
+      <div className="flex items-center gap-3 pt-3">
+        <button
+          type="button"
+          onClick={goBack}
+          aria-label="Go back"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-card transition hover:border-brand active:scale-95"
+        >
+          <ArrowLeft size={16} />
+        </button>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">{marker?.city || PRECINCT.name}</p>
+      </div>
       <h1 className="font-display mt-1 text-3xl font-semibold">{marker?.label || "Nearby"}</h1>
       <div className="mt-4">
         <FilterChips value={chip} onChange={setChip} />

@@ -8,13 +8,14 @@ import {
   THE_ROCKS_EVENTS,
 } from "@shared/the-rocks-data";
 import { SEED_BIO } from "@shared/bio";
+import { KERALA_PLACES } from "@shared/kerala-data";
 import { SEED_EVENT, SEED_STALLS } from "@shared/event";
 import { WALKING_TOURS } from "@shared/tours";
 import { HARBOUR_COLLEGE } from "@shared/campus";
 import { THE_ROCKS_ZOO } from "@shared/zoo";
 import { listingDefaults, upsertCachedListing } from "./listings";
 import { cachePlaces, loadPlaces } from "./places-store";
-import { placeCategoryFor } from "@shared/business";
+import { businessCategoryForPlace, placeCategoryFor } from "@shared/business";
 import { persistBios, loadBios } from "./bio-store";
 import { upsertStoredMarker } from "./markers-store";
 import { cacheTours } from "./tours-store";
@@ -104,13 +105,13 @@ export async function seedDatabase(): Promise<SeedResult> {
       }
     }
 
-    // 1. Seed Listings & Places from The Rocks
-    for (const place of THE_ROCKS_PLACES) {
+    // 1. Seed Listings & Places from The Rocks + Kerala
+    for (const place of [...THE_ROCKS_PLACES, ...KERALA_PLACES]) {
       const listing = listingDefaults({
         id: `list-${place.id}`,
         placeId: place.id,
         name: place.name,
-        category: "eat",
+        category: businessCategoryForPlace(place.category),
         placeCategory: placeCategoryFor(place.category),
         address: place.address || "Local precinct",
         hours: place.hours || "See venue",
@@ -167,7 +168,7 @@ export async function seedDatabase(): Promise<SeedResult> {
     upsertCachedListing(cutBarListing);
     placesCount++;
     const byPlaceId = new Map(loadPlaces().map((p) => [p.id, p]));
-    for (const place of THE_ROCKS_PLACES) {
+    for (const place of [...THE_ROCKS_PLACES, ...KERALA_PLACES]) {
       if (place.status === "active") byPlaceId.set(place.id, place);
     }
     cachePlaces(Array.from(byPlaceId.values()));

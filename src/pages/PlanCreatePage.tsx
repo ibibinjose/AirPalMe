@@ -655,7 +655,7 @@ export function PlanCreatePage() {
                 setTitleTouched(true);
               }}
               placeholder="e.g. Friday Sunset Drinks in The Rocks"
-              className="h-11 w-full rounded-2xl bg-paper px-4 text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand font-medium text-ink"
+              className="h-11 w-full rounded-2xl bg-paper px-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand font-medium text-ink focus:border-brand"
             />
           </div>
 
@@ -709,7 +709,7 @@ export function PlanCreatePage() {
                   value={date}
                   min={todayStr}
                   onChange={(e) => setDate(e.target.value)}
-                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand text-ink"
+                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
                 />
               </div>
             </div>
@@ -723,7 +723,7 @@ export function PlanCreatePage() {
                   required
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand text-ink"
+                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
                 />
               </div>
             </div>
@@ -736,7 +736,7 @@ export function PlanCreatePage() {
                   type="time"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand text-ink"
+                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
                 />
               </div>
             </div>
@@ -781,7 +781,7 @@ export function PlanCreatePage() {
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
                 placeholder="e.g. The Rocks & Circular Quay, Sydney"
-                className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand text-ink"
+                className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
               />
             </div>
 
@@ -815,7 +815,7 @@ export function PlanCreatePage() {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="What should mates know? e.g. Dress code, meeting spot, bring swimmers, etc."
-              className="w-full rounded-2xl bg-paper p-3.5 text-xs md:text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand text-ink leading-relaxed"
+              className="w-full rounded-2xl bg-paper p-3.5 text-xs md:text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink leading-relaxed focus:border-brand"
             />
           </div>
         </div>
@@ -933,7 +933,7 @@ export function PlanCreatePage() {
               value={heroImage || ""}
               onChange={(e) => setHeroImage(e.target.value.trim() || undefined)}
               placeholder="Paste image URL (https://...)"
-              className="h-10 w-full rounded-2xl bg-paper px-3.5 text-xs ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+              className="h-10 w-full rounded-2xl bg-paper px-3.5 text-xs border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
             />
             <div className="mt-2.5">
               <ImageField

@@ -232,7 +232,7 @@ export function PlanEditPage() {
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="h-11 w-full rounded-2xl bg-paper px-4 text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand font-medium text-ink"
+              className="h-11 w-full rounded-2xl bg-paper px-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand font-medium text-ink focus:border-brand"
             />
           </div>
 
@@ -246,7 +246,7 @@ export function PlanEditPage() {
                   required
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand text-ink"
+                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
                 />
               </div>
             </div>
@@ -260,7 +260,7 @@ export function PlanEditPage() {
                   required
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand text-ink"
+                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
                 />
               </div>
             </div>
@@ -273,7 +273,7 @@ export function PlanEditPage() {
                   type="time"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand text-ink"
+                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
                 />
               </div>
             </div>
@@ -288,7 +288,7 @@ export function PlanEditPage() {
                 required
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
-                className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand text-ink"
+                className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
               />
             </div>
           </div>
@@ -299,7 +299,7 @@ export function PlanEditPage() {
               rows={3}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-2xl bg-paper p-3.5 text-xs md:text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand text-ink leading-relaxed"
+              className="w-full rounded-2xl bg-paper p-3.5 text-xs md:text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink leading-relaxed focus:border-brand"
             />
           </div>
         </div>

@@ -124,6 +124,21 @@ service cloud.firestore {
       }
     }
 
+    // App invites: one inviter per joiner (doc id = invitee uid).
+    // Both sides can read; only the invitee can create their own row.
+    match /referrals/{inviteeUid} {
+      allow get: if signedIn()
+        && (request.auth.uid == inviteeUid || resource.data.inviterUid == request.auth.uid);
+      allow list: if signedIn()
+        && (request.auth.uid == inviteeUid || resource.data.inviterUid == request.auth.uid);
+      allow create: if signedIn()
+        && request.auth.uid == inviteeUid
+        && request.resource.data.inviteeUid == inviteeUid
+        && request.resource.data.inviterUid is string
+        && request.resource.data.inviterUid != inviteeUid;
+      allow update, delete: if false;
+    }
+
     match /events/{eventId} {
       allow get, list: if resource.data.status in ['live', 'ended']
         || (signedIn() && resource.data.organiserUid == request.auth.uid)

@@ -20,7 +20,13 @@ export function PlaceCard({
   const [, nav] = useLocation();
   const { t } = useLocale();
   const local = useOptionalLocalNow();
-  const img = place.heroImage || place.photos?.[0] || "/media/harbour.jpg";
+  // Harbour fallback is Sydney stock only — other cities render a clean ink
+  // card rather than the wrong city's photo.
+  const precinct = (place.precinctId || "").toLowerCase();
+  const img =
+    place.heroImage ||
+    place.photos?.[0] ||
+    (precinct === "the-rocks" || precinct === "local" || !precinct ? "/media/harbour.jpg" : undefined);
   const handle = handleOfPlace(place);
   const hoursFresh = freshnessOf(place.hoursVerifiedAt, "hours");
   const open = !hoursFresh.hideOpenNow && local ? isOpenAt(place.hours, local.now, local.timeZone) : null;

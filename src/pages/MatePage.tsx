@@ -35,6 +35,8 @@ export function MatePage() {
   const { user } = useAuth();
   const [, nav] = useLocation();
   const [requests, setRequests] = useState<MateRequest[] | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [assigned, setAssigned] = useState<MateRequest[]>([]);
   const [openJobs, setOpenJobs] = useState<MateRequest[]>([]);
   const [publicMates, setPublicMates] = useState<PublicMate[]>([]);
@@ -117,6 +119,7 @@ export function MatePage() {
       setRequests(null);
       return;
     }
+    setLoadError(false);
     void Promise.all([
       getDocs(
         query(collection(db, "mate_requests"), where("ownerUid", "==", user.uid), orderBy("createdAt", "desc"), limit(5)),
@@ -152,8 +155,9 @@ export function MatePage() {
         setOpenJobs([]);
         setPublicMates([]);
         setIsApprovedMate(false);
+        setLoadError(true);
       });
-  }, [user]);
+  }, [user, reloadKey]);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
@@ -233,7 +237,7 @@ export function MatePage() {
                         onChange={(e) => setReviewText(e.target.value)}
                         placeholder="How was it? (optional)"
                         maxLength={500}
-                        className="mt-2 w-full rounded-lg border border-line bg-card px-2.5 py-1.5 text-[13px] outline-none"
+                        className="mt-2 w-full rounded-lg border border-ink bg-card px-2.5 py-1.5 text-[13px] outline-none focus:border-brand"
                       />
                       <span className="mt-2 flex gap-1.5">
                         <Button size="sm" disabled={savingReview} loading={savingReview} onClick={() => void saveReview(r, true)}>
@@ -290,7 +294,21 @@ export function MatePage() {
 
       {user && <BookingsSection />}
 
-      {user && requests !== null && (
+      {user && loadError && (
+        <div className="mt-6 rounded-2xl border-2 border-ink bg-card p-4 text-center">
+          <p className="text-sm font-semibold">Couldn’t load Mate requests</p>
+          <p className="mt-1 text-[13px] text-mute">Check your connection and try again.</p>
+          <button
+            type="button"
+            onClick={() => setReloadKey((k) => k + 1)}
+            className="mt-3 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {user && requests !== null && !loadError && (
         <section className="mt-6 rounded-2xl border border-line bg-card p-4">
           <h2 className="font-display text-base font-bold">Your requests</h2>
           {!isFirebaseConfigured || requests.length === 0 ? (
@@ -377,7 +395,7 @@ export function MatePage() {
                           onChange={(e) => setReviewText(e.target.value)}
                           placeholder="How was it? (optional)"
                           maxLength={500}
-                          className="mt-2 w-full rounded-lg border border-line bg-card px-2.5 py-1.5 text-[13px] outline-none placeholder:text-mute focus:border-brand"
+                          className="mt-2 w-full rounded-lg border border-ink bg-card px-2.5 py-1.5 text-[13px] outline-none placeholder:text-mute focus:border-brand"
                         />
                         <span className="mt-2 flex gap-1.5">
                           <Button size="sm" disabled={savingReview} loading={savingReview} onClick={() => void saveReview(r, false)}>

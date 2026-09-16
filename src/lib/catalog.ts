@@ -11,6 +11,7 @@ import {
   type PlaceCategory,
 } from "@shared/nearby";
 import { haversineMeters, walkLabel } from "./geo";
+import { CITY_RADIUS_KM, knownCityCenter } from "./cities";
 import { listedPlaces } from "./listings";
 import { getStoredMarker } from "./markers-store";
 import { loadPlaces } from "./places-store";
@@ -19,17 +20,58 @@ import { loadTours } from "./tours-store";
 export const PRECINCT = THE_ROCKS_PRECINCT;
 
 /**
- * Walks for the guest's city from live `tours` docs. No city match returns
- * every tour (labelled by city) instead of silently substituting another
- * precinct's walks. Empty DB → empty list.
+ * Walks for the guest's city from live `tours` docs. A named city with no
+ * match returns [] (honest empty) instead of another precinct's walks.
+ * Empty city returns every tour, labelled by city (used by global search).
+ * Empty DB → empty list.
  */
 export function toursForPrecinct(city = PRECINCT.city, pool: WalkingTour[] = loadTours()) {
   const key = city.trim().toLowerCase();
-  const hits = pool.filter((t) => {
+  if (!key) return pool;
+  return pool.filter((t) => {
     const tc = (t.city || "").trim().toLowerCase();
     return tc === key || key.includes(tc) || tc.includes(key);
   });
-  return hits.length ? hits : pool;
+}
+
+function cityKey(value?: string): string {
+  return (value || "").trim().toLowerCase();
+}
+
+function isSydneyKey(key: string): boolean {
+  return !key || key.includes("sydney") || key.includes("rock");
+}
+
+/**
+ * Places for the guest's city. Place geography is precinct + geo (rows carry
+ * no city name): Sydney shows the bundled Rocks stock (precinct the-rocks,
+ * local, or legacy empty); any other known city shows rows within 60 km of
+ * its center; unknown cities show non-Sydney stock only. Melbourne never
+ * renders The Rocks.
+ */
+export function placesInCity<T extends { precinctId?: string; geo?: { lat: number; lng: number } }>(
+  rows: T[],
+  city?: string,
+): T[] {
+  const key = cityKey(city);
+  if (isSydneyKey(key)) {
+    return rows.filter((p) => {
+      const precinct = cityKey(p.precinctId);
+      return !precinct || precinct === "local" || precinct === "the-rocks";
+    });
+  }
+  const center = knownCityCenter(city);
+  if (!center) {
+    return rows.filter((p) => {
+      const precinct = cityKey(p.precinctId);
+      return Boolean(precinct) && precinct !== "local" && precinct !== "the-rocks";
+    });
+  }
+  const maxMeters = CITY_RADIUS_KM * 1000;
+  return rows.filter((p) => {
+    if (!p.geo || !Number.isFinite(p.geo.lat) || !Number.isFinite(p.geo.lng)) return false;
+    return haversineMeters(center, p.geo) <= maxMeters;
+  });
 }
 
 export const STAY = CURRENT_PROPERTY;
@@ -122,10 +164,12 @@ function discoverRank(place: NearbyPlace) {
   return 3;
 }
 
-/** Nearby for Discover: no car parks first, deals and food lead. */
-export function discoverPlaces(from: Geo = originFor()) {
-  return activePlaces()
-    .filter((p) => p.category !== "parking" && p.category !== "facilities")
+/** Nearby for Discover: no car parks first, deals and food lead. Pass the guest's city to keep other cities honest. */
+export function discoverPlaces(from: Geo = originFor(), city?: string) {
+  return placesInCity(
+    activePlaces().filter((p) => p.category !== "parking" && p.category !== "facilities"),
+    city,
+  )
     .map((p) => withWalk(p, from))
     .sort((a, b) => {
       const rank = discoverRank(a) - discoverRank(b);
@@ -133,8 +177,8 @@ export function discoverPlaces(from: Geo = originFor()) {
     });
 }
 
-export function featuredPlaces(from: Geo = originFor()) {
-  return discoverPlaces(from)
+export function featuredPlaces(from: Geo = originFor(), city?: string) {
+  return discoverPlaces(from, city)
     .filter((p) => p.deal || p.verifiedPartner || p.category === "eat")
     .slice(0, 8);
 }

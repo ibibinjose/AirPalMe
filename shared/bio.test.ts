@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BIO_CATALOG_MAX, BIO_PUBLIC_PATH, bioButtonLabel, catalogDeals, handleFromDomain, handleFromName, handleFromPlaceId, handleError, handleMatchesClaim, isHexHandle, isSafeBioHref, isSocialLinkType, normalizeHandle, parseAtHandle, randomHexHandle, sanitizeBioHref, sanitizeCatalog, socialLinks, stackLinks } from "./bio";
+import { BIO_CATALOG_MAX, BIO_PUBLIC_PATH, bioButtonLabel, bioKindLabel, catalogDeals, handleFromDomain, handleFromName, handleFromPlaceId, handleError, handleMatchesClaim, isBusinessKind, isHexHandle, isSafeBioHref, isSocialLinkType, normalizeHandle, parseAtHandle, randomHexHandle, sanitizeBioHref, sanitizeCatalog, socialLinks, stackLinks } from "./bio";
 
 describe("bio handle", () => {
   it("normalizes and validates", () => {
@@ -109,5 +109,20 @@ describe("bio href allowlist", () => {
     expect(rows[0]?.href).toBe("https://thecut.bar");
     expect(rows[1]?.href).toBeUndefined();
     expect(sanitizeBioHref("data:text/html,x")).toBeUndefined();
+  });
+});
+
+describe("profile kind identifier", () => {
+  it("labels businesses and individuals", () => {
+    expect(bioKindLabel("business")).toBe("Business");
+    expect(bioKindLabel("person")).toBe("Individual");
+    expect(bioKindLabel(undefined)).toBe("Individual");
+    expect(bioKindLabel(null)).toBe("Individual");
+  });
+
+  it("detects business kind only for exact match", () => {
+    expect(isBusinessKind("business")).toBe(true);
+    expect(isBusinessKind("person")).toBe(false);
+    expect(isBusinessKind(undefined)).toBe(false);
   });
 });

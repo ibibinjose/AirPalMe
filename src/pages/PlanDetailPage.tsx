@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Link, useRoute, useLocation, useSearch } from "wouter";
 import {
   ArrowLeft,
@@ -41,6 +41,7 @@ import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { EXPERIENCE_CATEGORIES, type HangoutPlan } from "@shared/plan";
 import { exportPlanItineraryPdf } from "@/lib/plan-pdf";
 import { NotFoundPage } from "./NotFoundPage";
+import { localTodayStr, shouldAutoOpenInviteRsvp } from "@/lib/plan-invite";
 import { trackContentAction } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 
@@ -93,6 +94,8 @@ export function PlanDetailPage() {
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
+  const autoRsvpShown = useRef(false);
+  const arrivedViaInvite = Boolean(paramsInvite?.code);
 
   const isHost = useMemo(() => {
     if (!plan || !user) return false;
@@ -104,6 +107,26 @@ export function PlanDetailPage() {
     const anonId = typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null;
     return plan.attendees.find((a) => (user?.uid && a.id === user.uid) || (anonId && a.id === anonId));
   }, [plan, user]);
+
+  // Invite-link arrival: open the RSVP sheet automatically (once) for guests
+  // who haven't joined yet — the link does the inviting, one tap completes it.
+  useEffect(() => {
+    if (autoRsvpShown.current) return;
+    if (
+      shouldAutoOpenInviteRsvp({
+        arrivedViaInvite,
+        planLoaded: !loading && Boolean(plan),
+        isHost,
+        alreadyAttendee: Boolean(userAttendee),
+        planDate: plan?.date || "",
+        planStatus: plan?.status || "",
+        todayStr: localTodayStr(),
+      })
+    ) {
+      autoRsvpShown.current = true;
+      setRsvpOpen(true);
+    }
+  }, [arrivedViaInvite, loading, plan, isHost, userAttendee]);
 
   const isSubscribed = useMemo(() => {
     if (!plan) return false;

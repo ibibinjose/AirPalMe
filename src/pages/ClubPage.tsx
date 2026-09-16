@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Photo } from "@/components/ui/Photo";
 import { useAuth } from "@/contexts/AuthContext";
 import { useClub } from "@/contexts/ClubContext";
+import { fieldInput } from "@/components/forms/ValidField";
 
 export function ClubPage() {
   const [, nav] = useLocation();
@@ -60,9 +61,9 @@ export function ClubPage() {
           </div>
         ) : (
           <form className="mt-6 space-y-3" onSubmit={onJoin}>
-            <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" autoCapitalize="words" placeholder="Name" required className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
-            <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
-            <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
+            <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" autoCapitalize="words" placeholder="Name" required className={fieldInput} />
+            <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className={fieldInput} />
+            <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" className={fieldInput} />
             <label className="flex items-center gap-3 text-sm">
               <input type="checkbox" checked={invites} onChange={(e) => setInvites(e.target.checked)} />
               Nights and guest-list invites

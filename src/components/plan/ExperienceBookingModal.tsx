@@ -393,7 +393,7 @@ export function ExperienceBookingModal({
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
                     placeholder="e.g. Sarah Jenkins"
-                    className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+                    className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                   />
                 </div>
                 <div>
@@ -404,7 +404,7 @@ export function ExperienceBookingModal({
                     value={guestEmail}
                     onChange={(e) => setGuestEmail(e.target.value)}
                     placeholder="sarah@example.com"
-                    className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+                    className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                   />
                 </div>
               </div>
@@ -416,7 +416,7 @@ export function ExperienceBookingModal({
                   value={specialRequests}
                   onChange={(e) => setSpecialRequests(e.target.value)}
                   placeholder="e.g. Vegetarian, surf beginner, celebration arrival"
-                  className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+                  className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                 />
               </div>
             </div>

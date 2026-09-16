@@ -293,7 +293,7 @@ export function BioCatchUpModal({
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="h-11 w-full rounded-2xl bg-card pl-9 pr-3 text-xs font-semibold text-ink ring-1 ring-line outline-none focus:ring-brand"
+                  className="h-11 w-full rounded-2xl bg-card pl-9 pr-3 text-xs font-semibold text-ink border border-ink outline-none focus:ring-brand focus:border-brand"
                 />
               </div>
               <div className="flex gap-1.5 mt-1.5">
@@ -331,7 +331,7 @@ export function BioCatchUpModal({
                   type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="h-11 w-full rounded-2xl bg-card pl-9 pr-3 text-xs font-semibold text-ink ring-1 ring-line outline-none focus:ring-brand"
+                  className="h-11 w-full rounded-2xl bg-card pl-9 pr-3 text-xs font-semibold text-ink border border-ink outline-none focus:ring-brand focus:border-brand"
                 />
               </div>
               <div className="flex gap-1.5 mt-1.5">
@@ -372,7 +372,7 @@ export function BioCatchUpModal({
                 value={venue}
                 onChange={(e) => setVenue(e.target.value)}
                 placeholder="e.g. The Rocks Café, Sydney"
-                className="h-11 w-full rounded-2xl bg-card pl-9 pr-3 text-xs font-semibold text-ink ring-1 ring-line outline-none focus:ring-brand"
+                className="h-11 w-full rounded-2xl bg-card pl-9 pr-3 text-xs font-semibold text-ink border border-ink outline-none focus:ring-brand focus:border-brand"
               />
             </div>
           </div>
@@ -389,7 +389,7 @@ export function BioCatchUpModal({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder={`e.g. Looking forward to chatting about upcoming collabs!`}
-                className="w-full rounded-2xl bg-card pl-9 pr-3 py-2.5 text-xs text-ink ring-1 ring-line outline-none focus:ring-brand resize-none"
+                className="w-full rounded-2xl bg-card pl-9 pr-3 py-2.5 text-xs text-ink border border-ink outline-none focus:ring-brand resize-none focus:border-brand"
               />
             </div>
           </div>

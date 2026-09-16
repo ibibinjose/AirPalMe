@@ -35,7 +35,7 @@ export function CalendarAgendaView({ events, onSelectEvent, onResetFilters, onSe
 
   if (groups.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-3xl bg-card p-10 text-center ring-1 ring-line/80">
+      <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-ink bg-card p-10 text-center">
         <div className="grid h-14 w-14 place-items-center rounded-full bg-paper text-mute">
           <CalendarDays size={26} />
         </div>
@@ -99,7 +99,7 @@ export function CalendarAgendaView({ events, onSelectEvent, onResetFilters, onSe
             }}
           >
             {/* Date section header */}
-            <div className="z-20 mb-3.5 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-paper/95 px-4 py-2.5 backdrop-blur-md ring-1 ring-line/60">
+            <div className="z-20 mb-3.5 flex flex-wrap items-center justify-between gap-2 rounded-2xl border-2 border-ink bg-paper/95 px-4 py-2.5 shadow-xs backdrop-blur-md">
               <div className="flex flex-wrap items-center gap-2">
                 <span
                   className={cn(

@@ -3,9 +3,9 @@ import { useLocation, useRoute } from "wouter";
 import { useStay } from "@/contexts/StayContext";
 import { fetchCampus, loadCampus, type CampusDoc } from "@/lib/campus-store";
 import { Sheet } from "@/components/ui/Sheet";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PageLoading } from "@/components/ui/PageLoading";
-import { toast } from "sonner";
 import { noteQrContext, trackContentAction } from "@/lib/analytics";
 
 export function CampusPage() {
@@ -47,7 +47,20 @@ export function CampusPage() {
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-10">
-      <p className="pt-3 text-[11px] uppercase tracking-[0.16em] text-gold">{CAMPUS.university}</p>
+      <div className="flex items-center gap-3 pt-3">
+        <button
+          type="button"
+          onClick={() => {
+            if (window.history.length > 1) window.history.back();
+            else nav("/");
+          }}
+          aria-label="Go back"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-card transition hover:border-brand active:scale-95"
+        >
+          <ArrowLeft size={16} />
+        </button>
+        <p className="text-[11px] uppercase tracking-[0.16em] text-gold">{CAMPUS.university}</p>
+      </div>
       <h1 className="font-display mt-1 text-3xl font-semibold">{CAMPUS.name}</h1>
       <div className="mt-4 flex gap-2">
         {(["today", "campus", "help"] as const).map((t) => (
@@ -73,6 +86,11 @@ export function CampusPage() {
           ))}
         </ul>
       )}
+      {tab === "today" && (CAMPUS.classes || []).length === 0 && (
+        <p className="mt-5 rounded-2xl border-2 border-dashed border-line px-4 py-6 text-center text-sm text-mute">
+          No classes listed for today — check the campus noticeboard.
+        </p>
+      )}
 
       {tab === "campus" && (
         <ul className="mt-5 space-y-2">
@@ -94,6 +112,11 @@ export function CampusPage() {
           ))}
         </ul>
       )}
+      {tab === "campus" && (CAMPUS.places || []).length === 0 && (CAMPUS.events || []).length === 0 && (
+        <p className="mt-5 rounded-2xl border-2 border-dashed border-line px-4 py-6 text-center text-sm text-mute">
+          Nothing listed around campus yet — check back soon.
+        </p>
+      )}
 
       {tab === "help" && (
         <div className="mt-5 space-y-3">
@@ -111,13 +134,14 @@ export function CampusPage() {
               Security
             </a>
           )}
-          <Button
-            variant="ghost"
-            className="w-full"
-            onClick={() => toast.success("Sent")}
-          >
-            Request
-          </Button>
+          {CAMPUS.phone && (
+            <a
+              href={`tel:${CAMPUS.phone}`}
+              className="flex h-12 items-center justify-center rounded-2xl border-2 border-ink bg-card text-sm font-semibold"
+            >
+              Call campus office
+            </a>
+          )}
         </div>
       )}
 

@@ -85,9 +85,10 @@ export function PlanHubPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:py-10 pb-28">
-      <div className="flex flex-col gap-4 border-b border-line/60 pb-6 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 border-b-2 border-ink pb-6 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-ink">Plans</h1>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Make plans</p>
+          <h1 className="font-display mt-1 text-3xl md:text-4xl font-bold text-ink">Plans</h1>
           <p className="text-sm text-mute mt-1">Hangouts with your crew — create one or join a public plan.</p>
         </div>
         <Button onClick={() => nav("/plan/new")} className="h-11 shrink-0 gap-2 self-start rounded-full px-5 md:self-auto">
@@ -97,7 +98,7 @@ export function PlanHubPage() {
       </div>
 
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex rounded-full bg-paper p-1 ring-1 ring-line" role="tablist">
+        <div className="flex rounded-full border-2 border-ink bg-paper p-1" role="tablist">
           {tabs.map((t) => (
             <button
               key={t.id}
@@ -125,7 +126,7 @@ export function PlanHubPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search plans or places…"
             aria-label="Search plans"
-            className="h-10 w-full rounded-full bg-card pl-10 pr-4 text-sm text-ink ring-1 ring-line outline-none placeholder:text-mute focus:border-brand"
+            className="h-10 w-full rounded-full bg-card pl-10 pr-4 text-sm text-ink border border-ink outline-none placeholder:text-mute focus:border-brand"
           />
         </div>
       </div>
@@ -138,8 +139,10 @@ export function PlanHubPage() {
             onClick={() => setCategory(c.id)}
             aria-pressed={category === c.id}
             className={cn(
-              "shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium ring-1 transition",
-              category === c.id ? "bg-ink text-white ring-ink" : "bg-paper text-mute ring-line hover:text-ink",
+              "shrink-0 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition",
+              category === c.id
+                ? "border-ink bg-ink text-white"
+                : "border-ink/30 bg-paper text-mute hover:border-ink hover:text-ink",
             )}
           >
             {c.label}
@@ -149,7 +152,7 @@ export function PlanHubPage() {
 
       <div className="mt-5">
         {displayedPlans.length === 0 ? (
-          <div className="rounded-3xl bg-card p-8 md:p-12 text-center ring-1 ring-line">
+          <div className="rounded-3xl border-2 border-ink bg-card p-8 md:p-12 text-center">
             <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-brand/10 text-brand">
               <Compass size={32} />
             </div>
@@ -167,7 +170,7 @@ export function PlanHubPage() {
                 <span>Create a plan</span>
               </Button>
               {tab !== "public" && (
-                <Button variant="ghost" onClick={() => setTab("public")} className="h-11 rounded-full px-5 ring-1 ring-line">
+                <Button variant="ghost" onClick={() => setTab("public")} className="h-11 rounded-full border border-ink px-5">
                   <Radar size={15} className="text-brand" />
                   <span>Browse public</span>
                 </Button>

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { ZooSticker } from "@/components/zoo/ZooSticker";
 import { useAuth } from "@/contexts/AuthContext";
 import { useZoo } from "@/contexts/ZooContext";
+import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const TABS = ["stickers", "shops", "offers", "hunts"] as const;
@@ -33,7 +34,17 @@ export function ZooPage() {
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-10">
-      <p className="pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Air Zoo</p>
+      <div className="flex items-center gap-3 pt-4">
+        <button
+          type="button"
+          onClick={() => nav("/me")}
+          aria-label="Back to profile"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-card transition hover:border-brand active:scale-95"
+        >
+          <ArrowLeft size={16} />
+        </button>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Air Zoo</p>
+      </div>
       <h1 className="font-display mt-1 text-3xl font-semibold">Your Zoo</h1>
       <p className="mt-2 text-sm text-mute">
         {progress.label || (hunt ? `Scan a shop QR on the ${hunt.name}.` : "No hunts published yet — scan a shop QR to begin.")}

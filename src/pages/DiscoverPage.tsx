@@ -69,8 +69,9 @@ export function DiscoverPage() {
     return ids;
   }, [remoteNearby, calendarEvents, now, timeZone, city]);
   const live = useMemo(() => tonight.filter((e) => liveIds.has(e.id)), [tonight, liveIds]);
-  const nearby = useMemo(() => discoverPlaces(here), [here, version]);
-  const featured = useMemo(() => featuredPlaces(here), [here, version]);
+  const nearby = useMemo(() => discoverPlaces(here, city), [here, city, version]);
+  const featured = useMemo(() => featuredPlaces(here, city), [here, city, version]);
+  const isHomeCity = !city || /sydney|rock/i.test(city);
   const walks = toursForPrecinct(city).slice(0, 3);
   const center = here;
 
@@ -150,23 +151,29 @@ export function DiscoverPage() {
       )}
 
       <motion.div {...orchestrate} variants={landing}>
-        <motion.section variants={landingItem} className="relative mx-4 overflow-hidden rounded-[28px] md:mx-6">
-          <motion.div
-            className="h-[260px] w-full md:h-[440px]"
-            initial={play ? { scale: 1.1 } : false}
-            animate={{ scale: 1 }}
-            transition={{ duration: 1.45, ease: enterEase }}
-          >
-            <Photo src="/media/harbour.jpg" className="h-full w-full object-cover" priority />
-          </motion.div>
-          <div className="hero-scrim absolute inset-0" />
+        <motion.section variants={landingItem} className="relative mx-4 overflow-hidden rounded-[28px] bg-ink md:mx-6">
+          {isHomeCity ? (
+            <>
+              <motion.div
+                className="h-[260px] w-full md:h-[440px]"
+                initial={play ? { scale: 1.1 } : false}
+                animate={{ scale: 1 }}
+                transition={{ duration: 1.45, ease: enterEase }}
+              >
+                <Photo src="/media/harbour.jpg" className="h-full w-full object-cover" priority />
+              </motion.div>
+              <div className="hero-scrim absolute inset-0" />
+            </>
+          ) : (
+            <div aria-hidden className="h-[200px] w-full bg-ink md:h-[280px]" />
+          )}
           <div className="absolute inset-x-0 bottom-0 p-5 md:p-8">
             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">
               {city || PRECINCT.city}
               {source === "gps" ? " · near you" : ""}
             </p>
             <h1 className="font-display mt-1 text-4xl font-semibold text-white md:text-5xl">
-              {PRECINCT.name.split("&")[0].trim()}
+              {isHomeCity ? PRECINCT.name.split("&")[0].trim() : city}
             </h1>
             <p className="mt-1.5 max-w-md text-sm text-white/80">{t("homeLede")}</p>
             <label className="mt-3.5 flex h-11 w-full max-w-md items-center gap-2 rounded-full bg-white/95 px-3.5 text-ink shadow-sm">
@@ -347,6 +354,7 @@ export function DiscoverPage() {
           ) : shown.length === 0 ? (
             <EmptyState
               title={t("aroundEmpty")}
+              body={isHomeCity ? undefined : `No places listed in ${city} yet — venues appear here once local hosts publish them.`}
               action={() => nav("/scan")}
               actionLabel={t("scan")}
               secondary={() => nav("/guide")}

@@ -52,9 +52,9 @@ export function PlanCard({
     <Link
       href={`/plan/${plan.id}`}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-[28px] bg-card p-5 ring-1 ring-line shadow-xs transition-all duration-300",
-        "hover:shadow-lg hover:ring-brand/40 hover:-translate-y-0.5 active:scale-[0.99]",
-        plan.isExperience && "ring-amber-500/25 hover:ring-amber-500/50",
+        "group relative flex flex-col justify-between overflow-hidden rounded-[28px] border-2 border-ink bg-card p-5 shadow-xs transition-all duration-300",
+        "hover:-translate-y-0.5 hover:border-brand hover:shadow-lg active:scale-[0.99]",
+        plan.isExperience && "border-amber-600/60 hover:border-amber-500",
       )}
     >
       {/* Top Background Gradient Tint */}

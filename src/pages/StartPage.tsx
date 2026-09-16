@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, type FormEvent } from "react";
+import { useEffect, useRef, useState, useMemo, type FormEvent } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import {
@@ -31,6 +31,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { useHandleStatus } from "@/hooks/useHandleStatus";
 import { liveBackendEnabled } from "@/lib/functions";
+import {
+  normalizeInviteCode,
+  recordAppInvite,
+  resolveInviter,
+  stashInviteRef,
+  takeInviteRef,
+} from "@/lib/app-invites";
 import { cn } from "@/lib/cn";
 
 type AuthMode = "signin" | "signup" | "reset";
@@ -40,6 +47,7 @@ export function StartPage() {
   const search = useSearch();
   const params = useMemo(() => new URLSearchParams(search), [search]);
   const tabParam = params.get("tab");
+  const refParam = params.get("ref") || "";
   const next = params.get("next") || "";
   const roleParam = params.get("role") || "";
   const emailParam = params.get("email") || "";
@@ -82,6 +90,42 @@ export function StartPage() {
   const passOk = passwordOk(password);
   const nameOk = name.trim().length >= 2;
   const handleOk = handleStatus.ok;
+
+  // Invite attribution: keep the inviter's code across the flow, show who
+  // invited, and record the join once the account exists.
+  const [inviterHandle, setInviterHandle] = useState<string | null>(null);
+  const inviteRecorded = useRef(false);
+  useEffect(() => {
+    stashInviteRef(refParam);
+    const code = normalizeInviteCode(refParam);
+    if (!code) {
+      setInviterHandle(null);
+      return;
+    }
+    let alive = true;
+    void resolveInviter(code).then((inviter) => {
+      if (alive) setInviterHandle(inviter?.handle || null);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [refParam]);
+  useEffect(() => {
+    if (inviteRecorded.current || !user) return;
+    const code = takeInviteRef();
+    if (!code) return;
+    inviteRecorded.current = true;
+    void (async () => {
+      const inviter = await resolveInviter(code);
+      if (!inviter || inviter.uid === user.uid) return;
+      await recordAppInvite({
+        inviterUid: inviter.uid,
+        inviterHandle: inviter.handle,
+        inviteeUid: user.uid,
+        inviteeLabel: user.displayName || "New member",
+      });
+    })();
+  }, [user]);
 
   // Sync tab param when search changes
   useEffect(() => {
@@ -399,6 +443,12 @@ export function StartPage() {
         </div>
         <p className="mt-2 text-xs text-mute leading-relaxed">{roleContext.desc}</p>
       </div>
+
+      {mode === "signup" && inviterHandle && (
+        <p className="mb-4 rounded-2xl border-2 border-ink bg-card px-4 py-3 text-center text-sm">
+          You’re invited by <span className="font-semibold text-brand">@{inviterHandle}</span>
+        </p>
+      )}
 
       {/* Main Card */}
       <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-sm">

@@ -36,12 +36,15 @@ export function ChatBox({
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const db = getFirebaseDb();
     if (!db) return;
     let cancelled = false;
+    setLoadError(false);
     // Ensure the chat shell exists so both parties share one thread.
     if (!readOnly) {
       void setDoc(
@@ -66,11 +69,13 @@ export function ChatBox({
           }
         }
       })
-      .catch(() => undefined);
+      .catch(() => {
+        if (!cancelled) setLoadError(true);
+      });
     return () => {
       cancelled = true;
     };
-  }, [requestId, readOnly, user]);
+  }, [requestId, readOnly, user, reloadKey]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ block: "nearest" });
@@ -125,9 +130,17 @@ export function ChatBox({
         </div>
       )}
       <div className="max-h-64 space-y-2 overflow-y-auto pr-1" role="log" aria-label="Match conversation">
-        {messages.length === 0 && (
+        {messages.length === 0 && !loadError && (
           <p className="py-3 text-center text-[13px] text-mute">
             No messages yet. Say hello — keep phone numbers and emails out of chat.
+          </p>
+        )}
+        {loadError && (
+          <p className="py-3 text-center text-[13px]">
+            <span className="font-semibold">Couldn’t load messages.</span>{" "}
+            <button type="button" onClick={() => setReloadKey((k) => k + 1)} className="font-semibold text-brand">
+              Retry
+            </button>
           </p>
         )}
         {messages.map((m) => {
@@ -164,7 +177,7 @@ export function ChatBox({
               placeholder="Message your Mate…"
               maxLength={1000}
               aria-label="Message your Mate"
-              className="min-w-0 flex-1 rounded-full border border-line bg-card px-3.5 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
+              className="min-w-0 flex-1 rounded-full border border-ink bg-card px-3.5 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
             />
             <Button size="sm" disabled={busy || !draft.trim()} loading={busy} onClick={() => void send()} aria-label="Send message">
               <Send size={15} />

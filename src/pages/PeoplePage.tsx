@@ -12,6 +12,7 @@ import { listMemories, memoriesWithPerson } from "@/lib/memories";
 import { listMyCatchUpReminders, removeCatchUp, type CatchUpItem } from "@/lib/catchup";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { bioPath } from "@shared/bio";
+import { fieldInput } from "@/components/forms/ValidField";
 
 function formatDay(iso: string): string {
   try {
@@ -210,21 +211,21 @@ export function PeoplePage() {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Name — Maya"
                 maxLength={60}
-                className="h-12 w-full rounded-2xl bg-paper px-4 ring-1 ring-line outline-none"
+                className={fieldInput}
               />
               <input
                 value={handle}
                 onChange={(e) => setHandle(e.target.value)}
                 placeholder="@handle (if they have an AirPal bio)"
                 maxLength={40}
-                className="h-12 w-full rounded-2xl bg-paper px-4 ring-1 ring-line outline-none"
+                className={fieldInput}
               />
               <input
                 value={whereMet}
                 onChange={(e) => setWhereMet(e.target.value)}
                 placeholder="Where you met — Bondi markets"
                 maxLength={80}
-                className="h-12 w-full rounded-2xl bg-paper px-4 ring-1 ring-line outline-none"
+                className={fieldInput}
               />
               <Button type="submit" className="w-full rounded-full">
                 Save person

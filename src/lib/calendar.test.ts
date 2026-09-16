@@ -452,3 +452,19 @@ describe("Collision Prevention & Nearest Slot Opening", () => {
   });
 });
 
+describe("Filter block themes", () => {
+  it("gives every category a colourful block, active, and count style", () => {
+    for (const [id, theme] of Object.entries(CATEGORY_THEMES)) {
+      expect(theme.blockClass, `${id} blockClass`).toContain("ring-");
+      expect(theme.blockActiveClass, `${id} blockActiveClass`).toMatch(/bg-\w+-600/);
+      expect(theme.countClass, `${id} countClass`).toContain("ring-");
+    }
+  });
+
+  it("gives every booking status a block style", () => {
+    for (const [id, theme] of Object.entries(BOOKING_THEMES)) {
+      expect(theme.blockClass, `${id} blockClass`).toContain("ring-");
+      expect(theme.blockActiveClass, `${id} blockActiveClass`).toContain("text-white");
+    }
+  });
+});

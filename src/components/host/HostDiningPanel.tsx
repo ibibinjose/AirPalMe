@@ -6,7 +6,7 @@ import { deletePropertyMenuItem, savePropertyMenuItem } from "@/lib/properties";
 
 const CATEGORIES: MenuItem["category"][] = ["Starters", "Mains", "Desserts", "Drinks", "Breakfast", "Late Night"];
 const field =
-  "mt-1 h-12 w-full rounded-2xl bg-paper/70 px-4 text-[16px] md:text-[15px] ring-1 ring-line outline-none transition focus:bg-card focus:ring-2 focus:ring-brand/45";
+  "mt-1 h-12 w-full rounded-2xl border-2 border-ink bg-paper/70 px-4 text-[16px] md:text-[15px] outline-none transition focus:border-brand focus:bg-card focus:ring-2 focus:ring-brand/45";
 
 export function HostDiningPanel({ propertyId, menu }: { propertyId: string; menu: MenuItem[] }) {
   const [name, setName] = useState("");

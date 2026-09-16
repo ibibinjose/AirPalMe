@@ -5,9 +5,11 @@ import {
   CalendarDays,
   Cat,
   HeartHandshake,
+  Images,
   Languages,
   LogIn,
   LogOut,
+  PencilLine,
   Settings,
   ShieldCheck,
   Sparkles,
@@ -22,7 +24,7 @@ import { useEvents } from "@/contexts/EventsContext";
 import { AvatarFace } from "@/components/auth/MeAvatar";
 import { BioStatusModal } from "@/components/bio/BioStatusModal";
 import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
-import { AVAILABILITY_STATUSES, type AvailabilityStatus } from "@shared/bio";
+import { AVAILABILITY_STATUSES, bioKindLabel, type AvailabilityStatus } from "@shared/bio";
 import { cn } from "@/lib/cn";
 
 function Row({
@@ -149,6 +151,13 @@ export function ProfileMenu() {
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold">{user.displayName || mine?.name || "Account"}</p>
             <p className="truncate text-[12px] text-mute">{user.email || user.phone}</p>
+            {(mine || business) && (
+              <p className="mt-0.5 truncate text-[11px] font-semibold text-gold">
+                {[mine && bioKindLabel(mine.kind), business && bioKindLabel(business.kind ?? "business")]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            )}
           </div>
         </div>
 
@@ -198,18 +207,40 @@ export function ProfileMenu() {
       </div>
 
       <div className="my-1 h-px bg-line" />
-      {mine && (
+      {mine ? (
         <Row
           icon={Sparkles}
-          label="Quick Bio"
+          label="Bio"
           hint={`airpal.me/@${mine.handle}`}
           highlight
           onClick={() => go(`/@${mine.handle}`)}
         />
+      ) : (
+        <Row
+          icon={Sparkles}
+          label="Bio"
+          hint="Claim your @handle"
+          highlight
+          onClick={() => go("/bio/setup")}
+        />
       )}
-      {mine && <Row icon={UserRound} label="Profile" hint={`@${mine.handle}`} onClick={() => go("/me")} />}
+      {mine && (
+        <Row
+          icon={PencilLine}
+          label="Edit bio"
+          hint="Profile, links, shop, share"
+          onClick={() => go("/bio/edit")}
+        />
+      )}
+      <Row
+        icon={UserRound}
+        label="Me"
+        hint={mine ? `@${mine.handle}` : "Dashboard, zoo, workspaces"}
+        onClick={() => go("/me")}
+      />
       <Row icon={Users} label="Circle" hint="Met, following, likes you" onClick={() => go("/circle")} />
       {mine && <Row icon={Cat} label="Air Zoo" hint="Stickers, shops, hunts" onClick={() => go("/me/zoo")} />}
+      <Row icon={Images} label="Memory Wall" hint="Keepsakes & moments" onClick={() => go("/me/memories")} />
       <Row icon={HeartHandshake} label="Become an AirPal" hint="Friend, teammate, companion" onClick={() => go("/companion")} />
 
       <div className="my-1 h-px bg-line" />
@@ -221,7 +252,20 @@ export function ProfileMenu() {
       )}
 
       {business ? (
-        <Row icon={Store} label="Business Place" hint={`@${business.handle}`} onClick={() => go("/business")} />
+        <>
+          <Row
+            icon={Store}
+            label="View business"
+            hint={`airpal.me/@${business.handle}`}
+            onClick={() => go(`/@${business.handle}`)}
+          />
+          <Row
+            icon={PencilLine}
+            label="Edit business"
+            hint="Place, offers, listing"
+            onClick={() => go("/business")}
+          />
+        </>
       ) : (
         <Row
           icon={Store}

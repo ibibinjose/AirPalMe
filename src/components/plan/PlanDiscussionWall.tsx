@@ -131,7 +131,7 @@ export function PlanDiscussionWall({
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Post a message, meeting spot update, or photo..."
-            className="h-11 flex-1 rounded-2xl bg-paper px-4 text-xs sm:text-sm ring-1 ring-line outline-none focus:ring-2 focus:ring-brand text-ink"
+            className="h-11 flex-1 rounded-2xl bg-paper px-4 text-xs sm:text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
           />
           <button
             type="button"

@@ -12,6 +12,7 @@ import { makeQrDataUrl } from "@/lib/qr";
 import { cn } from "@/lib/cn";
 import { PhoneField } from "@/components/forms/PhoneField";
 import { isValidPhone } from "@shared/geo-address";
+import { fieldInput } from "@/components/forms/ValidField";
 
 const SOCIAL_CONFIG: Partial<
   Record<
@@ -229,6 +230,11 @@ export function BioEditPage() {
           {business ? `@${business.handle}` : "Host a registered business"}
         </button>
       )}
+      <div>
+        <button type="button" className="mt-2 text-sm text-mute underline" onClick={() => nav("/bio/recover")}>
+          Lost a handle? Recover it
+        </button>
+      </div>
       <div className="mt-4 flex flex-wrap gap-2">
         {(["profile", "links", "shop", "share"] as const).map((id) => (
           <button
@@ -255,7 +261,7 @@ export function BioEditPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Harbour Brew Cafe or Alex Morgan"
-              className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none transition focus:ring-2 focus:ring-ink"
+              className={fieldInput}
             />
             <p className="text-[11px] text-mute">The primary name shown on your public profile card.</p>
           </div>
@@ -269,7 +275,7 @@ export function BioEditPage() {
               value={shortWhy}
               onChange={(e) => setShortWhy(e.target.value)}
               placeholder="e.g. Specialty coffee, artisanal roasts & harbour views"
-              className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none transition focus:ring-2 focus:ring-ink"
+              className={fieldInput}
             />
             <p className="text-[11px] text-mute">A short 1-line description displayed right below your name.</p>
           </div>
@@ -284,7 +290,7 @@ export function BioEditPage() {
               value={city}
               onChange={(e) => setCity(e.target.value)}
               placeholder="e.g. Sydney, NSW or Bondi Beach, NSW"
-              className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none transition focus:ring-2 focus:ring-ink"
+              className={fieldInput}
             />
             <p className="text-[11px] text-mute">
               Where you or your business is based. Used to group your bio with local precinct recommendations.
@@ -301,7 +307,7 @@ export function BioEditPage() {
               value={hours}
               onChange={(e) => setHours(e.target.value)}
               placeholder="e.g. Mon–Fri 7:00 AM – 4:00 PM, Sat 8:00 AM – 2:00 PM"
-              className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none transition focus:ring-2 focus:ring-ink"
+              className={fieldInput}
             />
             <p className="text-[11px] text-mute">
               Your opening schedule displayed at the top of your profile. For 24/7 access, write "Open 24/7".
@@ -357,7 +363,7 @@ export function BioEditPage() {
               value={mapsPlaceId}
               onChange={(e) => setMapsPlaceId(e.target.value)}
               placeholder="e.g. ChIJN1t_tDeuEmsRUsoyG83frY4"
-              className="h-12 w-full rounded-2xl bg-card px-4 font-mono text-xs ring-1 ring-line outline-none transition focus:ring-2 focus:ring-ink"
+              className={`font-mono text-xs ${fieldInput}`}
             />
             <p className="text-[11px] text-mute">
               Directly links your bio to your Google Place reviews, navigation, and photos.
@@ -593,7 +599,7 @@ export function BioEditPage() {
               value={nextHandle}
               onChange={(e) => setNextHandle(normalizeHandle(e.target.value))}
               placeholder="newhandle"
-              className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none"
+              className={fieldInput}
             />
             <Button type="submit" variant="ghost" className="w-full" disabled={!nextHandle}>
               Transfer

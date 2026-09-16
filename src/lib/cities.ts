@@ -28,6 +28,14 @@ export const CITY_OPTIONS: CityOption[] = [
   { id: "newyork", label: "New York", region: "NY", country: "United States", flag: "🇺🇸", lat: 40.7128, lng: -74.006 },
   { id: "delhi", label: "Delhi", region: "NCR", country: "India", flag: "🇮🇳", lat: 28.6139, lng: 77.209 },
   { id: "mumbai", label: "Mumbai", region: "Maharashtra", country: "India", flag: "🇮🇳", lat: 19.076, lng: 72.8777 },
+  { id: "kochi", label: "Kochi", region: "Kerala", country: "India", flag: "🇮🇳", lat: 9.93, lng: 76.27 },
+  { id: "kovalam", label: "Kovalam", region: "Kerala", country: "India", flag: "🇮🇳", lat: 8.4, lng: 76.98 },
+  { id: "trivandrum", label: "Trivandrum", region: "Kerala", country: "India", flag: "🇮🇳", lat: 8.52, lng: 76.94 },
+  { id: "munnar", label: "Munnar", region: "Kerala", country: "India", flag: "🇮🇳", lat: 10.09, lng: 77.06 },
+  { id: "alleppey", label: "Alleppey", region: "Kerala", country: "India", flag: "🇮🇳", lat: 9.5, lng: 76.34 },
+  { id: "varkala", label: "Varkala", region: "Kerala", country: "India", flag: "🇮🇳", lat: 8.74, lng: 76.7 },
+  { id: "wayanad", label: "Wayanad", region: "Kerala", country: "India", flag: "🇮🇳", lat: 11.61, lng: 76.08 },
+  { id: "kumarakom", label: "Kumarakom", region: "Kerala", country: "India", flag: "🇮🇳", lat: 9.62, lng: 76.43 },
 ];
 
 const CENTERS: Record<string, LatLng> = Object.fromEntries(CITY_OPTIONS.map((c) => [c.id, { lat: c.lat, lng: c.lng }]));
@@ -43,3 +51,14 @@ export function cityCenter(name?: string): LatLng {
   }
   return FALLBACK;
 }
+
+/** City name → map center, or null when the city isn't a known option (never falls back). */
+export function knownCityCenter(name?: string): LatLng | null {
+  if (!name) return null;
+  const key = name.trim().toLowerCase();
+  const found = CITY_OPTIONS.find((c) => c.id === key || c.label.toLowerCase() === key);
+  return found ? { lat: found.lat, lng: found.lng } : null;
+}
+
+/** Road-trip radius for "places in this city" filtering. */
+export const CITY_RADIUS_KM = 60;

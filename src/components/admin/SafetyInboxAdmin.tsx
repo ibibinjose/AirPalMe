@@ -119,7 +119,7 @@ export function SafetyInboxAdmin() {
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="Case note (action taken, who was contacted…)"
-                    className="mt-2 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
+                    className="mt-2 w-full rounded-xl border border-ink bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
                   />
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {(["reviewed", "actioned"] as SafetyReportStatus[])

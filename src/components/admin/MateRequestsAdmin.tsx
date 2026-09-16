@@ -197,7 +197,7 @@ export function MateRequestsAdmin() {
             value={feeBps}
             onChange={(e) => setFeeBps(e.target.value)}
             inputMode="numeric"
-            className="mt-1 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm text-ink"
+            className="mt-1 w-full rounded-xl border border-ink bg-card px-3 py-2 text-sm text-ink focus:border-brand"
           />
         </label>
         <label className="text-[12px] font-medium text-mute">
@@ -206,7 +206,7 @@ export function MateRequestsAdmin() {
             value={minFee}
             onChange={(e) => setMinFee(e.target.value)}
             inputMode="numeric"
-            className="mt-1 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm text-ink"
+            className="mt-1 w-full rounded-xl border border-ink bg-card px-3 py-2 text-sm text-ink focus:border-brand"
           />
         </label>
         <Button size="sm" className="self-end" disabled={feeBusy} loading={feeBusy}>
@@ -277,7 +277,7 @@ export function MateRequestsAdmin() {
                     <select
                       value={matePick}
                       onChange={(e) => setMatePick(e.target.value)}
-                      className="mt-1 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm outline-none focus:border-brand"
+                      className="mt-1 w-full rounded-xl border border-ink bg-card px-3 py-2 text-sm outline-none focus:border-brand"
                     >
                       <option value="">Select a Mate…</option>
                       {approvedMates.map((m) => (
@@ -294,7 +294,7 @@ export function MateRequestsAdmin() {
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="Matching note (e.g. offered to Ava, awaiting reply)"
-                    className="mt-2 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
+                    className="mt-2 w-full rounded-xl border border-ink bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
                   />
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {MATE_REQUEST_STATUSES.filter((s) => s !== r.status).map((s) => (

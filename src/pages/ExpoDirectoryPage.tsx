@@ -39,7 +39,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Business, stall number, or @handle"
-        className="mt-4 h-12 w-full rounded-full bg-card px-4 ring-1 ring-line outline-none"
+        className="mt-4 h-12 w-full rounded-full bg-card px-4 border border-ink outline-none focus:border-brand"
       />
       <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto">
         <button

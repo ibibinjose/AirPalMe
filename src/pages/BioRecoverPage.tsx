@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { handleFromName, handleMatchesClaim, normalizeHandle } from "@shared/bio";
 import { Button } from "@/components/ui/Button";
 import { LEGAL } from "@/lib/legal";
+import { fieldInput, fieldTextarea } from "@/components/forms/ValidField";
 
 export function BioRecoverPage() {
   const [handle, setHandle] = useState("");
@@ -51,13 +52,13 @@ export function BioRecoverPage() {
         </Link>
       </p>
       <form className="mt-6 space-y-3" onSubmit={onSubmit}>
-        <input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="@handle" required className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Registered business name" required className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
-        <input value={registrationNumber} onChange={(e) => setRegistrationNumber(e.target.value)} placeholder="ABN / company number" required className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
-        <input value={domain} onChange={(e) => setDomain(e.target.value)} autoComplete="url" autoCapitalize="none" placeholder="Domain you own" className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
-        <input value={trademark} onChange={(e) => setTrademark(e.target.value)} placeholder="Trade mark number or words" className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
-        <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
-        <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Evidence (optional)" className="h-28 w-full rounded-2xl bg-card p-4 ring-1 ring-line outline-none" />
+        <input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="@handle" required className={fieldInput} />
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Registered business name" required className={fieldInput} />
+        <input value={registrationNumber} onChange={(e) => setRegistrationNumber(e.target.value)} placeholder="ABN / company number" required className={fieldInput} />
+        <input value={domain} onChange={(e) => setDomain(e.target.value)} autoComplete="url" autoCapitalize="none" placeholder="Domain you own" className={fieldInput} />
+        <input value={trademark} onChange={(e) => setTrademark(e.target.value)} placeholder="Trade mark number or words" className={fieldInput} />
+        <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className={fieldInput} />
+        <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Evidence (optional)" className={fieldTextarea} />
         {handle && !matches && <p className="text-[12px] text-mute">The handle must match the name, mark, or domain.</p>}
         <Button type="submit" className="w-full">
           Request recovery

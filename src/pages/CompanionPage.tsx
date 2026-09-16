@@ -122,7 +122,7 @@ const inputCls =
   "h-12 w-full rounded-2xl bg-paper/70 px-4 text-[16px] md:text-[15px] ring-1 ring-line/90 outline-none transition duration-200 placeholder:text-mute/70 focus:bg-card focus:ring-2 focus:ring-brand/45 text-ink";
 
 const areaCls =
-  "w-full rounded-2xl bg-paper/70 p-4 text-[16px] md:text-[15px] ring-1 ring-line/90 outline-none transition duration-200 placeholder:text-mute/70 focus:bg-card focus:ring-2 focus:ring-brand/45 text-ink leading-relaxed";
+  "w-full rounded-2xl border-2 border-ink bg-paper/70 p-4 text-[16px] md:text-[15px] outline-none transition duration-200 placeholder:text-mute/70 focus:border-brand focus:bg-card focus:ring-2 focus:ring-brand/45 text-ink leading-relaxed";
 
 export function CompanionPage() {
   const [, nav] = useLocation();

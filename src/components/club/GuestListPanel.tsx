@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { AIRPAL_CLUB_ID, useClub } from "@/contexts/ClubContext";
+import { fieldInput, fieldTextarea } from "@/components/forms/ValidField";
 
 export function GuestListPanel({ clubId, clubName }: { clubId: string; clubName: string }) {
   const { guests, addGuest, removeGuest, importClubToList, sendInvite, members } = useClub();
@@ -50,8 +51,8 @@ export function GuestListPanel({ clubId, clubName }: { clubId: string; clubName:
       {!airpal && (
         <form className="space-y-2" onSubmit={onAdd}>
           <div className="flex gap-2">
-            <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" autoCapitalize="words" placeholder="Name" className="h-11 flex-1 rounded-full bg-card px-4 ring-1 ring-line outline-none" />
-            <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="h-11 flex-1 rounded-full bg-card px-4 ring-1 ring-line outline-none" />
+            <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" autoCapitalize="words" placeholder="Name" className="h-11 flex-1 rounded-full bg-card px-4 border border-ink outline-none focus:border-brand" />
+            <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="h-11 flex-1 rounded-full bg-card px-4 border border-ink outline-none focus:border-brand" />
           </div>
           <div className="flex gap-2">
             <Button type="submit" size="sm" className="h-11">
@@ -94,8 +95,8 @@ export function GuestListPanel({ clubId, clubName }: { clubId: string; clubName:
 
       <div className="space-y-2">
         <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Email invite</p>
-        <input value={subject} onChange={(e) => setSubject(e.target.value)} className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
-        <textarea value={body} onChange={(e) => setBody(e.target.value)} className="h-32 w-full rounded-2xl bg-card p-4 ring-1 ring-line outline-none" />
+        <input value={subject} onChange={(e) => setSubject(e.target.value)} className={fieldInput} />
+        <textarea value={body} onChange={(e) => setBody(e.target.value)} className={`h-32 ${fieldTextarea}`} />
         <Button className="w-full" onClick={onSend}>
           Open mail app
         </Button>

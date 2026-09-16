@@ -12,6 +12,7 @@ import { listPeople } from "@/lib/people";
 import { readFileAsImage, storeMedia } from "@/lib/image-store";
 import { bioPath } from "@shared/bio";
 import { cn } from "@/lib/cn";
+import { fieldInput } from "@/components/forms/ValidField";
 
 function downscale(image: HTMLImageElement, maxEdge = 1600): Promise<Blob> {
   const scale = Math.min(1, maxEdge / Math.max(image.naturalWidth, image.naturalHeight));
@@ -229,7 +230,7 @@ export function MemoryWallPage() {
               onChange={(e) => setCaption(e.target.value)}
               placeholder="Caption — sunset swim at Bondi"
               maxLength={120}
-              className="mt-3 h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none"
+              className={`mt-3 ${fieldInput}`}
             />
             <input
               value={withPeople}
@@ -237,7 +238,7 @@ export function MemoryWallPage() {
               placeholder="With — Maya, @leo (comma separated)"
               maxLength={120}
               list="memory-people"
-              className="mt-2 h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none"
+              className={`mt-2 ${fieldInput}`}
             />
             {knownPeople.length > 0 && (
               <datalist id="memory-people">
@@ -251,7 +252,7 @@ export function MemoryWallPage() {
               onChange={(e) => setPlace(e.target.value)}
               placeholder="Place — Bondi Beach"
               maxLength={80}
-              className="mt-2 h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none"
+              className={`mt-2 ${fieldInput}`}
             />
             <div className="mt-4 flex gap-2">
               <Button variant="ghost" className="flex-1 rounded-full" onClick={closeComposer}>

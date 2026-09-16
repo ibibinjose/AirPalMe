@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Camera, Loader2, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { ImageCropper } from "@/components/media/ImageCropper";
@@ -22,6 +22,7 @@ export function ImageField({
   round = false,
   previewClassName,
   align = "start",
+  cornerBadge,
 }: {
   kind: ImageKind;
   value?: string;
@@ -30,6 +31,8 @@ export function ImageField({
   round?: boolean;
   previewClassName?: string;
   align?: "start" | "center";
+  /** Optional overlay (e.g. a profile-kind icon) pinned to the preview's corner. */
+  cornerBadge?: ReactNode;
 }) {
   const preset = PRESETS[kind];
   const inputRef = useRef<HTMLInputElement>(null);
@@ -75,8 +78,11 @@ export function ImageField({
       )}
       <div className={cn("relative bg-card", round && "flex items-center gap-3 rounded-3xl p-3 ring-1 ring-line", round && align === "center" && "flex-col border-0 bg-transparent p-0 ring-0")}>
         {value ? (
-          <div className={cn("relative", frame, round && "shrink-0")}>
-            <Photo src={value} className="h-full w-full object-cover" />
+          <div className={cn("relative", round && "shrink-0")}>
+            <div className={cn("relative", frame)}>
+              <Photo src={value} className="h-full w-full object-cover" />
+            </div>
+            {cornerBadge && <div className="absolute -bottom-1 -right-1 z-10">{cornerBadge}</div>}
             {busy && (
               <div className="absolute inset-0 grid place-items-center bg-ink/40 text-white">
                 <Loader2 size={18} className="animate-spin" />

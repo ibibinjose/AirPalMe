@@ -10,9 +10,8 @@ import {
   X,
   LayoutGrid,
   Download,
+  List,
   PlusCircle,
-  GripVertical,
-  ShieldCheck,
   SlidersHorizontal,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -30,6 +29,7 @@ import {
   type CalendarViewMode,
 } from "@/lib/calendar-utils";
 import { downloadMultipleIcs } from "@/lib/calendar-export";
+import { CalendarAgendaView } from "@/components/calendar/CalendarAgendaView";
 import { CalendarMonthGrid } from "@/components/calendar/CalendarMonthGrid";
 import { CalendarWeekView } from "@/components/calendar/CalendarWeekView";
 import { CalendarDayView } from "@/components/calendar/CalendarDayView";
@@ -115,10 +115,10 @@ function CalendarPageContent() {
     return () => window.clearTimeout(t);
   }, [calendarEvents]);
 
-  // View state: 'month' | 'week' | 'day'
+  // View state: 'month' | 'week' | 'day' | 'list'
   const [viewMode, setViewMode] = useState<CalendarViewMode>(() => {
     const v = searchParams.get("view") as CalendarViewMode;
-    return ["month", "week", "day"].includes(v) ? v : "month";
+    return ["month", "week", "day", "list"].includes(v) ? v : "month";
   });
 
   // Active date for week and day views
@@ -327,19 +327,6 @@ function CalendarPageContent() {
             <span>{city} · What’s On</span>
           </div>
           <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-ink md:text-4xl">Event Calendar</h1>
-          <div className="mt-1 flex flex-wrap items-center gap-2">
-            <p className="text-sm text-mute">
-              Live local markets, gigs, precinct showcases, and your RSVP schedule.
-            </p>
-            <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-paper px-2.5 py-0.5 text-[11px] font-medium text-mute ring-1 ring-line/70">
-              <GripVertical size={12} className="text-brand" />
-              <span>Drag & drop to reschedule</span>
-            </span>
-            <span className="hidden md:inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-900 ring-1 ring-emerald-400/40">
-              <ShieldCheck size={12} className="text-emerald-600 shrink-0" />
-              <span>Collision prevention active</span>
-            </span>
-          </div>
         </div>
 
         {/* View Switcher & Action Tools */}
@@ -419,6 +406,18 @@ function CalendarPageContent() {
               <CalendarDays size={14} />
               <span>Day</span>
             </button>
+            <button
+              type="button"
+              aria-label="List View"
+              onClick={() => setViewMode("list")}
+              className={cn(
+                "flex items-center gap-1.5 rounded-full px-3 text-xs font-medium transition cursor-pointer",
+                viewMode === "list" ? "bg-ink text-white shadow-xs" : "text-mute hover:text-ink",
+              )}
+            >
+              <List size={14} />
+              <span>List</span>
+            </button>
           </div>
 
           {/* Export My Itinerary CTA */}
@@ -459,7 +458,7 @@ function CalendarPageContent() {
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Desktop Sticky Sidebar */}
         {isSidebarOpen && (
-          <div className="hidden lg:block w-72 xl:w-80 shrink-0 sticky top-20 rounded-2xl bg-card p-4 ring-1 ring-line/80 shadow-xs max-h-[calc(100vh-6rem)] overflow-y-auto no-scrollbar">
+          <div className="hidden lg:block w-72 xl:w-80 shrink-0 sticky top-20 rounded-2xl border-2 border-ink bg-card p-4 shadow-xs max-h-[calc(100vh-6rem)] overflow-y-auto no-scrollbar">
             <CalendarSidebar
               viewMode={viewMode}
               onViewModeChange={setViewMode}
@@ -741,6 +740,20 @@ function CalendarPageContent() {
           onSelectTag={(tag) => setSearchQuery(tag.startsWith("#") ? tag : `#${tag}`)}
         />
       )}
+
+      {/* List View Display — date tree of upcoming events only */}
+      {viewMode === "list" && (
+        <CalendarAgendaView
+          events={filteredEvents.filter((e) => e.date >= today)}
+          onSelectEvent={setModalEvent}
+          onResetFilters={() => {
+            setFilter("all");
+            setCategory("all");
+            setSearchQuery("");
+          }}
+          onSelectTag={(tag) => setSearchQuery(tag.startsWith("#") ? tag : `#${tag}`)}
+        />
+      )}
         </div>
       </div>
 
@@ -757,7 +770,7 @@ function CalendarPageContent() {
             onClick={() => setIsMobileDrawerOpen(false)}
             aria-hidden="true"
           />
-          <div className="fixed inset-y-0 right-0 max-w-xs w-full bg-card p-5 shadow-2xl ring-1 ring-line overflow-y-auto z-10">
+          <div className="fixed inset-y-0 right-0 max-w-xs w-full bg-card p-5 shadow-2xl border-l-2 border-ink overflow-y-auto z-10">
             <CalendarSidebar
               viewMode={viewMode}
               onViewModeChange={setViewMode}

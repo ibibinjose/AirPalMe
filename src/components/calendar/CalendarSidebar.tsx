@@ -13,6 +13,7 @@ import {
   CalendarDays,
   CalendarRange,
   LayoutGrid,
+  List,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
@@ -85,6 +86,8 @@ export function CalendarSidebar({
     count: number;
     icon: typeof CalendarDays;
     activeClass: string;
+    softClass: string;
+    iconClass: string;
   }> = [
     {
       id: "all",
@@ -92,6 +95,8 @@ export function CalendarSidebar({
       count: statusCounts.all,
       icon: CalendarDays,
       activeClass: "bg-ink text-white",
+      softClass: "bg-ink/[0.04] ring-1 ring-ink/15 hover:bg-ink/[0.08]",
+      iconClass: "text-ink",
     },
     {
       id: "weekend",
@@ -99,6 +104,8 @@ export function CalendarSidebar({
       count: statusCounts.weekend,
       icon: Compass,
       activeClass: "bg-indigo-600 text-white font-semibold",
+      softClass: "bg-indigo-500/10 ring-1 ring-indigo-500/40 hover:bg-indigo-500/20",
+      iconClass: "text-indigo-600",
     },
     {
       id: "free",
@@ -106,6 +113,8 @@ export function CalendarSidebar({
       count: statusCounts.free,
       icon: Sparkles,
       activeClass: "bg-teal-600 text-white font-semibold",
+      softClass: "bg-teal-500/10 ring-1 ring-teal-500/40 hover:bg-teal-500/20",
+      iconClass: "text-teal-600",
     },
     {
       id: "going",
@@ -113,20 +122,26 @@ export function CalendarSidebar({
       count: statusCounts.going,
       icon: Check,
       activeClass: "bg-emerald-600 text-white font-semibold",
+      softClass: "bg-emerald-500/10 ring-1 ring-emerald-500/40 hover:bg-emerald-500/20",
+      iconClass: "text-emerald-600",
     },
     {
       id: "interested",
       label: "Interested",
       count: statusCounts.interested,
       icon: Star,
-      activeClass: "bg-amber-500 text-white font-semibold",
+      activeClass: "bg-amber-600 text-white font-semibold",
+      softClass: "bg-amber-500/10 ring-1 ring-amber-500/40 hover:bg-amber-500/20",
+      iconClass: "text-amber-600",
     },
     {
       id: "liked",
       label: "Saved Favourites",
       count: statusCounts.liked,
       icon: Heart,
-      activeClass: "bg-rose-500 text-white font-semibold",
+      activeClass: "bg-rose-600 text-white font-semibold",
+      softClass: "bg-rose-500/10 ring-1 ring-rose-500/40 hover:bg-rose-500/20",
+      iconClass: "text-rose-600",
     },
     {
       id: "local",
@@ -134,6 +149,8 @@ export function CalendarSidebar({
       count: statusCounts.local,
       icon: Sparkles,
       activeClass: "bg-brand text-white font-semibold",
+      softClass: "bg-brand/10 ring-1 ring-brand/40 hover:bg-brand/20",
+      iconClass: "text-brand",
     },
   ];
 
@@ -190,7 +207,7 @@ export function CalendarSidebar({
         <div
           role="radiogroup"
           aria-label="Calendar view mode"
-          className="grid grid-cols-3 gap-1 rounded-xl bg-paper p-1 ring-1 ring-line/70 shadow-2xs"
+          className="grid grid-cols-2 gap-1 rounded-xl bg-paper p-1 ring-1 ring-line/70 shadow-2xs"
         >
           <button
             type="button"
@@ -237,6 +254,21 @@ export function CalendarSidebar({
             <CalendarDays size={13} />
             <span>Day</span>
           </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={viewMode === "list"}
+            onClick={() => onViewModeChange("list")}
+            className={cn(
+              "flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition active:scale-95 cursor-pointer",
+              viewMode === "list"
+                ? "bg-ink text-white shadow-xs"
+                : "text-mute hover:text-ink hover:bg-card/70",
+            )}
+          >
+            <List size={13} />
+            <span>List</span>
+          </button>
         </div>
       </div>
 
@@ -261,7 +293,7 @@ export function CalendarSidebar({
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search by title, tag (#jazz)..."
             aria-label="Search events by title or tag"
-            className="h-10 w-full rounded-xl bg-paper/90 pl-9 pr-8 text-xs text-ink placeholder:text-mute ring-1 ring-line/80 outline-none transition focus:bg-card focus:ring-2 focus:ring-ink"
+            className="h-10 w-full rounded-xl bg-paper/90 pl-9 pr-8 text-xs text-ink placeholder:text-mute border border-ink outline-none transition focus:bg-card focus:ring-2 focus:ring-ink focus:border-brand"
           />
           {searchQuery && (
             <button
@@ -296,7 +328,7 @@ export function CalendarSidebar({
           )}
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           {CALENDAR_CATEGORIES.map((c) => {
             const isSelected = category === c.id;
             const theme = c.id !== "all" ? CATEGORY_THEMES[c.id] : null;
@@ -309,15 +341,24 @@ export function CalendarSidebar({
                 onClick={() => onCategoryChange(c.id)}
                 aria-pressed={isSelected}
                 className={cn(
-                  "w-full flex items-center justify-between rounded-xl px-3 py-2 text-xs transition cursor-pointer",
-                  isSelected
-                    ? "bg-ink text-white font-medium shadow-xs"
-                    : "text-ink/85 hover:bg-paper/90 ring-1 ring-transparent hover:ring-line/60",
+                  "w-full flex items-center justify-between rounded-xl px-3 py-2 text-xs transition cursor-pointer active:scale-[0.98]",
+                  theme
+                    ? isSelected
+                      ? cn(theme.blockActiveClass, "shadow-xs")
+                      : cn(theme.blockClass, "text-ink/90 font-medium")
+                    : isSelected
+                      ? "bg-ink text-white font-medium shadow-xs"
+                      : "bg-ink/[0.04] text-ink/85 ring-1 ring-ink/15 hover:bg-ink/[0.08]",
                 )}
               >
                 <div className="flex items-center gap-2 truncate">
                   {theme ? (
-                    <span className={cn("h-2.5 w-2.5 rounded-full shrink-0", theme.dotClass)} />
+                    <span
+                      className={cn(
+                        "h-2.5 w-2.5 rounded-full shrink-0",
+                        isSelected ? "bg-white" : theme.dotClass,
+                      )}
+                    />
                   ) : (
                     <span
                       className={cn(
@@ -332,8 +373,10 @@ export function CalendarSidebar({
                   className={cn(
                     "ml-2 rounded-full px-1.5 py-0.2 text-[10px] font-semibold shrink-0",
                     isSelected
-                      ? "bg-white/20 text-white"
-                      : "bg-paper text-mute ring-1 ring-line/50",
+                      ? "bg-white/25 text-white"
+                      : theme
+                        ? theme.countClass
+                        : "bg-paper text-mute ring-1 ring-line/50",
                   )}
                 >
                   {count}
@@ -430,7 +473,7 @@ export function CalendarSidebar({
           )}
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           {statusOptions.map((opt) => {
             const isSelected = filter === opt.id;
             const Icon = opt.icon;
@@ -442,22 +485,20 @@ export function CalendarSidebar({
                 onClick={() => onFilterChange(opt.id)}
                 aria-pressed={isSelected}
                 className={cn(
-                  "w-full flex items-center justify-between rounded-xl px-3 py-2 text-xs transition cursor-pointer",
+                  "w-full flex items-center justify-between rounded-xl px-3 py-2 text-xs transition cursor-pointer active:scale-[0.98]",
                   isSelected
                     ? cn(opt.activeClass, "shadow-xs")
-                    : "text-ink/85 hover:bg-paper/90 ring-1 ring-transparent hover:ring-line/60",
+                    : cn(opt.softClass, "text-ink/90 font-medium"),
                 )}
               >
                 <div className="flex items-center gap-2">
-                  <Icon size={14} className={isSelected ? "text-white" : "text-mute"} />
+                  <Icon size={14} className={isSelected ? "text-white" : opt.iconClass} />
                   <span>{opt.label}</span>
                 </div>
                 <span
                   className={cn(
                     "rounded-full px-1.5 py-0.2 text-[10px] font-semibold",
-                    isSelected
-                      ? "bg-white/20 text-white"
-                      : "bg-paper text-mute ring-1 ring-line/50",
+                    isSelected ? "bg-white/25 text-white" : "bg-white/70 text-ink ring-1 ring-black/10",
                   )}
                 >
                   {opt.count}

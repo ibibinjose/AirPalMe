@@ -163,7 +163,7 @@ export function SafetyMenu({ targetUid, targetName, planId }: { targetUid: strin
                     <select
                       value={reason}
                       onChange={(e) => setReason(e.target.value as ReportReason)}
-                      className="mt-1 w-full rounded-xl border border-line bg-paper px-2 py-2 text-[13px] font-normal outline-none focus:border-brand"
+                      className="mt-1 w-full rounded-xl border border-ink bg-paper px-2 py-2 text-[13px] font-normal outline-none focus:border-brand"
                     >
                       {REPORT_REASONS.map((r) => (
                         <option key={r} value={r}>
@@ -177,7 +177,7 @@ export function SafetyMenu({ targetUid, targetName, planId }: { targetUid: strin
                     onChange={(e) => setDetails(e.target.value)}
                     rows={3}
                     placeholder="What happened, in your words (min 10 characters)…"
-                    className="mt-1.5 w-full rounded-xl border border-line bg-paper px-2 py-2 text-[13px] outline-none placeholder:text-mute focus:border-brand"
+                    className="mt-1.5 w-full rounded-xl border border-ink bg-paper px-2 py-2 text-[13px] outline-none placeholder:text-mute focus:border-brand"
                   />
                   {error && <span className="mt-1 block text-xs text-mute">{error}</span>}
                   <span className="mt-2 flex gap-1.5">

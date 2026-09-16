@@ -874,7 +874,7 @@ export function BioPublicPage() {
               value={listName}
               onChange={(e) => setListName(e.target.value)}
               placeholder="Name"
-              className="h-12 w-full rounded-full bg-card px-4 ring-1 ring-line outline-none"
+              className="h-12 w-full rounded-full bg-card px-4 border border-ink outline-none focus:border-brand"
             />
             <input
               type="email"
@@ -885,7 +885,7 @@ export function BioPublicPage() {
               value={listEmail}
               onChange={(e) => setListEmail(e.target.value)}
               placeholder="Email"
-              className="h-12 w-full rounded-full bg-card px-4 ring-1 ring-line outline-none"
+              className="h-12 w-full rounded-full bg-card px-4 border border-ink outline-none focus:border-brand"
             />
             <button type="submit" className="h-12 w-full rounded-full bg-ink text-sm font-medium text-white transition hover:bg-ink/90">
               Join the list

@@ -253,7 +253,7 @@ export function ExperiencePricingManager({
                       type="date"
                       value={data.endDate || ""}
                       onChange={(e) => onChange({ endDate: e.target.value })}
-                      className="h-9 rounded-xl bg-card px-3 text-xs font-medium text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+                      className="h-9 rounded-xl bg-card px-3 text-xs font-medium text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                     />
                   </div>
                 </div>
@@ -391,7 +391,7 @@ export function ExperiencePricingManager({
                               },
                             })
                           }
-                          className="h-10 w-full rounded-xl bg-card px-3 text-xs font-medium text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+                          className="h-10 w-full rounded-xl bg-card px-3 text-xs font-medium text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                         />
                       </div>
                     </div>
@@ -434,7 +434,7 @@ export function ExperiencePricingManager({
                               value={tier.name}
                               onChange={(e) => handleUpdateTier(tier.id, { name: e.target.value })}
                               placeholder="e.g. Shared Master Suite"
-                              className="h-8 w-full rounded-lg bg-paper px-2 text-xs font-semibold text-ink ring-1 ring-line outline-none"
+                              className="h-8 w-full rounded-lg bg-paper px-2 text-xs font-semibold text-ink border border-ink outline-none focus:border-brand"
                             />
                           </div>
 
@@ -444,7 +444,7 @@ export function ExperiencePricingManager({
                               type="number"
                               value={tier.price}
                               onChange={(e) => handleUpdateTier(tier.id, { price: parseFloat(e.target.value) || 0 })}
-                              className="h-8 w-full rounded-lg bg-paper px-2 text-xs font-semibold text-ink ring-1 ring-line outline-none"
+                              className="h-8 w-full rounded-lg bg-paper px-2 text-xs font-semibold text-ink border border-ink outline-none focus:border-brand"
                             />
                           </div>
 
@@ -454,7 +454,7 @@ export function ExperiencePricingManager({
                               type="number"
                               value={tier.capacity}
                               onChange={(e) => handleUpdateTier(tier.id, { capacity: parseInt(e.target.value, 10) || 1 })}
-                              className="h-8 w-full rounded-lg bg-paper px-2 text-xs font-semibold text-ink ring-1 ring-line outline-none"
+                              className="h-8 w-full rounded-lg bg-paper px-2 text-xs font-semibold text-ink border border-ink outline-none focus:border-brand"
                             />
                           </div>
                         </div>
@@ -465,7 +465,7 @@ export function ExperiencePricingManager({
                             value={tier.description || ""}
                             onChange={(e) => handleUpdateTier(tier.id, { description: e.target.value })}
                             placeholder="Description (e.g. Twin room, outdoor rain shower, pool access)"
-                            className="h-7 w-full rounded-lg bg-paper px-2 text-[11px] text-mute ring-1 ring-line outline-none"
+                            className="h-7 w-full rounded-lg bg-paper px-2 text-[11px] text-mute border border-ink outline-none focus:border-brand"
                           />
                         </div>
                       </div>
@@ -499,7 +499,7 @@ export function ExperiencePricingManager({
                           handleAddInclusion("included");
                         }
                       }}
-                      className="h-8 flex-1 rounded-xl bg-card px-2.5 text-xs text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+                      className="h-8 flex-1 rounded-xl bg-card px-2.5 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                     />
                     <button
                       type="button"
@@ -547,7 +547,7 @@ export function ExperiencePricingManager({
                           handleAddInclusion("whatToBring");
                         }
                       }}
-                      className="h-8 flex-1 rounded-xl bg-card px-2.5 text-xs text-ink ring-1 ring-line outline-none focus:ring-2 focus:ring-brand"
+                      className="h-8 flex-1 rounded-xl bg-card px-2.5 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                     />
                     <button
                       type="button"

@@ -1,7 +1,7 @@
 import type { CalendarEvent, CalendarEventCategory } from "@shared/event";
 
 export type CalendarFilter = "all" | "going" | "interested" | "liked" | "local" | "weekend" | "free";
-export type CalendarViewMode = "month" | "week" | "day";
+export type CalendarViewMode = "month" | "week" | "day" | "list";
 
 export type MonthDayCell = {
   date: Date;
@@ -27,6 +27,12 @@ export type EventColorTheme = {
   dotClass: string;
   borderClass: string;
   textClass: string;
+  /** Soft tinted block for unselected filter rows. */
+  blockClass: string;
+  /** Solid block for the selected filter row (white text). */
+  blockActiveClass: string;
+  /** Tinted count pill for unselected filter rows. */
+  countClass: string;
 };
 
 export const CATEGORY_THEMES: Record<CalendarEventCategory, EventColorTheme> = {
@@ -38,6 +44,9 @@ export const CATEGORY_THEMES: Record<CalendarEventCategory, EventColorTheme> = {
     dotClass: "bg-emerald-500",
     borderClass: "border-l-emerald-500",
     textClass: "text-emerald-950",
+    blockClass: "bg-emerald-500/10 ring-1 ring-emerald-500/40 hover:bg-emerald-500/20",
+    blockActiveClass: "bg-emerald-600 text-white font-semibold",
+    countClass: "bg-emerald-600/15 text-emerald-900 ring-1 ring-emerald-600/25",
   },
   music: {
     label: "Live Music",
@@ -47,6 +56,9 @@ export const CATEGORY_THEMES: Record<CalendarEventCategory, EventColorTheme> = {
     dotClass: "bg-violet-500",
     borderClass: "border-l-violet-500",
     textClass: "text-violet-950",
+    blockClass: "bg-violet-500/10 ring-1 ring-violet-500/40 hover:bg-violet-500/20",
+    blockActiveClass: "bg-violet-600 text-white font-semibold",
+    countClass: "bg-violet-600/15 text-violet-900 ring-1 ring-violet-600/25",
   },
   food: {
     label: "Food & Drinks",
@@ -56,6 +68,9 @@ export const CATEGORY_THEMES: Record<CalendarEventCategory, EventColorTheme> = {
     dotClass: "bg-amber-500",
     borderClass: "border-l-amber-500",
     textClass: "text-amber-950",
+    blockClass: "bg-amber-500/10 ring-1 ring-amber-500/40 hover:bg-amber-500/20",
+    blockActiveClass: "bg-amber-600 text-white font-semibold",
+    countClass: "bg-amber-600/15 text-amber-900 ring-1 ring-amber-600/25",
   },
   culture: {
     label: "Culture & Tours",
@@ -65,6 +80,9 @@ export const CATEGORY_THEMES: Record<CalendarEventCategory, EventColorTheme> = {
     dotClass: "bg-sky-500",
     borderClass: "border-l-sky-500",
     textClass: "text-sky-950",
+    blockClass: "bg-sky-500/10 ring-1 ring-sky-500/40 hover:bg-sky-500/20",
+    blockActiveClass: "bg-sky-600 text-white font-semibold",
+    countClass: "bg-sky-600/15 text-sky-900 ring-1 ring-sky-600/25",
   },
   community: {
     label: "Community",
@@ -74,6 +92,9 @@ export const CATEGORY_THEMES: Record<CalendarEventCategory, EventColorTheme> = {
     dotClass: "bg-teal-500",
     borderClass: "border-l-teal-500",
     textClass: "text-teal-950",
+    blockClass: "bg-teal-500/10 ring-1 ring-teal-500/40 hover:bg-teal-500/20",
+    blockActiveClass: "bg-teal-600 text-white font-semibold",
+    countClass: "bg-teal-600/15 text-teal-900 ring-1 ring-teal-600/25",
   },
   expo: {
     label: "Expo & Show",
@@ -83,6 +104,9 @@ export const CATEGORY_THEMES: Record<CalendarEventCategory, EventColorTheme> = {
     dotClass: "bg-indigo-500",
     borderClass: "border-l-indigo-500",
     textClass: "text-indigo-950",
+    blockClass: "bg-indigo-500/10 ring-1 ring-indigo-500/40 hover:bg-indigo-500/20",
+    blockActiveClass: "bg-indigo-600 text-white font-semibold",
+    countClass: "bg-indigo-600/15 text-indigo-900 ring-1 ring-indigo-600/25",
   },
   workshop: {
     label: "Workshop",
@@ -92,6 +116,9 @@ export const CATEGORY_THEMES: Record<CalendarEventCategory, EventColorTheme> = {
     dotClass: "bg-rose-500",
     borderClass: "border-l-rose-500",
     textClass: "text-rose-950",
+    blockClass: "bg-rose-500/10 ring-1 ring-rose-500/40 hover:bg-rose-500/20",
+    blockActiveClass: "bg-rose-600 text-white font-semibold",
+    countClass: "bg-rose-600/15 text-rose-900 ring-1 ring-rose-600/25",
   },
 };
 
@@ -106,6 +133,9 @@ export const BOOKING_THEMES: Record<BookingStatusType, EventColorTheme> = {
     dotClass: "bg-emerald-500",
     borderClass: "border-l-emerald-600",
     textClass: "text-emerald-950",
+    blockClass: "bg-emerald-500/10 ring-1 ring-emerald-500/40 hover:bg-emerald-500/20",
+    blockActiveClass: "bg-emerald-600 text-white font-semibold",
+    countClass: "bg-emerald-600/15 text-emerald-900 ring-1 ring-emerald-600/25",
   },
   tentative: {
     label: "Interested / Saved",
@@ -115,6 +145,9 @@ export const BOOKING_THEMES: Record<BookingStatusType, EventColorTheme> = {
     dotClass: "bg-amber-500",
     borderClass: "border-l-amber-600",
     textClass: "text-amber-950",
+    blockClass: "bg-amber-500/10 ring-1 ring-amber-500/40 hover:bg-amber-500/20",
+    blockActiveClass: "bg-amber-600 text-white font-semibold",
+    countClass: "bg-amber-600/15 text-amber-900 ring-1 ring-amber-600/25",
   },
   rescheduled: {
     label: "Rescheduled",
@@ -124,6 +157,9 @@ export const BOOKING_THEMES: Record<BookingStatusType, EventColorTheme> = {
     dotClass: "bg-orange-500",
     borderClass: "border-l-orange-600",
     textClass: "text-orange-950",
+    blockClass: "bg-orange-500/10 ring-1 ring-orange-500/40 hover:bg-orange-500/20",
+    blockActiveClass: "bg-orange-600 text-white font-semibold",
+    countClass: "bg-orange-600/15 text-orange-900 ring-1 ring-orange-600/25",
   },
   explore: {
     label: "Available / Explore",
@@ -133,6 +169,9 @@ export const BOOKING_THEMES: Record<BookingStatusType, EventColorTheme> = {
     dotClass: "bg-slate-500",
     borderClass: "border-l-slate-500",
     textClass: "text-slate-900",
+    blockClass: "bg-slate-500/10 ring-1 ring-slate-500/40 hover:bg-slate-500/20",
+    blockActiveClass: "bg-slate-600 text-white font-semibold",
+    countClass: "bg-slate-600/15 text-slate-900 ring-1 ring-slate-600/25",
   },
 };
 
