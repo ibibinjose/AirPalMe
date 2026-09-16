@@ -19,6 +19,7 @@ export type BookingProviderKind = "mate" | "business";
 
 export interface Booking {
   id: string;
+  /** Mate request id, or campaign id when providerKind is business. */
   requestId: string;
   customerUid: string;
   providerUid: string;
@@ -35,6 +36,10 @@ export interface Booking {
   cancelReason: string;
   createdAt: string;
   updatedAt: string;
+  /** Optional listing this booking is for (business vertical). */
+  listingId?: string;
+  /** Optional Experience campaign this booking is for. */
+  campaignId?: string;
 }
 
 export interface BookingInput {
@@ -47,6 +52,8 @@ export interface BookingInput {
   date: string;
   time: string;
   priceCents: number;
+  listingId?: string;
+  campaignId?: string;
 }
 
 export const PLATFORM_FEE_BPS = 1500; // 15% — must become admin-configurable with Stripe (§10/§28).
@@ -87,4 +94,14 @@ export function canProviderComplete(status: BookingStatus): boolean {
 
 export function isBookingStatus(s: string): s is BookingStatus {
   return (BOOKING_STATUSES as readonly string[]).includes(s);
+}
+
+/** Business-owner inbox rows: same bookings collection, providerKind business. */
+export function isBusinessProviderBooking(b: Pick<Booking, "providerKind" | "providerUid">, ownerUid: string): boolean {
+  return b.providerKind === "business" && b.providerUid === ownerUid;
+}
+
+/** Active (non-terminal) bookings the owner still needs to act on. */
+export function isOpenProviderBooking(status: BookingStatus): boolean {
+  return status === "pending" || status === "confirmed" || status === "in_progress";
 }

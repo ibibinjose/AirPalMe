@@ -65,7 +65,7 @@ export function BookingsSection() {
       const now = new Date().toISOString();
       await updateDoc(doc(db, "bookings", b.id), { status, updatedAt: now, ...extra });
       // Provider completing also closes the request loop (§30 acceptance).
-      if (status === "completed" && user.uid === b.providerUid) {
+      if (status === "completed" && user.uid === b.providerUid && b.providerKind === "mate") {
         try {
           await updateDoc(doc(db, "mate_requests", b.requestId), {
             status: "completed",
@@ -154,6 +154,60 @@ export async function createBookingForRequest(args: {
     paymentStatus: "deferred",
     status: "pending",
     cancelReason: "",
+    createdAt: now,
+    updatedAt: now,
+  });
+  return ref.id;
+}
+
+/** Guest books a business Experience — same `bookings` collection, not a parallel RSVP path. */
+export async function createBookingForCampaign(args: {
+  campaignId: string;
+  providerUid: string;
+  providerName: string;
+  title: string;
+  suburb: string;
+  date: string;
+  time: string;
+  priceCents: number;
+  customerUid: string;
+  listingId?: string;
+}): Promise<string> {
+  const db = getFirebaseDb();
+  if (!db || !isFirebaseConfigured) throw new Error("Connect Firebase first.");
+  const input = {
+    requestId: args.campaignId,
+    providerUid: args.providerUid,
+    providerKind: "business" as const,
+    providerName: args.providerName,
+    title: args.title,
+    suburb: args.suburb,
+    date: args.date,
+    time: args.time,
+    priceCents: args.priceCents,
+    campaignId: args.campaignId,
+    listingId: args.listingId,
+  };
+  if (!bookingValid(input)) throw new Error("Booking details are incomplete.");
+  const { feeCents } = quoteFees(args.priceCents);
+  const now = new Date().toISOString();
+  const ref = await addDoc(collection(db, "bookings"), {
+    requestId: input.requestId,
+    customerUid: args.customerUid,
+    providerUid: input.providerUid,
+    providerKind: input.providerKind,
+    providerName: input.providerName,
+    title: input.title,
+    suburb: input.suburb,
+    date: input.date,
+    time: input.time,
+    priceCents: input.priceCents,
+    feeCents,
+    paymentStatus: "deferred",
+    status: "pending",
+    cancelReason: "",
+    campaignId: args.campaignId,
+    ...(args.listingId ? { listingId: args.listingId } : {}),
     createdAt: now,
     updatedAt: now,
   });

@@ -5,6 +5,8 @@ import {
   canProviderComplete,
   canProviderConfirm,
   isBookingStatus,
+  isBusinessProviderBooking,
+  isOpenProviderBooking,
   quoteFees,
 } from "./booking";
 
@@ -30,6 +32,15 @@ describe("booking engine", () => {
     expect(bookingValid(good)).toBe(true);
     expect(bookingValid({ ...good, date: "tomorrow" })).toBe(false);
     expect(bookingValid({ ...good, priceCents: -1 })).toBe(false);
+    expect(
+      bookingValid({
+        ...good,
+        providerKind: "business",
+        providerName: "Harbour Hotel",
+        campaignId: "camp1",
+        listingId: "list1",
+      }),
+    ).toBe(true);
   });
 
   it("gates the lifecycle", () => {
@@ -41,5 +52,18 @@ describe("booking engine", () => {
     expect(canProviderComplete("cancelled")).toBe(false);
     expect(isBookingStatus("disputed")).toBe(true);
     expect(isBookingStatus("shipped")).toBe(false);
+  });
+
+  it("scopes business inbox to the owning provider", () => {
+    expect(
+      isBusinessProviderBooking({ providerKind: "business", providerUid: "biz1" }, "biz1"),
+    ).toBe(true);
+    expect(
+      isBusinessProviderBooking({ providerKind: "business", providerUid: "biz1" }, "other"),
+    ).toBe(false);
+    expect(isBusinessProviderBooking({ providerKind: "mate", providerUid: "biz1" }, "biz1")).toBe(false);
+    expect(isOpenProviderBooking("pending")).toBe(true);
+    expect(isOpenProviderBooking("completed")).toBe(false);
+    expect(isOpenProviderBooking("cancelled")).toBe(false);
   });
 });

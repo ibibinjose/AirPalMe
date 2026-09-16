@@ -19,10 +19,10 @@ import {
 const inputCls =
   "mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm outline-none placeholder:text-mute focus:border-brand";
 
-interface RsvpRow {
+interface BookingRow {
   id: string;
-  attendeeUid: string;
-  seats: number;
+  customerUid: string;
+  status: string;
   createdAt: string;
 }
 
@@ -42,7 +42,7 @@ export function BusinessCampaignsPage() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
-  const [roster, setRoster] = useState<Record<string, RsvpRow[]>>({});
+  const [roster, setRoster] = useState<Record<string, BookingRow[]>>({});
 
   const reload = useCallback(async () => {
     const db = getFirebaseDb();
@@ -74,8 +74,21 @@ export function BusinessCampaignsPage() {
     const db = getFirebaseDb();
     if (!db) return;
     try {
-      const snap = await getDocs(query(collection(db, "campaign_rsvps"), where("campaignId", "==", c.id)));
-      const list = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<RsvpRow, "id">) }));
+      // Shared bookings engine (§9). Query by providerUid (rules-safe); filter campaign client-side.
+      const snap = await getDocs(query(collection(db, "bookings"), where("providerUid", "==", user!.uid)));
+      const list = snap.docs
+        .map((d) => {
+          const data = d.data() as Omit<BookingRow, "id"> & { status?: string; campaignId?: string };
+          return {
+            id: d.id,
+            customerUid: data.customerUid,
+            status: data.status || "pending",
+            createdAt: data.createdAt,
+            campaignId: data.campaignId,
+          };
+        })
+        .filter((b) => b.campaignId === c.id && b.status !== "cancelled" && b.status !== "refunded")
+        .map(({ id, customerUid, status, createdAt }) => ({ id, customerUid, status, createdAt }));
       list.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
       setRoster((r) => ({ ...r, [c.id]: list }));
     } catch {
@@ -222,7 +235,7 @@ export function BusinessCampaignsPage() {
       ) : (
         <ul className="mt-3 space-y-2">
           {rows.map((c) => {
-            const seats = (roster[c.id] || []).reduce((n, r) => n + (r.seats || 1), 0);
+            const seats = (roster[c.id] || []).length;
             const fill = fillRate(seats, c.capacity);
             return (
               <li key={c.id} className="rounded-2xl border border-line bg-card p-4">

@@ -19,13 +19,14 @@ import { addressOk, countryByCode, emptyAddress, formatAddress, formatGps, isVal
 import { locateBusiness } from "@/lib/locate";
 import { ImageField } from "@/components/media/ImageField";
 import { HostFreshnessBanner } from "@/components/host/HostFreshnessBanner";
+import { BusinessBookingsSection } from "@/components/booking/BusinessBookingsSection";
 
 export function BusinessPage() {
   const [, nav] = useLocation();
   const { user, authReady } = useAuth();
   const { mine, savePlace, saveDeal, confirmHours } = useListings();
   const { mine: bio } = useBio();
-  const [tab, setTab] = useState<"place" | "offer" | "list">("place");
+  const [tab, setTab] = useState<"place" | "offer" | "bookings" | "list">("place");
   const [name, setName] = useState("");
   const [address, setAddress] = useState<AddressParts>(emptyAddress("AU"));
   const [hours, setHours] = useState("");
@@ -133,7 +134,7 @@ export function BusinessPage() {
       </div>
       <h1 className="font-display mt-4 text-3xl font-semibold">{mine.name}</h1>
       <div className="mt-4 flex gap-2">
-        {(["place", "offer", "list"] as const).map((id) => (
+        {(["place", "offer", "bookings", "list"] as const).map((id) => (
           <button
             key={id}
             onClick={() => setTab(id)}
@@ -226,6 +227,8 @@ export function BusinessPage() {
         </form>
       )}
 
+      {tab === "bookings" && <BusinessBookingsSection />}
+
       {tab === "list" && (
         <GuestListPanel clubId={handle || mine.id} clubName={mine.name} />
       )}
@@ -251,6 +254,9 @@ export function BusinessPage() {
       </div>
       <button type="button" className="mt-4 block text-sm text-brand" onClick={() => nav("/bio/edit")}>
         Your @handle
+      </button>
+      <button type="button" className="mt-2 block text-sm text-brand" onClick={() => nav("/business/campaigns")}>
+        Experience campaigns
       </button>
       <button type="button" className="mt-2 text-sm text-brand" onClick={() => nav("/?chip=deals")}>
         Open What’s around

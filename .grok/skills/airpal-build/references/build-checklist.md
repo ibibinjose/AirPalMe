@@ -88,7 +88,7 @@ Business is a dedicated dashboard on the **same** identity, listing, booking, pa
 - [ ] `partial` `biz-onboard` Apply / claim venue — Done when: Find venue → owner → verify claim → plan → sign-off writes a real partner record. Evidence: `src/pages/BusinessOnboardPage.tsx`, `shared/business-onboarding.ts`. Gap: plans are placeholder prices; verify is self-attested.
 - [ ] `partial` `biz-listing` Manage listing — Done when: owner edits place, hours, photos, deals; hours freshness SLA respected. Evidence: `src/pages/BusinessPage.tsx`, `shared/business.ts`, `listings` rules.
 - [ ] `partial` `biz-campaign` Create Experience campaign — Done when: business funds an Experience, admin reviews, guests book through shared bookings. Evidence: `src/pages/BusinessCampaignsPage.tsx`, `src/components/admin/CampaignInboxAdmin.tsx`. Gap: `paymentStatus: "deferred"`; RSVPs not `bookings`.
-- [ ] `todo` `biz-bookings` Business booking inbox — Done when: owner sees/confirm/completes bookings for their listings/experiences. Evidence: —
+- [x] `done` `biz-bookings` Business booking inbox — Done when: owner sees/confirm/completes bookings for their listings/experiences. Evidence: `src/components/booking/BusinessBookingsSection.tsx`, `src/pages/BusinessPage.tsx`, `createBookingForCampaign` in `src/components/booking/BookingsSection.tsx`, `src/pages/ExperiencesPage.tsx`.
 - [ ] `todo` `biz-payouts` Business payouts — Done when: Connect account + payout view. Evidence: —
 - [ ] `todo` `biz-customers` Customers — Done when: owner sees attendees without private PII they should not have. Evidence: —
 - [ ] `todo` `biz-reviews` Business reviews — Done when: listing/experience reviews from completed bookings. Evidence: —
