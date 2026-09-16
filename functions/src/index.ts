@@ -42,4 +42,12 @@ export {
   confirmExperienceBookingRemote,
 } from "./stripe";
 export { createStaffTicket, resolveStaffTicket, onStaffTicketCreated } from "./tickets";
+export {
+  createPromotion,
+  updatePromotion,
+  submitPromotion,
+  reviewPromotion,
+  enterPromotion,
+  seedPromotionDemo,
+} from "./promotions";
 

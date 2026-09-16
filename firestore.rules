@@ -399,6 +399,29 @@ service cloud.firestore {
       );
     }
 
+    // Giveaways & Promotions: public once live/closed; all writes via callables.
+    match /promotions/{promotionId} {
+      allow get, list: if resource.data.status == 'live'
+        || resource.data.status == 'closed'
+        || (signedIn() && resource.data.ownerUid == request.auth.uid)
+        || platformAdmin();
+      allow write: if false;
+    }
+
+    match /promotion_entries/{entryId} {
+      allow get, list: if signedIn() && (
+        resource.data.uid == request.auth.uid
+        || platformAdmin()
+        || get(/databases/$(database)/documents/promotions/$(resource.data.promotionId)).data.ownerUid == request.auth.uid
+      );
+      allow write: if false;
+    }
+
+    match /promotion_audit_logs/{logId} {
+      allow read: if signedIn() && platformAdmin();
+      allow write: if false;
+    }
+
     match /platform_settings/{docId} {
       allow read: if signedIn();
       allow write: if platformAdmin();

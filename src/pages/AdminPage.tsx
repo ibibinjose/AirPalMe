@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { Button } from "@/components/ui/Button";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { activePlaces } from "@/lib/catalog";
 import { useEvents } from "@/contexts/EventsContext";
 import { listBioDirectoryRemote, liveBackendEnabled, runAnalyticsAggregationRemote } from "@/lib/functions";
@@ -126,6 +126,16 @@ export function AdminPage() {
               </div>
             ))}
           </div>
+          <Link
+            href="/admin/promotions"
+            className="mt-4 flex items-center justify-between rounded-2xl border-2 border-ink bg-card p-4"
+          >
+            <span>
+              <span className="block text-sm font-bold">Giveaways & Promotions</span>
+              <span className="block text-xs text-mute">Review queue, campaigns, winners</span>
+            </span>
+            <span className="text-lg">→</span>
+          </Link>
         </>
       )}
       {tab === "system" && (

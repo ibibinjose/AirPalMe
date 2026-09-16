@@ -45,6 +45,14 @@ const BioEditPage = lazy(() => import("@/pages/BioEditPage").then((m) => ({ defa
 const BioRecoverPage = lazy(() => import("@/pages/BioRecoverPage").then((m) => ({ default: m.BioRecoverPage })));
 const CampusPage = lazy(() => import("@/pages/CampusPage").then((m) => ({ default: m.CampusPage })));
 const AdminPage = lazy(() => import("@/pages/AdminPage").then((m) => ({ default: m.AdminPage })));
+const GiveawaysPage = lazy(() => import("@/pages/GiveawaysPage").then((m) => ({ default: m.GiveawaysPage })));
+const PromotionsPage = lazy(() => import("@/pages/PromotionsPage").then((m) => ({ default: m.PromotionsPage })));
+const PromotionDetailPage = lazy(() =>
+  import("@/pages/PromotionDetailPage").then((m) => ({ default: m.PromotionDetailPage })),
+);
+const PromotionsAdminPage = lazy(() =>
+  import("@/pages/PromotionsAdminPage").then((m) => ({ default: m.PromotionsAdminPage })),
+);
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })));
 const AboutPage = lazy(() => import("@/pages/AboutPage").then((m) => ({ default: m.AboutPage })));
 const ContactPage = lazy(() => import("@/pages/ContactPage").then((m) => ({ default: m.ContactPage })));
@@ -161,6 +169,15 @@ export function AppRoutes() {
           <Redirect to="/partners" />
         </Route>
         <Route path="/admin" component={AdminPage} />
+        <Route path="/admin/promotions" component={PromotionsAdminPage} />
+        <Route path="/giveaways/:id">
+          <PromotionDetailPage kind="giveaway" />
+        </Route>
+        <Route path="/giveaways" component={GiveawaysPage} />
+        <Route path="/promotions/:id">
+          <PromotionDetailPage kind="promotion" />
+        </Route>
+        <Route path="/promotions" component={PromotionsPage} />
         <Route path="/about" component={AboutPage} />
         <Route path="/contact" component={ContactPage} />
         <Route path="/privacy" component={PrivacyPage} />

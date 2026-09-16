@@ -3,6 +3,7 @@ import { CalendarDays, List as ListIcon, Map as MapIcon, QrCode, Search, Sparkle
 import { useLocation, useSearch } from "wouter";
 import { motion, useReducedMotion } from "framer-motion";
 import { FilterChips } from "@/components/discovery/FilterChips";
+import { GiveawaysBand } from "@/components/promotions/GiveawaysBand";
 import { PlaceCard } from "@/components/discovery/PlaceCard";
 import { Photo } from "@/components/ui/Photo";
 import { TourCard } from "@/components/guide/TourCard";
@@ -271,6 +272,8 @@ export function DiscoverPage() {
           </div>
         </motion.div>
       </motion.div>
+
+      <GiveawaysBand />
 
       {view === "map" && (
         <section className="mt-6 px-4 pb-10 md:px-6">

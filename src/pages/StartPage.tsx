@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState, useMemo, type FormEvent } from "react";
+import { useEffect, useRef, useState, useMemo, type ComponentType, type FormEvent, type ReactNode } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import {
   AlertCircle,
   ArrowLeft,
+  BadgePercent,
+  BedDouble,
   Building2,
   CalendarDays,
   Check,
@@ -12,11 +14,16 @@ import {
   EyeOff,
   Lock,
   Mail,
+  MapPin,
+  Megaphone,
   Phone,
+  QrCode,
   ShieldCheck,
   Sparkles,
   Store,
+  Ticket,
   User,
+  Users,
 } from "lucide-react";
 import { authErrorMessage } from "@shared/auth-email";
 import { handleFromName, normalizeHandle, randomHexHandle } from "@shared/bio";
@@ -42,6 +49,58 @@ import { cn } from "@/lib/cn";
 
 type AuthMode = "signin" | "signup" | "reset";
 type AuthMethod = "email" | "phone";
+
+type RoleHeroItem = {
+  icon: ComponentType<{ size?: number | string; strokeWidth?: number | string }>;
+  title: string;
+  desc: string;
+  tint: string;
+};
+
+function RoleHero({
+  kicker,
+  title,
+  sub,
+  cta,
+  items,
+}: {
+  kicker: string;
+  title: ReactNode;
+  sub: string;
+  cta: string;
+  items: RoleHeroItem[];
+}) {
+  return (
+    <div className="mb-6 text-center">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">{kicker}</p>
+      <h1 className="font-display mt-2 text-3xl font-bold leading-tight">{title}</h1>
+      <p className="mx-auto mt-2 max-w-sm text-sm text-mute">{sub}</p>
+      <div className="mt-4 space-y-2 text-left">
+        {items.map((c) => (
+          <div
+            key={c.title}
+            className="flex items-center gap-3 rounded-2xl border-2 border-ink bg-card p-3"
+          >
+            <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-xl", c.tint)}>
+              <c.icon size={17} strokeWidth={2.2} />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold leading-tight">{c.title}</span>
+              <span className="block truncate text-xs text-mute">{c.desc}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={() => document.getElementById("auth-card")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+        className="mt-3 text-xs font-semibold text-brand hover:underline"
+      >
+        {cta}
+      </button>
+    </div>
+  );
+}
 
 export function StartPage() {
   const search = useSearch();
@@ -140,6 +199,16 @@ export function StartPage() {
     }
     if (emailParam && !email) setEmail(emailParam);
   }, [tabParam, emailParam]);
+
+  // Guest-first front door: default context (no host/business/event/club
+  // target) shows what AirPal is plus explore-first paths. Role contexts keep
+  // their focused banners.
+  const contextTarget = (roleParam || next).toLowerCase();
+  const isGuestStart = !/host|business|place|event|club/.test(contextTarget);
+  const isBusinessStart = /business|place/.test(contextTarget);
+  const isHostStart = /host/.test(contextTarget) && !isBusinessStart;
+  const isEventStart = /event/.test(contextTarget);
+  const isClubStart = /club/.test(contextTarget);
 
   // Determine role context
   const roleContext = useMemo(() => {
@@ -420,6 +489,98 @@ export function StartPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-8 md:py-12">
+      {isGuestStart && (
+        <div className="mb-6 text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">Life Made Easy</p>
+          <h1 className="font-display mt-2 text-3xl font-bold leading-tight">
+            Find a place. Make&nbsp;a&nbsp;plan. Meet&nbsp;your&nbsp;people.
+          </h1>
+          <p className="mx-auto mt-2 max-w-sm text-sm text-mute">
+            AirPal is your local companion — venues, walks, events, mates, and plans in one app.
+          </p>
+          <div className="mt-4 grid grid-cols-3 gap-2 text-left">
+            {[
+              { icon: MapPin, title: "Find places", desc: "Near you tonight", to: "/discover", tint: "bg-emerald-500/10 text-emerald-700" },
+              { icon: CalendarDays, title: "Make plans", desc: "Crew & public", to: "/plan", tint: "bg-brand/10 text-brand" },
+              { icon: Users, title: "Meet mates", desc: "Friend & team", to: "/mate", tint: "bg-amber-500/10 text-amber-700" },
+            ].map((c) => (
+              <button
+                key={c.to}
+                type="button"
+                onClick={() => nav(c.to)}
+                className="rounded-2xl border-2 border-ink bg-card p-3 transition hover:-translate-y-0.5 active:scale-[0.98]"
+              >
+                <span className={cn("grid h-8 w-8 place-items-center rounded-xl", c.tint)}>
+                  <c.icon size={16} strokeWidth={2.2} />
+                </span>
+                <span className="mt-2 block text-[13px] font-semibold leading-tight">{c.title}</span>
+                <span className="block text-[11px] text-mute">{c.desc}</span>
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => nav("/")}
+            className="mt-3 text-xs font-semibold text-brand hover:underline"
+          >
+            Browse first, join later →
+          </button>
+        </div>
+      )}
+
+      {isBusinessStart && (
+        <RoleHero
+          kicker="For local business"
+          title={<>Put your venue on AirPal&rsquo;s&nbsp;map.</>}
+          sub="Claim your @handle, publish perks guests redeem in-store, and welcome visitors staying nearby — free to list."
+          cta="List your business below — it takes a minute ↓"
+          items={[
+            { icon: Store, title: "Claim your @handle", desc: "Your public page on airpal.me", tint: "bg-emerald-500/10 text-emerald-700" },
+            { icon: BadgePercent, title: "Publish perks", desc: "Deals guests show at the till", tint: "bg-brand/10 text-brand" },
+            { icon: QrCode, title: "QR for your counter", desc: "Scans, taps and bookings tracked", tint: "bg-amber-500/10 text-amber-700" },
+          ]}
+        />
+      )}
+      {isHostStart && (
+        <RoleHero
+          kicker="For hosts"
+          title={<>Hosting changes everything.</>}
+          sub="List your rooms, approve every guest yourself, and get discovered by travellers staying nearby — you stay in control."
+          cta="List your space below — it takes a minute ↓"
+          items={[
+            { icon: BedDouble, title: "List your rooms", desc: "Rooms, bunks & crash pads", tint: "bg-emerald-500/10 text-emerald-700" },
+            { icon: ShieldCheck, title: "Approve every guest", desc: "Manual approval, your rules", tint: "bg-brand/10 text-brand" },
+            { icon: MapPin, title: "Get discovered", desc: "Show up in nearby stays", tint: "bg-amber-500/10 text-amber-700" },
+          ]}
+        />
+      )}
+      {isEventStart && (
+        <RoleHero
+          kicker="For organisers"
+          title={<>Fill every seat.</>}
+          sub="Publish your event, sell stalls to local vendors, and track RSVPs in one place — free to list."
+          cta="Publish your event below — it takes a minute ↓"
+          items={[
+            { icon: Megaphone, title: "Publish your event", desc: "Your page on airpal.me", tint: "bg-emerald-500/10 text-emerald-700" },
+            { icon: Store, title: "Sell stalls", desc: "Vendors book & pay online", tint: "bg-brand/10 text-brand" },
+            { icon: Users, title: "Track RSVPs", desc: "Know who's coming", tint: "bg-amber-500/10 text-amber-700" },
+          ]}
+        />
+      )}
+      {isClubStart && (
+        <RoleHero
+          kicker="For clubs & circles"
+          title={<>Run your circle, minus the admin.</>}
+          sub="Plan outings together, vote on stops, and keep everyone in the loop — free to start."
+          cta="Start your circle below — it takes a minute ↓"
+          items={[
+            { icon: CalendarDays, title: "Plan together", desc: "Propose dates & places", tint: "bg-emerald-500/10 text-emerald-700" },
+            { icon: Users, title: "Vote on stops", desc: "Everyone gets a say", tint: "bg-brand/10 text-brand" },
+            { icon: Ticket, title: "Keep everyone posted", desc: "One page for the whole crew", tint: "bg-amber-500/10 text-amber-700" },
+          ]}
+        />
+      )}
+
       {/* Context Role Banner */}
       <div className="mb-6 rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs">
         <div className="flex items-center gap-3">
@@ -451,7 +612,7 @@ export function StartPage() {
       )}
 
       {/* Main Card */}
-      <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-sm">
+      <div id="auth-card" className="rounded-3xl border-2 border-ink bg-card p-6 shadow-sm scroll-mt-4">
         {mode === "reset" ? (
           /* Password Reset Flow */
           <div>

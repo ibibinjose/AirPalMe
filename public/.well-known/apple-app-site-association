@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "REPLACE_WITH_TEAMID.me.airpal.app",
+        "paths": ["*"]
+      }
+    ]
+  }
+}
