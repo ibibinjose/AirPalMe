@@ -1,0 +1,74 @@
+{
+  "hosting": {
+    "public": "dist",
+    "ignore": ["firebase.json", "**/.DS_Store", "**/node_modules/**"],
+    "redirects": [
+      {
+        "source": "/auth",
+        "destination": "/start?tab=signin",
+        "type": 301
+      },
+      {
+        "source": "/reset",
+        "destination": "/start?tab=reset",
+        "type": 302
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/sw.js",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+      },
+      {
+        "source": "/assets/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
+      },
+      {
+        "source": "**",
+        "headers": [
+          { "key": "X-Content-Type-Options", "value": "nosniff" },
+          { "key": "X-Frame-Options", "value": "DENY" },
+          { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+          { "key": "Permissions-Policy", "value": "camera=(self), geolocation=(self), microphone=()" },
+          { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains; preload" },
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://www.gstatic.com https://www.google.com https://maps.googleapis.com https://maps.gstatic.com https://*.googleapis.com https://*.gstatic.com https://www.recaptcha.net https://www.gstatic.com/recaptcha/ https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.google.com https://*.gstatic.com https://www.recaptcha.net https://*.firebaseio.com https://*.firebasestorage.app https://*.cloudfunctions.net https://*.firebaseapp.com wss://*.firebaseio.com https://api.open-meteo.com https://api.bigdatacloud.net https://*.bigdatacloud.net https://api-bdc.io https://*.api-bdc.io https://nominatim.openstreetmap.org data: blob:; frame-src https://www.google.com https://maps.google.com https://*.google.com https://www.recaptcha.net https://*.firebaseapp.com; worker-src 'self' blob:"
+          }
+        ]
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "predeploy": ["npm --prefix functions run build"]
+    }
+  ],
+  "emulators": {
+    "auth": { "port": 9099 },
+    "firestore": { "port": 8080 },
+    "functions": { "port": 5001 },
+    "storage": { "port": 9199 },
+    "ui": { "enabled": true }
+  }
+}

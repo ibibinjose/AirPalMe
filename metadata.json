@@ -1,0 +1,11 @@
+{
+  "name": "AirPal.me",
+  "description": "Scan a place. See what’s around. AirPal is the guest concierge and local guide — no account, no download.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

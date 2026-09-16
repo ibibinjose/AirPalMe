@@ -1,0 +1,130 @@
+import { useEffect, useState } from "react";
+import { useLocation, useRoute } from "wouter";
+import { useStay } from "@/contexts/StayContext";
+import { fetchCampus, loadCampus, type CampusDoc } from "@/lib/campus-store";
+import { Sheet } from "@/components/ui/Sheet";
+import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
+import { toast } from "sonner";
+import { noteQrContext, trackContentAction } from "@/lib/analytics";
+
+export function CampusPage() {
+  const [, nav] = useLocation();
+  const [, params] = useRoute("/c/:id");
+  const id = params?.id || "";
+  const { setSession } = useStay();
+  const [campus, setCampus] = useState<CampusDoc | undefined>(() => loadCampus(id));
+  const [checked, setChecked] = useState(false);
+  const [wifi, setWifi] = useState(false);
+  const [tab, setTab] = useState<"today" | "campus" | "help">("today");
+
+  useEffect(() => {
+    setSession({ kind: "campus", campusId: params?.id, room: undefined });
+    if (params?.id) noteQrContext(`campus:${params.id}`, { campusId: params.id, source: "campus" });
+  }, [params?.id, setSession]);
+  useEffect(() => {
+    let alive = true;
+    void fetchCampus(id).then((c) => {
+      if (!alive) return;
+      setCampus(c);
+      setChecked(true);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [id]);
+  if (!campus) {
+    if (!checked) return <PageLoading />;
+    return (
+      <div className="mx-auto max-w-lg px-4 py-16 text-center">
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Unknown campus</p>
+        <h1 className="font-display mt-1 text-3xl font-semibold">This campus isn’t listed</h1>
+        <Button className="mt-6" onClick={() => nav("/")}>Explore nearby</Button>
+      </div>
+    );
+  }
+  const CAMPUS = campus;
+
+  return (
+    <div className="mx-auto max-w-lg px-4 pb-10">
+      <p className="pt-3 text-[11px] uppercase tracking-[0.16em] text-gold">{CAMPUS.university}</p>
+      <h1 className="font-display mt-1 text-3xl font-semibold">{CAMPUS.name}</h1>
+      <div className="mt-4 flex gap-2">
+        {(["today", "campus", "help"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`h-9 rounded-full px-4 text-sm capitalize ${tab === t ? "bg-ink text-white" : "bg-white ring-1 ring-line"}`}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      {tab === "today" && (
+        <ul className="mt-5 space-y-2">
+          {(CAMPUS.classes || []).slice(0, 5).map((c) => (
+            <li key={c.id} className="rounded-2xl bg-card px-4 py-3 ring-1 ring-line">
+              <p className="text-[12px] text-mute">
+                {c.start}–{c.end} · {c.place}
+              </p>
+              <p className="font-medium">{c.title}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {tab === "campus" && (
+        <ul className="mt-5 space-y-2">
+          {(CAMPUS.places || []).map((p) => (
+            <li key={p.id} className="rounded-2xl bg-card px-4 py-3 ring-1 ring-line">
+              <p className="text-[12px] text-mute">
+                {p.category} · {p.minutes}
+              </p>
+              <p className="font-medium">{p.name}</p>
+            </li>
+          ))}
+          {(CAMPUS.events || []).slice(0, 3).map((e) => (
+            <li key={e.id} className="rounded-2xl bg-card px-4 py-3 ring-1 ring-line">
+              <p className="text-[12px] text-gold">
+                {e.time} · {e.where}
+              </p>
+              <p className="font-medium">{e.title}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {tab === "help" && (
+        <div className="mt-5 space-y-3">
+          <Button
+            className="w-full"
+            onClick={() => {
+              setWifi(true);
+              trackContentAction("wifi_reveal", params?.id || CAMPUS.id);
+            }}
+          >
+            Wi-Fi
+          </Button>
+          {CAMPUS.security && (
+            <a href={`tel:${CAMPUS.security}`} className="flex h-11 items-center justify-center rounded-full bg-white ring-1 ring-line">
+              Security
+            </a>
+          )}
+          <Button
+            variant="ghost"
+            className="w-full"
+            onClick={() => toast.success("Sent")}
+          >
+            Request
+          </Button>
+        </div>
+      )}
+
+      <Sheet open={wifi} onClose={() => setWifi(false)} title="Wi-Fi">
+        <p className="font-display text-2xl">{CAMPUS.wifi?.network || "Ask the campus office"}</p>
+        <p className="mt-1 text-mute">{CAMPUS.wifi?.password || "Use eduroam with your student ID."}</p>
+      </Sheet>
+    </div>
+  );
+}

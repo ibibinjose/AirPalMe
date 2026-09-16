@@ -1,0 +1,39 @@
+import type { ButtonHTMLAttributes } from "react";
+import { cn } from "@/lib/cn";
+
+type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: "primary" | "ghost" | "dark" | "gold" | "light" | "onDark";
+  size?: "md" | "lg" | "sm";
+  loading?: boolean;
+};
+
+export function Button({ variant = "primary", size = "md", className, loading, disabled, children, ...props }: Props) {
+  return (
+    <button
+      className={cn(
+        "inline-flex touch-manipulation select-none items-center justify-center gap-2 rounded-full font-medium transition active:scale-[0.98] disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
+        size === "sm" && "h-9 px-3.5 text-sm",
+        size === "md" && "h-11 px-5 text-[15px]",
+        size === "lg" && "h-12 px-6 text-base",
+        variant === "primary" && "bg-brand text-white",
+        variant === "ghost" && "bg-white/80 text-ink ring-1 ring-line",
+        variant === "dark" && "bg-ink text-white",
+        variant === "gold" && "bg-gold text-white",
+        variant === "light" && "bg-white text-ink hover:bg-white/90",
+        variant === "onDark" && "bg-ink/80 text-white ring-1 ring-white/55 hover:bg-ink",
+        className,
+      )}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      {...props}
+    >
+      {loading ? (
+        <span
+          className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent"
+          aria-hidden
+        />
+      ) : null}
+      {children}
+    </button>
+  );
+}

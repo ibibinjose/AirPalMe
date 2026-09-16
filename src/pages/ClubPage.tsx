@@ -1,0 +1,93 @@
+import { useState, type FormEvent } from "react";
+import { Link, useLocation } from "wouter";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/Button";
+import { Photo } from "@/components/ui/Photo";
+import { useAuth } from "@/contexts/AuthContext";
+import { useClub } from "@/contexts/ClubContext";
+
+export function ClubPage() {
+  const [, nav] = useLocation();
+  const { user } = useAuth();
+  const { joinClub, leaveClub, memberByEmail } = useClub();
+  const [name, setName] = useState(user?.displayName || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [city, setCity] = useState("Sydney");
+  const [invites, setInvites] = useState(true);
+  const [offers, setOffers] = useState(true);
+  const mine = memberByEmail(email);
+
+  function onJoin(e: FormEvent) {
+    e.preventDefault();
+    try {
+      joinClub({ name, email, city, invites, offers });
+      toast.success("You're in AirPal Club");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed");
+    }
+  }
+
+  return (
+    <div>
+      <div className="mx-auto max-w-md px-4 pb-6 pt-6 md:px-6">
+        <div className="overflow-hidden rounded-[28px]">
+          <Photo src="/media/laneway.jpg" className="h-48 w-full object-cover" />
+        </div>
+        <p className="mt-6 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">AirPal Club</p>
+        <h1 className="font-display mt-1 text-3xl font-semibold">Invites and offers, kept on this device.</h1>
+        <p className="mt-3 text-[15px] leading-relaxed text-ink/80">
+          Join AirPal Club to be on our list for nights, markets, and deals. Clubs on AirPal can add you to their guest list. Invites today open the sender’s mail app with the list on BCC — we do not send bulk mail from our servers yet.
+        </p>
+
+        {mine ? (
+          <div className="mt-6 rounded-3xl bg-card p-5 ring-1 ring-line">
+            <p className="font-medium">You're in</p>
+            <p className="mt-1 text-sm text-mute">
+              {mine.email}
+              {mine.invites ? " · invites" : ""}
+              {mine.offers ? " · offers" : ""}
+            </p>
+            <button
+              type="button"
+              className="mt-4 text-sm text-brand"
+              onClick={() => {
+                leaveClub(mine.email);
+                toast.message("Left AirPal Club");
+              }}
+            >
+              Leave
+            </button>
+          </div>
+        ) : (
+          <form className="mt-6 space-y-3" onSubmit={onJoin}>
+            <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" autoCapitalize="words" placeholder="Name" required className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
+            <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
+            <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" className="h-12 w-full rounded-2xl bg-card px-4 ring-1 ring-line outline-none" />
+            <label className="flex items-center gap-3 text-sm">
+              <input type="checkbox" checked={invites} onChange={(e) => setInvites(e.target.checked)} />
+              Nights and guest-list invites
+            </label>
+            <label className="flex items-center gap-3 text-sm">
+              <input type="checkbox" checked={offers} onChange={(e) => setOffers(e.target.checked)} />
+              Offers from AirPal Club
+            </label>
+            <Button type="submit" className="w-full">
+              Join AirPal Club
+            </Button>
+            <p className="text-[12px] text-mute">
+              Unsubscribe any time. See{" "}
+              <Link href="/privacy" className="text-brand">
+                Privacy
+              </Link>
+              .
+            </p>
+          </form>
+        )}
+
+        <button type="button" className="mt-8 w-full text-center text-sm text-brand" onClick={() => nav("/club/list")}>
+          Clubs: open the guest list
+        </button>
+      </div>
+    </div>
+  );
+}

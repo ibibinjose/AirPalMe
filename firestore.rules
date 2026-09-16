@@ -1,0 +1,667 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAnonymous() {
+      return signedIn() && request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+
+    function platformAdmin() {
+      return signedIn() && (
+        request.auth.token.platform_admin == true ||
+        request.auth.token.role == 'super_admin'
+      );
+    }
+
+    function propertyDoc(propertyId) {
+      return get(/databases/$(database)/documents/properties/$(propertyId)).data;
+    }
+
+    function propertyExists(propertyId) {
+      return exists(/databases/$(database)/documents/properties/$(propertyId));
+    }
+
+    function tokenRole(propertyId) {
+      return request.auth.token.keys().hasAny(['properties'])
+        ? request.auth.token.properties[propertyId]
+        : null;
+    }
+
+    function docMemberRole(propertyId) {
+      return propertyDoc(propertyId).keys().hasAny(['members'])
+        ? propertyDoc(propertyId).members[request.auth.uid]
+        : null;
+    }
+
+    function manages(propertyId) {
+      return platformAdmin() || (
+        signedIn() &&
+        propertyExists(propertyId) &&
+        (
+          propertyDoc(propertyId).ownerId == request.auth.uid ||
+          docMemberRole(propertyId) in ['host_admin', 'staff'] ||
+          tokenRole(propertyId) in ['host_admin', 'staff']
+        )
+      );
+    }
+
+    function hosts(propertyId) {
+      return platformAdmin() || (
+        signedIn() &&
+        propertyExists(propertyId) &&
+        (
+          propertyDoc(propertyId).ownerId == request.auth.uid ||
+          docMemberRole(propertyId) == 'host_admin' ||
+          tokenRole(propertyId) == 'host_admin'
+        )
+      );
+    }
+
+    // ACL fields must only change via privileged Cloud Functions (setPropertyMember, etc.).
+    function propertyAclUnlocked() {
+      return !request.resource.data.diff(resource.data).affectedKeys()
+        .hasAny(['ownerId', 'members', 'id']);
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || platformAdmin());
+      allow create, delete: if false;
+      allow update: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.propertyIds == resource.data.propertyIds;
+
+      match /travel/{documentId} {
+        allow read, write: if signedIn() && request.auth.uid == userId;
+      }
+
+      match /vouchers/{voucherId} {
+        allow read: if signedIn() && request.auth.uid == userId;
+        allow write: if false;
+      }
+
+      match /dealClaims/{dealId} {
+        allow read: if signedIn() && request.auth.uid == userId;
+        allow write: if false;
+      }
+
+      match /savedEvents/{eventId} {
+        allow read, write: if signedIn() && request.auth.uid == userId;
+      }
+
+      match /savedStalls/{stallId} {
+        allow read, write: if signedIn() && request.auth.uid == userId;
+      }
+
+      match /calendar/{eventId} {
+        allow read, write: if signedIn() && request.auth.uid == userId;
+      }
+
+      match /likes/{likeId} {
+        allow read, write: if signedIn() && request.auth.uid == userId;
+      }
+
+      match /follows/{handle} {
+        allow read, write: if signedIn() && request.auth.uid == userId;
+      }
+
+      match /zoo/{docId} {
+        allow read, write: if signedIn() && request.auth.uid == userId && !isAnonymous();
+      }
+
+      match /fcmTokens/{tokenId} {
+        allow read, write: if signedIn() && request.auth.uid == userId;
+      }
+
+      match /hostAlerts/{alertId} {
+        allow read, delete: if signedIn() && request.auth.uid == userId;
+        allow create, update: if false;
+      }
+    }
+
+    match /events/{eventId} {
+      allow get, list: if resource.data.status in ['live', 'ended']
+        || (signedIn() && resource.data.organiserUid == request.auth.uid)
+        || platformAdmin();
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.organiserUid == request.auth.uid
+        && request.resource.data.keys().hasAny(['updatedAt']);
+      allow update, delete: if signedIn() && resource.data.organiserUid == request.auth.uid
+        || platformAdmin();
+
+      match /stalls/{stallId} {
+        allow get, list: if true;
+        allow write: if signedIn() && (
+          get(/databases/$(database)/documents/events/$(eventId)).data.organiserUid == request.auth.uid
+          || platformAdmin()
+        );
+      }
+
+      match /feedback/{ratingId} {
+        allow read: if signedIn() && (
+          resource.data.uid == request.auth.uid
+          || get(/databases/$(database)/documents/events/$(eventId)).data.organiserUid == request.auth.uid
+          || platformAdmin()
+        );
+        allow create: if signedIn()
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.emoji is string
+          && request.resource.data.mood is string;
+        allow update, delete: if false;
+      }
+    }
+
+    match /properties/{propertyId} {
+      // Public property docs must not contain wifi.password — see private/hostSecrets.
+      allow read: if true;
+      allow create: if platformAdmin()
+        && request.resource.data.ownerId is string
+        && request.resource.data.id == propertyId;
+      allow update: if hosts(propertyId) && propertyAclUnlocked();
+      allow delete: if hosts(propertyId);
+
+      match /feedback/{ratingId} {
+        allow read: if hosts(propertyId) || platformAdmin()
+          || (signedIn() && resource.data.uid == request.auth.uid);
+        allow create: if signedIn()
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.emoji is string
+          && request.resource.data.mood is string;
+        allow update, delete: if false;
+      }
+
+      match /deals/{documentId} {
+        allow read: if true;
+        allow create, update, delete: if manages(propertyId);
+      }
+      match /menu/{documentId} {
+        allow read: if true;
+        allow create, update, delete: if manages(propertyId);
+      }
+      match /places/{documentId} {
+        allow read: if true;
+        allow create, update, delete: if manages(propertyId);
+      }
+      match /qrCodes/{documentId} {
+        allow read: if true;
+        allow create, update, delete: if manages(propertyId);
+      }
+      match /dealSecrets/{documentId} {
+        allow read, write: if hosts(propertyId);
+      }
+
+      // Host-only secrets (wifi.password and similar). Guests use getPropertyWifi callable.
+      match /private/{docId} {
+        allow read, write: if hosts(propertyId);
+      }
+
+      match /tickets/{ticketId} {
+        allow read: if manages(propertyId);
+        allow create: if signedIn()
+          && propertyExists(propertyId)
+          && request.resource.data.propertyId == propertyId
+          && request.resource.data.status == 'pending'
+          && request.resource.data.category in ['reception', 'housekeeping', 'maintenance', 'dining', 'late_checkout']
+          && request.resource.data.urgency in ['normal', 'urgent']
+          && request.resource.data.roomNumber is string
+          && request.resource.data.guestName is string
+          && request.resource.data.details is string
+          && request.resource.data.details.size() < 2000;
+        allow update, delete: if manages(propertyId)
+          && request.resource.data.propertyId == resource.data.propertyId
+          && request.resource.data.id == resource.data.id;
+      }
+
+      match /events/{eventId} {
+        allow read: if manages(propertyId);
+        allow create: if signedIn()
+          && propertyExists(propertyId)
+          && request.resource.data.propertyId == propertyId
+          && request.resource.data.name is string
+          && request.resource.data.name.size() < 160;
+        allow update, delete: if manages(propertyId);
+      }
+
+      match /conversations/{conversationId} {
+        allow read: if manages(propertyId);
+        allow create: if signedIn()
+          && propertyExists(propertyId)
+          && request.resource.data.propertyId == propertyId
+          && request.resource.data.question is string
+          && request.resource.data.question.size() < 4000;
+        allow update, delete: if manages(propertyId);
+      }
+
+      match /transactions/{transactionId} {
+        allow read: if manages(propertyId);
+        // Commercial writes require a non-anonymous signed-in user.
+        allow create: if signedIn()
+          && !isAnonymous()
+          && propertyExists(propertyId)
+          && request.resource.data.propertyId == propertyId
+          && request.resource.data.kind in ['upsell', 'experience', 'dining']
+          && request.resource.data.amount is number;
+        allow update, delete: if manages(propertyId);
+      }
+
+      match /staffPresence/{staffId} {
+        allow read: if manages(propertyId);
+        allow create, update: if manages(propertyId)
+          && propertyExists(propertyId)
+          && request.resource.data.propertyId == propertyId
+          && request.resource.data.status in ['available', 'busy', 'on_break', 'off_shift'];
+        allow delete: if manages(propertyId);
+      }
+    }
+
+    match /businessDeals/{dealId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /businessDealSecrets/{dealId} {
+      allow read, write: if false;
+    }
+
+    match /vouchers/{voucherId} {
+      allow read: if signedIn() && (
+        resource.data.uid == request.auth.uid ||
+        platformAdmin()
+      );
+      allow write: if false;
+    }
+
+    match /partnerVenues/{venueId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /handles/{handle} {
+      allow get: if true;
+      allow list: if false;
+      allow write: if false;
+    }
+
+    match /profiles/{profileId} {
+      allow get: if true;
+      allow list: if signedIn() && resource.data.ownerUid == request.auth.uid;
+      allow write: if false;
+
+      match /taps/{day} {
+        allow get: if signedIn() && get(/databases/$(database)/documents/profiles/$(profileId)).data.ownerUid == request.auth.uid;
+        allow list: if signedIn() && get(/databases/$(database)/documents/profiles/$(profileId)).data.ownerUid == request.auth.uid;
+        allow write: if false;
+      }
+
+      match /claims/{claimId} {
+        allow get: if signedIn() && (
+          resource.data.uid == request.auth.uid ||
+          get(/databases/$(database)/documents/profiles/$(profileId)).data.ownerUid == request.auth.uid
+        );
+        allow list: if signedIn() && get(/databases/$(database)/documents/profiles/$(profileId)).data.ownerUid == request.auth.uid;
+        allow write: if false;
+      }
+    }
+
+    match /listings/{listingId} {
+      allow get, list: if resource.data.status == 'active'
+        || (signedIn() && resource.data.ownerUid == request.auth.uid)
+        || platformAdmin();
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.keys().hasAny(['updatedAt']);
+      allow update, delete: if signedIn() && resource.data.ownerUid == request.auth.uid
+        || platformAdmin();
+    }
+
+    // AirPal Studio walkthrough bookings: owner + admins can read; team triages.
+    match /studio_walkthroughs/{bookingId} {
+      allow read: if signedIn() && (
+        resource.data.ownerUid == request.auth.uid ||
+        platformAdmin()
+      );
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.keys().hasAny(['updatedAt']);
+      allow update: if signedIn() && platformAdmin();
+      allow delete: if signedIn() && (
+        resource.data.ownerUid == request.auth.uid ||
+        platformAdmin()
+      );
+    }
+
+    // §20 operating system: every admin action writes here. Admins only.
+    match /admin_audits/{auditId} {
+      allow create: if signedIn() && platformAdmin()
+        && request.resource.data.actorUid == request.auth.uid;
+      allow read: if signedIn() && platformAdmin();
+      allow update, delete: if false;
+    }
+
+    // B2B engine: campaigns are public once live; bookings tracked per campaign.
+    // Money movement is deferred until Stripe lands (paymentStatus == 'deferred').
+    match /campaigns/{campaignId} {
+      allow get, list: if resource.data.status == 'live'
+        || (signedIn() && resource.data.ownerUid == request.auth.uid)
+        || platformAdmin();
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasAny(['updatedAt']);
+      allow update: if signedIn() && (
+        platformAdmin() ||
+        (resource.data.ownerUid == request.auth.uid
+          && request.resource.data.ownerUid == request.auth.uid)
+      );
+      allow delete: if signedIn() && (
+        resource.data.ownerUid == request.auth.uid ||
+        platformAdmin()
+      );
+    }
+
+    match /campaign_rsvps/{rsvpId} {
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.attendeeUid == request.auth.uid
+        && request.resource.data.keys().hasAny(['updatedAt']);
+      allow read: if signedIn() && (
+        resource.data.attendeeUid == request.auth.uid ||
+        platformAdmin() ||
+        get(/databases/$(database)/documents/campaigns/$(resource.data.campaignId)).data.ownerUid == request.auth.uid
+      );
+      allow update, delete: if signedIn() && (
+        resource.data.attendeeUid == request.auth.uid ||
+        platformAdmin()
+      );
+    }
+
+    // Trust moat: safety reports open admin cases; blocks are private to the blocker.
+    match /safety_reports/{reportId} {
+      allow read: if signedIn() && (
+        resource.data.reporterUid == request.auth.uid ||
+        platformAdmin()
+      );
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.keys().hasAny(['updatedAt']);
+      allow update: if signedIn() && platformAdmin();
+      allow delete: if false;
+    }
+
+    match /blocks/{blockId} {
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.blockerUid == request.auth.uid;
+      allow get, update, delete: if signedIn() && resource.data.blockerUid == request.auth.uid;
+      allow list: if false;
+    }
+
+    // AirPal Mate requests: owner reads/writes their own; admins run manual matching.
+    match /mate_requests/{requestId} {
+      allow read: if signedIn() && (
+        resource.data.ownerUid == request.auth.uid ||
+        platformAdmin()
+      );
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.keys().hasAny(['updatedAt']);
+      allow update: if signedIn() && (
+        platformAdmin() ||
+        (resource.data.ownerUid == request.auth.uid
+          && request.resource.data.ownerUid == request.auth.uid)
+      );
+      allow delete: if signedIn() && (
+        resource.data.ownerUid == request.auth.uid ||
+        platformAdmin()
+      );
+    }
+
+    match /partnerClaims/{claimId} {
+      allow read: if signedIn() && (
+        resource.data.uid == request.auth.uid ||
+        platformAdmin()
+      );
+      allow write: if false;
+    }
+
+    // AirPal Companion applications: applicant owns their doc, admins review.
+    // Private adminNotes must never be served to non-admins; clients use the
+    // public projection for any shared view.
+    match /companion_applications/{applicationId} {
+      allow get, list: if signedIn()
+        && (resource.data.userId == request.auth.uid || platformAdmin());
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status in ['draft', 'submitted']
+        && request.resource.data.keys().hasOnly([
+          'applicationId', 'userId', 'roles', 'fullName', 'photo', 'email', 'phone',
+          'city', 'suburb', 'ageRange', 'introduction', 'languages', 'interests',
+          'hobbies', 'enjoysWithOthers', 'activities', 'availability', 'serviceArea',
+          'pricingPreference', 'preferredRate', 'motivation', 'policeClearanceNumber',
+          'policeClearanceDoc', 'applicantAgreementAccepted',
+          'communityGuidelinesAccepted', 'status', 'submittedAt', 'createdAt', 'updatedAt',
+        ]);
+      allow update: if platformAdmin()
+        || (signedIn()
+          && resource.data.userId == request.auth.uid
+          && resource.data.status in ['draft', 'more_info']
+          && request.resource.data.userId == request.auth.uid
+          && request.resource.data.status in ['draft', 'submitted']);
+      allow delete: if platformAdmin();
+    }
+
+    // Share-by-id: anyone with the link can get a trip; listing the collection is blocked.
+    match /trips/{tripId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.id == tripId
+        && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+    }
+
+    // Physical marker docs for /q/{markerHex}. Public get; list only own property/owner.
+    match /markers/{markerId} {
+      allow get: if true;
+      allow list: if platformAdmin() || (
+        resource.data.keys().hasAny(['propertyId']) &&
+        resource.data.propertyId is string &&
+        hosts(resource.data.propertyId)
+      ) || (
+        signedIn() &&
+        resource.data.keys().hasAny(['ownerUid']) &&
+        resource.data.ownerUid == request.auth.uid
+      );
+      allow create: if platformAdmin() || (
+        request.resource.data.propertyId is string && hosts(request.resource.data.propertyId)
+      ) || (
+        signedIn() &&
+        request.resource.data.ownerUid == request.auth.uid &&
+        request.resource.data.kind == 'venue'
+      );
+      allow update, delete: if platformAdmin() || (
+        resource.data.propertyId is string && hosts(resource.data.propertyId)
+      ) || (
+        signedIn() && resource.data.ownerUid == request.auth.uid
+      );
+    }
+
+    // City-only presence for Circle. Exact GPS never stored here.
+    match /presence/{handle} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    match /graph/{handle} {
+      match /followers/{fromHandle} {
+        allow read: if signedIn();
+        allow create, update: if signedIn() && request.resource.data.uid == request.auth.uid;
+        allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+      }
+      match /likedBy/{fromHandle} {
+        allow read: if signedIn();
+        allow create, update: if signedIn() && request.resource.data.uid == request.auth.uid;
+        allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+      }
+    }
+
+    match /precincts/{precinctId} {
+      allow get, list: if resource.data.status == 'active' || platformAdmin();
+      allow write: if platformAdmin();
+    }
+
+    // Published walking tours (Guide). Public read; admin writes via seed/console.
+    match /tours/{tourId} {
+      allow get, list: if true;
+      allow write: if platformAdmin();
+    }
+
+    // Campus companion docs for /c/{id}. Public get; list is admin-only.
+    match /campuses/{campusId} {
+      allow get: if true;
+      allow list: if platformAdmin();
+      allow write: if platformAdmin();
+    }
+
+    // Zoo hunts. Public read so a scan can resolve a sticker without sign-in.
+    match /zooHunts/{huntId} {
+      allow get, list: if true;
+      allow write: if platformAdmin();
+    }
+
+    // Precinct Nearby places. Query must include status == 'active' for public list.
+    match /places/{placeId} {
+      allow get, list: if resource.data.status == 'active' || platformAdmin() || (
+        resource.data.keys().hasAny(['propertyId']) &&
+        resource.data.propertyId is string &&
+        manages(resource.data.propertyId)
+      );
+      allow create, update: if platformAdmin() || (
+        request.resource.data.propertyId is string && hosts(request.resource.data.propertyId)
+      ) || (
+        signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.source == 'partner'
+      );
+      allow delete: if platformAdmin() || (
+        resource.data.propertyId is string && hosts(resource.data.propertyId)
+      ) || (
+        signedIn() && resource.data.ownerUid == request.auth.uid
+      );
+    }
+
+    match /nearbyEvents/{eventId} {
+      allow get, list: if resource.data.status == 'active' || platformAdmin() || (
+        resource.data.keys().hasAny(['propertyId']) &&
+        resource.data.propertyId is string &&
+        manages(resource.data.propertyId)
+      );
+      allow create, update, delete: if platformAdmin() || (
+        request.resource.data.propertyId is string && hosts(request.resource.data.propertyId)
+      );
+    }
+
+    match /scanEvents/{eventId} {
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.markerId is string
+        && request.resource.data.kind in [
+          'open', 'category', 'place', 'place_view', 'ask', 'issue', 'offers', 'order',
+          'booking_click', 'booking_return'
+        ];
+      allow get: if platformAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow list, update, delete: if platformAdmin();
+    }
+
+    match /analyticsEvents/{eventId} {
+      allow read: if platformAdmin();
+      allow write: if false;
+    }
+
+    match /analyticsEventRejects/{docId} {
+      allow read: if platformAdmin();
+      allow write: if false;
+    }
+
+    match /analyticsDaily/{docId} {
+      allow read: if platformAdmin() || (
+        signedIn() &&
+        resource.data.keys().hasAny(['tenantId']) &&
+        resource.data.tenantId == request.auth.uid
+      );
+      allow write: if false;
+    }
+
+    match /rateLimits/{docId} {
+      allow read, write: if false;
+    }
+
+    match /abuseSignals/{docId} {
+      allow read: if platformAdmin();
+      allow write: if false;
+    }
+
+    match /contentAudits/{docId} {
+      allow read: if platformAdmin();
+      allow write: if false;
+    }
+
+    match /booking_clicks/{clickId} {
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid;
+      allow get: if platformAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow list, update, delete: if platformAdmin();
+    }
+
+    // Hangout & Outing Plans collection
+    match /plans/{planId} {
+      allow get: if resource.data.isPublic == true
+        || platformAdmin()
+        || (signedIn() && resource.data.creator.uid == request.auth.uid)
+        || resource.data.status in ['open', 'confirmed'];
+      allow list: if resource.data.isPublic == true
+        || platformAdmin()
+        || (signedIn() && resource.data.creator.uid == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.id is string
+        && request.resource.data.title is string
+        && request.resource.data.date is string
+        && request.resource.data.time is string;
+      allow update: if platformAdmin()
+        || (signedIn() && resource.data.creator.uid == request.auth.uid)
+        || (signedIn() && (
+          // Collaborators/Guests can RSVP, add stops, or add comments
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendees', 'stops', 'comments', 'subscribers', 'updatedAt'])
+        ));
+      allow delete: if platformAdmin()
+        || (signedIn() && resource.data.creator.uid == request.auth.uid);
+
+      match /activity/{activityId} {
+        allow read: if resource.data.isPublic == true
+          || platformAdmin()
+          || (signedIn() && get(/databases/$(database)/documents/plans/$(planId)).data.creator.uid == request.auth.uid);
+        allow create: if signedIn()
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 500
+          && request.resource.data.keys().hasOnly(['text', 'authorId', 'authorName', 'createdAt'])
+          && request.resource.data.authorId == request.auth.uid;
+        allow update, delete: if platformAdmin()
+          || (signedIn() && resource.data.authorId == request.auth.uid);
+      }
+    }
+  }
+}

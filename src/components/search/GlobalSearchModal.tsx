@@ -1,0 +1,453 @@
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useLocation } from "wouter";
+import { collection, getDocs, limit, query as fsQuery, where } from "firebase/firestore";
+import { Search, MapPin, CalendarDays, Sparkles, Users, Building2, Wifi, ArrowRight, X, Compass, Footprints, HeartHandshake } from "lucide-react";
+import { activePlaces, toursForPrecinct } from "@/lib/catalog";
+import { getFirebaseDb } from "@/lib/firebase";
+import type { Campaign } from "@shared/campaign";
+import { loadTours } from "@/lib/tours-store";
+import { useEvents } from "@/contexts/EventsContext";
+import { useListings } from "@/contexts/ListingsContext";
+import { usePlans } from "@/contexts/PlanContext";
+import { triggerHaptic } from "@/lib/native";
+import { useScrollLock } from "@/hooks/useScrollLock";
+import { cn } from "@/lib/cn";
+
+export function openGlobalSearch() {
+  window.dispatchEvent(new CustomEvent("airpal-open-search"));
+}
+
+type SearchCategory = "all" | "places" | "events" | "stay" | "plan" | "experiences";
+
+interface SearchResultItem {
+  id: string;
+  category: "place" | "event" | "stay" | "plan" | "partner" | "experience";
+  title: string;
+  subtitle: string;
+  badge?: string;
+  href: string;
+  icon: typeof Compass;
+}
+
+export function GlobalSearchModal() {
+  const { version: catalogVersion } = useListings();
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState<SearchCategory>("all");
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [, nav] = useLocation();
+  const { calendarEvents } = useEvents();
+  const { plans } = usePlans();
+  const [liveExperiences, setLiveExperiences] = useState<Campaign[]>([]);
+
+  useScrollLock(open);
+
+  // Live AirPal Experiences for search (small capped read when opened).
+  useEffect(() => {
+    if (!open) return;
+    const db = getFirebaseDb();
+    if (!db) return;
+    void getDocs(fsQuery(collection(db, "campaigns"), where("status", "==", "live"), limit(20)))
+      .then((snap) => setLiveExperiences(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Campaign, "id">) }))))
+      .catch(() => undefined);
+  }, [open]);
+
+  // Keyboard shortcut (Cmd+K / Ctrl+K) and custom event listener
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setOpen((prev) => !prev);
+      } else if (e.key === "Escape" && open) {
+        setOpen(false);
+      }
+    }
+
+    function handleOpenEvent() {
+      setOpen(true);
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("airpal-open-search", handleOpenEvent);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("airpal-open-search", handleOpenEvent);
+    };
+  }, [open]);
+
+  // Focus input when opened
+  useEffect(() => {
+    if (open) {
+      void triggerHaptic("light");
+      setQuery("");
+      setSelectedIndex(0);
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
+  }, [open]);
+
+  // Generate indexed search results
+  const results = useMemo<SearchResultItem[]>(() => {
+    const q = query.trim().toLowerCase();
+    const items: SearchResultItem[] = [];
+
+    // Default Quick Actions when query is empty
+    if (!q) {
+      items.push(
+        {
+          id: "qa-plan-night",
+          category: "plan",
+          title: "Plan a Night Out with Mates",
+          subtitle: "Rooftop drinks, pubs & late-night spots with digital RSVP",
+          badge: "Mates Plan",
+          href: "/plan/new",
+          icon: Users,
+        },
+        {
+          id: "qa-wifi",
+          category: "stay",
+          title: "In-Room Wi-Fi & Password",
+          subtitle: "Instant connection details and concierge access",
+          badge: "Concierge",
+          href: "/concierge",
+          icon: Wifi,
+        },
+        {
+          id: "qa-calendar",
+          category: "event",
+          title: "Sydney Events & Live Gigs",
+          subtitle: "Explore weekend markets, harbour concerts & festivals",
+          badge: "Calendar",
+          href: "/calendar",
+          icon: CalendarDays,
+        },
+        {
+          id: "qa-host",
+          category: "partner",
+          title: "Become a Host or List a Venue",
+          subtitle: "Free QR companion kits, verified @handle and visitor deals",
+          badge: "Partner Hub",
+          href: "/join",
+          icon: Building2,
+        },
+      );
+      return items;
+    }
+
+    // 1. Match Places (live listings only — empty DB means no place results)
+    for (const p of activePlaces()) {
+      if (
+        p.name.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        p.shortWhy.toLowerCase().includes(q) ||
+        (p.address && p.address.toLowerCase().includes(q))
+      ) {
+        items.push({
+          id: `place-${p.id}`,
+          category: "place",
+          title: p.name,
+          subtitle: p.shortWhy || p.address || p.category,
+          badge: p.category,
+          href: `/p/${p.id}`,
+          icon: MapPin,
+        });
+      }
+    }
+
+    // 2. Match Events
+    for (const e of calendarEvents) {
+      if (
+        e.title.toLowerCase().includes(q) ||
+        e.category.toLowerCase().includes(q) ||
+        e.venue.toLowerCase().includes(q)
+      ) {
+        items.push({
+          id: `event-${e.id}`,
+          category: "event",
+          title: e.title,
+          subtitle: `${e.timeLabel} · ${e.venue}`,
+          badge: e.categoryLabel,
+          href: `/calendar?event=${e.id}`,
+          icon: CalendarDays,
+        });
+      }
+    }
+
+    // 3. Match Stay / Concierge actions
+    const stayKeywords = ["wifi", "wi-fi", "stay", "room", "concierge", "checkout", "breakfast", "towel", "key"];
+    if (stayKeywords.some((k) => q.includes(k))) {
+      items.push({
+        id: "stay-concierge",
+        category: "stay",
+        title: "Concierge",
+        subtitle: "Wi-Fi, front desk & checkout",
+        badge: "Concierge",
+        href: "/concierge",
+        icon: Sparkles,
+      });
+    }
+
+    // 4. Match Mates Planning keywords
+    const planKeywords = [
+      "plan",
+      "mate",
+      "friends",
+      "night",
+      "dinner",
+      "lunch",
+      "movie",
+      "cinema",
+      "roadtrip",
+      "hangout",
+    ];
+    if (planKeywords.some((k) => q.includes(k))) {
+      items.push({
+        id: "plan-create",
+        category: "plan",
+        title: "New Plan",
+        subtitle: "Invite link with RSVP",
+        badge: "Mates Plan",
+        href: "/plan/new",
+        icon: Users,
+      });
+    }
+
+    // 4b. Find a Mate shortcut
+    if (q.includes("mate") || q.includes("companion") || q.includes("someone")) {
+      items.push({
+        id: "mate-request",
+        category: "plan",
+        title: "Find someone to go with",
+        subtitle: "Request an approved Mate",
+        badge: "Mate",
+        href: "/mate/request",
+        icon: HeartHandshake,
+      });
+    }
+
+    // 4c. Match live AirPal Experiences
+    for (const c of liveExperiences) {
+      const hay = `${c.title} ${c.businessName} ${c.suburb} ${c.category}`.toLowerCase();
+      if (q.length >= 2 && hay.includes(q)) {
+        items.push({
+          id: `experience-${c.id}`,
+          category: "experience",
+          title: c.title,
+          subtitle: `${c.businessName} · ${c.suburb} · ${c.date}`,
+          badge: "Experience",
+          href: "/experiences",
+          icon: Sparkles,
+        });
+      }
+    }
+
+    // 5. Match open Plans (one global search replaces per-page plan search)
+    const openPlans = plans.filter((p) => p.isPublic && p.status === "open");
+    for (const p of openPlans) {
+      const hay = `${p.title} ${p.destination} ${p.city}`.toLowerCase();
+      if (q.length >= 2 && hay.includes(q)) {
+        items.push({
+          id: `plan-${p.id}`,
+          category: "plan",
+          title: p.title,
+          subtitle: `${p.destination || p.city} · ${p.date}`,
+          badge: "Plan",
+          href: `/plan/${p.id}`,
+          icon: Users,
+        });
+      }
+    }
+
+    // 6. Match Walks / Tours (live tours only)
+    for (const t of toursForPrecinct("", loadTours())) {
+      if (t.title.toLowerCase().includes(q) || t.city.toLowerCase().includes(q)) {
+        items.push({
+          id: `tour-${t.id}`,
+          category: "place",
+          title: t.title,
+          subtitle: `${t.city} · guided walk`,
+          badge: "Walk",
+          href: `/tour/${t.id}`,
+          icon: Footprints,
+        });
+      }
+    }
+
+    // 7. Street / lobby markers are QR-scanned codes, not searchable directory
+    // entries (marker docs are not publicly listable). They resolve on /q pages.
+
+    // 8. Match Partner / Roles keywords
+    const partnerKeywords = ["host", "business", "list", "partner", "organise", "join", "creator"];
+    if (partnerKeywords.some((k) => q.includes(k))) {
+      items.push({
+        id: "partner-join",
+        category: "partner",
+        title: "Partner Hub",
+        subtitle: "Host, business & events",
+        badge: "Partner Hub",
+        href: "/join",
+        icon: Building2,
+      });
+    }
+
+    // Apply category filter
+    if (activeCategory === "places") return items.filter((i) => i.category === "place");
+    if (activeCategory === "events") return items.filter((i) => i.category === "event");
+    if (activeCategory === "stay") return items.filter((i) => i.category === "stay");
+    if (activeCategory === "plan") return items.filter((i) => i.category === "plan");
+    if (activeCategory === "experiences") return items.filter((i) => i.category === "experience");
+
+    return items;
+  }, [query, calendarEvents, catalogVersion, plans, activeCategory, liveExperiences]);
+
+  // Keyboard navigation within list
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev + 1) % Math.max(1, results.length));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev - 1 + results.length) % Math.max(1, results.length));
+    } else if (e.key === "Enter" && results[selectedIndex]) {
+      e.preventDefault();
+      selectItem(results[selectedIndex]);
+    }
+  };
+
+  const selectItem = (item: SearchResultItem) => {
+    void triggerHaptic("light");
+    setOpen(false);
+    nav(item.href);
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-3 pt-4 sm:p-6 sm:pt-20 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200">
+      {/* Backdrop */}
+      <div className="fixed inset-0 bg-ink/60 backdrop-blur-md transition-opacity" onClick={() => setOpen(false)} />
+
+      {/* Modal Container */}
+      <div className="relative w-full max-w-xl overflow-hidden rounded-3xl bg-card shadow-2xl ring-1 ring-line/80 safe-bottom">
+        {/* Search Input Bar */}
+        <div className="flex items-center gap-3 border-b border-line px-4 py-3.5">
+          <Search size={20} className="shrink-0 text-gold" />
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelectedIndex(0);
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder="Search places, events, stays, plans…"
+            className="w-full bg-transparent text-[15px] font-medium text-ink placeholder:text-mute focus:outline-none"
+          />
+          {query && (
+            <button
+              onClick={() => setQuery("")}
+              className="grid h-6 w-6 place-items-center rounded-full text-mute hover:bg-paper hover:text-ink"
+            >
+              <X size={14} />
+            </button>
+          )}
+          <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-line bg-paper px-2 py-0.5 text-[10px] font-semibold text-mute">
+            ESC
+          </kbd>
+        </div>
+
+        {/* Category Chips */}
+        <div className="flex items-center gap-1.5 overflow-x-auto border-b border-line/60 bg-paper/40 px-3 py-2 no-scrollbar">
+          {(
+            [
+              { id: "all", label: "All" },
+              { id: "places", label: "Places" },
+              { id: "events", label: "Events" },
+              { id: "experiences", label: "Experiences" },
+              { id: "stay", label: "Stay Tools" },
+              { id: "plan", label: "Mates Plan" },
+            ] as const
+          ).map((c) => (
+            <button
+              key={c.id}
+              onClick={() => {
+                setActiveCategory(c.id);
+                setSelectedIndex(0);
+              }}
+              className={cn(
+                "h-7 rounded-full px-3 text-xs font-medium transition whitespace-nowrap",
+                activeCategory === c.id
+                  ? "bg-ink text-white"
+                  : "bg-paper text-mute hover:bg-line hover:text-ink ring-1 ring-line",
+              )}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Results List */}
+        <div className="scroll-container max-h-[min(60vh,calc(var(--visual-viewport-height,100dvh)-12rem))] p-2 space-y-1">
+          {results.length > 0 ? (
+            results.map((item, index) => {
+              const Icon = item.icon;
+              const isSelected = index === selectedIndex;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => selectItem(item)}
+                  onMouseEnter={() => setSelectedIndex(index)}
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-2xl p-3 text-left transition",
+                    isSelected ? "bg-paper ring-1 ring-line text-ink" : "hover:bg-paper/60 text-mute",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "grid h-10 w-10 shrink-0 place-items-center rounded-xl transition",
+                      isSelected ? "bg-brand text-white shadow-sm" : "bg-paper text-mute ring-1 ring-line",
+                    )}
+                  >
+                    <Icon size={18} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="truncate text-sm font-semibold text-ink">{item.title}</span>
+                      {item.badge && (
+                        <span className="rounded-full bg-paper px-2 py-0.5 text-[10px] font-medium text-gold ring-1 ring-line shrink-0">
+                          {item.badge}
+                        </span>
+                      )}
+                    </div>
+                    <p className="truncate text-xs text-mute mt-0.5">{item.subtitle}</p>
+                  </div>
+                  <ArrowRight
+                    size={15}
+                    className={cn("shrink-0 transition", isSelected ? "text-ink translate-x-0.5" : "text-transparent")}
+                  />
+                </button>
+              );
+            })
+          ) : (
+            <div className="p-8 text-center">
+              <Compass size={28} className="mx-auto text-mute/50 mb-2" />
+              <p className="text-sm font-semibold text-ink">No results found for &ldquo;{query}&rdquo;</p>
+              <p className="mt-1 text-xs text-mute">
+                Try searching &ldquo;glenmore&rdquo;, &ldquo;wifi&rdquo;, &ldquo;market&rdquo;, or &ldquo;night
+                out&rdquo;
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer Hint */}
+        <div className="hidden border-t border-line/60 bg-paper/60 px-4 py-2 text-[11px] text-mute sm:flex items-center gap-2">
+          <kbd className="rounded bg-card px-1.5 py-0.5 font-mono text-[10px] ring-1 ring-line">↑</kbd>
+          <kbd className="rounded bg-card px-1.5 py-0.5 font-mono text-[10px] ring-1 ring-line">↓</kbd>
+          <kbd className="rounded bg-card px-1.5 py-0.5 font-mono text-[10px] ring-1 ring-line">↵ Select</kbd>
+        </div>
+      </div>
+    </div>
+  );
+}

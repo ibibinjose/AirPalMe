@@ -1,0 +1,306 @@
+import { httpsCallable } from "firebase/functions";
+import {
+  CALLABLES,
+  type ClaimFreeVenuePresenceRequest,
+  type ClaimFreeVenuePresenceResponse,
+  type CompleteRegistrationRequest,
+  type CompleteRegistrationResponse,
+  type GetPropertyWifiRequest,
+  type GetPropertyWifiResponse,
+  type SubmitPartnerClaimRequest,
+} from "@shared/airpal-security";
+import type {
+  CreatePlanRequest,
+  CreatePlanResponse,
+  RsvpPlanRequest,
+  RsvpPlanResponse,
+  AddPlanStopRequest,
+  AddPlanStopResponse,
+  VotePlanStopRequest,
+  VotePlanStopResponse,
+  PostPlanCommentRequest,
+  PostPlanCommentResponse,
+  GetPlanByInviteCodeRequest,
+  GetPlanByInviteCodeResponse,
+} from "@shared/plan";
+import { getFirebaseFunctions, isFirebaseConfigured } from "./firebase";
+
+export function liveBackendEnabled() {
+  return isFirebaseConfigured;
+}
+
+async function callFunction<Req, Res>(name: string, data: Req): Promise<Res> {
+  const functions = getFirebaseFunctions();
+  if (!functions) throw new Error("Firebase is not configured.");
+  const callable = httpsCallable<Req, Res>(functions, name);
+  const result = await callable(data);
+  return result.data;
+}
+
+export function completeRegistrationRemote(data: CompleteRegistrationRequest) {
+  return callFunction<CompleteRegistrationRequest, CompleteRegistrationResponse>(CALLABLES.completeRegistration, data);
+}
+export const completeRegistration = completeRegistrationRemote;
+
+export function getPropertyWifiRemote(data: GetPropertyWifiRequest) {
+  return callFunction<GetPropertyWifiRequest, GetPropertyWifiResponse>(CALLABLES.getPropertyWifi, data);
+}
+
+export function updatePropertyWifiRemote(data: { propertyId: string; network: string; password: string; speed: string }) {
+  return callFunction<typeof data, { ok: true; updatedAt: string }>(CALLABLES.updatePropertyWifi, data);
+}
+
+export function updatePropertyProfileRemote(data: {
+  propertyId: string;
+  name?: string;
+  tagline?: string;
+  address?: string;
+  phone?: string;
+  city?: string;
+  checkIn?: string;
+  checkOut?: string;
+  heroImage?: string;
+  breakfast?: { hours: string; location: string; type: string; price: string };
+  facilities?: Array<{ name: string; hours: string; floor: string; details?: string; icon: string }>;
+  confirmHours?: boolean;
+}) {
+  return callFunction<typeof data, { ok: true; updatedAt: string }>(CALLABLES.updatePropertyProfile, data);
+}
+
+export function rotateRoomTokenRemote(data: { propertyId: string; roomNumber: string }) {
+  return callFunction<typeof data, { ok: true; roomNumber: string; roomToken: string; previousToken: string | null }>(
+    CALLABLES.rotateRoomToken,
+    data,
+  );
+}
+
+export function askAirPalRemote(data: { propertyId?: string; markerId?: string; question: string }) {
+  return callFunction<typeof data, { title: string; body: string }>(CALLABLES.askAirPal, data);
+}
+
+export function upsertBusinessListingRemote(data: {
+  listingId?: string;
+  name: string;
+  category: string;
+  address: string;
+  hours?: string;
+  shortWhy: string;
+  phone?: string;
+  lat?: number;
+  lng?: number;
+  precinctId?: string;
+  heroImage?: string;
+}) {
+  return callFunction<typeof data, { listingId: string; placeId: string }>(CALLABLES.upsertBusinessListing, data);
+}
+
+export function upsertBusinessDealRemote(data: {
+  listingId: string;
+  badge: string;
+  detail: string;
+  expiry?: string;
+  active?: boolean;
+}) {
+  return callFunction<typeof data, { ok: true; deal: { badge: string; detail: string } | null }>(CALLABLES.upsertBusinessDeal, data);
+}
+
+export function upsertEventRemote(data: {
+  eventId?: string;
+  name: string;
+  flavour: string;
+  city?: string;
+  venue?: string;
+  startsAt?: string;
+  endsAt?: string;
+  status?: string;
+  categoryChips?: string[];
+}) {
+  return callFunction<typeof data, { eventId: string }>(CALLABLES.upsertEvent, data);
+}
+
+export function upsertEventStallRemote(data: {
+  id?: string;
+  eventId: string;
+  name: string;
+  category: string;
+  booth?: string;
+  shortWhy?: string;
+  offer?: string;
+  handle?: string;
+}) {
+  return callFunction<typeof data, { stallId: string }>(CALLABLES.upsertEventStall, data);
+}
+
+export function saveAttendeeStallRemote(data: { eventId: string; stallId: string }) {
+  return callFunction<typeof data, { ok: true }>(CALLABLES.saveAttendeeStall, data);
+}
+
+export function checkHandleAvailableRemote(data: { handle: string }) {
+  return callFunction<typeof data, { ok: boolean; reason?: string }>(CALLABLES.checkHandleAvailable, data);
+}
+
+export function createBusinessProfileRemote(data: {
+  handle: string;
+  name: string;
+  city?: string;
+  category: string;
+  shortWhy: string;
+  placeId?: string;
+  listingId?: string;
+}) {
+  return callFunction<typeof data, { profileId: string; handle: string }>(CALLABLES.createBusinessProfile, data);
+}
+
+export function updateBusinessProfileRemote(data: {
+  handle: string;
+  name?: string;
+  shortWhy?: string;
+  city?: string;
+  category?: string;
+  hours?: string;
+  openNow?: boolean;
+  phone?: string;
+  avatar?: string;
+  cover?: string;
+  mapsPlaceId?: string;
+  listingId?: string;
+  placeId?: string;
+  links?: Array<{ id: string; type: string; label: string; href: string }>;
+  products?: Array<{ id: string; kind?: string; title: string; detail?: string; price?: string; badge?: string; href?: string }>;
+  services?: Array<{ id: string; kind?: string; title: string; detail?: string; price?: string; badge?: string; href?: string }>;
+  deals?: Array<{ id: string; kind?: string; title: string; detail?: string; price?: string; badge?: string; href?: string }>;
+}) {
+  return callFunction<typeof data, { ok: true }>(CALLABLES.updateBusinessProfile, data);
+}
+
+export function setBioOfferRemote(data: { handle: string; badge: string; detail: string; active?: boolean }) {
+  return callFunction<typeof data, { ok: true }>(CALLABLES.setBioOffer, data);
+}
+
+export function recordBioTapRemote(data: { handle: string; kind?: string }) {
+  return callFunction<typeof data, { ok: true }>(CALLABLES.recordBioTap, data);
+}
+
+export function claimBioOfferRemote(data: { handle: string; dealId: string }) {
+  return callFunction<typeof data, { code: string; badge: string; detail: string; expiresAt: string }>(CALLABLES.claimBioOffer, data);
+}
+
+export function transferHandleRemote(data: { from: string; to: string }) {
+  return callFunction<typeof data, { handle: string; profileId: string }>(CALLABLES.transferHandle, data);
+}
+
+export function listBioDirectoryRemote() {
+  return callFunction<Record<string, never>, { rows: Array<{ handle: string; name: string; ownerUid?: string; taps: number }> }>(CALLABLES.listBioDirectory, {});
+}
+
+export function recordAnalyticsBatchRemote(data: { events: unknown[] }) {
+  return callFunction<typeof data, { accepted: number; rejected: number; duplicates: number; acceptedIds: string[] }>(
+    CALLABLES.recordAnalyticsBatch,
+    data,
+  );
+}
+
+export function runAnalyticsAggregationRemote() {
+  return callFunction<Record<string, never>, { input: number; output: number }>(CALLABLES.runAnalyticsAggregation, {});
+}
+
+export function submitVenueRatingRemote(data: {
+  mood: string;
+  emoji: string;
+  note?: string;
+  target: "stall" | "event" | "stay";
+  eventId?: string;
+  stallId?: string;
+  stallName?: string;
+  propertyId?: string;
+}) {
+  return callFunction<typeof data, { ok: true }>(CALLABLES.submitVenueRating, data);
+}
+
+export function createPlanRemote(data: CreatePlanRequest) {
+  return callFunction<CreatePlanRequest, CreatePlanResponse>(CALLABLES.createPlan, data);
+}
+export const createPlanRemoteCall = createPlanRemote;
+
+export function rsvpPlanRemote(data: RsvpPlanRequest) {
+  return callFunction<RsvpPlanRequest, RsvpPlanResponse>(CALLABLES.rsvpPlan, data);
+}
+export const rsvpPlanRemoteCall = rsvpPlanRemote;
+
+export function addPlanStopRemote(data: AddPlanStopRequest) {
+  return callFunction<AddPlanStopRequest, AddPlanStopResponse>(CALLABLES.addPlanStop, data);
+}
+export const addPlanStopRemoteCall = addPlanStopRemote;
+
+export function votePlanStopRemote(data: VotePlanStopRequest) {
+  return callFunction<VotePlanStopRequest, VotePlanStopResponse>(CALLABLES.votePlanStop, data);
+}
+export const votePlanStopRemoteCall = votePlanStopRemote;
+
+export function postPlanCommentRemote(data: PostPlanCommentRequest) {
+  return callFunction<PostPlanCommentRequest, PostPlanCommentResponse>(CALLABLES.postPlanComment, data);
+}
+export const postPlanCommentRemoteCall = postPlanCommentRemote;
+
+export function getPlanByInviteCodeRemote(data: GetPlanByInviteCodeRequest) {
+  return callFunction<GetPlanByInviteCodeRequest, GetPlanByInviteCodeResponse>(CALLABLES.getPlanByInviteCode, data);
+}
+export const getPlanByInviteCodeRemoteCall = getPlanByInviteCodeRemote;
+
+export function createExperienceCheckoutSessionRemote(data: {
+  planId: string;
+  tierId?: string;
+  spots?: number;
+  isDeposit?: boolean;
+  guestName?: string;
+  guestEmail?: string;
+  successUrl?: string;
+  cancelUrl?: string;
+}) {
+  return callFunction<typeof data, {
+    ok: boolean;
+    mode?: string;
+    bookingId?: string;
+    sessionId?: string;
+    checkoutUrl?: string;
+    totalAmount?: number;
+    currency?: string;
+    message?: string;
+  }>(CALLABLES.createExperienceCheckoutSession, data);
+}
+
+export function confirmExperienceBookingRemote(data: { planId: string; bookingId: string; paymentIntentId?: string }) {
+  return callFunction<typeof data, { ok: boolean; status: string; bookingId: string }>(
+    CALLABLES.confirmExperienceBooking,
+    data,
+  );
+}
+export const confirmExperienceBookingRemoteCall = confirmExperienceBookingRemote;
+
+export function createStaffTicketRemote(data: {
+  propertyId: string;
+  details: string;
+  roomNumber?: string;
+  category?: string;
+  urgency?: string;
+}) {
+  return callFunction<typeof data, { ok: true; ticketId: string }>(CALLABLES.createStaffTicket, data);
+}
+
+export function resolveStaffTicketRemote(data: { propertyId: string; ticketId: string }) {
+  return callFunction<typeof data, { ok: true }>(CALLABLES.resolveStaffTicket, data);
+}
+
+export function submitPartnerClaimRemote(data: SubmitPartnerClaimRequest) {
+  return callFunction<SubmitPartnerClaimRequest, { claimId: string; status: string }>(
+    CALLABLES.submitPartnerClaim,
+    data,
+  );
+}
+
+export function claimFreeVenuePresenceRemote(data: ClaimFreeVenuePresenceRequest) {
+  return callFunction<ClaimFreeVenuePresenceRequest, ClaimFreeVenuePresenceResponse>(
+    CALLABLES.claimFreeVenuePresence,
+    data,
+  );
+}

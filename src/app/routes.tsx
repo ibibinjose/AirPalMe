@@ -1,0 +1,180 @@
+import { Suspense, lazy } from "react";
+import { Redirect, Route, Switch } from "wouter";
+import { BIO_PUBLIC_PATH } from "@shared/bio";
+
+// Eager load the landing page for instant first paint; every other route splits out.
+import { DiscoverPage } from "@/pages/DiscoverPage";
+
+// Code-split all other pages dynamically for fast initial bundle
+const ConciergePage = lazy(() => import("@/pages/ConciergePage").then((m) => ({ default: m.ConciergePage })));
+const CirclePage = lazy(() => import("@/pages/CirclePage").then((m) => ({ default: m.CirclePage })));
+const CompanionPage = lazy(() => import("@/pages/CompanionPage").then((m) => ({ default: m.CompanionPage })));
+const SolutionsPage = lazy(() => import("@/pages/SolutionsPage").then((m) => ({ default: m.SolutionsPage })));
+const SolutionDetailPage = lazy(() =>
+  import("@/pages/SolutionDetailPage").then((m) => ({ default: m.SolutionDetailPage })),
+);
+const GuidePage = lazy(() => import("@/pages/GuidePage").then((m) => ({ default: m.GuidePage })));
+const TourPage = lazy(() => import("@/pages/TourPage").then((m) => ({ default: m.TourPage })));
+const ScanPage = lazy(() => import("@/pages/ScanPage").then((m) => ({ default: m.ScanPage })));
+const PlacePage = lazy(() => import("@/pages/PlacePage").then((m) => ({ default: m.PlacePage })));
+const EventPage = lazy(() => import("@/pages/EventPage").then((m) => ({ default: m.EventPage })));
+const CalendarPage = lazy(() => import("@/pages/CalendarPage").then((m) => ({ default: m.CalendarPage })));
+const StallPage = lazy(() => import("@/pages/StallPage").then((m) => ({ default: m.StallPage })));
+const OrganiserEventPage = lazy(() =>
+  import("@/pages/OrganiserEventPage").then((m) => ({ default: m.OrganiserEventPage })),
+);
+const MePage = lazy(() => import("@/pages/MePage").then((m) => ({ default: m.MePage })));
+const ZooPage = lazy(() => import("@/pages/ZooPage").then((m) => ({ default: m.ZooPage })));
+const MemoryWallPage = lazy(() => import("@/pages/MemoryWallPage").then((m) => ({ default: m.MemoryWallPage })));
+const PeoplePage = lazy(() => import("@/pages/PeoplePage").then((m) => ({ default: m.PeoplePage })));
+const SettingsPage = lazy(() => import("@/pages/SettingsPage").then((m) => ({ default: m.SettingsPage })));
+const MarkerPage = lazy(() => import("@/pages/MarkerPage").then((m) => ({ default: m.MarkerPage })));
+const StayPage = lazy(() => import("@/pages/StayPage").then((m) => ({ default: m.StayPage })));
+const HostPage = lazy(() => import("@/pages/HostPage").then((m) => ({ default: m.HostPage })));
+const StartPage = lazy(() => import("@/pages/StartPage").then((m) => ({ default: m.StartPage })));
+const AuthActionPage = lazy(() => import("@/pages/AuthActionPage").then((m) => ({ default: m.AuthActionPage })));
+const PartnersPage = lazy(() => import("@/pages/PartnersPage").then((m) => ({ default: m.PartnersPage })));
+const JoinPage = lazy(() => import("@/pages/JoinPage").then((m) => ({ default: m.JoinPage })));
+const BusinessPage = lazy(() => import("@/pages/BusinessPage").then((m) => ({ default: m.BusinessPage })));
+const BusinessOnboardPage = lazy(() =>
+  import("@/pages/BusinessOnboardPage").then((m) => ({ default: m.BusinessOnboardPage })),
+);
+const BioPublicPage = lazy(() => import("@/pages/BioPublicPage").then((m) => ({ default: m.BioPublicPage })));
+const BioSetupPage = lazy(() => import("@/pages/BioSetupPage").then((m) => ({ default: m.BioSetupPage })));
+const BioEditPage = lazy(() => import("@/pages/BioEditPage").then((m) => ({ default: m.BioEditPage })));
+const BioRecoverPage = lazy(() => import("@/pages/BioRecoverPage").then((m) => ({ default: m.BioRecoverPage })));
+const CampusPage = lazy(() => import("@/pages/CampusPage").then((m) => ({ default: m.CampusPage })));
+const AdminPage = lazy(() => import("@/pages/AdminPage").then((m) => ({ default: m.AdminPage })));
+const NotFoundPage = lazy(() => import("@/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })));
+const AboutPage = lazy(() => import("@/pages/AboutPage").then((m) => ({ default: m.AboutPage })));
+const ContactPage = lazy(() => import("@/pages/ContactPage").then((m) => ({ default: m.ContactPage })));
+const PrivacyPage = lazy(() => import("@/pages/PrivacyPage").then((m) => ({ default: m.PrivacyPage })));
+const TermsPage = lazy(() => import("@/pages/TermsPage").then((m) => ({ default: m.TermsPage })));
+const CookiesPage = lazy(() => import("@/pages/CookiesPage").then((m) => ({ default: m.CookiesPage })));
+const ClubPage = lazy(() => import("@/pages/ClubPage").then((m) => ({ default: m.ClubPage })));
+const ClubListPage = lazy(() => import("@/pages/ClubListPage").then((m) => ({ default: m.ClubListPage })));
+const MatePage = lazy(() => import("@/pages/MatePage").then((m) => ({ default: m.MatePage })));
+const MateRequestPage = lazy(() =>
+  import("@/pages/MateRequestPage").then((m) => ({ default: m.MateRequestPage })),
+);
+const StudioPage = lazy(() => import("@/pages/StudioPage").then((m) => ({ default: m.StudioPage })));
+const BusinessCampaignsPage = lazy(() =>
+  import("@/pages/BusinessCampaignsPage").then((m) => ({ default: m.BusinessCampaignsPage })),
+);
+const ExperiencesPage = lazy(() =>
+  import("@/pages/ExperiencesPage").then((m) => ({ default: m.ExperiencesPage })),
+);
+const PlanHubPage = lazy(() => import("@/pages/PlanHubPage").then((m) => ({ default: m.PlanHubPage })));
+const PlanCreatePage = lazy(() => import("@/pages/PlanCreatePage").then((m) => ({ default: m.PlanCreatePage })));
+const PlanDetailPage = lazy(() => import("@/pages/PlanDetailPage").then((m) => ({ default: m.PlanDetailPage })));
+const PlanEditPage = lazy(() => import("@/pages/PlanEditPage").then((m) => ({ default: m.PlanEditPage })));
+
+function RouteFallback() {
+  return (
+    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3 p-8" role="status" aria-live="polite">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+      <p className="text-sm text-mute">Loading</p>
+    </div>
+  );
+}
+
+export function AppRoutes() {
+  return (
+    <Suspense fallback={<RouteFallback />}>
+      <Switch>
+        <Route path="/" component={DiscoverPage} />
+        <Route path="/mate" component={MatePage} />
+        <Route path="/mate/request" component={MateRequestPage} />
+        <Route path="/explore">
+          <Redirect to="/" />
+        </Route>
+        <Route path="/discover">
+          <Redirect to="/" />
+        </Route>
+        <Route path="/discovery">
+          <Redirect to="/" />
+        </Route>
+        <Route path="/solutions/:id" component={SolutionDetailPage} />
+        <Route path="/solutions" component={SolutionsPage} />
+        <Route path="/guide" component={GuidePage} />
+        <Route path="/tour/:id" component={TourPage} />
+        <Route path="/scan" component={ScanPage} />
+        <Route path="/concierge" component={ConciergePage} />
+        <Route path="/stay">
+          <Redirect to="/concierge" />
+        </Route>
+        <Route path="/companion" component={CompanionPage} />
+        <Route path="/g/:id" component={StayPage} />
+        <Route path="/q/:city/:handle" component={MarkerPage} />
+        <Route path="/q/:a" component={MarkerPage} />
+        <Route path="/q">
+          <Redirect to="/q/syd-rocks-argyle" />
+        </Route>
+        <Route path="/p/:id" component={PlacePage} />
+        <Route path="/e/:eventId/s/:stallId" component={StallPage} />
+        <Route path="/e/:id" component={EventPage} />
+        <Route path="/calendar" component={CalendarPage} />
+        <Route path="/events">
+          <Redirect to="/calendar" />
+        </Route>
+        <Route path="/plan/new" component={PlanCreatePage} />
+        <Route path="/plan/:id/edit" component={PlanEditPage} />
+        <Route path="/plan/:id" component={PlanDetailPage} />
+        <Route path="/plan" component={PlanHubPage} />
+        <Route path="/invite/:code" component={PlanDetailPage} />
+        <Route path="/event" component={OrganiserEventPage} />
+        <Route path="/me/zoo" component={ZooPage} />
+        <Route path="/me/memories" component={MemoryWallPage} />
+        <Route path="/me/people" component={PeoplePage} />
+        <Route path="/circle" component={CirclePage} />
+        <Route path="/me" component={MePage} />
+        <Route path="/settings" component={SettingsPage} />
+        <Route path="/c/:id" component={CampusPage} />
+        <Route path="/campus">
+          <Redirect to="/c/harbour-college" />
+        </Route>
+        <Route path="/host" component={HostPage} />
+        <Route path="/start" component={StartPage} />
+        <Route path="/reset">
+          <Redirect to="/start?tab=reset" />
+        </Route>
+        <Route path="/auth/action" component={AuthActionPage} />
+        <Route path="/join" component={JoinPage} />
+        <Route path="/club/list" component={ClubListPage} />
+        <Route path="/club" component={ClubPage} />
+        <Route path="/business/onboard" component={BusinessOnboardPage} />
+        <Route path="/business/campaigns" component={BusinessCampaignsPage} />
+        <Route path="/business" component={BusinessPage} />
+        <Route path="/experiences" component={ExperiencesPage} />
+        <Route path="/studio" component={StudioPage} />
+        <Route path="/bio/setup" component={BioSetupPage} />
+        <Route path="/bio/edit" component={BioEditPage} />
+        <Route path="/bio/recover" component={BioRecoverPage} />
+        <Route path="/auth">
+          <Redirect to="/start?tab=signin" />
+        </Route>
+        <Route path="/signin">
+          <Redirect to="/start?tab=signin" />
+        </Route>
+        <Route path="/partners" component={PartnersPage} />
+        <Route path="/partner">
+          <Redirect to="/partners" />
+        </Route>
+        <Route path="/admin" component={AdminPage} />
+        <Route path="/about" component={AboutPage} />
+        <Route path="/contact" component={ContactPage} />
+        <Route path="/privacy" component={PrivacyPage} />
+        <Route path="/terms" component={TermsPage} />
+        <Route path="/cookies" component={CookiesPage} />
+        <Route path="/legal">
+          <Redirect to="/privacy" />
+        </Route>
+        <Route path="/os">
+          <Redirect to="/concierge" />
+        </Route>
+        <Route path={BIO_PUBLIC_PATH} component={BioPublicPage} />
+        <Route component={NotFoundPage} />
+      </Switch>
+    </Suspense>
+  );
+}

@@ -1,0 +1,41 @@
+import {
+  Baby,
+  Cake,
+  Calendar,
+  Car,
+  Clapperboard,
+  Coffee,
+  Flower2,
+  GraduationCap,
+  Guitar,
+  HeartHandshake,
+  Home,
+  Martini,
+  Palmtree,
+  PartyPopper,
+  Pizza,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
+import type { PlanType } from "@shared/plan";
+
+/** Lucide replacements for the PLAN_TYPES emoji. */
+export const PLAN_TYPE_ICONS: Record<PlanType, LucideIcon> = {
+  birthday: Cake,
+  wedding: HeartHandshake,
+  graduation: GraduationCap,
+  housewarming: Home,
+  baby_shower: Baby,
+  memorial: Flower2,
+  anniversary: PartyPopper,
+  nightout: Martini,
+  lunch: Pizza,
+  movies: Clapperboard,
+  trip: Car,
+  escape: Palmtree,
+  gig: Guitar,
+  walk: Coffee,
+  catchup: Coffee,
+  meeting: Calendar,
+  custom: Sparkles,
+};

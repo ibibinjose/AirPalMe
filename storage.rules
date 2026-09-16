@@ -1,0 +1,90 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAnonymous() {
+      return signedIn() && request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+
+    function platformAdmin() {
+      return signedIn() && (
+        request.auth.token.platform_admin == true ||
+        request.auth.token.role == 'super_admin'
+      );
+    }
+
+    // Raster images only: image/svg+xml can carry executable script, and
+    // contentType is client-declared, so SVGs must never be served as images.
+    function isRasterImage() {
+      return request.resource.contentType in [
+        'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif'
+      ];
+    }
+
+    function propertyExists(propertyId) {
+      return firestore.exists(/databases/(default)/documents/properties/$(propertyId));
+    }
+
+    function propertyDoc(propertyId) {
+      return firestore.get(/databases/(default)/documents/properties/$(propertyId)).data;
+    }
+
+    function tokenRole(propertyId) {
+      return request.auth.token.keys().hasAny(['properties'])
+        ? request.auth.token.properties[propertyId]
+        : null;
+    }
+
+    function manages(propertyId) {
+      return platformAdmin() || (
+        signedIn() && (
+          tokenRole(propertyId) in ['host_admin', 'staff'] ||
+          (
+            propertyExists(propertyId) && (
+              propertyDoc(propertyId).ownerId == request.auth.uid ||
+              (
+                propertyDoc(propertyId).keys().hasAny(['members']) &&
+                propertyDoc(propertyId).members[request.auth.uid] in ['host_admin', 'staff']
+              )
+            )
+          )
+        )
+      );
+    }
+
+    match /properties/{propertyId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if manages(propertyId)
+        && request.resource.size < 10 * 1024 * 1024
+        && isRasterImage();
+    }
+
+    match /bios/{uid}/{allPaths=**} {
+      allow read: if true;
+      allow write: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.size < 5 * 1024 * 1024
+        && isRasterImage();
+    }
+
+    match /listings/{uid}/{allPaths=**} {
+      allow read: if true;
+      allow write: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.size < 5 * 1024 * 1024
+        && isRasterImage();
+    }
+
+    match /memories/{uid}/{allPaths=**} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if signedIn()
+        && !isAnonymous()
+        && request.auth.uid == uid
+        && request.resource.size < 5 * 1024 * 1024
+        && isRasterImage();
+    }
+  }
+}

@@ -1,0 +1,8 @@
+dist/
+functions/lib/
+coverage/
+playwright-report/
+test-results/
+android/
+ios/
+*.log

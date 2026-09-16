@@ -1,0 +1,46 @@
+# Firebase App Hosting configuration for AirPal.me
+runConfig:
+  cpu: 1
+  memoryMiB: 512
+  minInstances: 0
+  maxInstances: 10
+  concurrency: 80
+
+env:
+  - variable: VITE_FIREBASE_API_KEY
+    value: AIzaSyAaSH4p-2BEeEB2Xh08qRKESY02TsPJObo
+    availability:
+      - BUILD
+  - variable: VITE_FIREBASE_AUTH_DOMAIN
+    value: airpalme-app.firebaseapp.com
+    availability:
+      - BUILD
+  - variable: VITE_FIREBASE_PROJECT_ID
+    value: airpalme-app
+    availability:
+      - BUILD
+  - variable: VITE_FIREBASE_STORAGE_BUCKET
+    value: airpalme-app.firebasestorage.app
+    availability:
+      - BUILD
+  - variable: VITE_FIREBASE_MESSAGING_SENDER_ID
+    value: "265455282950"
+    availability:
+      - BUILD
+  - variable: VITE_FIREBASE_APP_ID
+    value: 1:265455282950:web:f9f883965b782d87cacc87
+    availability:
+      - BUILD
+  - variable: VITE_FIREBASE_MEASUREMENT_ID
+    value: G-0SQKWXLDLV
+    availability:
+      - BUILD
+  - variable: VITE_BOOTSTRAP_ADMIN_EMAIL
+    value: bibin.inc@gmail.com
+    availability:
+      - BUILD
+  - variable: PLATFORM_ADMIN_EMAILS
+    value: bibin.inc@gmail.com
+    availability:
+      - BUILD
+      - RUNTIME
