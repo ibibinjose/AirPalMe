@@ -1,6 +1,6 @@
 # AirPal build checklist
 
-Last audited: 2026-09-16
+Last audited: 2026-09-16 (local .env + Mate inbox)
 North star: Completed AirPal Experiences (not downloads).
 Marking rules: `.grok/skills/airpal-build/SKILL.md`. Product rules: `AGENTS.md`.
 
@@ -26,7 +26,7 @@ Only `done` is checked.
 
 - [x] `done` `p0-mate-request` Create activity request — Done when: what, category, date, time, location, party size, budget persist to `mate_requests`. Evidence: `src/pages/MateRequestPage.tsx`, `shared/mate-request.ts`.
 - [ ] `partial` `p0-mate-discover` Discover approved Mates — Done when: requester sees approved Mates with understandable reasons (availability, area, interests), never a mystery score. Evidence: `src/pages/MatePage.tsx`. Gap: no browse/match-reason UI; matching is admin-only.
-- [ ] `partial` `p0-match` Match send/accept — Done when: admin (MVP) or Mate can assign/accept; request becomes `matched` with `matchedMateUid`. Evidence: `src/components/admin/MateRequestsAdmin.tsx`. Gap: no Mate-facing accept; no reason chips.
+- [ ] `partial` `p0-match` Match send/accept — Done when: admin (MVP) or Mate can assign/accept; request becomes `matched` with `matchedMateUid`. Evidence: `src/components/admin/MateRequestsAdmin.tsx`, assigned inbox + `matchReasons()` on `src/pages/MatePage.tsx`. Gap: Mate still cannot accept an open request themselves; admin assigns first.
 - [ ] `partial` `p0-message` On-platform messaging — Done when: match conversation with timestamps, read state, no phone/email in the thread. Evidence: `src/components/messaging/ChatBox.tsx`, `shared/messaging.ts`, `request_chats` rules. Gap: no system messages, no report/block from thread, no booking conversation.
 
 ### Book → pay → complete → review
@@ -123,5 +123,5 @@ The MVP is not complete until every row above is `done`.
 ## Next 3
 
 1. `p0-pay` — charge Mate bookings through Stripe; stop hard-coding fees.
-2. `p0-match` — Mate-facing accept + understandable match reasons (admin still approves supply).
+2. `p0-match` — let an approved Mate accept an open request (callable + rules), not only admin assign.
 3. `p0-review` — both-sides review, only after booking `completed`.

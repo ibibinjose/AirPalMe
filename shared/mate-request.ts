@@ -91,3 +91,19 @@ export function reviewValid(rating: number, text: string): boolean {
 export function matchAssignmentValid(mateUid: string, mateName: string): boolean {
   return mateUid.trim().length > 0 && mateName.trim().length >= 2;
 }
+
+/** Understandable match reasons — never a mystery score (AGENTS.md §5). */
+export function matchReasons(
+  req: Pick<MateRequest, "suburb" | "date" | "time" | "mateKind" | "useCase">,
+): string[] {
+  const out: string[] = [];
+  const suburb = req.suburb.trim();
+  if (suburb) out.push(`In ${suburb}`);
+  const time = req.time.trim();
+  if (req.date) out.push(time ? `${req.date} at ${time}` : req.date);
+  const kind = req.mateKind.trim();
+  if (kind) out.push(`Looking for ${kind}`);
+  const use = MATE_USE_CASES.find((c) => c.id === req.useCase);
+  if (use) out.push(use.line);
+  return out.slice(0, 4);
+}

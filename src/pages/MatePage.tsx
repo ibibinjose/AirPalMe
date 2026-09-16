@@ -7,7 +7,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { ChatBox } from "@/components/messaging/ChatBox";
 import { BookingsSection, createBookingForRequest } from "@/components/booking/BookingsSection";
-import { MATE_USE_CASES, reviewValid, type MateRequest, type MateRequestStatus } from "@shared/mate-request";
+import {
+  MATE_USE_CASES,
+  matchReasons,
+  reviewValid,
+  type MateRequest,
+  type MateRequestStatus,
+} from "@shared/mate-request";
 
 const STEPS = [
   { title: "Tell us the plan", body: "What, when, where — and what kind of Mate you want along." },
@@ -26,6 +32,7 @@ export function MatePage() {
   const { user } = useAuth();
   const [, nav] = useLocation();
   const [requests, setRequests] = useState<MateRequest[] | null>(null);
+  const [assigned, setAssigned] = useState<MateRequest[]>([]);
   const [chatFor, setChatFor] = useState<string | null>(null);
   const [booked, setBooked] = useState<Record<string, boolean>>({});
   const [bookingBusy, setBookingBusy] = useState(false);
@@ -82,13 +89,24 @@ export function MatePage() {
       setRequests(null);
       return;
     }
-    void getDocs(
-      query(collection(db, "mate_requests"), where("ownerUid", "==", user.uid), orderBy("createdAt", "desc"), limit(5)),
-    )
-      .then((snap) =>
-        setRequests(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<MateRequest, "id">) }))),
-      )
-      .catch(() => setRequests([]));
+    void Promise.all([
+      getDocs(
+        query(collection(db, "mate_requests"), where("ownerUid", "==", user.uid), orderBy("createdAt", "desc"), limit(5)),
+      ),
+      getDocs(query(collection(db, "mate_requests"), where("matchedMateUid", "==", user.uid), limit(20))),
+    ])
+      .then(([mine, jobs]) => {
+        setRequests(mine.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<MateRequest, "id">) })));
+        const list = jobs.docs
+          .map((d) => ({ id: d.id, ...(d.data() as Omit<MateRequest, "id">) }))
+          .filter((r) => r.ownerUid !== user.uid);
+        list.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+        setAssigned(list);
+      })
+      .catch(() => {
+        setRequests([]);
+        setAssigned([]);
+      });
   }, [user]);
 
   return (
@@ -111,6 +129,52 @@ export function MatePage() {
           </Button>
         </Link>
       </div>
+
+      {user && assigned.length > 0 && (
+        <section className="mt-6 rounded-2xl border border-line bg-card p-4">
+          <h2 className="font-display text-base font-bold">Assigned to you</h2>
+          <p className="mt-1 text-[13px] text-mute">Admin matched you. Chat, then book when you&apos;re both in.</p>
+          <ul className="mt-2 divide-y divide-line">
+            {assigned.map((r) => (
+              <li key={r.id} className="py-3 text-sm">
+                <span className="flex items-center justify-between gap-3">
+                  <span className="min-w-0">
+                    <span className="block truncate font-semibold">{r.what}</span>
+                    <span className="mt-1 flex flex-wrap gap-1">
+                      {matchReasons(r).map((reason) => (
+                        <span
+                          key={reason}
+                          className="rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-medium text-brand"
+                        >
+                          {reason}
+                        </span>
+                      ))}
+                    </span>
+                  </span>
+                  <span className="shrink-0 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
+                    {STATUS_LABEL[r.status] ?? r.status}
+                  </span>
+                </span>
+                {r.status === "matched" && (
+                  <span className="mt-2 block">
+                    <button
+                      onClick={() => setChatFor(chatFor === r.id ? null : r.id)}
+                      className="text-xs font-semibold text-brand"
+                    >
+                      {chatFor === r.id ? "Hide chat" : "Open chat"}
+                    </button>
+                    {chatFor === r.id && (
+                      <span className="mt-1.5 block">
+                        <ChatBox requestId={r.id} />
+                      </span>
+                    )}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {user && <BookingsSection />}
 

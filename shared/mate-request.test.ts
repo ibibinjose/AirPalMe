@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { emptyMateRequest, isRequestStatus, isUseCase, matchAssignmentValid, mateRequestValid, reviewValid } from "./mate-request";
+import {
+  emptyMateRequest,
+  isRequestStatus,
+  isUseCase,
+  matchAssignmentValid,
+  matchReasons,
+  mateRequestValid,
+  reviewValid,
+} from "./mate-request";
 
 describe("mate requests", () => {
   it("accepts a complete request", () => {
@@ -43,5 +51,25 @@ describe("mate requests", () => {
     expect(isUseCase("dating")).toBe(false);
     expect(isRequestStatus("matched")).toBe(true);
     expect(isRequestStatus("refunded")).toBe(false);
+  });
+
+  it("lists understandable match reasons, never a score", () => {
+    expect(
+      matchReasons({
+        suburb: "Surry Hills",
+        date: "2026-10-04",
+        time: "19:00",
+        mateKind: "someone who likes live music",
+        useCase: "events",
+      }),
+    ).toEqual([
+      "In Surry Hills",
+      "2026-10-04 at 19:00",
+      "Looking for someone who likes live music",
+      "Someone to come to this event with",
+    ]);
+    expect(matchReasons({ suburb: "  ", date: "", time: "", mateKind: "", useCase: "social" })).toEqual([
+      "Go out, not alone",
+    ]);
   });
 });
