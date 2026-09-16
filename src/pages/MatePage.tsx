@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { collection, doc, getDocs, limit, orderBy, query, updateDoc, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, limit, orderBy, query, updateDoc, where } from "firebase/firestore";
 import { ArrowRight, BadgeCheck, CalendarDays, ShieldCheck, Sparkles, Star, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,12 +8,15 @@ import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { ChatBox } from "@/components/messaging/ChatBox";
 import { BookingsSection, createBookingForRequest } from "@/components/booking/BookingsSection";
 import {
+  canLeaveReview,
   MATE_USE_CASES,
   matchReasons,
   reviewValid,
   type MateRequest,
   type MateRequestStatus,
 } from "@shared/mate-request";
+import { mateDiscoverReasons, type PublicMate } from "@shared/companion";
+import { loadPublicMatesRemote } from "@/lib/companion-remote";
 
 const STEPS = [
   { title: "Tell us the plan", body: "What, when, where — and what kind of Mate you want along." },
@@ -33,6 +36,10 @@ export function MatePage() {
   const [, nav] = useLocation();
   const [requests, setRequests] = useState<MateRequest[] | null>(null);
   const [assigned, setAssigned] = useState<MateRequest[]>([]);
+  const [openJobs, setOpenJobs] = useState<MateRequest[]>([]);
+  const [publicMates, setPublicMates] = useState<PublicMate[]>([]);
+  const [isApprovedMate, setIsApprovedMate] = useState(false);
+  const [acceptBusy, setAcceptBusy] = useState<string | null>(null);
   const [chatFor, setChatFor] = useState<string | null>(null);
   const [booked, setBooked] = useState<Record<string, boolean>>({});
   const [bookingBusy, setBookingBusy] = useState(false);
@@ -50,6 +57,7 @@ export function MatePage() {
         date: r.date,
         time: r.time,
         customerUid: user.uid,
+        priceCents: Math.round(Math.max(0, r.budget) * 100),
       });
       setBooked((b) => ({ ...b, [r.id]: true }));
     } finally {
@@ -61,25 +69,45 @@ export function MatePage() {
   const [reviewText, setReviewText] = useState("");
   const [savingReview, setSavingReview] = useState(false);
 
-  async function saveReview(r: MateRequest) {
+  async function saveReview(r: MateRequest, asMate: boolean) {
     const db = getFirebaseDb();
-    if (!db || !reviewValid(stars, reviewText)) return;
+    if (!db || !reviewValid(stars, reviewText) || !canLeaveReview(r.status)) return;
     setSavingReview(true);
     try {
       const now = new Date().toISOString();
-      await updateDoc(doc(db, "mate_requests", r.id), {
-        rating: stars,
-        reviewText: reviewText.trim(),
-        updatedAt: now,
-      });
-      setRequests((list) =>
-        list ? list.map((x) => (x.id === r.id ? { ...x, rating: stars, reviewText: reviewText.trim(), updatedAt: now } : x)) : list,
-      );
+      const patch = asMate
+        ? { mateRating: stars, mateReviewText: reviewText.trim(), updatedAt: now }
+        : { rating: stars, reviewText: reviewText.trim(), updatedAt: now };
+      await updateDoc(doc(db, "mate_requests", r.id), patch);
+      const apply = (x: MateRequest): MateRequest => (x.id === r.id ? { ...x, ...patch } : x);
+      setRequests((list) => (list ? list.map(apply) : list));
+      setAssigned((list) => list.map(apply));
       setRatingFor(null);
       setReviewText("");
       setStars(5);
     } finally {
       setSavingReview(false);
+    }
+  }
+
+  async function acceptRequest(r: MateRequest) {
+    if (!user) return;
+    const db = getFirebaseDb();
+    if (!db) return;
+    setAcceptBusy(r.id);
+    try {
+      const now = new Date().toISOString();
+      const name = user.displayName?.trim().split(/\s+/)[0] || "Mate";
+      await updateDoc(doc(db, "mate_requests", r.id), {
+        status: "matched",
+        matchedMateUid: user.uid,
+        matchedMateName: name,
+        updatedAt: now,
+      });
+      setOpenJobs((list) => list.filter((x) => x.id !== r.id));
+      setAssigned((list) => [{ ...r, status: "matched", matchedMateUid: user.uid, matchedMateName: name, updatedAt: now }, ...list]);
+    } finally {
+      setAcceptBusy(null);
     }
   }
 
@@ -94,18 +122,36 @@ export function MatePage() {
         query(collection(db, "mate_requests"), where("ownerUid", "==", user.uid), orderBy("createdAt", "desc"), limit(5)),
       ),
       getDocs(query(collection(db, "mate_requests"), where("matchedMateUid", "==", user.uid), limit(20))),
+      getDoc(doc(db, "mates_public", user.uid)),
+      loadPublicMatesRemote().catch(() => [] as PublicMate[]),
     ])
-      .then(([mine, jobs]) => {
+      .then(async ([mine, jobs, publicSnap, mates]) => {
         setRequests(mine.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<MateRequest, "id">) })));
         const list = jobs.docs
           .map((d) => ({ id: d.id, ...(d.data() as Omit<MateRequest, "id">) }))
           .filter((r) => r.ownerUid !== user.uid);
         list.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
         setAssigned(list);
+        const approved = publicSnap.exists();
+        setIsApprovedMate(approved);
+        setPublicMates(mates.filter((m) => m.uid !== user.uid));
+        if (approved) {
+          const openSnap = await getDocs(query(collection(db, "mate_requests"), where("status", "==", "open"), limit(20)));
+          setOpenJobs(
+            openSnap.docs
+              .map((d) => ({ id: d.id, ...(d.data() as Omit<MateRequest, "id">) }))
+              .filter((r) => r.ownerUid !== user.uid),
+          );
+        } else {
+          setOpenJobs([]);
+        }
       })
       .catch(() => {
         setRequests([]);
         setAssigned([]);
+        setOpenJobs([]);
+        setPublicMates([]);
+        setIsApprovedMate(false);
       });
   }, [user]);
 
@@ -133,7 +179,7 @@ export function MatePage() {
       {user && assigned.length > 0 && (
         <section className="mt-6 rounded-2xl border border-line bg-card p-4">
           <h2 className="font-display text-base font-bold">Assigned to you</h2>
-          <p className="mt-1 text-[13px] text-mute">Admin matched you. Chat, then book when you&apos;re both in.</p>
+          <p className="mt-1 text-[13px] text-mute">Chat, then confirm the booking when you&apos;re both in.</p>
           <ul className="mt-2 divide-y divide-line">
             {assigned.map((r) => (
               <li key={r.id} className="py-3 text-sm">
@@ -165,14 +211,80 @@ export function MatePage() {
                     </button>
                     {chatFor === r.id && (
                       <span className="mt-1.5 block">
-                        <ChatBox requestId={r.id} />
+                        <ChatBox requestId={r.id} peerUid={r.ownerUid} peerName="Requester" />
                       </span>
                     )}
                   </span>
                 )}
+                {r.status === "completed" &&
+                  (r.mateRating ? (
+                    <span className="mt-1 block text-xs text-mute">You rated this {r.mateRating}/5</span>
+                  ) : ratingFor === r.id ? (
+                    <span className="mt-2 block rounded-xl bg-paper p-3 ring-1 ring-line">
+                      <span className="flex gap-1" role="radiogroup" aria-label="Rate this guest">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <button key={n} type="button" onClick={() => setStars(n)} className="p-0.5" aria-label={`${n} stars`}>
+                            <Star size={20} className={n <= stars ? "text-gold" : "text-line"} fill="currentColor" />
+                          </button>
+                        ))}
+                      </span>
+                      <input
+                        value={reviewText}
+                        onChange={(e) => setReviewText(e.target.value)}
+                        placeholder="How was it? (optional)"
+                        maxLength={500}
+                        className="mt-2 w-full rounded-lg border border-line bg-card px-2.5 py-1.5 text-[13px] outline-none"
+                      />
+                      <span className="mt-2 flex gap-1.5">
+                        <Button size="sm" disabled={savingReview} loading={savingReview} onClick={() => void saveReview(r, true)}>
+                          Save review
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => setRatingFor(null)}>
+                          Cancel
+                        </Button>
+                      </span>
+                    </span>
+                  ) : (
+                    <button type="button" onClick={() => { setRatingFor(r.id); setStars(5); setReviewText(""); }} className="mt-1 text-xs font-semibold text-brand">
+                      Rate this guest
+                    </button>
+                  ))}
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {user && isApprovedMate && (
+        <section className="mt-6 rounded-2xl border border-line bg-card p-4">
+          <h2 className="font-display text-base font-bold">Open requests</h2>
+          <p className="mt-1 text-[13px] text-mute">Accept one that fits — they&apos;ll see why you matched.</p>
+          {openJobs.length === 0 ? (
+            <p className="mt-2 text-[13px] text-mute">Nothing open right now. Check back after someone posts a plan.</p>
+          ) : (
+            <ul className="mt-2 divide-y divide-line">
+              {openJobs.map((r) => (
+                <li key={r.id} className="py-3 text-sm">
+                  <span className="block truncate font-semibold">{r.what}</span>
+                  <span className="mt-1 flex flex-wrap gap-1">
+                    {matchReasons(r).map((reason) => (
+                      <span key={reason} className="rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-medium text-brand">
+                        {reason}
+                      </span>
+                    ))}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={acceptBusy === r.id}
+                    onClick={() => void acceptRequest(r)}
+                    className="mt-2 rounded-full bg-ink px-3 py-1 text-xs font-semibold text-white disabled:opacity-50"
+                  >
+                    {acceptBusy === r.id ? "Accepting…" : "Accept this request"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       )}
 
@@ -219,13 +331,17 @@ export function MatePage() {
                               disabled={bookingBusy}
                               className="rounded-full bg-ink px-3 py-1 text-xs font-semibold text-white disabled:opacity-50"
                             >
-                              Book — pay later
+                              {r.budget > 0 ? `Book · about $${r.budget}` : "Book · free"}
                             </button>
                           ))}
                       </span>
-                      {chatFor === r.id && (
+                      {chatFor === r.id && r.matchedMateUid && (
                         <span className="mt-1.5 block">
-                          <ChatBox requestId={r.id} />
+                          <ChatBox
+                            requestId={r.id}
+                            peerUid={r.matchedMateUid}
+                            peerName={r.matchedMateName || "Your Mate"}
+                          />
                         </span>
                       )}
                     </span>
@@ -264,7 +380,7 @@ export function MatePage() {
                           className="mt-2 w-full rounded-lg border border-line bg-card px-2.5 py-1.5 text-[13px] outline-none placeholder:text-mute focus:border-brand"
                         />
                         <span className="mt-2 flex gap-1.5">
-                          <Button size="sm" disabled={savingReview} loading={savingReview} onClick={() => void saveReview(r)}>
+                          <Button size="sm" disabled={savingReview} loading={savingReview} onClick={() => void saveReview(r, false)}>
                             Save review
                           </Button>
                           <Button size="sm" variant="ghost" onClick={() => setRatingFor(null)}>
@@ -288,6 +404,28 @@ export function MatePage() {
               ))}
             </ul>
           )}
+        </section>
+      )}
+
+      {user && publicMates.length > 0 && (
+        <section className="mt-6 rounded-2xl border border-line bg-card p-4">
+          <h2 className="font-display text-base font-bold">Approved Mates</h2>
+          <p className="mt-1 text-[13px] text-mute">People already reviewed by AirPal — reasons, not a mystery score.</p>
+          <ul className="mt-3 space-y-2">
+            {publicMates.slice(0, 8).map((m) => (
+              <li key={m.uid} className="rounded-xl bg-paper p-3 ring-1 ring-line">
+                <p className="text-sm font-semibold">{m.firstName}</p>
+                <p className="mt-0.5 text-[12px] text-mute">{m.introduction || "Approved local Mate."}</p>
+                <span className="mt-1.5 flex flex-wrap gap-1">
+                  {mateDiscoverReasons(m, requests?.[0]).map((reason) => (
+                    <span key={reason} className="rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-medium text-brand">
+                      {reason}
+                    </span>
+                  ))}
+                </span>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 

@@ -168,6 +168,49 @@ export const updatePropertyProfile = onCall(CALLABLE, async (request) => {
       icon: str(row.icon, 40) || "Sparkles",
     }));
   }
+  const roomTypesIn = Array.isArray(request.data?.roomTypes)
+    ? (request.data.roomTypes as Array<Record<string, unknown>>)
+    : undefined;
+  if (roomTypesIn) {
+    const num = (value: unknown, fallback = 0) => {
+      const n = Number(value);
+      return Number.isFinite(n) && n >= 0 ? n : fallback;
+    };
+    patch.roomTypes = roomTypesIn.slice(0, 30).map((row: Record<string, unknown>) => ({
+      id: str(row.id, 60) || `rt_${Date.now().toString(36)}`,
+      name: str(row.name, 120),
+      category: ["Standard", "Deluxe", "Suite", "Penthouse", "Villa"].includes(String(row.category))
+        ? String(row.category)
+        : "Standard",
+      capacity: Math.max(1, Math.min(Math.floor(num(row.capacity, 1)) || 1, 12)),
+      sizeSqm: row.sizeSqm === undefined || row.sizeSqm === null ? null : num(row.sizeSqm),
+      bedConfig: str(row.bedConfig, 120),
+      totalRooms: Math.max(0, Math.min(Math.floor(num(row.totalRooms)) || 0, 500)),
+      startingPrice:
+        row.startingPrice === undefined || row.startingPrice === null ? null : Math.max(0, num(row.startingPrice)),
+      features: Array.isArray(row.features)
+        ? (row.features as unknown[]).map((f) => str(f, 80)).filter(Boolean).slice(0, 12)
+        : [],
+      roomNumbers: Array.isArray(row.roomNumbers)
+        ? (row.roomNumbers as unknown[]).map((n) => str(n, 20)).filter(Boolean).slice(0, 500)
+        : [],
+    }));
+  }
+  const roomStatusesIn =
+    request.data?.roomStatuses && typeof request.data.roomStatuses === "object"
+      ? (request.data.roomStatuses as Record<string, unknown>)
+      : undefined;
+  if (roomStatusesIn) {
+    const clean: Record<string, string> = {};
+    for (const [number, status] of Object.entries(roomStatusesIn).slice(0, 500)) {
+      const key = str(number, 20);
+      if (!key) continue;
+      clean[key] = ["occupied", "vacant", "maintenance", "cleaning"].includes(String(status))
+        ? String(status)
+        : "vacant";
+    }
+    patch.roomStatuses = clean;
+  }
   if (request.data?.confirmHours === true) {
     patch.hoursVerifiedAt = FieldValue.serverTimestamp();
   }

@@ -488,6 +488,17 @@ export function OrganiserEventPage() {
                 <p className="text-sm text-mute">Guest ratings</p>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={() => nav("/business/campaigns")}
+              className="flex w-full items-center justify-between gap-3 rounded-[22px] bg-ink p-4 text-left text-white"
+            >
+              <span>
+                <span className="block text-sm font-semibold">Need a bigger crowd?</span>
+                <span className="block text-xs text-white/70">Fund an Experience — AirPal fills the room.</span>
+              </span>
+              <span aria-hidden>→</span>
+            </button>
             <div className="flex flex-col gap-2 sm:flex-row">
               <Button className="flex-1" onClick={() => nav(myEvent.gatePath)}>
                 Open guest directory

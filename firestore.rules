@@ -384,13 +384,24 @@ service cloud.firestore {
       );
     }
 
-    // §9 shared booking engine. Money deferred until Stripe (§10).
+    match /platform_settings/{docId} {
+      allow read: if signedIn();
+      allow write: if platformAdmin();
+    }
+
+    // Public Mate cards — first name + area. Admin writes on approve/suspend.
+    match /mates_public/{uid} {
+      allow read: if signedIn();
+      allow create, update, delete: if platformAdmin();
+    }
+
+    // §9 shared booking engine. $0 is paid; otherwise unpaid until Stripe confirms.
     match /bookings/{bookingId} {
       allow create: if signedIn()
         && !isAnonymous()
         && request.resource.data.customerUid == request.auth.uid
         && request.resource.data.status == 'pending'
-        && request.resource.data.paymentStatus == 'deferred'
+        && request.resource.data.paymentStatus in ['deferred', 'unpaid', 'paid']
         && request.resource.data.keys().hasAny(['updatedAt']);
       allow read: if signedIn() && (
         resource.data.customerUid == request.auth.uid ||
@@ -458,12 +469,16 @@ service cloud.firestore {
       allow list: if false;
     }
 
-    // AirPal Mate requests: owner reads/writes their own; admins run manual matching.
+    // AirPal Mate requests: owner + assigned mate; approved Mates can read open ones and accept.
     match /mate_requests/{requestId} {
+      function approvedMate() {
+        return signedIn() && !isAnonymous() && exists(/databases/$(database)/documents/mates_public/$(request.auth.uid));
+      }
       allow read: if signedIn() && (
         resource.data.ownerUid == request.auth.uid ||
         resource.data.matchedMateUid == request.auth.uid ||
-        platformAdmin()
+        platformAdmin() ||
+        (resource.data.status == 'open' && approvedMate())
       );
       allow create: if signedIn()
         && !isAnonymous()
@@ -473,11 +488,21 @@ service cloud.firestore {
         platformAdmin() ||
         (resource.data.ownerUid == request.auth.uid
           && request.resource.data.ownerUid == request.auth.uid) ||
-        // Assigned Mate closes the loop: matched → completed only, nothing else.
+        (approvedMate()
+          && resource.data.status == 'open'
+          && request.resource.data.status == 'matched'
+          && request.resource.data.matchedMateUid == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['status', 'matchedMateUid', 'matchedMateName', 'updatedAt'])) ||
         (resource.data.matchedMateUid == request.auth.uid
           && resource.data.status == 'matched'
           && request.resource.data.status == 'completed'
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt', 'completedAt']))
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt', 'completedAt'])) ||
+        (resource.data.matchedMateUid == request.auth.uid
+          && resource.data.status == 'completed'
+          && request.resource.data.status == 'completed'
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['mateRating', 'mateReviewText', 'updatedAt']))
       );
       allow delete: if signedIn() && (
         resource.data.ownerUid == request.auth.uid ||
@@ -499,7 +524,7 @@ service cloud.firestore {
     match /companion_applications/{applicationId} {
       allow get, list: if signedIn()
         && (resource.data.userId == request.auth.uid || platformAdmin());
-      allow create: if signedIn()
+      allow create: if platformAdmin() || (signedIn()
         && !isAnonymous()
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.status in ['draft', 'submitted']
@@ -509,8 +534,8 @@ service cloud.firestore {
           'hobbies', 'enjoysWithOthers', 'activities', 'availability', 'serviceArea',
           'pricingPreference', 'preferredRate', 'motivation', 'policeClearanceNumber',
           'policeClearanceDoc', 'applicantAgreementAccepted',
-          'communityGuidelinesAccepted', 'status', 'submittedAt', 'createdAt', 'updatedAt',
-        ]);
+          'communityGuidelinesAccepted', 'adultConfirmed', 'status', 'submittedAt', 'createdAt', 'updatedAt',
+        ]));
       allow update: if platformAdmin()
         || (signedIn()
           && resource.data.userId == request.auth.uid

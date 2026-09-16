@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  canLeaveReview,
   emptyMateRequest,
   isRequestStatus,
   isUseCase,
@@ -71,5 +72,11 @@ describe("mate requests", () => {
     expect(matchReasons({ suburb: "  ", date: "", time: "", mateKind: "", useCase: "social" })).toEqual([
       "Go out, not alone",
     ]);
+  });
+
+  it("only allows reviews after the request is completed", () => {
+    expect(canLeaveReview("completed")).toBe(true);
+    expect(canLeaveReview("matched")).toBe(false);
+    expect(canLeaveReview("open")).toBe(false);
   });
 });

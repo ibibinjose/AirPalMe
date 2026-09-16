@@ -4,13 +4,17 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { logAdminAction } from "@/lib/admin-audit";
+import { getDoc } from "firebase/firestore";
 import {
   bookingValid,
   canCustomerCancel,
   canProviderComplete,
   canProviderConfirm,
+  DEFAULT_FEE_CONFIG,
+  paymentStatusForPrice,
   quoteFees,
   type Booking,
+  type FeeConfig,
 } from "@shared/booking";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -23,7 +27,23 @@ const STATUS_LABEL: Record<string, string> = {
   refunded: "Refunded",
 };
 
-/** §9 bookings for the signed-in user — as guest and as Mate. Money deferred until Stripe. */
+async function loadFeeConfig(): Promise<FeeConfig> {
+  const db = getFirebaseDb();
+  if (!db || !isFirebaseConfigured) return DEFAULT_FEE_CONFIG;
+  try {
+    const snap = await getDoc(doc(db, "platform_settings", "marketplace"));
+    if (!snap.exists()) return DEFAULT_FEE_CONFIG;
+    const row = snap.data() as Partial<FeeConfig>;
+    return {
+      platformFeeBps: Number(row.platformFeeBps) || DEFAULT_FEE_CONFIG.platformFeeBps,
+      minimumPlatformFeeCents: Number(row.minimumPlatformFeeCents) || 0,
+    };
+  } catch {
+    return DEFAULT_FEE_CONFIG;
+  }
+}
+
+/** §9 bookings for the signed-in user — as guest and as Mate. */
 export function BookingsSection() {
   const { user, isAdmin } = useAuth();
   const [rows, setRows] = useState<Booking[]>([]);
@@ -65,7 +85,7 @@ export function BookingsSection() {
       const now = new Date().toISOString();
       await updateDoc(doc(db, "bookings", b.id), { status, updatedAt: now, ...extra });
       // Provider completing also closes the request loop (§30 acceptance).
-      if (status === "completed" && user.uid === b.providerUid) {
+      if (status === "completed" && user.uid === b.providerUid && b.requestId) {
         try {
           await updateDoc(doc(db, "mate_requests", b.requestId), {
             status: "completed",
@@ -90,7 +110,9 @@ export function BookingsSection() {
   return (
     <section className="mt-6 rounded-2xl border border-line bg-card p-4">
       <h2 className="font-display text-base font-bold">Bookings</h2>
-      <p className="mt-0.5 text-[13px] text-mute">Payment lands with Stripe — until then, bookings confirm intent.</p>
+      <p className="mt-0.5 text-[13px] text-mute">
+        $0 stays are confirmed as paid. Anything else stays unpaid until Stripe checkout is live for that booking.
+      </p>
       <ul className="mt-2 divide-y divide-line">
         {rows.map((b) => {
           const mine = b.customerUid === user.uid;
@@ -101,6 +123,8 @@ export function BookingsSection() {
                   <span className="block truncate font-semibold">{b.title}</span>
                   <span className="block text-xs text-mute">
                     {mine ? `with ${b.providerName}` : `for ${b.title}`} · {b.suburb} · {b.date}
+                    {b.priceCents > 0 ? ` · $${(b.priceCents / 100).toFixed(0)}` : " · free"}
+                    {b.paymentStatus === "unpaid" ? " · unpaid" : b.paymentStatus === "paid" ? " · paid" : ""}
                   </span>
                 </span>
                 <span className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-brand">
@@ -132,6 +156,38 @@ export function BookingsSection() {
   );
 }
 
+/** Plan-linked pay-later booking for ticketed experiences (host providers). */
+export async function createBookingForPlan(args: {
+  planId: string;
+  providerUid: string;
+  providerName: string;
+  title: string;
+  suburb: string;
+  date: string;
+  time: string;
+  customerUid: string;
+  priceCents?: number;
+}): Promise<string> {
+  const db = getFirebaseDb();
+  if (!db || !isFirebaseConfigured) throw new Error("Connect Firebase first.");
+  const { priceCents: requestedPrice = 0, ...rest } = args;
+  const priceCents = Math.max(0, Math.round(requestedPrice));
+  const input = { ...rest, requestId: "", providerKind: "host" as const, priceCents };
+  if (!bookingValid(input)) throw new Error("Booking details are incomplete.");
+  const fees = quoteFees(priceCents, await loadFeeConfig());
+  const now = new Date().toISOString();
+  const ref = await addDoc(collection(db, "bookings"), {
+    ...input,
+    feeCents: fees.feeCents,
+    paymentStatus: paymentStatusForPrice(priceCents),
+    status: "pending",
+    cancelReason: "",
+    createdAt: now,
+    updatedAt: now,
+  });
+  return ref.id;
+}
+
 export async function createBookingForRequest(args: {
   requestId: string;
   providerUid: string;
@@ -141,17 +197,20 @@ export async function createBookingForRequest(args: {
   date: string;
   time: string;
   customerUid: string;
+  priceCents?: number;
 }): Promise<string> {
   const db = getFirebaseDb();
   if (!db || !isFirebaseConfigured) throw new Error("Connect Firebase first.");
-  const input = { ...args, providerKind: "mate" as const, priceCents: 0 };
+  const { priceCents: requestedPrice = 0, ...rest } = args;
+  const priceCents = Math.max(0, Math.round(requestedPrice));
+  const input = { ...rest, planId: "", providerKind: "mate" as const, priceCents };
   if (!bookingValid(input)) throw new Error("Booking details are incomplete.");
-  const { feeCents } = quoteFees(0);
+  const fees = quoteFees(priceCents, await loadFeeConfig());
   const now = new Date().toISOString();
   const ref = await addDoc(collection(db, "bookings"), {
     ...input,
-    feeCents,
-    paymentStatus: "deferred",
+    feeCents: fees.feeCents,
+    paymentStatus: paymentStatusForPrice(priceCents),
     status: "pending",
     cancelReason: "",
     createdAt: now,

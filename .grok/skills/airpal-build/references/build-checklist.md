@@ -1,6 +1,6 @@
 # AirPal build checklist
 
-Last audited: 2026-09-16 (local .env + Mate inbox)
+Last audited: 2026-09-16 (Mate loop: Firestore supply, accept, dual review, fees)
 North star: Completed AirPal Experiences (not downloads).
 Marking rules: `.grok/skills/airpal-build/SKILL.md`. Product rules: `AGENTS.md`.
 
@@ -25,16 +25,16 @@ Only `done` is checked.
 ### Mate demand (request → match → connect)
 
 - [x] `done` `p0-mate-request` Create activity request — Done when: what, category, date, time, location, party size, budget persist to `mate_requests`. Evidence: `src/pages/MateRequestPage.tsx`, `shared/mate-request.ts`.
-- [ ] `partial` `p0-mate-discover` Discover approved Mates — Done when: requester sees approved Mates with understandable reasons (availability, area, interests), never a mystery score. Evidence: `src/pages/MatePage.tsx`. Gap: no browse/match-reason UI; matching is admin-only.
-- [ ] `partial` `p0-match` Match send/accept — Done when: admin (MVP) or Mate can assign/accept; request becomes `matched` with `matchedMateUid`. Evidence: `src/components/admin/MateRequestsAdmin.tsx`, assigned inbox + `matchReasons()` on `src/pages/MatePage.tsx`. Gap: Mate still cannot accept an open request themselves; admin assigns first.
-- [ ] `partial` `p0-message` On-platform messaging — Done when: match conversation with timestamps, read state, no phone/email in the thread. Evidence: `src/components/messaging/ChatBox.tsx`, `shared/messaging.ts`, `request_chats` rules. Gap: no system messages, no report/block from thread, no booking conversation.
+- [x] `done` `p0-mate-discover` Discover approved Mates — Done when: requester sees approved Mates with understandable reasons (availability, area, interests), never a mystery score. Evidence: `mates_public` + `mateDiscoverReasons()` on `src/pages/MatePage.tsx`.
+- [x] `done` `p0-match` Match send/accept — Done when: admin (MVP) or Mate can assign/accept; request becomes `matched` with `matchedMateUid`. Evidence: approved Mate accept on `src/pages/MatePage.tsx`; admin backup in `MateRequestsAdmin.tsx`.
+- [x] `done` `p0-message` On-platform messaging — Done when: match conversation with timestamps, read state, no phone/email in the thread. Evidence: `ChatBox` safety banner + `SafetyMenu` on the thread.
 
 ### Book → pay → complete → review
 
-- [ ] `partial` `p0-book` Shared booking engine — Done when: customer/provider/date/location/price/fees/status live on `bookings`; statuses Pending → Confirmed → Cancelled / In Progress → Completed / Disputed → Refunded. Evidence: `shared/booking.ts`, `src/components/booking/BookingsSection.tsx`, `bookings` rules. Gap: `paymentStatus` is always `"deferred"`; fee bps hard-coded in `PLATFORM_FEE_BPS`.
-- [ ] `todo` `p0-pay` Payments (Stripe) — Done when: Mate booking charges through the platform, no raw cards stored, fees from admin config not literals. Evidence: `functions/src/stripe.ts` is experience-plan checkout only.
+- [x] `done` `p0-book` Shared booking engine — Done when: customer/provider/date/location/price/fees/status live on `bookings`; statuses Pending → Confirmed → Cancelled / In Progress → Completed / Disputed → Refunded. Evidence: `shared/booking.ts`, `BookingsSection.tsx`. Fees from `platform_settings/marketplace`. $0 = paid; else unpaid until Stripe.
+- [ ] `partial` `p0-pay` Payments (Stripe) — Done when: Mate booking charges through the platform, no raw cards stored, fees from admin config not literals. Evidence: fees are admin-configurable; Mate checkout still uses experience Stripe (`functions/src/stripe.ts`) — unpaid bookings wait on a Mate Checkout Session.
 - [ ] `todo` `p0-payout` Provider payouts — Done when: Stripe Connect for eligible Mates/businesses, payout records separate from profiles. Evidence: —
-- [ ] `partial` `p0-review` Reviews on completed bookings — Done when: both sides review after `completed`, reportable, no algorithmic trust score. Evidence: rating fields on `mate_requests` in `src/pages/MatePage.tsx`. Gap: requester-only; not gated on booking completion; no badges.
+- [x] `done` `p0-review` Reviews on completed bookings — Done when: both sides review after `completed`, reportable, no algorithmic trust score. Evidence: requester + Mate reviews on `src/pages/MatePage.tsx`, gated by `canLeaveReview`.
 
 ### Trust, admin, notifications
 
@@ -106,13 +106,13 @@ A real user can:
 - [x] `done` `mvp-apply` Apply as a Mate
 - [x] `done` `mvp-approved` Be manually approved
 - [x] `done` `mvp-request` Create an activity request
-- [ ] `partial` `mvp-discover` Discover an approved Mate
-- [ ] `partial` `mvp-match` Match
-- [ ] `partial` `mvp-message` Message
-- [ ] `partial` `mvp-book` Book
+- [x] `done` `mvp-discover` Discover an approved Mate
+- [x] `done` `mvp-match` Match
+- [x] `done` `mvp-message` Message
+- [x] `done` `mvp-book` Book
 - [ ] `todo` `mvp-pay` Pay
-- [ ] `partial` `mvp-complete` Complete the activity
-- [ ] `partial` `mvp-review` Leave a review
+- [x] `done` `mvp-complete` Complete the activity
+- [x] `done` `mvp-review` Leave a review
 - [x] `done` `mvp-report` Report / block
 - [ ] `partial` `mvp-admin-lifecycle` Admin inspects and intervenes at every stage
 
@@ -122,6 +122,6 @@ The MVP is not complete until every row above is `done`.
 
 ## Next 3
 
-1. `p0-pay` — charge Mate bookings through Stripe; stop hard-coding fees.
-2. `p0-match` — let an approved Mate accept an open request (callable + rules), not only admin assign.
-3. `p0-review` — both-sides review, only after booking `completed`.
+1. `p0-pay` — Mate Stripe Checkout Session (reuse `functions/src/stripe.ts` pattern); unpaid bookings are the honest gap.
+2. `p0-payout` — Stripe Connect for approved Mates.
+3. `p0-idv` — identity check before Mate `approved`.

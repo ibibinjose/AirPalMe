@@ -87,6 +87,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       ) : (
         <>
           <div className="fixed-element sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
+            <LocalNowBar />
             {workspace ? (
               <header className="overflow-visible border-b border-line bg-paper">
                 <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-3 sm:px-4 md:h-16 md:px-6">
@@ -154,7 +155,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </motion.div>
               </>
             )}
-            <LocalNowBar />
             <BatteryWarningBanner />
             <SyncStatusBar />
           </div>

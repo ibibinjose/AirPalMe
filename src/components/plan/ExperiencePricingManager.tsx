@@ -159,11 +159,11 @@ export function ExperiencePricingManager({
 
         {data.isExperience && (
           <div className="space-y-5 pt-4 border-t border-line/60 animate-in fade-in-50">
-            {/* Coming Soon Notice */}
-            <div className="flex items-center gap-2.5 rounded-2xl bg-amber-500/10 p-3.5 text-xs text-amber-800 ring-1 ring-amber-500/25">
-              <Sparkles size={16} className="shrink-0 text-amber-600" />
+            <div className="flex items-center gap-2.5 rounded-2xl bg-brand/5 p-3.5 text-xs text-ink ring-1 ring-brand/25">
+              <Sparkles size={16} className="shrink-0 text-brand" />
               <span>
-                <strong>Paid Experiences & Host Marketplace Coming Soon:</strong> You can configure and preview your ticket pricing, deposits, and capacity limits. Stripe payments & host payouts will go live shortly!
+                <strong>Pay-later bookings are live:</strong> guests book spots now and pay at the door. Card
+                payments and host payouts switch on with Stripe — your pricing below carries straight over.
               </span>
             </div>
 

@@ -16,6 +16,7 @@ import { authErrorMessage } from "@shared/auth-email";
 import { track } from "@/lib/analytics";
 import { HostActivationChecklist } from "@/components/host/HostActivationChecklist";
 import { HostPlaceForm } from "@/components/host/HostPlaceForm";
+import { HostRoomsPanel } from "@/components/host/HostRoomsPanel";
 import { HostDiningPanel } from "@/components/host/HostDiningPanel";
 import { HostPrintPanel } from "@/components/host/HostPrintPanel";
 import { openTicketCount, resolveStaffTicket, subscribePropertyTickets } from "@/lib/tickets-store";
@@ -24,7 +25,7 @@ import { hostWorkspacePropertyId, roomTokenEntries } from "@/lib/host-workspace"
 import { getPropertyWifiRemote, liveBackendEnabled } from "@/lib/functions";
 import { cn } from "@/lib/cn";
 
-type Tab = "today" | "place" | "dining" | "print";
+type Tab = "today" | "rooms" | "place" | "dining" | "print";
 
 export function HostPage() {
   const { user, isHost, isAdmin, authReady, createHostProperty, sendVerificationEmail } = useAuth();
@@ -245,7 +246,7 @@ export function HostPage() {
         </div>
 
         <div className="mt-5 flex gap-1 rounded-full bg-card/80 p-1 ring-1 ring-line shadow-sm backdrop-blur">
-          {(["today", "place", "dining", "print"] as const).map((t) => (
+          {(["today", "rooms", "place", "dining", "print"] as const).map((t) => (
             <button
               key={t}
               type="button"
@@ -289,7 +290,12 @@ export function HostPage() {
 
             {property.roomTypes && property.roomTypes.length > 0 && (
               <section className="mt-4 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Room types</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Room types</p>
+                  <button type="button" className="text-xs font-medium text-brand" onClick={() => setTab("rooms")}>
+                    Manage rooms →
+                  </button>
+                </div>
                 <ul className="mt-3 space-y-2">
                   {property.roomTypes.map((rt) => (
                     <li key={rt.id} className="flex items-baseline justify-between gap-3 text-sm">
@@ -302,6 +308,18 @@ export function HostPage() {
                 </ul>
               </section>
             )}
+
+            <button
+              type="button"
+              onClick={() => nav("/business/campaigns")}
+              className="mt-4 flex w-full items-center justify-between gap-3 rounded-[22px] bg-ink p-4 text-left text-white"
+            >
+              <span>
+                <span className="block text-sm font-semibold">Fill slow nights with an Experience</span>
+                <span className="block text-xs text-white/70">AirPal recruits the guests, you host.</span>
+              </span>
+              <span aria-hidden>→</span>
+            </button>
 
             <div className="mt-6 mb-2 flex items-center justify-between gap-2">
               <h2 className="text-sm font-semibold text-mute">
@@ -366,6 +384,7 @@ export function HostPage() {
           </>
         )}
 
+        {tab === "rooms" && <HostRoomsPanel property={property} onSaved={setProperty} />}
         {tab === "place" && <HostPlaceForm property={property} onSaved={setProperty} />}
         {tab === "dining" && <HostDiningPanel propertyId={property.id} menu={menu} />}
         {tab === "print" && <HostPrintPanel property={property} />}

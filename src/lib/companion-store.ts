@@ -73,6 +73,14 @@ export function loadApplications(): CompanionApplication[] {
   return cached;
 }
 
+/** Merge live Firestore rows into the local cache so draft/submit still work. */
+export function hydrateApplications(apps: CompanionApplication[]): void {
+  if (apps.length === 0) return;
+  const byId = new Map(loadApplications().map((a) => [a.applicationId, a]));
+  for (const app of apps) byId.set(app.applicationId, app);
+  writeToStorage(Array.from(byId.values()));
+}
+
 function persist(app: CompanionApplication): CompanionApplication {
   const all = loadApplications();
   const idx = all.findIndex((a) => a.applicationId === app.applicationId);

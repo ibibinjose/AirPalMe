@@ -62,6 +62,19 @@ export function updatePropertyProfileRemote(data: {
   heroImage?: string;
   breakfast?: { hours: string; location: string; type: string; price: string };
   facilities?: Array<{ name: string; hours: string; floor: string; details?: string; icon: string }>;
+  roomTypes?: Array<{
+    id: string;
+    name: string;
+    category: string;
+    capacity: number;
+    sizeSqm?: number;
+    bedConfig: string;
+    totalRooms: number;
+    startingPrice?: number;
+    features: string[];
+    roomNumbers?: string[];
+  }>;
+  roomStatuses?: Record<string, "occupied" | "vacant" | "maintenance" | "cleaning">;
   confirmHours?: boolean;
 }) {
   return callFunction<typeof data, { ok: true; updatedAt: string }>(CALLABLES.updatePropertyProfile, data);

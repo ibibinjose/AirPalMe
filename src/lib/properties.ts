@@ -289,6 +289,8 @@ export type PropertyProfilePatch = {
   heroImage?: string;
   breakfast?: PropertyInfo["breakfast"];
   facilities?: PropertyInfo["facilities"];
+  roomTypes?: PropertyInfo["roomTypes"];
+  roomStatuses?: PropertyInfo["roomStatuses"];
   confirmHours?: boolean;
 };
 

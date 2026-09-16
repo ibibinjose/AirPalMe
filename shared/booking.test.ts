@@ -5,6 +5,7 @@ import {
   canProviderComplete,
   canProviderConfirm,
   isBookingStatus,
+  paymentStatusForPrice,
   quoteFees,
 } from "./booking";
 
@@ -21,15 +22,46 @@ describe("booking engine", () => {
     priceCents: 8000,
   };
 
-  it("quotes the 15% platform fee", () => {
+  it("quotes the default 15% platform fee", () => {
     expect(quoteFees(10000)).toEqual({ priceCents: 10000, feeCents: 1500, providerCents: 8500 });
     expect(quoteFees(-5)).toEqual({ priceCents: 0, feeCents: 0, providerCents: 0 });
+  });
+
+  it("applies admin fee config instead of a hard-coded percent", () => {
+    expect(quoteFees(10000, { platformFeeBps: 1000, minimumPlatformFeeCents: 0 })).toEqual({
+      priceCents: 10000,
+      feeCents: 1000,
+      providerCents: 9000,
+    });
+    expect(quoteFees(1000, { platformFeeBps: 1500, minimumPlatformFeeCents: 250 })).toEqual({
+      priceCents: 1000,
+      feeCents: 250,
+      providerCents: 750,
+    });
+    expect(quoteFees(0, { platformFeeBps: 1500, minimumPlatformFeeCents: 250 })).toEqual({
+      priceCents: 0,
+      feeCents: 0,
+      providerCents: 0,
+    });
   });
 
   it("validates booking input", () => {
     expect(bookingValid(good)).toBe(true);
     expect(bookingValid({ ...good, date: "tomorrow" })).toBe(false);
     expect(bookingValid({ ...good, priceCents: -1 })).toBe(false);
+  });
+
+  it("accepts host plan bookings without a mate request", () => {
+    expect(
+      bookingValid({
+        ...good,
+        requestId: "",
+        planId: "plan-42",
+        providerKind: "host",
+        providerName: "Harbour Hotel",
+      }),
+    ).toBe(true);
+    expect(bookingValid({ ...good, requestId: "", planId: "" })).toBe(false);
   });
 
   it("gates the lifecycle", () => {
@@ -41,5 +73,7 @@ describe("booking engine", () => {
     expect(canProviderComplete("cancelled")).toBe(false);
     expect(isBookingStatus("disputed")).toBe(true);
     expect(isBookingStatus("shipped")).toBe(false);
+    expect(paymentStatusForPrice(0)).toBe("paid");
+    expect(paymentStatusForPrice(8000)).toBe("unpaid");
   });
 });

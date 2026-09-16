@@ -17,6 +17,8 @@ import {
 } from "@shared/plan";
 import { Button } from "@/components/ui/Button";
 import { createExperienceCheckoutSessionRemote } from "@/lib/functions";
+import { createBookingForPlan } from "@/components/booking/BookingsSection";
+import { useAuth } from "@/contexts/AuthContext";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
@@ -52,6 +54,8 @@ export function ExperienceBookingModal({
   const [isProcessing, setIsProcessing] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState<boolean>(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  const [payLater, setPayLater] = useState(false);
+  const { user, requireUser } = useAuth();
 
   if (!isOpen) return null;
 
@@ -115,8 +119,54 @@ export function ExperienceBookingModal({
         });
       }
     } catch (err) {
+      const message = err instanceof Error ? err.message : "Booking failed. Please try again.";
+      // No Stripe key: complete the build with a pay-later booking instead of a dead end.
+      if (/not configured/i.test(message)) {
+        if (!requireUser("Sign in to book with pay-later.")) {
+          setIsProcessing(false);
+          return;
+        }
+        if (!user) {
+          setIsProcessing(false);
+          return;
+        }
+        try {
+          const id = await createBookingForPlan({
+            planId: plan.id,
+            providerUid: plan.creator.uid || "",
+            providerName: plan.creator.name || "Host",
+            title: plan.title,
+            suburb: plan.city || plan.destination || "Sydney",
+            date: plan.date,
+            time: plan.time,
+            customerUid: user.uid,
+            priceCents: Math.round(totalPrice * 100),
+          });
+          setBookingRefId(id);
+          setPayLater(true);
+          setIsProcessing(false);
+          setConfirmedBooking(true);
+          void triggerHaptic("success");
+          if (onBookingSuccess) {
+            onBookingSuccess({
+              spots,
+              tierId: selectedTierId || undefined,
+              totalAmount: totalPrice,
+              depositPaid: 0,
+              isDeposit: false,
+            });
+          }
+          return;
+        } catch (fallbackErr) {
+          setIsProcessing(false);
+          setBookingError(
+            fallbackErr instanceof Error ? fallbackErr.message : "Pay-later booking failed. Please try again.",
+          );
+          return;
+        }
+      }
       setIsProcessing(false);
-      setBookingError(err instanceof Error ? err.message : "Booking failed. Please try again.");
+      setBookingError(message);
     }
   };
 
@@ -183,7 +233,7 @@ export function ExperienceBookingModal({
                   </span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-mute block">Total Paid:</span>
+                  <span className="text-[10px] text-mute block">{payLater ? "Due at the door:" : "Total Paid:"}</span>
                   <span className="font-bold text-brand">${amountToChargeNow} AUD</span>
                 </div>
                 {remainingBalance > 0 && (

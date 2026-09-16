@@ -12,14 +12,25 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { Send } from "lucide-react";
+import { Send, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { messageValid, type ChatMessage } from "@shared/messaging";
+import { SafetyMenu } from "@/components/safety/SafetyMenu";
 
 /** Match conversation: tied to one mate_request, parties only. */
-export function ChatBox({ requestId, readOnly = false }: { requestId: string; readOnly?: boolean }) {
+export function ChatBox({
+  requestId,
+  readOnly = false,
+  peerUid,
+  peerName,
+}: {
+  requestId: string;
+  readOnly?: boolean;
+  peerUid?: string;
+  peerName?: string;
+}) {
   const { user, requireUser } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
@@ -104,6 +115,15 @@ export function ChatBox({ requestId, readOnly = false }: { requestId: string; re
 
   return (
     <div className="rounded-xl bg-paper p-3 ring-1 ring-line">
+      <p className="mb-2 flex items-start gap-1.5 text-[11px] leading-4 text-mute">
+        <ShieldCheck size={12} className="mt-0.5 shrink-0 text-gold" />
+        Keep this chat on AirPal. Don&apos;t share phone numbers or emails.
+      </p>
+      {peerUid && peerName && user && (
+        <div className="mb-2">
+          <SafetyMenu targetUid={peerUid} targetName={peerName} planId={requestId} />
+        </div>
+      )}
       <div className="max-h-64 space-y-2 overflow-y-auto pr-1" role="log" aria-label="Match conversation">
         {messages.length === 0 && (
           <p className="py-3 text-center text-[13px] text-mute">

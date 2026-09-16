@@ -9,7 +9,16 @@ import { AVAILABILITY_STATUSES, type AvailabilityStatus } from "@shared/bio";
 /** Nav buttons are h-9 / lg:h-10 — keep the avatar on that same height. */
 export const NAV_AVATAR = "h-10 w-10 text-sm lg:text-base";
 
-export function AvatarFace({ className, statusClass }: { className?: string; statusClass?: string }) {
+export function AvatarFace({
+  className,
+  statusClass,
+  showStatusDot = true,
+}: {
+  className?: string;
+  statusClass?: string;
+  /** Corner status pip. Hide on the nav trigger — the ring carries status there. */
+  showStatusDot?: boolean;
+}) {
   const { user } = useAuth();
   const { mine } = useBio();
   const raw = mine?.avatar || user?.photoURL;
@@ -30,14 +39,16 @@ export function AvatarFace({ className, statusClass }: { className?: string; sta
           <UserRound className="h-[48%] w-[48%]" strokeWidth={1.8} />
         )}
       </span>
-      <span
-        aria-hidden
-        className={cn(
-          "pointer-events-none absolute right-0 bottom-0 z-10 translate-x-1/2 translate-y-1/2 rounded-full ring-2 ring-paper shadow-xs",
-          statusInfo?.dotColor || (user ? "bg-emerald-500" : "bg-mute"),
-          statusClass || "h-2.5 w-2.5",
-        )}
-      />
+      {showStatusDot && (
+        <span
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute right-0 bottom-0 z-10 translate-x-1/2 translate-y-1/2 rounded-full ring-2 ring-paper shadow-xs",
+            statusInfo?.dotColor || (user ? "bg-emerald-500" : "bg-mute"),
+            statusClass || "h-2.5 w-2.5",
+          )}
+        />
+      )}
     </span>
   );
 }

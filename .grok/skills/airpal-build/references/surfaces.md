@@ -22,6 +22,7 @@ Guest tabs today: Explore / Plan / Scan / Stay. Mate is `/mate`, not a fifth tab
 | Request types | `shared/mate-request.ts` | |
 | Supply apply | `src/pages/CompanionPage.tsx` | `companion_applications` |
 | Supply types | `shared/companion.ts` | |
+| Live supply | `src/lib/companion-remote.ts` | `companion_applications`, `mates_public` |
 | Supply admin | `src/components/admin/CompanionAdmin.tsx` | |
 | Match admin | `src/components/admin/MateRequestsAdmin.tsx` | |
 | Chat UI | `src/components/messaging/ChatBox.tsx` | `request_chats/{id}/messages` |

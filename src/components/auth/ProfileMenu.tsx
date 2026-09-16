@@ -4,12 +4,10 @@ import {
   Building2,
   CalendarDays,
   Cat,
-  ChevronDown,
   HeartHandshake,
   Languages,
   LogIn,
   LogOut,
-  Menu,
   Settings,
   ShieldCheck,
   Sparkles,
@@ -145,16 +143,17 @@ export function ProfileMenu() {
     <>
       <div className="px-2.5 pb-2 pt-1.5">
         <div className="flex items-center gap-3">
-          <AvatarFace className="h-11 w-11 shrink-0 text-base" />
+          <span className={cn("rounded-full ring-2 ring-offset-2 ring-offset-card shadow-none", statusInfo.ringClass)}>
+            <AvatarFace className="h-11 w-11 shrink-0 text-base" showStatusDot={false} />
+          </span>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold">{user.displayName || mine?.name || "Account"}</p>
             <p className="truncate text-[12px] text-mute">{user.email || user.phone}</p>
           </div>
         </div>
 
-        {/* Live Availability Status Pill & Quick Switcher */}
-        {mine && (
-          <div className="mt-2.5 flex items-center gap-1.5">
+        <div className="mt-2.5 flex items-center gap-1.5">
+          {mine ? (
             <button
               type="button"
               onClick={() => {
@@ -167,19 +166,28 @@ export function ProfileMenu() {
                 statusInfo.textColor,
               )}
             >
-              <div className="flex items-center gap-2 min-w-0 truncate">
-                <span className={cn("h-2 w-2 rounded-full shrink-0", statusInfo.dotColor)} />
-                <span className="text-[11px] font-semibold truncate">
+              <div className="flex min-w-0 items-center gap-2 truncate">
+                <span className="truncate text-[11px] font-semibold">
                   {statusInfo.label}
                   {mine.customStatus ? ` · ${mine.customStatusEmoji ? `${mine.customStatusEmoji} ` : ""}${mine.customStatus}` : ""}
                 </span>
               </div>
-              <span className="text-[10px] uppercase font-bold text-ink/60 shrink-0 ml-1">Edit</span>
+              <span className="ml-1 shrink-0 text-[10px] font-bold uppercase text-ink/60">Edit</span>
             </button>
-          </div>
-        )}
+          ) : (
+            <div
+              className={cn(
+                "flex-1 rounded-xl border px-2.5 py-1.5 text-[11px] font-semibold",
+                statusInfo.badgeBg,
+                statusInfo.textColor,
+              )}
+            >
+              {statusInfo.label}
+            </div>
+          )}
+        </div>
 
-        {/* Language selector under profile / burger menu */}
+        {/* Language selector in the profile menu */}
         <div id="profile-menu-language-selector" className="mt-2.5 flex items-center justify-between rounded-xl border border-line/80 bg-paper/60 px-2.5 py-1.5">
           <div className="flex items-center gap-1.5 text-xs font-medium text-mute">
             <Languages size={15} className="text-gold shrink-0" />
@@ -290,20 +298,22 @@ export function ProfileMenu() {
         id="profile-menu-button"
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label={user ? "Account and menu" : "Menu and sign in"}
+        aria-label={
+          user
+            ? `Account menu, ${statusInfo.label}`
+            : "Menu and sign in"
+        }
+        title={user ? `${statusInfo.label}${mine?.customStatus ? ` · ${mine.customStatus}` : ""}` : "Sign in"}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "flex h-9 sm:h-10 touch-manipulation items-center gap-1.5 overflow-visible rounded-full border border-line/80 bg-paper py-0.5 pl-2.5 pr-1.5 transition hover:border-brand/40 hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-paper",
+          "relative grid h-9 w-9 shrink-0 touch-manipulation place-items-center overflow-visible rounded-full bg-paper transition sm:h-10 sm:w-10",
+          "hover:brightness-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-paper",
           open && "ring-2 ring-brand ring-offset-2 ring-offset-paper",
+          !open && user && cn(statusInfo.ringClass, "ring-2 ring-offset-2 ring-offset-paper shadow-none"),
+          !open && !user && "ring-1 ring-line hover:ring-brand/50",
         )}
       >
-        <Menu size={16} className="text-mute shrink-0" aria-hidden="true" />
-        <AvatarFace className="h-7 w-7 text-xs sm:h-8 sm:w-8" />
-        <ChevronDown
-          size={12}
-          aria-hidden="true"
-          className={cn("shrink-0 text-mute/80 transition-transform -ml-0.5", open && "rotate-180")}
-        />
+        <AvatarFace className="h-9 w-9 text-xs sm:h-10 sm:w-10" showStatusDot={false} />
       </button>
       {open && (
         <>

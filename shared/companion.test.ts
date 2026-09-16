@@ -3,7 +3,10 @@ import {
   allowedAdminTransitions,
   companionStatusCopy,
   flagsRegulatedClaims,
+  firstNameOf,
+  mateDiscoverReasons,
   publicCompanionApplication,
+  publicMateFromApplication,
   validateCompanionApplication,
   type CompanionApplication,
   type CompanionApplicationInput,
@@ -124,6 +127,38 @@ describe("companionStatusCopy", () => {
       expect(copy.title.length).toBeGreaterThan(0);
       expect(copy.body.length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("public Mate cards", () => {
+  it("uses first name only and never email or clearance", () => {
+    expect(firstNameOf("Alex Mate")).toBe("Alex");
+    const card = publicMateFromApplication({
+      ...validInput(),
+      applicationId: "a1",
+      userId: "u1",
+      status: "approved",
+      createdAt: "",
+      updatedAt: "",
+    } as CompanionApplication);
+    expect(card.firstName).toBe("Alex");
+    expect(card.uid).toBe("u1");
+    expect(JSON.stringify(card)).not.toMatch(/alex@mates/i);
+    expect(JSON.stringify(card)).not.toMatch(/NSW-123456/);
+  });
+
+  it("explains a match in plain language", () => {
+    const card = publicMateFromApplication({
+      ...validInput(),
+      applicationId: "a1",
+      userId: "u1",
+      status: "approved",
+      createdAt: "",
+      updatedAt: "",
+    } as CompanionApplication);
+    expect(mateDiscoverReasons(card, { suburb: "Surry Hills", mateKind: "hiking" })).toEqual(
+      expect.arrayContaining(["Around Surry Hills", "Into Hiking", "Weekends"]),
+    );
   });
 });
 

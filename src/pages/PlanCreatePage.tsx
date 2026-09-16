@@ -12,6 +12,7 @@ import {
   Radar,
   ShieldCheck,
   Sparkles,
+  Ticket,
   Users,
   X,
 } from "lucide-react";
@@ -519,30 +520,46 @@ export function PlanCreatePage() {
               </div>
             </button>
 
-            {/* Paid / Bookable Experience (Disabled - Coming Soon) */}
-            <div
-              aria-disabled="true"
-              className="group flex flex-col items-start gap-3 rounded-2xl p-4 text-left ring-1 ring-line/60 bg-paper/60 text-mute relative overflow-hidden cursor-not-allowed opacity-75 select-none"
-              title="Paid Experiences & ticketed bookings are coming soon!"
+            {/* Paid / Bookable Experience — live with pay-later bookings; cards via Stripe later */}
+            <button
+              type="button"
+              role="radio"
+              aria-checked={experienceData.isExperience}
+              onClick={() => {
+                void triggerHaptic("medium");
+                setExperienceData((prev) => ({
+                  ...prev,
+                  isExperience: true,
+                  pricingModel: prev.pricingModel === "free" ? "fixed" : prev.pricingModel,
+                }));
+              }}
+              className={cn(
+                "group flex flex-col items-start gap-3 rounded-2xl p-4 text-left transition active:scale-[0.98] ring-1 relative overflow-hidden",
+                experienceData.isExperience
+                  ? "bg-brand/5 text-ink ring-2 ring-brand shadow-sm"
+                  : "bg-paper text-mute ring-line hover:text-ink hover:bg-line/40",
+              )}
             >
               <div className="flex items-center justify-between w-full">
-                <span className="text-2xl grayscale">🎟️</span>
-                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-amber-500/15 text-amber-700 ring-1 ring-amber-500/30 flex items-center gap-1">
-                  <Sparkles size={10} />
-                  <span>Coming Soon</span>
+                <Ticket size={22} className={experienceData.isExperience ? "text-brand" : undefined} />
+                <span
+                  className={cn(
+                    "text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider",
+                    experienceData.isExperience ? "bg-brand text-white" : "bg-line/60 text-mute",
+                  )}
+                >
+                  Pay later
                 </span>
               </div>
               <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-display text-base font-bold text-ink/70 block">
-                    Paid / Bookable Experience
-                  </span>
-                </div>
+                <span className="font-display text-base font-bold text-ink block">
+                  Paid / Bookable Experience
+                </span>
                 <p className="text-xs text-mute mt-1 leading-relaxed">
-                  Ticketed bookings, guided tours, retreats, workshops & upfront deposits. <span className="text-amber-600 font-semibold">(Launching Soon with Stripe)</span>
+                  Ticketed bookings, guided tours, retreats, workshops & deposits. Guests book now, pay later — cards arrive with Stripe.
                 </p>
               </div>
-            </div>
+            </button>
           </div>
         </div>
 

@@ -7,6 +7,8 @@ import { PlaceCard } from "@/components/discovery/PlaceCard";
 import { LocalFavorites } from "@/components/stay/LocalFavorites";
 import { EmojiRate } from "@/components/feedback/EmojiRate";
 import { ArrivalGuide } from "@/components/stay/ArrivalGuide";
+import { YourRoomCard } from "@/components/stay/YourRoomCard";
+import { roomTypeForNumber } from "@/lib/host-rooms";
 import { useStay } from "@/contexts/StayContext";
 import { useStayUi } from "@/contexts/StayUiContext";
 import { useListings } from "@/contexts/ListingsContext";
@@ -191,6 +193,15 @@ export function ConciergePage() {
 
       {property.name ? <ArrivalGuide /> : null}
 
+      {roomLabel ? (
+        <YourRoomCard
+          roomNumber={roomLabel}
+          roomType={roomTypeForNumber(property.roomTypes, roomLabel)}
+          checkIn={property.checkIn}
+          checkOut={property.checkOut}
+        />
+      ) : null}
+
       <div className="mt-5 grid grid-cols-2 gap-2">
         {tiles.map((t) => (
           <button
@@ -285,7 +296,7 @@ export function ConciergePage() {
           className="h-28 w-full rounded-2xl bg-paper p-3 text-[15px] outline-none ring-1 ring-line transition focus:ring-2 focus:ring-brand"
         />
         <div className="mt-3 grid grid-cols-3 gap-2">
-          {["Towels", "Clean", "Late out"].map((quick) => {
+          {["Towels", "Clean", "Late checkout", "Extra night", "Room move", "Early check-in"].map((quick) => {
             const selected = ticket === quick;
             return (
               <button

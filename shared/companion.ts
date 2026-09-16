@@ -187,6 +187,64 @@ export interface CompanionValidationError {
   message: string;
 }
 
+/** Public Mate card — first name and area only, never email/phone/PCC/admin notes. */
+export interface PublicMate {
+  uid: string;
+  firstName: string;
+  city: string;
+  suburb: string;
+  serviceArea: string;
+  languages: string[];
+  interests: string[];
+  activities: string[];
+  availability: string[];
+  introduction: string;
+  roles: CompanionRole[];
+  photo?: string;
+}
+
+export function firstNameOf(fullName: string): string {
+  return fullName.trim().split(/\s+/)[0] || "Mate";
+}
+
+export function publicMateFromApplication(app: CompanionApplication): PublicMate {
+  return {
+    uid: app.userId,
+    firstName: firstNameOf(app.fullName),
+    city: app.city.trim(),
+    suburb: app.suburb.trim(),
+    serviceArea: app.serviceArea.trim(),
+    languages: app.languages,
+    interests: app.interests,
+    activities: app.activities,
+    availability: app.availability,
+    introduction: app.introduction.trim().slice(0, 280),
+    roles: app.roles,
+    photo: app.photo,
+  };
+}
+
+export function mateDiscoverReasons(
+  mate: PublicMate,
+  hint?: { suburb?: string; mateKind?: string },
+): string[] {
+  const out: string[] = [];
+  const area = [mate.suburb, mate.city, mate.serviceArea].filter(Boolean).join(" ");
+  const want = (hint?.suburb || "").trim();
+  if (want && area.toLowerCase().includes(want.toLowerCase())) out.push(`Around ${want}`);
+  else if (mate.suburb || mate.city) out.push(`Based in ${[mate.suburb, mate.city].filter(Boolean).join(", ")}`);
+  const kind = (hint?.mateKind || "").trim().toLowerCase();
+  if (kind) {
+    const hit = [...mate.interests, ...mate.activities].find(
+      (item) => item.toLowerCase().includes(kind) || kind.includes(item.toLowerCase()),
+    );
+    if (hit) out.push(`Into ${hit}`);
+  }
+  if (mate.availability[0]) out.push(mate.availability[0]);
+  if (mate.languages[0]) out.push(`Speaks ${mate.languages[0]}`);
+  return out.slice(0, 4);
+}
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Claims that suggest regulated or professional services. Flagged for admin review. */

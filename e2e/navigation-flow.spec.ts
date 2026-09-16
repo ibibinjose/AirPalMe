@@ -14,10 +14,9 @@ test.describe("Global Navigation & Profile Flow", () => {
     await header.getByRole("button", { name: "Stay" }).click();
     await expect(page).toHaveURL(/\/concierge/);
 
-    // Navigate to Calendar
-    await header.getByRole("button", { name: "Calendar" }).click();
-    await expect(page).toHaveURL(/\/calendar/);
-    await expect(page.getByRole("heading", { name: /Event Calendar/i })).toBeVisible();
+    // Navigate to Plan
+    await header.getByRole("button", { name: "Plan" }).click();
+    await expect(page).toHaveURL(/\/plan/);
 
     // Navigate to Explore (home)
     await header.getByRole("button", { name: "Explore" }).click();
@@ -28,25 +27,42 @@ test.describe("Global Navigation & Profile Flow", () => {
     await expect(page).toHaveURL(/\/join/);
   });
 
+  test("time and weather sit above the main nav", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/");
+    await page.waitForLoadState("domcontentloaded");
+
+    const locationBtn = page.getByRole("button", { name: /Current location/i }).first();
+    await expect(locationBtn).toBeVisible();
+    const header = page.locator("header.hidden.lg\\:block");
+    await expect(header).toBeVisible();
+
+    const weatherBox = await locationBtn.boundingBox();
+    const headerBox = await header.boundingBox();
+    expect(weatherBox).toBeTruthy();
+    expect(headerBox).toBeTruthy();
+    expect(weatherBox!.y).toBeLessThan(headerBox!.y);
+  });
+
   test("unauthenticated profile menu provides entry to auth and partner tracks", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 
     // Open profile menu
-    const menuTrigger = page.getByRole("button", { name: /Sign in menu/i });
+    const menuTrigger = page.getByRole("button", { name: /menu and sign in/i });
     await expect(menuTrigger).toBeVisible();
     await menuTrigger.click();
 
     // Dropdown options
     const menu = page.getByRole("menu");
     await expect(menu.getByText("Welcome to AirPal")).toBeVisible();
-    await expect(menu.getByRole("button", { name: /Sign in \/ Create account/i })).toBeVisible();
-    await expect(menu.getByRole("button", { name: /Become a Host/i })).toBeVisible();
-    await expect(menu.getByRole("button", { name: /List a Business/i })).toBeVisible();
-    await expect(menu.getByRole("button", { name: /Organise an Event/i })).toBeVisible();
+    await expect(menu.getByRole("menuitem", { name: /Sign in \/ Create account/i })).toBeVisible();
+    await expect(menu.getByRole("menuitem", { name: /Become a Host/i })).toBeVisible();
+    await expect(menu.getByRole("menuitem", { name: /List a Business/i })).toBeVisible();
+    await expect(menu.getByRole("menuitem", { name: /Organise an Event/i })).toBeVisible();
 
     // Click Sign in / Create account -> goes to /start
-    await menu.getByRole("button", { name: /Sign in \/ Create account/i }).click();
+    await menu.getByRole("menuitem", { name: /Sign in \/ Create account/i }).click();
     await expect(page).toHaveURL(/\/start/);
   });
 
@@ -59,9 +75,9 @@ test.describe("Global Navigation & Profile Flow", () => {
     const tabNav = page.locator("nav.lg\\:hidden");
     await expect(tabNav).toBeVisible();
 
-    // Navigate to Calendar via bottom tab
-    await tabNav.getByRole("button", { name: "Calendar" }).click();
-    await expect(page).toHaveURL(/\/calendar/);
+    // Navigate to Plan via bottom tab
+    await tabNav.getByRole("button", { name: "Plan" }).click();
+    await expect(page).toHaveURL(/\/plan/);
 
     // Navigate to Stay via bottom tab
     await tabNav.getByRole("button", { name: "Stay" }).click();
@@ -80,7 +96,7 @@ test.describe("Global Navigation & Profile Flow", () => {
     const searchBtn = page.getByRole("button", { name: "Search" }).first();
     await searchBtn.click();
 
-    const searchInput = page.getByPlaceholder(/Search places, live events/i);
+    const searchInput = page.getByPlaceholder(/Search places, events, stays, plans/i);
     await expect(searchInput).toBeVisible();
 
     // Search for Glenmore
@@ -90,6 +106,6 @@ test.describe("Global Navigation & Profile Flow", () => {
 
     // Click the result to navigate
     await result.click();
-    await expect(page).toHaveURL(/\/place\/glenmore/);
+    await expect(page).toHaveURL(/\/p\/glenmore/);
   });
 });

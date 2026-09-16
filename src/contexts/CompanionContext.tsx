@@ -1,15 +1,22 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { CompanionApplication, CompanionApplicationInput, CompanionStatus } from "@shared/companion";
 import {
   adminUpdateApplication,
   getApplicationByUser,
   getOrCreateDraft,
   listApplicationsForAdmin,
+  hydrateApplications,
   loadApplications,
   saveDraft,
   submitApplication,
   subscribeCompanions,
 } from "@/lib/companion-store";
+import {
+  loadAllApplicationsRemote,
+  loadMyApplicationsRemote,
+  persistAdminApplicationRemote,
+  persistApplicationRemote,
+} from "@/lib/companion-remote";
 import { useAuth } from "./AuthContext";
 import { useBio } from "./BioContext";
 import { toast } from "sonner";
@@ -45,16 +52,47 @@ function currentUserId(user: { uid?: string } | null | undefined, email?: string
 }
 
 export function CompanionProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { mine } = useBio();
   const [tick, setTick] = useState(0);
+  const [remoteApps, setRemoteApps] = useState<CompanionApplication[]>([]);
 
   useEffect(() => subscribeCompanions(() => setTick((n) => n + 1)), []);
 
+  useEffect(() => {
+    if (!user?.uid) {
+      setRemoteApps([]);
+      return;
+    }
+    let cancelled = false;
+    const load = isAdmin ? loadAllApplicationsRemote() : loadMyApplicationsRemote(user.uid);
+    void load
+      .then((rows) => {
+        if (cancelled) return;
+        hydrateApplications(rows);
+        setRemoteApps(rows);
+      })
+      .catch(() => {
+        if (!cancelled) setRemoteApps([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.uid, isAdmin, tick]);
+
   const userId = currentUserId(user, user?.email || undefined);
   void tick;
-  const application = getApplicationByUser(userId);
-  const allApplications = loadApplications();
+  const localApp = getApplicationByUser(userId);
+  const remoteMine = remoteApps.find((a) => a.userId === userId);
+  const application = remoteMine || localApp;
+  const allApplications = useMemo(() => {
+    const local = loadApplications();
+    if (remoteApps.length === 0) return local;
+    const byId = new Map<string, CompanionApplication>();
+    for (const row of local) byId.set(row.applicationId, row);
+    for (const row of remoteApps) byId.set(row.applicationId, row);
+    return Array.from(byId.values());
+  }, [remoteApps, tick]);
 
   const startApplication = useCallback(() => {
     const uid = currentUserId(user, user?.email || undefined);
@@ -67,29 +105,31 @@ export function CompanionProvider({ children }: { children: ReactNode }) {
     if (accountName && !draft.fullName) patch.fullName = accountName;
     if (user?.email && !draft.email) patch.email = user.email;
     if (mine?.avatar && !draft.photo) patch.photo = mine.avatar;
-    if (Object.keys(patch).length > 0) {
-      return saveDraft(draft.applicationId, patch) || draft;
-    }
+    const started = Object.keys(patch).length > 0 ? saveDraft(draft.applicationId, patch) || draft : draft;
+    if (user?.uid) void persistApplicationRemote(started).catch(() => undefined);
     void track("companion_application_started", {});
-    return draft;
+    return started;
   }, [user, mine]);
 
   const save = useCallback(
     (patch: Partial<CompanionApplicationInput>) => {
       if (!application) return undefined;
-      return saveDraft(application.applicationId, patch);
+      const next = saveDraft(application.applicationId, patch);
+      if (next && user?.uid) void persistApplicationRemote(next).catch(() => undefined);
+      return next;
     },
-    [application],
+    [application, user?.uid],
   );
 
   const submit = useCallback(() => {
     if (!application) return { errors: [{ field: "application", message: "Start an application first." }] };
     const res = submitApplication(application.applicationId);
     if (res.errors) return { errors: res.errors };
+    if (res.application && user?.uid) void persistApplicationRemote(res.application).catch(() => undefined);
     toast.success("Your AirPal application has been received.");
     void track("companion_application_submitted", { roles: application.roles.join(",") });
     return {};
-  }, [application]);
+  }, [application, user?.uid]);
 
   const adminList = useCallback(
     (filters?: { status?: CompanionStatus | "all"; role?: string; location?: string }) =>
@@ -116,6 +156,7 @@ export function CompanionProvider({ children }: { children: ReactNode }) {
       };
       toast.success(messages[status]);
       void track("companion_application_reviewed", { status });
+      if (res.application) void persistAdminApplicationRemote(res.application).catch(() => undefined);
       return true;
     },
     [user],

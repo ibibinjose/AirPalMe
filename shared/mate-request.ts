@@ -28,6 +28,9 @@ export interface MateRequest {
   /** Post-meet review by the requester. Feeds trust data for future matching. */
   rating?: number;
   reviewText?: string;
+  /** Post-meet review by the Mate. */
+  mateRating?: number;
+  mateReviewText?: string;
   /** Who delivered. Without this, reputation (§31) can never exist. */
   matchedMateUid?: string;
   matchedMateName?: string;
@@ -86,6 +89,10 @@ export function isRequestStatus(s: string): s is MateRequestStatus {
 
 export function reviewValid(rating: number, text: string): boolean {
   return Number.isInteger(rating) && rating >= 1 && rating <= 5 && text.trim().length <= 500;
+}
+
+export function canLeaveReview(status: MateRequestStatus): boolean {
+  return status === "completed";
 }
 
 export function matchAssignmentValid(mateUid: string, mateName: string): boolean {

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { collection, doc, getDocs, limit, orderBy, query, updateDoc, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, limit, orderBy, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCompanion } from "@/contexts/CompanionContext";
@@ -14,6 +14,7 @@ import {
   type MateRequest,
   type MateRequestStatus,
 } from "@shared/mate-request";
+import { DEFAULT_FEE_CONFIG } from "@shared/booking";
 
 function statusPill(status: MateRequestStatus): string {
   switch (status) {
@@ -143,15 +144,75 @@ export function MateRequestsAdmin() {
     }
   }
 
+  const [feeBps, setFeeBps] = useState(String(DEFAULT_FEE_CONFIG.platformFeeBps));
+  const [minFee, setMinFee] = useState(String(DEFAULT_FEE_CONFIG.minimumPlatformFeeCents));
+  const [feeBusy, setFeeBusy] = useState(false);
+
+  useEffect(() => {
+    const db = getFirebaseDb();
+    if (!db || !isAdmin) return;
+    void getDoc(doc(db, "platform_settings", "marketplace")).then((snap) => {
+      if (!snap.exists()) return;
+      const row = snap.data() as { platformFeeBps?: number; minimumPlatformFeeCents?: number };
+      if (row.platformFeeBps != null) setFeeBps(String(row.platformFeeBps));
+      if (row.minimumPlatformFeeCents != null) setMinFee(String(row.minimumPlatformFeeCents));
+    });
+  }, [isAdmin]);
+
   if (!isAdmin) return null;
 
   return (
     <section className="mt-8 rounded-[28px] bg-card p-4 ring-1 ring-line">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Marketplace · manual matching</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Marketplace · matching & fees</p>
       <h2 className="font-display mt-1 text-lg font-semibold">Mate requests</h2>
       <p className="mt-1 text-sm text-mute">
-        Every request lands here. Match it by hand, then flip the status — the guest sees it on the Mate page.
+        Approved Mates can accept from /mate. This queue is the backup — match by hand when needed.
       </p>
+      <form
+        className="mt-3 grid gap-2 rounded-2xl bg-paper p-3 ring-1 ring-line sm:grid-cols-[1fr_1fr_auto]"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const db = getFirebaseDb();
+          if (!db || !user) return;
+          const platformFeeBps = Math.max(0, Math.min(5000, Math.floor(Number(feeBps) || 0)));
+          const minimumPlatformFeeCents = Math.max(0, Math.floor(Number(minFee) || 0));
+          setFeeBusy(true);
+          void setDoc(doc(db, "platform_settings", "marketplace"), {
+            platformFeeBps,
+            minimumPlatformFeeCents,
+            updatedAt: new Date().toISOString(),
+            updatedBy: user.uid,
+          })
+            .then(() => {
+              setFeeBps(String(platformFeeBps));
+              setMinFee(String(minimumPlatformFeeCents));
+              void logAdminAction(user.uid, "fees.update", "platform_settings", "marketplace", "", `${platformFeeBps}bps`);
+            })
+            .finally(() => setFeeBusy(false));
+        }}
+      >
+        <label className="text-[12px] font-medium text-mute">
+          Platform fee (bps)
+          <input
+            value={feeBps}
+            onChange={(e) => setFeeBps(e.target.value)}
+            inputMode="numeric"
+            className="mt-1 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm text-ink"
+          />
+        </label>
+        <label className="text-[12px] font-medium text-mute">
+          Minimum fee (cents)
+          <input
+            value={minFee}
+            onChange={(e) => setMinFee(e.target.value)}
+            inputMode="numeric"
+            className="mt-1 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm text-ink"
+          />
+        </label>
+        <Button size="sm" className="self-end" disabled={feeBusy} loading={feeBusy}>
+          Save fees
+        </Button>
+      </form>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {(["all", ...MATE_REQUEST_STATUSES] as const).map((s) => (
           <button

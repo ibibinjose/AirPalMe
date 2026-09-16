@@ -17,6 +17,8 @@ import { StudioInboxAdmin } from "@/components/admin/StudioInboxAdmin";
 import { SafetyInboxAdmin } from "@/components/admin/SafetyInboxAdmin";
 import { CampaignInboxAdmin } from "@/components/admin/CampaignInboxAdmin";
 import { AuditTrailAdmin } from "@/components/admin/AuditTrailAdmin";
+import { ADMIN_TABS, AdminOverview, type AdminTab } from "@/components/admin/AdminOverview";
+import { cn } from "@/lib/cn";
 import { AIRPAL_CLUB_ID } from "@/contexts/ClubContext";
 import { seedDatabase } from "@/lib/seed-database";
 import { toast } from "sonner";
@@ -33,6 +35,7 @@ export function AdminPage() {
   const northStar = northStarFromEvents(buffer);
   const clientErrors = buffer.filter((e) => e.eventName === "client_error").length;
   const locked = authReady && liveBackendEnabled() && !isAdmin;
+  const [tab, setTab] = useState<AdminTab>("overview");
   const [rows, setRows] = useState<DirectoryRow[]>([]);
   const { calendarEvents, remoteNearby } = useEvents();
   const stats = [
@@ -93,25 +96,49 @@ export function AdminPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
-      <header className="flex items-center justify-between">
-        <div>
-          <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Operator</p>
-          <h1 className="font-display mt-1 text-3xl font-semibold">Directory</h1>
-        </div>
-        <Button size="sm" variant="ghost" disabled={seeding} onClick={handleSeedDatabase}>
-          {seeding ? "Seeding…" : "Seed Real DB"}
-        </Button>
+      <header>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">AirPal OS · platform admin</p>
+        <h1 className="font-display mt-1 text-3xl font-semibold">Operations</h1>
       </header>
-      <div className="mt-6 grid grid-cols-4 gap-2">
-        {stats.map((s) => (
-          <div key={s.l} className="rounded-2xl bg-card p-3 text-center ring-1 ring-line">
-            <p className="font-display text-2xl font-semibold">{s.n}</p>
-            <p className="text-[11px] text-mute">{s.l}</p>
-          </div>
+      <nav aria-label="Admin sections" className="no-scrollbar -mx-4 mt-4 flex gap-1.5 overflow-x-auto px-4 pb-1">
+        {ADMIN_TABS.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            aria-current={tab === t.id ? "page" : undefined}
+            className={cn(
+              "shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition",
+              tab === t.id ? "bg-ink text-white" : "bg-card text-mute ring-1 ring-line",
+            )}
+          >
+            {t.label}
+          </button>
         ))}
-      </div>
-      <section className="mt-8 rounded-[28px] bg-card p-4 ring-1 ring-line">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">North-star (this device queue)</p>
+      </nav>
+      {tab === "overview" && (
+        <>
+          <AdminOverview onSelectTab={setTab} />
+          <div className="mt-4 grid grid-cols-4 gap-2">
+            {stats.map((s) => (
+              <div key={s.l} className="rounded-2xl bg-card p-3 text-center ring-1 ring-line">
+                <p className="font-display text-2xl font-semibold">{s.n}</p>
+                <p className="text-[11px] text-mute">{s.l}</p>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+      {tab === "system" && (
+        <>
+          <section className="mt-4 rounded-[28px] bg-card p-4 ring-1 ring-line">
+            <h2 className="font-display text-lg font-semibold">Seed & directory</h2>
+            <p className="mt-1 text-sm text-mute">One-time migration of bundled Sydney data into live Firestore.</p>
+            <Button size="sm" variant="ghost" disabled={seeding} onClick={handleSeedDatabase} className="mt-3">
+              {seeding ? "Seeding…" : "Seed Real DB"}
+            </Button>
+          </section>
+          <section className="mt-8 rounded-[28px] bg-card p-4 ring-1 ring-line">
+            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">North-star (this device queue)</p>
         <h2 className="font-display mt-1 text-lg font-semibold">WQGA / active QR context</h2>
         <p className="mt-1 text-sm text-mute">
           Verified qualified guest actions this week, excluding demo and duplicates. Production reports use server daily
@@ -176,12 +203,14 @@ export function AdminPage() {
         <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">AirPal Club</p>
         <GuestListPanel clubId={AIRPAL_CLUB_ID} clubName="AirPal Club" />
       </div>
-      <CompanionAdmin />
-      <MateRequestsAdmin />
-      <StudioInboxAdmin />
-      <SafetyInboxAdmin />
-      <CampaignInboxAdmin />
-      <AuditTrailAdmin />
+        </>
+      )}
+      {tab === "mates" && <CompanionAdmin />}
+      {tab === "marketplace" && <MateRequestsAdmin />}
+      {tab === "studio" && <StudioInboxAdmin />}
+      {tab === "safety" && <SafetyInboxAdmin />}
+      {tab === "experiences" && <CampaignInboxAdmin />}
+      {tab === "audit" && <AuditTrailAdmin />}
       <Button className="mt-6" variant="ghost" onClick={() => nav("/")}>
         Home
       </Button>
