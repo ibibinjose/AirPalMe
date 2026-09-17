@@ -136,6 +136,17 @@ export function MePage() {
       </div>
       {user.email && user.emailVerified === false && <VerifyEmailBanner email={user.email} onSend={sendVerificationEmail} />}
 
+      <Section title="Activity">
+        <Row kicker="Mate" title="Find someone to go with you" action="Open" onClick={() => nav("/mate")} />
+        <Row kicker="Requests" title="Your matches, chat and bookings" action="Open" onClick={() => nav("/mate")} />
+        <Row
+          kicker="Become a Mate"
+          title="Apply to go with people — reviewed by AirPal"
+          action="Apply"
+          onClick={() => nav("/companion")}
+        />
+      </Section>
+
       <Section title="Your spaces">
         <Row
           kicker="Host"
@@ -164,8 +175,8 @@ export function MePage() {
         />
         <Row
           kicker="Companion"
-          title="Become an AirPal — friend, teammate, companion"
-          action="Apply"
+          title="AirPal Mate application status"
+          action="Open"
           onClick={() => nav("/companion")}
         />
         <Row

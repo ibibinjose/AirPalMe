@@ -48,7 +48,7 @@ Only `done` is checked.
 
 ## P1 — Required for usability
 
-- [ ] `partial` `p1-search` Shared search — Done when: one search across people, experiences, stays, events, businesses. Evidence: `src/components/search/GlobalSearchModal.tsx`. Gap: no people/Mates.
+- [ ] `partial` `p1-search` Shared search — Done when: one search across people, experiences, stays, events, businesses. Evidence: `GlobalSearchModal` includes approved Mates (`mates_public`). Gap: no businesses/fashion as first-class results.
 - [ ] `partial` `p1-filters` Contextual filters — Done when: location/date/category/price appear only when relevant. Evidence: `src/components/discovery/FilterChips.tsx`.
 - [ ] `partial` `p1-saved` Saved items — Done when: one saved model across verticals. Evidence: `users/{id}/savedEvents`, `savedStalls`. Gap: not generic `saved_items`.
 - [ ] `partial` `p1-cancel` Cancellation flow — Done when: customer/provider cancel with visible policy. Evidence: `canCustomerCancel` in `shared/booking.ts`. Gap: no policy copy, no fees.
@@ -69,7 +69,7 @@ Only `done` is checked.
 - [ ] `partial` `p3-experiences` AirPal Experiences — Done when: provider apply → create → admin review → publish → book → pay → review, plus "Going alone? Find an AirPal." Evidence: `src/pages/ExperiencesPage.tsx`, `shared/campaign.ts`, plan Stripe checkout. Gap: RSVP is not the shared booking engine; payment deferred on campaigns.
 - [ ] `partial` `p3-stay` AirPal Stay (commercial partners) — Done when: hotel/motel/serviced/hostel partners list rooms, availability, bookings. Evidence: `src/pages/StayPage.tsx`, `src/pages/HostPage.tsx`, `src/pages/ConciergePage.tsx`, `properties` rules. Gap: not a Stay booking marketplace; no residential STRA (correctly deferred).
 - [ ] `todo` `p3-fashion` AirPal Fashion — Done when: brand campaign first, not P2P store. Evidence: none (copy-only mentions).
-- [ ] `partial` `p3-daily` AirPal Daily — Done when: "What's happening near me?" drives Mate/book/stay CTAs. Evidence: `src/pages/DiscoverPage.tsx`. Gap: home is discovery, not the Mate hero CTA.
+- [ ] `partial` `p3-daily` AirPal Daily — Done when: "What's happening near me?" drives Mate/book/stay CTAs. Evidence: `src/pages/DiscoverPage.tsx` hero is now Mate-first. Gap: Daily still isn't a separate transaction layer.
 - [ ] `partial` `p3-travel` AirPal Travel orchestration — Done when: a trip can hold stay + experiences + Mate + events. Evidence: `src/pages/PlanHubPage.tsx`, `shared/plan.ts`, `trips` rules. Gap: plans ≠ marketplace trip.
 
 ---

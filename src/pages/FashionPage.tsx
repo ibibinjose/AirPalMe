@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { ArrowRight, BadgeCheck, Filter, Heart, Layers, Share2, Shirt, Sparkles, Tag, Users } from "lucide-react";
+import { ArrowRight, BadgeCheck, Filter, Sparkles, Users } from "lucide-react";
 
 interface FashionBrand {
   id: string;

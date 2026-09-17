@@ -182,7 +182,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
         {[
           { icon: Gift, label: "Prize", value: promo.prizeValue || promo.prize.title },
           { icon: CalendarDays, label: "Closes", value: promo.endAt ? new Date(promo.endAt).toLocaleDateString() : "—" },
-          { icon: MapPin, label: "Where", value: promo.locationText || "Kerala" },
+          { icon: MapPin, label: "Where", value: promo.locationText || "Sydney" },
           { icon: User, label: "Eligibility", value: promo.eligibility.split(".")[0] },
         ].map((f) => (
           <div key={f.label} className="rounded-2xl border-2 border-ink bg-card p-3">

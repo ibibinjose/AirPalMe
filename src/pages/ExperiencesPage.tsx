@@ -100,7 +100,7 @@ export function ExperiencesPage() {
               </p>
               <div className="mt-3 flex gap-2">
                 <Button size="sm" disabled={joined[c.id] || busy === c.id} loading={busy === c.id} onClick={() => void join(c)}>
-                  {joined[c.id] ? "You're in ✓" : c.priceCents > 0 ? "Book (pay later)" : "Join free"}
+                  {joined[c.id] ? "You're in ✓" : c.priceCents > 0 ? "Book" : "Join free"}
                 </Button>
                 <Link href="/mate/request">
                   <Button size="sm" variant="ghost">
@@ -109,7 +109,7 @@ export function ExperiencesPage() {
                 </Link>
               </div>
               {c.priceCents > 0 && (
-                <p className="mt-1.5 text-[11px] text-mute">Paid at the door for now — in-app payment lands with Stripe.</p>
+                <p className="mt-1.5 text-[11px] text-mute">Unpaid until Stripe checkout — the booking still holds your spot.</p>
               )}
             </li>
           ))}

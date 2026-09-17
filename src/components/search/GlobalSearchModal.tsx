@@ -5,6 +5,8 @@ import { Search, MapPin, CalendarDays, Sparkles, Users, Building2, Wifi, ArrowRi
 import { activePlaces, toursForPrecinct } from "@/lib/catalog";
 import { getFirebaseDb } from "@/lib/firebase";
 import type { Campaign } from "@shared/campaign";
+import type { PublicMate } from "@shared/companion";
+import { loadPublicMatesRemote } from "@/lib/companion-remote";
 import { loadTours } from "@/lib/tours-store";
 import { useEvents } from "@/contexts/EventsContext";
 import { useListings } from "@/contexts/ListingsContext";
@@ -17,11 +19,11 @@ export function openGlobalSearch() {
   window.dispatchEvent(new CustomEvent("airpal-open-search"));
 }
 
-type SearchCategory = "all" | "places" | "events" | "stay" | "plan" | "experiences";
+type SearchCategory = "all" | "people" | "places" | "events" | "stay" | "plan" | "experiences";
 
 interface SearchResultItem {
   id: string;
-  category: "place" | "event" | "stay" | "plan" | "partner" | "experience";
+  category: "place" | "event" | "stay" | "plan" | "partner" | "experience" | "person";
   title: string;
   subtitle: string;
   badge?: string;
@@ -40,6 +42,7 @@ export function GlobalSearchModal() {
   const { calendarEvents } = useEvents();
   const { plans } = usePlans();
   const [liveExperiences, setLiveExperiences] = useState<Campaign[]>([]);
+  const [publicMates, setPublicMates] = useState<PublicMate[]>([]);
 
   useScrollLock(open);
 
@@ -50,6 +53,9 @@ export function GlobalSearchModal() {
     if (!db) return;
     void getDocs(fsQuery(collection(db, "campaigns"), where("status", "==", "live"), limit(20)))
       .then((snap) => setLiveExperiences(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Campaign, "id">) }))))
+      .catch(() => undefined);
+    void loadPublicMatesRemote()
+      .then(setPublicMates)
       .catch(() => undefined);
   }, [open]);
 
@@ -94,6 +100,15 @@ export function GlobalSearchModal() {
     // Default Quick Actions when query is empty
     if (!q) {
       items.push(
+        {
+          id: "qa-mate",
+          category: "person",
+          title: "Find someone to go with you",
+          subtitle: "Request an approved AirPal Mate",
+          badge: "Mate",
+          href: "/mate",
+          icon: HeartHandshake,
+        },
         {
           id: "qa-plan-night",
           category: "plan",
@@ -212,17 +227,31 @@ export function GlobalSearchModal() {
       });
     }
 
-    // 4b. Find a Mate shortcut
     if (q.includes("mate") || q.includes("companion") || q.includes("someone")) {
       items.push({
         id: "mate-request",
-        category: "plan",
+        category: "person",
         title: "Find someone to go with",
         subtitle: "Request an approved Mate",
         badge: "Mate",
         href: "/mate/request",
         icon: HeartHandshake,
       });
+    }
+
+    for (const m of publicMates) {
+      const hay = `${m.firstName} ${m.suburb} ${m.city} ${m.interests.join(" ")} ${m.activities.join(" ")} ${m.introduction}`.toLowerCase();
+      if (q.length >= 2 && hay.includes(q)) {
+        items.push({
+          id: `mate-${m.uid}`,
+          category: "person",
+          title: m.firstName,
+          subtitle: [m.suburb || m.city, m.interests[0]].filter(Boolean).join(" · ") || "Approved Mate",
+          badge: "Mate",
+          href: "/mate",
+          icon: HeartHandshake,
+        });
+      }
     }
 
     // 4c. Match live AirPal Experiences
@@ -291,6 +320,7 @@ export function GlobalSearchModal() {
     }
 
     // Apply category filter
+    if (activeCategory === "people") return items.filter((i) => i.category === "person");
     if (activeCategory === "places") return items.filter((i) => i.category === "place");
     if (activeCategory === "events") return items.filter((i) => i.category === "event");
     if (activeCategory === "stay") return items.filter((i) => i.category === "stay");
@@ -298,7 +328,7 @@ export function GlobalSearchModal() {
     if (activeCategory === "experiences") return items.filter((i) => i.category === "experience");
 
     return items;
-  }, [query, calendarEvents, catalogVersion, plans, activeCategory, liveExperiences]);
+  }, [query, calendarEvents, catalogVersion, plans, activeCategory, liveExperiences, publicMates]);
 
   // Keyboard navigation within list
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -341,7 +371,7 @@ export function GlobalSearchModal() {
               setSelectedIndex(0);
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Search places, events, stays, plans…"
+            placeholder="Search people, places, events, stays, plans…"
             className="w-full bg-transparent text-[15px] font-medium text-ink placeholder:text-mute focus:outline-none"
           />
           {query && (
@@ -362,6 +392,7 @@ export function GlobalSearchModal() {
           {(
             [
               { id: "all", label: "All" },
+              { id: "people", label: "People" },
               { id: "places", label: "Places" },
               { id: "events", label: "Events" },
               { id: "experiences", label: "Experiences" },
