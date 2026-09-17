@@ -20,6 +20,10 @@ MEET MATES — Find travel companions, RSVP to events, and share calendars.
 
 LOCAL DEALS — Claim perks from nearby businesses with a quick QR scan and show them at the till.
 
+STAY FOOD ORDERS — Order from the hotel menu (room service, dine-in, or pickup) and pay by card in the app.
+
+SHARE YOUR BIO — Tap your profile onto an NFC card and anyone who taps it opens your bio.
+
 FOR HOSTS & BUSINESSES — List rooms, publish perks, sell event stalls, and approve every guest yourself. Free to list.
 
 Life Made Easy.

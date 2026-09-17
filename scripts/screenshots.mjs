@@ -16,6 +16,9 @@ const SHOTS = [
 const SIZES = [
   { w: 1080, h: 1920, suffix: "1080x1920" },
   { w: 1290, h: 2796, suffix: "1290x2796" },
+  // App Store required families: 6.9" and 6.5" displays.
+  { w: 1320, h: 2868, suffix: "1320x2868" },
+  { w: 1242, h: 2688, suffix: "1242x2688" },
 ];
 
 function waitForServer(port, tries = 40) {
@@ -49,6 +52,13 @@ try {
     }
     await page.close();
   }
+  // Marketing poster: exact 1080x1350 social/store creative, chrome-free.
+  const poster = await browser.newPage({ viewport: { width: 1080, height: 1350 } });
+  await poster.goto("http://127.0.0.1:4173/marketing?bare=1", { waitUntil: "networkidle" });
+  await poster.waitForTimeout(1500);
+  await poster.locator(".marketing-poster").screenshot({ path: "docs/store/images/marketing-poster-1080x1350.png" });
+  console.log("captured marketing poster 1080x1350");
+  await poster.close();
   await browser.close();
   console.log("done: docs/store/images/screenshots/");
 } finally {

@@ -21,5 +21,14 @@ export function setShareMeta(input: { title: string; description: string; image?
     set("og:image", image);
     set("twitter:image", image, "name");
   }
-  if (input.url) set("og:url", input.url);
+  if (input.url) {
+    set("og:url", input.url);
+    let canonical = document.head.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute("href", input.url);
+  }
 }

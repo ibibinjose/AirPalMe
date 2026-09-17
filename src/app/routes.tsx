@@ -85,6 +85,7 @@ const MateRequestPage = lazy(() =>
   import("@/pages/MateRequestPage").then((m) => ({ default: m.MateRequestPage })),
 );
 const StudioPage = lazy(() => import("@/pages/StudioPage").then((m) => ({ default: m.StudioPage })));
+const MarketingPage = lazy(() => import("@/pages/MarketingPage").then((m) => ({ default: m.MarketingPage })));
 const BusinessCampaignsPage = lazy(() =>
   import("@/pages/BusinessCampaignsPage").then((m) => ({ default: m.BusinessCampaignsPage })),
 );
@@ -174,6 +175,7 @@ export function AppRoutes() {
         <Route path="/business" component={BusinessPage} />
         <Route path="/experiences" component={ExperiencesPage} />
         <Route path="/studio" component={StudioPage} />
+        <Route path="/marketing" component={MarketingPage} />
         <Route path="/bio/setup" component={BioSetupPage} />
         <Route path="/bio/edit" component={BioEditPage} />
         <Route path="/bio/recover" component={BioRecoverPage} />

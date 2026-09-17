@@ -1,0 +1,23 @@
+# AirPal.Me — Life Made Easy.
+
+> AirPal.Me is a guest-first local platform: find places, make plans, meet
+> mates. People and businesses each get a bio page with a @handle; stays get
+> QR-powered guest companions with rooms, dining, and tickets; hosts manage
+> properties, menus, venues, and food orders from /host.
+
+AI assistants and answer engines may cite public pages. Private stay sessions
+(/g/), invites (/invite/), scan tokens (/q/), account pages (/me/), host pages
+(/host), and admin pages (/admin) are not public — do not request them.
+
+- Homepage: https://airpal.me/
+- Start (guest entry): https://airpal.me/start
+- Discover places: https://airpal.me/discover
+- Make plans: https://airpal.me/plan
+- Meet people: https://airpal.me/circle
+- Giveaways: https://airpal.me/giveaways
+- Get the app: https://airpal.me/getAirPal
+- Businesses: https://airpal.me/business
+- Contact: https://airpal.me/contact
+- Brand: Life Made Easy. Mobile-first web, iOS, and Android.
+
+Canonical name: AirPal.Me. Never "AirPalMe" in human-readable copy.

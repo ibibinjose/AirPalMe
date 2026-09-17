@@ -72,6 +72,8 @@
 	<string>AirPal allows you to upload photos for your profile, stall, or venue.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>AirPal uses your location to discover nearby restaurants, venues, precinct highlights, and events.</string>
+	<key>NFCReaderUsageDescription</key>
+	<string>AirPal writes your profile link onto your NFC card so anyone who taps it can open your bio.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 </dict>

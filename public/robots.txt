@@ -1,0 +1,30 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /host
+Disallow: /me/
+Disallow: /bio/edit
+Disallow: /bio/recover
+Disallow: /auth
+Disallow: /g/
+Disallow: /invite/
+Disallow: /q/
+Disallow: /plan/new
+
+# AI assistants and answer engines are welcome to cite public pages.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://airpal.me/sitemap.xml
