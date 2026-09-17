@@ -19,6 +19,12 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
+    files: ["scripts/screenshots.mjs"],
+    languageOptions: {
+      globals: { console: "readonly", process: "readonly", fetch: "readonly", setTimeout: "readonly" },
+    },
+  },
+  {
     files: ["scripts/**/*.mjs"],
     languageOptions: {
       globals: { console: "readonly", process: "readonly" },

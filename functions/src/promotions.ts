@@ -311,7 +311,7 @@ export const seedPromotionDemo = onCall(CALLABLE, async (request) => {
       legalReviewStatus: "approved",
       sponsorName: "AirPal",
       category: "AirPal",
-      heroImage: "",
+      heroImage: "/media/harbour.jpg",
       prize: {
         title: "AirPal Weekend for two",
         description: "One-night stay, dinner for two, and a guided local experience.",
@@ -344,7 +344,7 @@ export const seedPromotionDemo = onCall(CALLABLE, async (request) => {
       legalReviewStatus: "not_required",
       sponsorName: "Kovalam Café Partners",
       category: "Food",
-      heroImage: "",
+      heroImage: "/media/laneway.jpg",
       prize: { title: "20% off", description: "Dine-in discount at partner cafés.", valueText: "20% off" },
       prizeValue: "20% off",
       eligibility: "Open to all AirPal members.",

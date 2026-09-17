@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Sparkles, X, Smile } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useBio } from "@/contexts/BioContext";
 import {
   AVAILABILITY_STATUSES,
+  resolveStatusPicks,
   type AvailabilityStatus,
 } from "@shared/bio";
 import { toast } from "sonner";
@@ -40,10 +41,21 @@ export function BioStatusModal({
   onSaved,
 }: BioStatusModalProps) {
   const { updateProfile } = useBio();
-  const [status, setStatus] = useState<AvailabilityStatus>(currentStatus);
-  const [customText, setCustomText] = useState(currentCustomStatus);
-  const [emoji, setEmoji] = useState(currentEmoji || "☕");
+  const initial = resolveStatusPicks({ status: currentStatus, customStatus: currentCustomStatus, emoji: currentEmoji });
+  const [status, setStatus] = useState<AvailabilityStatus>(initial.status);
+  const [customText, setCustomText] = useState(initial.customText);
+  const [emoji, setEmoji] = useState(initial.emoji);
   const [saving, setSaving] = useState(false);
+
+  // The modal stays mounted while closed, so resync picks when it reopens.
+  useEffect(() => {
+    if (open) {
+      const picks = resolveStatusPicks({ status: currentStatus, customStatus: currentCustomStatus, emoji: currentEmoji });
+      setStatus(picks.status);
+      setCustomText(picks.customText);
+      setEmoji(picks.emoji);
+    }
+  }, [open, currentStatus, currentCustomStatus, currentEmoji]);
 
   if (!open) return null;
 
@@ -164,7 +176,7 @@ export function BioStatusModal({
           {/* WhatsApp-Style Custom Status Message */}
           <div>
             <label className="text-xs font-semibold text-ink uppercase tracking-wider block mb-2">
-              WhatsApp Status Message
+              What&apos;s on?
             </label>
             <div className="flex items-center gap-2 rounded-2xl bg-card p-1.5 ring-1 ring-line">
               <div className="flex items-center justify-center h-9 w-9 rounded-xl bg-paper ring-1 ring-line text-lg shrink-0">

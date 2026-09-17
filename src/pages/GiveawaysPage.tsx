@@ -4,6 +4,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { ArrowLeft, Clock, Gift, MapPin, Sparkles, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { getFirebaseDb } from "@/lib/firebase";
+import { promoArtFor } from "@/lib/promotions";
 import { cn } from "@/lib/cn";
 import { PROMOTION_CATEGORIES, type Promotion } from "@shared/promotions";
 
@@ -19,6 +20,7 @@ function closingLabel(p: Promotion): string {
 
 function Card({ p, featured }: { p: Promotion; featured?: boolean }) {
   const closed = p.status === "closed" || (p.endAt && Date.parse(p.endAt) <= Date.now());
+  const art = promoArtFor(p.category, p.heroImage);
   return (
     <Link
       href={`/giveaways/${p.id}`}
@@ -27,8 +29,8 @@ function Card({ p, featured }: { p: Promotion; featured?: boolean }) {
         featured && "border-gold",
       )}
     >
-      {p.heroImage ? (
-        <img src={p.heroImage} alt={p.title} className="h-40 w-full object-cover" loading="lazy" />
+      {art ? (
+        <img src={art} alt={p.title} className="h-40 w-full object-cover" loading="lazy" />
       ) : (
         <div
           className={cn(

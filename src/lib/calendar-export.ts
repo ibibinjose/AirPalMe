@@ -29,7 +29,7 @@ function normalizePayload(event: CalendarEvent | SimpleCalendarPayload): {
   return {
     id: event.id || `airpal-${Date.now()}`,
     title: event.title || "AirPal Catch Up",
-    description: event.description || "Organised on AirPal.me",
+    description: event.description || "Organised on AirPal.Me",
     startsAt,
     endsAt,
     location,

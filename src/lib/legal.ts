@@ -1,7 +1,7 @@
 export const LEGAL = {
-  brand: "AirPal.me",
+  brand: "AirPal.Me",
   site: "https://airpal.me",
-  operator: "the operator of AirPal.me",
+  operator: "the operator of AirPal.Me",
   location: "New South Wales, Australia",
   law: "the laws of New South Wales, Australia",
   courts: "the courts of New South Wales, Australia",

@@ -35,6 +35,25 @@ Support email: bibin.inc@gmail.com (switch to hello@airpal.me once forwarding ex
    Upload the AAB to Play Console (first upload uses your keystore; Play App Signing after that). iOS: `npx cap open ios`, pick your Team (automatic signing already on), Product → Archive → Distribute to App Store Connect. Then fill the SHA-256/Team-ID placeholders (items 1–2) and redeploy hosting so App Links verify.
 5. **Questionnaires** → content-rating (Everyone), ads declaration (none), data-safety form (answers above).
 
+## Store images
+
+| Asset | Status | File |
+|---|---|---|
+| App Store icon 1024×1024, flattened RGB (no alpha) | Ready | `docs/store/images/app-store-icon-1024.png` |
+| Play icon 512×512 | Ready | `public/icon-512.png` |
+| Feature graphic 1024×500 | Ready | `docs/store/images/play-feature-graphic-1024x500.png` |
+| Promo page `airpal.me/getAirPal` (badges, QR, share) | Live in app | `src/pages/GetAirPalPage.tsx` |
+| Phone screenshots 1080×1920 + 1290×2796 (Start, Giveaways, Promotions, Discover, getAirPal) | Run on your Mac | `npm run screenshots` → `docs/store/images/screenshots/` |
+
+## Promotion images (giveaways & campaigns)
+
+Campaigns use their own `heroImage` when set. Otherwise cards and detail pages
+fall back to the bundled Kerala set via `promoArtFor()` in `src/lib/promotions.ts`:
+Stays→`room.jpg`, Experiences→`walk.jpg`, Travel→`harbour.jpg`,
+Local→`laneway.jpg`, Events→`campus.jpg`, AirPal→`og-share-preview.jpg`.
+Demo seeds ship with real art. Food/Fashion/Family/Lifestyle keep the gradient
+card until you add photos to `public/media/`.
+
 ## In-repo status (done)
 
 - Web PWA: manifest, 192/512 icons, apple-touch-icon, offline page, service worker, no-cache for `sw.js`, immutable assets, full CSP/HSTS headers — `firebase.json`.

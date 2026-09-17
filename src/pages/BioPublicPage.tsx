@@ -132,8 +132,8 @@ export function BioPublicPage() {
     viewed.current = profile.handle;
     recordTap(profile.handle, "view");
     setShareMeta({
-      title: `${profile.name} (@${profile.handle}) · AirPal.me`,
-      description: profile.shortWhy || profile.offer?.detail || "On AirPal.me",
+      title: `${profile.name} (@${profile.handle}) · AirPal.Me`,
+      description: profile.shortWhy || profile.offer?.detail || "On AirPal.Me",
       image: profile.cover || profile.avatar,
       url: `${window.location.origin}${bioPath(profile.handle)}`,
     });
@@ -419,7 +419,7 @@ export function BioPublicPage() {
                       name: bio.name,
                       phone: bio.phone,
                       url: share,
-                      note: `AirPal bio · airpal.me/@${bio.handle}`,
+                      note: `AirPal bio · AirPal.Me/@${bio.handle}`,
                     })
                   }
                 >

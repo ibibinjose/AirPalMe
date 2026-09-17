@@ -1,6 +1,6 @@
 import { buildStayUrl } from "./airpal-urls";
 
-export const SCAN_AIRPAL_HEADLINE = "Scan AirPalMe — what’s around you";
+export const SCAN_AIRPAL_HEADLINE = "Scan AirPal.Me — what’s around you";
 export const SCAN_AIRPAL_LANG_LINE = "Opens in your language · No app · No login";
 export const SCAN_AIRPAL_STAY_LINE = "Wi-Fi · Staff · Dining · Nearby";
 

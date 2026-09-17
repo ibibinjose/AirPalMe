@@ -177,7 +177,7 @@ export function StudioPage() {
 
       <section className="mt-8 rounded-2xl bg-ink p-5 text-white">
         <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
-          <Megaphone size={13} /> Promote AirPal.me for business
+          <Megaphone size={13} /> Promote AirPal.Me for business
         </p>
         <h2 className="font-display mt-1 text-xl font-bold">Don&apos;t advertise. Host.</h2>
         <ul className="mt-3 space-y-2 text-[13px] leading-6 text-white/75">

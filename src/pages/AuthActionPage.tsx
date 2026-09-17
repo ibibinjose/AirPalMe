@@ -24,7 +24,7 @@ export function AuthActionPage() {
     return "error";
   });
   const [message, setMessage] = useState(
-    action.oobCode ? "" : "This link is missing a code. Open the latest email from AirPal.me.",
+    action.oobCode ? "" : "This link is missing a code. Open the latest email from AirPal.Me.",
   );
   const [accountEmail, setAccountEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,7 +34,7 @@ export function AuthActionPage() {
   useEffect(() => {
     if (!action.oobCode) {
       setPhase("error");
-      setMessage("This link is missing a code. Open the latest email from AirPal.me.");
+      setMessage("This link is missing a code. Open the latest email from AirPal.Me.");
       return;
     }
     if (action.mode === "verifyEmail" || action.mode === "recoverEmail") {
@@ -64,7 +64,7 @@ export function AuthActionPage() {
       return;
     }
     setPhase("error");
-    setMessage("This sign-in link is not used on AirPal.me. Sign in with email and password.");
+    setMessage("This sign-in link is not used on AirPal.Me. Sign in with email and password.");
   }, [action.mode, action.oobCode]);
 
   async function onReset(e: FormEvent) {

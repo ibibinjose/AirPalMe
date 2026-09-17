@@ -464,7 +464,7 @@ export function generatePlanIcs(plan: HangoutPlan): string {
     d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 
   const stopsSummary = plan.stops.map((s, i) => `${i + 1}. ${s.name}${s.time ? ` (${s.time})` : ""}`).join("\\n");
-  const fullDesc = `${plan.notes || ""}\\n\\nItinerary:\\n${stopsSummary}\\n\\nCreated on AirPal.me: ${planInviteUrl(plan.id, typeof window !== "undefined" ? window.location.origin : "https://airpal.me")}`;
+  const fullDesc = `${plan.notes || ""}\\n\\nItinerary:\\n${stopsSummary}\\n\\nCreated on AirPal.Me: ${planInviteUrl(plan.id, typeof window !== "undefined" ? window.location.origin : "https://airpal.me")}`;
 
   return [
     "BEGIN:VCALENDAR",

@@ -205,6 +205,29 @@ export const AVAILABILITY_STATUSES: Record<AvailabilityStatus, AvailabilityStatu
   },
 };
 
+export type StatusPicks = {
+  status: AvailabilityStatus;
+  customText: string;
+  emoji: string;
+};
+
+/**
+ * Resolve the status editor's picks from saved profile values.
+ * Used for initial state and to resync when the modal reopens,
+ * so a cancelled edit never leaks into the next open.
+ */
+export function resolveStatusPicks(input: {
+  status?: AvailabilityStatus;
+  customStatus?: string;
+  emoji?: string;
+}): StatusPicks {
+  return {
+    status: input.status || "available",
+    customText: input.customStatus || "",
+    emoji: input.emoji || "☕",
+  };
+}
+
 export type BioProfile = {
   id: string;
   handle: string;

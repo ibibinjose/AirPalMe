@@ -3,7 +3,7 @@ import { roomCardRows, SCAN_AIRPAL_HEADLINE } from "./print-kit";
 
 describe("print kit", () => {
   it("prints the nearby headline", () => {
-    expect(SCAN_AIRPAL_HEADLINE).toBe("Scan AirPalMe — what’s around you");
+    expect(SCAN_AIRPAL_HEADLINE).toBe("Scan AirPal.Me — what’s around you");
   });
 
   it("builds room cards from opaque tokens, sorted by room number", () => {

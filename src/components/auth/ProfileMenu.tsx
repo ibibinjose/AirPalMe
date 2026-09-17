@@ -211,7 +211,7 @@ export function ProfileMenu() {
         <Row
           icon={Sparkles}
           label="Bio"
-          hint={`airpal.me/@${mine.handle}`}
+          hint={`AirPal.Me/@${mine.handle}`}
           highlight
           onClick={() => go(`/@${mine.handle}`)}
         />
@@ -256,7 +256,7 @@ export function ProfileMenu() {
           <Row
             icon={Store}
             label="View business"
-            hint={`airpal.me/@${business.handle}`}
+            hint={`AirPal.Me/@${business.handle}`}
             onClick={() => go(`/@${business.handle}`)}
           />
           <Row

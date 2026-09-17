@@ -53,6 +53,7 @@ const PromotionDetailPage = lazy(() =>
 const PromotionsAdminPage = lazy(() =>
   import("@/pages/PromotionsAdminPage").then((m) => ({ default: m.PromotionsAdminPage })),
 );
+const GetAirPalPage = lazy(() => import("@/pages/GetAirPalPage").then((m) => ({ default: m.GetAirPalPage })));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })));
 const AboutPage = lazy(() => import("@/pages/AboutPage").then((m) => ({ default: m.AboutPage })));
 const ContactPage = lazy(() => import("@/pages/ContactPage").then((m) => ({ default: m.ContactPage })));
@@ -178,6 +179,7 @@ export function AppRoutes() {
           <PromotionDetailPage kind="promotion" />
         </Route>
         <Route path="/promotions" component={PromotionsPage} />
+        <Route path="/getAirPal" component={GetAirPalPage} />
         <Route path="/about" component={AboutPage} />
         <Route path="/contact" component={ContactPage} />
         <Route path="/privacy" component={PrivacyPage} />

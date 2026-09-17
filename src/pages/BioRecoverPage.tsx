@@ -26,7 +26,7 @@ export function BioRecoverPage() {
       toast.error("Handle must match the registered name, trade mark, or domain");
       return;
     }
-    const subject = `[AirPal.me] Handle recovery @${normalizeHandle(handle)}`;
+    const subject = `[AirPal.Me] Handle recovery @${normalizeHandle(handle)}`;
     const body = [
       `Handle: @${normalizeHandle(handle)}`,
       `Registered name: ${name}`,

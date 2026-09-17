@@ -1,5 +1,5 @@
 export const BRAND = {
-  name: "AirPal.me",
+  name: "AirPal.Me",
   tagline: "Life Made Easy.",
   mechanism: "ME = Made Easy",
   coreIdea: "AirPal connects people with the people, places, things and experiences that make life easier.",

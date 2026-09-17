@@ -10,7 +10,7 @@ export function GuestListPanel({ clubId, clubName }: { clubId: string; clubName:
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState(`${clubName} — you're on the list`);
-  const [body, setBody] = useState(`Hi,\n\nYou're invited. Show this mail at the door.\n\n${clubName}\nvia AirPal.me`);
+  const [body, setBody] = useState(`Hi,\n\nYou're invited. Show this mail at the door.\n\n${clubName}\nvia AirPal.Me`);
   const airpal = clubId === AIRPAL_CLUB_ID;
 
   function onAdd(e: FormEvent) {

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { PromotionTerms } from "@/components/promotions/PromotionTerms";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
-import { enterPromotionRemote, friendlyPromotionError } from "@/lib/promotions";
+import { enterPromotionRemote, friendlyPromotionError, promoArtFor } from "@/lib/promotions";
 import type { Promotion } from "@shared/promotions";
 
 export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }) {
@@ -92,8 +92,8 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
         <ArrowLeft size={14} /> {kind === "giveaway" ? "Giveaways" : "Promotions"}
       </Link>
 
-      {promo.heroImage ? (
-        <img src={promo.heroImage} alt={promo.title} className="mt-4 h-56 w-full rounded-3xl border-2 border-ink object-cover" />
+      {promoArtFor(promo.category, promo.heroImage) ? (
+        <img src={promoArtFor(promo.category, promo.heroImage)} alt={promo.title} className="mt-4 h-56 w-full rounded-3xl border-2 border-ink object-cover" />
       ) : (
         <div className="mt-4 grid h-40 w-full place-items-center rounded-3xl border-2 border-ink bg-gradient-to-br from-brand/15 via-sky-100 to-emerald-100">
           <Gift size={44} className="text-brand" />

@@ -57,6 +57,30 @@ export function seedPromotionDemoRemote() {
   );
 }
 
+/**
+ * Category fallback art from the bundled Kerala photo set.
+ * Used when a campaign has no hero image of its own.
+ */
+export function promoArtFor(category: string, heroImage?: string): string {
+  if (heroImage) return heroImage;
+  switch (category) {
+    case "Stays":
+      return "/media/room.jpg";
+    case "Experiences":
+      return "/media/walk.jpg";
+    case "Travel":
+      return "/media/harbour.jpg";
+    case "Local":
+      return "/media/laneway.jpg";
+    case "Events":
+      return "/media/campus.jpg";
+    case "AirPal":
+      return "/brand/og-share-preview.jpg";
+    default:
+      return "";
+  }
+}
+
 export function friendlyPromotionError(err: unknown): string {
   const code = (err as { code?: string } | null)?.code || "";
   const message = err instanceof Error ? err.message : "";

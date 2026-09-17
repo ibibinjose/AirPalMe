@@ -259,7 +259,7 @@ export function StartPage() {
     }
     return {
       icon: ShieldCheck,
-      kicker: "AirPal.me",
+      kicker: "AirPal.Me",
       title: "Welcome back",
       signupTitle: "Create your AirPal account",
       desc: "One secure login for your personal @handle, concierge stays, places, and events.",
@@ -535,7 +535,7 @@ export function StartPage() {
           sub="Claim your @handle, publish perks guests redeem in-store, and welcome visitors staying nearby — free to list."
           cta="List your business below — it takes a minute ↓"
           items={[
-            { icon: Store, title: "Claim your @handle", desc: "Your public page on airpal.me", tint: "bg-emerald-500/10 text-emerald-700" },
+            { icon: Store, title: "Claim your @handle", desc: "Your public page on AirPal.Me", tint: "bg-emerald-500/10 text-emerald-700" },
             { icon: BadgePercent, title: "Publish perks", desc: "Deals guests show at the till", tint: "bg-brand/10 text-brand" },
             { icon: QrCode, title: "QR for your counter", desc: "Scans, taps and bookings tracked", tint: "bg-amber-500/10 text-amber-700" },
           ]}
@@ -561,7 +561,7 @@ export function StartPage() {
           sub="Publish your event, sell stalls to local vendors, and track RSVPs in one place — free to list."
           cta="Publish your event below — it takes a minute ↓"
           items={[
-            { icon: Megaphone, title: "Publish your event", desc: "Your page on airpal.me", tint: "bg-emerald-500/10 text-emerald-700" },
+            { icon: Megaphone, title: "Publish your event", desc: "Your page on AirPal.Me", tint: "bg-emerald-500/10 text-emerald-700" },
             { icon: Store, title: "Sell stalls", desc: "Vendors book & pay online", tint: "bg-brand/10 text-brand" },
             { icon: Users, title: "Track RSVPs", desc: "Know who's coming", tint: "bg-amber-500/10 text-amber-700" },
           ]}

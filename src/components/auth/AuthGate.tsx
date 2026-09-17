@@ -27,7 +27,7 @@ export function AuthGate({
         title: title || "AirPal Account Required",
         description:
           lede ||
-          "Sign in or create your free AirPal.me account to launch custom hangout plans, build multi-stop itineraries, and share VIP digital invitations.",
+          "Sign in or create your free AirPal.Me account to launch custom hangout plans, build multi-stop itineraries, and share VIP digital invitations.",
         benefits: [
           "Create and host custom hangout plans & multi-stop itineraries",
           "Generate instant VIP passes & dynamic QR codes for guests",
