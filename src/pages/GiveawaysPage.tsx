@@ -3,7 +3,6 @@ import { Link } from "wouter";
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { ArrowLeft, CalendarDays, Clock, Gift, MapPin, Sparkles, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { SectionHead } from "@/components/ui/SectionHead";
 import { getFirebaseDb } from "@/lib/firebase";
 import { promoArtFor } from "@/lib/promotions";
 import { cn } from "@/lib/cn";
@@ -26,12 +25,12 @@ function Card({ p, featured }: { p: Promotion; featured?: boolean }) {
     <Link
       href={`/giveaways/${p.id}`}
       className={cn(
-        "block overflow-hidden rounded-card border-2 border-ink bg-card shadow-card transition-all hover:-translate-y-0.5 hover:shadow-pop",
+        "block overflow-hidden rounded-3xl border-2 border-ink bg-card shadow-sm transition-transform hover:-translate-y-0.5",
         featured && "border-gold",
       )}
     >
       {art ? (
-        <img src={art} alt={p.title} className="aspect-[16/10] w-full object-cover" loading="lazy" />
+        <img src={art} alt={p.title} className="h-40 w-full object-cover" loading="lazy" />
       ) : (
         <div
           className={cn(
@@ -135,11 +134,11 @@ export function GiveawaysPage() {
       <Link href="/" className="flex items-center gap-1 text-[13px] font-medium text-mute">
         <ArrowLeft size={14} /> Explore
       </Link>
-      <p className="mt-4 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
+      <p className="mt-4 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
         <Sparkles size={13} /> AirPal Giveaways
       </p>
-      <h1 className="font-display mt-1 text-balance text-4xl font-bold leading-[1.05] tracking-tight">Discover. Experience. Win.</h1>
-      <p className="mt-2 max-w-md text-[15px] leading-relaxed text-mute">
+      <h1 className="font-display mt-1 text-3xl font-bold">Discover. Experience. Win.</h1>
+      <p className="mt-1 text-sm text-mute">
         Real experiences from local partners. Free to enter — entry never guarantees winning.
       </p>
 
@@ -187,31 +186,33 @@ export function GiveawaysPage() {
           )}
           {featured && (
             <section>
-              <SectionHead kicker="Spotlight" title="Featured" className="mb-3" />
+              <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-mute">Featured</h2>
               <Card p={featured} featured />
             </section>
           )}
           {endingSoon.length > 0 && (
             <section>
-              <SectionHead kicker="Don't miss" title="Ending soon" className="mb-3" />
+              <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-mute">Ending soon</h2>
               <div className="space-y-4">{endingSoon.map((p) => <Card key={p.id} p={p} />)}</div>
             </section>
           )}
           {active.length > 0 && (
             <section>
-              <SectionHead kicker="Open now" title="Active giveaways" className="mb-3" />
+              <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-mute">Active giveaways</h2>
               <div className="space-y-4">{active.map((p) => <Card key={p.id} p={p} />)}</div>
             </section>
           )}
           {upcoming.length > 0 && (
             <section>
-              <SectionHead kicker="Save the date" title="Upcoming" className="mb-3" />
+              <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-mute">Upcoming</h2>
               <div className="space-y-4">{upcoming.map((p) => <Card key={p.id} p={p} />)}</div>
             </section>
           )}
           {winners.length > 0 && (
             <section>
-              <SectionHead kicker="Celebrated" title="Previous winners" className="mb-3" />
+              <h2 className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-mute">
+                <Trophy size={13} /> Previous winners
+              </h2>
               <div className="space-y-4">{winners.map((p) => <Card key={p.id} p={p} />)}</div>
             </section>
           )}

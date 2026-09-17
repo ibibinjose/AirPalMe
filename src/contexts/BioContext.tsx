@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { nanoid } from "nanoid";
 import {
   handleError,
@@ -10,8 +10,7 @@ import {
 import { getFirebaseAuth } from "@/lib/firebase";
 import { liveBackendEnabled, checkHandleAvailableRemote, createBusinessProfileRemote, recordBioTapRemote, setBioOfferRemote, transferHandleRemote, updateBusinessProfileRemote } from "@/lib/functions";
 import { useAuth } from "@/contexts/AuthContext";
-import { bumpTap, loadBios, mergeProfiles, persistBios, subscribeBios, tapCount } from "@/lib/bio-store";
-import { adoptProfilesByEmailRemote, mirrorProfilesToCloud, pullRemoteProfiles } from "@/lib/account-profiles";
+import { bumpTap, loadBios, persistBios, subscribeBios, tapCount } from "@/lib/bio-store";
 import { syncBioToListing } from "@/lib/identity";
 import { placeByHandle } from "@/lib/catalog";
 import { stallByHandle } from "@/lib/bio-handle";
@@ -55,37 +54,6 @@ export function BioProvider({ children }: { children: ReactNode }) {
     refresh();
     return subscribeBios(refresh);
   }, [refresh]);
-
-  // One account, one shelf: on sign-in, claim verified-email orphans, pull
-  // the cloud shelf, and converge this device with it. Offline-safe.
-  const restoredFor = useRef<string | null>(null);
-  const accountEmail = user?.email || "";
-  const accountEmailVerified = Boolean(user?.emailVerified);
-  useEffect(() => {
-    const uid = user?.uid;
-    if (!uid || !liveBackendEnabled()) return;
-    if (restoredFor.current === uid) return;
-    restoredFor.current = uid;
-    void (async () => {
-      try {
-        if (accountEmail && accountEmailVerified) {
-          try {
-            await adoptProfilesByEmailRemote();
-          } catch {
-            /* adoption is best-effort */
-          }
-        }
-        const remote = await pullRemoteProfiles(uid);
-        if (!remote.length) {
-          await mirrorProfilesToCloud(uid, loadBios()).catch(() => undefined);
-          return;
-        }
-        persistBios(mergeProfiles(loadBios(), remote));
-      } catch {
-        /* offline: the local shelf stands */
-      }
-    })();
-  }, [user?.uid, accountEmail, accountEmailVerified]);
 
   const owned = useMemo(() => {
     if (!user) return profiles.filter((p) => p.ownerEmail || p.ownerUid || p.id.startsWith("bio-"));
@@ -187,7 +155,6 @@ export function BioProvider({ children }: { children: ReactNode }) {
         registrationNumber: input.registrationNumber?.trim() || keep?.registrationNumber,
         domain: input.domain?.trim() || keep?.domain,
         trademark: input.trademark?.trim() || keep?.trademark,
-        updatedAt: new Date().toISOString(),
       };
       persistBios([
         profile,
@@ -216,9 +183,6 @@ export function BioProvider({ children }: { children: ReactNode }) {
           /* local profile is enough for demo */
         }
       }
-      if (profile.ownerUid) {
-        void mirrorProfilesToCloud(profile.ownerUid, loadBios()).catch(() => undefined);
-      }
       return profile;
     },
     [business, mine, refresh, user],
@@ -228,12 +192,9 @@ export function BioProvider({ children }: { children: ReactNode }) {
     async (patch: Partial<BioProfile> & { handle: string }) => {
       const current = loadBios().find((p) => p.handle === patch.handle);
       if (!current) throw new Error("No profile");
-      const next = { ...current, ...patch, updatedAt: new Date().toISOString() };
+      const next = { ...current, ...patch };
       if (patch.deals) next.offer = next.deals[0] ? { badge: next.deals[0].badge || next.deals[0].title, detail: next.deals[0].detail } : undefined;
       persistBios([next, ...loadBios().filter((p) => p.handle !== next.handle)]);
-      if (next.ownerUid) {
-        void mirrorProfilesToCloud(next.ownerUid, loadBios()).catch(() => undefined);
-      }
       if ((next.kind || "business") === "business") syncBioToListing(next);
       refresh();
       if (liveBackendEnabled() && getFirebaseAuth()?.currentUser) {

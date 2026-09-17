@@ -7,7 +7,6 @@ import {
   type GetPropertyWifiRequest,
   type GetPropertyWifiResponse,
 } from "../../shared/airpal-security";
-import { VENUE_KINDS } from "../../shared/airpal-data";
 import { noteAppCheck } from "./abuse";
 import { CALLABLE, db, isPlatformAdmin, requireAccount, requireAuth } from "./admin";
 
@@ -168,22 +167,6 @@ export const updatePropertyProfile = onCall(CALLABLE, async (request) => {
       details: str(row.details, 200),
       icon: str(row.icon, 40) || "Sparkles",
     }));
-  }
-  const venuesIn = Array.isArray(request.data?.venues)
-    ? (request.data.venues as Array<Record<string, unknown>>)
-    : undefined;
-  if (venuesIn) {
-    patch.venues = venuesIn
-      .slice(0, 20)
-      .map((row: Record<string, unknown>, i: number) => ({
-        id: str(row.id, 60) || `v_${Date.now().toString(36)}_${i}`,
-        kind: (VENUE_KINDS as readonly string[]).includes(String(row.kind)) ? String(row.kind) : "amenity",
-        name: str(row.name, 80),
-        hours: str(row.hours, 80),
-        floor: str(row.floor, 80),
-        details: str(row.details, 200),
-      }))
-      .filter((row: { name: string }) => row.name);
   }
   const roomTypesIn = Array.isArray(request.data?.roomTypes)
     ? (request.data.roomTypes as Array<Record<string, unknown>>)

@@ -263,8 +263,6 @@ export type BioProfile = {
   registrationNumber?: string;
   domain?: string;
   trademark?: string;
-  /** Last write time. Newer wins when merging this device with the account cloud. */
-  updatedAt?: string;
   /** Opt in to Air Zoo hunts and a collectible sticker on the shop QR. */
   zooHunt?: boolean;
 };

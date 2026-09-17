@@ -103,13 +103,7 @@ export async function sendPhoneCode(phone: string): Promise<void> {
 
 export async function confirmPhoneCode(code: string): Promise<string> {
   if (!confirmation) throw new Error("Request a new code first.");
-  const auth = getFirebaseAuth();
-  const anon = auth?.currentUser && auth.currentUser.isAnonymous ? auth.currentUser : null;
-  const clean = code.replace(/\D/g, "");
-  // Upgrading keeps the SAME uid, so guest-made content stays attached.
-  const cred = anon
-    ? await linkWithCredential(anon, PhoneAuthProvider.credential(confirmation.verificationId, clean))
-    : await confirmation.confirm(clean);
+  const cred = await confirmation.confirm(code.replace(/\D/g, ""));
   confirmation = null;
   return cred.user.uid;
 }

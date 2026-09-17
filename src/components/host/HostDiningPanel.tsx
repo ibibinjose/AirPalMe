@@ -1,11 +1,10 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
-import { MENU_CATEGORIES, type MenuItem } from "@shared/airpal-data";
+import type { MenuItem } from "@shared/airpal-data";
 import { deletePropertyMenuItem, savePropertyMenuItem } from "@/lib/properties";
-import { cn } from "@/lib/cn";
 
-const CATEGORIES: MenuItem["category"][] = [...MENU_CATEGORIES];
+const CATEGORIES: MenuItem["category"][] = ["Starters", "Mains", "Desserts", "Drinks", "Breakfast", "Late Night"];
 const field =
   "mt-1 h-12 w-full rounded-2xl border-2 border-ink bg-paper/70 px-4 text-[16px] md:text-[15px] outline-none transition focus:border-brand focus:bg-card focus:ring-2 focus:ring-brand/45";
 
@@ -73,49 +72,28 @@ export function HostDiningPanel({ propertyId, menu }: { propertyId: string; menu
               <div key={cat}>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mute">{cat}</p>
                 <ul className="mt-2 space-y-2">
-                  {items.map((item) => {
-                    const live = item.available !== false;
-                    return (
-                      <li key={item.id} className="flex items-start justify-between gap-3 rounded-2xl bg-paper/70 px-4 py-3 ring-1 ring-line">
-                        <div className="min-w-0">
-                          <p className="font-medium">{item.name}</p>
-                          {item.description ? <p className="mt-0.5 text-xs text-mute">{item.description}</p> : null}
-                        </div>
-                        <div className="flex shrink-0 items-center gap-2">
-                          <p className="text-sm font-semibold text-brand">${item.price}</p>
-                          <button
-                            type="button"
-                            aria-pressed={live}
-                            title={live ? "Pause this dish" : "Put this dish back on"}
-                            onClick={() => {
-                              void savePropertyMenuItem(propertyId, { ...item, available: !live })
-                                .then(() => toast.success(live ? "Dish paused" : "Dish is live"))
-                                .catch((err) => toast.error(err instanceof Error ? err.message : "Couldn’t update"));
-                            }}
-                            className={cn(
-                              "rounded-full px-2.5 py-1 text-[11px] font-bold ring-1 transition active:scale-95",
-                              live
-                                ? "bg-emerald-500/10 text-emerald-700 ring-emerald-500/30"
-                                : "bg-ink/[0.06] text-mute ring-line",
-                            )}
-                          >
-                            {live ? "Live" : "Paused"}
-                          </button>
-                          <button
-                            type="button"
-                            className="text-xs text-mute hover:text-ink"
-                            onClick={() => {
-                              void deletePropertyMenuItem(propertyId, item.id)
-                                .then(() => toast.success("Removed"))
-                                .catch((err) => toast.error(err instanceof Error ? err.message : "Couldn’t remove"));
-                            }}
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </li>
-                    );
-                  })}
+                  {items.map((item) => (
+                    <li key={item.id} className="flex items-start justify-between gap-3 rounded-2xl bg-paper/70 px-4 py-3 ring-1 ring-line">
+                      <div className="min-w-0">
+                        <p className="font-medium">{item.name}</p>
+                        {item.description ? <p className="mt-0.5 text-xs text-mute">{item.description}</p> : null}
+                      </div>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <p className="text-sm font-semibold text-brand">${item.price}</p>
+                        <button
+                          type="button"
+                          className="text-xs text-mute hover:text-ink"
+                          onClick={() => {
+                            void deletePropertyMenuItem(propertyId, item.id)
+                              .then(() => toast.success("Removed"))
+                              .catch((err) => toast.error(err instanceof Error ? err.message : "Couldn’t remove"));
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </li>
+                  ))}
                 </ul>
               </div>
             ))}

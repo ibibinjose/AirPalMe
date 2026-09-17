@@ -1,6 +1,6 @@
 {
   "name": "AirPal.me",
-  "description": "Scan a place. See what’s around. AirPal is the guest concierge and local guide — no account, no download.",
+  "description": "Life Made Easy. People, places, things and experiences — made easier.",
   "requestFramePermissions": [
     "camera",
     "geolocation"

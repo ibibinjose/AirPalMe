@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import type { BioCatalogItem } from "@shared/bio";
 import { BUSINESS_CATEGORIES } from "@shared/business";
-import { FollowButton, LikeButton, WaveButton } from "@/components/social/SocialButtons";
+import { FollowButton, LikeButton } from "@/components/social/SocialButtons";
 import { downloadVCard, upsertPerson } from "@/lib/people";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { BioHandleButton } from "@/components/bio/BioHandleButton";
@@ -486,12 +486,11 @@ export function BioPublicPage() {
           )}
         </div>
 
-        {/* Primary Action Row 1: Follow, Like, Wave, Catch Up, QR in one line */}
+        {/* Primary Action Row 1: Follow, Like, Catch Up, QR in one line */}
         <div className="mt-4 flex items-center gap-2">
           <FollowButton handle={bio.handle} name={bio.name} className="flex-1 h-10 text-xs font-semibold" />
           <LikeButton handle={bio.handle} name={bio.name} className="flex-1 h-10 text-xs font-semibold" />
-          {!isOwner && <WaveButton handle={bio.handle} name={bio.name} />}
-
+          
           {/* Catch Up / Remember to Catch Up button */}
           <button
             type="button"

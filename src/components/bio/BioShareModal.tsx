@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Copy, Check, Download, Nfc, Share2, X, QrCode } from "lucide-react";
+import { Copy, Check, Download, Share2, X, QrCode } from "lucide-react";
 import { toast } from "sonner";
 import { makeQrDataUrl } from "@/lib/qr";
-import { nfcResultMessage, nfcUnavailableHint, nfcWriteSupport, writeProfileTag } from "@/lib/nfc";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { Button } from "@/components/ui/Button";
 
@@ -19,7 +18,6 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
 
   const [qrData, setQrData] = useState<string>("");
   const [copied, setCopied] = useState(false);
-  const [nfcWriting, setNfcWriting] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -54,29 +52,6 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
     a.click();
     document.body.removeChild(a);
     toast.success("QR Code downloaded for print & counters");
-  }
-
-  async function handleNfcWrite() {
-    if (nfcWriting) return;
-    if (nfcWriteSupport() === "none") {
-      toast.message(nfcUnavailableHint());
-      return;
-    }
-    setNfcWriting(true);
-    toast.message("Hold a blank NFC card to the back of your phone…");
-    try {
-      const result = await writeProfileTag(url);
-      if (result.ok) {
-        toast.success(nfcResultMessage(result));
-        onClose();
-      } else if (result.reason === "cancelled") {
-        toast.message(nfcResultMessage(result));
-      } else {
-        toast.error(nfcResultMessage(result));
-      }
-    } finally {
-      setNfcWriting(false);
-    }
   }
 
   async function handleNativeShare() {
@@ -147,21 +122,6 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
             Share via…
           </Button>
         )}
-
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleNfcWrite}
-          disabled={nfcWriting}
-          className="mt-2 w-full gap-1.5 border border-ink"
-        >
-          <Nfc size={15} className="text-gold" />
-          {nfcWriting ? "Waiting for card…" : "Share via NFC"}
-        </Button>
-        <p className="mt-2 text-[11px] leading-relaxed text-mute">
-          Writes your link onto an NFC card or sticker — anyone who taps it opens your bio. Needs a blank
-          card and Android Chrome (or the AirPal app).
-        </p>
 
         <button
           type="button"

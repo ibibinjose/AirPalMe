@@ -251,32 +251,3 @@ export const listBioDirectory = onCall(CALLABLE, async (request) => {
   );
   return { rows };
 });
-
-/**
- * One human, one shelf. When this verified email owns profiles stranded on
- * other sign-ins (old uid, other device), copy them onto this account and
- * mark the orphans. Never deletes — the old rows stay readable for audit.
- */
-export const adoptProfilesByEmail = onCall(CALLABLE, async (request) => {
-  const uid = requireAccount(request, "Sign in to claim your profiles.");
-  const token = (request.auth?.token || {}) as AccessClaims & { email?: string; email_verified?: boolean };
-  const email = String(token.email || "").toLowerCase();
-  if (!email || token.email_verified !== true) {
-    throw new HttpsError("failed-precondition", "Verify your email first — unverified addresses can't claim profiles.");
-  }
-  const orphans = await db
-    .collectionGroup("profiles")
-    .where("ownerEmail", "==", email)
-    .get();
-  let adopted = 0;
-  const now = new Date().toISOString();
-  for (const doc of orphans.docs) {
-    const data = doc.data() as { ownerUid?: string; adoptedBy?: string };
-    if (String(data.ownerUid || "") === uid || data.adoptedBy) continue;
-    const copy = { ...data, ownerUid: uid, adoptedFrom: doc.ref.path, updatedAt: now };
-    await db.collection("users").doc(uid).collection("profiles").doc(doc.id).set(copy, { merge: true });
-    await doc.ref.set({ adoptedBy: uid, adoptedAt: now }, { merge: true });
-    adopted += 1;
-  }
-  return { ok: true as const, adopted };
-});

@@ -6,15 +6,22 @@ import { connectFunctionsEmulator, getFunctions, type Functions } from "firebase
 import type { Analytics } from "firebase/analytics";
 import { FUNCTIONS_REGION } from "@shared/airpal-security";
 
+const appletConfig: Record<string, string> =
+  typeof __FIREBASE_APPLET_CONFIG__ !== "undefined" && __FIREBASE_APPLET_CONFIG__ ? __FIREBASE_APPLET_CONFIG__ : {};
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string | undefined,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string | undefined,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID as string | undefined,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string | undefined,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string | undefined,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID as string | undefined,
-  measurementId: ((import.meta.env.VITE_FIREBASE_MEASUREMENT_ID ||
-    import.meta.env.VITE_GA_MEASUREMENT_ID) as string | undefined) || undefined,
+  apiKey: (import.meta.env.VITE_FIREBASE_API_KEY as string | undefined) || appletConfig.apiKey,
+  authDomain: (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string | undefined) || appletConfig.authDomain,
+  projectId: (import.meta.env.VITE_FIREBASE_PROJECT_ID as string | undefined) || appletConfig.projectId,
+  storageBucket: (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string | undefined) || appletConfig.storageBucket,
+  messagingSenderId:
+    (import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string | undefined) || appletConfig.messagingSenderId,
+  appId: (import.meta.env.VITE_FIREBASE_APP_ID as string | undefined) || appletConfig.appId,
+  measurementId:
+    ((import.meta.env.VITE_FIREBASE_MEASUREMENT_ID ||
+      import.meta.env.VITE_GA_MEASUREMENT_ID) as string | undefined) ||
+    appletConfig.measurementId ||
+    undefined,
 };
 
 export function getMeasurementId(): string | undefined {

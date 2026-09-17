@@ -3,10 +3,23 @@ import { Link } from "wouter";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { ArrowLeft, Megaphone, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { PromoStatusChip } from "@/components/promotions/PromoStatusChip";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
+import { cn } from "@/lib/cn";
 import type { Promotion } from "@shared/promotions";
+
+const STATUS_TINT: Record<string, string> = {
+  live: "bg-emerald-500/10 text-emerald-700",
+  paused: "bg-amber-500/15 text-amber-700",
+  submitted: "bg-amber-500/15 text-amber-700",
+  under_review: "bg-amber-500/15 text-amber-700",
+  approved: "bg-brand/10 text-brand",
+  scheduled: "bg-brand/10 text-brand",
+  closed: "bg-ink/10 text-mute",
+  rejected: "bg-red-500/10 text-red-700",
+  draft: "bg-ink/10 text-mute",
+  archived: "bg-ink/10 text-mute",
+};
 
 export function BusinessPromotionsPage() {
   const { user, authReady, requireUser } = useAuth();
@@ -69,7 +82,9 @@ export function BusinessPromotionsPage() {
               className="block rounded-2xl border-2 border-ink bg-card p-3"
             >
               <div className="flex items-center gap-2">
-                <PromoStatusChip status={p.status} />
+                <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide", STATUS_TINT[p.status] || STATUS_TINT.draft)}>
+                  {p.status.replace("_", " ")}
+                </span>
                 <span className="text-[11px] text-mute">{p.kind} · {p.mechanicType}</span>
               </div>
               <p className="mt-1 text-sm font-bold">{p.title}</p>

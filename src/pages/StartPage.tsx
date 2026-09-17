@@ -71,21 +71,21 @@ function RoleHero({
   items: RoleHeroItem[];
 }) {
   return (
-    <div className="mb-8 text-center">
-      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">{kicker}</p>
-      <h1 className="font-display mx-auto mt-2 max-w-md text-balance text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl">{title}</h1>
-      <p className="mx-auto mt-3 max-w-sm text-[15px] leading-relaxed text-mute">{sub}</p>
-      <div className="mt-5 space-y-2 text-left sm:space-y-2.5">
+    <div className="mb-6 text-center">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">{kicker}</p>
+      <h1 className="font-display mt-2 text-3xl font-bold leading-tight">{title}</h1>
+      <p className="mx-auto mt-2 max-w-sm text-sm text-mute">{sub}</p>
+      <div className="mt-4 space-y-2 text-left">
         {items.map((c) => (
           <div
             key={c.title}
-            className="flex items-center gap-3 rounded-card border-2 border-ink bg-card p-3 shadow-card sm:p-3.5"
+            className="flex items-center gap-3 rounded-2xl border-2 border-ink bg-card p-3"
           >
-            <span className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-xl", c.tint)}>
-              <c.icon size={18} strokeWidth={2.2} />
+            <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-xl", c.tint)}>
+              <c.icon size={17} strokeWidth={2.2} />
             </span>
             <span className="min-w-0">
-              <span className="block text-sm font-bold leading-tight">{c.title}</span>
+              <span className="block text-sm font-semibold leading-tight">{c.title}</span>
               <span className="block truncate text-xs text-mute">{c.desc}</span>
             </span>
           </div>
@@ -490,15 +490,15 @@ export function StartPage() {
   return (
     <div className="mx-auto max-w-md px-4 py-8 md:py-12">
       {isGuestStart && (
-        <div className="mb-8 text-center">
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">Life Made Easy</p>
-          <h1 className="font-display mx-auto mt-2 max-w-md text-balance text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl">
+        <div className="mb-6 text-center">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">Life Made Easy</p>
+          <h1 className="font-display mt-2 text-3xl font-bold leading-tight">
             Find a place. Make&nbsp;a&nbsp;plan. Meet&nbsp;your&nbsp;people.
           </h1>
-          <p className="mx-auto mt-3 max-w-sm text-[15px] leading-relaxed text-mute">
+          <p className="mx-auto mt-2 max-w-sm text-sm text-mute">
             AirPal is your local companion — venues, walks, events, mates, and plans in one app.
           </p>
-          <div className="mt-5 grid grid-cols-3 gap-2 text-left sm:gap-3">
+          <div className="mt-4 grid grid-cols-3 gap-2 text-left">
             {[
               { icon: MapPin, title: "Find places", desc: "Near you tonight", to: "/discover", tint: "bg-emerald-500/10 text-emerald-700" },
               { icon: CalendarDays, title: "Make plans", desc: "Crew & public", to: "/plan", tint: "bg-brand/10 text-brand" },
@@ -508,13 +508,13 @@ export function StartPage() {
                 key={c.to}
                 type="button"
                 onClick={() => nav(c.to)}
-                className="rounded-card border-2 border-ink bg-card p-3 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-pop active:scale-[0.98] sm:p-4"
+                className="rounded-2xl border-2 border-ink bg-card p-3 transition hover:-translate-y-0.5 active:scale-[0.98]"
               >
-                <span className={cn("grid h-9 w-9 place-items-center rounded-xl", c.tint)}>
-                  <c.icon size={17} strokeWidth={2.2} />
+                <span className={cn("grid h-8 w-8 place-items-center rounded-xl", c.tint)}>
+                  <c.icon size={16} strokeWidth={2.2} />
                 </span>
-                <span className="mt-2 block text-[13px] font-bold leading-tight sm:text-sm">{c.title}</span>
-                <span className="mt-0.5 block text-[11px] leading-snug text-mute">{c.desc}</span>
+                <span className="mt-2 block text-[13px] font-semibold leading-tight">{c.title}</span>
+                <span className="block text-[11px] text-mute">{c.desc}</span>
               </button>
             ))}
           </div>

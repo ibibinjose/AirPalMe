@@ -34,8 +34,6 @@ export interface PropertyInfo {
     price: string;
   };
   facilities: FacilityItem[];
-  /** Structured venues (restaurants, bars, kitchen, amenities) shown to guests. */
-  venues?: VenueProfile[];
   roomTypes?: RoomType[];
   roomsCount?: number;
   status?: "active" | "trial" | "suspended";
@@ -135,50 +133,16 @@ export interface UserProfile {
   photoURL?: string;
 }
 
-export const MENU_CATEGORIES = [
-  "Starters",
-  "Mains",
-  "Desserts",
-  "Drinks",
-  "Hot Drinks",
-  "Snacks",
-  "Beverages",
-  "Breakfast",
-  "Late Night",
-] as const;
-export type MenuCategory = (typeof MENU_CATEGORIES)[number];
-
 export interface MenuItem {
   id: string;
   propertyId?: string;
   name: string;
-  category: MenuCategory;
+  category: "Starters" | "Mains" | "Desserts" | "Drinks" | "Breakfast" | "Late Night";
   price: number;
   description: string;
   dietary?: string[];
   popular?: boolean;
   available?: boolean;
-}
-
-/** Structured stay venues: kitchen, restaurant, bar, cafe, and other amenities. */
-export const VENUE_KINDS = ["restaurant", "bar", "cafe", "kitchen", "amenity"] as const;
-export type VenueKind = (typeof VENUE_KINDS)[number];
-
-export const VENUE_KIND_LABELS: Record<VenueKind, string> = {
-  restaurant: "Restaurant",
-  bar: "Bar",
-  cafe: "Cafe",
-  kitchen: "Kitchen",
-  amenity: "Amenity",
-};
-
-export interface VenueProfile {
-  id: string;
-  kind: VenueKind;
-  name: string;
-  hours: string;
-  floor: string;
-  details?: string;
 }
 
 export interface LocalPlace {

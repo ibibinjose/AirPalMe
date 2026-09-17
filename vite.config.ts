@@ -21,6 +21,20 @@ function getGradleVersion(): { versionName: string; versionCode: string } {
 
 const gradleVersion = getGradleVersion();
 
+function getFirebaseAppletConfig(): Record<string, string> {
+  try {
+    const configPath = path.resolve(import.meta.dirname, "firebase-applet-config.json");
+    if (fs.existsSync(configPath)) {
+      return JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    }
+  } catch {
+    /* ignore */
+  }
+  return {};
+}
+
+const firebaseAppletConfig = getFirebaseAppletConfig();
+
 function atHandleSpa(): Plugin {
   const rewrite = (req: { url?: string }, _res: unknown, next: () => void) => {
     const raw = req.url || "";
@@ -53,6 +67,7 @@ export default defineConfig({
     __APP_VERSION_NAME__: JSON.stringify(gradleVersion.versionName),
     __APP_VERSION_CODE__: JSON.stringify(gradleVersion.versionCode),
     __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
+    __FIREBASE_APPLET_CONFIG__: JSON.stringify(firebaseAppletConfig),
   },
   resolve: {
     alias: {

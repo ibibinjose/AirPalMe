@@ -22,7 +22,6 @@ export {
   claimBioOffer,
   transferHandle,
   listBioDirectory,
-  adoptProfilesByEmail,
 } from "./bio";
 export {
   createPlan,
@@ -43,7 +42,6 @@ export {
   confirmExperienceBookingRemote,
 } from "./stripe";
 export { createStaffTicket, resolveStaffTicket, onStaffTicketCreated } from "./tickets";
-export { placeFoodOrder, confirmFoodOrder, updateFoodOrderStatus } from "./food";
 export {
   createPromotion,
   updatePromotion,
@@ -60,5 +58,4 @@ export {
   seedPromotionDemo,
 } from "./promotions";
 export { createBroadcast, reviewBroadcast } from "./notifications";
-export { sendWave } from "./waves";
 

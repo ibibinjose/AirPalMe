@@ -169,8 +169,8 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
         </div>
       )}
 
-      <h1 className="font-display mt-4 text-balance text-3xl font-bold leading-[1.08] tracking-tight sm:text-4xl">{promo.title}</h1>
-      <p className="mt-1.5 text-sm text-mute">by {promo.sponsorName}</p>
+      <h1 className="font-display mt-4 text-3xl font-bold leading-tight">{promo.title}</h1>
+      <p className="mt-1 text-sm text-mute">by {promo.sponsorName}</p>
 
       {promo.winnerNote && (
         <p className="mt-3 flex items-center gap-1.5 rounded-2xl border-2 border-gold bg-card p-3 text-sm font-semibold">

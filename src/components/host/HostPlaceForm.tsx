@@ -2,14 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { HostFreshnessBanner } from "@/components/host/HostFreshnessBanner";
-import {
-  VENUE_KINDS,
-  VENUE_KIND_LABELS,
-  type FacilityItem,
-  type PropertyInfo,
-  type VenueKind,
-  type VenueProfile,
-} from "@shared/airpal-data";
+import type { FacilityItem, PropertyInfo } from "@shared/airpal-data";
 import { savePropertyProfile, updatePropertyWifi } from "@/lib/properties";
 import { stampWifiSavedAt, wifiSavedAt } from "@/components/host/HostActivationChecklist";
 import { getPropertyWifiRemote, liveBackendEnabled } from "@/lib/functions";
@@ -34,7 +27,6 @@ export function HostPlaceForm({
   const [checkOut, setCheckOut] = useState(property.checkOut || "");
   const [breakfast, setBreakfast] = useState(property.breakfast);
   const [facilities, setFacilities] = useState<FacilityItem[]>(property.facilities || []);
-  const [venues, setVenues] = useState<VenueProfile[]>(property.venues || []);
   const [network, setNetwork] = useState(property.wifi?.network || "");
   const [password, setPassword] = useState("");
   const [speed, setSpeed] = useState(property.wifi?.speed || "");
@@ -51,10 +43,9 @@ export function HostPlaceForm({
     setCheckOut(property.checkOut || "");
     setBreakfast(property.breakfast);
     setFacilities(property.facilities || []);
-    setVenues(property.venues || []);
     setNetwork(property.wifi?.network || "");
     setSpeed(property.wifi?.speed || "");
-  }, [property.id, property.name, property.tagline, property.address, property.phone, property.city, property.checkIn, property.checkOut, property.breakfast, property.facilities, property.venues, property.wifi]);
+  }, [property.id, property.name, property.tagline, property.address, property.phone, property.city, property.checkIn, property.checkOut, property.breakfast, property.facilities, property.wifi]);
 
   useEffect(() => {
     if (!property.id || property.id === "unknown" || !liveBackendEnabled()) return;
@@ -85,16 +76,6 @@ export function HostPlaceForm({
         checkOut: checkOut.trim(),
         breakfast,
         facilities: facilities.filter((f) => f.name.trim()),
-        venues: venues
-          .filter((v) => v.name.trim())
-          .map((v, i) => ({
-            ...v,
-            id: v.id || `v-${Date.now().toString(36)}-${i}`,
-            name: v.name.trim(),
-            hours: v.hours.trim(),
-            floor: v.floor.trim(),
-            details: v.details?.trim() || "",
-          })),
         confirmHours: true,
       });
       onSaved(next);
@@ -272,87 +253,6 @@ export function HostPlaceForm({
                   type="button"
                   className="mt-2 text-xs text-mute hover:text-ink"
                   onClick={() => setFacilities((rows) => rows.filter((_, n) => n !== i))}
-                >
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <div className="flex items-center justify-between">
-            <p className="text-[12px] font-semibold text-ink/70">Restaurants, bar & amenities</p>
-            <button
-              type="button"
-              className="text-xs font-semibold text-brand"
-              onClick={() =>
-                setVenues((rows) => [...rows, { id: "", kind: "restaurant" as VenueKind, name: "", hours: "", floor: "", details: "" }])
-              }
-            >
-              Add
-            </button>
-          </div>
-          <p className="mt-1 text-[12px] text-mute">Kitchen, restaurant, bar, cafe, pool, gym — guests see these after they scan.</p>
-          <ul className="mt-2 space-y-2">
-            {venues.map((row, i) => (
-              <li key={`${row.id || row.name}-${i}`} className="rounded-2xl bg-paper/70 p-3 ring-1 ring-line">
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <label className="block">
-                    <span className="text-[11px] font-semibold text-mute">Kind</span>
-                    <select
-                      value={row.kind}
-                      onChange={(e) =>
-                        setVenues((rows) => rows.map((r, n) => (n === i ? { ...r, kind: e.target.value as VenueKind } : r)))
-                      }
-                      className={field + " mt-1"}
-                    >
-                      {VENUE_KINDS.map((k) => (
-                        <option key={k} value={k}>
-                          {VENUE_KIND_LABELS[k]}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="block">
-                    <span className="text-[11px] font-semibold text-mute">Name</span>
-                    <input
-                      value={row.name}
-                      placeholder="e.g. Rooftop Bar"
-                      onChange={(e) =>
-                        setVenues((rows) => rows.map((r, n) => (n === i ? { ...r, name: e.target.value } : r)))
-                      }
-                      className={field + " mt-1"}
-                    />
-                  </label>
-                  <input
-                    value={row.hours}
-                    placeholder="Hours"
-                    onChange={(e) =>
-                      setVenues((rows) => rows.map((r, n) => (n === i ? { ...r, hours: e.target.value } : r)))
-                    }
-                    className={field + " mt-0"}
-                  />
-                  <input
-                    value={row.floor}
-                    placeholder="Floor / location"
-                    onChange={(e) =>
-                      setVenues((rows) => rows.map((r, n) => (n === i ? { ...r, floor: e.target.value } : r)))
-                    }
-                    className={field + " mt-0"}
-                  />
-                </div>
-                <input
-                  value={row.details || ""}
-                  placeholder="Details (optional)"
-                  onChange={(e) =>
-                    setVenues((rows) => rows.map((r, n) => (n === i ? { ...r, details: e.target.value } : r)))
-                  }
-                  className={field + " mt-2"}
-                />
-                <button
-                  type="button"
-                  className="mt-2 text-xs text-mute hover:text-ink"
-                  onClick={() => setVenues((rows) => rows.filter((_, n) => n !== i))}
                 >
                   Remove
                 </button>

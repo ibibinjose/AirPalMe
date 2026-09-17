@@ -163,7 +163,7 @@ export function NotificationBell() {
             </Link>
           </div>
           {notes.length === 0 && (
-            <p className="px-3 pb-3 text-xs text-mute">Nothing yet. Waves, giveaway results, and campaign news land here.</p>
+            <p className="px-3 pb-3 text-xs text-mute">Nothing yet. Giveaway results and campaign news land here.</p>
           )}
           {notes.map((n) => (
             <Link key={n.id} href={n.href || "/me/giveaways"} onClick={() => setOpen(false)} className="block border-t border-line/60 px-3 py-2 hover:bg-card">
