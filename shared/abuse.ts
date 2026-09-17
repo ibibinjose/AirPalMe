@@ -15,6 +15,7 @@ export const RATE_LIMIT_ACTIONS = [
   "planRsvp",
   "enter",
   "wave",
+  "foodOrder",
 ] as const;
 
 export type RateLimitAction = (typeof RATE_LIMIT_ACTIONS)[number];
@@ -40,6 +41,7 @@ export const RATE_LIMITS: Record<RateLimitAction, RateLimitSpec> = {
   planRsvp: { windowMs: 60_000, max: 20, anonymousMax: 15 },
   enter: { windowMs: 60_000, max: 10, anonymousMax: 0 },
   wave: { windowMs: 24 * 60 * 60_000, max: 20, anonymousMax: 0 },
+  foodOrder: { windowMs: 10 * 60_000, max: 10, anonymousMax: 6 },
 };
 
 export function rateLimitMax(action: RateLimitAction, anonymous: boolean): number {

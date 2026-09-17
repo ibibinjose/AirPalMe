@@ -24,6 +24,12 @@ import type {
   GetPlanByInviteCodeResponse,
 } from "@shared/plan";
 import type { SendWaveRequest, SendWaveResponse } from "@shared/waves";
+import type {
+  ConfirmFoodOrderRequest,
+  PlaceFoodOrderRequest,
+  PlaceFoodOrderResponse,
+  UpdateFoodOrderStatusRequest,
+} from "@shared/food";
 import { getFirebaseFunctions, isFirebaseConfigured } from "./firebase";
 
 export function liveBackendEnabled() {
@@ -205,6 +211,24 @@ export function transferHandleRemote(data: { from: string; to: string }) {
 
 export function sendWaveRemote(data: SendWaveRequest) {
   return callFunction<SendWaveRequest, SendWaveResponse>(CALLABLES.sendWave, data);
+}
+
+export function placeFoodOrderRemote(data: PlaceFoodOrderRequest) {
+  return callFunction<PlaceFoodOrderRequest, PlaceFoodOrderResponse>(CALLABLES.placeFoodOrder, data);
+}
+
+export function confirmFoodOrderRemote(data: ConfirmFoodOrderRequest) {
+  return callFunction<ConfirmFoodOrderRequest, { ok: boolean; status: string; orderId: string }>(
+    CALLABLES.confirmFoodOrder,
+    data,
+  );
+}
+
+export function updateFoodOrderStatusRemote(data: UpdateFoodOrderStatusRequest) {
+  return callFunction<UpdateFoodOrderStatusRequest, { ok: boolean; status: string; orderId: string }>(
+    CALLABLES.updateFoodOrderStatus,
+    data,
+  );
 }
 
 export function listBioDirectoryRemote() {

@@ -43,6 +43,7 @@ export {
   confirmExperienceBookingRemote,
 } from "./stripe";
 export { createStaffTicket, resolveStaffTicket, onStaffTicketCreated } from "./tickets";
+export { placeFoodOrder, confirmFoodOrder, updateFoodOrderStatus } from "./food";
 export {
   createPromotion,
   updatePromotion,

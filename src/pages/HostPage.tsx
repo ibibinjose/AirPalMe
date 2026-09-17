@@ -15,6 +15,7 @@ import type { MenuItem, PropertyInfo, StaffTicket } from "@shared/airpal-data";
 import { authErrorMessage } from "@shared/auth-email";
 import { track } from "@/lib/analytics";
 import { HostActivationChecklist } from "@/components/host/HostActivationChecklist";
+import { HostOrdersPanel } from "@/components/host/HostOrdersPanel";
 import { HostPlaceForm } from "@/components/host/HostPlaceForm";
 import { HostRoomsPanel } from "@/components/host/HostRoomsPanel";
 import { HostDiningPanel } from "@/components/host/HostDiningPanel";
@@ -25,7 +26,7 @@ import { hostWorkspacePropertyId, roomTokenEntries } from "@/lib/host-workspace"
 import { getPropertyWifiRemote, liveBackendEnabled } from "@/lib/functions";
 import { cn } from "@/lib/cn";
 
-type Tab = "today" | "rooms" | "place" | "dining" | "print";
+type Tab = "today" | "orders" | "rooms" | "place" | "dining" | "print";
 
 export function HostPage() {
   const { user, isHost, isAdmin, authReady, createHostProperty, sendVerificationEmail } = useAuth();
@@ -40,6 +41,7 @@ export function HostPage() {
   const [alertsOn, setAlertsOn] = useState(() => ticketPushPrefEnabled());
   const [wifiLive, setWifiLive] = useState(false);
   const [qrReady, setQrReady] = useState(false);
+  const [openOrders, setOpenOrders] = useState(0);
 
   const [newPropName, setNewPropName] = useState("");
   const [newPropKind, setNewPropKind] = useState<HostPropertyKind>("hotel");
@@ -245,18 +247,23 @@ export function HostPage() {
           </Button>
         </div>
 
-        <div className="mt-5 flex gap-1 rounded-full bg-card/80 p-1 ring-1 ring-line shadow-sm backdrop-blur">
-          {(["today", "rooms", "place", "dining", "print"] as const).map((t) => (
+        <div className="no-scrollbar mt-5 flex gap-1 overflow-x-auto rounded-full bg-card/80 p-1 ring-1 ring-line shadow-sm backdrop-blur">
+          {(["today", "orders", "rooms", "place", "dining", "print"] as const).map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => setTab(t)}
               className={cn(
-                "h-9 flex-1 rounded-full px-3 text-sm capitalize transition",
+                "flex h-9 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 text-sm capitalize transition",
                 tab === t ? "bg-ink text-white shadow-sm" : "text-mute hover:text-ink",
               )}
             >
               {t}
+              {t === "orders" && openOrders > 0 && (
+                <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand px-1 text-[11px] font-bold text-white">
+                  {openOrders > 9 ? "9+" : openOrders}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -384,6 +391,7 @@ export function HostPage() {
           </>
         )}
 
+        {tab === "orders" && <HostOrdersPanel propertyId={property.id} onOpenCount={setOpenOrders} />}
         {tab === "rooms" && <HostRoomsPanel property={property} onSaved={setProperty} />}
         {tab === "place" && <HostPlaceForm property={property} onSaved={setProperty} />}
         {tab === "dining" && <HostDiningPanel propertyId={property.id} menu={menu} />}

@@ -7,6 +7,7 @@ import { PlaceCard } from "@/components/discovery/PlaceCard";
 import { LocalFavorites } from "@/components/stay/LocalFavorites";
 import { EmojiRate } from "@/components/feedback/EmojiRate";
 import { ArrivalGuide } from "@/components/stay/ArrivalGuide";
+import { FoodOrderPanel } from "@/components/stay/FoodOrderPanel";
 import { YourRoomCard } from "@/components/stay/YourRoomCard";
 import { roomTypeForNumber } from "@/lib/host-rooms";
 import { useStay } from "@/contexts/StayContext";
@@ -373,19 +374,12 @@ export function ConciergePage() {
             <p className="text-sm text-mute mt-1">{property.breakfast?.location || property.address || "On site"}</p>
             <p className="text-sm text-brand mt-1">{property.breakfast?.price || "Ask front desk"}</p>
           </div>
-          {menu.length > 0 &&
-            menu.slice(0, 8).map((item) => (
-              <div key={item.id} className="rounded-2xl bg-paper p-4 ring-1 ring-line">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-mute">{item.category}</p>
-                    <p className="font-medium">{item.name}</p>
-                    {item.description ? <p className="mt-1 text-xs text-mute leading-relaxed">{item.description}</p> : null}
-                  </div>
-                  <p className="shrink-0 text-sm font-semibold text-brand">${item.price}</p>
-                </div>
-              </div>
-            ))}
+          <FoodOrderPanel
+            propertyId={property.id}
+            menu={menu}
+            venues={property.venues || []}
+            roomDefault={roomLabel || "Guest"}
+          />
         </div>
       </Sheet>
 

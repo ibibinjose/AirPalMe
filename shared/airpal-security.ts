@@ -67,6 +67,9 @@ export const CALLABLES = {
   getPlanByInviteCode: "getPlanByInviteCode",
   confirmExperienceBooking: "confirmExperienceBookingRemote",
   sendWave: "sendWave",
+  placeFoodOrder: "placeFoodOrder",
+  confirmFoodOrder: "confirmFoodOrder",
+  updateFoodOrderStatus: "updateFoodOrderStatus",
 } as const;
 
 /** Canonical platform Super Admin. Extra addresses can be added via PLATFORM_ADMIN_EMAILS. */

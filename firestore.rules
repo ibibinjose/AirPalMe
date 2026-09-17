@@ -221,6 +221,12 @@ service cloud.firestore {
         allow read, write: if hosts(propertyId);
       }
 
+      match /orders/{orderId} {
+        allow read: if manages(propertyId)
+          || (signedIn() && resource.data.guestUid == request.auth.uid);
+        allow write: if false;
+      }
+
       match /tickets/{ticketId} {
         allow read: if manages(propertyId);
         allow create: if signedIn()
