@@ -1,6 +1,7 @@
 # AirPal store submission pack
 
 App: **AirPal** · ID `me.airpal.app` · version 2.0.0 (iOS build 2, Android versionCode 2)
+Legal entity: **SarvamDaily Pty Ltd** trading as **AirPal.Me**
 Web: https://airpal.me · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms · Contact: https://airpal.me/contact
 Support email: hello@airpal.me (forwards to the operator inbox — see `docs/email-setup.md`)
 

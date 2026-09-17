@@ -41,7 +41,7 @@ This is deliberate, not forgotten.
 ## Who owns what
 | Thing | Account is in the name of | Who pays |
 | --- | --- | --- |
-| Domain (`airpal.me`, Spaceship) | AirPal.me operator (`bibin.inc@gmail.com`) | Operator |
+| Domain (`airpal.me`, Spaceship) | SarvamDaily Pty Ltd trading as AirPal.Me | Operator |
 | Hosting (Firebase Hosting, project `airpalme-app`) | Same Google / Firebase project | Operator (Google Cloud billing) |
 | Database (Cloud Firestore + Storage) | Same Firebase project | Operator |
 | Payments (Stripe) | Wired in code; live guest checkout not on | Operator, when experiences go live |

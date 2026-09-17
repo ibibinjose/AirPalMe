@@ -145,7 +145,7 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-line/60 pt-5 text-xs text-mute sm:flex-row">
           <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center sm:text-left">
             <span>
-              © {new Date().getFullYear()} {LEGAL.brand}
+              © {new Date().getFullYear()} {LEGAL.byline}
             </span>
             <span>·</span>
             <span className="text-mute/80">{LEGAL.location}</span>

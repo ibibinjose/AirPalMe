@@ -1,7 +1,12 @@
 export const LEGAL = {
   brand: "AirPal.Me",
   site: "https://airpal.me",
-  operator: "the operator of AirPal.Me",
+  company: "SarvamDaily Pty Ltd",
+  tradingAs: "AirPal.Me",
+  /** ASIC-style line for terms, privacy, invoices. */
+  operator: "SarvamDaily Pty Ltd trading as AirPal.Me",
+  /** Public byline. */
+  byline: "AirPal.Me by SarvamDaily Pty Ltd",
   location: "New South Wales, Australia",
   law: "the laws of New South Wales, Australia",
   courts: "the courts of New South Wales, Australia",
