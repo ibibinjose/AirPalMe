@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { ArrowLeft, CalendarDays, MapPin, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
-import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
+import { getFirebaseDb } from "@/lib/firebase";
 import { trackContentAction } from "@/lib/analytics";
+import { createBookingForCampaign } from "@/components/booking/BookingsSection";
 import { aud, type Campaign } from "@shared/campaign";
 
 export function ExperiencesPage() {
@@ -34,17 +35,19 @@ export function ExperiencesPage() {
   async function join(c: Campaign) {
     if (!requireUser("Sign in to join this experience.")) return;
     if (!user) return;
-    const db = getFirebaseDb();
-    if (!db || !isFirebaseConfigured) return;
     setBusy(c.id);
     try {
-      const now = new Date().toISOString();
-      await addDoc(collection(db, "campaign_rsvps"), {
+      await createBookingForCampaign({
         campaignId: c.id,
-        attendeeUid: user.uid,
-        seats: 1,
-        createdAt: now,
-        updatedAt: now,
+        providerUid: c.ownerUid,
+        providerName: c.businessName,
+        title: c.title,
+        suburb: c.suburb,
+        date: c.date,
+        time: c.time || "",
+        priceCents: c.priceCents,
+        customerUid: user.uid,
+        listingId: c.venueId || undefined,
       });
       trackContentAction("booking_intent", c.id, { source: "experiences" });
       setJoined((j) => ({ ...j, [c.id]: true }));

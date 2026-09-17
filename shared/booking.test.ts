@@ -6,6 +6,8 @@ import {
   canProviderConfirm,
   isBookingStatus,
   paymentStatusForPrice,
+  isBusinessProviderBooking,
+  isOpenProviderBooking,
   quoteFees,
 } from "./booking";
 
@@ -49,6 +51,15 @@ describe("booking engine", () => {
     expect(bookingValid(good)).toBe(true);
     expect(bookingValid({ ...good, date: "tomorrow" })).toBe(false);
     expect(bookingValid({ ...good, priceCents: -1 })).toBe(false);
+    expect(
+      bookingValid({
+        ...good,
+        providerKind: "business",
+        providerName: "Harbour Hotel",
+        campaignId: "camp1",
+        listingId: "list1",
+      }),
+    ).toBe(true);
   });
 
   it("accepts host plan bookings without a mate request", () => {
@@ -75,5 +86,18 @@ describe("booking engine", () => {
     expect(isBookingStatus("shipped")).toBe(false);
     expect(paymentStatusForPrice(0)).toBe("paid");
     expect(paymentStatusForPrice(8000)).toBe("unpaid");
+  });
+
+  it("scopes business inbox to the owning provider", () => {
+    expect(
+      isBusinessProviderBooking({ providerKind: "business", providerUid: "biz1" }, "biz1"),
+    ).toBe(true);
+    expect(
+      isBusinessProviderBooking({ providerKind: "business", providerUid: "biz1" }, "other"),
+    ).toBe(false);
+    expect(isBusinessProviderBooking({ providerKind: "mate", providerUid: "biz1" }, "biz1")).toBe(false);
+    expect(isOpenProviderBooking("pending")).toBe(true);
+    expect(isOpenProviderBooking("completed")).toBe(false);
+    expect(isOpenProviderBooking("cancelled")).toBe(false);
   });
 });

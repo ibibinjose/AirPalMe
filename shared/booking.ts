@@ -33,6 +33,7 @@ export const DEFAULT_FEE_CONFIG: FeeConfig = {
 
 export interface Booking {
   id: string;
+  /** Mate request id, or campaign id when providerKind is business. */
   requestId: string;
   planId: string;
   customerUid: string;
@@ -50,11 +51,15 @@ export interface Booking {
   cancelReason: string;
   createdAt: string;
   updatedAt: string;
+  /** Optional listing this booking is for (business vertical). */
+  listingId?: string;
+  /** Optional Experience campaign this booking is for. */
+  campaignId?: string;
 }
 
 export interface BookingInput {
-  requestId: string;
-  planId: string;
+  requestId?: string;
+  planId?: string;
   providerUid: string;
   providerKind: BookingProviderKind;
   providerName: string;
@@ -63,6 +68,8 @@ export interface BookingInput {
   date: string;
   time: string;
   priceCents: number;
+  listingId?: string;
+  campaignId?: string;
 }
 
 /** @deprecated Use DEFAULT_FEE_CONFIG.platformFeeBps — kept so existing imports compile. */
@@ -88,8 +95,13 @@ export function isPaymentStatus(s: string): s is PaymentStatus {
 }
 
 export function bookingValid(input: BookingInput): boolean {
+  const hasTarget =
+    Boolean(input.requestId?.trim()) ||
+    Boolean(input.planId?.trim()) ||
+    Boolean(input.campaignId?.trim()) ||
+    Boolean(input.listingId?.trim());
   return (
-    (input.requestId.trim().length > 0 || input.planId.trim().length > 0) &&
+    hasTarget &&
     input.providerUid.trim().length > 0 &&
     (input.providerKind === "mate" || input.providerKind === "business" || input.providerKind === "host") &&
     input.providerName.trim().length >= 2 &&
@@ -117,4 +129,14 @@ export function canProviderComplete(status: BookingStatus): boolean {
 
 export function isBookingStatus(s: string): s is BookingStatus {
   return (BOOKING_STATUSES as readonly string[]).includes(s);
+}
+
+/** Business-owner inbox rows: same bookings collection, providerKind business. */
+export function isBusinessProviderBooking(b: Pick<Booking, "providerKind" | "providerUid">, ownerUid: string): boolean {
+  return b.providerKind === "business" && b.providerUid === ownerUid;
+}
+
+/** Active (non-terminal) bookings the owner still needs to act on. */
+export function isOpenProviderBooking(status: BookingStatus): boolean {
+  return status === "pending" || status === "confirmed" || status === "in_progress";
 }
