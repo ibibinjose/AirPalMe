@@ -66,6 +66,11 @@ service cloud.firestore {
         .hasAny(['ownerId', 'members', 'id']);
     }
 
+    // Account shelf: this user's bios, roamable across devices. Owner only.
+    match /users/{userId}/profiles/{profileId} {
+      allow read, write: if signedIn() && request.auth.uid == userId;
+    }
+
     match /users/{userId} {
       allow read: if signedIn() && (request.auth.uid == userId || platformAdmin());
       allow create, delete: if false;
@@ -427,6 +432,23 @@ service cloud.firestore {
     match /promotion_winners/{winnerId} {
       allow get, list: if signedIn() && (
         resource.data.uid == request.auth.uid || platformAdmin()
+      );
+      allow write: if false;
+    }
+
+    // Waves: history and per-pair cooldown, written by the sendWave callable only.
+    match /waves/{waveId} {
+      allow read: if signedIn() && (
+        resource.data.fromUid == request.auth.uid
+        || resource.data.toUid == request.auth.uid
+        || platformAdmin()
+      );
+      allow write: if false;
+    }
+
+    match /wave_state/{stateId} {
+      allow read: if signedIn() && (
+        resource.data.fromUid == request.auth.uid || platformAdmin()
       );
       allow write: if false;
     }

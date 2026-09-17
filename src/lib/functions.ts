@@ -23,6 +23,7 @@ import type {
   GetPlanByInviteCodeRequest,
   GetPlanByInviteCodeResponse,
 } from "@shared/plan";
+import type { SendWaveRequest, SendWaveResponse } from "@shared/waves";
 import { getFirebaseFunctions, isFirebaseConfigured } from "./firebase";
 
 export function liveBackendEnabled() {
@@ -200,6 +201,10 @@ export function claimBioOfferRemote(data: { handle: string; dealId: string }) {
 
 export function transferHandleRemote(data: { from: string; to: string }) {
   return callFunction<typeof data, { handle: string; profileId: string }>(CALLABLES.transferHandle, data);
+}
+
+export function sendWaveRemote(data: SendWaveRequest) {
+  return callFunction<SendWaveRequest, SendWaveResponse>(CALLABLES.sendWave, data);
 }
 
 export function listBioDirectoryRemote() {

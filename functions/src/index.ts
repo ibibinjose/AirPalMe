@@ -22,6 +22,7 @@ export {
   claimBioOffer,
   transferHandle,
   listBioDirectory,
+  adoptProfilesByEmail,
 } from "./bio";
 export {
   createPlan,
@@ -58,4 +59,5 @@ export {
   seedPromotionDemo,
 } from "./promotions";
 export { createBroadcast, reviewBroadcast } from "./notifications";
+export { sendWave } from "./waves";
 

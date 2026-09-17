@@ -302,6 +302,7 @@ export const NOTIFICATION_KINDS = [
   "points_redeemed",
   "winner_update",
   "announcement",
+  "wave_received",
 ] as const;
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 

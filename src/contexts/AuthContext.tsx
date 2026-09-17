@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { EmailAuthProvider, createUserWithEmailAndPassword, linkWithCredential, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import type { UserProfile, UserRole } from "@shared/airpal-data";
 import { buildHostProperty, parseHostPropertyKind, type HostPropertyKind } from "@shared/host-property";
@@ -255,7 +255,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const auth = getFirebaseAuth();
         if (!auth) throw new Error("Sign-up needs Firebase.");
         const cleanEmail = normalizeEmail(email);
-        const cred = await createUserWithEmailAndPassword(auth, cleanEmail, opts?.password || "");
+        // Upgrading an anonymous session keeps the SAME uid, so everything the
+        // guest made (bio, plans, tickets) stays attached instead of orphaning.
+        const anon = auth.currentUser && auth.currentUser.isAnonymous ? auth.currentUser : null;
+        const cred = anon
+          ? await linkWithCredential(anon, EmailAuthProvider.credential(cleanEmail, opts?.password || ""))
+          : await createUserWithEmailAndPassword(auth, cleanEmail, opts?.password || "");
         await setAuthDisplayName(cred.user, name);
         try {
           await sendAccountVerificationEmail(cred.user);

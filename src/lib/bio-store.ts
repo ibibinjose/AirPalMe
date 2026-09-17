@@ -51,6 +51,25 @@ export function persistBios(rows: BioProfile[]) {
   listeners.forEach((fn) => fn());
 }
 
+function profileTime(p: BioProfile): number {
+  const t = p.updatedAt ? Date.parse(p.updatedAt) : NaN;
+  return Number.isFinite(t) ? t : 0;
+}
+
+/**
+ * Merge this device's profiles with the account cloud. One profile per id;
+ * the newer write wins, so signing in anywhere converges instead of forking.
+ */
+export function mergeProfiles(local: BioProfile[], remote: BioProfile[]): BioProfile[] {
+  const by = new Map<string, BioProfile>();
+  for (const row of local) by.set(row.id, withCatalog(row));
+  for (const row of remote) {
+    const prev = by.get(row.id);
+    if (!prev || profileTime(row) >= profileTime(prev)) by.set(row.id, withCatalog(row));
+  }
+  return Array.from(by.values());
+}
+
 export function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }

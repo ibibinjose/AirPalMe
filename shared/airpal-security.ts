@@ -66,6 +66,7 @@ export const CALLABLES = {
   postPlanCommentRemote: "postPlanCommentRemote",
   getPlanByInviteCode: "getPlanByInviteCode",
   confirmExperienceBooking: "confirmExperienceBookingRemote",
+  sendWave: "sendWave",
 } as const;
 
 /** Canonical platform Super Admin. Extra addresses can be added via PLATFORM_ADMIN_EMAILS. */

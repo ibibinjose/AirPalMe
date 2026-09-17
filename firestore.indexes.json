@@ -15,6 +15,16 @@
       ]
     },
     {
+      "collectionGroup": "profiles",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "ownerEmail",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "promotion_notifications",
       "queryScope": "COLLECTION",
       "fields": [

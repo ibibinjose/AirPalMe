@@ -8,7 +8,6 @@ import { DebugInfoOverlay } from "@/components/debug/DebugInfoOverlay";
 import { NativeSplashTransition } from "@/components/layout/NativeSplashTransition";
 import { AppProviders } from "@/app/providers";
 import { AppRoutes } from "@/app/routes";
-import { ensureAnonymousSession } from "@/lib/firebase";
 import { initNativeApp } from "@/lib/native";
 import { installErrorTracking } from "@/lib/error-report";
 import { initKeyboardManager } from "@/lib/keyboard";
@@ -17,7 +16,9 @@ import { useEffect } from "react";
 function Boot() {
   useEffect(() => {
     installErrorTracking();
-    void ensureAnonymousSession();
+    // No boot-time anonymous sign-in: a guest identity is created lazily, only
+    // when the stay QR check-in (or another identity-needing action) requires
+    // one. Signing up later upgrades that same uid instead of forking.
     void initNativeApp({ deferSplashHide: true });
     const cleanupKeyboard = initKeyboardManager();
     return () => {
