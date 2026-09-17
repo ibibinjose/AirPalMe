@@ -215,22 +215,22 @@ export function DiscoverPage() {
             <div aria-hidden className="h-[200px] w-full bg-ink md:h-[280px]" />
           )}
           <div className="absolute inset-x-0 bottom-0 p-5 md:p-8">
-            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-slate-950/60 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
-              <Sparkles size={12} className="text-white/80" />
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full apple-liquid-glass-dark px-3.5 py-1 text-xs font-bold text-white shadow-lg">
+              <Sparkles size={12} className="text-white/90" />
               <span>AirPal Circle · {placeName}</span>
             </div>
             <h1 className="font-display text-3xl font-extrabold leading-tight tracking-tight text-white md:text-5xl">
               Discover {placeName}.
             </h1>
-            <p className="mt-1 text-sm font-medium text-white/75">Places, events, and plans around you right now.</p>
+            <p className="mt-1 text-sm font-medium text-white/85">Places, events, and plans around you right now.</p>
 
-            <label className="mt-3 flex h-10 w-full max-w-md items-center gap-2 rounded-xl border border-ink/20 bg-white/95 px-3 text-ink shadow-xs">
-              <Search size={15} className="shrink-0 text-brand" />
+            <label className="mt-3 flex h-10 w-full max-w-md items-center gap-2 rounded-xl apple-liquid-glass-clear px-3.5 text-white shadow-lg">
+              <Search size={15} className="shrink-0 text-white/90" />
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={t("aroundYouSearch")}
-                className="w-full bg-transparent text-[13px] font-medium outline-none placeholder:text-mute"
+                className="w-full bg-transparent text-[13px] font-semibold outline-none text-white placeholder:text-white/70"
               />
             </label>
 
@@ -238,50 +238,50 @@ export function DiscoverPage() {
               <button
                 type="button"
                 onClick={() => nav("/mate")}
-                className="group flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl transition hover:border-white/30 hover:bg-white/15"
+                className="group flex cursor-pointer items-center justify-center gap-2 rounded-xl apple-liquid-glass-dark px-3 py-2 text-white shadow-lg transition hover:scale-[1.03] active:scale-95"
               >
                 <Users size={15} className="shrink-0 text-white transition group-hover:scale-110" />
-                <span className="text-xs font-semibold tracking-tight">Mates</span>
+                <span className="text-xs font-bold tracking-tight">Mates</span>
               </button>
               <button
                 type="button"
                 onClick={() => nav("/concierge")}
-                className="group flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/10 border border-white/20 text-white backdrop-blur-xl hover:bg-white/15 hover:border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition cursor-pointer"
+                className="group flex cursor-pointer items-center justify-center gap-2 rounded-xl apple-liquid-glass-dark px-3 py-2 text-white shadow-lg transition hover:scale-[1.03] active:scale-95"
               >
-                <Building2 size={15} className="text-white group-hover:scale-110 transition shrink-0" />
-                <span className="text-xs font-semibold tracking-tight">Stay</span>
+                <Building2 size={15} className="shrink-0 text-white transition group-hover:scale-110" />
+                <span className="text-xs font-bold tracking-tight">Stay</span>
               </button>
               <button
                 type="button"
                 onClick={() => nav("/calendar")}
-                className="group flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/10 border border-white/20 text-white backdrop-blur-xl hover:bg-white/15 hover:border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition cursor-pointer"
+                className="group flex cursor-pointer items-center justify-center gap-2 rounded-xl apple-liquid-glass-dark px-3 py-2 text-white shadow-lg transition hover:scale-[1.03] active:scale-95"
               >
-                <Ticket size={15} className="text-white group-hover:scale-110 transition shrink-0" />
-                <span className="text-xs font-semibold tracking-tight">Events</span>
+                <Ticket size={15} className="shrink-0 text-white transition group-hover:scale-110" />
+                <span className="text-xs font-bold tracking-tight">Events</span>
               </button>
               <button
                 type="button"
                 onClick={() => nav("/plan")}
-                className="group flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/10 border border-white/20 text-white backdrop-blur-xl hover:bg-white/15 hover:border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition cursor-pointer"
+                className="group flex cursor-pointer items-center justify-center gap-2 rounded-xl apple-liquid-glass-dark px-3 py-2 text-white shadow-lg transition hover:scale-[1.03] active:scale-95"
               >
-                <CalendarDays size={15} className="text-white group-hover:scale-110 transition shrink-0" />
-                <span className="text-xs font-semibold tracking-tight">Plans</span>
+                <CalendarDays size={15} className="shrink-0 text-white transition group-hover:scale-110" />
+                <span className="text-xs font-bold tracking-tight">Plans</span>
               </button>
               <button
                 type="button"
                 onClick={() => nav("/?chip=deals")}
-                className="group flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/10 border border-white/20 text-white backdrop-blur-xl hover:bg-white/15 hover:border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition cursor-pointer"
+                className="group flex cursor-pointer items-center justify-center gap-2 rounded-xl apple-liquid-glass-dark px-3 py-2 text-white shadow-lg transition hover:scale-[1.03] active:scale-95"
               >
-                <BadgePercent size={15} className="text-white group-hover:scale-110 transition shrink-0" />
-                <span className="text-xs font-semibold tracking-tight">Deals</span>
+                <BadgePercent size={15} className="shrink-0 text-white transition group-hover:scale-110" />
+                <span className="text-xs font-bold tracking-tight">Deals</span>
               </button>
               <button
                 type="button"
                 onClick={() => nav("/guide")}
-                className="group flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl transition hover:border-white/30 hover:bg-white/15"
+                className="group flex cursor-pointer items-center justify-center gap-2 rounded-xl apple-liquid-glass-dark px-3 py-2 text-white shadow-lg transition hover:scale-[1.03] active:scale-95"
               >
                 <Compass size={15} className="shrink-0 text-white transition group-hover:scale-110" />
-                <span className="text-xs font-semibold tracking-tight">Guides</span>
+                <span className="text-xs font-bold tracking-tight">Guides</span>
               </button>
             </div>
           </div>

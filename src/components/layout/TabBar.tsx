@@ -62,7 +62,7 @@ function TabItem({
       {on && (
         <motion.div
           layoutId="activeTabPill"
-          className="absolute inset-x-1 inset-y-1 rounded-2xl bg-brand/80 border border-white/20 shadow-md shadow-brand/40"
+          className="absolute inset-x-1 inset-y-1 rounded-2xl apple-liquid-glass-active"
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
         />
       )}
@@ -95,8 +95,8 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
       transition={{ duration: 0.25, ease: enterEase }}
     >
       <div className="relative mx-auto max-w-md px-3 pb-[max(0.6rem,env(safe-area-inset-bottom))] pointer-events-auto">
-        {/* Floating Dark Glass Dock Shell */}
-        <div className="relative flex items-center justify-between rounded-3xl border-2 border-white/10 bg-slate-950/90 p-1.5 backdrop-blur-2xl shadow-2xl shadow-slate-950/60 text-white">
+        {/* Floating Apple Liquid Glass Dock Shell */}
+        <div className="relative flex items-center justify-between rounded-3xl apple-liquid-glass-dark p-1.5 text-white">
           
           {/* Left Navigation Items */}
           <div className="flex flex-1 items-center gap-1">
