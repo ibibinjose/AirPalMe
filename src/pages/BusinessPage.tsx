@@ -18,73 +18,12 @@ import { PhoneField } from "@/components/forms/PhoneField";
 import { addressOk, countryByCode, emptyAddress, formatAddress, formatGps, isValidPhone, type AddressParts } from "@shared/geo-address";
 import { locateBusiness } from "@/lib/locate";
 import { ImageField } from "@/components/media/ImageField";
-import { Link } from "wouter";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase";
 import { HostFreshnessBanner } from "@/components/host/HostFreshnessBanner";
 import { fieldInput, fieldTextarea } from "@/components/forms/ValidField";
 import { BusinessBookingsSection } from "@/components/booking/BusinessBookingsSection";
 import { BusinessNavHub } from "@/components/business/BusinessNavHub";
-
-function BusinessOverviewStrip({ listingActive, dealLive }: { listingActive: boolean; dealLive: boolean }) {
-  const { user } = useAuth();
-  const [stats, setStats] = useState<{ campaigns: number; rsvps: number } | null>(null);
-
-  useEffect(() => {
-    const db = getFirebaseDb();
-    if (!db || !user) {
-      setStats({ campaigns: 0, rsvps: 0 });
-      return;
-    }
-    void (async () => {
-      try {
-        const csnap = await getDocs(query(collection(db, "campaigns"), where("ownerUid", "==", user.uid)));
-        let rsvps = 0;
-        for (const c of csnap.docs) {
-          try {
-            const rsnap = await getDocs(query(collection(db, "campaign_rsvps"), where("campaignId", "==", c.id)));
-            for (const r of rsnap.docs) rsvps += Number((r.data() as { seats?: number }).seats || 1);
-          } catch {
-            // roster reads need campaign ownership; skip silently.
-          }
-        }
-        setStats({ campaigns: csnap.size, rsvps });
-      } catch {
-        setStats({ campaigns: 0, rsvps: 0 });
-      }
-    })();
-  }, [user]);
-
-  const cards = [
-    { label: "Listing", value: listingActive ? "Live" : "Draft" },
-    { label: "Deal", value: dealLive ? "Live" : "Off" },
-    { label: "Campaigns", value: String(stats?.campaigns ?? "…") },
-    { label: "Bookings", value: String(stats?.rsvps ?? "…") },
-  ];
-  return (
-    <div className="mt-3">
-      <div className="grid grid-cols-4 gap-2">
-        {cards.map((c) => (
-          <div key={c.label} className="rounded-2xl bg-card p-2.5 text-center ring-1 ring-line">
-            <p className="font-display text-lg font-semibold">{c.value}</p>
-            <p className="text-[10px] text-mute">{c.label}</p>
-          </div>
-        ))}
-      </div>
-      <div className="mt-2 flex flex-wrap gap-2 text-[13px] font-semibold">
-        <Link href="/business/campaigns" className="text-brand">
-          Create an Experience →
-        </Link>
-        <Link href="/business/promotions" className="text-brand">
-          Promotions & giveaways →
-        </Link>
-        <Link href="/business/onboard" className="text-mute">
-          Claim another venue →
-        </Link>
-      </div>
-    </div>
-  );
-}
 
 export function BusinessPage() {
   const [, nav] = useLocation();

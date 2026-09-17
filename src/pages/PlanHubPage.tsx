@@ -2,13 +2,9 @@ import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import {
   ArrowRight,
-  Beer,
   Clock,
-  Coffee,
   Compass,
-  Footprints,
   HeartHandshake,
-  Palette,
   Plus,
   Radar,
   Search,

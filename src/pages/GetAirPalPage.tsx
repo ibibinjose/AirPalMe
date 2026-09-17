@@ -18,8 +18,6 @@ import {
   Sparkles,
   Users,
   Bed,
-  MapPin,
-  Calendar,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
@@ -161,14 +159,11 @@ export function GetAirPalPage() {
 
       {/* Hero Section */}
       <div className="mt-8 text-center">
-        <div className="relative mx-auto inline-block">
-          <div className="absolute -inset-2 rounded-full bg-gradient-to-tr from-brand via-gold to-brand/40 opacity-30 blur-lg animate-pulse" />
-          <img
-            src="/logo-mark.png"
-            alt="AirPal"
-            className="relative mx-auto h-24 w-24 rounded-3xl border-2 border-ink bg-paper shadow-md"
-          />
-        </div>
+        <img
+          src="/logo-mark.png"
+          alt="AirPal"
+          className="mx-auto h-24 w-24 rounded-3xl border-2 border-ink bg-white p-2 shadow-md object-contain"
+        />
 
         <h1 className="font-display mt-5 text-4xl font-extrabold tracking-tight md:text-5xl text-ink">
           Get AirPal

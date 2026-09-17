@@ -1,7 +1,6 @@
 import { useLocation } from "wouter";
 import {
   ArrowRight,
-  BadgePercent,
   Building2,
   CalendarDays,
   CheckCircle2,

@@ -1,5 +1,5 @@
-import { Link, useLocation } from "wouter";
-import { Building2, Calendar, Gift, Sparkles, Users, Store, CheckCircle2, ChevronRight, PlusCircle } from "lucide-react";
+import { Link } from "wouter";
+import { Gift, Sparkles, ChevronRight, PlusCircle } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 export type BusinessRoleDomain = "venue" | "bookings" | "experiences" | "promotions" | "onboard";
@@ -14,46 +14,6 @@ interface BusinessNavHubProps {
   businessName: string;
 }
 
-const DOMAIN_ROLES = [
-  {
-    id: "place",
-    domain: "venue",
-    title: "Venue & Place",
-    role: "Venue Host",
-    description: "Manage location, opening hours, address pin, hero photo, and @handle",
-    icon: Building2,
-    badgeColor: "bg-blue-500/10 text-blue-700 border-blue-500/30",
-  },
-  {
-    id: "bookings",
-    domain: "operations",
-    title: "Bookings & Door",
-    role: "Operations Manager",
-    description: "Real-time guest lists, RSVPs, check-ins, and customer bookings",
-    icon: Calendar,
-    badgeColor: "bg-amber-500/10 text-amber-700 border-amber-500/30",
-  },
-  {
-    id: "experiences",
-    domain: "experiences",
-    title: "Experiences",
-    role: "Experience Provider",
-    description: "Create food tours, ticketed events, classes, and group campaigns",
-    icon: Sparkles,
-    badgeColor: "bg-purple-500/10 text-purple-700 border-purple-500/30",
-    href: "/business/campaigns",
-  },
-  {
-    id: "offer",
-    domain: "marketing",
-    title: "Deals & Offers",
-    role: "Marketing Promoter",
-    description: "Publish local discounts, instant offers, and promotional giveaways",
-    icon: Gift,
-    badgeColor: "bg-rose-500/10 text-rose-700 border-rose-500/30",
-  },
-] as const;
-
 export function BusinessNavHub({
   activeTab,
   onTabChange,
@@ -63,8 +23,6 @@ export function BusinessNavHub({
   bookingCount,
   businessName,
 }: BusinessNavHubProps) {
-  const [, nav] = useLocation();
-
   return (
     <div className="space-y-4">
       {/* Domain Role Quick Cards */}
