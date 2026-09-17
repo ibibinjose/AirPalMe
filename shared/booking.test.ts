@@ -12,6 +12,7 @@ import {
 describe("booking engine", () => {
   const good = {
     requestId: "r1",
+    planId: "",
     providerUid: "u9",
     providerKind: "mate" as const,
     providerName: "Ava",
