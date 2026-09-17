@@ -1,7 +1,7 @@
 # AirPal store submission pack
 
 App: **AirPal** · ID `me.airpal.app` · version 2.0.0 (iOS build 2, Android versionCode 2)
-Legal entity: **SarvamDaily Pty Ltd** trading as **AirPal.Me**
+Legal entity: **SarvamDaily Pty Ltd** trading as **AirPal.Me** · ABN **83 702 462 977** · Apple Team ID **26WGXSNG58**
 Web: https://airpal.me · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms · Contact: https://airpal.me/contact
 Support email: hello@airpal.me (forwards to the operator inbox — see `docs/email-setup.md`)
 
@@ -28,7 +28,7 @@ Support email: hello@airpal.me (forwards to the operator inbox — see `docs/ema
 ## Needs-you (cannot be done from this checkout)
 
 1. **Play App Signing SHA-256** → paste into `public/.well-known/assetlinks.json` (replacing `REPLACE_WITH_PLAY_APP_SIGNING_SHA256`), redeploy hosting.
-2. **Apple Team ID** → paste into `public/.well-known/apple-app-site-association` (`REPLACE_WITH_TEAMID.me.airpal.app`), redeploy hosting. Universal Links then verify automatically.
+2. **Apple Team ID** → `26WGXSNG58` is in `apple-app-site-association`. Redeploy hosting after any change. Universal Links then verify automatically.
 3. **Screenshots + feature graphic + descriptions** → `docs/store/listing.md` has the copy; upload in Play Console / App Store Connect yourself.
 4. **Signing & upload** → run these on your Mac (builds need your keychain/keys; they cannot run in a sandboxed agent):
    ```sh

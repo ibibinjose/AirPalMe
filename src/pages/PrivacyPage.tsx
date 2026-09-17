@@ -11,7 +11,7 @@ export function PrivacyPage() {
     >
       <div className="callout">
         <p>
-          Controller: {LEGAL.operator}, based in {LEGAL.location}. Privacy contact:{" "}
+          Controller: {LEGAL.operator} (ABN {LEGAL.abn}), based in {LEGAL.location}. Privacy contact:{" "}
           <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a> or the{" "}
           <Link href="/contact">contact form</Link>. Last updated {LEGAL.updated}.
         </p>

@@ -1,41 +1,44 @@
 # AirPal — store listing copy (paste into Play Console / App Store Connect)
 
+Legal: SarvamDaily Pty Ltd trading as AirPal.Me · ABN 83 702 462 977  
+Support: hello@airpal.me · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms
+
 ## App name
 
 AirPal
 
 ## Short description (Play, ≤80 chars)
 
-Find places, make plans, meet mates in Kerala. Life Made Easy.
+Find someone to go with you. Plans, places and mates in Sydney. Life Made Easy.
 
 ## Full description
 
-AirPal is your local companion for Kerala, India.
+AirPal is your local companion for Sydney.
 
-FIND YOUR PLACE — Browse stays, cafés, and attractions across Kovalam, Kochi, Munnar, Alleppey, Varkala, Wayanad, Kumarakom, and Trivandrum, with verified photos and walking tours.
+FIND SOMEONE TO GO WITH YOU — Create a plan, match with an approved AirPal Mate, message in-app, and book.
 
-MAKE PLANS — Create outings, invite friends with a code, vote on stops, and keep everyone in the loop.
+MAKE PLANS — Build an outing, invite friends with a code, vote on stops, and keep everyone in the loop.
 
-MEET MATES — Find travel companions, RSVP to events, and share calendars.
+DISCOVER WHAT'S AROUND — Browse places, events, and experiences nearby. Scan a host QR for stay Wi-Fi, dining, and help — no account needed for guests.
 
-LOCAL DEALS — Claim perks from nearby businesses with a quick QR scan and show them at the till.
+LOCAL DEALS — Claim perks from nearby businesses with a QR scan and show them at the till.
 
-STAY FOOD ORDERS — Order from the hotel menu (room service, dine-in, or pickup) and pay by card in the app.
-
-SHARE YOUR BIO — Tap your profile onto an NFC card and anyone who taps it opens your bio.
-
-FOR HOSTS & BUSINESSES — List rooms, publish perks, sell event stalls, and approve every guest yourself. Free to list.
+FOR HOSTS & BUSINESSES — List a stay or place, publish perks, and run experiences. Apply once; AirPal reviews before you go live.
 
 Life Made Easy.
 
 ## Subtitle (App Store, ≤30 chars)
 
-Kerala travel, plans & mates
+Sydney mates, plans & places
 
 ## Keywords (App Store, ≤100 chars)
 
-kerala,kovalam,kochi,travel,homestay,deals,events,plans,friends
+sydney,mates,plans,events,stay,deals,travel,companion,experiences,local
 
 ## Category
 
 Travel. Age rating: Everyone / 4+.
+
+## Seller / developer
+
+SarvamDaily Pty Ltd trading as AirPal.Me

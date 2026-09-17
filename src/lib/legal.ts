@@ -3,6 +3,7 @@ export const LEGAL = {
   site: "https://airpal.me",
   company: "SarvamDaily Pty Ltd",
   tradingAs: "AirPal.Me",
+  abn: "83 702 462 977",
   /** ASIC-style line for terms, privacy, invoices. */
   operator: "SarvamDaily Pty Ltd trading as AirPal.Me",
   /** Public byline. */

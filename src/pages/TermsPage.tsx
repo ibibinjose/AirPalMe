@@ -11,7 +11,7 @@ export function TermsPage() {
     >
       <div className="callout">
         <p>
-          Operator: {LEGAL.operator}, {LEGAL.location}. Governing law: {LEGAL.law}. Contact:{" "}
+          Operator: {LEGAL.operator} (ABN {LEGAL.abn}), {LEGAL.location}. Governing law: {LEGAL.law}. Contact:{" "}
           <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>. Effective {LEGAL.updated}.
         </p>
       </div>

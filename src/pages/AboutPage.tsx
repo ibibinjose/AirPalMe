@@ -29,7 +29,7 @@ export function AboutPage() {
           ))}
         </ul>
         <p className="mt-6 text-[15px] leading-relaxed text-ink/85">
-          We started in The Rocks, Sydney — sandstone lanes, harbour weather, and a code on a door. The product is built in {LEGAL.location}. {LEGAL.brand} is operated by {LEGAL.company}.
+          We started in The Rocks, Sydney — sandstone lanes, harbour weather, and a code on a door. The product is built in {LEGAL.location}. {LEGAL.brand} is operated by {LEGAL.company} (ABN {LEGAL.abn}).
         </p>
         <p className="mt-4 text-[15px] leading-relaxed text-ink/85">
           <Link href="/contact" className="text-brand">
