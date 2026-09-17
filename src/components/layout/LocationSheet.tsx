@@ -11,10 +11,11 @@ import {
   MapPin,
   Share2,
   ShieldCheck,
+  Compass,
 } from "lucide-react";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { useLocalNow } from "@/hooks/useLocalNow";
-import { CITY_OPTIONS, cityCenter, type CityOption } from "@/lib/cities";
+import { CITY_OPTIONS, SYDNEY_PRECINCTS, cityCenter, type CityOption } from "@/lib/cities";
 import { shareCurrentLocation } from "@/lib/share";
 import { cn } from "@/lib/cn";
 import { useAuth } from "@/contexts/AuthContext";
@@ -78,44 +79,45 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
       aria-labelledby="location-picker-title"
     >
       <div
-        className="relative flex flex-col w-full max-w-lg max-h-[min(88vh,calc(var(--visual-viewport-height,100dvh)-1.5rem))] rounded-t-[32px] sm:rounded-[32px] bg-card shadow-2xl ring-1 ring-line overflow-hidden animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 transition-all duration-200"
+        className="relative flex flex-col w-full max-w-lg max-h-[min(88vh,calc(var(--visual-viewport-height,100dvh)-1.5rem))] rounded-t-[32px] sm:rounded-[32px] bg-card border-2 border-ink shadow-2xl overflow-hidden animate-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 transition-all"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Mobile Pull Tab */}
-        <div className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-line sm:hidden" />
+        <div className="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-ink/20 sm:hidden" />
 
         {/* Header (Pinned) */}
-        <div className="flex items-center justify-between border-b border-line/70 bg-gradient-to-r from-card via-paper to-card px-5 py-3.5 shrink-0">
+        <div className="flex items-center justify-between border-b-2 border-ink bg-card px-5 py-4 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="grid h-8 w-8 place-items-center rounded-xl bg-gold/15 text-gold">
-              <MapPin size={16} />
+            <div className="grid h-9 w-9 place-items-center rounded-xl bg-amber-400 text-slate-950 border border-ink shadow-xs">
+              <MapPin size={18} />
             </div>
             <div>
-              <h2 id="location-picker-title" className="font-display text-base font-bold text-ink leading-tight">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-slate-950 border border-ink shadow-xs">
+                <Sparkles size={11} />
+                <span>Sydney Precincts &amp; Cities</span>
+              </div>
+              <h2 id="location-picker-title" className="font-display text-lg font-bold text-ink leading-tight mt-0.5">
                 Location &amp; Precinct
               </h2>
-              <p className="text-[11px] text-mute">
-                Currently exploring in <strong className="text-ink font-semibold">{city || "Sydney"}</strong>
-              </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-full bg-card text-mute hover:text-ink ring-1 ring-line transition hover:bg-paper cursor-pointer"
+            className="grid h-8 w-8 place-items-center rounded-full bg-paper text-ink hover:bg-card border-2 border-ink transition cursor-pointer shadow-xs"
             aria-label="Close"
           >
-            <X size={15} />
+            <X size={16} />
           </button>
         </div>
 
         {/* Scrollable Content Body */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {/* Quick Share Current Location & Guide */}
-          <div className="flex items-center justify-between rounded-2xl bg-gradient-to-r from-paper via-card to-paper p-3.5 ring-1 ring-line">
+          <div className="flex items-center justify-between rounded-2xl border-2 border-ink bg-paper p-3.5 shadow-xs">
             <div className="min-w-0 pr-3">
               <div className="flex items-center gap-1.5">
-                <Share2 size={13} className="text-gold" />
+                <Share2 size={14} className="text-brand" />
                 <span className="text-xs font-bold text-ink">Share Location &amp; Guide</span>
               </div>
               <p className="mt-0.5 text-[11px] text-mute leading-snug">
@@ -127,10 +129,10 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
               onClick={() => {
                 void shareCurrentLocation(city);
               }}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-xs font-medium text-white shadow-xs hover:bg-ink/90 active:scale-95 transition cursor-pointer"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-ink px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-ink/90 active:scale-95 transition cursor-pointer border border-ink"
               aria-label="Share current location and guide link"
             >
-              <Share2 size={12} />
+              <Share2 size={13} />
               <span>Share</span>
             </button>
           </div>
@@ -145,16 +147,16 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
                 onClose();
               }}
               className={cn(
-                "group relative flex items-start gap-3 rounded-2xl p-3.5 text-left ring-1 transition active:scale-[0.98] cursor-pointer",
+                "group relative flex items-start gap-3 rounded-2xl p-3.5 text-left border-2 transition active:scale-[0.98] cursor-pointer shadow-xs",
                 isGpsActive
-                  ? "bg-ink text-white ring-ink shadow-md"
-                  : "bg-paper text-ink ring-line hover:bg-card",
+                  ? "bg-ink text-white border-ink"
+                  : "bg-paper text-ink border-ink hover:bg-card",
               )}
             >
               <div
                 className={cn(
-                  "grid h-9 w-9 shrink-0 place-items-center rounded-xl transition",
-                  isGpsActive ? "bg-white/20 text-white" : "bg-brand/10 text-brand group-hover:scale-105",
+                  "grid h-9 w-9 shrink-0 place-items-center rounded-xl transition border border-ink",
+                  isGpsActive ? "bg-amber-400 text-slate-950 font-bold" : "bg-brand/10 text-brand group-hover:scale-105",
                 )}
               >
                 <Navigation size={17} className={cn(isGpsActive && "animate-pulse")} />
@@ -166,7 +168,7 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
                     <span className="flex h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-emerald-400/40" />
                   )}
                 </div>
-                <p className={cn("text-[11px] mt-0.5 leading-snug", isGpsActive ? "text-white/80" : "text-mute")}>
+                <p className={cn("text-[11px] mt-0.5 leading-snug font-medium", isGpsActive ? "text-white/80" : "text-mute")}>
                   Tracks what’s around you in real time
                 </p>
               </div>
@@ -181,49 +183,87 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
                 onClose();
               }}
               className={cn(
-                "group relative flex items-start gap-3 rounded-2xl p-3.5 text-left ring-1 transition active:scale-[0.98] cursor-pointer",
+                "group relative flex items-start gap-3 rounded-2xl p-3.5 text-left border-2 transition active:scale-[0.98] cursor-pointer shadow-xs",
                 isStayActive
-                  ? "bg-ink text-white ring-ink shadow-md"
-                  : "bg-paper text-ink ring-line hover:bg-card",
+                  ? "bg-ink text-white border-ink"
+                  : "bg-paper text-ink border-ink hover:bg-card",
               )}
             >
               <div
                 className={cn(
-                  "grid h-9 w-9 shrink-0 place-items-center rounded-xl transition",
-                  isStayActive ? "bg-white/20 text-white" : "bg-amber-500/10 text-gold group-hover:scale-105",
+                  "grid h-9 w-9 shrink-0 place-items-center rounded-xl transition border border-ink",
+                  isStayActive ? "bg-amber-400 text-slate-950 font-bold" : "bg-amber-500/10 text-amber-900 dark:text-amber-300 group-hover:scale-105",
                 )}
               >
                 <Building2 size={17} />
               </div>
               <div className="min-w-0 flex-1">
-                <span className="text-xs font-bold block">Stay / Precinct</span>
-                <p className={cn("text-[11px] mt-0.5 leading-snug", isStayActive ? "text-white/80" : "text-mute")}>
-                  Hotel pin or The Rocks precinct
+                <span className="text-xs font-bold block">Stay / Hotel Pin</span>
+                <p className={cn("text-[11px] mt-0.5 leading-snug font-medium", isStayActive ? "text-white/80" : "text-mute")}>
+                  Lock to your hotel or stay location
                 </p>
               </div>
               {isStayActive && <Check size={14} className="text-emerald-400 mt-0.5 shrink-0" />}
             </button>
           </div>
 
-          {/* City Search and Quick Filter Section */}
-          <div className="pt-2 border-t border-line/60">
+          {/* Sydney Precincts Section */}
+          <div className="pt-2 border-t-2 border-ink/10">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-gold flex items-center gap-1">
-                <Globe2 size={12} />
-                <span>Jump to Destination</span>
+              <span className="text-xs font-black uppercase tracking-wider text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                <Compass size={14} className="text-brand" />
+                <span>Sydney Launch Precincts</span>
               </span>
-              <span className="text-[11px] text-mute">{filteredCities.length} destinations</span>
+              <span className="text-[11px] font-bold text-mute">Sydney, NSW 🇦🇺</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {SYDNEY_PRECINCTS.map((p) => {
+                const isSelected = choice.mode === "city" && choice.city.toLowerCase().includes(p.name.toLowerCase());
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => {
+                      chooseLocation({ mode: "city", city: `${p.name}, Sydney`, lat: p.lat, lng: p.lng });
+                      onClose();
+                    }}
+                    className={cn(
+                      "flex items-center gap-2.5 rounded-2xl border-2 p-2.5 text-left transition active:scale-95 cursor-pointer shadow-xs",
+                      isSelected
+                        ? "bg-ink text-white border-ink"
+                        : "bg-paper text-ink border-ink hover:bg-card",
+                    )}
+                  >
+                    <span className="text-base shrink-0">{p.icon}</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-bold">{p.name}</p>
+                      <p className={cn("truncate text-[10px] font-medium", isSelected ? "text-white/70" : "text-mute")}>{p.tagline}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* City Search and Quick Filter Section */}
+          <div className="pt-3 border-t-2 border-ink/10">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-black uppercase tracking-wider text-ink flex items-center gap-1.5">
+                <Globe2 size={14} className="text-brand" />
+                <span>All Destinations</span>
+              </span>
+              <span className="text-[11px] font-bold text-mute">{filteredCities.length} cities</span>
             </div>
 
             {/* Search Bar */}
             <div className="relative mb-2.5">
-              <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search cities (e.g. Sydney, Melbourne, Gold Coast)..."
-                className="h-10 w-full rounded-2xl bg-paper pl-9 pr-8 text-xs text-ink placeholder:text-mute border border-ink outline-none transition focus:bg-card focus:ring-brand focus:border-brand"
+                className="h-10 w-full rounded-2xl bg-paper pl-9 pr-8 text-xs font-medium text-ink placeholder:text-mute border-2 border-ink outline-none transition focus:bg-card focus:ring-2 focus:ring-brand shadow-xs"
               />
               {search && (
                 <button
@@ -231,7 +271,7 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
                   onClick={() => setSearch("")}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-mute hover:text-ink cursor-pointer"
                 >
-                  <X size={13} />
+                  <X size={14} />
                 </button>
               )}
             </div>
@@ -242,10 +282,10 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
                 type="button"
                 onClick={() => setFilter("all")}
                 className={cn(
-                  "rounded-full px-3 py-1 text-[11px] font-semibold transition active:scale-95 cursor-pointer",
+                  "rounded-full px-3.5 py-1 text-xs font-bold transition active:scale-95 cursor-pointer border border-ink",
                   filter === "all"
                     ? "bg-ink text-white shadow-xs"
-                    : "bg-paper text-mute hover:text-ink ring-1 ring-line",
+                    : "bg-paper text-ink hover:bg-card",
                 )}
               >
                 All
@@ -254,10 +294,10 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
                 type="button"
                 onClick={() => setFilter("australia")}
                 className={cn(
-                  "rounded-full px-3 py-1 text-[11px] font-semibold transition active:scale-95 cursor-pointer",
+                  "rounded-full px-3.5 py-1 text-xs font-bold transition active:scale-95 cursor-pointer border border-ink",
                   filter === "australia"
                     ? "bg-ink text-white shadow-xs"
-                    : "bg-paper text-mute hover:text-ink ring-1 ring-line",
+                    : "bg-paper text-ink hover:bg-card",
                 )}
               >
                 🇦🇺 Australia &amp; NZ
@@ -266,10 +306,10 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
                 type="button"
                 onClick={() => setFilter("international")}
                 className={cn(
-                  "rounded-full px-3 py-1 text-[11px] font-semibold transition active:scale-95 cursor-pointer",
+                  "rounded-full px-3.5 py-1 text-xs font-bold transition active:scale-95 cursor-pointer border border-ink",
                   filter === "international"
                     ? "bg-ink text-white shadow-xs"
-                    : "bg-paper text-mute hover:text-ink ring-1 ring-line",
+                    : "bg-paper text-ink hover:bg-card",
                 )}
               >
                 🌐 International
@@ -289,21 +329,21 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
                       onClose();
                     }}
                     className={cn(
-                      "flex items-center justify-between rounded-xl px-3 py-2 text-left ring-1 transition active:scale-95 cursor-pointer",
+                      "flex items-center justify-between rounded-xl px-3 py-2 text-left border-2 transition active:scale-95 cursor-pointer shadow-xs",
                       isSelected
-                        ? "bg-ink text-white ring-ink shadow-xs"
-                        : "bg-paper text-ink ring-line hover:bg-card",
+                        ? "bg-ink text-white border-ink"
+                        : "bg-paper text-ink border-ink hover:bg-card",
                     )}
                   >
                     <div className="min-w-0 pr-1">
                       <div className="flex items-center gap-1">
                         <span className="text-xs">{c.flag}</span>
-                        <span className="truncate text-xs font-semibold">{c.label}</span>
+                        <span className="truncate text-xs font-bold">{c.label}</span>
                       </div>
                       {c.region && (
                         <span
                           className={cn(
-                            "block truncate text-[10px]",
+                            "block truncate text-[10px] font-medium",
                             isSelected ? "text-white/70" : "text-mute",
                           )}
                         >
@@ -311,15 +351,15 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
                         </span>
                       )}
                     </div>
-                    {isSelected && <Check size={13} className="text-emerald-400 shrink-0 ml-1" />}
+                    {isSelected && <Check size={14} className="text-emerald-400 shrink-0 ml-1" />}
                   </button>
                 );
               })}
             </div>
 
             {filteredCities.length === 0 && (
-              <div className="rounded-2xl bg-paper p-6 text-center ring-1 ring-line">
-                <p className="text-xs font-semibold text-ink">No cities matching "{search}"</p>
+              <div className="rounded-2xl border-2 border-ink bg-paper p-6 text-center shadow-xs">
+                <p className="text-xs font-bold text-ink">No cities matching "{search}"</p>
                 <button
                   type="button"
                   onClick={() => {
@@ -327,9 +367,9 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
                     chooseLocation({ mode: "city", city: search.trim(), lat: center.lat, lng: center.lng });
                     onClose();
                   }}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-xs font-medium text-white shadow-xs cursor-pointer active:scale-95"
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-xs font-bold text-white shadow-xs cursor-pointer active:scale-95 border border-ink"
                 >
-                  <Sparkles size={12} />
+                  <Sparkles size={13} />
                   <span>Explore "{search.trim()}"</span>
                 </button>
               </div>
@@ -337,8 +377,8 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
           </div>
 
           {/* Social Presence & Circle Sharing */}
-          <div className="pt-2 border-t border-line/60">
-            <label className="flex items-start gap-3 rounded-2xl bg-paper/80 p-3.5 ring-1 ring-line/80 cursor-pointer hover:bg-paper transition">
+          <div className="pt-3 border-t-2 border-ink/10">
+            <label className="flex items-start gap-3 rounded-2xl border-2 border-ink bg-paper p-3.5 shadow-xs cursor-pointer hover:bg-card transition">
               <input
                 type="checkbox"
                 className="mt-1 h-4 w-4 rounded text-brand focus:ring-brand accent-brand cursor-pointer"
@@ -353,20 +393,20 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
-                  <ShieldCheck size={13} className="text-emerald-600" />
+                  <ShieldCheck size={14} className="text-emerald-600" />
                   <span className="text-xs font-bold text-ink">Share city with Circle</span>
                 </div>
-                <p className="text-[11px] text-mute mt-0.5 leading-snug">
+                <p className="text-[11px] text-mute mt-0.5 leading-snug font-medium">
                   Mutuals and followers see you're currently in <strong className="text-ink">{city || "Sydney"}</strong>. Exact GPS coordinates never leave your device.
                 </p>
               </div>
             </label>
 
             <div className="mt-2.5 flex items-center justify-between text-xs">
-              <span className="text-mute text-[11px]">Looking for mutuals in {city}?</span>
+              <span className="text-mute text-[11px] font-medium">Looking for mutuals in {city}?</span>
               <button
                 type="button"
-                className="font-semibold text-brand hover:underline inline-flex items-center gap-1 cursor-pointer"
+                className="font-bold text-brand hover:underline inline-flex items-center gap-1 cursor-pointer"
                 onClick={() => {
                   onClose();
                   nav("/circle");
@@ -383,5 +423,3 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
     document.body,
   );
 }
-
-

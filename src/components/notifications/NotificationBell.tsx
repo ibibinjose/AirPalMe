@@ -115,11 +115,11 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="relative grid h-9 w-9 touch-manipulation place-items-center rounded-full text-mute hover:bg-card hover:text-ink ring-1 ring-line transition"
+        className="relative grid h-9 w-9 touch-manipulation place-items-center rounded-full text-brand hover:bg-card ring-1 ring-line transition"
         aria-label={total ? `${total} unread notifications` : "Notifications"}
         title="Notifications"
       >
-        {total > 0 ? <BellRing size={16} className="text-brand" /> : <Bell size={16} />}
+        {total > 0 ? <BellRing size={16} className="text-brand" /> : <Bell size={16} className="text-brand" />}
         {total > 0 && (
           <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white">
             {total > 9 ? "9+" : total}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Bell, CalendarDays, CircleHelp, ClipboardCheck, Shield, Sparkles, Utensils, Wifi } from "lucide-react";
+import { ArrowRight, Bell, CalendarDays, CircleHelp, ClipboardCheck, HeartHandshake, Shield, Sparkles, Utensils, Wifi } from "lucide-react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/Button";
 import { Sheet } from "@/components/ui/Sheet";
@@ -37,6 +37,7 @@ export function ConciergePage() {
   const { now, timeZone, city } = useLocalNow();
   const { calendarEvents, remoteNearby } = useEvents();
   const [, nav] = useLocation();
+
   // Tonight around the guest, for Ask answers — live DB data only.
   const tonightForAsk = useMemo(() => {
     const nearby = eventsTonight(remoteNearby, now, timeZone).map((ev) => ({ title: ev.title, sub: ev.when }));
@@ -46,6 +47,7 @@ export function ConciergePage() {
     }));
     return [...nearby, ...cal.filter((e) => !nearby.some((n) => n.title === e.title))];
   }, [remoteNearby, calendarEvents, now, timeZone, city]);
+
   const [sheet, setSheet] = useState<null | "wifi" | "staff" | "dining" | "ask" | "safety">(null);
   const [ask, setAsk] = useState("");
   const [answer, setAnswer] = useState<{ title: string; body: string } | null>(null);
@@ -125,20 +127,22 @@ export function ConciergePage() {
   if (!hasStay && session.kind !== "marker") {
     return (
       <div className="mx-auto max-w-lg px-4 pb-10">
-        <div className="relative mt-2 overflow-hidden rounded-[28px] bg-ink">
+        <div className="relative mt-2 overflow-hidden rounded-[28px] border-2 border-ink bg-ink shadow-xs">
           {property.heroImage && <img src={property.heroImage} alt="" className="h-72 w-full object-cover" />}
           <div className="hero-scrim absolute inset-0" />
           <div className="absolute inset-x-0 bottom-0 p-6">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-white/70">{t("concierge")}</p>
-            <h1 className="font-display text-3xl font-semibold text-white">{t("scanRoom")}</h1>
-            <p className="mt-1 text-sm text-white/75">Scan the lobby or room QR for Wi-Fi, tonight, and the desk.</p>
+            <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-slate-950 border border-ink shadow-xs mb-2">
+              Guest Companion · Sydney 🇦🇺
+            </span>
+            <h1 className="font-display text-3xl font-bold text-white">{t("scanRoom")}</h1>
+            <p className="mt-1 text-sm text-white/80">Scan your room or lobby QR code to access instant Wi-Fi, front desk requests, and local dining.</p>
           </div>
         </div>
         <div className="mt-5 grid gap-3">
-          <Button className="w-full" onClick={() => nav("/scan")}>
+          <Button className="w-full font-bold h-12 shadow-xs" onClick={() => nav("/scan")}>
             {t("scan")}
           </Button>
-          <Button variant="ghost" className="w-full" onClick={() => nav("/")}>
+          <Button variant="ghost" className="w-full font-bold h-12 border-2 border-ink" onClick={() => nav("/")}>
             {t("explore")}
           </Button>
         </div>
@@ -149,10 +153,10 @@ export function ConciergePage() {
   if (loadingProperty && !property.name) {
     return (
       <div className="mx-auto max-w-lg px-4 pb-10">
-        <div className="mt-2 h-48 animate-pulse rounded-[28px] bg-card ring-1 ring-line" />
+        <div className="mt-2 h-48 animate-pulse rounded-3xl bg-card border-2 border-ink" />
         <div className="mt-5 grid grid-cols-2 gap-2">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-14 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
+            <div key={i} className="h-14 animate-pulse rounded-2xl bg-card border-2 border-ink" />
           ))}
         </div>
       </div>
@@ -172,23 +176,40 @@ export function ConciergePage() {
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-10">
-      <div className="relative mt-1 overflow-hidden rounded-[28px] bg-ink">
+      {/* Header Banner */}
+      <div className="relative mt-2 overflow-hidden rounded-[28px] border-2 border-ink bg-ink shadow-xs">
         {property.heroImage && <img src={property.heroImage} alt="" className="h-48 w-full object-cover" />}
         <div className="hero-scrim absolute inset-0" />
         <div className="absolute inset-x-0 bottom-0 p-5">
-          <p className="text-[11px] uppercase tracking-[0.16em] text-white/70">
-            {roomLabel
-              ? `Room ${roomLabel}`
-              : property.city || property.destination || t("concierge")}
-          </p>
-          <h1 className="font-display text-2xl font-semibold text-white">{property.name || t("scanRoom")}</h1>
-          {property.tagline ? <p className="mt-1 text-sm text-white/80">{property.tagline}</p> : null}
+          <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-slate-950 border border-ink shadow-xs mb-1.5">
+            {roomLabel ? `Room ${roomLabel}` : property.city || property.destination || "AirPal Stay Concierge"}
+          </span>
+          <h1 className="font-display text-2xl font-extrabold text-white">{property.name || t("scanRoom")}</h1>
+          {property.tagline ? <p className="mt-1 text-xs text-white/80">{property.tagline}</p> : null}
           {demoModeActive() && (
             <div className="mt-2">
               <DemoBadge />
             </div>
           )}
         </div>
+      </div>
+
+      {/* AirPal Companion Integration Banner */}
+      <div className="mt-4 rounded-3xl border-2 border-ink bg-gradient-to-r from-brand/10 via-amber-500/10 to-purple-500/10 p-4 shadow-xs flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
+            <HeartHandshake size={20} />
+          </span>
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">AirPal Mate Priority</p>
+            <p className="text-xs font-bold text-ink">Exploring Sydney alone?</p>
+            <p className="text-[11px] text-mute">Find a local AirPal Mate to go with you.</p>
+          </div>
+        </div>
+        <Button size="sm" className="shrink-0 font-bold gap-1 shadow-xs" onClick={() => nav("/companion")}>
+          <span>Find Mate</span>
+          <ArrowRight size={14} />
+        </Button>
       </div>
 
       {property.name ? <ArrivalGuide /> : null}
@@ -202,22 +223,24 @@ export function ConciergePage() {
         />
       ) : null}
 
-      <div className="mt-5 grid grid-cols-2 gap-2">
+      {/* Quick Action Tiles */}
+      <div className="mt-5 grid grid-cols-2 gap-2.5">
         {tiles.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={t.run}
-            className="flex touch-manipulation items-center gap-3 rounded-2xl bg-card px-4 py-3.5 ring-1 ring-line transition hover:ring-brand/40 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            className="flex touch-manipulation items-center gap-3 rounded-2xl border-2 border-ink bg-card px-4 py-3.5 shadow-xs transition hover:bg-paper active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             <t.icon size={18} className="shrink-0 text-brand" />
-            <span className="truncate text-sm font-medium">{t.label}</span>
+            <span className="truncate text-sm font-bold text-ink">{t.label}</span>
           </button>
         ))}
       </div>
 
+      {/* Ask AirPal Input */}
       <form
-        className="mt-5 flex items-center gap-2 rounded-full bg-card px-4 py-2 ring-1 ring-line transition focus-within:ring-2 focus-within:ring-brand"
+        className="mt-5 flex items-center gap-2 rounded-full border-2 border-ink bg-card px-4 py-2 shadow-xs transition focus-within:ring-2 focus-within:ring-brand"
         onSubmit={(e) => {
           e.preventDefault();
           if (!ask.trim()) return;
@@ -231,7 +254,7 @@ export function ConciergePage() {
           onChange={(e) => setAsk(e.target.value)}
           placeholder={t("askAirPal")}
           aria-label={t("askAirPal")}
-          className="h-10 w-full bg-transparent text-[15px] outline-none"
+          className="h-10 w-full bg-transparent text-[15px] outline-none text-ink placeholder:text-mute font-medium"
         />
       </form>
 
@@ -240,13 +263,13 @@ export function ConciergePage() {
       <LocalFavorites />
 
       <div className="mt-8 flex items-end justify-between">
-        <h2 className="font-display text-xl font-semibold">{t("aroundYou")}</h2>
-        <button className="text-sm text-mute" onClick={() => nav("/")}>
+        <h2 className="font-display text-xl font-bold text-ink">{t("aroundYou")}</h2>
+        <button className="text-xs font-bold text-mute hover:text-ink" onClick={() => nav("/")}>
           {t("all")}
         </button>
       </div>
       {nearby.length === 0 ? (
-        <p className="mt-3 rounded-2xl bg-card px-4 py-5 text-center text-sm text-mute ring-1 ring-line">
+        <p className="mt-3 rounded-2xl border-2 border-ink bg-card px-4 py-5 text-center text-sm text-mute shadow-xs">
           {t("aroundEmpty")}
         </p>
       ) : (
@@ -257,16 +280,17 @@ export function ConciergePage() {
         </div>
       )}
 
+      {/* Sheets */}
       <Sheet open={sheet === "wifi"} onClose={() => setSheet(null)} title={t("wifi")}>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mute">Network</p>
-        <p className="font-display text-2xl">{wifi.network || "Ask the desk"}</p>
-        {wifi.speed ? <p className="mt-1 text-sm text-mute">{wifi.speed}</p> : null}
+        <p className="text-[11px] font-bold uppercase tracking-wider text-mute">Network Name</p>
+        <p className="font-display text-2xl font-bold text-ink">{wifi.network || "Ask the desk"}</p>
+        {wifi.speed ? <p className="mt-1 text-xs text-mute font-medium">{wifi.speed}</p> : null}
         {wifi.password ? (
           <>
-            <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-mute">Password</p>
-            <p className="mt-1 font-mono text-lg">{wifi.password}</p>
+            <p className="mt-4 text-[11px] font-bold uppercase tracking-wider text-mute">Password</p>
+            <p className="mt-1 font-mono text-xl font-bold text-ink">{wifi.password}</p>
             <Button
-              className="mt-5 w-full"
+              className="mt-5 w-full font-bold shadow-xs"
               onClick={() => {
                 void (async () => {
                   try {
@@ -279,11 +303,11 @@ export function ConciergePage() {
                 })();
               }}
             >
-              Copy
+              Copy Password
             </Button>
           </>
         ) : (
-          <p className="mt-4 text-sm text-mute">Scan the room or lobby QR for the live password, or ask the desk.</p>
+          <p className="mt-4 text-xs text-mute">Scan the room or lobby QR code for the live password, or ask front desk.</p>
         )}
       </Sheet>
 
@@ -293,7 +317,7 @@ export function ConciergePage() {
           onChange={(e) => setTicket(e.target.value)}
           placeholder="Towels, extra pillow, AC…"
           aria-label="Describe your request for the front desk"
-          className="h-28 w-full rounded-2xl bg-paper p-3 text-[15px] outline-none border border-ink transition focus:ring-2 focus:ring-brand focus:border-brand"
+          className="h-28 w-full rounded-2xl bg-paper p-3 text-[15px] outline-none border-2 border-ink transition focus:ring-2 focus:ring-brand focus:border-brand font-medium"
         />
         <div className="mt-3 grid grid-cols-3 gap-2">
           {["Towels", "Clean", "Late checkout", "Extra night", "Room move", "Early check-in"].map((quick) => {
@@ -306,8 +330,8 @@ export function ConciergePage() {
                 onClick={() => setTicket(quick)}
                 className={
                   selected
-                    ? "h-10 rounded-full bg-brand text-sm font-semibold text-white ring-1 ring-brand transition active:scale-95"
-                    : "h-10 rounded-full bg-paper text-sm ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
+                    ? "h-10 rounded-full bg-brand text-xs font-bold text-white border-2 border-ink transition active:scale-95 shadow-xs"
+                    : "h-10 rounded-full bg-paper text-xs font-bold text-ink border-2 border-ink transition hover:bg-card active:scale-95 shadow-xs"
                 }
               >
                 {quick}
@@ -316,7 +340,7 @@ export function ConciergePage() {
           })}
         </div>
         <Button
-          className="mt-4 w-full"
+          className="mt-4 w-full font-bold shadow-xs"
           loading={ticketSending}
           onClick={() => {
             if (!ticket.trim() || ticketSending) return;
@@ -361,28 +385,28 @@ export function ConciergePage() {
             })();
           }}
         >
-          {ticketSending ? "Sending…" : "Send"}
+          {ticketSending ? "Sending…" : "Send Request"}
         </Button>
       </Sheet>
 
       <Sheet open={sheet === "dining"} onClose={() => setSheet(null)} title={t("dining")}>
-        <p className="text-sm text-mute">{property.breakfast?.hours || "Dining hours — ask the front desk"}</p>
+        <p className="text-xs font-bold text-mute">{property.breakfast?.hours || "Dining hours — ask the front desk"}</p>
         <div className="mt-4 space-y-3">
-          <div className="rounded-2xl bg-paper p-4 ring-1 ring-line">
-            <p className="font-medium">{property.breakfast?.type || "Breakfast & Dining"}</p>
-            <p className="text-sm text-mute mt-1">{property.breakfast?.location || property.address || "On site"}</p>
-            <p className="text-sm text-brand mt-1">{property.breakfast?.price || "Ask front desk"}</p>
+          <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-xs">
+            <p className="font-bold text-ink">{property.breakfast?.type || "Breakfast & Dining"}</p>
+            <p className="text-xs text-mute mt-1">{property.breakfast?.location || property.address || "On site"}</p>
+            <p className="text-xs font-bold text-brand mt-1">{property.breakfast?.price || "Ask front desk"}</p>
           </div>
           {menu.length > 0 &&
             menu.slice(0, 8).map((item) => (
-              <div key={item.id} className="rounded-2xl bg-paper p-4 ring-1 ring-line">
+              <div key={item.id} className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-xs">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-mute">{item.category}</p>
-                    <p className="font-medium">{item.name}</p>
+                    <p className="text-[10px] font-extrabold uppercase tracking-wider text-mute">{item.category}</p>
+                    <p className="font-bold text-ink">{item.name}</p>
                     {item.description ? <p className="mt-1 text-xs text-mute leading-relaxed">{item.description}</p> : null}
                   </div>
-                  <p className="shrink-0 text-sm font-semibold text-brand">${item.price}</p>
+                  <p className="shrink-0 text-sm font-extrabold text-brand">${item.price}</p>
                 </div>
               </div>
             ))}
@@ -390,22 +414,22 @@ export function ConciergePage() {
       </Sheet>
 
       <Sheet open={sheet === "safety"} onClose={() => setSheet(null)} title={t("help")}>
-        <p className="text-sm">{property.name ? `${property.name} Front Desk & Duty Manager` : "Front Desk & Duty Manager"}</p>
-        <p className="mt-2 text-sm text-mute">
+        <p className="text-sm font-bold text-ink">{property.name ? `${property.name} Front Desk & Duty Manager` : "Front Desk & Duty Manager"}</p>
+        <p className="mt-2 text-xs text-mute leading-relaxed">
           {property.address || "Contact staff at front desk for emergency procedures"}
         </p>
         {property.phone && (
-          <a className="mt-4 block font-medium text-brand" href={`tel:${property.phone}`}>
+          <a className="mt-4 block font-bold text-brand text-sm" href={`tel:${property.phone}`}>
             {property.phone}
           </a>
         )}
-        <a className="mt-2 block text-sm text-mute" href="tel:000">
-          Emergency: 000
+        <a className="mt-2 block text-xs font-bold text-mute" href="tel:000">
+          Emergency Services (Australia): 000
         </a>
       </Sheet>
 
-      <Sheet open={sheet === "ask"} onClose={() => setSheet(null)} title={answer?.title || "Ask"}>
-        <p className="text-[15px] leading-relaxed">{answer?.body}</p>
+      <Sheet open={sheet === "ask"} onClose={() => setSheet(null)} title={answer?.title || "Ask AirPal"}>
+        <p className="text-sm font-medium text-ink leading-relaxed">{answer?.body}</p>
       </Sheet>
     </div>
   );

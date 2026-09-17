@@ -57,7 +57,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
             className="flex h-9 items-center gap-2 rounded-full bg-paper px-3 text-xs font-medium text-mute ring-1 ring-line hover:text-ink hover:bg-card transition lg:h-10 lg:px-3.5"
             title="Search AirPal (⌘K)"
           >
-            <Search size={15} className="text-gold" />
+            <Search size={15} className="text-brand" />
             <span className="hidden xl:inline">Search</span>
             <kbd className="hidden rounded border border-line bg-card px-1.5 py-0.5 text-[10px] font-semibold text-mute xl:inline-block">
               ⌘K

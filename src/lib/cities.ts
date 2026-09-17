@@ -8,6 +8,24 @@ export interface CityOption extends LatLng {
   flag?: string;
 }
 
+export interface PrecinctOption extends LatLng {
+  id: string;
+  name: string;
+  tagline: string;
+  icon?: string;
+}
+
+export const SYDNEY_PRECINCTS: PrecinctOption[] = [
+  { id: "therocks", name: "The Rocks", tagline: "Historic Harbour & Pubs", icon: "🏛️", lat: -33.8599, lng: 151.209 },
+  { id: "cbd", name: "Sydney CBD", tagline: "Shopping & Dining", icon: "🏙️", lat: -33.8688, lng: 151.2093 },
+  { id: "bondi", name: "Bondi & Beaches", tagline: "Coastal Walk & Surf", icon: "🏖️", lat: -33.8915, lng: 151.2767 },
+  { id: "surryhills", name: "Surry Hills", tagline: "Café Culture & Design", icon: "☕", lat: -33.8867, lng: 151.2117 },
+  { id: "darlingharbour", name: "Darling Harbour", tagline: "Waterfront & Entertainment", icon: "🎡", lat: -33.8748, lng: 151.2009 },
+  { id: "barangaroo", name: "Barangaroo", tagline: "Dining & Harbour Walk", icon: "🍸", lat: -33.8634, lng: 151.2014 },
+  { id: "manly", name: "Manly Beach", tagline: "Ferry & Ocean Beach", icon: "🌊", lat: -33.7971, lng: 151.2881 },
+  { id: "paddington", name: "Paddington", tagline: "Boutiques & Heritage", icon: "🛍️", lat: -33.8833, lng: 151.2264 },
+];
+
 export const CITY_OPTIONS: CityOption[] = [
   { id: "sydney", label: "Sydney", region: "NSW", country: "Australia", flag: "🇦🇺", lat: -33.8688, lng: 151.2093 },
   { id: "melbourne", label: "Melbourne", region: "VIC", country: "Australia", flag: "🇦🇺", lat: -37.8136, lng: 144.9631 },
