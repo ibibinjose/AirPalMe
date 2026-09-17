@@ -4,6 +4,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { ArrowLeft, Pause, Play, Plus, Star, StarOff } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
+import { PromoStatusChip } from "@/components/promotions/PromoStatusChip";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
 import { liveBackendEnabled } from "@/lib/functions";
@@ -245,16 +246,8 @@ export function PromotionsAdminPage() {
           {shown.map((p) => (
             <div key={p.id} className="rounded-2xl border-2 border-ink bg-card p-3">
               <div className="flex items-center gap-2">
-                <span className={cn(
-                  "rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide",
-                  p.status === "live" ? "bg-emerald-500/10 text-emerald-700"
-                  : ["submitted", "under_review"].includes(p.status) ? "bg-amber-500/15 text-amber-700"
-                  : "bg-ink/10 text-mute",
-                )}>
-                  {p.status.replace("_", " ")}
-                </span>
+                <PromoStatusChip status={p.status} featured={p.featured} />
                 <span className="text-[11px] text-mute">{p.kind} · {p.mechanicType} · legal: {p.legalReviewStatus.replace("_", " ")}</span>
-                {p.featured && <Star size={13} className="text-gold" />}
               </div>
               <p className="mt-1 text-sm font-bold">{p.title}</p>
               <p className="truncate text-xs text-mute">{p.sponsorName} · ends {p.endAt ? new Date(p.endAt).toLocaleDateString() : "—"}</p>

@@ -52,8 +52,8 @@ export function PlanCard({
     <Link
       href={`/plan/${plan.id}`}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-[28px] border-2 border-ink bg-card p-5 shadow-xs transition-all duration-300",
-        "hover:-translate-y-0.5 hover:border-brand hover:shadow-lg active:scale-[0.99]",
+        "group relative flex flex-col justify-between overflow-hidden rounded-hero border-2 border-ink bg-card p-5 shadow-card transition-all duration-300",
+        "hover:-translate-y-0.5 hover:border-brand hover:shadow-pop active:scale-[0.99]",
         plan.isExperience && "border-amber-600/60 hover:border-amber-500",
       )}
     >

@@ -43,8 +43,8 @@ export function PromotionsPage() {
       <p className="mt-4 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand">
         <BadgePercent size={13} /> AirPal Promotions
       </p>
-      <h1 className="font-display mt-1 text-3xl font-bold">Offers near you.</h1>
-      <p className="mt-1 text-sm text-mute">Discounts and member offers from local businesses.</p>
+      <h1 className="font-display mt-1 text-balance text-4xl font-bold leading-[1.05] tracking-tight">Offers near you.</h1>
+      <p className="mt-2 max-w-md text-[15px] leading-relaxed text-mute">Discounts and member offers from local businesses.</p>
 
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
         {["All", ...PROMOTION_CATEGORIES].map((c) => (

@@ -169,14 +169,14 @@ export function DiscoverPage() {
             <div aria-hidden className="h-[200px] w-full bg-ink md:h-[280px]" />
           )}
           <div className="absolute inset-x-0 bottom-0 p-5 md:p-8">
-            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/70">
               {city || PRECINCT.city}
               {source === "gps" ? " · near you" : ""}
             </p>
-            <h1 className="font-display mt-1 text-4xl font-semibold text-white md:text-5xl">
+            <h1 className="font-display mt-1 text-balance text-4xl font-bold leading-[1.05] tracking-tight text-white md:text-6xl">
               {isHomeCity ? PRECINCT.name.split("&")[0].trim() : city}
             </h1>
-            <p className="mt-1.5 max-w-md text-sm text-white/80">{t("homeLede")}</p>
+            <p className="mt-2 max-w-md text-[15px] leading-relaxed text-white/80">{t("homeLede")}</p>
             <label className="mt-3.5 flex h-11 w-full max-w-md items-center gap-2 rounded-full bg-white/95 px-3.5 text-ink shadow-sm">
               <Search size={16} className="shrink-0 text-mute" />
               <input
@@ -348,8 +348,8 @@ export function DiscoverPage() {
       )}
 
       {view === "list" && chip !== "tonight" && (
-        <section className="mt-6 px-4 pb-2 md:px-6">
-          <h2 className="font-display mb-3 text-xl font-semibold">
+        <section className="mt-8 px-4 pb-2 md:px-6">
+          <h2 className="font-display mb-3 text-balance text-2xl font-bold tracking-tight">
             {chip === "all" && !q ? t("aroundYou") : t("places")}
           </h2>
           {!remoteLoaded && shown.length === 0 ? (
