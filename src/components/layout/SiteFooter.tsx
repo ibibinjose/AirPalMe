@@ -92,6 +92,9 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
                   </>
                 )}
               </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-ink/25 bg-card px-3 py-1 text-xs text-mute select-none">
+                Built in Australia
+              </span>
             </div>
           </div>
 
