@@ -91,6 +91,7 @@ export function DiscoverPage() {
   const nearby = useMemo(() => discoverPlaces(here, city), [here, city, version]);
   const featured = useMemo(() => featuredPlaces(here, city), [here, city, version]);
   const isHomeCity = !city || /sydney|rock/i.test(city);
+  const placeName = (city && city.trim()) || "Sydney";
   const walks = toursForPrecinct(city).slice(0, 3);
   const center = here;
 
@@ -202,7 +203,7 @@ export function DiscoverPage() {
           {isHomeCity ? (
             <>
               <motion.div
-                className="h-[380px] w-full md:h-[520px]"
+                className="h-[260px] w-full md:h-[440px]"
                 initial={play ? { scale: 1.1 } : false}
                 animate={{ scale: 1 }}
                 transition={{ duration: 1.45, ease: enterEase }}
@@ -212,29 +213,18 @@ export function DiscoverPage() {
               <div className="hero-scrim absolute inset-0" />
             </>
           ) : (
-            <div aria-hidden className="h-[340px] w-full bg-ink md:h-[400px]" />
+            <div aria-hidden className="h-[200px] w-full bg-ink md:h-[280px]" />
           )}
           <div className="absolute inset-x-0 bottom-0 p-5 md:p-8">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">
-              What are you looking for?
-            </p>
-            <h1 className="font-display mt-1 text-3xl font-extrabold leading-tight tracking-tight text-white md:text-5xl">
-              Find someone to go with you.
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-slate-950/60 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
+              <Sparkles size={12} className="text-white/80" />
+              <span>AirPal Circle · {placeName}</span>
+            </div>
+            <h1 className="font-display text-3xl font-extrabold leading-tight tracking-tight text-white md:text-5xl">
+              Discover {placeName}.
             </h1>
-            <p className="mt-1 text-sm font-medium text-white/75">
-              {isHomeCity ? "Sydney" : city} · mates, places, stays and what&apos;s on tonight.
-            </p>
+            <p className="mt-1 text-sm font-medium text-white/75">Places, events, and plans around you right now.</p>
 
-            <button
-              type="button"
-              onClick={() => nav("/mate")}
-              className="mt-3 inline-flex h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-bold text-ink shadow-sm transition hover:bg-white/90 active:scale-[0.98]"
-            >
-              <Users size={16} />
-              Find an AirPal
-            </button>
-
-            {/* Search Bar */}
             <label className="mt-3 flex h-10 w-full max-w-md items-center gap-2 rounded-xl border border-ink/20 bg-white/95 px-3 text-ink shadow-xs">
               <Search size={15} className="shrink-0 text-brand" />
               <input
@@ -248,11 +238,11 @@ export function DiscoverPage() {
             <div className="mt-3 grid max-w-3xl grid-cols-3 gap-2 sm:grid-cols-6">
               <button
                 type="button"
-                onClick={() => nav("/experiences")}
+                onClick={() => nav("/mate")}
                 className="group flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl transition hover:border-white/30 hover:bg-white/15"
               >
-                <Sparkles size={15} className="shrink-0 text-white transition group-hover:scale-110" />
-                <span className="text-xs font-semibold tracking-tight">Experiences</span>
+                <Users size={15} className="shrink-0 text-white transition group-hover:scale-110" />
+                <span className="text-xs font-semibold tracking-tight">Mates</span>
               </button>
               <button
                 type="button"
