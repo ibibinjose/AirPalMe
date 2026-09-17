@@ -1,4 +1,4 @@
-# AirPal — store listing copy (paste into Play Console / App Store Connect)
+# AirPal — store listing copy (paste into App Store Connect / Play Console)
 
 Legal: SarvamDaily Pty Ltd trading as AirPal.Me · ABN 83 702 462 977  
 Support: hello@airpal.me · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms · Contact: https://airpal.me/contact
@@ -7,39 +7,34 @@ Support: hello@airpal.me · Privacy: https://airpal.me/privacy · Terms: https:/
 
 AirPal
 
-## Short description (Play, ≤80 chars)
-
-Discover Sydney. Places, events, stays and plans around you. Life Made Easy.
-
-## Full description
-
-AirPal helps you discover what's around you — in Sydney and wherever you go.
-
-DISCOVER — Browse places, events, and experiences nearby. Change city anytime (Sydney, Kovalam, and more).
-
-STAY — Scan a host QR for Wi-Fi, dining, and help. Guests browse without an account.
-
-PLANS — Build an outing, invite friends with a code, and keep everyone in the loop.
-
-MATES — Optional: find someone to go with you. Match, message in-app, and book.
-
-DEALS — Claim perks from nearby businesses with a QR scan.
-
-FOR HOSTS & BUSINESSES — List a stay or place, publish perks, run experiences. AirPal reviews before you go live.
-
-Life Made Easy.
-
 ## Subtitle (App Store, ≤30 chars)
 
 Discover places, stays & plans
 
 ## Keywords (App Store, ≤100 chars)
 
-sydney,discover,places,events,stay,plans,deals,travel,local,mates
+travel,explore,places,concierge,events,venues,qr scanner,local guide,plans,airpal
+
+## Short description (Play, ≤80 chars)
+
+Discover places, events, stays and plans around you. Life Made Easy.
+
+## Description
+
+AirPal makes exploring people, places, and experiences effortless.
+
+Whether you are visiting a new precinct, checking into a stay, or discovering local highlights, AirPal connects you directly to what is around you:
+
+• Instant Scan: Tap or scan QR codes at venues, hotels, and precinct spots to access live concierge tools and guest passes.
+• Discover Nearby: Find local dining, hidden gems, upcoming events, and precinct highlights around your location.
+• Plan & Catch Up: Organize plans with mates, manage shared event calendars, and keep itineraries in one spot.
+• Digital Profiles & NFC: Share your bio, links, and contact card seamlessly with a single tap.
+
+Travel smarter and connect with your surroundings using AirPal.
 
 ## Category
 
-Travel. Age rating: 17+ (App Store) / Mature 18+ (Play) — AirPal is 18+ only.
+Primary: Travel · Secondary: Lifestyle
 
 ## Seller / developer
 
