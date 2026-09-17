@@ -57,7 +57,7 @@ function StoreBadge({ store, href }: { store: "apple" | "play"; href: string }) 
         <span className="flex items-center gap-1.5 text-base font-bold">
           {store === "apple" ? "App Store" : "Google Play"}
           {comingSoon && (
-            <span className="rounded-full bg-gold/20 px-2 py-0.5 text-[10px] font-semibold text-gold border border-gold/30">
+            <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-slate-950">
               Soon
             </span>
           )}
@@ -203,7 +203,7 @@ export function GetAirPalPage() {
               </Button>
             </Link>
 
-            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-line/60">
+            <div className="flex flex-col gap-2.5 pt-3 border-t border-line/60">
               <StoreBadge store="apple" href={APP_STORE_URL} />
               <StoreBadge store="play" href={PLAY_STORE_URL} />
             </div>
@@ -228,10 +228,10 @@ export function GetAirPalPage() {
           </div>
 
           <div className="flex w-full justify-center gap-2">
-            <Button onClick={share} className="flex-1 bg-paper text-ink border-2 border-ink hover:bg-card">
+            <Button onClick={share} variant="light" className="flex-1 border-2 border-ink text-ink font-semibold hover:bg-paper">
               <Share2 size={14} /> Share
             </Button>
-            <Button onClick={copyLink} className="bg-paper text-ink border-2 border-ink hover:bg-card">
+            <Button onClick={copyLink} variant="light" className="border-2 border-ink text-ink font-semibold hover:bg-paper">
               <Copy size={14} /> Copy Link
             </Button>
           </div>
@@ -352,7 +352,7 @@ export function GetAirPalPage() {
 
       {/* One Platform — 6 Verticals Section */}
       <div className="mt-12 text-center">
-        <span className="text-[11px] font-bold uppercase tracking-widest text-gold">One Platform Engine</span>
+        <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-800">One Platform Engine</span>
         <h2 className="mt-1 text-3xl font-extrabold text-ink">Explore Everything AirPal Offers</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-mute">
           Designed for Sydney local discovery, experiences, stays, and connection.

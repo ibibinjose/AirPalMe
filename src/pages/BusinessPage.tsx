@@ -24,6 +24,7 @@ import { getFirebaseDb } from "@/lib/firebase";
 import { HostFreshnessBanner } from "@/components/host/HostFreshnessBanner";
 import { fieldInput, fieldTextarea } from "@/components/forms/ValidField";
 import { BusinessBookingsSection } from "@/components/booking/BusinessBookingsSection";
+import { BusinessNavHub } from "@/components/business/BusinessNavHub";
 
 function BusinessOverviewStrip({ listingActive, dealLive }: { listingActive: boolean; dealLive: boolean }) {
   const { user } = useAuth();
@@ -185,6 +186,30 @@ export function BusinessPage() {
     }
   }
 
+  const [stats, setStats] = useState<{ campaigns: number; rsvps: number }>({ campaigns: 0, rsvps: 0 });
+
+  useEffect(() => {
+    const db = getFirebaseDb();
+    if (!db || !user) return;
+    void (async () => {
+      try {
+        const csnap = await getDocs(query(collection(db, "campaigns"), where("ownerUid", "==", user.uid)));
+        let rsvps = 0;
+        for (const c of csnap.docs) {
+          try {
+            const rsnap = await getDocs(query(collection(db, "campaign_rsvps"), where("campaignId", "==", c.id)));
+            for (const r of rsnap.docs) rsvps += Number((r.data() as { seats?: number }).seats || 1);
+          } catch {
+            // roster reads need campaign ownership; skip silently.
+          }
+        }
+        setStats({ campaigns: csnap.size, rsvps });
+      } catch {
+        setStats({ campaigns: 0, rsvps: 0 });
+      }
+    })();
+  }, [user]);
+
   const handle = mine.handle || bio?.handle;
   const preview = withWalk(listingToPlace({ ...mine, name, category, placeCategory: mine.placeCategory, address: formatAddress(address), hours, shortWhy, deal: badge ? { badge, detail } : mine.deal, handle, heroImage: mine.heroImage, geo: geo || mine.geo, phone }));
 
@@ -197,17 +222,17 @@ export function BusinessPage() {
         <BioHandleButton handle={handle} className="absolute bottom-3 right-4 z-10" />
       </div>
       <h1 className="font-display mt-4 text-3xl font-semibold">{mine.name}</h1>
-      <BusinessOverviewStrip listingActive={mine.status === "active"} dealLive={Boolean(mine.deal)} />
-      <div className="mt-4 flex gap-2">
-        {(["place", "offer", "bookings", "list"] as const).map((id) => (
-          <button
-            key={id}
-            onClick={() => setTab(id)}
-            className={cn("h-9 rounded-full px-4 text-sm capitalize", tab === id ? "bg-ink text-white" : "bg-white ring-1 ring-line")}
-          >
-            {id}
-          </button>
-        ))}
+      
+      <div className="mt-4">
+        <BusinessNavHub
+          activeTab={tab}
+          onTabChange={setTab}
+          listingActive={mine.status === "active"}
+          dealLive={Boolean(mine.deal)}
+          campaignCount={stats.campaigns}
+          bookingCount={stats.rsvps}
+          businessName={mine.name}
+        />
       </div>
 
       {tab === "place" && (
