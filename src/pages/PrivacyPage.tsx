@@ -188,15 +188,15 @@ export function PrivacyPage() {
         <li>Lodge a complaint with the Office of the Australian Information Commissioner, your EEA supervisory authority, the UK ICO, or the California Privacy Protection Agency.</li>
       </ul>
       <p>
-        How to ask: use <Link href="/contact">Contact</Link>, choose “Copy of my data” or “Delete my data”, and email from the address on the account. We may need to verify you. We aim to respond within 30 days (or the shorter period your law requires).
+        How to ask: delete your account in <Link href="/settings">Settings</Link> (type DELETE), or use <Link href="/contact">Contact</Link> and choose “Copy of my data” or “Delete my data” from the address on the account. We may need to verify you. We aim to respond within 30 days (or the shorter period your law requires).
       </p>
       <p>
         You can also delete much on-device data yourself: browser settings → clear data for airpal.me. That removes local listings, checklists, till codes, and language.
       </p>
 
-      <h2>11. Children</h2>
+      <h2>11. Age requirement (18+)</h2>
       <p>
-        AirPal is not directed at children under 16. We do not knowingly collect their personal information. If you believe we have, write to us and we will delete it.
+        AirPal is for adults aged 18 and over. You must be 18 or older to create an account or use the app. We do not knowingly collect personal information of anyone under 18. If you believe we have, write to us and we will delete it.
       </p>
 
       <h2>12. Automated decisions</h2>

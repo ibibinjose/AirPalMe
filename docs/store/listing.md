@@ -1,7 +1,7 @@
 # AirPal — store listing copy (paste into Play Console / App Store Connect)
 
 Legal: SarvamDaily Pty Ltd trading as AirPal.Me · ABN 83 702 462 977  
-Support: hello@airpal.me · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms
+Support: hello@airpal.me · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms · Contact: https://airpal.me/contact
 
 ## App name
 
@@ -9,36 +9,39 @@ AirPal
 
 ## Short description (Play, ≤80 chars)
 
-Find someone to go with you. Plans, places and mates in Sydney. Life Made Easy.
+Discover Sydney. Places, events, stays and plans around you. Life Made Easy.
 
 ## Full description
 
-AirPal is your local companion for Sydney.
+AirPal helps you discover what's around you — in Sydney and wherever you go.
 
-FIND SOMEONE TO GO WITH YOU — Create a plan, match with an approved AirPal Mate, message in-app, and book.
+DISCOVER — Browse places, events, and experiences nearby. Change city anytime (Sydney, Kovalam, and more).
 
-MAKE PLANS — Build an outing, invite friends with a code, vote on stops, and keep everyone in the loop.
+STAY — Scan a host QR for Wi-Fi, dining, and help. Guests browse without an account.
 
-DISCOVER WHAT'S AROUND — Browse places, events, and experiences nearby. Scan a host QR for stay Wi-Fi, dining, and help — no account needed for guests.
+PLANS — Build an outing, invite friends with a code, and keep everyone in the loop.
 
-LOCAL DEALS — Claim perks from nearby businesses with a QR scan and show them at the till.
+MATES — Optional: find someone to go with you. Match, message in-app, and book.
 
-FOR HOSTS & BUSINESSES — List a stay or place, publish perks, and run experiences. Apply once; AirPal reviews before you go live.
+DEALS — Claim perks from nearby businesses with a QR scan.
+
+FOR HOSTS & BUSINESSES — List a stay or place, publish perks, run experiences. AirPal reviews before you go live.
 
 Life Made Easy.
 
 ## Subtitle (App Store, ≤30 chars)
 
-Sydney mates, plans & places
+Discover places, stays & plans
 
 ## Keywords (App Store, ≤100 chars)
 
-sydney,mates,plans,events,stay,deals,travel,companion,experiences,local
+sydney,discover,places,events,stay,plans,deals,travel,local,mates
 
 ## Category
 
-Travel. Age rating: Everyone / 4+.
+Travel. Age rating: 17+ (App Store) / Mature 18+ (Play) — AirPal is 18+ only.
 
 ## Seller / developer
 
 SarvamDaily Pty Ltd trading as AirPal.Me
+ABN 83 702 462 977

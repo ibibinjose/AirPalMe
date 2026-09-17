@@ -33,7 +33,7 @@ export function TermsPage() {
         <Link href="/start?tab=reset">/start?tab=reset</Link>.
       </p>
       <h3>Account termination</h3>
-      <p>You may close an account by writing to us from the registered email via <Link href="/contact">Contact</Link> and asking us to delete it. We may suspend or terminate an account, listing, @handle, or event if:</p>
+      <p>You may close an account in <Link href="/settings">Settings</Link> (Delete account) or by writing from the registered email via <Link href="/contact">Contact</Link>. We may suspend or terminate an account, listing, @handle, or event if:</p>
       <ul>
         <li>you breach these Terms or the law;</li>
         <li>you impersonate a place, host, or person;</li>

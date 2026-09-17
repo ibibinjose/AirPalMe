@@ -492,6 +492,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /account_deletions/{uid} {
+      allow create, get: if signedIn() && !isAnonymous() && request.auth.uid == uid;
+      allow list, update, delete: if platformAdmin();
+    }
+
     match /platform_settings/{docId} {
       allow read: if signedIn();
       allow write: if platformAdmin();

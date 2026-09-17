@@ -10,7 +10,7 @@ Support email: hello@airpal.me (forwards to the operator inbox — see `docs/ema
 - Sign-in works without a prior account: email, phone (SMS), and anonymous QR-guest sessions. No OAuth in the app, so no external-login headaches.
 - Camera permission → QR deal-scan and photo upload. Location permission → nearby stays and business locate-me. Photo library → profile/venue photos.
 - Paid paths are real-world services only: experience bookings and stay food orders check out with Stripe card payment (live when `STRIPE_SECRET_KEY` is set, sandbox otherwise). No digital goods or in-app currency, so no in-app-purchase conflict — still, re-read both stores' payments policies before release.
-- Reviewer path (no demo account needed): open the app → continue as guest (Scan/Start works with no account). Host features need any email account; food ordering works in sandbox mode. Account/data deletion: in-app Contact page or hello@airpal.me.
+- Reviewer path (no demo account needed): open the app → continue as guest (Scan/Start works with no account). Host features need any email account; food ordering works in sandbox mode. Account deletion: Settings → Delete account (type DELETE), or hello@airpal.me. Paste `docs/store/reviewer-notes.md` into the review notes field.
 - Content: user-generated venues, plans, and reviews. Safety tooling in-app: safety reports, blocks, manual claim review, admin audit log.
 
 ## Data safety (Play) / privacy labels (App Store) — fill verbatim
@@ -36,7 +36,7 @@ Support email: hello@airpal.me (forwards to the operator inbox — see `docs/ema
    cd android && ./gradlew :app:bundleRelease   # → app/build/outputs/bundle/release/app-release.aab
    ```
    Upload the AAB to Play Console (first upload uses your keystore; Play App Signing after that). iOS: `npx cap open ios`, pick your Team (automatic signing already on), Product → Archive → Distribute to App Store Connect. Then fill the SHA-256/Team-ID placeholders (items 1–2) and redeploy hosting so App Links verify.
-5. **Questionnaires** → content-rating (Everyone), ads declaration (none), data-safety form (answers above).
+5. **Questionnaires** → content-rating (17+ App Store / Mature 18+ Play — the app is 18+ only), ads declaration (none), data-safety form (answers above).
 
 ## Store images
 

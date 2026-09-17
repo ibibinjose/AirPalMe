@@ -11,9 +11,11 @@ import { useBio } from "@/contexts/BioContext";
 
 export function SettingsPage() {
   const [, nav] = useLocation();
-  const { user, logout, sendVerificationEmail, requestPasswordReset } = useAuth();
+  const { user, logout, deleteAccount, sendVerificationEmail, requestPasswordReset } = useAuth();
   const { mine, business } = useBio();
   const [resetBusy, setResetBusy] = useState(false);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
 
   return (
     <div className="mx-auto max-w-md px-4 pb-10">
@@ -129,9 +131,39 @@ export function SettingsPage() {
       </p>
 
       {user ? (
-        <button type="button" className="mt-8 text-sm text-mute" onClick={() => void logout().then(() => nav("/"))}>
-          Sign out
-        </button>
+        <>
+          <button type="button" className="mt-8 text-sm text-mute" onClick={() => void logout().then(() => nav("/"))}>
+            Sign out
+          </button>
+          <h2 className="font-display mt-10 text-xl text-rose-700">Delete account</h2>
+          <p className="mt-2 text-sm text-mute">
+            This signs you out and removes your login. Type DELETE to confirm. We keep a deletion record for 30 days so we can finish clearing bookings and reports.
+          </p>
+          <input
+            value={deleteConfirm}
+            onChange={(e) => setDeleteConfirm(e.target.value)}
+            placeholder="Type DELETE"
+            autoComplete="off"
+            className="mt-3 w-full rounded-2xl border border-line bg-card px-4 py-3 text-sm"
+          />
+          <button
+            type="button"
+            disabled={deleteBusy || deleteConfirm !== "DELETE"}
+            className="mt-3 text-sm font-semibold text-rose-700 disabled:opacity-40"
+            onClick={() => {
+              setDeleteBusy(true);
+              void deleteAccount()
+                .then(() => {
+                  toast.success("Account deleted");
+                  nav("/");
+                })
+                .catch((err) => toast.error(authErrorMessage(err, "Could not delete account")))
+                .finally(() => setDeleteBusy(false));
+            }}
+          >
+            {deleteBusy ? "Deleting…" : "Delete my account"}
+          </button>
+        </>
       ) : (
         <div className="mt-8 space-y-2">
           <Button className="w-full" onClick={() => nav("/start")}>

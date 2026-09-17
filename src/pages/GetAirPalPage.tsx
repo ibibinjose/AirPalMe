@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { makeQrDataUrl } from "@/lib/qr";
 
+/** Replace with live store IDs after first listing is approved. */
 const APP_STORE_URL = "#";
 const PLAY_STORE_URL = "#";
 const PAGE_URL = "https://airpal.me/getAirPal";

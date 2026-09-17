@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
+import { createUserWithEmailAndPassword, deleteUser, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
 import type { UserProfile, UserRole } from "@shared/airpal-data";
 import { buildHostProperty, parseHostPropertyKind, type HostPropertyKind } from "@shared/host-property";
 import {
@@ -55,6 +55,8 @@ type AuthValue = {
     city?: string;
   }) => Promise<{ propertyId: string }>;
   logout: () => Promise<void>;
+  /** In-app account deletion (App Store 5.1.1(v)). */
+  deleteAccount: () => Promise<void>;
   sendVerificationEmail: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
   /** Open sign-in nudge (null when hidden). Guests see this before gated actions. */
@@ -372,6 +374,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         resetPhoneLogin();
         const auth = getFirebaseAuth();
         if (auth) await signOut(auth);
+        setUser(null);
+      },
+      async deleteAccount() {
+        const auth = getFirebaseAuth();
+        const fb = auth?.currentUser;
+        if (!fb || fb.isAnonymous) throw new Error("Sign in first.");
+        const db = getFirebaseDb();
+        if (db) {
+          await setDoc(doc(db, "account_deletions", fb.uid), {
+            uid: fb.uid,
+            email: fb.email || "",
+            phone: fb.phoneNumber || "",
+            requestedAt: new Date().toISOString(),
+            status: "requested",
+          });
+        }
+        try {
+          await deleteUser(fb);
+        } catch (err) {
+          const code = (err as { code?: string }).code;
+          if (code === "auth/requires-recent-login") {
+            throw new Error("Sign in again, then tap Delete account.");
+          }
+          throw err;
+        }
+        resetPhoneLogin();
         setUser(null);
       },
       async sendVerificationEmail() {

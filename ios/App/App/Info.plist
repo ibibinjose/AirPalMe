@@ -49,7 +49,7 @@
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
-		<string>armv7</string>
+		<string>arm64</string>
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
@@ -70,6 +70,8 @@
 	<string>AirPal uses your camera to scan room keys, street markers, event passes, and table QR codes.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>AirPal allows you to upload photos for your profile, stall, or venue.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>AirPal may save a photo you take for your profile, stall, or venue.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>AirPal uses your location to discover nearby restaurants, venues, precinct highlights, and events.</string>
 	<key>NFCReaderUsageDescription</key>

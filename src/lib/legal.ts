@@ -12,7 +12,7 @@ export const LEGAL = {
   law: "the laws of New South Wales, Australia",
   courts: "the courts of New South Wales, Australia",
   email: "hello@airpal.me",
-  updated: "17 September 2026",
+  updated: "18 September 2026",
 } as const;
 
 export const LEGAL_NAV = [
