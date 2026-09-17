@@ -9,6 +9,7 @@ import {
   Lock,
   QrCode,
   ShieldCheck,
+  Shirt,
   Smartphone,
   Sparkles,
   Store,
@@ -130,8 +131,8 @@ export function JoinPage() {
         </div>
       </div>
 
-      {/* 4 Provider Track Grid */}
-      <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* 5 Provider Track Grid */}
+      <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {/* Track 1: Stay Host */}
         <div className="flex flex-col justify-between rounded-3xl border-2 border-ink bg-card p-6 shadow-xs hover:-translate-y-0.5 transition">
           <div>
@@ -171,6 +172,49 @@ export function JoinPage() {
               }}
             >
               <span>{isHost ? "Host Workspace" : "Start as Host"}</span>
+              <ArrowRight size={15} />
+            </Button>
+          </div>
+        </div>
+
+        {/* Track 2: Fashion Brand */}
+        <div className="flex flex-col justify-between rounded-3xl border-2 border-ink bg-card p-6 shadow-xs hover:-translate-y-0.5 transition">
+          <div>
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-rose-500/10 text-rose-600 border border-rose-500/20">
+              <Shirt size={24} strokeWidth={2} />
+            </div>
+            <p className="mt-4 text-[11px] font-bold uppercase tracking-wider text-rose-600">
+              AirPal Fashion
+            </p>
+            <h2 className="font-display mt-1 text-xl font-bold text-ink">Fashion Brand</h2>
+            <p className="mt-1.5 text-xs text-mute leading-relaxed">
+              For designer fashion brands, boutiques, rentals, and campaign drops.
+            </p>
+
+            <ul className="mt-4 space-y-2 text-xs text-ink/90">
+              <li className="flex items-start gap-2">
+                <CheckCircle2 size={15} className="shrink-0 text-rose-500 mt-0.5" />
+                <span>Publish brand drops, rentals & swap campaigns</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 size={15} className="shrink-0 text-rose-500 mt-0.5" />
+                <span>AirPal Mate experience & event pairings</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 size={15} className="shrink-0 text-rose-500 mt-0.5" />
+                <span>Direct brand shop dashboard & inventory listing</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-line/60">
+            <Button
+              className="w-full justify-between bg-rose-600 hover:bg-rose-700 text-white"
+              onClick={() => {
+                nav("/business/onboard?track=fashion");
+              }}
+            >
+              <span>List Brand & Drops</span>
               <ArrowRight size={15} />
             </Button>
           </div>

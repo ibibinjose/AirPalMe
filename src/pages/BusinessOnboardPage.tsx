@@ -72,7 +72,13 @@ export function BusinessOnboardPage() {
   const [, nav] = useLocation();
   const { user, authReady, requireUser } = useAuth();
   const [step, setStep] = useState(0);
-  const [draft, setDraft] = useState<OnboardDraft>(emptyDraft);
+  const [draft, setDraft] = useState<OnboardDraft>(() => {
+    const base = emptyDraft();
+    const isFashion = typeof window !== "undefined" && window.location.search.includes("track=fashion");
+    return isFashion
+      ? { ...base, category: "shops", venue: { ...base.venue, mode: "unlisted" } }
+      : base;
+  });
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<DirectoryVenue[]>([]);
   const [searching, setSearching] = useState(false);

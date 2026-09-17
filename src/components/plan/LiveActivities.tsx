@@ -49,17 +49,23 @@ export function LiveActivities({ city }: { city?: string }) {
 
   return (
     <section className="mt-8">
-      <div className="mb-3 flex items-end justify-between px-4 md:px-6">
+      <div className="mb-4 flex items-end justify-between px-4 md:px-6">
         <div>
-          <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Live near you</p>
-          <h2 className="font-display text-xl font-semibold">Join an activity</h2>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-brand border border-brand/20">
+            <Sparkles size={12} /> Live near you
+          </span>
+          <h2 className="font-display mt-1 text-2xl font-extrabold text-ink">Join an activity</h2>
         </div>
-        <button type="button" onClick={() => nav("/plan/new")} className="inline-flex items-center gap-1 text-sm text-brand">
+        <button
+          type="button"
+          onClick={() => nav("/plan/new")}
+          className="inline-flex h-9 items-center gap-1.5 rounded-2xl bg-ink px-4 text-xs font-bold text-white hover:bg-slate-800 transition cursor-pointer shadow-xs"
+        >
           <Plus size={14} />
-          Create
+          <span>Create</span>
         </button>
       </div>
-      <div className="no-scrollbar flex gap-3 overflow-x-auto px-4 pb-1 md:px-6">
+      <div className="no-scrollbar flex gap-4 overflow-x-auto px-4 pb-2 md:px-6">
         {feed.map(({ plan, match }) => {
           const going = plan.attendees.some((a) => a.status === "going" && uid && a.id === uid);
           const goingCount = plan.attendees.filter((a) => a.status === "going").length;
@@ -67,40 +73,42 @@ export function LiveActivities({ city }: { city?: string }) {
             <article
               key={plan.id}
               className={cn(
-                "w-64 shrink-0 rounded-3xl bg-card p-4 ring-1 ring-line transition active:scale-[0.99]",
-                plan.isExperience && "ring-amber-500/30",
+                "w-72 shrink-0 rounded-3xl border-2 border-ink bg-card p-5 shadow-xs hover:-translate-y-0.5 transition flex flex-col justify-between",
+                plan.isExperience && "border-brand/40 bg-brand/5",
               )}
             >
               <button type="button" onClick={() => nav(`/plan/${plan.id}`)} className="block w-full text-left">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   {match > 0 && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-semibold text-brand">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-brand px-2.5 py-0.5 text-[11px] font-black text-white border border-brand-ink shadow-xs">
                       <Sparkles size={11} />
                       Matches you
                     </span>
                   )}
                   {plan.isExperience && (
-                    <span className="inline-flex items-center rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/30">
+                    <span className="inline-flex items-center rounded-full bg-slate-950 px-2.5 py-0.5 text-[10px] font-bold text-white border border-ink">
                       ${plan.pricePerPerson || 0} {plan.pricingModel === "deposit" && plan.depositConfig ? `($${plan.depositConfig.depositAmount} dep)` : ""}
                     </span>
                   )}
                 </div>
-                <p className="font-display mt-1.5 text-[16px] font-semibold leading-snug">{plan.title}</p>
-                <p className="mt-1 flex items-center gap-1.5 text-xs text-mute">
-                  <CalendarDays size={12} />
-                  {formatWhen(plan.date, plan.time)}
-                  <span aria-hidden>·</span>
-                  <Users size={12} />
-                  {goingCount} in
-                </p>
-                <p className="mt-0.5 flex items-center gap-1.5 truncate text-xs text-mute">
-                  <MapPin size={12} className="shrink-0" />
-                  <span className="truncate">{plan.destination || plan.city}</span>
-                </p>
+                <h3 className="font-display mt-2 text-lg font-bold text-ink leading-snug line-clamp-2">{plan.title}</h3>
+                <div className="mt-2 space-y-1 text-xs text-mute font-medium">
+                  <p className="flex items-center gap-1.5">
+                    <CalendarDays size={13} className="text-brand shrink-0" />
+                    <span>{formatWhen(plan.date, plan.time)}</span>
+                    <span aria-hidden>·</span>
+                    <Users size={13} className="text-brand shrink-0" />
+                    <span className="font-semibold text-ink">{goingCount} in</span>
+                  </p>
+                  <p className="flex items-center gap-1.5 truncate">
+                    <MapPin size={13} className="shrink-0 text-brand" />
+                    <span className="truncate">{plan.destination || plan.city}</span>
+                  </p>
+                </div>
                 {plan.interests && plan.interests.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1">
+                  <div className="mt-3 flex flex-wrap gap-1">
                     {plan.interests.slice(0, 3).map((t) => (
-                      <span key={t} className="rounded-full bg-paper px-2 py-0.5 text-[11px] text-mute ring-1 ring-line">
+                      <span key={t} className="rounded-full bg-paper px-2.5 py-0.5 text-[11px] font-semibold text-ink border border-line">
                         {ACTIVITY_INTERESTS.find((tag) => tag.id === t)?.label || t}
                       </span>
                     ))}
@@ -114,15 +122,15 @@ export function LiveActivities({ city }: { city?: string }) {
                   else rsvpPlan(plan.id, "going");
                 }}
                 className={cn(
-                  "mt-3 h-9 w-full rounded-full text-xs font-semibold transition active:scale-[0.99]",
+                  "mt-4 h-10 w-full rounded-2xl text-xs font-black transition cursor-pointer shadow-xs border border-ink",
                   going
-                    ? "bg-paper text-ink ring-1 ring-line"
+                    ? "bg-emerald-500/15 text-emerald-900 border-emerald-500/30"
                     : plan.isExperience
-                      ? "bg-amber-500 text-black font-bold hover:bg-amber-400"
-                      : "bg-ink text-white hover:bg-ink/90",
+                      ? "bg-ink text-white hover:bg-slate-800"
+                      : "bg-brand text-white hover:bg-brand-ink",
                 )}
               >
-                {going ? "You're in · open plan" : plan.isExperience ? "View & Book Experience" : "Join in one tap"}
+                {going ? "You're in · open plan" : plan.isExperience ? "View & Book Experience" : "Join in one tap →"}
               </button>
             </article>
           );

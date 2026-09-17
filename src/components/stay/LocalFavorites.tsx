@@ -250,9 +250,9 @@ export function LocalFavorites() {
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-gold/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-brand border border-brand/20">
               <Sparkles size={12} />
-              {t("hostPicks") || "Local Favorites"}
+              {t("hostPicks") || "Host Picks"}
             </span>
             {apiKey && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
@@ -261,10 +261,10 @@ export function LocalFavorites() {
               </span>
             )}
           </div>
-          <h2 className="font-display mt-1 text-2xl font-bold tracking-tight text-ink">
-            Nearby Cafes & Attractions
+          <h2 className="font-display mt-1 text-2xl font-extrabold tracking-tight text-ink">
+            Nearby Cafes &amp; Attractions
           </h2>
-          <p className="mt-0.5 text-xs text-mute">
+          <p className="mt-0.5 text-xs text-mute font-medium">
             Walkable favorites ranked by distance from your active location
           </p>
         </div>
@@ -276,10 +276,10 @@ export function LocalFavorites() {
               type="button"
               id="btn-reset-stay-geo"
               onClick={handleResetStayLocation}
-              className="inline-flex h-8 items-center gap-1.5 rounded-full bg-card px-3 text-xs font-medium text-ink ring-1 ring-line transition hover:bg-paper"
+              className="inline-flex h-8 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-bold text-ink border border-line transition hover:bg-paper"
               title="Switch back to stay address"
             >
-              <MapPin size={13} className="text-gold" />
+              <MapPin size={13} className="text-brand" />
               Stay Anchor
             </button>
           ) : (
@@ -288,10 +288,10 @@ export function LocalFavorites() {
               id="btn-locate-device-geo"
               onClick={handleRequestDeviceLocation}
               disabled={geoLoading}
-              className="inline-flex h-8 items-center gap-1.5 rounded-full bg-ink px-3 text-xs font-medium text-white transition hover:bg-ink/90 disabled:opacity-50"
+              className="inline-flex h-8 items-center gap-1.5 rounded-full bg-ink px-3.5 text-xs font-bold text-white transition hover:bg-slate-800 disabled:opacity-50 cursor-pointer shadow-xs"
               title="Use current device GPS location"
             >
-              <Compass size={13} className={cn("text-gold", geoLoading && "animate-spin")} />
+              <Compass size={13} className={cn("text-brand", geoLoading && "animate-spin")} />
               {geoLoading ? "Locating..." : "Use My Location"}
             </button>
           )}
@@ -302,16 +302,16 @@ export function LocalFavorites() {
       {geoNotice && (
         <div
           id="geo-notice-banner"
-          className="mb-3 flex items-center justify-between rounded-xl bg-paper/80 px-3 py-2 text-xs text-mute ring-1 ring-line"
+          className="mb-3 flex items-center justify-between rounded-2xl bg-paper px-3.5 py-2 text-xs text-mute border border-line"
         >
-          <span className="flex items-center gap-1.5">
-            <Info size={13} className="text-gold shrink-0" />
+          <span className="flex items-center gap-1.5 font-medium">
+            <Info size={13} className="text-brand shrink-0" />
             {geoNotice}
           </span>
           <button
             type="button"
             onClick={() => setGeoNotice(null)}
-            className="text-[11px] font-medium text-ink underline"
+            className="text-[11px] font-bold text-ink underline cursor-pointer"
           >
             Dismiss
           </button>
@@ -326,8 +326,8 @@ export function LocalFavorites() {
             id="filter-category-all"
             onClick={() => setCategory("all")}
             className={cn(
-              "h-8 shrink-0 rounded-full px-3.5 text-xs font-medium transition",
-              category === "all" ? "bg-ink text-white" : "bg-card text-mute ring-1 ring-line hover:text-ink"
+              "h-8 shrink-0 rounded-full px-4 text-xs font-bold transition cursor-pointer",
+              category === "all" ? "bg-ink text-white" : "bg-card text-mute border border-line hover:text-ink"
             )}
           >
             All Places ({allFavorites.length})
@@ -337,28 +337,28 @@ export function LocalFavorites() {
             id="filter-category-cafe"
             onClick={() => setCategory("cafe")}
             className={cn(
-              "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-xs font-medium transition",
+              "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs font-bold transition cursor-pointer",
               category === "cafe"
-                ? "bg-amber-600 text-white"
-                : "bg-card text-mute ring-1 ring-line hover:text-ink"
+                ? "bg-brand text-white"
+                : "bg-card text-mute border border-line hover:text-ink"
             )}
           >
             <Coffee size={13} />
-            Cafes & Coffee
+            Cafes &amp; Coffee
           </button>
           <button
             type="button"
             id="filter-category-attraction"
             onClick={() => setCategory("attraction")}
             className={cn(
-              "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-xs font-medium transition",
+              "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs font-bold transition cursor-pointer",
               category === "attraction"
-                ? "bg-indigo-600 text-white"
-                : "bg-card text-mute ring-1 ring-line hover:text-ink"
+                ? "bg-slate-900 text-white"
+                : "bg-card text-mute border border-line hover:text-ink"
             )}
           >
             <Landmark size={13} />
-            Attractions & Sights
+            Attractions &amp; Sights
           </button>
         </div>
 
@@ -369,8 +369,8 @@ export function LocalFavorites() {
             id="filter-toggle-walk"
             onClick={() => setMaxWalkFilter(!maxWalkFilter)}
             className={cn(
-              "inline-flex h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-medium ring-1 transition",
-              maxWalkFilter ? "bg-brand/10 text-brand ring-brand/30" : "bg-card text-mute ring-line hover:text-ink"
+              "inline-flex h-7 items-center gap-1 rounded-full px-3 text-[11px] font-bold border transition cursor-pointer",
+              maxWalkFilter ? "bg-brand/10 text-brand border-brand/30" : "bg-card text-mute border-line hover:text-ink"
             )}
           >
             <Navigation size={11} />
@@ -381,8 +381,8 @@ export function LocalFavorites() {
             id="filter-toggle-rating"
             onClick={() => setHighRatingFilter(!highRatingFilter)}
             className={cn(
-              "inline-flex h-7 items-center gap-1 rounded-full px-2.5 text-[11px] font-medium ring-1 transition",
-              highRatingFilter ? "bg-amber-500/10 text-amber-600 ring-amber-500/30" : "bg-card text-mute ring-line hover:text-ink"
+              "inline-flex h-7 items-center gap-1 rounded-full px-3 text-[11px] font-bold border transition cursor-pointer",
+              highRatingFilter ? "bg-brand/10 text-brand border-brand/30" : "bg-card text-mute border-line hover:text-ink"
             )}
           >
             <Star size={11} className="fill-current" />
@@ -392,8 +392,8 @@ export function LocalFavorites() {
       </div>
 
       {/* Main Map Card */}
-      <div className="overflow-hidden rounded-3xl bg-card ring-1 ring-line shadow-sm">
-        {/* Interactive Google Map Container (Explicit Height as required by skill) */}
+      <div className="overflow-hidden rounded-3xl bg-card border-2 border-ink shadow-sm">
+        {/* Interactive Google Map Container */}
         <div id="google-maps-canvas-container" className="relative h-72 sm:h-80 w-full bg-paper">
           {apiKey ? (
             <APIProvider apiKey={apiKey} libraries={["marker"]}>
@@ -413,11 +413,11 @@ export function LocalFavorites() {
                   title={geoMode === "device" ? "Your Location" : property.name || "Stay Location"}
                 >
                   <div className="relative flex items-center justify-center">
-                    <span className="absolute -inset-1.5 animate-ping rounded-full bg-gold/40" />
+                    <span className="absolute -inset-1.5 animate-ping rounded-full bg-brand/40" />
                     <Pin
-                      background="#111827"
-                      borderColor="#f59e0b"
-                      glyphColor="#f59e0b"
+                      background="#1805db"
+                      borderColor="#ffffff"
+                      glyphColor="#ffffff"
                       scale={1.15}
                     />
                   </div>
@@ -437,7 +437,7 @@ export function LocalFavorites() {
                     >
                       <div className={cn("transition-transform duration-200", isSelected ? "scale-125 z-30" : "hover:scale-110")}>
                         <Pin
-                          background={isCafe ? "#d97706" : "#4f46e5"}
+                          background={isCafe ? "#1805db" : "#0f172a"}
                           borderColor="#ffffff"
                           glyphColor="#ffffff"
                           scale={isSelected ? 1.2 : 0.95}
@@ -453,7 +453,7 @@ export function LocalFavorites() {
                     position={{ lat: selectedPlace.geo.lat, lng: selectedPlace.geo.lng }}
                     onCloseClick={() => setSelectedId(null)}
                     headerContent={
-                      <div className="text-xs font-semibold text-ink truncate pr-2">
+                      <div className="text-xs font-bold text-ink truncate pr-2">
                         {selectedPlace.name}
                       </div>
                     }
@@ -469,17 +469,17 @@ export function LocalFavorites() {
                         </div>
                       )}
                       <div className="flex items-center gap-1.5 text-[11px] text-mute mb-1">
-                        <span className="flex items-center text-amber-500 font-medium">
+                        <span className="flex items-center text-brand font-bold">
                           <Star size={11} className="fill-current mr-0.5" />
                           {selectedPlace.rating?.toFixed(1) || "—"}
                         </span>
                         <span>•</span>
-                        <span className="flex items-center text-brand font-medium">
+                        <span className="flex items-center text-brand font-semibold">
                           <Navigation size={11} className="mr-0.5" />
                           {selectedPlace.walk}
                         </span>
                       </div>
-                      <p className="text-[11px] text-mute line-clamp-2 mb-2">
+                      <p className="text-[11px] text-mute line-clamp-2 mb-2 font-medium">
                         {selectedPlace.insiderTip || selectedPlace.shortWhy || selectedPlace.address}
                       </p>
                       <div className="flex items-center gap-2">
@@ -487,7 +487,7 @@ export function LocalFavorites() {
                           href={mapsWalkUrl(activeGeo, selectedPlace.geo)}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex-1 inline-flex items-center justify-center gap-1 rounded-md bg-ink px-2 py-1 text-[11px] font-semibold text-white transition hover:bg-ink/90"
+                          className="flex-1 inline-flex items-center justify-center gap-1 rounded-lg bg-brand px-2 py-1.5 text-[11px] font-bold text-white transition hover:bg-brand-ink"
                         >
                           <Navigation size={11} />
                           Walk There
@@ -496,7 +496,7 @@ export function LocalFavorites() {
                           href={mapsPlaceUrl(selectedPlace.geo, selectedPlace.name)}
                           target="_blank"
                           rel="noreferrer"
-                          className="p-1 rounded-md text-mute hover:text-ink ring-1 ring-line"
+                          className="p-1 rounded-lg text-mute hover:text-ink border border-line"
                           title="Open in Google Maps"
                         >
                           <ExternalLink size={13} />
@@ -520,22 +520,22 @@ export function LocalFavorites() {
         </div>
 
         {/* Places Card Carousel / List */}
-        <div className="border-t border-line p-3 sm:p-4">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-medium text-mute">
+        <div className="border-t-2 border-ink p-3 sm:p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-xs font-bold text-ink">
               Showing {filteredFavorites.length} recommended spots
             </span>
-            <span className="text-[11px] text-mute flex items-center gap-1">
+            <span className="text-[11px] text-mute font-medium flex items-center gap-1">
               <Navigation size={11} className="text-brand" />
               Times measured on foot
             </span>
           </div>
 
-          <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1 pt-1">
+          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-1 pt-1">
             {filteredFavorites.length === 0 ? (
-              <div className="w-full rounded-2xl bg-paper px-4 py-6 text-center ring-1 ring-line">
-                <p className="text-sm font-semibold">No walkable spots listed yet</p>
-                <p className="mt-1 text-xs text-mute">Scan a stay QR or open Explore when venues are published nearby.</p>
+              <div className="w-full rounded-2xl bg-paper px-4 py-6 text-center border border-line">
+                <p className="text-sm font-bold text-ink">No walkable spots listed yet</p>
+                <p className="mt-1 text-xs text-mute font-medium">Scan a stay QR or open Explore when venues are published nearby.</p>
               </div>
             ) : null}
             {filteredFavorites.map((place) => {
@@ -548,47 +548,47 @@ export function LocalFavorites() {
                   id={`favorite-card-${place.id}`}
                   onClick={() => handleSelectPlace(place)}
                   className={cn(
-                    "group relative flex w-64 shrink-0 flex-col overflow-hidden rounded-2xl bg-paper p-2.5 ring-1 transition cursor-pointer text-left",
+                    "group relative flex w-72 shrink-0 flex-col overflow-hidden rounded-3xl bg-paper p-3 border-2 transition cursor-pointer text-left shadow-xs hover:-translate-y-0.5",
                     isSelected
-                      ? "ring-2 ring-ink shadow-md"
-                      : "ring-line hover:ring-ink/30 hover:shadow-sm"
+                      ? "border-brand ring-2 ring-brand/30 shadow-md"
+                      : "border-ink hover:border-brand"
                   )}
                 >
                   {/* Photo Container */}
-                  <div className="relative h-28 w-full overflow-hidden rounded-xl bg-card">
+                  <div className="relative h-32 w-full overflow-hidden rounded-2xl bg-card">
                     <Photo
                       src={place.photo}
                       alt={place.name}
                       className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
-                    <div className="absolute top-2 left-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-md">
-                      {isCafe ? <Coffee size={10} className="text-amber-400" /> : <Landmark size={10} className="text-indigo-400" />}
+                    <div className="absolute top-2 left-2 flex items-center gap-1 rounded-full bg-slate-950/80 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur-md border border-white/10">
+                      {isCafe ? <Coffee size={10} className="text-brand" /> : <Landmark size={10} className="text-indigo-400" />}
                       {isCafe ? "Cafe" : "Attraction"}
                     </div>
                     {place.isHostPick && (
-                      <div className="absolute top-2 right-2 rounded-full bg-gold/90 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-black backdrop-blur-md">
+                      <div className="absolute top-2 right-2 rounded-full bg-brand px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white backdrop-blur-md border border-brand-ink shadow-xs">
                         Host Pick
                       </div>
                     )}
                   </div>
 
                   {/* Details */}
-                  <div className="mt-2.5 flex flex-1 flex-col justify-between">
+                  <div className="mt-3 flex flex-1 flex-col justify-between">
                     <div>
                       <div className="flex items-start justify-between gap-1">
-                        <h4 className="font-display font-semibold text-sm text-ink truncate">
+                        <h4 className="font-display font-extrabold text-base text-ink truncate">
                           {place.name}
                         </h4>
                         {place.rating && (
-                          <span className="flex items-center gap-0.5 shrink-0 text-xs font-semibold text-amber-600">
-                            <Star size={11} className="fill-current text-amber-500" />
+                          <span className="flex items-center gap-0.5 shrink-0 text-xs font-extrabold text-brand">
+                            <Star size={11} className="fill-current text-brand" />
                             {place.rating.toFixed(1)}
                           </span>
                         )}
                       </div>
 
-                      <div className="mt-1 flex items-center gap-1.5 text-[11px] text-mute">
-                        <span className="font-semibold text-brand">{place.walk}</span>
+                      <div className="mt-1 flex items-center gap-1.5 text-[11px] text-mute font-medium">
+                        <span className="font-bold text-brand">{place.walk}</span>
                         <span>•</span>
                         <span>{place.meters}m away</span>
                         {place.priceLevel && (
@@ -599,13 +599,13 @@ export function LocalFavorites() {
                         )}
                       </div>
 
-                      <p className="mt-1 text-[11px] text-mute line-clamp-2">
+                      <p className="mt-1.5 text-xs text-mute line-clamp-2 font-medium">
                         {place.insiderTip || place.shortWhy || place.address}
                       </p>
                     </div>
 
                     {/* Action Bar */}
-                    <div className="mt-3 flex items-center gap-2 pt-2 border-t border-line/60">
+                    <div className="mt-3 flex items-center gap-2 pt-2 border-t border-line">
                       <a
                         href={mapsWalkUrl(activeGeo, place.geo)}
                         target="_blank"
@@ -618,17 +618,17 @@ export function LocalFavorites() {
                             source: "local_favorites_walk",
                           });
                         }}
-                        className="flex-1 inline-flex items-center justify-center gap-1 rounded-xl bg-ink py-1.5 text-xs font-semibold text-white transition hover:bg-ink/90"
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-brand py-2 text-xs font-bold text-white transition hover:bg-brand-ink shadow-xs"
                       >
                         <Navigation size={12} />
-                        Walk
+                        <span>Walk</span>
                       </a>
                       <a
                         href={mapsPlaceUrl(place.geo, place.name)}
                         target="_blank"
                         rel="noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-card text-mute ring-1 ring-line transition hover:text-ink hover:bg-paper"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-card text-mute border border-line transition hover:text-ink hover:bg-paper"
                         title="View on Google Maps"
                       >
                         <ExternalLink size={13} />

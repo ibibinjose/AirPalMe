@@ -161,13 +161,12 @@ export function MatePage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">AirPal Mate · Sydney</p>
-      <h1 className="font-display mt-2 text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl">
-        Don&apos;t go alone.
+      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">AirPal Mate · Sydney Launch</p>
+      <h1 className="font-display mt-2 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl text-ink">
+        Go with your Mate, Friends &amp; Family.
       </h1>
-      <p className="mt-3 max-w-md text-[15px] leading-7 text-mute">
-        Got tickets but no one to go with? Want to explore Sydney? Tell us the plan — we&apos;ll find someone to go
-        with you.
+      <p className="mt-3 max-w-md text-[15px] leading-relaxed text-mute font-medium">
+        Got plans or Sydney events but need a companion or local guide? Go solo, bring your crew, or find an approved AirPal Mate to join you.
       </p>
       <div className="mt-5 flex flex-wrap gap-2">
         <Button size="lg" onClick={() => nav("/mate/request")}>

@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, List as ListIcon, Map as MapIcon, QrCode, Search, Sparkles, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowDown, BadgePercent, Building2, CalendarDays, Compass, List as ListIcon, Loader2, Map as MapIcon, Search, Sparkles, Ticket, Users, X } from "lucide-react";
 import { useLocation, useSearch } from "wouter";
 import { motion, useReducedMotion } from "framer-motion";
 import { FilterChips } from "@/components/discovery/FilterChips";
@@ -9,7 +9,7 @@ import { Photo } from "@/components/ui/Photo";
 import { TourCard } from "@/components/guide/TourCard";
 import { CityMap, type MapPin } from "@/components/map/CityMap";
 import { LiveActivities } from "@/components/plan/LiveActivities";
-import { discoverPlaces, featuredPlaces, PRECINCT, toursForPrecinct } from "@/lib/catalog";
+import { discoverPlaces, featuredPlaces, toursForPrecinct } from "@/lib/catalog";
 import { eventsLiveNow, eventsTonight } from "@/lib/local-events";
 import { liveCalendarEvents, tonightCalendarEvents } from "@/lib/remote-events";
 import { useEvents } from "@/contexts/EventsContext";
@@ -34,7 +34,7 @@ export function DiscoverPage() {
   const { session } = useStay();
   const { version, remoteLoaded } = useListings();
   const { t } = useLocale();
-  const { here, today, now, timeZone, city, source } = useLocalNow();
+  const { here, today, now, timeZone, city } = useLocalNow();
   const [chip, setChip] = useState("all");
   const [q, setQ] = useState("");
   const [view, setView] = useState<"list" | "map">("list");
@@ -43,7 +43,25 @@ export function DiscoverPage() {
   const [play] = useState(() => !reduce && takeLandingEnter());
   const { plans } = usePlans();
 
-  const { calendarEvents, remoteNearby } = useEvents();
+  const { calendarEvents, remoteNearby, refresh: refreshEvents } = useEvents();
+  const [pullPx, setPullPx] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const touchY = useRef<number | null>(null);
+
+  function doRefresh() {
+    if (refreshing) return;
+    setRefreshing(true);
+    try {
+      refreshEvents();
+    } catch {
+      /* contexts still reload via the bus below */
+    }
+    window.dispatchEvent(new Event("airpal:reload-data"));
+    window.setTimeout(() => {
+      setRefreshing(false);
+      setPullPx(0);
+    }, 1200);
+  }
   // What's happening around the guest: Firestore events (curated + organiser),
   // filtered by tonight/live windows and the GPS-derived city. Empty DB → empty.
   const tonight = useMemo(() => {
@@ -141,7 +159,35 @@ export function DiscoverPage() {
     : { initial: false as const, animate: "show" as const };
 
   return (
-    <div className="relative mx-auto max-w-6xl">
+    <div
+      className="relative mx-auto max-w-6xl"
+      onTouchStart={(e) => {
+        if (e.touches.length === 1) touchY.current = e.touches[0]?.clientY ?? null;
+      }}
+      onTouchMove={(e) => {
+        if (touchY.current == null || refreshing) return;
+        const dy = (e.touches[0]?.clientY ?? 0) - touchY.current;
+        if (window.scrollY <= 0 && dy > 0) setPullPx(Math.min(dy * 0.6, 110));
+      }}
+      onTouchEnd={() => {
+        if (pullPx > 70) doRefresh();
+        else setPullPx(0);
+        touchY.current = null;
+      }}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-center transition-opacity"
+        style={{ opacity: pullPx > 8 || refreshing ? 1 : 0 }}
+      >
+        <div
+          className="mt-3 flex items-center gap-2 rounded-full border border-white/15 bg-slate-950/70 px-4 py-2 text-xs font-semibold text-white backdrop-blur-md"
+          style={{ transform: `translateY(${refreshing ? 0 : Math.min(pullPx, 80)}px)` }}
+        >
+          {refreshing ? <Loader2 size={14} className="animate-spin" /> : <ArrowDown size={14} />}
+          {refreshing ? "Refreshing…" : pullPx > 70 ? "Release to refresh" : "Pull to refresh"}
+        </div>
+      </div>
       {play && (
         <motion.div
           className="pointer-events-none fixed inset-0 z-50 bg-paper"
@@ -169,68 +215,77 @@ export function DiscoverPage() {
             <div aria-hidden className="h-[200px] w-full bg-ink md:h-[280px]" />
           )}
           <div className="absolute inset-x-0 bottom-0 p-5 md:p-8">
-            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/70">
-              {city || PRECINCT.city}
-              {source === "gps" ? " · near you" : ""}
-            </p>
-            <h1 className="font-display mt-1 text-4xl font-semibold text-white md:text-5xl">
-              {isHomeCity ? PRECINCT.name.split("&")[0].trim() : city}
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-950/60 backdrop-blur-md px-3 py-1 text-xs font-semibold text-white border border-white/20 mb-2">
+              <Sparkles size={12} className="text-white/80" />
+              <span>AirPal Circle · {isHomeCity ? "Sydney" : city}</span>
+            </div>
+            <h1 className="font-display text-3xl font-extrabold text-white md:text-5xl leading-tight tracking-tight">
+              Discover {isHomeCity ? "Sydney" : city}.
             </h1>
-            <p className="mt-1.5 max-w-md text-sm text-white/80">{t("homeLede")}</p>
-            <label className="mt-3.5 flex h-11 w-full max-w-md items-center gap-2 rounded-full bg-white/95 px-3.5 text-ink shadow-sm">
-              <Search size={16} className="shrink-0 text-mute" />
+            <p className="mt-1 text-sm font-medium text-white/75">
+              Places, events, and plans around you right now.
+            </p>
+
+            {/* Search Bar */}
+            <label className="mt-3 flex h-10 w-full max-w-md items-center gap-2 rounded-xl bg-white/95 px-3 text-ink border border-ink/20 shadow-xs">
+              <Search size={15} className="shrink-0 text-brand" />
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={t("aroundYouSearch")}
-                className="w-full bg-transparent text-[14px] outline-none placeholder:text-mute"
+                className="w-full bg-transparent text-[13px] font-medium outline-none placeholder:text-mute"
               />
             </label>
-            <div className="mt-3 flex flex-wrap gap-2">
+
+            {/* Quick links: every tile lands somewhere real */}
+            <div className="mt-3 grid grid-cols-3 sm:grid-cols-6 gap-2 max-w-3xl">
               <button
                 type="button"
-                onClick={() => nav("/scan")}
-                className="inline-flex h-9 items-center gap-2 rounded-full bg-white px-3.5 text-sm font-medium text-ink"
+                onClick={() => nav("/mate")}
+                className="group flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/10 border border-white/20 text-white backdrop-blur-xl hover:bg-white/15 hover:border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition cursor-pointer"
               >
-                <QrCode size={14} />
-                {t("scan")}
+                <Users size={15} className="text-white group-hover:scale-110 transition shrink-0" />
+                <span className="text-xs font-semibold tracking-tight">Mates</span>
               </button>
               <button
                 type="button"
                 onClick={() => nav("/concierge")}
-                className="inline-flex h-9 items-center rounded-full bg-white/15 px-3.5 text-sm font-medium text-white ring-1 ring-white/35"
+                className="group flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/10 border border-white/20 text-white backdrop-blur-xl hover:bg-white/15 hover:border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition cursor-pointer"
               >
-                {t("stay")}
-              </button>
-              <button
-                type="button"
-                onClick={() => nav("/guide")}
-                className="inline-flex h-9 items-center rounded-full bg-white/15 px-3.5 text-sm font-medium text-white ring-1 ring-white/35"
-              >
-                {t("explore")}
+                <Building2 size={15} className="text-white group-hover:scale-110 transition shrink-0" />
+                <span className="text-xs font-semibold tracking-tight">Stay</span>
               </button>
               <button
                 type="button"
                 onClick={() => nav("/calendar")}
-                className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white/15 px-3.5 text-sm font-medium text-white ring-1 ring-white/35 hover:bg-white/25 transition"
+                className="group flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/10 border border-white/20 text-white backdrop-blur-xl hover:bg-white/15 hover:border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition cursor-pointer"
               >
-                <CalendarDays size={14} />
-                <span>{t("calendar")}</span>
+                <Ticket size={15} className="text-white group-hover:scale-110 transition shrink-0" />
+                <span className="text-xs font-semibold tracking-tight">Events</span>
               </button>
               <button
                 type="button"
-                onClick={() => nav("/experiences")}
-                className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white px-3.5 text-sm font-medium text-ink hover:bg-white/90 transition"
+                onClick={() => nav("/plan")}
+                className="group flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/10 border border-white/20 text-white backdrop-blur-xl hover:bg-white/15 hover:border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition cursor-pointer"
               >
-                <Sparkles size={14} className="text-gold" />
-                <span>Experiences</span>
+                <CalendarDays size={15} className="text-white group-hover:scale-110 transition shrink-0" />
+                <span className="text-xs font-semibold tracking-tight">Plans</span>
               </button>
               <button
                 type="button"
-                onClick={() => nav("/mate")}
-                className="inline-flex h-9 items-center gap-1.5 rounded-full bg-white/15 px-3.5 text-sm font-medium text-white ring-1 ring-white/35 hover:bg-white/25 transition"
+                onClick={() => nav("/?chip=deals")}
+                className="group flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/10 border border-white/20 text-white backdrop-blur-xl hover:bg-white/15 hover:border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition cursor-pointer"
               >
-                <span>Find a Mate</span>
+                <BadgePercent size={15} className="text-white group-hover:scale-110 transition shrink-0" />
+                <span className="text-xs font-semibold tracking-tight">Deals</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => nav("/guide")}
+                className="group flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-white/10 border border-white/20 text-white backdrop-blur-xl hover:bg-white/15 hover:border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition cursor-pointer"
+              >
+                <Compass size={15} className="text-white group-hover:scale-110 transition shrink-0" />
+                <span className="text-xs font-semibold tracking-tight">Guides</span>
               </button>
             </div>
           </div>
@@ -445,7 +500,7 @@ export function DiscoverPage() {
       )}
 
       {view === "list" && chip === "all" && (
-        <section className="mt-8 grid gap-3 px-4 pb-10 md:grid-cols-2 md:px-6">
+        <section className="mt-8 grid gap-3 px-4 pb-28 md:grid-cols-2 md:px-6">
           <button
             type="button"
             onClick={() => nav("/scan")}
@@ -496,7 +551,7 @@ export function DiscoverPage() {
             className="flex items-center justify-between rounded-3xl bg-card px-5 py-4 text-left ring-1 ring-line hover:shadow-md transition col-span-full md:col-span-2"
           >
             <div className="flex items-center gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-2xl bg-amber-50 text-amber-900 ring-1 ring-amber-200">
+              <div className="grid h-10 w-10 place-items-center rounded-2xl bg-ink/[0.05] text-ink ring-1 ring-line">
                 <CalendarDays size={20} />
               </div>
               <span>

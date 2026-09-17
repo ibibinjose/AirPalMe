@@ -1,5 +1,7 @@
-/** Primary guest tabs: Explore (home) / Plan / Stay, plus Mate and Scan. Calendar lives inside Explore + global search. */
-export type GuestTab = "scan" | "plan" | "stay" | "explore" | "mate";
+import { parseAtHandle } from "@shared/bio";
+
+/** Primary guest tabs: Explore (home) / Plan / Stay, plus Mate, You, and Scan. Calendar lives inside Explore + global search. */
+export type GuestTab = "scan" | "plan" | "stay" | "explore" | "mate" | "you";
 
 /** Map a route path to the bottom-tab it belongs to. Pure: safe to unit test. */
 export function tabFromPath(path: string): GuestTab {
@@ -11,6 +13,8 @@ export function tabFromPath(path: string): GuestTab {
     path.startsWith("/events") ||
     path.startsWith("/guide") ||
     path.startsWith("/circle") ||
+    path.startsWith("/promotions") ||
+    path.startsWith("/giveaways") ||
     path.startsWith("/explore")
   )
     return "explore";
@@ -22,6 +26,14 @@ export function tabFromPath(path: string): GuestTab {
     path.startsWith("/q/")
   ) {
     return "stay";
+  }
+  if (
+    path === "/me" ||
+    path.startsWith("/me/") ||
+    path.startsWith("/bio/") ||
+    parseAtHandle(path.split("?")[0] || "")
+  ) {
+    return "you";
   }
   return "explore";
 }

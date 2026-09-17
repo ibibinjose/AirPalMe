@@ -27,4 +27,20 @@ describe("tabFromPath", () => {
     expect(tabFromPath("/host")).toBe("explore");
     expect(tabFromPath("/settings")).toBe("explore");
   });
+
+  it("parks deals and giveaways under Explore", () => {
+    expect(tabFromPath("/promotions")).toBe("explore");
+    expect(tabFromPath("/promotions/summer")).toBe("explore");
+    expect(tabFromPath("/giveaways")).toBe("explore");
+    expect(tabFromPath("/giveaways/abc")).toBe("explore");
+  });
+
+  it("routes your profile and account to the You tab", () => {
+    expect(tabFromPath("/me")).toBe("you");
+    expect(tabFromPath("/me/giveaways")).toBe("you");
+    expect(tabFromPath("/bio/setup")).toBe("you");
+    expect(tabFromPath("/bio/edit")).toBe("you");
+    expect(tabFromPath("/@maya")).toBe("you");
+    expect(tabFromPath("/join")).toBe("explore");
+  });
 });

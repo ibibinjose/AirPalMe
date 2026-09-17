@@ -92,6 +92,7 @@ const BusinessCampaignsPage = lazy(() =>
 const ExperiencesPage = lazy(() =>
   import("@/pages/ExperiencesPage").then((m) => ({ default: m.ExperiencesPage })),
 );
+const FashionPage = lazy(() => import("@/pages/FashionPage").then((m) => ({ default: m.FashionPage })));
 const PlanHubPage = lazy(() => import("@/pages/PlanHubPage").then((m) => ({ default: m.PlanHubPage })));
 const PlanCreatePage = lazy(() => import("@/pages/PlanCreatePage").then((m) => ({ default: m.PlanCreatePage })));
 const PlanDetailPage = lazy(() => import("@/pages/PlanDetailPage").then((m) => ({ default: m.PlanDetailPage })));
@@ -168,6 +169,7 @@ export function AppRoutes() {
         </Route>
         <Route path="/auth/action" component={AuthActionPage} />
         <Route path="/join" component={JoinPage} />
+        <Route path="/fashion" component={FashionPage} />
         <Route path="/club/list" component={ClubListPage} />
         <Route path="/club" component={ClubPage} />
         <Route path="/business/onboard" component={BusinessOnboardPage} />

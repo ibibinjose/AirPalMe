@@ -30,39 +30,46 @@ export function GiveawaysBand() {
 
   return (
     <section className="mx-4 mt-6 md:mx-6">
-      <div className="overflow-hidden rounded-[28px] border-2 border-ink bg-card p-5">
-        <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
-          <Sparkles size={13} /> Discover. Experience. Win.
-        </p>
-        {featured ? (
-          <Link href={`/giveaways/${featured.id}`} className="mt-2 block">
-            <span className="font-display text-xl font-bold leading-snug">{featured.title}</span>
-            <span className="mt-0.5 block text-sm text-mute">
-              {featured.prizeValue || featured.prize.title} · closes{" "}
-              {featured.endAt ? new Date(featured.endAt).toLocaleDateString() : "soon"}
+      <div className="relative overflow-hidden rounded-3xl border-2 border-ink bg-slate-950 p-5 md:p-6 text-white shadow-md">
+        {/* Subtle Ambient Blue Glow */}
+        <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-brand/25 blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/15 px-3 py-1 text-[11px] font-black uppercase tracking-widest text-brand border border-brand/30 mb-2">
+              <Sparkles size={12} /> Discover. Experience. Win.
             </span>
-            <span className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-brand px-4 py-2 text-sm font-bold text-white">
-              <Gift size={15} /> Enter now
-            </span>
-          </Link>
-        ) : (
-          <p className="font-display mt-2 text-xl font-bold leading-snug">
-            Giveaways and offers from local partners.
-          </p>
-        )}
-        <div className="mt-3 flex gap-2">
-          <Link
-            href="/giveaways"
-            className="inline-flex items-center gap-1.5 rounded-xl border-2 border-ink px-3 py-1.5 text-xs font-bold"
-          >
-            <Gift size={13} /> Giveaways
-          </Link>
-          <Link
-            href="/promotions"
-            className="inline-flex items-center gap-1.5 rounded-xl border-2 border-ink px-3 py-1.5 text-xs font-bold"
-          >
-            <BadgePercent size={13} /> Offers near you
-          </Link>
+            {featured ? (
+              <Link href={`/giveaways/${featured.id}`} className="block group">
+                <h3 className="font-display text-xl md:text-2xl font-extrabold text-white group-hover:text-brand transition leading-snug">
+                  {featured.title}
+                </h3>
+                <p className="mt-1 text-xs text-white/70 font-medium">
+                  {featured.prizeValue || featured.prize.title} · Closes{" "}
+                  {featured.endAt ? new Date(featured.endAt).toLocaleDateString() : "soon"}
+                </p>
+              </Link>
+            ) : (
+              <h3 className="font-display text-xl md:text-2xl font-extrabold text-white leading-snug">
+                Giveaways &amp; offers from local partners.
+              </h3>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/giveaways"
+              className="inline-flex h-10 items-center gap-2 rounded-xl bg-brand px-4 text-xs font-black text-white border border-brand-ink hover:bg-brand-ink transition shadow-xs cursor-pointer"
+            >
+              <Gift size={14} /> Giveaways
+            </Link>
+            <Link
+              href="/promotions"
+              className="inline-flex h-10 items-center gap-2 rounded-xl bg-white/10 px-4 text-xs font-bold text-white border border-white/20 hover:bg-white/20 backdrop-blur-md transition cursor-pointer"
+            >
+              <BadgePercent size={14} /> Offers near you
+            </Link>
+          </div>
         </div>
       </div>
     </section>

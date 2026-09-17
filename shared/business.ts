@@ -7,6 +7,7 @@ export const BUSINESS_CATEGORIES = [
   { id: "bar", place: "eat", label: "Bar", line: "Pubs & wine" },
   { id: "club", place: "eat", label: "Club", line: "Nights, DJs, guest list" },
   { id: "shops", place: "shops", label: "Shop", line: "Retail & makers" },
+  { id: "fashion", place: "shops", label: "Fashion Brand", line: "Designer apparel, drops & rentals" },
   { id: "things", place: "things", label: "See", line: "Parks, museums, walks" },
   { id: "events", place: "events", label: "Events", line: "Nights & tickets" },
   { id: "wellness", place: "services", label: "Wellness", line: "Spa, gym, massage" },
