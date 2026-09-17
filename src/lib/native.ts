@@ -167,6 +167,14 @@ export async function initNativeApp(options: {
       await hideNativeSplash({ fadeOutDuration: options.fadeOutDuration ?? 350 });
     }
 
+    // Native push registration (no-op until @capacitor/push-notifications is installed).
+    try {
+      const { registerNativePush } = await import("./notifications");
+      await registerNativePush();
+    } catch {
+      /* inbox still works */
+    }
+
     // Handle Android hardware back button with modal support
     App.addListener("backButton", ({ canGoBack }) => {
       // First try to close modal if handler exists

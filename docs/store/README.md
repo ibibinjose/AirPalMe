@@ -54,6 +54,17 @@ Local→`laneway.jpg`, Events→`campus.jpg`, AirPal→`og-share-preview.jpg`.
 Demo seeds ship with real art. Food/Fashion/Family/Lifestyle keep the gradient
 card until you add photos to `public/media/`.
 
+## Push notifications (web + native)
+
+- Web push works once `VITE_FIREBASE_VAPID_KEY` is set: users tap the bell →
+  Turn on push → FCM token stored at `users/{uid}/fcmTokens`. Transactional
+  mail always pushes; marketing kinds (`giveaway_launched`,
+  `promotion_ending_soon`) are skipped when the user opted out.
+- Native push (iOS/Android) needs one Mac step:
+  `npm i @capacitor/push-notifications && npx cap sync`
+  (APNs key / FCM config per Capacitor docs). The app already registers and
+  saves native tokens through the same `fcmTokens` collection — no code change.
+
 ## In-repo status (done)
 
 - Web PWA: manifest, 192/512 icons, apple-touch-icon, offline page, service worker, no-cache for `sw.js`, immutable assets, full CSP/HSTS headers — `firebase.json`.

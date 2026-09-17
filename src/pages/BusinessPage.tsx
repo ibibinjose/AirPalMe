@@ -69,9 +69,12 @@ function BusinessOverviewStrip({ listingActive, dealLive }: { listingActive: boo
           </div>
         ))}
       </div>
-      <div className="mt-2 flex gap-2 text-[13px] font-semibold">
+      <div className="mt-2 flex flex-wrap gap-2 text-[13px] font-semibold">
         <Link href="/business/campaigns" className="text-brand">
           Create an Experience →
+        </Link>
+        <Link href="/business/promotions" className="text-brand">
+          Promotions & giveaways →
         </Link>
         <Link href="/business/onboard" className="text-mute">
           Claim another venue →

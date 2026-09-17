@@ -422,6 +422,76 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Draw results: the selected entrant and admins only. Public display
+    // uses the masked winnerNote on the promotion doc.
+    match /promotion_winners/{winnerId} {
+      allow get, list: if signedIn() && (
+        resource.data.uid == request.auth.uid || platformAdmin()
+      );
+      allow write: if false;
+    }
+
+    match /promotion_notifications/{noteId} {
+      allow get, list: if signedIn() && (
+        resource.data.uid == request.auth.uid || platformAdmin()
+      );
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow create, delete: if false;
+    }
+
+    match /promotion_terms/{termsId} {
+      allow get, list: if signedIn() && (
+        platformAdmin()
+        || get(/databases/$(database)/documents/promotions/$(resource.data.promotionId)).data.ownerUid == request.auth.uid
+      );
+      allow write: if false;
+    }
+
+    match /promotion_weeks/{weekId} {
+      allow get, list: if true;
+      allow write: if false;
+    }
+
+    match /rewards/{uid} {
+      allow get: if signedIn() && (uid == request.auth.uid || platformAdmin());
+      allow write: if false;
+    }
+
+    match /reward_transactions/{txId} {
+      allow get, list: if signedIn() && (
+        resource.data.uid == request.auth.uid || platformAdmin()
+      );
+      allow write: if false;
+    }
+
+    // Creator broadcasts: owner drafts, admin reviews, functions send.
+    match /broadcasts/{broadcastId} {
+      allow get, list: if signedIn() && (
+        resource.data.ownerUid == request.auth.uid || platformAdmin()
+      );
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.status == 'draft';
+      allow update: if signedIn() && (
+        platformAdmin()
+        || (resource.data.ownerUid == request.auth.uid && resource.data.status == 'draft')
+      );
+      allow delete: if signedIn() && (
+        resource.data.ownerUid == request.auth.uid || platformAdmin()
+      );
+    }
+
+    match /promotion_redemptions/{redemptionId} {
+      allow get, list: if signedIn() && (
+        resource.data.uid == request.auth.uid || platformAdmin()
+        || get(/databases/$(database)/documents/promotions/$(resource.data.promotionId)).data.ownerUid == request.auth.uid
+      );
+      allow write: if false;
+    }
+
     match /platform_settings/{docId} {
       allow read: if signedIn();
       allow write: if platformAdmin();

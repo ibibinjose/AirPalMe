@@ -48,6 +48,14 @@ export {
   submitPromotion,
   reviewPromotion,
   enterPromotion,
+  closeAndDraw,
+  setWinnerStatus,
+  recordPromotionView,
+  recordPromotionClick,
+  setWeeklyCampaign,
+  redeemPoints,
+  promotionEndingSoon,
   seedPromotionDemo,
 } from "./promotions";
+export { createBroadcast, reviewBroadcast } from "./notifications";
 

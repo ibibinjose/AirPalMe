@@ -123,6 +123,8 @@ export interface Promotion {
   entriesFrozenCount?: number;
   /** Public, masked winner line, e.g. "Won by entry ENT-AIRP-••42". */
   winnerNote?: string;
+  /** Last ending-soon reminder sweep, to avoid repeat nudges. */
+  remindedAt?: string;
   createdAt: string;
   updatedAt: string;
   createdBy: string;
@@ -298,6 +300,8 @@ export const NOTIFICATION_KINDS = [
   "campaign_changes_requested",
   "referral_bonus",
   "points_redeemed",
+  "winner_update",
+  "announcement",
 ] as const;
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 
@@ -308,6 +312,7 @@ export interface PromotionNotification {
   title: string;
   body: string;
   promotionId: string;
+  href?: string;
   read: boolean;
   at: string;
 }

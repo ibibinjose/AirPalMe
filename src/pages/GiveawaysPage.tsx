@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { ArrowLeft, Clock, Gift, MapPin, Sparkles, Trophy } from "lucide-react";
+import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
+import { ArrowLeft, CalendarDays, Clock, Gift, MapPin, Sparkles, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { getFirebaseDb } from "@/lib/firebase";
 import { promoArtFor } from "@/lib/promotions";
 import { cn } from "@/lib/cn";
-import { PROMOTION_CATEGORIES, type Promotion } from "@shared/promotions";
+import { PROMOTION_CATEGORIES, currentWeekId, type Promotion, type WeekCampaign } from "@shared/promotions";
 
 function closingLabel(p: Promotion): string {
   if (!p.endAt) return "";
@@ -77,6 +77,7 @@ export function GiveawaysPage() {
   const [rows, setRows] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState<string>("All");
+  const [weekly, setWeekly] = useState<{ campaign: WeekCampaign; giveaway: Promotion | null } | null>(null);
 
   useEffect(() => {
     const db = getFirebaseDb();
@@ -94,6 +95,25 @@ export function GiveawaysPage() {
       })
       .catch(() => setRows([]))
       .finally(() => setLoading(false));
+    void getDoc(doc(db, "promotion_weeks", currentWeekId()))
+      .then(async (wSnap) => {
+        if (!wSnap.exists()) return;
+        const campaign = { weekId: wSnap.id, ...(wSnap.data() as Omit<WeekCampaign, "weekId">) };
+        if (!campaign.giveawayId) {
+          setWeekly({ campaign, giveaway: null });
+          return;
+        }
+        try {
+          const gSnap = await getDoc(doc(db, "promotions", campaign.giveawayId));
+          setWeekly({
+            campaign,
+            giveaway: gSnap.exists() ? { id: gSnap.id, ...(gSnap.data() as Omit<Promotion, "id">) } : null,
+          });
+        } catch {
+          setWeekly({ campaign, giveaway: null });
+        }
+      })
+      .catch(() => undefined);
   }, []);
 
   const filtered = useMemo(
@@ -151,6 +171,19 @@ export function GiveawaysPage() {
         </div>
       ) : (
         <div className="mt-6 space-y-8">
+          {weekly && (weekly.giveaway || weekly.campaign.destination) && (
+            <section className="rounded-3xl border-2 border-gold bg-card p-4">
+              <h2 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gold">
+                <CalendarDays size={13} /> AirPal.Me Weekly
+              </h2>
+              <p className="mt-1 text-sm text-mute">Every week. Something to discover. Something to experience. Something to win.</p>
+              {weekly.giveaway ? (
+                <div className="mt-3"><Card p={weekly.giveaway} featured /></div>
+              ) : weekly.campaign.destination ? (
+                <p className="font-display mt-2 text-lg font-bold">This week: {weekly.campaign.destination}</p>
+              ) : null}
+            </section>
+          )}
           {featured && (
             <section>
               <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-mute">Featured</h2>

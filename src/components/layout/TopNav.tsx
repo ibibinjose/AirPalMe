@@ -3,11 +3,12 @@ import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { ProfileMenu } from "@/components/auth/ProfileMenu";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
 import { cn } from "@/lib/cn";
 import { enterEase } from "@/lib/motion";
 import { tabFromPath } from "@/lib/tabs";
-import { HostTicketBell } from "@/components/host/HostTicketBell";
+
 import { useLocale } from "@/contexts/LocaleContext";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -62,7 +63,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
               ⌘K
             </kbd>
           </button>
-          <HostTicketBell />
+          
           <button
             onClick={() => nav("/scan")}
             className="h-9 shrink-0 rounded-full bg-brand px-3.5 text-sm font-medium text-white lg:h-10 lg:px-4"
@@ -85,6 +86,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
               <span className="hidden xl:inline">Become a </span>Host
             </button>
           )}
+          <NotificationBell />
           <ProfileMenu />
         </div>
       </div>

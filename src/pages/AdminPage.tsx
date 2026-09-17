@@ -136,6 +136,16 @@ export function AdminPage() {
             </span>
             <span className="text-lg">→</span>
           </Link>
+          <Link
+            href="/admin/notifications"
+            className="mt-2 flex items-center justify-between rounded-2xl border-2 border-ink bg-card p-4"
+          >
+            <span>
+              <span className="block text-sm font-bold">Broadcasts</span>
+              <span className="block text-xs text-mute">Approve creator messages, send history</span>
+            </span>
+            <span className="text-lg">→</span>
+          </Link>
         </>
       )}
       {tab === "system" && (

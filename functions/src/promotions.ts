@@ -1,20 +1,33 @@
+import { randomInt } from "node:crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 import {
   adminCanTransition,
   canPublish,
   ownerCanTransition,
   validatePromotionDraft,
   entryReferenceFor,
+  winnerCanTransition,
+  ENTRY_POINTS,
+  REFERRAL_POINTS,
   type CreatePromotionRequest,
+  type DrawWinnersRequest,
   type EnterPromotionRequest,
   type MechanicType,
+  type NotificationKind,
   type Promotion,
   type PromotionStatus,
+  type RedeemPointsRequest,
   type ReviewPromotionRequest,
+  type SetWeeklyCampaignRequest,
+  type SetWinnerStatusRequest,
+  type WinnerStatus,
 } from "../../shared/promotions";
 import { enforceRateLimit, noteAppCheck } from "./abuse";
-import { CALLABLE, db, isPlatformAdmin, requireAccount } from "./admin";
+import { CALLABLE, auth, db, isPlatformAdmin, requireAccount, requireAuth } from "./admin";
+import { isAnonymousAuth } from "./abuse";
+import { sendPushIfAllowed } from "./notifications";
 import type { AccessClaims } from "../../shared/airpal-security";
 
 function slugFor(title: string): string {
@@ -49,6 +62,46 @@ async function writePromotionAudit(input: {
     from: input.from,
     to: input.to,
     reason: input.reason || "",
+    at: new Date().toISOString(),
+    createdAt: FieldValue.serverTimestamp(),
+  });
+}
+
+async function notifyUser(
+  uid: string,
+  kind: NotificationKind,
+  title: string,
+  body: string,
+  promotionId: string,
+) {
+  if (!uid) return;
+  await db.collection("promotion_notifications").add({
+    uid,
+    kind,
+    title,
+    body,
+    promotionId,
+    read: false,
+    at: new Date().toISOString(),
+    createdAt: FieldValue.serverTimestamp(),
+  });
+  await sendPushIfAllowed(uid, kind, title, body, promotionId);
+}
+
+/** Ledger grant. Points are earned, never bought; deltas may be negative for redemptions. */
+async function grantPoints(uid: string, delta: number, reason: string, refId: string) {
+  if (!uid || !delta) return;
+  const ref = db.collection("rewards").doc(uid);
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const current = snap.exists ? Number(snap.data()?.points || 0) : 0;
+    tx.set(ref, { uid, points: current + delta, updatedAt: new Date().toISOString() }, { merge: true });
+  });
+  await db.collection("reward_transactions").add({
+    uid,
+    delta,
+    reason,
+    refId,
     at: new Date().toISOString(),
     createdAt: FieldValue.serverTimestamp(),
   });
@@ -171,6 +224,7 @@ export const submitPromotion = onCall(CALLABLE, async (request) => {
   if (!allowed) throw new HttpsError("failed-precondition", `Cannot submit from ${from}.`);
   await ref.update({ status: to, updatedAt: new Date().toISOString() });
   await writePromotionAudit({ promotionId, actorUid: uid, action: "submit", from, to });
+  await notifyUser(promo.ownerUid, "campaign_submitted", "Submitted for review", `${promo.title} is with the AirPal team.`, promotionId);
   return { ok: true, status: to };
 });
 
@@ -232,6 +286,34 @@ export const reviewPromotion = onCall(CALLABLE, async (request) => {
     reviewReason: String(data.reason || ""),
     updatedAt: new Date().toISOString(),
   });
+  if (to === "live") {
+    const prior = await db.collection("promotion_terms").where("promotionId", "==", promotionId).get();
+    await db.collection("promotion_terms").add({
+      promotionId,
+      version: prior.size + 1,
+      text: String(promo.termsText || ""),
+      at: new Date().toISOString(),
+      createdAt: FieldValue.serverTimestamp(),
+    });
+  }
+  const ownerNote = String(data.reason || "");
+  if (data.decision === "approve" || data.decision === "publish") {
+    await notifyUser(promo.ownerUid, "promotion_approved", "Campaign approved", `${promo.title} is ${to === "live" ? "live" : "approved"}.`, promotionId);
+  } else if (data.decision === "reject") {
+    await notifyUser(promo.ownerUid, "promotion_rejected", "Campaign needs work", `${promo.title} was not approved. ${ownerNote}`, promotionId);
+  } else if (data.decision === "request_changes") {
+    await notifyUser(promo.ownerUid, "campaign_changes_requested", "Changes requested", `${promo.title}: ${ownerNote || "see review notes"}.`, promotionId);
+  } else if (data.decision === "close") {
+    const entrants = await db.collection("promotion_entries").where("promotionId", "==", promotionId).get();
+    const seen = new Set<string>();
+    for (const doc of entrants.docs) {
+      const eu = String(doc.data()?.uid || "");
+      if (eu && !seen.has(eu)) {
+        seen.add(eu);
+        await notifyUser(eu, "promotion_closed", "Giveaway closed", `${promo.title} has closed. Winners are announced soon.`, promotionId);
+      }
+    }
+  }
   await writePromotionAudit({
     promotionId,
     actorUid: uid,
@@ -265,6 +347,19 @@ export const enterPromotion = onCall(CALLABLE, async (request) => {
   if (promo.kind !== "giveaway") {
     throw new HttpsError("failed-precondition", "This promotion does not take entries.");
   }
+  if (promo.promoCode && String(data.code || "") !== promo.promoCode) {
+    throw new HttpsError("failed-precondition", "A valid promotional code is required to enter.");
+  }
+  let referrerUid = "";
+  const ref = String(data.ref || "").trim();
+  if (ref && ref !== uid) {
+    try {
+      await auth.getUser(ref);
+      referrerUid = ref;
+    } catch {
+      referrerUid = "";
+    }
+  }
 
   const entriesRef = db.collection("promotion_entries");
   const existing = await entriesRef
@@ -283,11 +378,261 @@ export const enterPromotion = onCall(CALLABLE, async (request) => {
     promotionId,
     uid,
     reference,
+    referrerUid,
     status: "entered",
     createdAt: new Date().toISOString(),
   });
+  await db.collection("promotions").doc(promotionId).update({
+    entriesCount: FieldValue.increment(1),
+    updatedAt: new Date().toISOString(),
+  });
+  await grantPoints(uid, ENTRY_POINTS, "giveaway_entry", promotionId);
+  await notifyUser(uid, "entry_confirmed", "Entry confirmed", `You're in: ${promo.title}. Reference ${reference}.`, promotionId);
+  if (referrerUid) {
+    await grantPoints(referrerUid, REFERRAL_POINTS, "referral_bonus", promotionId);
+    await notifyUser(referrerUid, "referral_bonus", "A mate entered", `Someone joined ${promo.title} with your link. +${REFERRAL_POINTS} points.`, promotionId);
+  }
   return { ok: true, duplicate: false, reference };
 });
+
+function maskReference(reference: string): string {
+  const r = String(reference || "");
+  if (r.length < 6) return "••••";
+  return `${r.slice(0, 8)}••${r.slice(-2)}`;
+}
+
+export const closeAndDraw = onCall(CALLABLE, async (request) => {
+  const uid = requireAccount(request);
+  const caller = (request.auth?.token || {}) as AccessClaims;
+  if (!isPlatformAdmin(caller)) {
+    throw new HttpsError("permission-denied", "Only a platform admin can run the draw.");
+  }
+  const data = (request.data || {}) as DrawWinnersRequest;
+  const promotionId = String(data.promotionId || "");
+  const winnerCount = Math.max(1, Math.min(10, Math.floor(Number(data.winnerCount) || 1)));
+  if (!promotionId) throw new HttpsError("invalid-argument", "promotionId is required.");
+
+  const ref = db.collection("promotions").doc(promotionId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Promotion not found.");
+  const promo = snap.data() as Promotion;
+  if (promo.kind !== "giveaway") throw new HttpsError("failed-precondition", "Only giveaways can be drawn.");
+  if (promo.status !== "live" && promo.status !== "paused") {
+    throw new HttpsError("failed-precondition", `Cannot draw from ${promo.status}.`);
+  }
+
+  const entriesSnap = await db.collection("promotion_entries").where("promotionId", "==", promotionId).get();
+  if (entriesSnap.empty) throw new HttpsError("failed-precondition", "No entries to draw from.");
+  const priorWinners = await db.collection("promotion_winners").where("promotionId", "==", promotionId).get();
+  const drawnUids = new Set(priorWinners.docs.map((d) => String(d.data()?.uid || "")));
+  const pool = entriesSnap.docs.filter((d) => !drawnUids.has(String(d.data()?.uid || "")));
+  if (!pool.length) throw new HttpsError("failed-precondition", "Every entrant already has a draw result.");
+
+  // Fisher–Yates with cryptographic randomness; full audit trail below.
+  const order = [...pool];
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = randomInt(i + 1);
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  const picked = order.slice(0, winnerCount);
+  const drawnAt = new Date().toISOString();
+  const batch = db.batch();
+  picked.forEach((doc, index) => {
+    const entry = doc.data() as { uid?: string; reference?: string };
+    batch.set(db.collection("promotion_winners").doc(), {
+      promotionId,
+      uid: String(entry.uid || ""),
+      reference: String(entry.reference || ""),
+      status: "selected" as WinnerStatus,
+      drawIndex: priorWinners.size + index,
+      drawnAt,
+      note: "",
+      updatedAt: drawnAt,
+      createdAt: FieldValue.serverTimestamp(),
+    });
+  });
+  await batch.commit();
+
+  const firstRef = String((picked[0].data() as { reference?: string }).reference || "");
+  await ref.update({
+    status: "closed" as PromotionStatus,
+    entriesFrozenAt: drawnAt,
+    entriesFrozenCount: entriesSnap.size,
+    winnerNote: `Won by entry ${maskReference(firstRef)}`,
+    updatedAt: drawnAt,
+  });
+  await writePromotionAudit({
+    promotionId,
+    actorUid: uid,
+    action: "draw",
+    from: promo.status,
+    to: "closed",
+    reason: `${picked.length} winner(s) from ${entriesSnap.size} entries (${pool.length} eligible)`,
+  });
+  for (const doc of picked) {
+    const entry = doc.data() as { uid?: string };
+    await notifyUser(
+      String(entry.uid || ""),
+      "winner_selected",
+      "You've been selected",
+      `${promo.title}: your entry was drawn. Verification is next — watch your inbox.`,
+      promotionId,
+    );
+  }
+  return { ok: true, winners: picked.length, entries: entriesSnap.size };
+});
+
+export const setWinnerStatus = onCall(CALLABLE, async (request) => {
+  const uid = requireAccount(request);
+  const caller = (request.auth?.token || {}) as AccessClaims;
+  if (!isPlatformAdmin(caller)) {
+    throw new HttpsError("permission-denied", "Only a platform admin can manage winners.");
+  }
+  const data = (request.data || {}) as SetWinnerStatusRequest;
+  const winnerId = String(data.winnerId || "");
+  const to = data.to;
+  if (!winnerId || !to) throw new HttpsError("invalid-argument", "winnerId and status are required.");
+  const ref = db.collection("promotion_winners").doc(winnerId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Winner not found.");
+  const winner = snap.data() as { status?: WinnerStatus; promotionId?: string; uid?: string };
+  const from = (winner.status || "selected") as WinnerStatus;
+  if (!winnerCanTransition(from, to)) {
+    throw new HttpsError("failed-precondition", `Cannot move winner from ${from} to ${to}.`);
+  }
+  await ref.update({ status: to, note: String(data.note || ""), updatedAt: new Date().toISOString() });
+  const promotionId = String(winner.promotionId || "");
+  await writePromotionAudit({ promotionId, actorUid: uid, action: `winner:${to}`, from, to, reason: String(data.note || "") });
+  const wuid = String(winner.uid || "");
+  if (to === "verified") {
+    await notifyUser(wuid, "winner_verification", "Entry verified", "Your winning entry checks out. We'll be in touch about the prize.", promotionId);
+  } else if (to === "accepted") {
+    await notifyUser(wuid, "prize_available", "Prize accepted", "Your prize is being arranged. Congratulations.", promotionId);
+  } else if (to === "disqualified" || to === "declined") {
+    await notifyUser(wuid, "winner_update", "Draw update", `Your selected entry was ${to}. An alternate may be drawn.`, promotionId);
+  }
+  return { ok: true, status: to };
+});
+
+export const recordPromotionView = onCall(CALLABLE, async (request) => {
+  const uid = requireAuth(request.auth?.uid);
+  await enforceRateLimit(uid, "analytics", isAnonymousAuth(request));
+  const promotionId = String((request.data || {}).promotionId || "");
+  if (!promotionId) throw new HttpsError("invalid-argument", "promotionId is required.");
+  await db.collection("promotions").doc(promotionId).update({
+    viewsCount: FieldValue.increment(1),
+    updatedAt: new Date().toISOString(),
+  });
+  return { ok: true };
+});
+
+export const recordPromotionClick = onCall(CALLABLE, async (request) => {
+  const uid = requireAuth(request.auth?.uid);
+  await enforceRateLimit(uid, "analytics", isAnonymousAuth(request));
+  const promotionId = String((request.data || {}).promotionId || "");
+  if (!promotionId) throw new HttpsError("invalid-argument", "promotionId is required.");
+  await db.collection("promotions").doc(promotionId).update({
+    clicksCount: FieldValue.increment(1),
+    updatedAt: new Date().toISOString(),
+  });
+  return { ok: true };
+});
+
+export const setWeeklyCampaign = onCall(CALLABLE, async (request) => {
+  const uid = requireAccount(request);
+  const caller = (request.auth?.token || {}) as AccessClaims;
+  if (!isPlatformAdmin(caller)) {
+    throw new HttpsError("permission-denied", "Only a platform admin can configure AirPal Weekly.");
+  }
+  const data = (request.data || {}) as SetWeeklyCampaignRequest;
+  const weekId = String(data.weekId || "").trim();
+  if (!weekId) throw new HttpsError("invalid-argument", "weekId is required.");
+  await db.collection("promotion_weeks").doc(weekId).set(
+    {
+      weekId,
+      giveawayId: String(data.giveawayId || ""),
+      promotionId: String(data.promotionId || ""),
+      experienceId: String(data.experienceId || ""),
+      businessId: String(data.businessId || ""),
+      destination: String(data.destination || ""),
+      note: String(data.note || ""),
+      updatedAt: new Date().toISOString(),
+      updatedBy: uid,
+    },
+    { merge: true },
+  );
+  return { ok: true, weekId };
+});
+
+export const redeemPoints = onCall(CALLABLE, async (request) => {
+  const uid = requireAccount(request, "Sign in to redeem member offers.");
+  const data = (request.data || {}) as RedeemPointsRequest;
+  const promotionId = String(data.promotionId || "");
+  if (!promotionId) throw new HttpsError("invalid-argument", "promotionId is required.");
+  const promoSnap = await db.collection("promotions").doc(promotionId).get();
+  if (!promoSnap.exists) throw new HttpsError("not-found", "Offer not found.");
+  const promo = promoSnap.data() as Promotion;
+  if (promo.status !== "live") throw new HttpsError("failed-precondition", "This offer is not live.");
+  if (promo.mechanicType !== "member") throw new HttpsError("failed-precondition", "This offer is not redeemable with points.");
+  const cost = Math.max(1, Math.floor(Number(promo.pointsCost) || 0));
+  if (!cost) throw new HttpsError("failed-precondition", "This offer has no points price.");
+
+  const rewardRef = db.collection("rewards").doc(uid);
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(rewardRef);
+    const balance = snap.exists ? Number(snap.data()?.points || 0) : 0;
+    if (balance < cost) throw new HttpsError("failed-precondition", `You need ${cost} points (balance ${balance}).`);
+    tx.set(rewardRef, { uid, points: balance - cost, updatedAt: new Date().toISOString() }, { merge: true });
+  });
+  const code = `RDM-${promotionId.replace(/[^a-zA-Z]/g, "").substring(0, 4).toUpperCase() || "AP"}-${1000 + randomInt(9000)}`;
+  await db.collection("reward_transactions").add({
+    uid,
+    delta: -cost,
+    reason: "member_offer_redeem",
+    refId: promotionId,
+    at: new Date().toISOString(),
+    createdAt: FieldValue.serverTimestamp(),
+  });
+  await db.collection("promotion_redemptions").add({
+    uid,
+    promotionId,
+    pointsSpent: cost,
+    code,
+    status: "active",
+    at: new Date().toISOString(),
+    createdAt: FieldValue.serverTimestamp(),
+  });
+  await notifyUser(uid, "points_redeemed", "Offer redeemed", `${promo.title} — show code ${code} in-store.`, promotionId);
+  return { ok: true, code };
+});
+
+/** Daily: nudge entrants of giveaways closing within 24h. Marketing mail, not transactional. */
+export const promotionEndingSoon = onSchedule(
+  { region: "us-central1", schedule: "every 24 hours", timeoutSeconds: 180 },
+  async () => {
+    const now = Date.now();
+    const horizon = now + 24 * 3600000;
+    const live = await db.collection("promotions").where("status", "==", "live").get();
+    for (const doc of live.docs) {
+      const promo = doc.data() as Promotion;
+      const end = promo.endAt ? Date.parse(promo.endAt) : NaN;
+      if (!Number.isFinite(end) || end <= now || end > horizon) continue;
+      if (promo.kind !== "giveaway") continue;
+      const remindedAt = promo.remindedAt ? Date.parse(String(promo.remindedAt)) : 0;
+      if (remindedAt && now - remindedAt < 20 * 3600000) continue;
+      const entries = await db.collection("promotion_entries").where("promotionId", "==", doc.id).limit(500).get();
+      const seen = new Set<string>();
+      for (const entry of entries.docs) {
+        const eu = String(entry.data()?.uid || "");
+        if (eu && !seen.has(eu)) {
+          seen.add(eu);
+          await notifyUser(eu, "promotion_ending_soon", "Closing soon", `${promo.title} closes in under 24 hours.`, doc.id);
+        }
+      }
+      await doc.ref.update({ remindedAt: new Date().toISOString() });
+    }
+  },
+);
 
 export const seedPromotionDemo = onCall(CALLABLE, async (request) => {
   const uid = requireAccount(request);

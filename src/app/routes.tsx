@@ -53,6 +53,24 @@ const PromotionDetailPage = lazy(() =>
 const PromotionsAdminPage = lazy(() =>
   import("@/pages/PromotionsAdminPage").then((m) => ({ default: m.PromotionsAdminPage })),
 );
+const PromotionAdminDetailPage = lazy(() =>
+  import("@/pages/PromotionAdminDetailPage").then((m) => ({ default: m.PromotionAdminDetailPage })),
+);
+const BusinessPromotionsPage = lazy(() =>
+  import("@/pages/BusinessPromotionsPage").then((m) => ({ default: m.BusinessPromotionsPage })),
+);
+const BusinessPromotionNewPage = lazy(() =>
+  import("@/pages/BusinessPromotionNewPage").then((m) => ({ default: m.BusinessPromotionNewPage })),
+);
+const BusinessPromotionDetailPage = lazy(() =>
+  import("@/pages/BusinessPromotionDetailPage").then((m) => ({ default: m.BusinessPromotionDetailPage })),
+);
+const MyGiveawaysPage = lazy(() =>
+  import("@/pages/MyGiveawaysPage").then((m) => ({ default: m.MyGiveawaysPage })),
+);
+const NotificationsAdminPage = lazy(() =>
+  import("@/pages/NotificationsAdminPage").then((m) => ({ default: m.NotificationsAdminPage })),
+);
 const GetAirPalPage = lazy(() => import("@/pages/GetAirPalPage").then((m) => ({ default: m.GetAirPalPage })));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })));
 const AboutPage = lazy(() => import("@/pages/AboutPage").then((m) => ({ default: m.AboutPage })));
@@ -171,6 +189,12 @@ export function AppRoutes() {
         </Route>
         <Route path="/admin" component={AdminPage} />
         <Route path="/admin/promotions" component={PromotionsAdminPage} />
+        <Route path="/admin/promotions/:id" component={PromotionAdminDetailPage} />
+        <Route path="/business/promotions/new" component={BusinessPromotionNewPage} />
+        <Route path="/business/promotions/:id" component={BusinessPromotionDetailPage} />
+        <Route path="/business/promotions" component={BusinessPromotionsPage} />
+        <Route path="/me/giveaways" component={MyGiveawaysPage} />
+        <Route path="/admin/notifications" component={NotificationsAdminPage} />
         <Route path="/giveaways/:id">
           <PromotionDetailPage kind="giveaway" />
         </Route>

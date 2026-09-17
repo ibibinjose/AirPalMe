@@ -124,6 +124,9 @@ export function MePage() {
             <Button size="sm" variant="ghost" onClick={() => nav("/settings")}>
               Settings
             </Button>
+            <Button size="sm" variant="ghost" onClick={() => nav("/me/giveaways")}>
+              Giveaways
+            </Button>
           </div>
         </div>
       </div>

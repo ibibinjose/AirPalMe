@@ -14,7 +14,9 @@ import { forceUnlockBodyScroll } from "@/hooks/useScrollLock";
 import { GuestStayTools } from "@/components/stay/GuestStayTools";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { ProfileMenu } from "@/components/auth/ProfileMenu";
-import { HostTicketBell } from "@/components/host/HostTicketBell";
+
+import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { NotificationPopup } from "@/components/notifications/NotificationPopup";
 import { PresencePublisher } from "@/components/layout/PresencePublisher";
 import { useLocale } from "@/contexts/LocaleContext";
 import { cn } from "@/lib/cn";
@@ -124,7 +126,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                     >
                       {t("calendar")}
                     </Link>
-                    <HostTicketBell />
+                    
+                    <NotificationBell />
                     <ProfileMenu />
                   </div>
                 </div>
@@ -149,7 +152,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                     >
                       <Search size={17} />
                     </button>
-                    <HostTicketBell />
+                    
+                    <NotificationBell />
                     <ProfileMenu />
                   </div>
                 </motion.div>
@@ -171,6 +175,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <GuestStayTools />
           <GlobalSearchModal />
           <NetworkStatusToast />
+          <NotificationPopup />
         </>
       )}
     </div>
