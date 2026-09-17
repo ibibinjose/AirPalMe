@@ -5,11 +5,10 @@ import type {
   CreateBroadcastRequest,
   ReviewBroadcastRequest,
 } from "@shared/notifications";
-import { getFirebaseApp, getFirebaseAuth, getFirebaseDb } from "./firebase";
+import { getFirebaseApp, getFirebaseAuth, getFirebaseDb, getFirebaseFunctions } from "./firebase";
 import { isNativeApp } from "./native";
 
 async function callNotify<Req, Res>(name: string, data: Req): Promise<Res> {
-  const { getFirebaseFunctions } = await import("./firebase");
   const functions = getFirebaseFunctions();
   if (!functions) throw new Error("Firebase is not configured.");
   const callable = httpsCallable<Req, Res>(functions, name);

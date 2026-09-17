@@ -8,17 +8,24 @@ import { mkdirSync } from "node:fs";
 
 const SHOTS = [
   { route: "/start", name: "01-start" },
-  { route: "/giveaways", name: "02-giveaways" },
-  { route: "/promotions", name: "03-promotions" },
-  { route: "/", name: "04-discover" },
-  { route: "/getAirPal", name: "05-getairpal" },
+  { route: "/", name: "02-discover" },
+  { route: "/plan", name: "03-plan" },
+  { route: "/experiences", name: "04-experiences" },
+  { route: "/solutions", name: "05-solutions" },
+  { route: "/giveaways", name: "06-giveaways" },
+  { route: "/promotions", name: "07-promotions" },
+  { route: "/getAirPal", name: "08-getairpal" },
 ];
 const SIZES = [
+  // Phones: Play + App Store 6.7".
   { w: 1080, h: 1920, suffix: "1080x1920" },
   { w: 1290, h: 2796, suffix: "1290x2796" },
   // App Store required families: 6.9" and 6.5" displays.
   { w: 1320, h: 2868, suffix: "1320x2868" },
   { w: 1242, h: 2688, suffix: "1242x2688" },
+  // Tablets: iPad 13" portrait + Play tablet landscape.
+  { w: 2064, h: 2752, suffix: "2064x2752" },
+  { w: 1920, h: 1200, suffix: "1920x1200" },
 ];
 
 function waitForServer(port, tries = 40) {

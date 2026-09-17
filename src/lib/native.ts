@@ -4,6 +4,7 @@ import { SplashScreen } from "@capacitor/splash-screen";
 import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
 import { Share } from "@capacitor/share";
 import { App } from "@capacitor/app";
+import { registerNativePush } from "./notifications";
 
 /**
  * Modal back handler registry for Android hardware back button.
@@ -169,7 +170,6 @@ export async function initNativeApp(options: {
 
     // Native push registration (no-op until @capacitor/push-notifications is installed).
     try {
-      const { registerNativePush } = await import("./notifications");
       await registerNativePush();
     } catch {
       /* inbox still works */

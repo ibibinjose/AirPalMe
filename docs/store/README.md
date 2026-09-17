@@ -46,7 +46,7 @@ Support email: hello@airpal.me (forwards to the operator inbox — see `docs/ema
 | Play icon 512×512 | Ready | `public/icon-512.png` |
 | Feature graphic 1024×500 | Ready | `docs/store/images/play-feature-graphic-1024x500.png` |
 | Promo page `airpal.me/getAirPal` (badges, QR, share) | Live in app | `src/pages/GetAirPalPage.tsx` |
-| Phone screenshots 1080×1920, 1290×2796, 1320×2868 (6.9"), 1242×2688 (6.5") — Start, Giveaways, Promotions, Discover, getAirPal | Run on your Mac | `npm run screenshots` → `docs/store/images/screenshots/` |
+| Phone screenshots (1080×1920, 1290×2796, 1320×2868 = 6.9", 1242×2688 = 6.5") + tablets (2064×2752 iPad, 1920×1200 Play) — Start, Discover, Plan, Experiences, Solutions, Giveaways, Promotions, getAirPal | Run on your Mac | `npm run screenshots` → `docs/store/images/screenshots/` (cold/guest state — sign-in-gated screens capture their auth gate, so shoot Circle/Host by hand if you want them) |
 | Marketing poster 1080×1350 (social/store creative) | Run on your Mac | `npm run screenshots` → `docs/store/images/marketing-poster-1080x1350.png` |
 
 ## Promotion images (giveaways & campaigns)
