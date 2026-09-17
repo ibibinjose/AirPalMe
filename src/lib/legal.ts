@@ -5,8 +5,8 @@ export const LEGAL = {
   location: "New South Wales, Australia",
   law: "the laws of New South Wales, Australia",
   courts: "the courts of New South Wales, Australia",
-  email: "bibin.inc@gmail.com",
-  updated: "15 September 2026",
+  email: "hello@airpal.me",
+  updated: "17 September 2026",
 } as const;
 
 export const LEGAL_NAV = [

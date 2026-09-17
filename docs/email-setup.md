@@ -21,7 +21,7 @@ Do not invent DNS values. Firebase shows the exact TXT/CNAME strings after you c
 | Branded HTML templates in repo | Yes (`emails/verify-account.html`, `emails/reset-password.html`) |
 | Handler page | Yes (`/auth/action`) |
 | `email.airpal.me` DNS (SPF + `firebase=airpalme-app`) | Verified (`customDomainState: SUCCEEDED`) |
-| Apex MX / SPF / DMARC for `hello@airpal.me` | Missing |
+| Apex MX / SPF for `hello@airpal.me` | Live (17 Sep 2026): `mx1/mx2.improvmx.com` + `v=spf1 include:spf.improvmx.com ~all`. Hosting TXT `hosting-site=airpalme-app` kept. DMARC not set (optional). |
 | Firebase **Apply custom domain** | Not applied — mail still From `noreply@airpalme-app.firebaseapp.com` |
 | Template HTML + action URL in Console | Still Firebase defaults — links still open `airpalme-app.firebaseapp.com/__/auth/action` |
 
@@ -92,19 +92,42 @@ Pass:
 
 ---
 
-## Part B — Receiving `hello@airpal.me` (optional but needed for a real business)
+## Part B — Receiving `hello@airpal.me` (required for brand)
 
-Firebase custom domain **does not** create a mailbox. Replies and Contact still need MX.
+Firebase custom domain **does not** create a mailbox. Contact, replies, and store-review support use `hello@airpal.me` in the product (`src/lib/legal.ts`). Without MX, that address **bounces**.
 
-Simplest: forward `hello@airpal.me` → `bibin.inc@gmail.com`.
+Forward `hello@airpal.me` → `bibin.inc@gmail.com`. Do **not** point apex MX at Firebase.
 
-On Spaceship, enable **email forwarding** for `airpal.me` if offered. If not, use a forwarder (e.g. ImprovMX) and add **their** MX + SPF on `@`.
+### Preferred: Spaceship Email Forwarding (same registrar as the domain)
 
-If you add SPF on `@` for forwarding, it must be a **single** combined `v=spf1` record. Do not create two SPF records on `@`.
+NS is already `launch1.spaceship.net` / `launch2.spaceship.net`, so Spaceship can add MX for you.
 
-After `hello@airpal.me` receives mail, change Contact / legal from `bibin.inc@gmail.com` to `hello@airpal.me` in `src/lib/legal.ts`.
+1. Open [Spaceship Domain Manager](https://www.spaceship.com/) → **airpal.me**.
+2. Side panel → **Email Forwarding**.
+3. **To a single address** (or **To multiple addresses** with From `hello`):
+   - Forwarded from: `hello@airpal.me` (or catch-all `@airpal.me`)
+   - Forwarding to: `bibin.inc@gmail.com`
+4. **Set rule**. Spaceship writes MX. Do not delete `email.airpal.me` TXT/SPF — that is Firebase Auth sending, a different host.
+5. Leave the existing apex TXT `hosting-site=airpalme-app` (Firebase Hosting). If Spaceship adds an apex SPF TXT, it must be **one** `v=spf1 …` record, not a second SPF.
+6. In Gmail: wait for a “forwarding confirmation” from Spaceship/ImprovMX-style sender if they send one, click confirm. Then add `hello@airpal.me` under **Send mail as** (Gmail Settings → Accounts) so replies show AirPal, not Gmail.
 
-Do **not** point apex MX at Firebase. Firebase is not your inbox.
+### If Email Forwarding is not offered: ImprovMX on Advanced DNS
+
+Create a free alias `hello@airpal.me` → `bibin.inc@gmail.com` at [improvmx.com](https://improvmx.com), then in Spaceship **Advanced DNS** add:
+
+| Type | Host | Value | Priority |
+|---|---|---|---|
+| MX | `@` | `mx1.improvmx.com` | 10 |
+| MX | `@` | `mx2.improvmx.com` | 20 |
+| TXT | `@` | `v=spf1 include:spf.improvmx.com ~all` | — |
+
+Confirm:
+
+```
+dig +short MX airpal.me
+```
+
+You should see mx records. Then send a test to `hello@airpal.me` from a **non-Gmail** address and check `bibin.inc@gmail.com` (including Spam).
 
 ---
 
@@ -127,4 +150,6 @@ Tick these:
 - [ ] Test verify email received from `@email.airpal.me`
 - [ ] Test reset email received from `@email.airpal.me`
 - [ ] Reset link sets a new password on `/auth/action`
-- [ ] (Optional) `hello@airpal.me` forwards to you
+- [ ] `hello@airpal.me` forwards to `bibin.inc@gmail.com` (Spaceship Email Forwarding or ImprovMX MX)
+- [ ] Test mail to `hello@airpal.me` arrives
+- [ ] Contact / legal show `hello@airpal.me` (`src/lib/legal.ts`)

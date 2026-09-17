@@ -675,7 +675,7 @@ export const seedPromotionDemo = onCall(CALLABLE, async (request) => {
       termsText: "Subject to the official promotion terms. No purchase necessary. Entry does not guarantee winning.",
       privacyNote: "Entry details are used only to run this giveaway.",
       jurisdiction: "Kerala, India",
-      contactEmail: "bibin.inc@gmail.com",
+      contactEmail: "hello@airpal.me",
       featured: true,
     },
     {
@@ -703,7 +703,7 @@ export const seedPromotionDemo = onCall(CALLABLE, async (request) => {
       termsText: "Subject to the official promotion terms. Valid for dine-in at participating venues.",
       privacyNote: "Subject to the official promotion terms.",
       jurisdiction: "Kerala, India",
-      contactEmail: "bibin.inc@gmail.com",
+      contactEmail: "hello@airpal.me",
       featured: false,
     },
   ];

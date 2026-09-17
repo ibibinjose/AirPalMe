@@ -50,6 +50,7 @@ export function ContactPage() {
           <a href={`mailto:${LEGAL.email}`} className="text-brand">
             {LEGAL.email}
           </a>
+          . That is the AirPal inbox — not a personal Gmail address.
         </p>
         <form className="mt-6 space-y-3" onSubmit={onSubmit}>
           <input

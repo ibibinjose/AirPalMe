@@ -2,14 +2,14 @@
 
 App: **AirPal** · ID `me.airpal.app` · version 2.0.0 (iOS build 2, Android versionCode 2)
 Web: https://airpal.me · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms · Contact: https://airpal.me/contact
-Support email: bibin.inc@gmail.com (switch to hello@airpal.me once forwarding exists — see `docs/email-setup.md`)
+Support email: hello@airpal.me (forwards to the operator inbox — see `docs/email-setup.md`)
 
 ## What Apple review / Play review will check
 
 - Sign-in works without a prior account: email, phone (SMS), and anonymous QR-guest sessions. No OAuth in the app, so no external-login headaches.
 - Camera permission → QR deal-scan and photo upload. Location permission → nearby stays and business locate-me. Photo library → profile/venue photos.
 - Paid paths are real-world services only: experience bookings and stay food orders check out with Stripe card payment (live when `STRIPE_SECRET_KEY` is set, sandbox otherwise). No digital goods or in-app currency, so no in-app-purchase conflict — still, re-read both stores' payments policies before release.
-- Reviewer path (no demo account needed): open the app → continue as guest (Scan/Start works with no account). Host features need any email account; food ordering works in sandbox mode. Account/data deletion: in-app Contact page or support email.
+- Reviewer path (no demo account needed): open the app → continue as guest (Scan/Start works with no account). Host features need any email account; food ordering works in sandbox mode. Account/data deletion: in-app Contact page or hello@airpal.me.
 - Content: user-generated venues, plans, and reviews. Safety tooling in-app: safety reports, blocks, manual claim review, admin audit log.
 
 ## Data safety (Play) / privacy labels (App Store) — fill verbatim

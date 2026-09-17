@@ -29,12 +29,12 @@ Password reset works from the login page (Forgot password). You can change yours
 This is deliberate, not forgotten.
 1. **Paid experiences and host payouts** — Plans can be created; ticketed “Experiences” are marked Coming Soon. Stripe checkout is in the functions code but not on for live guest payments.
 2. **Mail that looks like AirPal** — Reset and verify emails still send From `noreply@airpalme-app.firebaseapp.com` with Firebase’s default copy and a firebaseapp.com link. DNS for `email.airpal.me` is verified; the Firebase Console still needs **Apply custom domain**, branded HTML from `emails/`, and action URL `https://airpal.me/auth/action`. Steps: [email-setup.md](./email-setup.md).
-3. **`hello@airpal.me` inbox** — Contact in the product is still `bibin.inc@gmail.com` because `airpal.me` has no MX. Forwarding is not set up.
+3. **`hello@airpal.me` inbox** — Contact / legal in the product now show `hello@airpal.me`. Apex still had **no MX** at last check; enable Spaceship **Email Forwarding** (`hello` → `bibin.inc@gmail.com`) or the ImprovMX records in [email-setup.md](./email-setup.md) Part B, or mail bounces.
 4. **App Check enforcement** — Functions can consume reCAPTCHA tokens; `ENFORCE_APPCHECK=true` is off until a live site key is locked in.
 
 ## What I would suggest next
 1. Finish auth email in Firebase Console (templates + Apply custom domain), roughly **0.5 day**
-2. Point `hello@airpal.me` at a real inbox (Spaceship forwarding or similar), roughly **0.5 day**
+2. Turn on Spaceship Email Forwarding for `hello@airpal.me` → `bibin.inc@gmail.com` (MX), roughly **15 minutes** once you are in Domain Manager
 3. Turn on paid experiences (Stripe live keys, host payouts, take down Coming Soon), roughly **5–8 days**
 4. Enforce App Check on callables once the reCAPTCHA site key is live, roughly **1 day**
 
@@ -78,7 +78,7 @@ Agreed 16 September 2026, between Bibin Jose and the AirPal.me operator
 ## Not in this phase
 Not refused, scheduled.
 1. Auth email that looks like AirPal (From `noreply@email.airpal.me`, branded HTML, links to https://airpal.me/auth/action). DNS is verified; Firebase Console still needs Apply custom domain and the templates in `emails/`.
-2. A real `hello@airpal.me` inbox (MX / forwarding). Contact stays `bibin.inc@gmail.com` until that exists.
+2. MX / forwarding so `hello@airpal.me` actually receives (product already uses that address). See [email-setup.md](./email-setup.md) Part B.
 3. Paid experiences, Stripe live checkout, and host payouts. The Plan UI can be used; ticketed Experiences stay Coming Soon.
 4. Enforcing App Check on Cloud Functions (`ENFORCE_APPCHECK=true` after a live reCAPTCHA site key).
 5. App Store / Play listing. Capacitor shells exist (`me.airpal.app`); store submission is a later job.
@@ -87,7 +87,7 @@ Not refused, scheduled.
 | What | Rough effort | Rough cost |
 | --- | --- | --- |
 | Finish auth email in Firebase Console (templates + Apply custom domain) | 0.5 day | Quoted before work starts |
-| `hello@airpal.me` forwarding and switch Contact/legal to that address | 0.5 day | Quoted before work starts |
+| Enable Spaceship Email Forwarding so `hello@airpal.me` receives | 15 min in Domain Manager | Operator |
 | Paid experiences live (Stripe keys, checkout, host payouts, remove Coming Soon) | 5–8 days | Quoted before work starts |
 | Enforce App Check on callables | 1 day | Quoted before work starts |
 | Store listing (screenshots, review, submit iOS/Android) | 3–5 days | Quoted before work starts |
