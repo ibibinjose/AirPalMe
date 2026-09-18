@@ -25,7 +25,7 @@ export function ContactPage() {
     e.preventDefault();
     const subject = `[AirPal.me] ${TOPICS.find((t) => t.id === topic)?.label} — ${name || "Message"}`;
     const body = [`Name: ${name}`, `Email: ${email}`, `Topic: ${topic}`, "", message].join("\n");
-    const href = `mailto:${LEGAL.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const href = `mailto:${LEGAL.contacts}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = href;
     void navigator.clipboard?.writeText(`${subject}\n\n${body}`).then(
       () => toast.success("Copied. Your mail app should open."),
@@ -47,10 +47,13 @@ export function ContactPage() {
         </p>
         <p className="mt-2 text-sm text-mute">
           Direct:{" "}
+          <a href={`mailto:${LEGAL.contacts}`} className="text-brand">
+            {LEGAL.contacts}
+          </a>
+          {" · "}
           <a href={`mailto:${LEGAL.email}`} className="text-brand">
             {LEGAL.email}
           </a>
-          . That is the AirPal inbox — not a personal Gmail address.
         </p>
         <form className="mt-6 space-y-3" onSubmit={onSubmit}>
           <input

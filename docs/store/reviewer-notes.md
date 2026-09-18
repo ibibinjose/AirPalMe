@@ -2,7 +2,7 @@
 
 **App:** AirPal (`me.airpal.app`) 2.0.0  
 **Seller:** SarvamDaily Pty Ltd trading as AirPal.Me · ABN 83 702 462 977  
-**Support:** hello@airpal.me
+**Support:** AirPalMe@gmail.com · hello@airpal.me
 
 ## How to review without an account
 

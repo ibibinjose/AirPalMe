@@ -3,7 +3,7 @@
 App: **AirPal** · ID `me.airpal.app` · version 2.0.0 (iOS build 2, Android versionCode 2)
 Legal entity: **SarvamDaily Pty Ltd** trading as **AirPal.Me** · ABN **83 702 462 977** · Apple Team ID **26WGXSNG58**
 Web: https://airpal.me · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms · Contact: https://airpal.me/contact
-Support email: hello@airpal.me (forwards to the operator inbox — see `docs/email-setup.md`)
+Support email: AirPalMe@gmail.com (App Store / Play contact) · hello@airpal.me (brand)
 
 ## What Apple review / Play review will check
 

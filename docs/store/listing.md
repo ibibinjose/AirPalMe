@@ -1,7 +1,7 @@
 # AirPal — store listing copy (paste into App Store Connect / Play Console)
 
 Legal: SarvamDaily Pty Ltd trading as AirPal.Me · ABN 83 702 462 977  
-Support: hello@airpal.me · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms · Contact: https://airpal.me/contact
+Support: AirPalMe@gmail.com · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms · Contact: https://airpal.me/contact
 
 ## App name
 
