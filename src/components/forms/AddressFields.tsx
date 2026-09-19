@@ -1,13 +1,7 @@
 import { HOST_COUNTRIES, addressLayoutFor, addressOk, type AddressParts } from "@shared/geo-address";
 import { ValidField, fieldInput } from "./ValidField";
 
-export function AddressFields({
-  value,
-  onChange,
-}: {
-  value: AddressParts;
-  onChange: (next: AddressParts) => void;
-}) {
+export function AddressFields({ value, onChange }: { value: AddressParts; onChange: (next: AddressParts) => void }) {
   const layout = addressLayoutFor(value.countryCode);
   const patch = (part: Partial<AddressParts>) => onChange({ ...value, ...part });
   return (

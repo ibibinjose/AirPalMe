@@ -9,11 +9,7 @@ export interface PullToRefreshContainerProps {
   className?: string;
 }
 
-export function PullToRefreshContainer({
-  state,
-  children,
-  className,
-}: PullToRefreshContainerProps) {
+export function PullToRefreshContainer({ state, children, className }: PullToRefreshContainerProps) {
   const { isPulling, pullDistance, pullProgress, isRefreshing, isSuccess } = state;
 
   const isVisible = pullDistance > 0 || isRefreshing;

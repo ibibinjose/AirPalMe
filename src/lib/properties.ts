@@ -114,7 +114,10 @@ export function normalizeProperty(id: string, data: Record<string, unknown>): Pr
       ...base.breakfast,
       ...((data.breakfast as object) || {}),
     },
-    facilities: Array.isArray(data.facilities) && data.facilities.length > 0 ? (data.facilities as PropertyInfo["facilities"]) : base.facilities,
+    facilities:
+      Array.isArray(data.facilities) && data.facilities.length > 0
+        ? (data.facilities as PropertyInfo["facilities"])
+        : base.facilities,
     roomTokens: (data.roomTokens as Record<string, string>) || base.roomTokens,
     lobbyMarkerId: data.lobbyMarkerId ? String(data.lobbyMarkerId) : undefined,
     wifiUpdatedAt: isoFromUnknown(data.wifiUpdatedAt),

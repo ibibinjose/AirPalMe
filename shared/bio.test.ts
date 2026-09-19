@@ -1,5 +1,28 @@
 import { describe, expect, it } from "vitest";
-import { BIO_CATALOG_MAX, BIO_PUBLIC_PATH, bioButtonLabel, bioKindLabel, catalogDeals, handleFromDomain, handleFromName, handleFromPlaceId, handleError, handleMatchesClaim, isBusinessKind, isHexHandle, isSafeBioHref, isSocialLinkType, normalizeHandle, parseAtHandle, randomHexHandle, resolveStatusPicks, sanitizeBioHref, sanitizeCatalog, socialLinks, stackLinks } from "./bio";
+import {
+  BIO_CATALOG_MAX,
+  BIO_PUBLIC_PATH,
+  bioButtonLabel,
+  bioKindLabel,
+  catalogDeals,
+  handleFromDomain,
+  handleFromName,
+  handleFromPlaceId,
+  handleError,
+  handleMatchesClaim,
+  isBusinessKind,
+  isHexHandle,
+  isSafeBioHref,
+  isSocialLinkType,
+  normalizeHandle,
+  parseAtHandle,
+  randomHexHandle,
+  resolveStatusPicks,
+  sanitizeBioHref,
+  sanitizeCatalog,
+  socialLinks,
+  stackLinks,
+} from "./bio";
 
 describe("bio handle", () => {
   it("normalizes and validates", () => {
@@ -130,8 +153,10 @@ describe("profile kind identifier", () => {
 describe("status picks", () => {
   it("resolves saved values with safe defaults", () => {
     expect(resolveStatusPicks({})).toEqual({ status: "available", customText: "", emoji: "☕" });
-    expect(
-      resolveStatusPicks({ status: "busy", customStatus: "Heads down", emoji: "💻" }),
-    ).toEqual({ status: "busy", customText: "Heads down", emoji: "💻" });
+    expect(resolveStatusPicks({ status: "busy", customStatus: "Heads down", emoji: "💻" })).toEqual({
+      status: "busy",
+      customText: "Heads down",
+      emoji: "💻",
+    });
   });
 });

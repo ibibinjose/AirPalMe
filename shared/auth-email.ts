@@ -145,11 +145,7 @@ const BRAND = {
 } as const;
 
 function escapeHtml(raw: string) {
-  return raw
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return raw.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 function greetingName(name?: string) {
@@ -172,10 +168,7 @@ function wrapEmail(input: {
   const link = input.link;
   const site = input.site.replace(/\/$/, "");
   const paragraphs = input.body
-    .map(
-      (p) =>
-        `<p style="margin:0 0 14px;font-size:16px;line-height:1.55;color:${BRAND.ink};">${p}</p>`,
-    )
+    .map((p) => `<p style="margin:0 0 14px;font-size:16px;line-height:1.55;color:${BRAND.ink};">${p}</p>`)
     .join("");
   return `<!DOCTYPE html>
 <html lang="en">
@@ -230,7 +223,9 @@ export function accountVerificationEmail(input: AuthEmailInput): AuthEmail {
   const body = [
     first ? `Hi ${escapeHtml(first)},` : "Hi,",
     "Confirm this address so we know it is yours. Then you can sign in, keep a personal @handle, and reset the password if you need to.",
-    input.email ? `This email was sent to ${escapeHtml(input.email)}.` : "If you did not create an AirPal.me account, ignore this email.",
+    input.email
+      ? `This email was sent to ${escapeHtml(input.email)}.`
+      : "If you did not create an AirPal.me account, ignore this email.",
   ];
   if (input.email) body.push("If you did not create an AirPal.me account, ignore this email.");
   const html = wrapEmail({
@@ -271,9 +266,12 @@ export function passwordResetEmail(input: AuthEmailInput): AuthEmail {
   const body = [
     first ? `Hi ${escapeHtml(first)},` : "Hi,",
     "Someone asked to reset the password on this AirPal.me account. The link expires after a short time and can be used once.",
-    input.email ? `This email was sent to ${escapeHtml(input.email)}.` : "If you did not ask for a reset, you can ignore this email. Your password stays the same.",
+    input.email
+      ? `This email was sent to ${escapeHtml(input.email)}.`
+      : "If you did not ask for a reset, you can ignore this email. Your password stays the same.",
   ];
-  if (input.email) body.push("If you did not ask for a reset, you can ignore this email. Your password stays the same.");
+  if (input.email)
+    body.push("If you did not ask for a reset, you can ignore this email. Your password stays the same.");
   const html = wrapEmail({
     title: subject,
     preheader,

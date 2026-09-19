@@ -1,23 +1,10 @@
-import { parseAtHandle } from "@shared/bio";
-
-/** Primary guest tabs: Explore (home) / Plan / Stay, plus Mate, You, and Scan. Calendar lives inside Explore + global search. */
-export type GuestTab = "scan" | "plan" | "stay" | "explore" | "mate" | "you";
+/** Mobile tabs: What's on / Plan / Scan / Stay / @ Me. Circle lives in Plan. */
+export type GuestTab = "explore" | "plan" | "scan" | "stay" | "me";
 
 /** Map a route path to the bottom-tab it belongs to. Pure: safe to unit test. */
 export function tabFromPath(path: string): GuestTab {
-  if (path.startsWith("/scan")) return "scan";
-  if (path.startsWith("/mate")) return "mate";
-  if (path.startsWith("/plan") || path.startsWith("/invite")) return "plan";
-  if (
-    path.startsWith("/calendar") ||
-    path.startsWith("/events") ||
-    path.startsWith("/guide") ||
-    path.startsWith("/circle") ||
-    path.startsWith("/promotions") ||
-    path.startsWith("/giveaways") ||
-    path.startsWith("/explore")
-  )
-    return "explore";
+  if (path.startsWith("/scan") || path.startsWith("/w/")) return "scan";
+  if (path.startsWith("/plan") || path.startsWith("/invite") || path.startsWith("/circle")) return "plan";
   if (
     path.startsWith("/concierge") ||
     path.startsWith("/g/") ||
@@ -27,13 +14,6 @@ export function tabFromPath(path: string): GuestTab {
   ) {
     return "stay";
   }
-  if (
-    path === "/me" ||
-    path.startsWith("/me/") ||
-    path.startsWith("/bio/") ||
-    parseAtHandle(path.split("?")[0] || "")
-  ) {
-    return "you";
-  }
+  if (path.startsWith("/me") || path.startsWith("/bio") || path.startsWith("/@")) return "me";
   return "explore";
 }

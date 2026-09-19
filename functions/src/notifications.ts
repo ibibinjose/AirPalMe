@@ -2,6 +2,8 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getMessaging } from "firebase-admin/messaging";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import {
+  CIRCLE_BROADCAST_CAP,
+  broadcastNeedsReview,
   isMarketingKind,
   validateBroadcast,
   type BroadcastAudience,
@@ -11,16 +13,11 @@ import {
 } from "../../shared/notifications";
 import type { AccessClaims } from "../../shared/airpal-security";
 import type { NotificationKind, Promotion } from "../../shared/promotions";
+import { enforceRateLimit, isAnonymousAuth, noteAppCheck } from "./abuse";
 import { CALLABLE, db, isPlatformAdmin, requireAccount } from "./admin";
 
 /** Best-effort push. The inbox row is the record; push never blocks it. */
-export async function sendPushIfAllowed(
-  uid: string,
-  kind: string,
-  title: string,
-  body: string,
-  promotionId: string,
-) {
+export async function sendPushIfAllowed(uid: string, kind: string, title: string, body: string, promotionId: string) {
   try {
     if (!uid) return;
     const userSnap = await db.collection("users").doc(uid).get();
@@ -39,7 +36,7 @@ export async function sendPushIfAllowed(
   }
 }
 
-async function fanOut(input: {
+export async function fanOut(input: {
   uids: string[];
   kind: NotificationKind;
   title: string;
@@ -82,14 +79,35 @@ async function fanOut(input: {
   return sent;
 }
 
+async function ownerHandle(uid: string): Promise<string> {
+  const userSnap = await db.collection("users").doc(uid).get();
+  const fromUser = String(userSnap.data()?.handle || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^@/, "");
+  if (fromUser) return fromUser;
+  const owned = await db.collection("handles").where("ownerUid", "==", uid).limit(1).get();
+  return owned.empty ? "" : owned.docs[0]!.id;
+}
+
+async function circleAudienceUids(handle: string): Promise<string[]> {
+  const snap = await db.collection("graph").doc(handle).collection("followers").limit(CIRCLE_BROADCAST_CAP).get();
+  const uids = snap.docs.map((d) => String(d.data()?.uid || "")).filter(Boolean);
+  return Array.from(new Set(uids));
+}
+
 export const createBroadcast = onCall(CALLABLE, async (request) => {
+  await noteAppCheck(request, "createBroadcast");
   const uid = requireAccount(request);
+  await enforceRateLimit(uid, "broadcast", isAnonymousAuth(request));
   const caller = (request.auth?.token || {}) as AccessClaims;
   const admin = isPlatformAdmin(caller);
   const data = (request.data || {}) as CreateBroadcastRequest;
   const errors = validateBroadcast(data as unknown as Record<string, unknown>);
   if (errors.length) throw new HttpsError("invalid-argument", errors.join(" "));
-  const audience = data.audience === "everyone" ? "everyone" : "promotion_entrants";
+  const rawAudience = String(data.audience || "circle");
+  const audience: BroadcastAudience =
+    rawAudience === "everyone" ? "everyone" : rawAudience === "promotion_entrants" ? "promotion_entrants" : "circle";
   const promotionId = String(data.promotionId || "");
   if (audience === "everyone" && !admin) {
     throw new HttpsError("permission-denied", "Only admins can message everyone.");
@@ -102,14 +120,23 @@ export const createBroadcast = onCall(CALLABLE, async (request) => {
       throw new HttpsError("permission-denied", "You can only message your own campaign audience.");
     }
   }
+  let handle = "";
+  if (audience === "circle") {
+    handle = await ownerHandle(uid);
+    if (!handle) throw new HttpsError("failed-precondition", "Claim a @handle first so your Circle can find you.");
+  }
   const now = new Date().toISOString();
+  const href = String(
+    data.href || (audience === "circle" ? `/@${handle}` : promotionId ? `/giveaways/${promotionId}` : "/giveaways"),
+  );
   const ref = await db.collection("broadcasts").add({
     ownerUid: uid,
     title: String(data.title).trim(),
     body: String(data.body).trim(),
-    href: String(data.href || (promotionId ? `/giveaways/${promotionId}` : "/giveaways")),
-    audience: audience as BroadcastAudience,
+    href,
+    audience,
     promotionId,
+    handle: handle || "",
     status: "draft" as BroadcastStatus,
     reviewReason: "",
     sentCount: 0,
@@ -117,9 +144,26 @@ export const createBroadcast = onCall(CALLABLE, async (request) => {
     updatedAt: now,
     sentAt: "",
   });
-  // Creators submit in one step; admins still approve before anything sends.
-  await ref.update({ status: "submitted", updatedAt: new Date().toISOString() });
-  return { ok: true, broadcastId: ref.id };
+  if (broadcastNeedsReview(audience)) {
+    await ref.update({ status: "submitted", updatedAt: new Date().toISOString() });
+    return { ok: true as const, broadcastId: ref.id, status: "submitted" as const };
+  }
+  const uids = await circleAudienceUids(handle);
+  const sent = await fanOut({
+    uids,
+    kind: "announcement",
+    title: String(data.title).trim(),
+    body: String(data.body).trim(),
+    promotionId: ref.id,
+    href,
+  });
+  await ref.update({
+    status: "sent",
+    sentCount: sent,
+    sentAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
+  return { ok: true as const, broadcastId: ref.id, status: "sent" as const, sent };
 });
 
 export const reviewBroadcast = onCall(CALLABLE, async (request) => {

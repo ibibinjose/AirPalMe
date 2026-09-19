@@ -1,12 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  APIProvider,
-  Map as GoogleMap,
-  AdvancedMarker,
-  Pin,
-  InfoWindow,
-  useMap,
-} from "@vis.gl/react-google-maps";
+import { APIProvider, Map as GoogleMap, AdvancedMarker, Pin, InfoWindow, useMap } from "@vis.gl/react-google-maps";
 import {
   Coffee,
   Compass,
@@ -26,7 +19,7 @@ import { mapsEmbedSrc, mapsKey, mapsMapId, mapsPlaceUrl, mapsWalkUrl } from "@/l
 import { isOpenAt } from "@/lib/hours";
 import { freshnessOf } from "@shared/freshness";
 import { useLocalNow } from "@/hooks/useLocalNow";
-import { activePlaces, placesInCity } from "@/lib/catalog";
+import { activePlaces, placesAround, placesInCity } from "@/lib/catalog";
 import { useListings } from "@/contexts/ListingsContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import { trackMapClick } from "@/lib/analytics";
@@ -60,13 +53,7 @@ export interface LocalFavoriteItem {
 /**
  * Controller hook to center and animate the map to selected locations.
  */
-function MapCameraController({
-  target,
-  zoom,
-}: {
-  target: Geo | null;
-  zoom?: number;
-}) {
+function MapCameraController({ target, zoom }: { target: Geo | null; zoom?: number }) {
   const map = useMap();
 
   useEffect(() => {
@@ -82,8 +69,8 @@ function MapCameraController({
 
 export function LocalFavorites() {
   const { t } = useLocale();
-  const { property, marker } = useStay();
-  const { now, timeZone, here, city, source } = useLocalNow();
+  const { property, marker, session } = useStay();
+  const { now, timeZone, here, city, source, usingGps } = useLocalNow();
   const { version } = useListings();
   const apiKey = mapsKey();
   const mapId = mapsMapId();
@@ -115,21 +102,22 @@ export function LocalFavorites() {
   // Places pool: live listings only — no third-party directory content.
   // Filtered to the guest's active city so Kovalam never shows The Rocks.
   const curatedItems = useMemo<LocalFavoriteItem[]>(() => {
-    const pool = placesInCity(activePlaces(), city);
+    const inStay = session.kind === "stay" || session.kind === "campus" || Boolean(session.room);
+    const aroundYou = !inStay && usingGps;
+    const pool = aroundYou ? placesAround(activePlaces(), activeGeo) : placesInCity(activePlaces(), city);
     const items: LocalFavoriteItem[] = [];
 
     for (const p of pool) {
       if (!p.geo || !Number.isFinite(p.geo.lat) || !Number.isFinite(p.geo.lng)) continue;
 
       let cat: "cafe" | "attraction" | null = null;
-      if (
-        p.category === "coffee" ||
-        /cafe|coffee|roasters|bakery|pâtisserie|patisserie|tea|espresso/i.test(p.name)
-      ) {
+      if (p.category === "coffee" || /cafe|coffee|roasters|bakery|pâtisserie|patisserie|tea|espresso/i.test(p.name)) {
         cat = "cafe";
       } else if (
         p.category === "things" ||
-        /park|reserve|museum|observatory|bridge|opera|ruins|wharf|harbour|gallery|market|heritage|distillery/i.test(p.name)
+        /park|reserve|museum|observatory|bridge|opera|ruins|wharf|harbour|gallery|market|heritage|distillery/i.test(
+          p.name,
+        )
       ) {
         cat = "attraction";
       } else if (p.category === "eat") {
@@ -169,7 +157,7 @@ export function LocalFavorites() {
     }
 
     return items;
-  }, [activeGeo, city, now, timeZone, version]);
+  }, [activeGeo, city, now, timeZone, version, source, usingGps, session.kind, session.room]);
 
   // Live listings, nearest first. Empty DB → empty list, honestly.
   const allFavorites = useMemo(() => {
@@ -221,7 +209,7 @@ export function LocalFavorites() {
           setGeoNotice("Unable to retrieve GPS signal. Using stay coordinates.");
         }
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 },
     );
   }, [stayGeo]);
 
@@ -241,7 +229,7 @@ export function LocalFavorites() {
         source: "local_favorites",
       });
     },
-    [property.id]
+    [property.id],
   );
 
   return (
@@ -288,7 +276,7 @@ export function LocalFavorites() {
               id="btn-locate-device-geo"
               onClick={handleRequestDeviceLocation}
               disabled={geoLoading}
-              className="inline-flex h-8 items-center gap-1.5 rounded-full bg-ink px-3.5 text-xs font-bold text-white transition hover:bg-slate-800 disabled:opacity-50 cursor-pointer shadow-xs"
+              className="inline-flex h-8 items-center gap-1.5 rounded-full bg-brand px-3.5 text-xs font-bold text-white transition hover:bg-slate-800 disabled:opacity-50 cursor-pointer shadow-xs"
               title="Use current device GPS location"
             >
               <Compass size={13} className={cn("text-brand", geoLoading && "animate-spin")} />
@@ -327,7 +315,7 @@ export function LocalFavorites() {
             onClick={() => setCategory("all")}
             className={cn(
               "h-8 shrink-0 rounded-full px-4 text-xs font-bold transition cursor-pointer",
-              category === "all" ? "bg-ink text-white" : "bg-card text-mute border border-line hover:text-ink"
+              category === "all" ? "bg-brand text-white" : "bg-card text-mute border border-line hover:text-ink",
             )}
           >
             All Places ({allFavorites.length})
@@ -338,9 +326,7 @@ export function LocalFavorites() {
             onClick={() => setCategory("cafe")}
             className={cn(
               "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs font-bold transition cursor-pointer",
-              category === "cafe"
-                ? "bg-brand text-white"
-                : "bg-card text-mute border border-line hover:text-ink"
+              category === "cafe" ? "bg-brand text-white" : "bg-card text-mute border border-line hover:text-ink",
             )}
           >
             <Coffee size={13} />
@@ -354,7 +340,7 @@ export function LocalFavorites() {
               "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs font-bold transition cursor-pointer",
               category === "attraction"
                 ? "bg-slate-900 text-white"
-                : "bg-card text-mute border border-line hover:text-ink"
+                : "bg-card text-mute border border-line hover:text-ink",
             )}
           >
             <Landmark size={13} />
@@ -370,7 +356,7 @@ export function LocalFavorites() {
             onClick={() => setMaxWalkFilter(!maxWalkFilter)}
             className={cn(
               "inline-flex h-7 items-center gap-1 rounded-full px-3 text-[11px] font-bold border transition cursor-pointer",
-              maxWalkFilter ? "bg-brand/10 text-brand border-brand/30" : "bg-card text-mute border-line hover:text-ink"
+              maxWalkFilter ? "bg-brand/10 text-brand border-brand/30" : "bg-card text-mute border-line hover:text-ink",
             )}
           >
             <Navigation size={11} />
@@ -382,7 +368,9 @@ export function LocalFavorites() {
             onClick={() => setHighRatingFilter(!highRatingFilter)}
             className={cn(
               "inline-flex h-7 items-center gap-1 rounded-full px-3 text-[11px] font-bold border transition cursor-pointer",
-              highRatingFilter ? "bg-brand/10 text-brand border-brand/30" : "bg-card text-mute border-line hover:text-ink"
+              highRatingFilter
+                ? "bg-brand/10 text-brand border-brand/30"
+                : "bg-card text-mute border-line hover:text-ink",
             )}
           >
             <Star size={11} className="fill-current" />
@@ -392,7 +380,7 @@ export function LocalFavorites() {
       </div>
 
       {/* Main Map Card */}
-      <div className="overflow-hidden rounded-3xl bg-card border-2 border-ink shadow-sm">
+      <div className="overflow-hidden rounded-3xl bg-card ring-1 ring-line shadow-sm">
         {/* Interactive Google Map Container */}
         <div id="google-maps-canvas-container" className="relative h-72 sm:h-80 w-full bg-paper">
           {apiKey ? (
@@ -414,12 +402,7 @@ export function LocalFavorites() {
                 >
                   <div className="relative flex items-center justify-center">
                     <span className="absolute -inset-1.5 animate-ping rounded-full bg-brand/40" />
-                    <Pin
-                      background="#1805db"
-                      borderColor="#ffffff"
-                      glyphColor="#ffffff"
-                      scale={1.15}
-                    />
+                    <Pin background="#1805db" borderColor="#ffffff" glyphColor="#ffffff" scale={1.15} />
                   </div>
                 </AdvancedMarker>
 
@@ -435,7 +418,12 @@ export function LocalFavorites() {
                       onClick={() => handleSelectPlace(place)}
                       title={place.name}
                     >
-                      <div className={cn("transition-transform duration-200", isSelected ? "scale-125 z-30" : "hover:scale-110")}>
+                      <div
+                        className={cn(
+                          "transition-transform duration-200",
+                          isSelected ? "scale-125 z-30" : "hover:scale-110",
+                        )}
+                      >
                         <Pin
                           background={isCafe ? "#1805db" : "#0f172a"}
                           borderColor="#ffffff"
@@ -452,11 +440,7 @@ export function LocalFavorites() {
                   <InfoWindow
                     position={{ lat: selectedPlace.geo.lat, lng: selectedPlace.geo.lng }}
                     onCloseClick={() => setSelectedId(null)}
-                    headerContent={
-                      <div className="text-xs font-bold text-ink truncate pr-2">
-                        {selectedPlace.name}
-                      </div>
-                    }
+                    headerContent={<div className="text-xs font-bold text-ink truncate pr-2">{selectedPlace.name}</div>}
                   >
                     <div className="max-w-[240px] p-1">
                       {selectedPlace.photo && (
@@ -522,9 +506,7 @@ export function LocalFavorites() {
         {/* Places Card Carousel / List */}
         <div className="border-t-2 border-ink p-3 sm:p-4">
           <div className="mb-3 flex items-center justify-between">
-            <span className="text-xs font-bold text-ink">
-              Showing {filteredFavorites.length} recommended spots
-            </span>
+            <span className="text-xs font-bold text-ink">Showing {filteredFavorites.length} recommended spots</span>
             <span className="text-[11px] text-mute font-medium flex items-center gap-1">
               <Navigation size={11} className="text-brand" />
               Times measured on foot
@@ -535,7 +517,9 @@ export function LocalFavorites() {
             {filteredFavorites.length === 0 ? (
               <div className="w-full rounded-2xl bg-paper px-4 py-6 text-center border border-line">
                 <p className="text-sm font-bold text-ink">No walkable spots listed yet</p>
-                <p className="mt-1 text-xs text-mute font-medium">Scan a stay QR or open Explore when venues are published nearby.</p>
+                <p className="mt-1 text-xs text-mute font-medium">
+                  Scan a stay QR or open Explore when venues are published nearby.
+                </p>
               </div>
             ) : null}
             {filteredFavorites.map((place) => {
@@ -549,9 +533,7 @@ export function LocalFavorites() {
                   onClick={() => handleSelectPlace(place)}
                   className={cn(
                     "group relative flex w-72 shrink-0 flex-col overflow-hidden rounded-3xl bg-paper p-3 border-2 transition cursor-pointer text-left shadow-xs hover:-translate-y-0.5",
-                    isSelected
-                      ? "border-brand ring-2 ring-brand/30 shadow-md"
-                      : "border-ink hover:border-brand"
+                    isSelected ? "border-brand ring-2 ring-brand/30 shadow-md" : "border-ink hover:ring-brand/40",
                   )}
                 >
                   {/* Photo Container */}
@@ -562,7 +544,11 @@ export function LocalFavorites() {
                       className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
                     <div className="absolute top-2 left-2 flex items-center gap-1 rounded-full bg-slate-950/80 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur-md border border-white/10">
-                      {isCafe ? <Coffee size={10} className="text-brand" /> : <Landmark size={10} className="text-indigo-400" />}
+                      {isCafe ? (
+                        <Coffee size={10} className="text-brand" />
+                      ) : (
+                        <Landmark size={10} className="text-indigo-400" />
+                      )}
                       {isCafe ? "Cafe" : "Attraction"}
                     </div>
                     {place.isHostPick && (
@@ -576,9 +562,7 @@ export function LocalFavorites() {
                   <div className="mt-3 flex flex-1 flex-col justify-between">
                     <div>
                       <div className="flex items-start justify-between gap-1">
-                        <h4 className="font-display font-extrabold text-base text-ink truncate">
-                          {place.name}
-                        </h4>
+                        <h4 className="font-display font-extrabold text-base text-ink truncate">{place.name}</h4>
                         {place.rating && (
                           <span className="flex items-center gap-0.5 shrink-0 text-xs font-extrabold text-brand">
                             <Star size={11} className="fill-current text-brand" />

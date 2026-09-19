@@ -34,15 +34,15 @@ export function ValidField({
 }
 
 /**
- * Shared field system: clear ink borders at rest, brand borders on focus.
+ * Shared field system: light line at rest, brand ring on focus.
  * Use these constants for every text input / select / textarea so all
  * forms across bio, host, business, companion, plans, and auth match.
  */
 export const fieldInput =
-  "h-12 w-full rounded-2xl border-2 border-ink bg-card px-4 pr-10 outline-none transition placeholder:text-mute/60 focus:border-brand focus:ring-2 focus:ring-brand/25 disabled:opacity-60";
+  "h-12 w-full rounded-2xl border border-line bg-card px-4 pr-10 outline-none transition placeholder:text-mute/60 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:opacity-60";
 
 export const fieldSelect =
-  "h-12 w-full rounded-2xl border-2 border-ink bg-card px-4 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/25 disabled:opacity-60";
+  "h-12 w-full rounded-2xl border border-line bg-card px-4 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:opacity-60";
 
 export const fieldTextarea =
-  "min-h-28 w-full rounded-2xl border-2 border-ink bg-card p-4 outline-none transition placeholder:text-mute/60 focus:border-brand focus:ring-2 focus:ring-brand/25 disabled:opacity-60";
+  "min-h-28 w-full rounded-2xl border border-line bg-card p-4 outline-none transition placeholder:text-mute/60 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:opacity-60";

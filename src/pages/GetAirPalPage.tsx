@@ -35,7 +35,7 @@ function StoreBadge({ store, href }: { store: "apple" | "play"; href: string }) 
       href={href}
       onClick={comingSoon ? (e) => e.preventDefault() : undefined}
       aria-label={store === "apple" ? "Download on the App Store" : "Get it on Google Play"}
-      className="group relative flex items-center gap-3 rounded-2xl border-2 border-ink bg-ink px-5 py-3 text-white transition hover:bg-neutral-800 active:scale-[0.98]"
+      className="group relative flex items-center gap-3 rounded-2xl ring-1 ring-line bg-ink px-5 py-3 text-white transition hover:bg-neutral-800 active:scale-[0.98]"
     >
       {store === "apple" ? (
         <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden className="shrink-0">
@@ -56,9 +56,7 @@ function StoreBadge({ store, href }: { store: "apple" | "play"; href: string }) 
         <span className="flex items-center gap-1.5 text-base font-bold">
           {store === "apple" ? "App Store" : "Google Play"}
           {comingSoon && (
-            <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-slate-950">
-              Soon
-            </span>
+            <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-slate-950">Soon</span>
           )}
         </span>
       </span>
@@ -116,7 +114,9 @@ export function GetAirPalPage() {
   const [activeTab, setActiveTab] = useState<"ios" | "android">("ios");
 
   useEffect(() => {
-    void makeQrDataUrl(PAGE_URL, 240).then(setQr).catch(() => undefined);
+    void makeQrDataUrl(PAGE_URL, 240)
+      .then(setQr)
+      .catch(() => undefined);
   }, []);
 
   async function share() {
@@ -150,10 +150,13 @@ export function GetAirPalPage() {
     <div className="mx-auto max-w-4xl px-4 py-8 md:px-6">
       {/* Top Header Navigation */}
       <div className="flex items-center justify-between">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-mute transition hover:text-ink">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-mute transition hover:text-ink"
+        >
           <ArrowLeft size={16} /> Back to Discover
         </Link>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-ink/25 bg-card px-3 py-1 text-xs font-semibold text-mute">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-line/25 bg-card px-3 py-1 text-xs font-semibold text-mute">
           Built in Australia 🇦🇺
         </span>
       </div>
@@ -163,22 +166,22 @@ export function GetAirPalPage() {
         <img
           src="/logo-mark.png"
           alt="AirPal"
-          className="mx-auto h-24 w-24 rounded-3xl border-2 border-ink bg-white p-2 shadow-md object-contain"
+          className="mx-auto h-24 w-24 rounded-3xl ring-1 ring-line bg-white p-2 shadow-md object-contain"
         />
 
-        <h1 className="font-display mt-5 text-4xl font-extrabold tracking-tight md:text-5xl text-ink">
-          Get AirPal
-        </h1>
+        <h1 className="font-display mt-5 text-4xl font-extrabold tracking-tight md:text-5xl text-ink">Get AirPal</h1>
         <p className="mt-2 text-lg font-bold text-brand">Life Made Easy.</p>
         <p className="mx-auto mt-3 max-w-lg text-base text-mute leading-relaxed">
-          The trusted marketplace connecting you with <strong className="text-ink font-semibold">people, places, experiences and things</strong> — starting in Sydney, Australia.
+          The trusted marketplace connecting you with{" "}
+          <strong className="text-ink font-semibold">people, places, experiences and things</strong> — starting in
+          Sydney, Australia.
         </p>
       </div>
 
       {/* Primary Action & Download Section */}
       <div className="mt-8 grid gap-6 md:grid-cols-2 items-center">
         {/* Web App Launch & Store Badges Card */}
-        <div className="rounded-3xl border-2 border-ink bg-card p-6 shadow-xs flex flex-col justify-between h-full">
+        <div className="rounded-3xl ring-1 ring-line bg-card p-6 shadow-xs flex flex-col justify-between h-full">
           <div>
             <div className="flex items-center gap-2">
               <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-500/30 flex items-center gap-1">
@@ -207,7 +210,7 @@ export function GetAirPalPage() {
         </div>
 
         {/* Scan & Share Card */}
-        <div className="rounded-3xl border-2 border-ink bg-card p-6 text-center shadow-xs flex flex-col items-center justify-between h-full">
+        <div className="rounded-3xl ring-1 ring-line bg-card p-6 text-center shadow-xs flex flex-col items-center justify-between h-full">
           <div className="w-full">
             <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-xs font-bold text-brand border border-brand/20">
               <Smartphone size={13} /> Scan on Mobile
@@ -215,7 +218,7 @@ export function GetAirPalPage() {
             <h3 className="mt-2 text-lg font-bold text-ink">Scan to open on your phone</h3>
           </div>
 
-          <div className="my-4 rounded-2xl border-2 border-ink bg-white p-3 shadow-inner">
+          <div className="my-4 rounded-2xl ring-1 ring-line bg-white p-3 shadow-inner">
             {qr ? (
               <img src={qr} alt="QR code for AirPal.Me/getAirPal" className="h-36 w-36" />
             ) : (
@@ -224,10 +227,18 @@ export function GetAirPalPage() {
           </div>
 
           <div className="flex w-full justify-center gap-2">
-            <Button onClick={share} variant="light" className="flex-1 border-2 border-ink text-ink font-semibold hover:bg-paper">
+            <Button
+              onClick={share}
+              variant="light"
+              className="flex-1 ring-1 ring-line text-ink font-semibold hover:bg-paper"
+            >
               <Share2 size={14} /> Share
             </Button>
-            <Button onClick={copyLink} variant="light" className="border-2 border-ink text-ink font-semibold hover:bg-paper">
+            <Button
+              onClick={copyLink}
+              variant="light"
+              className="ring-1 ring-line text-ink font-semibold hover:bg-paper"
+            >
               <Copy size={14} /> Copy Link
             </Button>
           </div>
@@ -235,25 +246,23 @@ export function GetAirPalPage() {
       </div>
 
       {/* PWA Install Instructions ("Add to Home Screen") */}
-      <div className="mt-10 rounded-3xl border-2 border-ink bg-paper p-6 md:p-8">
+      <div className="mt-10 rounded-3xl ring-1 ring-line bg-paper p-6 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-line pb-4">
           <div>
             <h3 className="text-xl font-bold text-ink flex items-center gap-2">
               <Smartphone className="text-brand" size={20} />
               Install as Mobile App (PWA)
             </h3>
-            <p className="text-xs text-mute mt-0.5">
-              Enjoy fullscreen view, fast loading, and home screen access.
-            </p>
+            <p className="text-xs text-mute mt-0.5">Enjoy fullscreen view, fast loading, and home screen access.</p>
           </div>
 
           {/* iOS / Android Selector */}
-          <div className="inline-flex rounded-xl border border-ink/20 bg-card p-1">
+          <div className="inline-flex rounded-xl border border-line/20 bg-card p-1">
             <button
               type="button"
               onClick={() => setActiveTab("ios")}
               className={`rounded-lg px-3 py-1 text-xs font-bold transition ${
-                activeTab === "ios" ? "bg-ink text-white" : "text-mute hover:text-ink"
+                activeTab === "ios" ? "bg-brand text-white" : "text-mute hover:text-ink"
               }`}
             >
               iPhone (Safari)
@@ -262,7 +271,7 @@ export function GetAirPalPage() {
               type="button"
               onClick={() => setActiveTab("android")}
               className={`rounded-lg px-3 py-1 text-xs font-bold transition ${
-                activeTab === "android" ? "bg-ink text-white" : "text-mute hover:text-ink"
+                activeTab === "android" ? "bg-brand text-white" : "text-mute hover:text-ink"
               }`}
             >
               Android (Chrome)
@@ -280,7 +289,9 @@ export function GetAirPalPage() {
                 </span>
                 <div>
                   <p className="text-sm font-bold text-ink">Open Safari</p>
-                  <p className="text-xs text-mute mt-1">Navigate to <strong className="text-ink">airpal.me</strong> in Safari browser.</p>
+                  <p className="text-xs text-mute mt-1">
+                    Navigate to <strong className="text-ink">airpal.me</strong> in Safari browser.
+                  </p>
                 </div>
               </div>
 
@@ -304,7 +315,9 @@ export function GetAirPalPage() {
                   <p className="text-sm font-bold text-ink flex items-center gap-1">
                     Add to Home Screen <PlusSquare size={14} className="text-brand" />
                   </p>
-                  <p className="text-xs text-mute mt-1">Scroll down and tap &ldquo;Add to Home Screen&rdquo;, then confirm.</p>
+                  <p className="text-xs text-mute mt-1">
+                    Scroll down and tap &ldquo;Add to Home Screen&rdquo;, then confirm.
+                  </p>
                 </div>
               </div>
             </>
@@ -316,7 +329,9 @@ export function GetAirPalPage() {
                 </span>
                 <div>
                   <p className="text-sm font-bold text-ink">Open Chrome</p>
-                  <p className="text-xs text-mute mt-1">Visit <strong className="text-ink">airpal.me</strong> in Google Chrome.</p>
+                  <p className="text-xs text-mute mt-1">
+                    Visit <strong className="text-ink">airpal.me</strong> in Google Chrome.
+                  </p>
                 </div>
               </div>
 
@@ -338,7 +353,9 @@ export function GetAirPalPage() {
                 </span>
                 <div>
                   <p className="text-sm font-bold text-ink">Install App</p>
-                  <p className="text-xs text-mute mt-1">Tap &ldquo;Install app&rdquo; or &ldquo;Add to Home screen&rdquo;.</p>
+                  <p className="text-xs text-mute mt-1">
+                    Tap &ldquo;Install app&rdquo; or &ldquo;Add to Home screen&rdquo;.
+                  </p>
                 </div>
               </div>
             </>
@@ -356,7 +373,10 @@ export function GetAirPalPage() {
 
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
           {VERTICALS.map((v) => (
-            <div key={v.title} className="rounded-2xl border-2 border-ink bg-card p-5 shadow-xs transition hover:-translate-y-0.5">
+            <div
+              key={v.title}
+              className="rounded-2xl ring-1 ring-line bg-card p-5 shadow-xs transition hover:-translate-y-0.5"
+            >
               <div className="flex items-center justify-between">
                 <div className={`rounded-xl p-2.5 border ${v.color}`}>
                   <v.icon size={20} />
@@ -373,7 +393,7 @@ export function GetAirPalPage() {
       </div>
 
       {/* Trust & Safety Highlights */}
-      <div className="mt-12 rounded-3xl border-2 border-ink bg-card p-6 md:p-8">
+      <div className="mt-12 rounded-3xl ring-1 ring-line bg-card p-6 md:p-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
           <div className="flex flex-col items-center md:items-start">
             <div className="rounded-2xl bg-brand/10 p-3 text-brand border border-brand/20">

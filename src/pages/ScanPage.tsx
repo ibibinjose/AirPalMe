@@ -7,11 +7,13 @@ import { useStay } from "@/contexts/StayContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { hrefForPlace } from "@/lib/bio-handle";
-import { activePlaces } from "@/lib/catalog";
+import { activePlaces, placesForLocation } from "@/lib/catalog";
+import { useLocalNow } from "@/hooks/useLocalNow";
 import { useListings } from "@/contexts/ListingsContext";
 import { noteQrContext } from "@/lib/analytics";
 import { triggerHaptic } from "@/lib/native";
 import { qrContextIdFromPath, qrContextIdFromStay } from "@shared/analytics";
+import { WaveListenCard } from "@/components/wave/WaveListenCard";
 
 /**
  * Quick links are live listings only — no hardcoded demo venues. Empty DB
@@ -23,7 +25,11 @@ export function ScanPage() {
   const { session, setSession } = useStay();
   const { t } = useLocale();
   const { version, remoteLoaded } = useListings();
-  const quickPlaces = useMemo(() => activePlaces().slice(0, 6), [version]);
+  const { here, city, usingGps } = useLocalNow();
+  const quickPlaces = useMemo(
+    () => placesForLocation(activePlaces(), here, city, usingGps).slice(0, 6),
+    [version, here, city, usingGps],
+  );
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [live, setLive] = useState(false);
@@ -164,8 +170,8 @@ export function ScanPage() {
             {denied && (
               <>
                 <p className="max-w-xs text-xs text-white/60">
-                  Allow camera access in your browser settings, or use the code box below — room
-                  numbers, @handles, and invite codes work without the camera, even offline.
+                  Allow camera access in your browser settings, or use the code box below — room numbers, @handles, and
+                  invite codes work without the camera, even offline.
                 </p>
                 <button
                   type="button"
@@ -186,6 +192,8 @@ export function ScanPage() {
         </div>
       </div>
 
+      <WaveListenCard />
+
       {/* Manual Code / PIN Entry */}
       <form onSubmit={handleManualSubmit} className="mt-4 flex gap-2">
         <input
@@ -193,7 +201,7 @@ export function ScanPage() {
           value={manualCode}
           onChange={(e) => setManualCode(e.target.value)}
           placeholder="Enter room # (e.g. 101), invite code, or @handle..."
-          className="h-11 flex-1 rounded-2xl bg-card px-4 text-xs md:text-sm font-medium text-ink border border-ink outline-none focus:ring-2 focus:ring-brand placeholder:text-mute focus:border-brand"
+          className="h-11 flex-1 rounded-2xl bg-card px-4 text-xs md:text-sm font-medium text-ink border border-line outline-none focus:ring-2 focus:ring-brand placeholder:text-mute focus:border-brand"
         />
         <button
           type="submit"
@@ -232,10 +240,17 @@ export function ScanPage() {
                 className="relative h-28 overflow-hidden rounded-3xl bg-ink"
               >
                 {p.heroImage && (
-                  <img src={p.heroImage} alt="" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full object-cover" />
+                  <img
+                    src={p.heroImage}
+                    alt=""
+                    referrerPolicy="no-referrer"
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
                 )}
                 <div className="hero-scrim absolute inset-0" />
-                <span className="absolute inset-x-0 bottom-3 px-2 text-center font-display text-[16px] text-white">{p.name}</span>
+                <span className="absolute inset-x-0 bottom-3 px-2 text-center font-display text-[16px] text-white">
+                  {p.name}
+                </span>
               </button>
             ))}
           </div>

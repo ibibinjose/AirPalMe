@@ -20,7 +20,8 @@ export function AuthActionPage() {
   const continueTo = safeContinuePath(action.continueUrl, origin);
   const [phase, setPhase] = useState<Phase>(() => {
     if (!action.oobCode) return "error";
-    if (action.mode === "resetPassword" || action.mode === "verifyEmail" || action.mode === "recoverEmail") return "loading";
+    if (action.mode === "resetPassword" || action.mode === "verifyEmail" || action.mode === "recoverEmail")
+      return "loading";
     return "error";
   });
   const [message, setMessage] = useState(
@@ -86,7 +87,11 @@ export function AuthActionPage() {
   }
 
   const title =
-    action.mode === "resetPassword" ? "New password" : action.mode === "recoverEmail" ? "Restore email" : "Confirm email";
+    action.mode === "resetPassword"
+      ? "New password"
+      : action.mode === "recoverEmail"
+        ? "Restore email"
+        : "Confirm email";
 
   return (
     <div className="mx-auto max-w-md px-4 py-8">
@@ -121,7 +126,8 @@ export function AuthActionPage() {
       {phase === "form" && action.mode === "resetPassword" && (
         <>
           <p className="mt-2 text-sm text-mute">
-            {accountEmail ? `Choose a new password for ${accountEmail}.` : "Choose a new password."} At least 8 characters.
+            {accountEmail ? `Choose a new password for ${accountEmail}.` : "Choose a new password."} At least 8
+            characters.
           </p>
           <form className="mt-6 space-y-3" onSubmit={onReset}>
             <ValidField label="New password" ok={passOk} error={password && !passOk ? "At least 8 characters" : null}>

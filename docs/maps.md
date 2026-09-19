@@ -4,11 +4,11 @@ Interactive Stay maps and Places search need a browser Maps Platform key. Vite i
 
 ## What the app uses
 
-| API | Why |
-|---|---|
-| Maps JavaScript API | Interactive map in Stay → Local favorites (`LocalFavorites`) |
-| Places API (New) | Nearby cafes / attractions around the active pin |
-| Maps Embed API | Iframe fallback and other embeds (`mapsEmbedSrc`) |
+| API                 | Why                                                                                                                         |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Maps JavaScript API | Interactive map in Stay → Local favorites (`LocalFavorites`)                                                                |
+| Places API (New)    | Nearby cafes / attractions, plus Autocomplete + Place Details for **Add your place** (logo, address, phone, website, hours) |
+| Maps Embed API      | Iframe fallback and other embeds (`mapsEmbedSrc`)                                                                           |
 
 Library: `@vis.gl/react-google-maps`. Map ID defaults to Google’s `DEMO_MAP_ID` (Advanced Markers). Override with `VITE_GOOGLE_MAPS_MAP_ID`.
 

@@ -1,4 +1,11 @@
-import { type HangoutPlan, formatPlanDate, formatTime12h, planInviteUrl, PLAN_TYPES, EXPERIENCE_CATEGORIES } from "@shared/plan";
+import {
+  type HangoutPlan,
+  formatPlanDate,
+  formatTime12h,
+  planInviteUrl,
+  PLAN_TYPES,
+  EXPERIENCE_CATEGORIES,
+} from "@shared/plan";
 import { makeQrDataUrl } from "@/lib/qr";
 
 /**
@@ -12,17 +19,21 @@ export async function exportPlanItineraryPdf(plan: HangoutPlan): Promise<void> {
   const qrDataUrl = await makeQrDataUrl(inviteUrl, 240);
 
   const typeInfo = PLAN_TYPES[plan.type] || PLAN_TYPES.custom;
-  const occasionLabel = plan.isExperience && plan.experienceCategory
-    ? `${EXPERIENCE_CATEGORIES[plan.experienceCategory]?.emoji || "✨"} ${EXPERIENCE_CATEGORIES[plan.experienceCategory]?.label || "Experience"}`
-    : typeInfo.label;
+  const occasionLabel =
+    plan.isExperience && plan.experienceCategory
+      ? `${EXPERIENCE_CATEGORIES[plan.experienceCategory]?.emoji || "✨"} ${EXPERIENCE_CATEGORIES[plan.experienceCategory]?.label || "Experience"}`
+      : typeInfo.label;
 
   const printWindow = window.open("", "_blank", "width=850,height=1100");
   if (!printWindow) {
     throw new Error("Could not open print window. Please allow popups for this site.");
   }
 
-  const stopsHtml = plan.stops.length > 0
-    ? plan.stops.map((stop, index) => `
+  const stopsHtml =
+    plan.stops.length > 0
+      ? plan.stops
+          .map(
+            (stop, index) => `
       <div class="stop-item">
         <div class="stop-left">
           <div class="stop-number">#${index + 1}</div>
@@ -36,41 +47,57 @@ export async function exportPlanItineraryPdf(plan: HangoutPlan): Promise<void> {
           ${stop.notes ? `<div class="stop-notes">${escapeHtml(stop.notes)}</div>` : ""}
         </div>
       </div>
-    `).join("")
-    : `<div class="empty-stops">No fixed stops listed. Check live plan for real-time updates.</div>`;
+    `,
+          )
+          .join("")
+      : `<div class="empty-stops">No fixed stops listed. Check live plan for real-time updates.</div>`;
 
-  const inclusionsHtml = plan.inclusions && (
-    (plan.inclusions.included && plan.inclusions.included.length > 0) ||
-    (plan.inclusions.notIncluded && plan.inclusions.notIncluded.length > 0) ||
-    (plan.inclusions.whatToBring && plan.inclusions.whatToBring.length > 0)
-  ) ? `
+  const inclusionsHtml =
+    plan.inclusions &&
+    ((plan.inclusions.included && plan.inclusions.included.length > 0) ||
+      (plan.inclusions.notIncluded && plan.inclusions.notIncluded.length > 0) ||
+      (plan.inclusions.whatToBring && plan.inclusions.whatToBring.length > 0))
+      ? `
     <div class="section-box inclusions-grid">
-      ${plan.inclusions.included && plan.inclusions.included.length > 0 ? `
+      ${
+        plan.inclusions.included && plan.inclusions.included.length > 0
+          ? `
         <div class="inc-col">
           <h4>✅ What's Included</h4>
           <ul>
-            ${plan.inclusions.included.map(item => `<li>${escapeHtml(item)}</li>`).join("")}
+            ${plan.inclusions.included.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
           </ul>
         </div>
-      ` : ""}
-      ${plan.inclusions.notIncluded && plan.inclusions.notIncluded.length > 0 ? `
+      `
+          : ""
+      }
+      ${
+        plan.inclusions.notIncluded && plan.inclusions.notIncluded.length > 0
+          ? `
         <div class="inc-col">
           <h4>ℹ️ Not Included</h4>
           <ul class="muted-list">
-            ${plan.inclusions.notIncluded.map(item => `<li>${escapeHtml(item)}</li>`).join("")}
+            ${plan.inclusions.notIncluded.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
           </ul>
         </div>
-      ` : ""}
-      ${plan.inclusions.whatToBring && plan.inclusions.whatToBring.length > 0 ? `
+      `
+          : ""
+      }
+      ${
+        plan.inclusions.whatToBring && plan.inclusions.whatToBring.length > 0
+          ? `
         <div class="inc-col">
           <h4>🎒 What to Bring</h4>
           <ul>
-            ${plan.inclusions.whatToBring.map(item => `<li>${escapeHtml(item)}</li>`).join("")}
+            ${plan.inclusions.whatToBring.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
           </ul>
         </div>
-      ` : ""}
+      `
+          : ""
+      }
     </div>
-  ` : "";
+  `
+      : "";
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -430,12 +457,16 @@ export async function exportPlanItineraryPdf(plan: HangoutPlan): Promise<void> {
       </div>
     </div>
 
-    ${plan.notes ? `
+    ${
+      plan.notes
+        ? `
       <div class="notes-box">
         <strong>Host Notes & Overview</strong>
         ${escapeHtml(plan.notes)}
       </div>
-    ` : ""}
+    `
+        : ""
+    }
 
     <!-- Stops Section -->
     <div class="section-title">

@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   interestOverlap,
+  isSoldOut,
+  isTicketed,
   myInterestProfile,
   PLAN_TYPES,
   PLAN_COVER_PRESETS,
@@ -8,6 +10,7 @@ import {
   buildStopChangeMessage,
   formatTime12h,
   reorderStops,
+  spotsLeft,
   stopChangeRecipients,
 } from "./plan";
 
@@ -121,4 +124,17 @@ describe("invitation themes", () => {
   });
 });
 
+describe("ticketed events", () => {
+  it("treats a priced experience as a ticket, not a free RSVP", () => {
+    expect(isTicketed({ isExperience: true, pricePerPerson: 25, pricingModel: "fixed" })).toBe(true);
+    expect(isTicketed({ isExperience: true, pricePerPerson: 0, pricingModel: "free" })).toBe(false);
+    expect(isTicketed({ isExperience: false, pricePerPerson: 40, pricingModel: "fixed" })).toBe(false);
+  });
 
+  it("counts remaining tickets against capacity", () => {
+    expect(spotsLeft({ capacity: 10, spotsBooked: 6 })).toBe(4);
+    expect(isSoldOut({ capacity: 10, spotsBooked: 10 })).toBe(true);
+    expect(isSoldOut({ capacity: 10, spotsBooked: 3 })).toBe(false);
+    expect(spotsLeft({ capacity: 0, spotsBooked: 2 })).toBe(null);
+  });
+});

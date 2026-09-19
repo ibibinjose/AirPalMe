@@ -4,11 +4,11 @@ Guests should not see a confident **Open now** or **Live now** from stale host c
 
 ## SLAs (`shared/freshness.ts`)
 
-| Kind | Re-confirm | Guest effect |
-|---|---|---|
-| Wi-Fi | 30 days | Host checklist nudge (password still shown if set) |
-| Place hours | 14 days | Host banner on `/business`. After **45 days**, Open now/Closed is hidden. |
-| Event schedule | 7 days | Host banner on `/event`. Tonight shows **Check times** instead of Live now. |
+| Kind           | Re-confirm | Guest effect                                                                |
+| -------------- | ---------- | --------------------------------------------------------------------------- |
+| Wi-Fi          | 30 days    | Host checklist nudge (password still shown if set)                          |
+| Place hours    | 14 days    | Host banner on `/business`. After **45 days**, Open now/Closed is hidden.   |
+| Event schedule | 7 days     | Host banner on `/event`. Tonight shows **Check times** instead of Live now. |
 
 ## Stamps
 

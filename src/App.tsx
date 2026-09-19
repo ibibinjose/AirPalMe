@@ -39,11 +39,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <AppProviders>
-        <Toaster
-          position="top-center"
-          richColors
-          offset="calc(env(safe-area-inset-top, 0px) + 112px)"
-        />
+        <Toaster position="top-center" richColors offset="calc(env(safe-area-inset-top, 0px) + 112px)" />
         <NativeSplashTransition />
         <Boot />
       </AppProviders>

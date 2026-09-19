@@ -15,7 +15,15 @@ import {
 } from "@shared/safety";
 
 /** Per-person safety actions: report user/booking, or block immediately. */
-export function SafetyMenu({ targetUid, targetName, planId }: { targetUid: string; targetName: string; planId: string }) {
+export function SafetyMenu({
+  targetUid,
+  targetName,
+  planId,
+}: {
+  targetUid: string;
+  targetName: string;
+  planId: string;
+}) {
   const { user, requireUser } = useAuth();
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"menu" | "report" | "blocked">("menu");
@@ -138,8 +146,9 @@ export function SafetyMenu({ targetUid, targetName, planId }: { targetUid: strin
               {reported ? (
                 <span className="block p-1 text-[13px] leading-6">
                   <span className="font-semibold">Report filed.</span>{" "}
-                  <span className="text-mute">Every report opens a case a person reviews. In danger now? Call local
-                  emergency services first.</span>
+                  <span className="text-mute">
+                    Every report opens a case a person reviews. In danger now? Call local emergency services first.
+                  </span>
                 </span>
               ) : (
                 <span className="block">
@@ -151,7 +160,7 @@ export function SafetyMenu({ targetUid, targetName, planId }: { targetUid: strin
                         aria-pressed={target === t}
                         className={cn(
                           "flex-1 rounded-full px-2 py-1 text-xs font-semibold ring-1",
-                          target === t ? "bg-ink text-white ring-ink" : "text-mute ring-line",
+                          target === t ? "bg-brand text-white ring-ink" : "text-mute ring-line",
                         )}
                       >
                         {t === "user" ? "Person" : "Booking"}
@@ -163,7 +172,7 @@ export function SafetyMenu({ targetUid, targetName, planId }: { targetUid: strin
                     <select
                       value={reason}
                       onChange={(e) => setReason(e.target.value as ReportReason)}
-                      className="mt-1 w-full rounded-xl border border-ink bg-paper px-2 py-2 text-[13px] font-normal outline-none focus:border-brand"
+                      className="mt-1 w-full rounded-xl border border-line bg-paper px-2 py-2 text-[13px] font-normal outline-none focus:border-brand"
                     >
                       {REPORT_REASONS.map((r) => (
                         <option key={r} value={r}>
@@ -177,7 +186,7 @@ export function SafetyMenu({ targetUid, targetName, planId }: { targetUid: strin
                     onChange={(e) => setDetails(e.target.value)}
                     rows={3}
                     placeholder="What happened, in your words (min 10 characters)…"
-                    className="mt-1.5 w-full rounded-xl border border-ink bg-paper px-2 py-2 text-[13px] outline-none placeholder:text-mute focus:border-brand"
+                    className="mt-1.5 w-full rounded-xl border border-line bg-paper px-2 py-2 text-[13px] outline-none placeholder:text-mute focus:border-brand"
                   />
                   {error && <span className="mt-1 block text-xs text-mute">{error}</span>}
                   <span className="mt-2 flex gap-1.5">

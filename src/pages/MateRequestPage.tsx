@@ -6,20 +6,21 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { cn } from "@/lib/cn";
-import {
-  MATE_USE_CASES,
-  emptyMateRequest,
-  isUseCase,
-  mateRequestValid,
-} from "@shared/mate-request";
+import { MATE_USE_CASES, emptyMateRequest, isUseCase, mateRequestValid } from "@shared/mate-request";
 
 const inputCls =
   "mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm outline-none placeholder:text-mute focus:border-brand";
 
-function sydneyToday(): string {
+function localToday(): string {
+  let timeZone: string | undefined;
+  try {
+    timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    timeZone = undefined;
+  }
   try {
     return new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Australia/Sydney",
+      ...(timeZone ? { timeZone } : {}),
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -94,7 +95,7 @@ export function MateRequestPage() {
         <div className="mt-6 flex flex-col gap-2">
           <Button onClick={() => nav("/mate")}>Back to Mate</Button>
           <Button variant="ghost" onClick={() => nav("/")}>
-            Browse Sydney meanwhile
+            Browse meanwhile
           </Button>
         </div>
       </div>
@@ -107,7 +108,9 @@ export function MateRequestPage() {
         <ArrowLeft size={14} /> Mate
       </Link>
       <h1 className="font-display mt-2 text-3xl font-bold tracking-tight">What do you want to do?</h1>
-      <p className="mt-1 text-sm text-mute">One request, one match. No payments yet — this is the free beta.</p>
+      <p className="mt-1 text-sm text-mute">
+        One request, one match. If you set a budget, you pay by card on AirPal after you’re matched.
+      </p>
 
       <div className="mt-5 rounded-2xl border border-line bg-card p-5">
         <span className="text-[13px] font-semibold">I want someone to…</span>
@@ -141,10 +144,10 @@ export function MateRequestPage() {
           </label>
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
-              <span className="text-[13px] font-semibold">Date (Sydney)</span>
+              <span className="text-[13px] font-semibold">Date</span>
               <input
                 type="date"
-                min={sydneyToday() || undefined}
+                min={localToday() || undefined}
                 value={form.date}
                 onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
                 className={inputCls}
@@ -161,7 +164,7 @@ export function MateRequestPage() {
             </label>
           </div>
           <label className="block">
-            <span className="text-[13px] font-semibold">Where in Sydney?</span>
+            <span className="text-[13px] font-semibold">Where?</span>
             <input
               value={form.suburb}
               onChange={(e) => setForm((f) => ({ ...f, suburb: e.target.value }))}
@@ -183,7 +186,7 @@ export function MateRequestPage() {
               />
             </label>
             <label className="block">
-              <span className="text-[13px] font-semibold">Budget (AUD)</span>
+              <span className="text-[13px] font-semibold">Budget</span>
               <input
                 type="number"
                 min={0}

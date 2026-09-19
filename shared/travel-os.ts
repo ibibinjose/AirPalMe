@@ -12,15 +12,7 @@ export interface TripCompanion {
 export type TravelStyle = "budget" | "comfortable" | "luxury";
 export type TripStatus = "planning" | "upcoming" | "active" | "completed";
 export type TripItemKind =
-  | "before"
-  | "flight"
-  | "airport"
-  | "transfer"
-  | "hotel"
-  | "experience"
-  | "restaurant"
-  | "memory"
-  | "note";
+  "before" | "flight" | "airport" | "transfer" | "hotel" | "experience" | "restaurant" | "memory" | "note";
 export type TripItemStatus = "planned" | "confirmed" | "missing" | "done" | "conflict";
 export type WalletKind = "boarding_pass" | "hotel" | "ticket" | "transfer" | "reservation";
 export type KnowledgeLayer = "hotel" | "destination" | "business" | "experience" | "faq" | "emergency" | "campus";
@@ -578,8 +570,22 @@ export const SEED_COMMUNITIES: CommunityGroup[] = [
     culture: "Malayali",
     members: 1840,
     events: [
-      { id: "e1", title: "Onam sadhya at Pendle Hill", when: "Sat 12 Sep · 12:00", date: "2026-09-12", time: "12:00", where: "Pendle Hill Community Hall" },
-      { id: "e2", title: "Malayalam movie night", when: "Thu 17 Sep · 19:00", date: "2026-09-17", time: "19:00", where: "Event Cinemas George St" },
+      {
+        id: "e1",
+        title: "Onam sadhya at Pendle Hill",
+        when: "Sat 12 Sep · 12:00",
+        date: "2026-09-12",
+        time: "12:00",
+        where: "Pendle Hill Community Hall",
+      },
+      {
+        id: "e2",
+        title: "Malayalam movie night",
+        when: "Thu 17 Sep · 19:00",
+        date: "2026-09-17",
+        time: "19:00",
+        where: "Event Cinemas George St",
+      },
     ],
     foodPicks: [
       { name: "Taste of Kerala, Harris Park", why: "Appam and stew the way home cooks make it." },
@@ -593,7 +599,14 @@ export const SEED_COMMUNITIES: CommunityGroup[] = [
     culture: "Indian",
     members: 6200,
     events: [
-      { id: "e3", title: "Harris Park food crawl", when: "Sun 20 Sep · 17:00", date: "2026-09-20", time: "17:00", where: "Marion St, Harris Park" },
+      {
+        id: "e3",
+        title: "Harris Park food crawl",
+        when: "Sun 20 Sep · 17:00",
+        date: "2026-09-20",
+        time: "17:00",
+        where: "Marion St, Harris Park",
+      },
     ],
     foodPicks: [
       { name: "The Spice Room, Circular Quay", why: "Hotel concierge + Indian community pick." },
@@ -606,7 +619,16 @@ export const SEED_COMMUNITIES: CommunityGroup[] = [
     city: "Sydney",
     culture: "Korean",
     members: 2100,
-    events: [{ id: "e4", title: "Strathfield night market", when: "Fri 18 Sep · 18:30", date: "2026-09-18", time: "18:30", where: "The Boulevarde" }],
+    events: [
+      {
+        id: "e4",
+        title: "Strathfield night market",
+        when: "Fri 18 Sep · 18:30",
+        date: "2026-09-18",
+        time: "18:30",
+        where: "The Boulevarde",
+      },
+    ],
     foodPicks: [{ name: "Mad for Chicken, Haymarket", why: "Late fried chicken after the Opera House." }],
   },
 ];
@@ -666,8 +688,28 @@ export const SEED_MEMORIES: MemoryItem[] = [
 ];
 
 export const EXPLORE_DESTINATIONS = [
-  { id: "sydney", name: "Sydney", country: "Australia", blurb: "Harbour walks, The Rocks, and food within 10 minutes of your hotel." },
-  { id: "melbourne", name: "Melbourne", country: "Australia", blurb: "Laneways, coffee, and long tables. You already have a passport stamp." },
-  { id: "tokyo", name: "Tokyo", country: "Japan", blurb: "Rail-first, food-led, family-capable. Saved as a future trip." },
-  { id: "kochi", name: "Kochi", country: "India", blurb: "Home circuit — Malayali food DNA, backwaters, and family stays." },
+  {
+    id: "sydney",
+    name: "Sydney",
+    country: "Australia",
+    blurb: "Harbour walks, The Rocks, and food within 10 minutes of your hotel.",
+  },
+  {
+    id: "melbourne",
+    name: "Melbourne",
+    country: "Australia",
+    blurb: "Laneways, coffee, and long tables. You already have a passport stamp.",
+  },
+  {
+    id: "tokyo",
+    name: "Tokyo",
+    country: "Japan",
+    blurb: "Rail-first, food-led, family-capable. Saved as a future trip.",
+  },
+  {
+    id: "kochi",
+    name: "Kochi",
+    country: "India",
+    blurb: "Home circuit — Malayali food DNA, backwaters, and family stays.",
+  },
 ];

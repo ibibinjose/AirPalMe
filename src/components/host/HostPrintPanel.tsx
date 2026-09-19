@@ -43,8 +43,8 @@ export function HostPrintPanel({ property }: { property: PropertyInfo }) {
   return (
     <div className="mt-5 space-y-4">
       <p className="text-[13px] text-mute">
-        Print the lobby code plus each room that has a live token. Codes use this property’s Firestore room map — no demo
-        rooms.
+        Print the lobby code plus each room that has a live token. Codes use this property’s Firestore room map — no
+        demo rooms.
       </p>
       <div className="grid gap-4 md:grid-cols-2">
         <article className="flex flex-col rounded-[28px] bg-card/90 p-5 text-center ring-1 ring-line shadow-sm">
@@ -55,18 +55,28 @@ export function HostPrintPanel({ property }: { property: PropertyInfo }) {
           ) : (
             <div className="mx-auto mt-3 h-48 w-48 animate-pulse rounded-xl bg-paper" />
           )}
-          <Button variant="ghost" className="mt-4 w-full" disabled={!lobbyQr} onClick={() => lobbyQr && download(lobbyQr, "lobby")}>
+          <Button
+            variant="ghost"
+            className="mt-4 w-full"
+            disabled={!lobbyQr}
+            onClick={() => lobbyQr && download(lobbyQr, "lobby")}
+          >
             Download PNG
           </Button>
         </article>
         {rooms.length === 0 ? (
           <article className="flex flex-col justify-center rounded-[28px] bg-card/90 p-5 text-center ring-1 ring-line shadow-sm">
             <p className="font-display text-lg font-semibold">No room tokens yet</p>
-            <p className="mt-1 text-sm text-mute">Room QRs appear here once this stay has live room tokens in the database.</p>
+            <p className="mt-1 text-sm text-mute">
+              Room QRs appear here once this stay has live room tokens in the database.
+            </p>
           </article>
         ) : (
           rooms.map(([token, room]) => (
-            <article key={token} className="flex flex-col rounded-[28px] bg-card/90 p-5 text-center ring-1 ring-line shadow-sm">
+            <article
+              key={token}
+              className="flex flex-col rounded-[28px] bg-card/90 p-5 text-center ring-1 ring-line shadow-sm"
+            >
               <p className="font-display text-lg font-semibold">Room {room}</p>
               <p className="mt-1 text-xs text-mute">Guest companion for this room</p>
               {codes[token] ? (

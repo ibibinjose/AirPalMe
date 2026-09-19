@@ -62,7 +62,7 @@ export function SignInPrompt() {
           <button
             type="button"
             onClick={() => go("signin")}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-white transition hover:bg-ink/90 active:scale-[0.99]"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-white transition hover:bg-brand-ink active:scale-[0.99]"
           >
             <LogIn size={16} />
             Sign in with email or phone

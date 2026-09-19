@@ -1,14 +1,6 @@
 /** Real Nearby — markers, precinct places, events/offers, scan analytics. */
 
-export const MARKER_KINDS = [
-  "lobby",
-  "room",
-  "venue",
-  "meeting",
-  "precinct",
-  "street",
-  "event",
-] as const;
+export const MARKER_KINDS = ["lobby", "room", "venue", "meeting", "precinct", "street", "event"] as const;
 
 /** Reserved for later transport / aviation markers. Do not emit yet. */
 export const RESERVED_MARKER_KINDS = ["vehicle", "seat", "gate", "aircraft"] as const;
@@ -242,7 +234,10 @@ export function summarizeScanEvents(
 ): ScanEventSummary {
   const byKind: Partial<Record<ScanEventKind, number>> = {};
   const byMarker = new Map<string, { total: number; bookings: number; estimatedDemand: number }>();
-  const byTarget = new Map<string, { id: string; name: string; type: "property" | "place"; count: number; estimatedValue: number }>();
+  const byTarget = new Map<
+    string,
+    { id: string; name: string; type: "property" | "place"; count: number; estimatedValue: number }
+  >();
 
   let bookingClicks = 0;
   let placeViews = 0;
@@ -258,7 +253,12 @@ export function summarizeScanEvents(
       if (kind === "open") opens++;
     }
 
-    const value = event.estimatedValue && event.estimatedValue > 0 ? event.estimatedValue : (kind === "booking_click" ? defaultAvgValue : 0);
+    const value =
+      event.estimatedValue && event.estimatedValue > 0
+        ? event.estimatedValue
+        : kind === "booking_click"
+          ? defaultAvgValue
+          : 0;
     if (kind === "booking_click") {
       estimatedAttributedDemand += value;
     }
@@ -277,7 +277,13 @@ export function summarizeScanEvents(
       const targetId = event.propertyId || event.placeId!;
       const targetName = event.propertyName || event.placeName || targetId;
       const targetType = event.propertyId ? "property" : "place";
-      const existing = byTarget.get(targetId) || { id: targetId, name: targetName, type: targetType, count: 0, estimatedValue: 0 };
+      const existing = byTarget.get(targetId) || {
+        id: targetId,
+        name: targetName,
+        type: targetType,
+        count: 0,
+        estimatedValue: 0,
+      };
       existing.count += 1;
       existing.estimatedValue += value;
       byTarget.set(targetId, existing);
@@ -285,7 +291,7 @@ export function summarizeScanEvents(
   }
 
   const topMarkers = Array.from(byMarker.entries())
-    .sort((a, b) => (b[1].bookings * 1000 + b[1].total) - (a[1].bookings * 1000 + a[1].total) || a[0].localeCompare(b[0]))
+    .sort((a, b) => b[1].bookings * 1000 + b[1].total - (a[1].bookings * 1000 + a[1].total) || a[0].localeCompare(b[0]))
     .slice(0, topN)
     .map(([markerId, stat]) => ({
       markerId,
@@ -354,10 +360,12 @@ export function guessPrecinctIdFromCityText(text?: string): string | undefined {
   if (!raw) return undefined;
   const lower = raw.toLowerCase();
   if (/\b(the rocks|sydney|circular quay)\b/.test(lower)) return "the-rocks";
-  return raw
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "") || undefined;
+  return (
+    raw
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || undefined
+  );
 }
 
 export function parsePropertyTradeKind(value: string | undefined): PropertyTradeKind | undefined {
@@ -369,7 +377,8 @@ export function parsePropertyTradeKind(value: string | undefined): PropertyTrade
 export function venueTradeOf(input: MarkerCompetitorInput): PlaceCategory | undefined {
   if (input.venueCategory && isPlaceCategory(input.venueCategory)) return input.venueCategory;
   if (input.kind === "street" || input.kind === "precinct" || input.kind === "event") return undefined;
-  if (input.propertyKind === "hotel" || input.propertyKind === "hostel" || input.propertyKind === "campus") return "stay";
+  if (input.propertyKind === "hotel" || input.propertyKind === "hostel" || input.propertyKind === "campus")
+    return "stay";
   if (input.propertyKind === "venue" || input.kind === "venue") return "eat";
   if (input.kind === "lobby" || input.kind === "room" || input.kind === "meeting") return "stay";
   return undefined;
@@ -449,14 +458,24 @@ export function nearbyAskCategory(raw: string): PlaceCategory | undefined {
   if (q.includes("coffee") || q.includes("cafe") || q.includes("caff")) return "coffee";
   if (q.includes("park")) return "parking";
   if (q.includes("shop") || q.includes("buy") || q.includes("retail")) return "shops";
-  if (q.includes("eat") || q.includes("food") || q.includes("dinner") || q.includes("lunch") || q.includes("restaurant")) return "eat";
-  if (q.includes("event") || q.includes("tonight") || q.includes("what's on") || q.includes("whats on")) return "events";
+  if (
+    q.includes("eat") ||
+    q.includes("food") ||
+    q.includes("dinner") ||
+    q.includes("lunch") ||
+    q.includes("restaurant")
+  )
+    return "eat";
+  if (q.includes("event") || q.includes("tonight") || q.includes("what's on") || q.includes("whats on"))
+    return "events";
   return undefined;
 }
 
 export function isStayScopedAsk(raw: string): boolean {
   const q = raw.toLowerCase();
-  return /\b(wifi|wi-fi|wi fi|password|ssid|towel|housekeep|clean(?:ing)?|staff|front desk|maintenance|a\/c|\bac\b|room service)\b/.test(q);
+  return /\b(wifi|wi-fi|wi fi|password|ssid|towel|housekeep|clean(?:ing)?|staff|front desk|maintenance|a\/c|\bac\b|room service)\b/.test(
+    q,
+  );
 }
 
 /** Local marker answers only — not a destination LLM. */
@@ -511,7 +530,14 @@ export function parseMarkerKind(value: string | undefined): MarkerKind {
 const EARTH_M = 6371000;
 
 export function haversineMeters(a: Geo, b: Geo): number {
-  if (!a || !b || !Number.isFinite(a.lat) || !Number.isFinite(a.lng) || !Number.isFinite(b.lat) || !Number.isFinite(b.lng)) {
+  if (
+    !a ||
+    !b ||
+    !Number.isFinite(a.lat) ||
+    !Number.isFinite(a.lng) ||
+    !Number.isFinite(b.lat) ||
+    !Number.isFinite(b.lng)
+  ) {
     return 0;
   }
   const toRad = (deg: number) => (deg * Math.PI) / 180;
@@ -519,9 +545,7 @@ export function haversineMeters(a: Geo, b: Geo): number {
   const dLng = toRad(b.lng - a.lng);
   const lat1 = toRad(a.lat);
   const lat2 = toRad(b.lat);
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
   return 2 * EARTH_M * Math.asin(Math.min(1, Math.sqrt(Math.max(0, h))));
 }
 

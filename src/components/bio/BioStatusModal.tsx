@@ -2,11 +2,7 @@ import { useEffect, useState } from "react";
 import { Check, Sparkles, X, Smile } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useBio } from "@/contexts/BioContext";
-import {
-  AVAILABILITY_STATUSES,
-  resolveStatusPicks,
-  type AvailabilityStatus,
-} from "@shared/bio";
+import { AVAILABILITY_STATUSES, resolveStatusPicks, type AvailabilityStatus } from "@shared/bio";
 import { toast } from "sonner";
 import { cn } from "@/lib/cn";
 
@@ -50,7 +46,11 @@ export function BioStatusModal({
   // The modal stays mounted while closed, so resync picks when it reopens.
   useEffect(() => {
     if (open) {
-      const picks = resolveStatusPicks({ status: currentStatus, customStatus: currentCustomStatus, emoji: currentEmoji });
+      const picks = resolveStatusPicks({
+        status: currentStatus,
+        customStatus: currentCustomStatus,
+        emoji: currentEmoji,
+      });
       setStatus(picks.status);
       setCustomText(picks.customText);
       setEmoji(picks.emoji);
@@ -123,9 +123,9 @@ export function BioStatusModal({
             </div>
             <div>
               <h2 id="bio-status-modal-title" className="font-display text-base font-bold text-ink">
-                Set Availability Status
+                Status
               </h2>
-              <p className="text-[11px] text-mute font-medium">WhatsApp & Bio Live Status</p>
+              <p className="text-[11px] text-mute font-medium">On your bio and in Circle</p>
             </div>
           </div>
           <button
@@ -259,13 +259,7 @@ export function BioStatusModal({
             Clear Status
           </Button>
           <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="rounded-full text-xs"
-            >
+            <Button type="button" variant="ghost" size="sm" onClick={onClose} className="rounded-full text-xs">
               Cancel
             </Button>
             <Button
@@ -273,7 +267,7 @@ export function BioStatusModal({
               size="sm"
               onClick={handleSave}
               disabled={saving}
-              className="rounded-full bg-ink text-white text-xs font-semibold px-4 shadow-sm hover:bg-ink/90"
+              className="rounded-full bg-brand text-white text-xs font-semibold px-4 shadow-sm hover:bg-brand-ink"
             >
               Save Status
             </Button>

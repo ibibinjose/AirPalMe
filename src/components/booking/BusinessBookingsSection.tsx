@@ -3,9 +3,11 @@ import { collection, doc, getDocs, query, updateDoc, where } from "firebase/fire
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
+import { completePaidBookingRemote } from "@/lib/functions";
 import {
   canProviderComplete,
   canProviderConfirm,
+  canRetryPayout,
   isBusinessProviderBooking,
   isOpenProviderBooking,
   type Booking,
@@ -72,8 +74,12 @@ export function BusinessBookingsSection() {
     if (!db || !user || user.uid !== b.providerUid) return;
     setBusy(b.id);
     try {
-      const now = new Date().toISOString();
-      await updateDoc(doc(db, "bookings", b.id), { status, updatedAt: now });
+      if (status === "completed") {
+        await completePaidBookingRemote({ bookingId: b.id });
+      } else {
+        const now = new Date().toISOString();
+        await updateDoc(doc(db, "bookings", b.id), { status, updatedAt: now });
+      }
       await reload(user.uid);
     } finally {
       setBusy(null);
@@ -106,7 +112,7 @@ export function BusinessBookingsSection() {
       <p className="mt-0.5 text-[13px] text-mute">
         {openCount > 0
           ? `${openCount} open · confirm pending, then mark delivered.`
-          : "Payment lands with Stripe — until then, bookings confirm intent."}
+          : "Guests pay AirPal. Your share is sent after you mark a booking delivered."}
       </p>
       <ul className="mt-2 divide-y divide-line">
         {rows.map((b) => (
@@ -126,13 +132,33 @@ export function BusinessBookingsSection() {
             </span>
             <span className="mt-1.5 flex flex-wrap gap-1.5">
               {canProviderConfirm(b.status) && (
-                <Button size="sm" disabled={busy === b.id} loading={busy === b.id} onClick={() => void transition(b, "confirmed")}>
+                <Button
+                  size="sm"
+                  disabled={busy === b.id}
+                  loading={busy === b.id}
+                  onClick={() => void transition(b, "confirmed")}
+                >
                   Confirm
                 </Button>
               )}
-              {canProviderComplete(b.status) && (
-                <Button size="sm" disabled={busy === b.id} loading={busy === b.id} onClick={() => void transition(b, "completed")}>
+              {canProviderComplete(b.status) && (b.priceCents <= 0 || b.paymentStatus === "paid") && (
+                <Button
+                  size="sm"
+                  disabled={busy === b.id}
+                  loading={busy === b.id}
+                  onClick={() => void transition(b, "completed")}
+                >
                   Mark delivered
+                </Button>
+              )}
+              {canRetryPayout(b) && (
+                <Button
+                  size="sm"
+                  disabled={busy === b.id}
+                  loading={busy === b.id}
+                  onClick={() => void transition(b, "completed")}
+                >
+                  Get paid
                 </Button>
               )}
             </span>

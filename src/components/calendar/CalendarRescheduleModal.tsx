@@ -2,12 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { X, Calendar as CalendarIcon, Clock, RotateCcw, Check, AlertTriangle, Zap, CheckCircle2 } from "lucide-react";
 import type { CalendarEvent } from "@shared/event";
 import { useEvents } from "@/contexts/EventsContext";
-import {
-  computeRescheduledTimes,
-  toDateStr,
-  formatRelativeBadge,
-  checkSlotCollision,
-} from "@/lib/calendar-utils";
+import { computeRescheduledTimes, toDateStr, formatRelativeBadge, checkSlotCollision } from "@/lib/calendar-utils";
 import { triggerHaptic } from "@/lib/native";
 import { toast } from "sonner";
 import { cn } from "@/lib/cn";
@@ -50,8 +45,8 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
       const dateStr = toDateStr(d);
       const isWeekend = d.getDay() === 0 || d.getDay() === 6;
       const rel = formatRelativeBadge(dateStr);
-      const weekday = new Intl.DateTimeFormat("en-AU", { weekday: "short" }).format(d);
-      const monthDay = new Intl.DateTimeFormat("en-AU", { month: "short", day: "numeric" }).format(d);
+      const weekday = new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(d);
+      const monthDay = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(d);
 
       slots.push({
         label: rel.label,
@@ -71,11 +66,7 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
 
   if (!event) return null;
 
-  const currentPreviewTimes = computeRescheduledTimes(
-    event.startsAt,
-    event.endsAt,
-    selectedDate || event.date,
-  );
+  const currentPreviewTimes = computeRescheduledTimes(event.startsAt, event.endsAt, selectedDate || event.date);
 
   const handleConfirm = async () => {
     if (!selectedDate || selectedDate === event.date) {
@@ -145,9 +136,7 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
               <CalendarIcon size={14} />
               <span>Reschedule Event</span>
             </div>
-            <h3 className="font-display text-lg font-bold text-ink leading-snug">
-              {event.title}
-            </h3>
+            <h3 className="font-display text-lg font-bold text-ink leading-snug">{event.title}</h3>
           </div>
 
           <button
@@ -194,7 +183,10 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
 
         {/* Choose Target Date Slot */}
         <div className="space-y-3">
-          <label htmlFor="calendar-custom-date" className="block text-xs font-semibold text-ink uppercase tracking-wider">
+          <label
+            htmlFor="calendar-custom-date"
+            className="block text-xs font-semibold text-ink uppercase tracking-wider"
+          >
             Select New Date Slot
           </label>
 
@@ -216,11 +208,9 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
                   className={cn(
                     "flex flex-col items-start rounded-xl p-2.5 text-left transition ring-1 text-xs",
                     isSelected
-                      ? (
-                        slotCollision.hasCollision
-                          ? "bg-amber-600 text-white ring-amber-600 shadow-xs font-semibold"
-                          : "bg-brand text-white ring-brand shadow-xs font-semibold"
-                      )
+                      ? slotCollision.hasCollision
+                        ? "bg-amber-600 text-white ring-amber-600 shadow-xs font-semibold"
+                        : "bg-brand text-white ring-brand shadow-xs font-semibold"
                       : "bg-card text-ink ring-line/80 hover:bg-paper",
                     isCurrent && !isSelected && "border-l-2 border-l-amber-500",
                     !isSelected && slotCollision.hasCollision && "bg-amber-500/[0.06] ring-amber-300/60",
@@ -233,7 +223,12 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
                         (Current)
                       </span>
                     ) : slotCollision.hasCollision ? (
-                      <span className={cn("text-[9px] font-bold inline-flex items-center gap-0.5", isSelected ? "text-amber-100" : "text-amber-700")}>
+                      <span
+                        className={cn(
+                          "text-[9px] font-bold inline-flex items-center gap-0.5",
+                          isSelected ? "text-amber-100" : "text-amber-700",
+                        )}
+                      >
                         <AlertTriangle size={9} />
                         <span>Conflict</span>
                       </span>
@@ -257,13 +252,14 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full rounded-xl bg-paper px-3 py-2 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+              className="w-full rounded-xl bg-paper px-3 py-2 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
             />
           </div>
 
           {/* Collision Warning Box or Clean Preview */}
-          {selectedDate && selectedDate !== event.date && (
-            collision?.hasCollision ? (
+          {selectedDate &&
+            selectedDate !== event.date &&
+            (collision?.hasCollision ? (
               <div className="rounded-2xl bg-amber-500/10 p-3.5 ring-1 ring-amber-400/50 text-xs text-amber-950 space-y-2.5 animate-in fade-in">
                 <div className="flex items-start gap-2">
                   <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
@@ -286,7 +282,9 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
                       className="inline-flex items-center justify-center gap-1 rounded-full bg-amber-500/25 px-3 py-1.5 text-xs font-bold text-amber-950 hover:bg-amber-500/35 transition ring-1 ring-amber-500/40 active:scale-95 shadow-2xs"
                     >
                       <Zap size={12} className="text-amber-700" />
-                      <span>Snap to {collision.nearestOpening.dayBadge} ({collision.nearestOpening.formattedDate})</span>
+                      <span>
+                        Snap to {collision.nearestOpening.dayBadge} ({collision.nearestOpening.formattedDate})
+                      </span>
                     </button>
                   </div>
                 )}
@@ -295,11 +293,13 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
               <div className="rounded-xl bg-emerald-500/10 p-3 ring-1 ring-emerald-500/30 text-xs flex items-center justify-between text-emerald-950 dark:text-emerald-200">
                 <div className="flex items-center gap-1.5 font-medium">
                   <CheckCircle2 size={13} className="text-emerald-600 shrink-0" />
-                  <span>Available: {formatRelativeBadge(selectedDate).label} ({currentPreviewTimes.timeLabel}) · No conflicts</span>
+                  <span>
+                    Available: {formatRelativeBadge(selectedDate).label} ({currentPreviewTimes.timeLabel}) · No
+                    conflicts
+                  </span>
                 </div>
               </div>
-            )
-          )}
+            ))}
         </div>
 
         {/* Action Buttons */}

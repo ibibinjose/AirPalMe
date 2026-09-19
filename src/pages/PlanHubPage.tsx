@@ -1,23 +1,16 @@
 import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
-import {
-  ArrowRight,
-  Clock,
-  Compass,
-  HeartHandshake,
-  Plus,
-  Radar,
-  Search,
-  Sparkles,
-  Users,
-} from "lucide-react";
+import { Clock, Compass, Plus, Radar, Search, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { usePlans } from "@/contexts/PlanContext";
 import { useAuth } from "@/contexts/AuthContext";
+
 import { PlanCard } from "@/components/plan/PlanCard";
+import { EventTile } from "@/components/event/EventTile";
 import { PLAN_TYPES } from "@shared/plan";
 import { cn } from "@/lib/cn";
 import { useLocalNow } from "@/hooks/useLocalNow";
+import { EVENT_NEAR_M, locatedNear } from "@/lib/location-scope";
 
 type HubTab = "my" | "public" | "past";
 type Category = "all" | "experience" | "milestone" | "social";
@@ -29,32 +22,32 @@ const CATEGORIES: { id: Category; label: string }[] = [
   { id: "social", label: "Social" },
 ];
 
-const TEMPLATE_SUGGESTIONS = [
-  { label: "☕ Harbour Coffee Walk", destination: "Circus Quay, Sydney", type: "casual" },
-  { label: "🍻 Rocks Pub Crawl", destination: "The Rocks, Sydney", type: "nightlife" },
-  { label: "🎨 MCA Art Tour", destination: "Museum of Contemporary Art", type: "culture" },
-  { label: "🏃 Bondi Coastal Run", destination: "Bondi to Coogee Coastal Walk", type: "activity" },
-];
+function templateSuggestions(city: string) {
+  const dest = city && city !== "Current location" && city !== "Choose a city" ? city : "Nearby";
+  return [
+    { label: "👨‍👩‍👧 Family brunch", destination: dest, type: "lunch" as const },
+    { label: "☕ Coffee with friends", destination: dest, type: "catchup" as const },
+    { label: "🌃 Night out nearby", destination: dest, type: "nightout" as const },
+    { label: "🚶 Walk nearby", destination: dest, type: "walk" as const },
+  ];
+}
 
 export function PlanHubPage() {
   const [, nav] = useLocation();
   const { plans, myPlans, publicPlans } = usePlans();
   const { user } = useAuth();
-  const { today } = useLocalNow();
+
+  const { today, city, here, usingGps } = useLocalNow();
 
   const [tab, setTab] = useState<HubTab>("my");
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState<Category>("all");
 
   const userAttendeeId =
-    user?.uid ||
-    (typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null) ||
-    undefined;
+    user?.uid || (typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null) || undefined;
 
   const pastPlans = useMemo(() => {
-    return plans
-      .filter((p) => p.date < today || p.status === "completed")
-      .sort((a, b) => b.date.localeCompare(a.date));
+    return plans.filter((p) => p.date < today || p.status === "completed").sort((a, b) => b.date.localeCompare(a.date));
   }, [plans, today]);
 
   const activeMyPlans = useMemo(() => {
@@ -66,8 +59,9 @@ export function PlanHubPage() {
   const activePublicPlans = useMemo(() => {
     return publicPlans
       .filter((p) => p.date >= today && p.status !== "completed")
+      .filter((p) => locatedNear({ geo: p.geo, city: p.city || p.destination }, here, city, usingGps, EVENT_NEAR_M))
       .sort((a, b) => a.date.localeCompare(b.date));
-  }, [publicPlans, today]);
+  }, [publicPlans, today, here, city, usingGps]);
 
   const displayedPlans = useMemo(() => {
     let list = tab === "my" ? activeMyPlans : tab === "public" ? activePublicPlans : pastPlans;
@@ -105,51 +99,44 @@ export function PlanHubPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-0.5 text-xs font-black uppercase tracking-[0.16em] text-slate-950 border border-ink shadow-xs">
-            <Sparkles size={13} />
-            <span>Make Plans · Sydney 🇦🇺</span>
-          </div>
-          <h1 className="font-display mt-2 text-3xl md:text-4xl font-extrabold text-ink">Hangouts & Plans</h1>
-          <p className="text-sm text-mute mt-1">Organise hangouts with your crew, build itineraries, or join a public plan.</p>
+          <h1 className="font-display text-3xl md:text-4xl font-extrabold text-ink">Plans</h1>
+          <p className="text-sm text-mute mt-1">With family and friends. Ticketed nights live under Events.</p>
         </div>
-        <Button onClick={() => nav("/plan/new")} className="h-11 shrink-0 gap-2 self-start rounded-full px-5 md:self-auto shadow-xs">
-          <Plus size={17} />
-          <span>New plan</span>
-        </Button>
+        <div className="flex flex-wrap gap-2 self-start">
+          <Button onClick={() => nav("/plan/new")} className="h-11 shrink-0 gap-2 rounded-full px-5 shadow-xs">
+            <Plus size={17} />
+            <span>Create plan</span>
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => nav("/circle")}
+            className="h-11 shrink-0 rounded-full px-4 ring-1 ring-line"
+          >
+            Circle
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => nav("/event/new")}
+            className="h-11 shrink-0 rounded-full px-4 ring-1 ring-line"
+          >
+            Ticketed event
+          </Button>
+        </div>
       </div>
 
-      {/* AirPal Companion Banner */}
-      <div className="mt-6 rounded-3xl border-2 border-ink bg-gradient-to-r from-brand/10 via-amber-500/10 to-purple-500/10 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
-            <HeartHandshake size={22} />
-          </span>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">AirPal Mate Priority</p>
-            <h3 className="font-display text-base font-bold text-ink">Going alone or need someone to join?</h3>
-            <p className="text-xs text-mute">Find a verified AirPal Mate in Sydney to accompany you to any event or hangout.</p>
-          </div>
-        </div>
-        <Button
-          size="sm"
-          className="shrink-0 gap-1.5 font-bold shadow-xs self-start sm:self-auto"
-          onClick={() => nav("/companion")}
-        >
-          <span>Find an AirPal</span>
-          <ArrowRight size={15} />
-        </Button>
-      </div>
-
-      {/* Quick Hangout Template Chips */}
       <div className="mt-6">
-        <p className="text-xs font-bold uppercase tracking-wider text-mute mb-2">Quick-start Sydney templates</p>
+        <p className="text-xs font-bold uppercase tracking-wider text-mute mb-2">Quick-start with your people</p>
         <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1">
-          {TEMPLATE_SUGGESTIONS.map((item) => (
+          {templateSuggestions(city).map((item) => (
             <button
               key={item.label}
               type="button"
-              onClick={() => nav(`/plan/new?title=${encodeURIComponent(item.label.slice(2))}&dest=${encodeURIComponent(item.destination)}`)}
-              className="shrink-0 rounded-full border border-ink bg-card px-3.5 py-1.5 text-xs font-semibold text-ink shadow-xs hover:bg-paper transition"
+              onClick={() =>
+                nav(
+                  `/plan/new?title=${encodeURIComponent(item.label.slice(2).trim())}&dest=${encodeURIComponent(item.destination)}&type=${item.type}`,
+                )
+              }
+              className="shrink-0 rounded-full border border-line bg-card px-3.5 py-1.5 text-xs font-semibold text-ink shadow-xs hover:bg-paper transition"
             >
               {item.label}
             </button>
@@ -159,7 +146,7 @@ export function PlanHubPage() {
 
       {/* Tabs and Search Bar */}
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex rounded-full border-2 border-ink bg-paper p-1 shadow-xs" role="tablist">
+        <div className="flex rounded-full ring-1 ring-line bg-paper p-1 shadow-xs" role="tablist">
           {tabs.map((t) => (
             <button
               key={t.id}
@@ -169,7 +156,7 @@ export function PlanHubPage() {
               onClick={() => setTab(t.id)}
               className={cn(
                 "flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-bold transition",
-                tab === t.id ? "bg-ink text-white" : "text-mute hover:text-ink",
+                tab === t.id ? "bg-brand text-white" : "text-mute hover:text-ink",
               )}
             >
               <t.icon size={14} className={t.id === "public" && tab !== "public" ? "text-brand" : undefined} />
@@ -187,7 +174,7 @@ export function PlanHubPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search plans or places…"
             aria-label="Search plans"
-            className="h-10 w-full rounded-full bg-card pl-10 pr-4 text-sm text-ink border-2 border-ink outline-none placeholder:text-mute focus:border-brand shadow-xs"
+            className="h-10 w-full rounded-full bg-card pl-10 pr-4 text-sm text-ink ring-1 ring-line outline-none placeholder:text-mute shadow-xs focus:ring-2 focus:ring-brand/20"
           />
         </div>
       </div>
@@ -201,10 +188,10 @@ export function PlanHubPage() {
             onClick={() => setCategory(c.id)}
             aria-pressed={category === c.id}
             className={cn(
-              "shrink-0 rounded-full border-2 px-3.5 py-1.5 text-[13px] font-bold transition",
+              "shrink-0 rounded-full border px-3.5 py-1.5 text-[13px] font-bold transition",
               category === c.id
-                ? "border-ink bg-ink text-white"
-                : "border-ink/40 bg-paper text-mute hover:border-ink hover:text-ink",
+                ? "border-brand bg-brand text-white"
+                : "border-line bg-paper text-mute hover:border-brand/40 hover:text-ink",
             )}
           >
             {c.label}
@@ -215,7 +202,7 @@ export function PlanHubPage() {
       {/* Plans List */}
       <div className="mt-5">
         {displayedPlans.length === 0 ? (
-          <div className="rounded-3xl border-2 border-ink bg-card p-8 md:p-12 text-center shadow-xs">
+          <div className="rounded-3xl ring-1 ring-line bg-card p-8 md:p-12 text-center shadow-xs">
             <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-brand/10 text-brand border border-brand/20">
               <Compass size={32} />
             </div>
@@ -224,16 +211,27 @@ export function PlanHubPage() {
             </h2>
             <p className="text-sm text-mute mt-1.5 max-w-md mx-auto">
               {tab === "my"
-                ? "Create a hangout, invite mates with a link, and build the itinerary together."
-                : "Check back soon — or start a public plan and meet people nearby."}
+                ? "Make a plan with family and friends, share a link, go together."
+                : "Check back soon — or host a ticketed event people nearby can join."}
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
               <Button onClick={() => nav("/plan/new")} className="h-11 rounded-full px-6 shadow-xs font-bold">
                 <Plus size={16} />
-                <span>Create a plan</span>
+                <span>Create plan</span>
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => nav("/event/new")}
+                className="h-11 rounded-full px-5 ring-1 ring-line font-bold"
+              >
+                Ticketed event
               </Button>
               {tab !== "public" && (
-                <Button variant="ghost" onClick={() => setTab("public")} className="h-11 rounded-full border-2 border-ink px-5 font-bold">
+                <Button
+                  variant="ghost"
+                  onClick={() => setTab("public")}
+                  className="h-11 rounded-full ring-1 ring-line px-5 font-bold"
+                >
                   <Radar size={15} className="text-brand" />
                   <span>Browse public</span>
                 </Button>
@@ -241,10 +239,16 @@ export function PlanHubPage() {
             </div>
           </div>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {displayedPlans.map((plan) => (
-              <PlanCard key={plan.id} plan={plan} userAttendeeId={userAttendeeId} />
-            ))}
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+            {displayedPlans.map((plan) =>
+              plan.isExperience || plan.heroImage ? (
+                <EventTile key={plan.id} plan={plan} />
+              ) : (
+                <div key={plan.id} className="col-span-2 sm:col-span-1">
+                  <PlanCard plan={plan} userAttendeeId={userAttendeeId} />
+                </div>
+              ),
+            )}
           </div>
         )}
       </div>

@@ -55,21 +55,50 @@ export function BioCatalogEditor({
             key={k.id}
             type="button"
             onClick={() => setKind(k.id)}
-            className={cn("h-9 rounded-full px-4 text-sm", kind === k.id ? "bg-ink text-white" : "bg-white ring-1 ring-line")}
+            className={cn(
+              "h-9 rounded-full px-4 text-sm",
+              kind === k.id ? "bg-brand text-white" : "bg-white ring-1 ring-line",
+            )}
           >
             {k.label}
           </button>
         ))}
       </div>
       <form className="space-y-2" onSubmit={add}>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" required className={fieldInput} />
-        <input value={detail} onChange={(e) => setDetail(e.target.value)} placeholder="Short line" className={fieldInput} />
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Title"
+          required
+          className={fieldInput}
+        />
+        <input
+          value={detail}
+          onChange={(e) => setDetail(e.target.value)}
+          placeholder="Short line"
+          className={fieldInput}
+        />
         <div className="grid grid-cols-2 gap-2">
-          <input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" className={`h-12 ${fieldInput}`} />
+          <input
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            placeholder="Price"
+            className={`h-12 ${fieldInput}`}
+          />
           {kind === "deal" ? (
-            <input value={badge} onChange={(e) => setBadge(e.target.value)} placeholder="Badge" className={`h-12 ${fieldInput}`} />
+            <input
+              value={badge}
+              onChange={(e) => setBadge(e.target.value)}
+              placeholder="Badge"
+              className={`h-12 ${fieldInput}`}
+            />
           ) : (
-            <input value={href} onChange={(e) => setHref(e.target.value)} placeholder="Link" className={`h-12 ${fieldInput}`} />
+            <input
+              value={href}
+              onChange={(e) => setHref(e.target.value)}
+              placeholder="Link"
+              className={`h-12 ${fieldInput}`}
+            />
           )}
         </div>
         {kind === "deal" && (
@@ -81,14 +110,28 @@ export function BioCatalogEditor({
       </form>
       <ul className="space-y-2">
         {rows.map((row) => (
-          <li key={row.id} className="flex items-start justify-between gap-3 rounded-2xl bg-card px-4 py-3 ring-1 ring-line">
+          <li
+            key={row.id}
+            className="flex items-start justify-between gap-3 rounded-2xl bg-card px-4 py-3 ring-1 ring-line"
+          >
             <span>
-              {row.badge && <span className="block text-[11px] uppercase tracking-[0.14em] text-gold">{row.badge}</span>}
+              {row.badge && (
+                <span className="block text-[11px] uppercase tracking-[0.14em] text-gold">{row.badge}</span>
+              )}
               <span className="font-medium">{row.title}</span>
               {row.price && <span className="ml-2 text-sm text-mute">{row.price}</span>}
               {row.detail && <span className="mt-0.5 block text-sm text-mute">{row.detail}</span>}
             </span>
-            <button type="button" className="shrink-0 text-sm text-mute" onClick={() => onChange(kind, rows.filter((x) => x.id !== row.id))}>
+            <button
+              type="button"
+              className="shrink-0 text-sm text-mute"
+              onClick={() =>
+                onChange(
+                  kind,
+                  rows.filter((x) => x.id !== row.id),
+                )
+              }
+            >
               Remove
             </button>
           </li>

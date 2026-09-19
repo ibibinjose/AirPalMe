@@ -30,6 +30,9 @@ const config: CapacitorConfig = {
       style: "light",
       resizeOnFullScreen: true,
     },
+    Geolocation: {
+      enableHighAccuracy: true,
+    },
   },
 };
 

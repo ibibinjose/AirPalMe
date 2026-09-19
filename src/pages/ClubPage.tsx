@@ -37,7 +37,9 @@ export function ClubPage() {
         <p className="mt-6 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">AirPal Club</p>
         <h1 className="font-display mt-1 text-3xl font-semibold">Invites and offers, kept on this device.</h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ink/80">
-          Join AirPal Club to be on our list for nights, markets, and deals. Clubs on AirPal can add you to their guest list. Invites today open the sender’s mail app with the list on BCC — we do not send bulk mail from our servers yet.
+          Join AirPal Club to be on our list for nights, markets, and deals. Clubs on AirPal can add you to their guest
+          list. Invites today open the sender’s mail app with the list on BCC — we do not send bulk mail from our
+          servers yet.
         </p>
 
         {mine ? (
@@ -61,8 +63,26 @@ export function ClubPage() {
           </div>
         ) : (
           <form className="mt-6 space-y-3" onSubmit={onJoin}>
-            <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" autoCapitalize="words" placeholder="Name" required className={fieldInput} />
-            <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className={fieldInput} />
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoComplete="name"
+              autoCapitalize="words"
+              placeholder="Name"
+              required
+              className={fieldInput}
+            />
+            <input
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              autoCapitalize="none"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              required
+              className={fieldInput}
+            />
             <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" className={fieldInput} />
             <label className="flex items-center gap-3 text-sm">
               <input type="checkbox" checked={invites} onChange={(e) => setInvites(e.target.checked)} />

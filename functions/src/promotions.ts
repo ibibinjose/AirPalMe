@@ -41,8 +41,7 @@ function slugFor(title: string): string {
 
 /** Chance-based mechanics always need human legal review before they can go live. */
 function defaultLegalStatus(mechanic: MechanicType): Promotion["legalReviewStatus"] {
-  return mechanic === "giveaway" || mechanic === "free_entry" ||
-    mechanic === "referral" || mechanic === "challenge"
+  return mechanic === "giveaway" || mechanic === "free_entry" || mechanic === "referral" || mechanic === "challenge"
     ? "pending"
     : "not_required";
 }
@@ -67,13 +66,7 @@ async function writePromotionAudit(input: {
   });
 }
 
-async function notifyUser(
-  uid: string,
-  kind: NotificationKind,
-  title: string,
-  body: string,
-  promotionId: string,
-) {
+async function notifyUser(uid: string, kind: NotificationKind, title: string, body: string, promotionId: string) {
   if (!uid) return;
   await db.collection("promotion_notifications").add({
     uid,
@@ -190,7 +183,17 @@ export const updatePromotion = onCall(CALLABLE, async (request) => {
   }
   const patch = { ...(data.patch || {}) };
   // Never client-settable: ownership, status machine, featuring, legal sign-off.
-  for (const k of ["ownerUid", "createdBy", "createdAt", "status", "featured", "legalReviewStatus", "sponsorId", "id", "slug"]) {
+  for (const k of [
+    "ownerUid",
+    "createdBy",
+    "createdAt",
+    "status",
+    "featured",
+    "legalReviewStatus",
+    "sponsorId",
+    "id",
+    "slug",
+  ]) {
     delete patch[k];
   }
   if (!Object.keys(patch).length) throw new HttpsError("invalid-argument", "Nothing to update.");
@@ -224,7 +227,13 @@ export const submitPromotion = onCall(CALLABLE, async (request) => {
   if (!allowed) throw new HttpsError("failed-precondition", `Cannot submit from ${from}.`);
   await ref.update({ status: to, updatedAt: new Date().toISOString() });
   await writePromotionAudit({ promotionId, actorUid: uid, action: "submit", from, to });
-  await notifyUser(promo.ownerUid, "campaign_submitted", "Submitted for review", `${promo.title} is with the AirPal team.`, promotionId);
+  await notifyUser(
+    promo.ownerUid,
+    "campaign_submitted",
+    "Submitted for review",
+    `${promo.title} is with the AirPal team.`,
+    promotionId,
+  );
   return { ok: true, status: to };
 });
 
@@ -298,11 +307,29 @@ export const reviewPromotion = onCall(CALLABLE, async (request) => {
   }
   const ownerNote = String(data.reason || "");
   if (data.decision === "approve" || data.decision === "publish") {
-    await notifyUser(promo.ownerUid, "promotion_approved", "Campaign approved", `${promo.title} is ${to === "live" ? "live" : "approved"}.`, promotionId);
+    await notifyUser(
+      promo.ownerUid,
+      "promotion_approved",
+      "Campaign approved",
+      `${promo.title} is ${to === "live" ? "live" : "approved"}.`,
+      promotionId,
+    );
   } else if (data.decision === "reject") {
-    await notifyUser(promo.ownerUid, "promotion_rejected", "Campaign needs work", `${promo.title} was not approved. ${ownerNote}`, promotionId);
+    await notifyUser(
+      promo.ownerUid,
+      "promotion_rejected",
+      "Campaign needs work",
+      `${promo.title} was not approved. ${ownerNote}`,
+      promotionId,
+    );
   } else if (data.decision === "request_changes") {
-    await notifyUser(promo.ownerUid, "campaign_changes_requested", "Changes requested", `${promo.title}: ${ownerNote || "see review notes"}.`, promotionId);
+    await notifyUser(
+      promo.ownerUid,
+      "campaign_changes_requested",
+      "Changes requested",
+      `${promo.title}: ${ownerNote || "see review notes"}.`,
+      promotionId,
+    );
   } else if (data.decision === "close") {
     const entrants = await db.collection("promotion_entries").where("promotionId", "==", promotionId).get();
     const seen = new Set<string>();
@@ -310,7 +337,13 @@ export const reviewPromotion = onCall(CALLABLE, async (request) => {
       const eu = String(doc.data()?.uid || "");
       if (eu && !seen.has(eu)) {
         seen.add(eu);
-        await notifyUser(eu, "promotion_closed", "Giveaway closed", `${promo.title} has closed. Winners are announced soon.`, promotionId);
+        await notifyUser(
+          eu,
+          "promotion_closed",
+          "Giveaway closed",
+          `${promo.title} has closed. Winners are announced soon.`,
+          promotionId,
+        );
       }
     }
   }
@@ -362,10 +395,7 @@ export const enterPromotion = onCall(CALLABLE, async (request) => {
   }
 
   const entriesRef = db.collection("promotion_entries");
-  const existing = await entriesRef
-    .where("promotionId", "==", promotionId)
-    .where("uid", "==", uid)
-    .get();
+  const existing = await entriesRef.where("promotionId", "==", promotionId).where("uid", "==", uid).get();
   const limit = Math.max(1, Number(promo.entryLimit || 1));
   if (existing.size >= limit) {
     // Idempotent: re-entry returns the existing reference, never a duplicate.
@@ -382,15 +412,30 @@ export const enterPromotion = onCall(CALLABLE, async (request) => {
     status: "entered",
     createdAt: new Date().toISOString(),
   });
-  await db.collection("promotions").doc(promotionId).update({
-    entriesCount: FieldValue.increment(1),
-    updatedAt: new Date().toISOString(),
-  });
+  await db
+    .collection("promotions")
+    .doc(promotionId)
+    .update({
+      entriesCount: FieldValue.increment(1),
+      updatedAt: new Date().toISOString(),
+    });
   await grantPoints(uid, ENTRY_POINTS, "giveaway_entry", promotionId);
-  await notifyUser(uid, "entry_confirmed", "Entry confirmed", `You're in: ${promo.title}. Reference ${reference}.`, promotionId);
+  await notifyUser(
+    uid,
+    "entry_confirmed",
+    "Entry confirmed",
+    `You're in: ${promo.title}. Reference ${reference}.`,
+    promotionId,
+  );
   if (referrerUid) {
     await grantPoints(referrerUid, REFERRAL_POINTS, "referral_bonus", promotionId);
-    await notifyUser(referrerUid, "referral_bonus", "A mate entered", `Someone joined ${promo.title} with your link. +${REFERRAL_POINTS} points.`, promotionId);
+    await notifyUser(
+      referrerUid,
+      "referral_bonus",
+      "A mate entered",
+      `Someone joined ${promo.title} with your link. +${REFERRAL_POINTS} points.`,
+      promotionId,
+    );
   }
   return { ok: true, duplicate: false, reference };
 });
@@ -502,14 +547,39 @@ export const setWinnerStatus = onCall(CALLABLE, async (request) => {
   }
   await ref.update({ status: to, note: String(data.note || ""), updatedAt: new Date().toISOString() });
   const promotionId = String(winner.promotionId || "");
-  await writePromotionAudit({ promotionId, actorUid: uid, action: `winner:${to}`, from, to, reason: String(data.note || "") });
+  await writePromotionAudit({
+    promotionId,
+    actorUid: uid,
+    action: `winner:${to}`,
+    from,
+    to,
+    reason: String(data.note || ""),
+  });
   const wuid = String(winner.uid || "");
   if (to === "verified") {
-    await notifyUser(wuid, "winner_verification", "Entry verified", "Your winning entry checks out. We'll be in touch about the prize.", promotionId);
+    await notifyUser(
+      wuid,
+      "winner_verification",
+      "Entry verified",
+      "Your winning entry checks out. We'll be in touch about the prize.",
+      promotionId,
+    );
   } else if (to === "accepted") {
-    await notifyUser(wuid, "prize_available", "Prize accepted", "Your prize is being arranged. Congratulations.", promotionId);
+    await notifyUser(
+      wuid,
+      "prize_available",
+      "Prize accepted",
+      "Your prize is being arranged. Congratulations.",
+      promotionId,
+    );
   } else if (to === "disqualified" || to === "declined") {
-    await notifyUser(wuid, "winner_update", "Draw update", `Your selected entry was ${to}. An alternate may be drawn.`, promotionId);
+    await notifyUser(
+      wuid,
+      "winner_update",
+      "Draw update",
+      `Your selected entry was ${to}. An alternate may be drawn.`,
+      promotionId,
+    );
   }
   return { ok: true, status: to };
 });
@@ -519,10 +589,13 @@ export const recordPromotionView = onCall(CALLABLE, async (request) => {
   await enforceRateLimit(uid, "analytics", isAnonymousAuth(request));
   const promotionId = String((request.data || {}).promotionId || "");
   if (!promotionId) throw new HttpsError("invalid-argument", "promotionId is required.");
-  await db.collection("promotions").doc(promotionId).update({
-    viewsCount: FieldValue.increment(1),
-    updatedAt: new Date().toISOString(),
-  });
+  await db
+    .collection("promotions")
+    .doc(promotionId)
+    .update({
+      viewsCount: FieldValue.increment(1),
+      updatedAt: new Date().toISOString(),
+    });
   return { ok: true };
 });
 
@@ -531,10 +604,13 @@ export const recordPromotionClick = onCall(CALLABLE, async (request) => {
   await enforceRateLimit(uid, "analytics", isAnonymousAuth(request));
   const promotionId = String((request.data || {}).promotionId || "");
   if (!promotionId) throw new HttpsError("invalid-argument", "promotionId is required.");
-  await db.collection("promotions").doc(promotionId).update({
-    clicksCount: FieldValue.increment(1),
-    updatedAt: new Date().toISOString(),
-  });
+  await db
+    .collection("promotions")
+    .doc(promotionId)
+    .update({
+      clicksCount: FieldValue.increment(1),
+      updatedAt: new Date().toISOString(),
+    });
   return { ok: true };
 });
 
@@ -547,20 +623,23 @@ export const setWeeklyCampaign = onCall(CALLABLE, async (request) => {
   const data = (request.data || {}) as SetWeeklyCampaignRequest;
   const weekId = String(data.weekId || "").trim();
   if (!weekId) throw new HttpsError("invalid-argument", "weekId is required.");
-  await db.collection("promotion_weeks").doc(weekId).set(
-    {
-      weekId,
-      giveawayId: String(data.giveawayId || ""),
-      promotionId: String(data.promotionId || ""),
-      experienceId: String(data.experienceId || ""),
-      businessId: String(data.businessId || ""),
-      destination: String(data.destination || ""),
-      note: String(data.note || ""),
-      updatedAt: new Date().toISOString(),
-      updatedBy: uid,
-    },
-    { merge: true },
-  );
+  await db
+    .collection("promotion_weeks")
+    .doc(weekId)
+    .set(
+      {
+        weekId,
+        giveawayId: String(data.giveawayId || ""),
+        promotionId: String(data.promotionId || ""),
+        experienceId: String(data.experienceId || ""),
+        businessId: String(data.businessId || ""),
+        destination: String(data.destination || ""),
+        note: String(data.note || ""),
+        updatedAt: new Date().toISOString(),
+        updatedBy: uid,
+      },
+      { merge: true },
+    );
   return { ok: true, weekId };
 });
 
@@ -573,7 +652,8 @@ export const redeemPoints = onCall(CALLABLE, async (request) => {
   if (!promoSnap.exists) throw new HttpsError("not-found", "Offer not found.");
   const promo = promoSnap.data() as Promotion;
   if (promo.status !== "live") throw new HttpsError("failed-precondition", "This offer is not live.");
-  if (promo.mechanicType !== "member") throw new HttpsError("failed-precondition", "This offer is not redeemable with points.");
+  if (promo.mechanicType !== "member")
+    throw new HttpsError("failed-precondition", "This offer is not redeemable with points.");
   const cost = Math.max(1, Math.floor(Number(promo.pointsCost) || 0));
   if (!cost) throw new HttpsError("failed-precondition", "This offer has no points price.");
 
@@ -584,7 +664,12 @@ export const redeemPoints = onCall(CALLABLE, async (request) => {
     if (balance < cost) throw new HttpsError("failed-precondition", `You need ${cost} points (balance ${balance}).`);
     tx.set(rewardRef, { uid, points: balance - cost, updatedAt: new Date().toISOString() }, { merge: true });
   });
-  const code = `RDM-${promotionId.replace(/[^a-zA-Z]/g, "").substring(0, 4).toUpperCase() || "AP"}-${1000 + randomInt(9000)}`;
+  const code = `RDM-${
+    promotionId
+      .replace(/[^a-zA-Z]/g, "")
+      .substring(0, 4)
+      .toUpperCase() || "AP"
+  }-${1000 + randomInt(9000)}`;
   await db.collection("reward_transactions").add({
     uid,
     delta: -cost,
@@ -602,7 +687,13 @@ export const redeemPoints = onCall(CALLABLE, async (request) => {
     at: new Date().toISOString(),
     createdAt: FieldValue.serverTimestamp(),
   });
-  await notifyUser(uid, "points_redeemed", "Offer redeemed", `${promo.title} — show code ${code} in-store.`, promotionId);
+  await notifyUser(
+    uid,
+    "points_redeemed",
+    "Offer redeemed",
+    `${promo.title} — show code ${code} in-store.`,
+    promotionId,
+  );
   return { ok: true, code };
 });
 
@@ -626,7 +717,13 @@ export const promotionEndingSoon = onSchedule(
         const eu = String(entry.data()?.uid || "");
         if (eu && !seen.has(eu)) {
           seen.add(eu);
-          await notifyUser(eu, "promotion_ending_soon", "Closing soon", `${promo.title} closes in under 24 hours.`, doc.id);
+          await notifyUser(
+            eu,
+            "promotion_ending_soon",
+            "Closing soon",
+            `${promo.title} closes in under 24 hours.`,
+            doc.id,
+          );
         }
       }
       await doc.ref.update({ remindedAt: new Date().toISOString() });

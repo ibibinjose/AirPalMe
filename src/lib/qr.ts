@@ -47,6 +47,10 @@ export function parseQrPayload(raw: string): QrIntent {
     if (campus?.[1]) {
       return { kind: "campus", campusId: campus[1], room: url.searchParams.get("room") || undefined };
     }
+    const wave = url.pathname.match(/^\/w\/([A-Za-z0-9]{4,8})/);
+    if (wave?.[1]) {
+      return { kind: "url", href: `/w/${wave[1].toUpperCase()}` };
+    }
     const at = url.pathname.match(/^\/@([a-z0-9._]{3,30})/i);
     if (at?.[1]) {
       return { kind: "url", href: `/@${at[1].toLowerCase()}` };

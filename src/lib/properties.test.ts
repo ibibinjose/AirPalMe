@@ -1,5 +1,13 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { fetchProperty, getCachedProperty, normalizeProperty, saveCachedProperty, subscribeProperty, unknownProperty, updatePropertyWifi } from "./properties";
+import {
+  fetchProperty,
+  getCachedProperty,
+  normalizeProperty,
+  saveCachedProperty,
+  subscribeProperty,
+  unknownProperty,
+  updatePropertyWifi,
+} from "./properties";
 import { buildHostProperty } from "@shared/host-property";
 import { askLocal } from "./ask";
 

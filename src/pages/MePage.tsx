@@ -19,6 +19,8 @@ import { loadHunts } from "@/lib/hunts-store";
 import { listMemories } from "@/lib/memories";
 import { listPeople } from "@/lib/people";
 import { InvitePanel } from "@/components/invite/InvitePanel";
+import { BookingsSection } from "@/components/booking/BookingsSection";
+import { PayoutSetupCard } from "@/components/connect/PayoutSetupCard";
 import { cn } from "@/lib/cn";
 
 function Row({
@@ -36,13 +38,13 @@ function Row({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full touch-manipulation items-center justify-between gap-3 rounded-2xl border-2 border-ink bg-card px-4 py-3 text-left transition hover:border-brand active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+      className="flex w-full touch-manipulation items-center justify-between gap-3 rounded-2xl ring-1 ring-line bg-card px-4 py-3 text-left transition hover:ring-brand/40 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
     >
       <span className="min-w-0">
         <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">{kicker}</span>
         <span className="block truncate font-medium">{title}</span>
       </span>
-      <span className="shrink-0 rounded-full border border-ink px-3 py-1 text-xs font-semibold">{action}</span>
+      <span className="shrink-0 rounded-full border border-line px-3 py-1 text-xs font-semibold">{action}</span>
     </button>
   );
 }
@@ -94,7 +96,7 @@ export function MePage() {
     <div className="mx-auto max-w-lg px-4 pb-10">
       <p className="pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Profile</p>
 
-      <div className="mt-3 rounded-[28px] border-2 border-ink bg-card p-6 text-center shadow-sm">
+      <div className="mt-3 rounded-[28px] ring-1 ring-line bg-card p-6 text-center shadow-sm">
         <div className="flex flex-col items-center">
           <ImageField
             kind="avatar"
@@ -134,7 +136,9 @@ export function MePage() {
       <div className="mt-4">
         <AccountContacts compact />
       </div>
-      {user.email && user.emailVerified === false && <VerifyEmailBanner email={user.email} onSend={sendVerificationEmail} />}
+      {user.email && user.emailVerified === false && (
+        <VerifyEmailBanner email={user.email} onSend={sendVerificationEmail} />
+      )}
 
       <Section title="Activity">
         <Row kicker="Mate" title="Find someone to go with you" action="Open" onClick={() => nav("/mate")} />
@@ -145,7 +149,16 @@ export function MePage() {
           action="Apply"
           onClick={() => nav("/companion")}
         />
+        <Row
+          kicker="Tickets"
+          title="Events and experiences you’ve bought or hosted"
+          action="Open"
+          onClick={() => nav("/experiences")}
+        />
       </Section>
+
+      <PayoutSetupCard />
+      <BookingsSection />
 
       <Section title="Your spaces">
         <Row
@@ -160,13 +173,18 @@ export function MePage() {
           action={business ? "Open" : "Add"}
           onClick={() => nav(business ? "/business" : "/bio/setup?kind=business")}
         />
-        <Row kicker="Event" title="Market, expo, festival" action="Open" onClick={() => nav("/event")} />
-        {business && (
-          <Row kicker="Guest list" title="Email the door" action="Open" onClick={() => nav("/club/list")} />
-        )}
+        <Row kicker="Plan" title="With family and friends" action="Create" onClick={() => nav("/plan/new")} />
+        <Row
+          kicker="Event"
+          title="Ticketed public night or experience"
+          action="Create"
+          onClick={() => nav("/event/new")}
+        />
+        {business && <Row kicker="Guest list" title="Email the door" action="Open" onClick={() => nav("/club/list")} />}
       </Section>
 
       <Section title="Belong">
+        <Row kicker="Inbox" title="Announcements, plans, alerts" action="Open" onClick={() => nav("/me/inbox")} />
         <Row
           kicker="AirPal Club"
           title={club ? "Invites and offers on" : "Join for invites and offers"}
@@ -180,14 +198,18 @@ export function MePage() {
           onClick={() => nav("/companion")}
         />
         <Row
-          kicker="Networking"
-          title={peopleCount > 0 ? `Circle · ${peopleCount} met` : "Circle — met, following, likes"}
+          kicker="Circle"
+          title={peopleCount > 0 ? `Audience · ${peopleCount} met` : "Your people in one place"}
           action="Open"
           onClick={() => nav("/circle")}
         />
         <Row
           kicker="People met"
-          title={peopleCount > 0 ? `${peopleCount} ${peopleCount === 1 ? "person" : "people"} + catch-ups` : "Log everyone you meet"}
+          title={
+            peopleCount > 0
+              ? `${peopleCount} ${peopleCount === 1 ? "person" : "people"} + catch-ups`
+              : "Log everyone you meet"
+          }
           action={peopleCount > 0 ? "Open" : "Add"}
           onClick={() => nav("/me/people")}
         />
@@ -215,7 +237,9 @@ export function MePage() {
         />
         <Row
           kicker="Keepsakes"
-          title={memoryCount > 0 ? `${memoryCount} ${memoryCount === 1 ? "memory" : "memories"} on the wall` : "Memory Wall"}
+          title={
+            memoryCount > 0 ? `${memoryCount} ${memoryCount === 1 ? "memory" : "memories"} on the wall` : "Memory Wall"
+          }
           action={memoryCount > 0 ? "Open" : "Add"}
           onClick={() => nav("/me/memories")}
         />
@@ -227,7 +251,7 @@ export function MePage() {
           <button
             type="button"
             onClick={() => nav("/calendar")}
-            className="rounded-full border border-ink px-3 py-1 text-xs font-semibold transition hover:border-brand hover:text-brand"
+            className="rounded-full border border-line px-3 py-1 text-xs font-semibold transition hover:ring-brand/40 hover:text-brand"
           >
             Open Calendar →
           </button>
@@ -238,7 +262,7 @@ export function MePage() {
               <button
                 type="button"
                 onClick={() => nav(`/calendar?event=${e.eventId}`)}
-                className="w-full rounded-2xl border-2 border-ink bg-card px-4 py-3 text-left transition hover:border-brand active:scale-[0.99]"
+                className="w-full rounded-2xl ring-1 ring-line bg-card px-4 py-3 text-left transition hover:ring-brand/40 active:scale-[0.99]"
               >
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">
                   {EVENT_FLAVOUR_LABELS[e.flavour]}
@@ -250,11 +274,7 @@ export function MePage() {
           {savedEvents.length === 0 && (
             <p className="rounded-2xl border-2 border-dashed border-line px-4 py-5 text-center text-sm text-mute">
               No saved events yet. Browse the{" "}
-              <button
-                type="button"
-                onClick={() => nav("/calendar")}
-                className="font-medium text-brand underline"
-              >
+              <button type="button" onClick={() => nav("/calendar")} className="font-medium text-brand underline">
                 Event Calendar
               </button>
               .
@@ -274,7 +294,7 @@ export function MePage() {
                   const stall = stalls.find((row) => row.id === s.stallId);
                   nav(hrefForStall(stall || { id: s.stallId, eventId: s.eventId, handle: s.handle }));
                 }}
-                className="w-full rounded-2xl border-2 border-ink bg-card px-4 py-3 text-left transition hover:border-brand active:scale-[0.99]"
+                className="w-full rounded-2xl ring-1 ring-line bg-card px-4 py-3 text-left transition hover:ring-brand/40 active:scale-[0.99]"
               >
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">
                   {s.booth || "—"} · {getEvent(s.eventId)?.name || s.eventId}

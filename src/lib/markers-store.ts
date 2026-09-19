@@ -12,7 +12,10 @@ function read(): MarkerDoc[] {
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(
       (m): m is MarkerDoc =>
-        !!m && typeof m.id === "string" && typeof m.kind === "string" && (m.status === "active" || m.status === "inactive"),
+        !!m &&
+        typeof m.id === "string" &&
+        typeof m.kind === "string" &&
+        (m.status === "active" || m.status === "inactive"),
     );
   } catch {
     return [];

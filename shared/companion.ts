@@ -224,10 +224,7 @@ export function publicMateFromApplication(app: CompanionApplication): PublicMate
   };
 }
 
-export function mateDiscoverReasons(
-  mate: PublicMate,
-  hint?: { suburb?: string; mateKind?: string },
-): string[] {
+export function mateDiscoverReasons(mate: PublicMate, hint?: { suburb?: string; mateKind?: string }): string[] {
   const out: string[] = [];
   const area = [mate.suburb, mate.city, mate.serviceArea].filter(Boolean).join(" ");
   const want = (hint?.suburb || "").trim();

@@ -1,10 +1,13 @@
 {
+  "id": "https://airpal.me/",
+  "lang": "en-AU",
   "name": "AirPal.Me",
   "short_name": "AirPal",
-  "description": "Scan a place. See what's around.",
+  "description": "Find places and experiences. Make plans with family and friends. Stay concierge, in one app.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "orientation": "portrait",
@@ -23,10 +26,17 @@
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "My Calendar",
-      "short_name": "Calendar",
-      "description": "View your upcoming events and plans",
-      "url": "/calendar",
+      "name": "Create a Plan",
+      "short_name": "Plan",
+      "description": "Plan something with family, friends, or people nearby",
+      "url": "/plan/new",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Your Circle",
+      "short_name": "Circle",
+      "description": "Invite family and friends, see who's nearby",
+      "url": "/circle",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
@@ -34,13 +44,6 @@
       "short_name": "Stay",
       "description": "Access local concierge and guest tools",
       "url": "/concierge",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Create Plan",
-      "short_name": "Plan",
-      "description": "Organize a mates plan or event",
-      "url": "/plan/new",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]

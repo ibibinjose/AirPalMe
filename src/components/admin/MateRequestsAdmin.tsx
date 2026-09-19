@@ -186,7 +186,14 @@ export function MateRequestsAdmin() {
             .then(() => {
               setFeeBps(String(platformFeeBps));
               setMinFee(String(minimumPlatformFeeCents));
-              void logAdminAction(user.uid, "fees.update", "platform_settings", "marketplace", "", `${platformFeeBps}bps`);
+              void logAdminAction(
+                user.uid,
+                "fees.update",
+                "platform_settings",
+                "marketplace",
+                "",
+                `${platformFeeBps}bps`,
+              );
             })
             .finally(() => setFeeBusy(false));
         }}
@@ -197,7 +204,7 @@ export function MateRequestsAdmin() {
             value={feeBps}
             onChange={(e) => setFeeBps(e.target.value)}
             inputMode="numeric"
-            className="mt-1 w-full rounded-xl border border-ink bg-card px-3 py-2 text-sm text-ink focus:border-brand"
+            className="mt-1 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm text-ink focus:border-brand"
           />
         </label>
         <label className="text-[12px] font-medium text-mute">
@@ -206,7 +213,7 @@ export function MateRequestsAdmin() {
             value={minFee}
             onChange={(e) => setMinFee(e.target.value)}
             inputMode="numeric"
-            className="mt-1 w-full rounded-xl border border-ink bg-card px-3 py-2 text-sm text-ink focus:border-brand"
+            className="mt-1 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm text-ink focus:border-brand"
           />
         </label>
         <Button size="sm" className="self-end" disabled={feeBusy} loading={feeBusy}>
@@ -220,7 +227,7 @@ export function MateRequestsAdmin() {
             onClick={() => setFilter(s)}
             className={cn(
               "rounded-full px-3 py-1 text-xs font-medium ring-1",
-              filter === s ? "bg-ink text-white ring-ink" : "bg-paper text-mute ring-line",
+              filter === s ? "bg-brand text-white ring-ink" : "bg-paper text-mute ring-line",
             )}
           >
             {s === "all" ? `All (${rows.length})` : `${s} (${counts.get(s) || 0})`}
@@ -250,7 +257,12 @@ export function MateRequestsAdmin() {
                     {r.suburb} · {r.date} · {r.partySize} people · ${r.budget}
                   </span>
                 </span>
-                <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1", statusPill(r.status))}>
+                <span
+                  className={cn(
+                    "shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1",
+                    statusPill(r.status),
+                  )}
+                >
                   {r.status}
                 </span>
               </button>
@@ -259,11 +271,9 @@ export function MateRequestsAdmin() {
                   <p className="text-mute">
                     Use case: {r.useCase} · Mate kind: {r.mateKind || "any"} · Time: {r.time || "flexible"}
                   </p>
-                  {r.matchedMateName && (
-                    <p className="mt-1 font-semibold">Delivering: {r.matchedMateName}</p>
-                  )}
+                  {r.matchedMateName && <p className="mt-1 font-semibold">Delivering: {r.matchedMateName}</p>}
                   {bookingFor[r.id] && bookingFor[r.id] !== "none" && (
-                    <p className="mt-1 text-mute">Booking: {bookingFor[r.id]} (pay later — Stripe pending)</p>
+                    <p className="mt-1 text-mute">Booking: {bookingFor[r.id]} (Stripe Checkout)</p>
                   )}
                   {r.adminNote && <p className="mt-1">Note: {r.adminNote}</p>}
                   {(r.status === "matched" || r.status === "completed") && (
@@ -277,7 +287,7 @@ export function MateRequestsAdmin() {
                     <select
                       value={matePick}
                       onChange={(e) => setMatePick(e.target.value)}
-                      className="mt-1 w-full rounded-xl border border-ink bg-card px-3 py-2 text-sm outline-none focus:border-brand"
+                      className="mt-1 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm outline-none focus:border-brand"
                     >
                       <option value="">Select a Mate…</option>
                       {approvedMates.map((m) => (
@@ -294,7 +304,7 @@ export function MateRequestsAdmin() {
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="Matching note (e.g. offered to Ava, awaiting reply)"
-                    className="mt-2 w-full rounded-xl border border-ink bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
+                    className="mt-2 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
                   />
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {MATE_REQUEST_STATUSES.filter((s) => s !== r.status).map((s) => (

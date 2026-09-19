@@ -3,11 +3,7 @@ import type { CalendarEvent } from "@shared/event";
 import { useEvents } from "@/contexts/EventsContext";
 import { triggerHaptic } from "@/lib/native";
 import { toast } from "sonner";
-import {
-  formatRelativeBadge,
-  checkSlotCollision,
-  type SlotCollisionResult,
-} from "@/lib/calendar-utils";
+import { formatRelativeBadge, checkSlotCollision, type SlotCollisionResult } from "@/lib/calendar-utils";
 
 interface CalendarDragContextValue {
   draggedEvent: CalendarEvent | null;

@@ -14,6 +14,11 @@ export const RATE_LIMIT_ACTIONS = [
   "planWrite",
   "planRsvp",
   "enter",
+  "authLogin",
+  "broadcast",
+  "hereShare",
+  "wave",
+  "pay",
 ] as const;
 
 export type RateLimitAction = (typeof RATE_LIMIT_ACTIONS)[number];
@@ -38,6 +43,11 @@ export const RATE_LIMITS: Record<RateLimitAction, RateLimitSpec> = {
   planWrite: { windowMs: 60_000, max: 15, anonymousMax: 10 },
   planRsvp: { windowMs: 60_000, max: 20, anonymousMax: 15 },
   enter: { windowMs: 60_000, max: 10, anonymousMax: 0 },
+  authLogin: { windowMs: 60_000, max: 8, anonymousMax: 8 },
+  broadcast: { windowMs: 60_000, max: 4, anonymousMax: 0 },
+  hereShare: { windowMs: 60_000, max: 8, anonymousMax: 0 },
+  wave: { windowMs: 60_000, max: 12, anonymousMax: 0 },
+  pay: { windowMs: 60_000, max: 8, anonymousMax: 0 },
 };
 
 export function rateLimitMax(action: RateLimitAction, anonymous: boolean): number {
@@ -75,7 +85,11 @@ export function submissionFingerprint(parts: Array<string | number | boolean | u
     .join("|");
 }
 
-export function isDuplicateSubmission(previousAt: string | number | undefined, now = Date.now(), windowMs = 120_000): boolean {
+export function isDuplicateSubmission(
+  previousAt: string | number | undefined,
+  now = Date.now(),
+  windowMs = 120_000,
+): boolean {
   if (previousAt == null || previousAt === "") return false;
   const at = typeof previousAt === "number" ? previousAt : Date.parse(previousAt);
   return Number.isFinite(at) && now - at < windowMs;

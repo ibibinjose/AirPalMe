@@ -4,4 +4,5 @@
     <string name="title_activity_main">AirPal</string>
     <string name="package_name">me.airpal.app</string>
     <string name="custom_url_scheme">me.airpal.app</string>
+    <string name="airpal_url_scheme">airpal</string>
 </resources>

@@ -1,5 +1,18 @@
 import { useState, useRef, useEffect } from "react";
-import { Check, Heart, Star, MapPin, CalendarPlus, Share2, ExternalLink, Sparkles, Footprints, GripVertical, Clock, RotateCcw } from "lucide-react";
+import {
+  Check,
+  Heart,
+  Star,
+  MapPin,
+  CalendarPlus,
+  Share2,
+  ExternalLink,
+  Sparkles,
+  Footprints,
+  GripVertical,
+  Clock,
+  RotateCcw,
+} from "lucide-react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import type { CalendarEvent } from "@shared/event";
@@ -161,7 +174,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
     >
       {/* Top Banner / Image */}
       {event.heroImage && !compact && (
-        <div className="relative mb-3.5 h-44 w-full overflow-hidden rounded-2xl bg-paper/60 md:h-52">
+        <div className="relative mb-3.5 aspect-square w-full overflow-hidden rounded-2xl bg-paper/60">
           {/* Loading placeholder */}
           {!imageLoaded && !imageError && (
             <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-paper via-line/30 to-paper" />
@@ -184,9 +197,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
           )}
 
           {/* Error state - show gradient instead */}
-          {imageError && (
-            <div className="absolute inset-0 bg-gradient-to-br from-brand/10 via-brand/5 to-paper" />
-          )}
+          {imageError && <div className="absolute inset-0 bg-gradient-to-br from-brand/10 via-brand/5 to-paper" />}
 
           <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
 
@@ -275,9 +286,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
               )}
             </div>
             {event.ticketPrice && (
-              <span className="text-xs font-medium text-white/90 drop-shadow">
-                {event.ticketPrice}
-              </span>
+              <span className="text-xs font-medium text-white/90 drop-shadow">{event.ticketPrice}</span>
             )}
           </div>
         </div>
@@ -339,9 +348,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
                 </span>
               )}
             </div>
-            {event.ticketPrice && (
-              <span className="text-[12px] font-medium text-gold">{event.ticketPrice}</span>
-            )}
+            {event.ticketPrice && <span className="text-[12px] font-medium text-gold">{event.ticketPrice}</span>}
           </div>
         )}
 
@@ -376,11 +383,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
         </div>
 
         {/* Snippet Description */}
-        {!compact && (
-          <p className="mt-2.5 line-clamp-2 text-sm leading-relaxed text-mute">
-            {event.description}
-          </p>
-        )}
+        {!compact && <p className="mt-2.5 line-clamp-2 text-sm leading-relaxed text-mute">{event.description}</p>}
 
         {/* Tags */}
         {event.tags && event.tags.length > 0 && (
@@ -464,11 +467,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
                   : "bg-paper text-ink/70 hover:bg-rose-50 hover:text-rose-600 ring-1 ring-line/80",
               )}
             >
-              <Heart
-                size={14}
-                className={event.isLiked ? "fill-white" : ""}
-                strokeWidth={event.isLiked ? 2.5 : 2}
-              />
+              <Heart size={14} className={event.isLiked ? "fill-white" : ""} strokeWidth={event.isLiked ? 2.5 : 2} />
             </button>
           </div>
 
@@ -628,7 +627,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
                   nav(event.gatePath!);
                 }}
                 title="View market stalls & expo directory"
-                className="inline-flex h-8 items-center gap-1 rounded-full bg-ink px-2.5 text-xs font-medium text-white hover:bg-ink/90 transition shadow-xs"
+                className="inline-flex h-8 items-center gap-1 rounded-full bg-brand px-2.5 text-xs font-medium text-white hover:bg-brand-ink transition shadow-xs"
               >
                 <span>Stalls</span>
                 <ExternalLink size={11} />

@@ -153,7 +153,12 @@ export function SocialProvider({ children }: { children: ReactNode }) {
   const toggleLike = useCallback(
     (rawHandle: string, name?: string): boolean | null => {
       const handle = norm(rawHandle);
-      if (!requireUser("Sign in to like places — your liked list syncs across devices.", { kind: "like-handle", id: handle }))
+      if (
+        !requireUser("Sign in to like places — your liked list syncs across devices.", {
+          kind: "like-handle",
+          id: handle,
+        })
+      )
         return null;
       return applyToggle("like", handle, name);
     },

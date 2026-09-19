@@ -174,3 +174,4 @@ Posture: **real database only, empty is OK**. Curated bundle content
    (shared validation, stripped from public profiles); companion funnel
    (`started`/`submitted`) and Stripe booking success (`booking_intent`) are
    tracked. Club stays device-kept with no server bulk-send (already gated).
+```

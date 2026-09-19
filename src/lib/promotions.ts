@@ -21,10 +21,7 @@ async function callPromotion<Req, Res>(name: string, data: Req): Promise<Res> {
 }
 
 export function createPromotionRemote(data: CreatePromotionRequest) {
-  return callPromotion<CreatePromotionRequest, { ok: boolean; promotionId: string }>(
-    "createPromotion",
-    data,
-  );
+  return callPromotion<CreatePromotionRequest, { ok: boolean; promotionId: string }>("createPromotion", data);
 }
 
 export function updatePromotionRemote(data: { promotionId: string; patch: Record<string, unknown> }) {
@@ -35,10 +32,7 @@ export function updatePromotionRemote(data: { promotionId: string; patch: Record
 }
 
 export function submitPromotionRemote(data: { promotionId: string }) {
-  return callPromotion<{ promotionId: string }, { ok: boolean; status: PromotionStatus }>(
-    "submitPromotion",
-    data,
-  );
+  return callPromotion<{ promotionId: string }, { ok: boolean; status: PromotionStatus }>("submitPromotion", data);
 }
 
 export function reviewPromotionRemote(data: ReviewPromotionRequest) {
@@ -56,17 +50,11 @@ export function enterPromotionRemote(data: EnterPromotionRequest) {
 }
 
 export function closeAndDrawRemote(data: DrawWinnersRequest) {
-  return callPromotion<DrawWinnersRequest, { ok: boolean; winners: number; entries: number }>(
-    "closeAndDraw",
-    data,
-  );
+  return callPromotion<DrawWinnersRequest, { ok: boolean; winners: number; entries: number }>("closeAndDraw", data);
 }
 
 export function setWinnerStatusRemote(data: SetWinnerStatusRequest) {
-  return callPromotion<SetWinnerStatusRequest, { ok: boolean; status: WinnerStatus }>(
-    "setWinnerStatus",
-    data,
-  );
+  return callPromotion<SetWinnerStatusRequest, { ok: boolean; status: WinnerStatus }>("setWinnerStatus", data);
 }
 
 export function recordPromotionViewRemote(promotionId: string) {
@@ -78,10 +66,7 @@ export function recordPromotionClickRemote(promotionId: string) {
 }
 
 export function setWeeklyCampaignRemote(data: SetWeeklyCampaignRequest) {
-  return callPromotion<SetWeeklyCampaignRequest, { ok: boolean; weekId: string }>(
-    "setWeeklyCampaign",
-    data,
-  );
+  return callPromotion<SetWeeklyCampaignRequest, { ok: boolean; weekId: string }>("setWeeklyCampaign", data);
 }
 
 export function redeemPointsRemote(data: RedeemPointsRequest) {
@@ -89,10 +74,7 @@ export function redeemPointsRemote(data: RedeemPointsRequest) {
 }
 
 export function seedPromotionDemoRemote() {
-  return callPromotion<Record<string, never>, { ok: boolean; created: number }>(
-    "seedPromotionDemo",
-    {},
-  );
+  return callPromotion<Record<string, never>, { ok: boolean; created: number }>("seedPromotionDemo", {});
 }
 
 /**

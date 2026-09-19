@@ -33,11 +33,7 @@ vi.mock("./functions", () => {
 });
 
 import { signInAnonymously } from "firebase/auth";
-import {
-  ensureAnonymousSession,
-  resetAnonymousSessionStateForTesting,
-  setFirebaseAuthForTesting,
-} from "./firebase";
+import { ensureAnonymousSession, resetAnonymousSessionStateForTesting, setFirebaseAuthForTesting } from "./firebase";
 import { flushAnalyticsQueue, track, setAnalyticsConsent } from "./analytics";
 import { recordAnalyticsBatchRemote } from "./functions";
 

@@ -54,8 +54,18 @@ export function SafetyInboxAdmin() {
     try {
       const now = new Date().toISOString();
       await updateDoc(doc(db, "safety_reports", row.id), { status, adminNote: note.trim(), updatedAt: now });
-      void logAdminAction(user?.uid ?? "", "safety_report.status", "safety_reports", row.id, row.status, status, note.trim());
-      setRows((list) => list.map((r) => (r.id === row.id ? { ...r, status, adminNote: note.trim(), updatedAt: now } : r)));
+      void logAdminAction(
+        user?.uid ?? "",
+        "safety_report.status",
+        "safety_reports",
+        row.id,
+        row.status,
+        status,
+        note.trim(),
+      );
+      setRows((list) =>
+        list.map((r) => (r.id === row.id ? { ...r, status, adminNote: note.trim(), updatedAt: now } : r)),
+      );
       setNote("");
       setOpenId(null);
     } finally {
@@ -77,7 +87,7 @@ export function SafetyInboxAdmin() {
             onClick={() => setFilter(f)}
             className={cn(
               "rounded-full px-3 py-1 text-xs font-medium ring-1",
-              filter === f ? "bg-ink text-white ring-ink" : "bg-paper text-mute ring-line",
+              filter === f ? "bg-brand text-white ring-ink" : "bg-paper text-mute ring-line",
             )}
           >
             {f === "all" ? `All (${rows.length})` : `${f} (${rows.filter((r) => r.status === f).length})`}
@@ -87,7 +97,9 @@ export function SafetyInboxAdmin() {
       {loading ? (
         <p className="mt-4 text-sm text-mute">Loading cases…</p>
       ) : visible.length === 0 ? (
-        <p className="mt-4 rounded-2xl bg-paper p-4 text-sm text-mute">No {filter === "all" ? "" : `${filter} `}cases. Quiet is good.</p>
+        <p className="mt-4 rounded-2xl bg-paper p-4 text-sm text-mute">
+          No {filter === "all" ? "" : `${filter} `}cases. Quiet is good.
+        </p>
       ) : (
         <ul className="mt-3 space-y-2">
           {visible.map((r) => (
@@ -98,7 +110,10 @@ export function SafetyInboxAdmin() {
                 r.reason === "emergency" ? "ring-red-500/50" : "ring-line",
               )}
             >
-              <button onClick={() => setOpenId(openId === r.id ? null : r.id)} className="flex w-full items-center gap-2 text-left">
+              <button
+                onClick={() => setOpenId(openId === r.id ? null : r.id)}
+                className="flex w-full items-center gap-2 text-left"
+              >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold">
                     {(REPORT_REASON_LABELS as Record<string, string>)[r.reason] ?? r.reason} · {r.target}
@@ -119,7 +134,7 @@ export function SafetyInboxAdmin() {
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="Case note (action taken, who was contacted…)"
-                    className="mt-2 w-full rounded-xl border border-ink bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
+                    className="mt-2 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
                   />
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {(["reviewed", "actioned"] as SafetyReportStatus[])

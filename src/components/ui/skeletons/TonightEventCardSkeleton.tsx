@@ -4,10 +4,7 @@ export function TonightEventCardSkeleton({ className }: { className?: string }) 
   return (
     <div
       aria-hidden="true"
-      className={cn(
-        "relative h-40 w-56 shrink-0 overflow-hidden rounded-3xl bg-card ring-1 ring-line/70",
-        className,
-      )}
+      className={cn("relative h-40 w-56 shrink-0 overflow-hidden rounded-3xl bg-card ring-1 ring-line/70", className)}
     >
       <div className="absolute inset-0 bg-gradient-to-r from-line/30 via-line/65 to-line/30 bg-[length:200%_100%] animate-shimmer" />
       <div className="hero-scrim absolute inset-0" />
@@ -19,13 +16,7 @@ export function TonightEventCardSkeleton({ className }: { className?: string }) 
   );
 }
 
-export function TonightEventSkeletonRow({
-  count = 4,
-  className,
-}: {
-  count?: number;
-  className?: string;
-}) {
+export function TonightEventSkeletonRow({ count = 4, className }: { count?: number; className?: string }) {
   return (
     <div
       role="status"

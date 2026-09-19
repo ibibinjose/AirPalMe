@@ -139,10 +139,7 @@ export function initKeyboardManager(): () => void {
 
   // Set initial viewport height
   if (window.visualViewport) {
-    document.documentElement.style.setProperty(
-      "--visual-viewport-height",
-      `${window.visualViewport.height}px`,
-    );
+    document.documentElement.style.setProperty("--visual-viewport-height", `${window.visualViewport.height}px`);
   } else {
     document.documentElement.style.setProperty("--visual-viewport-height", `${window.innerHeight}px`);
   }
@@ -161,19 +158,23 @@ export function initKeyboardManager(): () => void {
         setTimeout(() => ensureElementInView(active), 100);
         setTimeout(() => ensureElementInView(active), 300);
       }
-    }).then((sub) => {
-      willShowSub = sub;
-    }).catch(() => {
-      /* ignore */
-    });
+    })
+      .then((sub) => {
+        willShowSub = sub;
+      })
+      .catch(() => {
+        /* ignore */
+      });
 
     Keyboard.addListener("keyboardWillHide", () => {
       applyKeyboardStateToDom(false, 0);
-    }).then((sub) => {
-      willHideSub = sub;
-    }).catch(() => {
-      /* ignore */
-    });
+    })
+      .then((sub) => {
+        willHideSub = sub;
+      })
+      .catch(() => {
+        /* ignore */
+      });
 
     unsubs.push(() => {
       willShowSub?.remove();

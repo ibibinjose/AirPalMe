@@ -1,13 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import {
-  collectAtStop,
-  emptyZoo,
-  mergeZooState,
-  type ZooHunt,
-  type ZooHuntStop,
-  type ZooState,
-} from "@shared/zoo";
+import { collectAtStop, emptyZoo, mergeZooState, type ZooHunt, type ZooHuntStop, type ZooState } from "@shared/zoo";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
 import { loadZoo, persistZoo, subscribeZoo } from "@/lib/zoo-store";

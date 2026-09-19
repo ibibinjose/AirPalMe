@@ -13,8 +13,16 @@ export function parseCheckInClock(label: string): { hours: number; minutes: numb
   return { hours, minutes };
 }
 
+function deviceLocale(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().locale || "en";
+  } catch {
+    return "en";
+  }
+}
+
 function tzParts(now: Date, timeZone: string) {
-  const fmt = new Intl.DateTimeFormat("en-AU", {
+  const fmt = new Intl.DateTimeFormat(deviceLocale(), {
     timeZone,
     year: "numeric",
     month: "2-digit",
@@ -36,7 +44,9 @@ export function checkInOnDay(now: Date, hours: number, minutes: number, timeZone
   const y = Number(parts.year);
   const m = Number(parts.month);
   const d = Number(parts.day);
-  const probe = new Date(`${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`);
+  const probe = new Date(
+    `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`,
+  );
   const shown = tzParts(probe, timeZone);
   const shownH = Number(shown.hour);
   const driftHours = hours - shownH;
@@ -77,7 +87,7 @@ export function countdownLabel(deltaMs: number) {
 }
 
 export function formatWhen(date: Date, timeZone = TZ) {
-  return date.toLocaleString("en-AU", {
+  return date.toLocaleString(deviceLocale(), {
     timeZone,
     weekday: "short",
     hour: "numeric",

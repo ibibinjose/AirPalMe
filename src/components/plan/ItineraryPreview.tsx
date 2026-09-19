@@ -35,9 +35,7 @@ export function ItineraryPreview({
               key={stop.id ?? `${stop.name}-${idx}`}
               className="flex items-center gap-3 rounded-2xl bg-paper px-3.5 py-2.5 ring-1 ring-line"
             >
-              <span className="w-5 shrink-0 text-center text-[11px] font-bold tabular-nums text-mute">
-                {idx + 1}
-              </span>
+              <span className="w-5 shrink-0 text-center text-[11px] font-bold tabular-nums text-mute">{idx + 1}</span>
               <span
                 className={cn(
                   "grid h-10 w-10 shrink-0 place-items-center rounded-xl ring-1",

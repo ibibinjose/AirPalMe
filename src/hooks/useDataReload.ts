@@ -56,9 +56,7 @@ export function useDataReload() {
       }
 
       // 5. Fire window event so active pages re-evaluate or refetch
-      window.dispatchEvent(
-        new CustomEvent(RELOAD_DATA_EVENT, { detail: { timestamp: Date.now() } }),
-      );
+      window.dispatchEvent(new CustomEvent(RELOAD_DATA_EVENT, { detail: { timestamp: Date.now() } }));
 
       await Promise.allSettled(tasks);
     } catch (err) {

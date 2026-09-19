@@ -1,6 +1,13 @@
 import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
-import { EVENT_FLAVOUR_LABELS, STALL_CATEGORIES, stallFieldLabels, stallUnitDisplay, type EventRecord, type StallCategoryId } from "@shared/event";
+import {
+  EVENT_FLAVOUR_LABELS,
+  STALL_CATEGORIES,
+  stallFieldLabels,
+  stallUnitDisplay,
+  type EventRecord,
+  type StallCategoryId,
+} from "@shared/event";
 import { hrefForStall } from "@/lib/bio-handle";
 import { useEvents } from "@/contexts/EventsContext";
 import { cn } from "@/lib/cn";
@@ -30,21 +37,28 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-10">
-      <p className="pt-3 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">{EVENT_FLAVOUR_LABELS[event.flavour]}</p>
+      <p className="pt-3 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">
+        {EVENT_FLAVOUR_LABELS[event.flavour]}
+      </p>
       <h1 className="font-display mt-1 text-3xl font-semibold">{event.name}</h1>
       <p className="mt-1 text-sm text-mute">
-        {[event.venue, event.city, `${stalls.length} ${stallFieldLabels(event.flavour).listNoun}`].filter(Boolean).join(" · ")}
+        {[event.venue, event.city, `${stalls.length} ${stallFieldLabels(event.flavour).listNoun}`]
+          .filter(Boolean)
+          .join(" · ")}
       </p>
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Business, stall number, or @handle"
-        className="mt-4 h-12 w-full rounded-full bg-card px-4 border border-ink outline-none focus:border-brand"
+        className="mt-4 h-12 w-full rounded-full bg-card px-4 border border-line outline-none focus:border-brand"
       />
       <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto">
         <button
           onClick={() => setChip("all")}
-          className={cn("h-9 shrink-0 rounded-full px-4 text-sm", chip === "all" ? "bg-ink text-white" : "bg-white ring-1 ring-line")}
+          className={cn(
+            "h-9 shrink-0 rounded-full px-4 text-sm",
+            chip === "all" ? "bg-brand text-white" : "bg-white ring-1 ring-line",
+          )}
         >
           All
         </button>
@@ -52,7 +66,10 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
           <button
             key={c.id}
             onClick={() => setChip(c.id)}
-            className={cn("h-9 shrink-0 rounded-full px-4 text-sm", chip === c.id ? "bg-ink text-white" : "bg-white ring-1 ring-line")}
+            className={cn(
+              "h-9 shrink-0 rounded-full px-4 text-sm",
+              chip === c.id ? "bg-brand text-white" : "bg-white ring-1 ring-line",
+            )}
           >
             {c.label}
           </button>

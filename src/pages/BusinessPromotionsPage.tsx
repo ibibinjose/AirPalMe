@@ -58,7 +58,9 @@ export function BusinessPromotionsPage() {
           <p className="mt-0.5 text-sm text-mute">Drafts, reviews, live campaigns and results.</p>
         </div>
         <Link href="/business/promotions/new">
-          <Button><Plus size={15} /> New</Button>
+          <Button>
+            <Plus size={15} /> New
+          </Button>
         </Link>
       </div>
 
@@ -79,17 +81,24 @@ export function BusinessPromotionsPage() {
             <Link
               key={p.id}
               href={`/business/promotions/${p.id}`}
-              className="block rounded-2xl border-2 border-ink bg-card p-3"
+              className="block rounded-2xl ring-1 ring-line bg-card p-3"
             >
               <div className="flex items-center gap-2">
-                <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide", STATUS_TINT[p.status] || STATUS_TINT.draft)}>
+                <span
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide",
+                    STATUS_TINT[p.status] || STATUS_TINT.draft,
+                  )}
+                >
                   {p.status.replace("_", " ")}
                 </span>
-                <span className="text-[11px] text-mute">{p.kind} · {p.mechanicType}</span>
+                <span className="text-[11px] text-mute">
+                  {p.kind} · {p.mechanicType}
+                </span>
               </div>
               <p className="mt-1 text-sm font-bold">{p.title}</p>
               <p className="mt-0.5 text-xs text-mute">
-                {(p.viewsCount || 0)} views · {(p.entriesCount || 0)} entries · {(p.clicksCount || 0)} clicks
+                {p.viewsCount || 0} views · {p.entriesCount || 0} entries · {p.clicksCount || 0} clicks
                 {p.winnerNote ? ` · ${p.winnerNote}` : ""}
               </p>
             </Link>

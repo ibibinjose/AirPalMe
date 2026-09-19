@@ -47,6 +47,10 @@ export function ratingsForEvent(eventId: string) {
 
 export function myRating(target: VenueRating["target"], key: string) {
   return loadRatings().find((r) =>
-    target === "stall" ? r.stallId === key : target === "event" ? r.eventId === key && !r.stallId : r.propertyId === key,
+    target === "stall"
+      ? r.stallId === key
+      : target === "event"
+        ? r.eventId === key && !r.stallId
+        : r.propertyId === key,
   );
 }

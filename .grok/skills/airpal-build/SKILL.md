@@ -24,12 +24,12 @@ Operate this repo as one marketplace engine. Product rules live in `AGENTS.md`. 
 
 Use exactly these words in the checklist:
 
-| Value | Checkbox | Meaning |
-|---|---|---|
-| `done` | `[x]` | User-facing path exists, wired to live Firestore or callables, not a stub |
-| `partial` | `[ ]` | Real code exists; the Done-when line is not met |
-| `todo` | `[ ]` | Not built |
-| `later` | `[ ]` | Out of current priority (P3/P4 while P0 is incomplete) |
+| Value     | Checkbox | Meaning                                                                   |
+| --------- | -------- | ------------------------------------------------------------------------- |
+| `done`    | `[x]`    | User-facing path exists, wired to live Firestore or callables, not a stub |
+| `partial` | `[ ]`    | Real code exists; the Done-when line is not met                           |
+| `todo`    | `[ ]`    | Not built                                                                 |
+| `later`   | `[ ]`    | Out of current priority (P3/P4 while P0 is incomplete)                    |
 
 Partial items stay unchecked. Only `done` gets `[x]`.
 
@@ -71,11 +71,11 @@ Do not delete rows. Demote with `later` and a reason. Bots treat unknown ids as 
 
 ## Bot entry points
 
-| Command | Workflow | What it does |
-|---|---|---|
-| `/airpal-build` | this skill | Human-driven: pick next item, implement, update checklist |
-| `/airpal-status` | `.grok/workflows/airpal-status.rhai` | Read-only audit; report drift vs checklist |
-| `/airpal-next` | `.grok/workflows/airpal-next.rhai` | Implement the highest P0 gap, then update checklist |
+| Command            | Workflow                               | What it does                                                       |
+| ------------------ | -------------------------------------- | ------------------------------------------------------------------ |
+| `/airpal-build`    | this skill                             | Human-driven: pick next item, implement, update checklist          |
+| `/airpal-status`   | `.grok/workflows/airpal-status.rhai`   | Read-only audit; report drift vs checklist                         |
+| `/airpal-next`     | `.grok/workflows/airpal-next.rhai`     | Implement the highest P0 gap, then update checklist                |
 | `/airpal-business` | `.grok/workflows/airpal-business.rhai` | Implement the highest AirPal Business gap, reuse the shared engine |
 
 Pass `args.write: true` on `/airpal-status` only when the user wants the checklist rewritten from a fresh scan.

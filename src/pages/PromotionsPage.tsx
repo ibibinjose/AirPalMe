@@ -54,7 +54,7 @@ export function PromotionsPage() {
             onClick={() => setCategory(c)}
             className={cn(
               "shrink-0 rounded-full border-2 px-3 py-1 text-xs font-semibold",
-              category === c ? "border-ink bg-ink text-white" : "border-ink/15 bg-card",
+              category === c ? "border-brand bg-brand text-white" : "border-ink/15 bg-card",
             )}
           >
             {c}
@@ -81,31 +81,31 @@ export function PromotionsPage() {
               <Link
                 key={p.id}
                 href={`/promotions/${p.id}`}
-                className="flex items-center gap-3 rounded-2xl border-2 border-ink bg-card p-3"
+                className="flex items-center gap-3 rounded-2xl ring-1 ring-line bg-card p-3"
               >
                 <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand">
                   <BadgePercent size={20} />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-bold">{p.title}</span>
-                  <span className="block truncate text-xs text-mute">
-                    {p.prizeValue || p.sponsorName}
-                  </span>
+                  <span className="block truncate text-xs text-mute">{p.prizeValue || p.sponsorName}</span>
                   <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[11px] text-mute">
                     {p.locationText && (
-                      <span className="inline-flex items-center gap-0.5"><MapPin size={11} />{p.locationText}</span>
+                      <span className="inline-flex items-center gap-0.5">
+                        <MapPin size={11} />
+                        {p.locationText}
+                      </span>
                     )}
                     {p.endAt && !expired && (
                       <span className="inline-flex items-center gap-0.5">
-                        <Clock size={11} />Ends {new Date(p.endAt).toLocaleDateString()}
+                        <Clock size={11} />
+                        Ends {new Date(p.endAt).toLocaleDateString()}
                       </span>
                     )}
                     {expired && <span>Ended</span>}
                   </span>
                 </span>
-                <span className="shrink-0 rounded-xl bg-ink px-3 py-1.5 text-xs font-bold text-white">
-                  View
-                </span>
+                <span className="shrink-0 rounded-xl bg-brand px-3 py-1.5 text-xs font-bold text-white">View</span>
               </Link>
             );
           })}

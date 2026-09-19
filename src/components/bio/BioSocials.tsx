@@ -11,13 +11,7 @@ const ICONS: Partial<Record<BioLinkType, typeof Instagram>> = {
   linkedin: Linkedin,
 };
 
-export function BioSocials({
-  links,
-  onTap,
-}: {
-  links: BioLink[];
-  onTap: (kind: string) => void;
-}) {
+export function BioSocials({ links, onTap }: { links: BioLink[]; onTap: (kind: string) => void }) {
   const rows = socialLinks(links).filter((link) => isSafeBioHref(link.href));
   if (!rows.length) return null;
   return (

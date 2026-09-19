@@ -39,7 +39,8 @@ export function ContactPage() {
         <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Contact</p>
         <h1 className="font-display mt-1 text-3xl font-semibold">Write to us</h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ink/80">
-          For access or deletion, choose that topic. To recover an @handle that matches your registered name, trade mark, or domain, choose Handle / trade mark or{" "}
+          For access or deletion, choose that topic. To recover an @handle that matches your registered name, trade
+          mark, or domain, choose Handle / trade mark or{" "}
           <Link href="/bio/recover" className="text-brand">
             recover
           </Link>
@@ -80,7 +81,7 @@ export function ContactPage() {
                 key={t.id}
                 type="button"
                 onClick={() => setTopic(t.id)}
-                className={`h-9 rounded-full px-3 text-sm ${topic === t.id ? "bg-ink text-white" : "bg-white ring-1 ring-line"}`}
+                className={`h-9 rounded-full px-3 text-sm ${topic === t.id ? "bg-brand text-white" : "bg-white ring-1 ring-line"}`}
               >
                 {t.label}
               </button>

@@ -3,7 +3,13 @@ import { getMarker } from "@/lib/catalog";
 import type { MarkerDoc } from "@shared/nearby";
 import type { PropertyInfo } from "@shared/airpal-data";
 import { useAuth } from "./AuthContext";
-import { fetchProperty, getCachedProperty, saveCachedProperty, subscribeProperty, unknownProperty } from "@/lib/properties";
+import {
+  fetchProperty,
+  getCachedProperty,
+  saveCachedProperty,
+  subscribeProperty,
+  unknownProperty,
+} from "@/lib/properties";
 import { fetchMarker } from "@/lib/markers-store";
 
 export type StayKind = "none" | "stay" | "marker" | "campus";
@@ -55,8 +61,8 @@ export function StayProvider({ children }: { children: React.ReactNode }) {
   const hostPropertyId = user?.propertyIds?.[0];
   const activePropertyId = session.propertyId || (isHost && hostPropertyId ? hostPropertyId : undefined);
 
-  const [property, setPropertyState] = useState<PropertyInfo>(() =>
-    (activePropertyId && getCachedProperty(activePropertyId)) || unknownProperty(activePropertyId || "unknown"),
+  const [property, setPropertyState] = useState<PropertyInfo>(
+    () => (activePropertyId && getCachedProperty(activePropertyId)) || unknownProperty(activePropertyId || "unknown"),
   );
   const [loadingProperty, setLoadingProperty] = useState(false);
 

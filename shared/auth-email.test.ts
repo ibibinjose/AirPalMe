@@ -48,7 +48,9 @@ describe("auth error copy", () => {
     expect(authErrorCode({ code: "auth/invalid-action-code" })).toBe("auth/invalid-action-code");
     expect(authErrorMessage({ code: "auth/expired-action-code" })).toMatch(/expired/i);
     expect(authErrorMessage({ code: "auth/email-already-in-use" })).toMatch(/already has an account/i);
-    expect(authErrorMessage(new Error("Firebase: Error (auth/wrong-password)."))).toBe("Email or password does not match");
+    expect(authErrorMessage(new Error("Firebase: Error (auth/wrong-password)."))).toBe(
+      "Email or password does not match",
+    );
     expect(authErrorMessage({ code: "auth/operation-not-allowed" })).toMatch(/region|test number/i);
     expect(authErrorMessage(new Error("Sign-in needs Firebase."))).toBe("Sign-in needs Firebase.");
   });

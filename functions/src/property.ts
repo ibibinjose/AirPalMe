@@ -135,7 +135,10 @@ export const updatePropertyProfile = onCall(CALLABLE, async (request) => {
     throw new HttpsError("permission-denied", "Only a property host can update this stay.");
   }
 
-  const str = (value: unknown, max = 240) => String(value || "").trim().slice(0, max);
+  const str = (value: unknown, max = 240) =>
+    String(value || "")
+      .trim()
+      .slice(0, max);
   const breakfastIn = (request.data?.breakfast || {}) as Record<string, unknown>;
   const facilitiesIn = Array.isArray(request.data?.facilities)
     ? (request.data.facilities as Array<Record<string, unknown>>)
@@ -189,10 +192,16 @@ export const updatePropertyProfile = onCall(CALLABLE, async (request) => {
       startingPrice:
         row.startingPrice === undefined || row.startingPrice === null ? null : Math.max(0, num(row.startingPrice)),
       features: Array.isArray(row.features)
-        ? (row.features as unknown[]).map((f) => str(f, 80)).filter(Boolean).slice(0, 12)
+        ? (row.features as unknown[])
+            .map((f) => str(f, 80))
+            .filter(Boolean)
+            .slice(0, 12)
         : [],
       roomNumbers: Array.isArray(row.roomNumbers)
-        ? (row.roomNumbers as unknown[]).map((n) => str(n, 20)).filter(Boolean).slice(0, 500)
+        ? (row.roomNumbers as unknown[])
+            .map((n) => str(n, 20))
+            .filter(Boolean)
+            .slice(0, 500)
         : [],
     }));
   }

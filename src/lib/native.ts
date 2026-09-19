@@ -149,10 +149,12 @@ export async function hideNativeSplash(options: { fadeOutDuration?: number } = {
  * Initialize native device features upon app launch.
  * Sets status bar overlays, brand background, hides splash, and registers back button handlers.
  */
-export async function initNativeApp(options: {
-  fadeOutDuration?: number;
-  deferSplashHide?: boolean;
-} = {}): Promise<void> {
+export async function initNativeApp(
+  options: {
+    fadeOutDuration?: number;
+    deferSplashHide?: boolean;
+  } = {},
+): Promise<void> {
   if (!isNativeApp()) return;
 
   try {

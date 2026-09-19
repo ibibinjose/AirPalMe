@@ -299,7 +299,9 @@ export const postPlanCommentRemote = onCall(CALLABLE, async (request) => {
 export const getPlanByInviteCode = onCall(CALLABLE, async (request) => {
   await noteAppCheck(request, "getPlanByInviteCode");
   const data = (request.data || {}) as GetPlanByInviteCodeRequest;
-  const code = String(data.inviteCode || "").trim().toUpperCase();
+  const code = String(data.inviteCode || "")
+    .trim()
+    .toUpperCase();
   if (!code) throw new HttpsError("invalid-argument", "Invite code is required.");
 
   const snap = await db.collection("plans").where("inviteCode", "==", code).limit(1).get();

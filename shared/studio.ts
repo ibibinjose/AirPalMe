@@ -10,7 +10,13 @@ export interface WalkthroughInput {
   notes: string;
 }
 
-export const WALKTHROUGH_KINDS = ["Hotel / Stay", "Venue / Hospitality", "Events / Organiser", "Brand / Retail", "Other"];
+export const WALKTHROUGH_KINDS = [
+  "Hotel / Stay",
+  "Venue / Hospitality",
+  "Events / Organiser",
+  "Brand / Retail",
+  "Other",
+];
 
 export function emptyWalkthrough(): WalkthroughInput {
   return { name: "", business: "", email: "", phone: "", kind: "Venue / Hospitality", preferredDay: "", notes: "" };

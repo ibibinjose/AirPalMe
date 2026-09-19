@@ -1,10 +1,18 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { createUserWithEmailAndPassword, deleteUser, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  deleteUser,
+  onAuthStateChanged,
+  signInWithCustomToken,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
 import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
 import type { UserProfile, UserRole } from "@shared/airpal-data";
 import { buildHostProperty, parseHostPropertyKind, type HostPropertyKind } from "@shared/host-property";
 import {
   attachEmailToAccount,
+  linkEmailPasswordToAccount,
   removeEmailFromAccount,
   sendAccountVerificationEmail,
   sendPasswordResetToEmail,
@@ -19,9 +27,14 @@ import {
   sendAccountPhoneCode as sendLinkedSms,
   sendPhoneCode as sendSms,
 } from "@/lib/phone-auth";
-import { getFirebaseAuth, getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
+import { firebaseWebApiKey, getFirebaseAuth, getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { clearPendingIntent, savePendingIntent, type PendingIntent } from "@/lib/pending-intent";
-import { completeRegistration, liveBackendEnabled } from "@/lib/functions";
+import {
+  completeAccountSignupRemote,
+  completeRegistration,
+  liveBackendEnabled,
+  loginWithPhonePasswordRemote,
+} from "@/lib/functions";
 import { saveCachedProperty } from "@/lib/properties";
 import { track } from "@/lib/analytics";
 
@@ -39,10 +52,13 @@ type AuthValue = {
   isHost: boolean;
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithPhonePassword: (phone: string, password: string) => Promise<void>;
   register: (email: string, name: string, opts?: RegisterOpts) => Promise<{ propertyId?: string }>;
   sendPhoneCode: (phone: string) => Promise<void>;
   confirmPhoneCode: (code: string) => Promise<void>;
   completePhoneProfile: (input: { name: string; email: string }) => Promise<void>;
+  linkEmailPassword: (email: string, password: string) => Promise<void>;
+  completeAccount: (input: { handle: string; name: string; email: string }) => Promise<void>;
   updateEmailAddress: (email: string) => Promise<void>;
   removeEmailAddress: () => Promise<void>;
   sendAccountPhoneCode: (phone: string) => Promise<void>;
@@ -206,6 +222,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const auth = getFirebaseAuth();
         if (!auth) throw new Error("Sign-in needs Firebase.");
         await signInWithEmailAndPassword(auth, normalizeEmail(email), password);
+      },
+      async loginWithPhonePassword(phone, password) {
+        const auth = getFirebaseAuth();
+        if (!auth) throw new Error("Sign-in needs Firebase.");
+        const { token } = await loginWithPhonePasswordRemote({
+          phone,
+          password,
+          apiKey: firebaseWebApiKey() || undefined,
+        });
+        await signInWithCustomToken(auth, token);
+      },
+      async linkEmailPassword(email, password) {
+        await linkEmailPasswordToAccount(normalizeEmail(email), password);
+        await pullUser();
+      },
+      async completeAccount(input) {
+        if (liveBackendEnabled()) {
+          await completeAccountSignupRemote({
+            handle: input.handle,
+            name: input.name,
+            email: normalizeEmail(input.email),
+          });
+        }
+        await pullUser();
       },
       async sendPhoneCode(phone) {
         await sendSms(phone);

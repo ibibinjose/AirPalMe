@@ -69,19 +69,35 @@ export function BusinessPromotionNewPage() {
         <ArrowLeft size={14} /> Your promotions
       </Link>
       <h1 className="font-display mt-4 text-2xl font-bold">New campaign</h1>
-      <p className="mt-0.5 text-sm text-mute">What value does this create for the customer? Campaigns go live after review — never directly.</p>
+      <p className="mt-0.5 text-sm text-mute">
+        What value does this create for the customer? Campaigns go live after review — never directly.
+      </p>
 
-      <div className="mt-4 space-y-2 rounded-3xl border-2 border-ink bg-card p-4">
+      <div className="mt-4 space-y-2 rounded-3xl ring-1 ring-line bg-card p-4">
         <div className="grid grid-cols-2 gap-2">
-          <label className="text-xs font-semibold">Kind
-            <select value={form.kind} onChange={(e) => set("kind", e.target.value)} className="mt-1 w-full rounded-xl border-2 border-ink/15 p-2 text-sm">
+          <label className="text-xs font-semibold">
+            Kind
+            <select
+              value={form.kind}
+              onChange={(e) => set("kind", e.target.value)}
+              className="mt-1 w-full rounded-xl ring-1 ring-line/15 p-2 text-sm"
+            >
               <option value="promotion">Promotion</option>
               <option value="giveaway">Giveaway proposal</option>
             </select>
           </label>
-          <label className="text-xs font-semibold">Mechanic
-            <select value={form.mechanicType} onChange={(e) => set("mechanicType", e.target.value)} className="mt-1 w-full rounded-xl border-2 border-ink/15 p-2 text-sm">
-              {MECHANIC_TYPES.map((m) => <option key={m} value={m}>{m}</option>)}
+          <label className="text-xs font-semibold">
+            Mechanic
+            <select
+              value={form.mechanicType}
+              onChange={(e) => set("mechanicType", e.target.value)}
+              className="mt-1 w-full rounded-xl ring-1 ring-line/15 p-2 text-sm"
+            >
+              {MECHANIC_TYPES.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
             </select>
           </label>
         </div>
@@ -93,37 +109,86 @@ export function BusinessPromotionNewPage() {
           ["locationText", "Location"],
           ["eligibility", "Eligibility"],
         ].map(([k, label]) => (
-          <label key={k} className="block text-xs font-semibold">{label}
-            <input value={String(form[k as keyof typeof form])} onChange={(e) => set(k, e.target.value)} className="mt-1 w-full rounded-xl border-2 border-ink/15 p-2 text-sm font-normal" />
+          <label key={k} className="block text-xs font-semibold">
+            {label}
+            <input
+              value={String(form[k as keyof typeof form])}
+              onChange={(e) => set(k, e.target.value)}
+              className="mt-1 w-full rounded-xl ring-1 ring-line/15 p-2 text-sm font-normal"
+            />
           </label>
         ))}
-        <label className="block text-xs font-semibold">Description
-          <textarea value={form.description} onChange={(e) => set("description", e.target.value)} rows={3} className="mt-1 w-full rounded-xl border-2 border-ink/15 p-2 text-sm font-normal" />
+        <label className="block text-xs font-semibold">
+          Description
+          <textarea
+            value={form.description}
+            onChange={(e) => set("description", e.target.value)}
+            rows={3}
+            className="mt-1 w-full rounded-xl ring-1 ring-line/15 p-2 text-sm font-normal"
+          />
         </label>
         <div className="grid grid-cols-2 gap-2">
-          <label className="text-xs font-semibold">Category
-            <select value={form.category} onChange={(e) => set("category", e.target.value)} className="mt-1 w-full rounded-xl border-2 border-ink/15 p-2 text-sm">
-              {PROMOTION_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+          <label className="text-xs font-semibold">
+            Category
+            <select
+              value={form.category}
+              onChange={(e) => set("category", e.target.value)}
+              className="mt-1 w-full rounded-xl ring-1 ring-line/15 p-2 text-sm"
+            >
+              {PROMOTION_CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
             </select>
           </label>
-          <label className="text-xs font-semibold">Entry limit
-            <input type="number" min={1} value={form.entryLimit} onChange={(e) => set("entryLimit", Number(e.target.value))} className="mt-1 w-full rounded-xl border-2 border-ink/15 p-2 text-sm font-normal" />
+          <label className="text-xs font-semibold">
+            Entry limit
+            <input
+              type="number"
+              min={1}
+              value={form.entryLimit}
+              onChange={(e) => set("entryLimit", Number(e.target.value))}
+              className="mt-1 w-full rounded-xl ring-1 ring-line/15 p-2 text-sm font-normal"
+            />
           </label>
-          <label className="text-xs font-semibold">Starts
-            <input type="datetime-local" value={form.startAt} onChange={(e) => set("startAt", e.target.value)} className="mt-1 w-full rounded-xl border-2 border-ink/15 p-2 text-sm font-normal" />
+          <label className="text-xs font-semibold">
+            Starts
+            <input
+              type="datetime-local"
+              value={form.startAt}
+              onChange={(e) => set("startAt", e.target.value)}
+              className="mt-1 w-full rounded-xl ring-1 ring-line/15 p-2 text-sm font-normal"
+            />
           </label>
-          <label className="text-xs font-semibold">Ends
-            <input type="datetime-local" value={form.endAt} onChange={(e) => set("endAt", e.target.value)} className="mt-1 w-full rounded-xl border-2 border-ink/15 p-2 text-sm font-normal" />
+          <label className="text-xs font-semibold">
+            Ends
+            <input
+              type="datetime-local"
+              value={form.endAt}
+              onChange={(e) => set("endAt", e.target.value)}
+              className="mt-1 w-full rounded-xl ring-1 ring-line/15 p-2 text-sm font-normal"
+            />
           </label>
         </div>
-        <label className="block text-xs font-semibold">Terms & redemption rules
-          <textarea value={form.termsText} onChange={(e) => set("termsText", e.target.value)} rows={3} className="mt-1 w-full rounded-xl border-2 border-ink/15 p-2 text-sm font-normal" />
+        <label className="block text-xs font-semibold">
+          Terms & redemption rules
+          <textarea
+            value={form.termsText}
+            onChange={(e) => set("termsText", e.target.value)}
+            rows={3}
+            className="mt-1 w-full rounded-xl ring-1 ring-line/15 p-2 text-sm font-normal"
+          />
         </label>
         <div className="flex gap-2">
-          <Button onClick={() => save(false)} disabled={busy} className="flex-1 bg-card text-ink border-2 border-ink">
+          <Button onClick={() => save(false)} disabled={busy} className="flex-1 bg-card text-ink ring-1 ring-line">
             {busy ? "Saving…" : "Save draft"}
           </Button>
-          <Button onClick={() => save(true)} disabled={busy || !form.title || !form.startAt || !form.endAt} className="flex-1">
+          <Button
+            onClick={() => save(true)}
+            disabled={busy || !form.title || !form.startAt || !form.endAt}
+            className="flex-1"
+          >
             {busy ? "Submitting…" : "Submit for review"}
           </Button>
         </div>

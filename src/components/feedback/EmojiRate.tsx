@@ -20,7 +20,11 @@ export function EmojiRate({ target, eventId, stallId, stallName, propertyId }: P
   const existing = useMemo(
     () =>
       loadRatings().find((r) =>
-        target === "stall" ? r.stallId === stallId : target === "event" ? r.eventId === eventId && !r.stallId : r.propertyId === propertyId,
+        target === "stall"
+          ? r.stallId === stallId
+          : target === "event"
+            ? r.eventId === eventId && !r.stallId
+            : r.propertyId === propertyId,
       ),
     [eventId, propertyId, stallId, target],
   );
@@ -101,7 +105,7 @@ export function EmojiRate({ target, eventId, stallId, stallName, propertyId }: P
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="A line for the host"
-            className="mt-3 h-11 w-full rounded-full bg-paper px-4 text-[15px] outline-none border border-ink focus:border-brand"
+            className="mt-3 h-11 w-full rounded-full bg-paper px-4 text-[15px] outline-none border border-line focus:border-brand"
           />
           <Button className="mt-3 w-full" disabled={!mood} onClick={() => void send()}>
             Send
@@ -109,9 +113,7 @@ export function EmojiRate({ target, eventId, stallId, stallName, propertyId }: P
         </>
       )}
       {sent && mood && (
-        <p className="mt-3 text-center text-sm text-mute">
-          {RATE_MOODS.find((m) => m.id === mood)?.emoji} to the host
-        </p>
+        <p className="mt-3 text-center text-sm text-mute">{RATE_MOODS.find((m) => m.id === mood)?.emoji} to the host</p>
       )}
     </section>
   );

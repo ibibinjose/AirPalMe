@@ -11,10 +11,7 @@ import {
   Calendar as CalendarIcon,
 } from "lucide-react";
 import type { CalendarEvent } from "@shared/event";
-import {
-  toDateStr,
-  formatRelativeBadge,
-} from "@/lib/calendar-utils";
+import { toDateStr, formatRelativeBadge } from "@/lib/calendar-utils";
 import { downloadMultipleIcs } from "@/lib/calendar-export";
 import { useCalendarDrag } from "./CalendarDragContext";
 import { CalendarEventCard } from "./CalendarEventCard";
@@ -38,18 +35,13 @@ export function CalendarDayView({
   onSelectEvent,
   onSelectTag,
 }: CalendarDayViewProps) {
-  const {
-    dragOverDate,
-    dragCollision,
-    setDragOverDate,
-    dropOnDate,
-  } = useCalendarDrag();
+  const { dragOverDate, dragCollision, setDragOverDate, dropOnDate } = useCalendarDrag();
 
   const currentDateStr = toDateStr(currentDate);
   const relativeBadge = formatRelativeBadge(currentDateStr);
 
   const formattedDate = useMemo(() => {
-    return new Intl.DateTimeFormat("en-AU", {
+    return new Intl.DateTimeFormat(undefined, {
       weekday: "long",
       day: "numeric",
       month: "long",
@@ -93,7 +85,7 @@ export function CalendarDayView({
       list.push({
         date: d,
         dateStr: dStr,
-        dayName: new Intl.DateTimeFormat("en-AU", { weekday: "narrow" }).format(d),
+        dayName: new Intl.DateTimeFormat(undefined, { weekday: "narrow" }).format(d),
         dayNum: d.getDate(),
         isCurrent: dStr === currentDateStr,
         isToday: dStr === todayStr,
@@ -105,9 +97,7 @@ export function CalendarDayView({
 
   // Events on this active day
   const dayEvents = useMemo(() => {
-    return events
-      .filter((e) => e.date === currentDateStr)
-      .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+    return events.filter((e) => e.date === currentDateStr).sort((a, b) => a.startsAt.localeCompare(b.startsAt));
   }, [events, currentDateStr]);
 
   // Group events by time of day
@@ -129,9 +119,30 @@ export function CalendarDayView({
     }
 
     return [
-      { id: "morning", label: "Morning", sublabel: "Before 12:00 PM", icon: Sun, items: morning, iconColor: "text-amber-500" },
-      { id: "afternoon", label: "Afternoon", sublabel: "12:00 PM – 5:00 PM", icon: Sunset, items: afternoon, iconColor: "text-orange-500" },
-      { id: "evening", label: "Evening & Night", sublabel: "After 5:00 PM", icon: Moon, items: evening, iconColor: "text-indigo-400" },
+      {
+        id: "morning",
+        label: "Morning",
+        sublabel: "Before 12:00 PM",
+        icon: Sun,
+        items: morning,
+        iconColor: "text-amber-500",
+      },
+      {
+        id: "afternoon",
+        label: "Afternoon",
+        sublabel: "12:00 PM – 5:00 PM",
+        icon: Sunset,
+        items: afternoon,
+        iconColor: "text-orange-500",
+      },
+      {
+        id: "evening",
+        label: "Evening & Night",
+        sublabel: "After 5:00 PM",
+        icon: Moon,
+        items: evening,
+        iconColor: "text-indigo-400",
+      },
     ];
   }, [dayEvents]);
 
@@ -168,11 +179,10 @@ export function CalendarDayView({
         }}
         className={cn(
           "rounded-3xl bg-card p-4 ring-1 ring-line/80 shadow-sm transition-all duration-200 md:p-6",
-          isOver && (
-            hasConflict
+          isOver &&
+            (hasConflict
               ? "bg-amber-100/90 ring-2 ring-amber-500 scale-[1.01]"
-              : "bg-brand/10 ring-2 ring-brand scale-[1.01]"
-          ),
+              : "bg-brand/10 ring-2 ring-brand scale-[1.01]"),
         )}
       >
         <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-line/60">
@@ -184,9 +194,7 @@ export function CalendarDayView({
               <span
                 className={cn(
                   "rounded-full px-2.5 py-0.5 text-xs font-bold ring-1",
-                  relativeBadge.highlight
-                    ? "bg-amber-500 text-white ring-amber-600"
-                    : "bg-paper text-ink ring-line/80",
+                  relativeBadge.highlight ? "bg-amber-500 text-white ring-amber-600" : "bg-paper text-ink ring-line/80",
                 )}
               >
                 {relativeBadge.label}
@@ -198,9 +206,7 @@ export function CalendarDayView({
                 </span>
               )}
             </div>
-            <p className="text-xs text-mute mt-1">
-              Detailed daily agenda • Drop dragged events here to reschedule
-            </p>
+            <p className="text-xs text-mute mt-1">Detailed daily agenda • Drop dragged events here to reschedule</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -256,7 +262,7 @@ export function CalendarDayView({
               className={cn(
                 "flex-1 min-w-[42px] flex flex-col items-center py-2 px-1 rounded-xl transition cursor-pointer active:scale-95",
                 m.isCurrent
-                  ? "bg-ink text-white shadow-xs"
+                  ? "bg-brand text-white shadow-xs"
                   : m.isToday
                     ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300"
                     : "hover:bg-paper text-mute hover:text-ink",
@@ -267,11 +273,7 @@ export function CalendarDayView({
               <span
                 className={cn(
                   "h-1.5 w-1.5 rounded-full mt-1",
-                  m.count > 0
-                    ? m.isCurrent
-                      ? "bg-gold"
-                      : "bg-brand"
-                    : "opacity-0",
+                  m.count > 0 ? (m.isCurrent ? "bg-gold" : "bg-brand") : "opacity-0",
                 )}
               />
             </button>
@@ -319,13 +321,14 @@ export function CalendarDayView({
           </div>
           <h3 className="font-display text-lg font-bold text-ink">No events scheduled for this day</h3>
           <p className="mt-1 text-xs text-mute max-w-sm mx-auto">
-            There are no events matching your active filters on {formattedDate}. You can drag events from other views here or check surrounding dates.
+            There are no events matching your active filters on {formattedDate}. You can drag events from other views
+            here or check surrounding dates.
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
             <button
               type="button"
               onClick={jumpToday}
-              className="inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-ink/90 transition active:scale-95 cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand-ink transition active:scale-95 cursor-pointer"
             >
               <CalendarDays size={13} />
               <span>Go to Today</span>

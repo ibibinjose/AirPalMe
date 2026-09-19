@@ -4,10 +4,7 @@ export function TourCardSkeleton({ className }: { className?: string }) {
   return (
     <div
       aria-hidden="true"
-      className={cn(
-        "relative min-h-[240px] w-full overflow-hidden rounded-3xl bg-card ring-1 ring-line/70",
-        className,
-      )}
+      className={cn("relative min-h-[240px] w-full overflow-hidden rounded-3xl bg-card ring-1 ring-line/70", className)}
     >
       {/* Full-bleed shimmer background */}
       <div className="absolute inset-0 bg-gradient-to-r from-line/30 via-line/65 to-line/30 bg-[length:200%_100%] animate-shimmer" />
@@ -24,13 +21,7 @@ export function TourCardSkeleton({ className }: { className?: string }) {
   );
 }
 
-export function TourCardSkeletonGrid({
-  count = 3,
-  className,
-}: {
-  count?: number;
-  className?: string;
-}) {
+export function TourCardSkeletonGrid({ count = 3, className }: { count?: number; className?: string }) {
   return (
     <div
       role="status"

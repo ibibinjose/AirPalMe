@@ -14,9 +14,7 @@ function ItemCard({
 }) {
   const inner = (
     <>
-      {item.badge && (
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">{item.badge}</p>
-      )}
+      {item.badge && <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">{item.badge}</p>}
       <div className="flex items-baseline justify-between gap-3">
         <p className={cn("font-medium", featured && "font-display text-xl font-semibold")}>{item.title}</p>
         {item.price && <p className="shrink-0 text-sm font-medium">{item.price}</p>}

@@ -1,6 +1,7 @@
 // Barrel: every callable keeps its deployed name. Domain logic lives in sibling modules.
 export { recordAnalyticsBatch, aggregateAnalyticsHourly, runAnalyticsAggregation } from "./analytics";
 export { completeRegistration, ensurePlatformAdmin, setPropertyMember, backfillOwnerClaims } from "./registration";
+export { completeAccountSignup, loginWithPhonePassword } from "./account";
 export {
   claimDeal,
   redeemVoucher,
@@ -40,6 +41,13 @@ export {
   createExperienceCheckoutSession,
   confirmExperienceBooking,
   confirmExperienceBookingRemote,
+  createBookingCheckoutSession,
+  createConnectAccountLink,
+  refreshConnectAccount,
+  createConnectLoginLink,
+  releaseHeldPayouts,
+  completePaidBooking,
+  stripeWebhook,
 } from "./stripe";
 export { createStaffTicket, resolveStaffTicket, onStaffTicketCreated } from "./tickets";
 export {
@@ -58,4 +66,5 @@ export {
   seedPromotionDemo,
 } from "./promotions";
 export { createBroadcast, reviewBroadcast } from "./notifications";
-
+export { shareHere, stopHere } from "./here";
+export { startWave, waveAt, stopWave } from "./wave";

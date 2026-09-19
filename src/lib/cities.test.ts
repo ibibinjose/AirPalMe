@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { cityCenter, knownCityCenter } from "./cities";
+import { cityCenter, currencyForCity, knownCityCenter } from "./cities";
 
 describe("cityCenter", () => {
   it("resolves known cities loosely and falls back", () => {
     expect(cityCenter("The Rocks, Sydney")).toEqual({ lat: -33.8688, lng: 151.2093 });
     expect(cityCenter("MUMBAI")).toEqual({ lat: 19.076, lng: 72.8777 });
+    expect(cityCenter("Bengaluru")).toEqual({ lat: 12.9716, lng: 77.5946 });
     expect(cityCenter("Nowhere Ville")).toEqual({ lat: -33.8688, lng: 151.2093 });
     expect(cityCenter()).toEqual({ lat: -33.8688, lng: 151.2093 });
   });
@@ -22,5 +23,8 @@ describe("knownCityCenter", () => {
     expect(knownCityCenter("Kumarakom")).toEqual({ lat: 9.62, lng: 76.43 });
     expect(knownCityCenter("Nowhere Ville")).toBeNull();
     expect(knownCityCenter()).toBeNull();
+    expect(knownCityCenter("Bengaluru")).toEqual({ lat: 12.9716, lng: 77.5946 });
+    expect(currencyForCity("Kochi")).toBe("INR");
+    expect(currencyForCity("Sydney")).toBe("AUD");
   });
 });

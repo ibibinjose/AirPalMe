@@ -10,7 +10,9 @@ export function SolutionsPage() {
     <div className="mx-auto max-w-5xl px-4 pb-10 md:px-6">
       <header className="py-6 md:py-10">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-gold">{t("solutionsKicker")}</p>
-        <h1 className="font-display mt-2 text-4xl font-semibold md:text-5xl whitespace-pre-line">{t("solutionsTitle")}</h1>
+        <h1 className="font-display mt-2 text-4xl font-semibold md:text-5xl whitespace-pre-line">
+          {t("solutionsTitle")}
+        </h1>
       </header>
 
       <div className="grid gap-3 md:grid-cols-2">

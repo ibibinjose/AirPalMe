@@ -1,4 +1,9 @@
-import { CURRENT_PROPERTY, IN_ROOM_DINING_MENU, INITIAL_STAFF_TICKETS, SAFETY_AND_EMERGENCY_DATA } from "@shared/airpal-data";
+import {
+  CURRENT_PROPERTY,
+  IN_ROOM_DINING_MENU,
+  INITIAL_STAFF_TICKETS,
+  SAFETY_AND_EMERGENCY_DATA,
+} from "@shared/airpal-data";
 import { THE_ROCKS_PRECINCT } from "@shared/the-rocks-data";
 import { HARBOUR_COLLEGE } from "@shared/campus";
 import { handleFromPlaceId } from "@shared/bio";
@@ -18,6 +23,27 @@ import { loadPlaces } from "./places-store";
 import { loadTours } from "./tours-store";
 
 export const PRECINCT = THE_ROCKS_PRECINCT;
+
+/** Walk / short trip from current GPS. The Rocks is ~8 km from Ashfield — outside this. */
+export const AROUND_YOU_M = 5000;
+
+export const ROCKS_BROWSE = {
+  mode: "city" as const,
+  city: "The Rocks, Sydney",
+  lat: THE_ROCKS_PRECINCT.geo?.lat ?? -33.85945,
+  lng: THE_ROCKS_PRECINCT.geo?.lng ?? 151.20835,
+};
+
+export function placesAround<T extends { geo?: { lat: number; lng: number } }>(
+  rows: T[],
+  from: { lat: number; lng: number },
+  maxMeters = AROUND_YOU_M,
+): T[] {
+  return rows.filter((p) => {
+    if (!p.geo || !Number.isFinite(p.geo.lat) || !Number.isFinite(p.geo.lng)) return false;
+    return haversineMeters(from, p.geo) <= maxMeters;
+  });
+}
 
 /**
  * Walks for the guest's city from live `tours` docs. A named city with no
@@ -39,21 +65,24 @@ function cityKey(value?: string): string {
 }
 
 function isSydneyKey(key: string): boolean {
-  return !key || key.includes("sydney") || key.includes("rock");
+  if (!key) return false;
+  return key.includes("sydney") || key.includes("the rocks") || key === "therocks";
 }
 
 /**
  * Places for the guest's city. Place geography is precinct + geo (rows carry
  * no city name): Sydney shows the bundled Rocks stock (precinct the-rocks,
  * local, or legacy empty); any other known city shows rows within 60 km of
- * its center; unknown cities show non-Sydney stock only. Melbourne never
- * renders The Rocks.
+ * its center; unknown cities show non-Sydney stock only; an empty city
+ * returns [] (honest empty — callers render their own empty state, never a
+ * default city's stock). Melbourne never renders The Rocks.
  */
 export function placesInCity<T extends { precinctId?: string; geo?: { lat: number; lng: number } }>(
   rows: T[],
   city?: string,
 ): T[] {
   const key = cityKey(city);
+  if (!key) return [];
   if (isSydneyKey(key)) {
     return rows.filter((p) => {
       const precinct = cityKey(p.precinctId);
@@ -164,12 +193,11 @@ function discoverRank(place: NearbyPlace) {
   return 3;
 }
 
-/** Nearby for Discover: no car parks first, deals and food lead. Pass the guest's city to keep other cities honest. */
-export function discoverPlaces(from: Geo = originFor(), city?: string) {
-  return placesInCity(
-    activePlaces().filter((p) => p.category !== "parking" && p.category !== "facilities"),
-    city,
-  )
+/** Nearby for Discover: no car parks first, deals and food lead. `around` uses GPS distance, not The Rocks dump. */
+export function discoverPlaces(from: Geo = originFor(), city?: string, scope: "city" | "around" = "city") {
+  const pool = activePlaces().filter((p) => p.category !== "parking" && p.category !== "facilities");
+  const scoped = scope === "around" ? placesAround(pool, from) : placesInCity(pool, city);
+  return scoped
     .map((p) => withWalk(p, from))
     .sort((a, b) => {
       const rank = discoverRank(a) - discoverRank(b);
@@ -177,10 +205,19 @@ export function discoverPlaces(from: Geo = originFor(), city?: string) {
     });
 }
 
-export function featuredPlaces(from: Geo = originFor(), city?: string) {
-  return discoverPlaces(from, city)
+export function featuredPlaces(from: Geo = originFor(), city?: string, scope: "city" | "around" = "city") {
+  return discoverPlaces(from, city, scope)
     .filter((p) => p.deal || p.verifiedPartner || p.category === "eat")
     .slice(0, 8);
+}
+
+export function placesForLocation<T extends { geo?: { lat: number; lng: number }; precinctId?: string }>(
+  rows: T[],
+  from: Geo,
+  city: string,
+  usingGps: boolean,
+) {
+  return usingGps ? placesAround(rows, from) : placesInCity(rows, city);
 }
 
 export function nearbyParking(from = originFor()) {

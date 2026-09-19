@@ -1,11 +1,4 @@
-import {
-  collection,
-  doc,
-  onSnapshot,
-  serverTimestamp,
-  setDoc,
-  type Timestamp,
-} from "firebase/firestore";
+import { collection, doc, onSnapshot, serverTimestamp, setDoc, type Timestamp } from "firebase/firestore";
 import type { StaffTicket } from "@shared/airpal-data";
 export type { StaffTicket } from "@shared/airpal-data";
 import { resolveTicketPriority } from "@shared/airpal-data";
@@ -27,7 +20,9 @@ export function ticketFromDoc(id: string, data: Record<string, unknown>): StaffT
   if (!details) return null;
   const category = data.category;
   const allowed = ["reception", "housekeeping", "maintenance", "dining", "late_checkout"] as const;
-  const cat = allowed.includes(category as (typeof allowed)[number]) ? (category as StaffTicket["category"]) : "reception";
+  const cat = allowed.includes(category as (typeof allowed)[number])
+    ? (category as StaffTicket["category"])
+    : "reception";
   const urgency = data.urgency === "urgent" ? "urgent" : "normal";
   const status = data.status === "resolved" || data.status === "in_progress" ? data.status : "pending";
   const ticket: StaffTicket = {

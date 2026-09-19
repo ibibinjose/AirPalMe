@@ -21,11 +21,7 @@ if (typeof globalThis.localStorage === "undefined" || !globalThis.localStorage.g
 if (typeof globalThis.sessionStorage === "undefined" || !globalThis.sessionStorage.getItem) {
   (globalThis as Record<string, unknown>).sessionStorage = memoryStorage();
 }
-import {
-  clearPendingIntent,
-  peekPendingIntent,
-  savePendingIntent,
-} from "./pending-intent";
+import { clearPendingIntent, peekPendingIntent, savePendingIntent } from "./pending-intent";
 import { loadSocialSet, persistSocialSet, toggleSocialId } from "./social-store";
 
 describe("pending-intent", () => {
@@ -38,7 +34,7 @@ describe("pending-intent", () => {
 
   it("rejects malformed payloads", () => {
     savePendingIntent({ kind: "follow-handle", id: "cafe" });
-    sessionStorage.setItem("airpal:pending-intent:v1", "{\"kind\":\"hack\",\"id\":\"x\"}");
+    sessionStorage.setItem("airpal:pending-intent:v1", '{"kind":"hack","id":"x"}');
     expect(peekPendingIntent()).toBeNull();
     sessionStorage.setItem("airpal:pending-intent:v1", "not json");
     expect(peekPendingIntent()).toBeNull();
@@ -59,7 +55,7 @@ describe("social-store", () => {
   it("persists and reloads sets, ignoring junk", () => {
     persistSocialSet("follow", new Set(["cafe-sydney", "bar-1"]));
     expect(loadSocialSet("follow").has("cafe-sydney")).toBe(true);
-    localStorage.setItem("airpal:social:like:v1", "[1,null,\"ok\"]");
+    localStorage.setItem("airpal:social:like:v1", '[1,null,"ok"]');
     expect(loadSocialSet("like")).toEqual(new Set(["ok"]));
   });
 });

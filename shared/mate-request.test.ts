@@ -27,11 +27,17 @@ describe("mate requests", () => {
 
   it("rejects vague or malformed requests", () => {
     expect(mateRequestValid({ ...emptyMateRequest(), what: "Hi", date: "2026-10-03", suburb: "Bondi" })).toBe(false);
+    expect(mateRequestValid({ ...emptyMateRequest(), what: "Concert buddy", date: "tomorrow", suburb: "CBD" })).toBe(
+      false,
+    );
     expect(
-      mateRequestValid({ ...emptyMateRequest(), what: "Concert buddy", date: "tomorrow", suburb: "CBD" }),
-    ).toBe(false);
-    expect(
-      mateRequestValid({ ...emptyMateRequest(), what: "Concert buddy", date: "2026-10-03", suburb: "CBD", partySize: 99 }),
+      mateRequestValid({
+        ...emptyMateRequest(),
+        what: "Concert buddy",
+        date: "2026-10-03",
+        suburb: "CBD",
+        partySize: 99,
+      }),
     ).toBe(false);
   });
 

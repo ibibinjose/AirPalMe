@@ -45,7 +45,19 @@ export function HostPlaceForm({
     setFacilities(property.facilities || []);
     setNetwork(property.wifi?.network || "");
     setSpeed(property.wifi?.speed || "");
-  }, [property.id, property.name, property.tagline, property.address, property.phone, property.city, property.checkIn, property.checkOut, property.breakfast, property.facilities, property.wifi]);
+  }, [
+    property.id,
+    property.name,
+    property.tagline,
+    property.address,
+    property.phone,
+    property.city,
+    property.checkIn,
+    property.checkOut,
+    property.breakfast,
+    property.facilities,
+    property.wifi,
+  ]);
 
   useEffect(() => {
     if (!property.id || property.id === "unknown" || !liveBackendEnabled()) return;
@@ -123,7 +135,9 @@ export function HostPlaceForm({
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Guest stay</p>
           <h2 className="font-display text-xl font-semibold tracking-tight">Place details</h2>
-          <p className="mt-1 text-[13px] text-mute">What guests see after they scan. Saved to the live property record.</p>
+          <p className="mt-1 text-[13px] text-mute">
+            What guests see after they scan. Saved to the live property record.
+          </p>
         </div>
         <HostFreshnessBanner
           kind="hours"

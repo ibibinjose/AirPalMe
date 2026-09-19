@@ -17,6 +17,7 @@ Count: hotel guide(11)+qr concierge(12)+local events(12)+city walks(10)+guest wi
 ```
 Scan a place. See what's around — no account, no download.
 ```
+
 (62 chars.)
 
 ## Full description (both stores)
@@ -69,15 +70,15 @@ features work anonymously; no account is required to evaluate the app.
 
 ## Asset map (this repo, `store/`)
 
-| Asset | File | Size |
-|---|---|---|
-| iOS 6.9" screenshots (4) | `screenshots/ios-6.9/01..04-*.jpg` | 1320x2868 |
-| iOS 6.7" screenshots (4) | `screenshots/ios-6.7/01..04-*.jpg` | 1290x2796 |
-| iOS 5.5" screenshots (4) | `screenshots/ios-5.5/01..04-*.jpg` | 1242x2208 |
-| Android phone screenshots (4) | `screenshots/android-phone/01..04-*.jpg` | 1080x1920 |
-| Play feature graphic | `feature-graphic-1024x500.png` | 1024x500 |
-| Play hi-res icon (flattened, no alpha risk) | `icons/icon-512-flat.png` | 512x512 |
-| iOS app icon (in Xcode asset catalog, no alpha) | `ios/.../AppIcon-512@2x.png` | 1024x1024 |
+| Asset                                           | File                                     | Size      |
+| ----------------------------------------------- | ---------------------------------------- | --------- |
+| iOS 6.9" screenshots (4)                        | `screenshots/ios-6.9/01..04-*.jpg`       | 1320x2868 |
+| iOS 6.7" screenshots (4)                        | `screenshots/ios-6.7/01..04-*.jpg`       | 1290x2796 |
+| iOS 5.5" screenshots (4)                        | `screenshots/ios-5.5/01..04-*.jpg`       | 1242x2208 |
+| Android phone screenshots (4)                   | `screenshots/android-phone/01..04-*.jpg` | 1080x1920 |
+| Play feature graphic                            | `feature-graphic-1024x500.png`           | 1024x500  |
+| Play hi-res icon (flattened, no alpha risk)     | `icons/icon-512-flat.png`                | 512x512   |
+| iOS app icon (in Xcode asset catalog, no alpha) | `ios/.../AppIcon-512@2x.png`             | 1024x1024 |
 
 To replace these designed previews with real captures later, run
 `node scripts/capture-store-shots.mjs` on a machine that can serve the app

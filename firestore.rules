@@ -66,6 +66,11 @@ service cloud.firestore {
         .hasAny(['ownerId', 'members', 'id']);
     }
 
+    // Phone → uid index for mobile + password sign-in. Functions only.
+    match /phone_logins/{e164} {
+      allow read, write: if false;
+    }
+
     match /users/{userId} {
       allow read: if signedIn() && (request.auth.uid == userId || platformAdmin());
       allow create, delete: if false;
@@ -509,12 +514,14 @@ service cloud.firestore {
     }
 
     // §9 shared booking engine. $0 is paid; otherwise unpaid until Stripe confirms.
+    // Money fields (price, fees, payment/payout, Stripe ids) are Functions-only.
     match /bookings/{bookingId} {
       allow create: if signedIn()
         && !isAnonymous()
         && request.resource.data.customerUid == request.auth.uid
         && request.resource.data.status == 'pending'
         && request.resource.data.paymentStatus in ['deferred', 'unpaid', 'paid']
+        && (request.resource.data.priceCents <= 0 || request.resource.data.paymentStatus != 'paid')
         && request.resource.data.keys().hasAny(['updatedAt']);
       allow read: if signedIn() && (
         resource.data.customerUid == request.auth.uid ||
@@ -523,12 +530,38 @@ service cloud.firestore {
       );
       allow update: if signedIn() && (
         platformAdmin() ||
-        (resource.data.customerUid == request.auth.uid
-          && request.resource.data.customerUid == request.auth.uid) ||
-        (resource.data.providerUid == request.auth.uid
-          && request.resource.data.providerUid == request.auth.uid)
+        (
+          (
+            resource.data.customerUid == request.auth.uid
+            || resource.data.providerUid == request.auth.uid
+          )
+          && request.resource.data.customerUid == resource.data.customerUid
+          && request.resource.data.providerUid == resource.data.providerUid
+          && request.resource.data.priceCents == resource.data.priceCents
+          && request.resource.data.feeCents == resource.data.feeCents
+          && request.resource.data.paymentStatus == resource.data.paymentStatus
+          && request.resource.data.status in ['pending', 'confirmed', 'cancelled', 'in_progress']
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt', 'cancelReason'])
+        )
       );
       allow delete: if false;
+    }
+
+    match /connect_accounts/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || platformAdmin());
+      allow write: if false;
+    }
+
+    match /payments/{paymentId} {
+      allow read: if signedIn() && platformAdmin();
+      allow write: if false;
+    }
+
+    match /payouts/{payoutId} {
+      allow read: if signedIn() && (
+        platformAdmin() || resource.data.providerUid == request.auth.uid
+      );
+      allow write: if false;
     }
 
     // §8 messaging: one chat per matched request, parties only (+ admins for moderation).
@@ -701,6 +734,44 @@ service cloud.firestore {
       allow delete: if signedIn() && resource.data.uid == request.auth.uid;
     }
 
+    // Event-space “I’m here” pins. Rounded venue coords only; writes via callables.
+    match /here_pins/{handle} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+    match /here_at/{placeKey} {
+      match /pins/{handle} {
+        allow read: if signedIn();
+        allow write: if false;
+      }
+    }
+    match /here_shares/{shareId} {
+      allow get, list: if signedIn() && (
+        resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid
+      );
+      allow write: if false;
+    }
+
+    // Venue Wave: greet AirPals in the room. Writes via callables.
+    match /waves/{code} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+    match /wave_here/{placeKey} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+    match /wave_hits/{hitId} {
+      allow get, list: if signedIn() && (
+        resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid
+      );
+      allow write: if false;
+    }
+    match /wave_owners/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
     match /graph/{handle} {
       match /followers/{fromHandle} {
         allow read: if signedIn();
@@ -858,6 +929,22 @@ service cloud.firestore {
         allow update, delete: if platformAdmin()
           || (signedIn() && resource.data.authorId == request.auth.uid);
       }
+    }
+
+    // 1-on-1 catch-up / meeting / hangout proposals from a public bio.
+    match /catchups/{catchupId} {
+      allow create: if signedIn()
+        && request.resource.data.requesterUid == request.auth.uid
+        && request.resource.data.targetHandle is string
+        && request.resource.data.requesterName is string;
+      allow get, list: if signedIn() && (
+        resource.data.requesterUid == request.auth.uid
+        || resource.data.targetOwnerUid == request.auth.uid
+      );
+      allow update, delete: if signedIn() && (
+        resource.data.requesterUid == request.auth.uid
+        || resource.data.targetOwnerUid == request.auth.uid
+      );
     }
   }
 }

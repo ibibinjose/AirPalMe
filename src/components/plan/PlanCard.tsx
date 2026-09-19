@@ -1,25 +1,23 @@
 import { useMemo } from "react";
 import { Link } from "wouter";
 import { Calendar, MapPin, Sparkles, Lock, Radar, CreditCard } from "lucide-react";
-import { type HangoutPlan, PLAN_THEMES, PLAN_TYPES, EXPERIENCE_CATEGORIES, formatPlanDate } from "@shared/plan";
+import {
+  type HangoutPlan,
+  PLAN_THEMES,
+  PLAN_TYPES,
+  EXPERIENCE_CATEGORIES,
+  formatPlanDate,
+  isTicketed,
+} from "@shared/plan";
 import { PLAN_TYPE_ICONS } from "./planTypeIcons";
 import { cn } from "@/lib/cn";
 
-export function PlanCard({
-  plan,
-  userAttendeeId,
-}: {
-  plan: HangoutPlan;
-  userAttendeeId?: string;
-}) {
+export function PlanCard({ plan, userAttendeeId }: { plan: HangoutPlan; userAttendeeId?: string }) {
   const theme = PLAN_THEMES[plan.theme] || PLAN_THEMES.gold;
   const typeInfo = PLAN_TYPES[plan.type] || PLAN_TYPES.custom;
   const TypeIcon = PLAN_TYPE_ICONS[plan.type] || Sparkles;
 
-  const goingAttendees = useMemo(
-    () => plan.attendees.filter((a) => a.status === "going"),
-    [plan.attendees],
-  );
+  const goingAttendees = useMemo(() => plan.attendees.filter((a) => a.status === "going"), [plan.attendees]);
 
   const userRsvp = useMemo(() => {
     if (!userAttendeeId) return null;
@@ -52,9 +50,9 @@ export function PlanCard({
     <Link
       href={`/plan/${plan.id}`}
       className={cn(
-        "group relative flex flex-col justify-between overflow-hidden rounded-[28px] border-2 border-ink bg-card p-5 shadow-xs transition-all duration-300",
-        "hover:-translate-y-0.5 hover:border-brand hover:shadow-lg active:scale-[0.99]",
-        plan.isExperience && "border-amber-600/60 hover:border-amber-500",
+        "group relative flex flex-col justify-between overflow-hidden rounded-[28px] bg-card p-5 ring-1 ring-line shadow-xs transition-all duration-300",
+        "hover:-translate-y-0.5 hover:shadow-md hover:ring-brand/30 active:scale-[0.99]",
+        plan.isExperience && "ring-amber-200 hover:ring-amber-300",
       )}
     >
       {/* Top Background Gradient Tint */}
@@ -77,8 +75,12 @@ export function PlanCard({
               <span className="inline-flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-white backdrop-blur-md ring-1 ring-white/20">
                 {plan.isExperience ? (
                   <>
-                    <span>{plan.experienceCategory ? EXPERIENCE_CATEGORIES[plan.experienceCategory]?.emoji : "✨"}</span>
-                    <span>{plan.experienceCategory ? EXPERIENCE_CATEGORIES[plan.experienceCategory]?.label : "Experience"}</span>
+                    <span>
+                      {plan.experienceCategory ? EXPERIENCE_CATEGORIES[plan.experienceCategory]?.emoji : "✨"}
+                    </span>
+                    <span>
+                      {plan.experienceCategory ? EXPERIENCE_CATEGORIES[plan.experienceCategory]?.label : "Experience"}
+                    </span>
                   </>
                 ) : (
                   <>
@@ -98,7 +100,7 @@ export function PlanCard({
             {plan.isExperience && (
               <div className="absolute bottom-2.5 left-3 flex items-center gap-1.5">
                 <span className="rounded-full bg-amber-500 px-2.5 py-0.5 text-xs font-black text-black shadow-md">
-                  ${plan.pricePerPerson || 0} {plan.currency || "AUD"}
+                  {isTicketed(plan) ? `$${plan.pricePerPerson} ticket` : "Free"}
                 </span>
                 {plan.pricingModel === "deposit" && plan.depositConfig && (
                   <span className="rounded-full bg-black/70 backdrop-blur-sm px-2 py-0.5 text-[10px] font-semibold text-amber-300 ring-1 ring-amber-400/40">
@@ -121,7 +123,9 @@ export function PlanCard({
               {plan.isExperience ? (
                 <>
                   <span>{plan.experienceCategory ? EXPERIENCE_CATEGORIES[plan.experienceCategory]?.emoji : "✨"}</span>
-                  <span>{plan.experienceCategory ? EXPERIENCE_CATEGORIES[plan.experienceCategory]?.label : "Experience"}</span>
+                  <span>
+                    {plan.experienceCategory ? EXPERIENCE_CATEGORIES[plan.experienceCategory]?.label : "Experience"}
+                  </span>
                 </>
               ) : (
                 <>
@@ -133,7 +137,7 @@ export function PlanCard({
 
             {plan.isExperience ? (
               <span className="rounded-full bg-amber-500/15 px-2.5 py-0.5 text-xs font-bold text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/30">
-                ${plan.pricePerPerson || 0} {plan.currency || "AUD"}
+                {isTicketed(plan) ? `$${plan.pricePerPerson}` : "Free"}
               </span>
             ) : countdown ? (
               <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-brand">
@@ -144,18 +148,12 @@ export function PlanCard({
         )}
 
         {/* Title and Host */}
-        <p className="text-[11px] font-medium text-mute uppercase tracking-wider">
-          Hosted by {plan.creator.name}
-        </p>
+        <p className="text-[11px] font-medium text-mute uppercase tracking-wider">Hosted by {plan.creator.name}</p>
         <h3 className="font-display mt-0.5 text-lg font-bold text-ink group-hover:text-brand transition-colors line-clamp-2">
           {plan.title}
         </h3>
 
-        {plan.notes && (
-          <p className="mt-1.5 text-xs text-mute line-clamp-2 leading-relaxed">
-            {plan.notes}
-          </p>
-        )}
+        {plan.notes && <p className="mt-1.5 text-xs text-mute line-clamp-2 leading-relaxed">{plan.notes}</p>}
 
         {/* Date & Destination */}
         <div className="mt-4 space-y-1.5 border-t border-line/60 pt-3">
@@ -184,13 +182,9 @@ export function PlanCard({
               </span>
             ))}
           </div>
-          <span className="text-xs font-semibold text-ink">
-            {goingAttendees.length} going
-          </span>
+          <span className="text-xs font-semibold text-ink">{goingAttendees.length} going</span>
           {spotsLeft !== undefined && (
-            <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400">
-              · {spotsLeft} left
-            </span>
+            <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400">· {spotsLeft} left</span>
           )}
         </div>
 

@@ -110,7 +110,9 @@ body.keyboard-open .keyboard-hide {
   transform: translateY(100%) !important;
   opacity: 0 !important;
   pointer-events: none !important;
-  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+  transition:
+    transform 0.2s ease-out,
+    opacity 0.2s ease-out;
 }
 
 /* Tap-only map (touch devices): let page scroll gestures pass through the map. */
@@ -206,6 +208,27 @@ body.keyboard-open .keyboard-hide {
   }
   100% {
     background-position: -200% 0;
+  }
+}
+
+/* Red ticket alert: blinks while a host's own property has open guest tickets. */
+@keyframes ticket-alert-blink {
+  0%,
+  100% {
+    background-color: #dc2626;
+  }
+  50% {
+    background-color: #991b1b;
+  }
+}
+
+.ticket-alert-blink {
+  animation: ticket-alert-blink 1.1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticket-alert-blink {
+    animation: none;
   }
 }
 
@@ -324,14 +347,16 @@ body.keyboard-open .keyboard-hide {
 }
 
 .apple-liquid-glass-dark {
-  background: rgba(8, 12, 28, 0.82);
-  backdrop-filter: blur(32px) saturate(220%);
-  -webkit-backdrop-filter: blur(32px) saturate(220%);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 28%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0) 40%), rgba(12, 16, 34, 0.52);
+  backdrop-filter: blur(30px) saturate(200%) brightness(1.12);
+  -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.12);
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
   box-shadow:
-    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4),
-    0 20px 50px -10px rgba(0, 0, 0, 0.6);
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.28),
+    0 -12px 40px -8px rgba(0, 0, 0, 0.45);
 }
 
 .apple-liquid-glass-light {
@@ -354,16 +379,3 @@ body.keyboard-open .keyboard-hide {
     inset 0 -1px 1px 0 rgba(0, 0, 0, 0.15),
     0 12px 32px -4px rgba(0, 0, 0, 0.35);
 }
-
-.apple-liquid-glass-active {
-  background: rgba(24, 5, 219, 0.82);
-  backdrop-filter: blur(28px) saturate(250%);
-  -webkit-backdrop-filter: blur(28px) saturate(250%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow:
-    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.65),
-    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3),
-    0 8px 25px 0 rgba(24, 5, 219, 0.6);
-}
-
-

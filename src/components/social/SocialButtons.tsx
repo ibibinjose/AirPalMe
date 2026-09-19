@@ -8,15 +8,7 @@ import { cn } from "@/lib/cn";
  * sign-in prompt and the tap resumes after login. Fixed min-widths keep the
  * row from jerking when the label flips.
  */
-export function LikeButton({
-  handle,
-  name,
-  className,
-}: {
-  handle: string;
-  name?: string;
-  className?: string;
-}) {
+export function LikeButton({ handle, name, className }: { handle: string; name?: string; className?: string }) {
   const { isLiked, toggleLike } = useSocial();
   const liked = isLiked(handle);
   return (
@@ -40,15 +32,7 @@ export function LikeButton({
   );
 }
 
-export function FollowButton({
-  handle,
-  name,
-  className,
-}: {
-  handle: string;
-  name?: string;
-  className?: string;
-}) {
+export function FollowButton({ handle, name, className }: { handle: string; name?: string; className?: string }) {
   const { isFollowing, toggleFollow } = useSocial();
   const following = isFollowing(handle);
   return (
@@ -60,9 +44,7 @@ export function FollowButton({
       onClick={() => toggleFollow(handle, name)}
       className={cn(
         "inline-flex h-10 min-w-[120px] flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition active:scale-95",
-        following
-          ? "bg-ink text-white shadow-sm"
-          : "bg-brand text-white shadow-sm hover:brightness-110",
+        following ? "bg-brand text-white shadow-sm" : "bg-brand text-white shadow-sm hover:brightness-110",
         className,
       )}
     >

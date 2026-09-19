@@ -1,12 +1,6 @@
 import { cn } from "@/lib/cn";
 
-export function PlanCardSkeleton({
-  hasCover = false,
-  className,
-}: {
-  hasCover?: boolean;
-  className?: string;
-}) {
+export function PlanCardSkeleton({ hasCover = false, className }: { hasCover?: boolean; className?: string }) {
   return (
     <div
       aria-hidden="true"
@@ -62,19 +56,9 @@ export function PlanCardSkeleton({
   );
 }
 
-export function PlanCardSkeletonGrid({
-  count = 3,
-  className,
-}: {
-  count?: number;
-  className?: string;
-}) {
+export function PlanCardSkeletonGrid({ count = 3, className }: { count?: number; className?: string }) {
   return (
-    <div
-      role="status"
-      aria-label="Loading plans"
-      className={cn("grid gap-5 sm:grid-cols-2 lg:grid-cols-3", className)}
-    >
+    <div role="status" aria-label="Loading plans" className={cn("grid gap-5 sm:grid-cols-2 lg:grid-cols-3", className)}>
       {Array.from({ length: count }).map((_, i) => (
         <PlanCardSkeleton key={i} hasCover={i % 2 === 0} />
       ))}

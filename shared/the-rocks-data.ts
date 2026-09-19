@@ -85,10 +85,12 @@ export const THE_ROCKS_PLACES: NearbyPlace[] = [
     ],
     deal: {
       badge: "15% Guest Perk",
-      detail: "Show your digital Room Key at the bar for 15% off all rooftop food and local craft schooners before 6 PM.",
+      detail:
+        "Show your digital Room Key at the bar for 15% off all rooftop food and local craft schooners before 6 PM.",
       claimHint: "Show Room Key",
     },
-    insiderTip: "Head straight up the stairs to the rooftop terrace. No bookings needed for high-top walk-ins; arrive by 5:15 PM for golden hour over the Opera House.",
+    insiderTip:
+      "Head straight up the stairs to the rooftop terrace. No bookings needed for high-top walk-ins; arrive by 5:15 PM for golden hour over the Opera House.",
     transitNotes: "Circular Quay Light Rail & Ferry (5 min walk), Wynyard Station (9 min walk)",
     bookingUrl: "https://theglenmore.com.au",
     bookingLabel: "Reserve on official site",
@@ -121,7 +123,8 @@ export const THE_ROCKS_PLACES: NearbyPlace[] = [
       detail: "Complimentary taster paddle of Sydney pale ales with any classic counter meal.",
       claimHint: "Show AirPal Pass",
     },
-    insiderTip: "Check out the historic maritime photos along the hallway dating back to 1828. Grab a seat in the sunlit rear courtyard.",
+    insiderTip:
+      "Check out the historic maritime photos along the hallway dating back to 1828. Grab a seat in the sunlit rear courtyard.",
     transitNotes: "George St opposite MCA (2 min walk)",
     bookingUrl: "https://fortuneofwar.com.au",
     bookingLabel: "View menu & details",
@@ -149,7 +152,8 @@ export const THE_ROCKS_PLACES: NearbyPlace[] = [
       "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1200&q=80",
     ],
-    insiderTip: "Famous for native Australian meat pizzas (Kangaroo and Pepper Kangaroo) paired with over 100 Australian craft beers.",
+    insiderTip:
+      "Famous for native Australian meat pizzas (Kangaroo and Pepper Kangaroo) paired with over 100 Australian craft beers.",
     bookingUrl: "https://australianheritagehotel.com",
     bookingLabel: "View pizza menu",
     bookingActionType: "visit",
@@ -205,7 +209,8 @@ export const THE_ROCKS_PLACES: NearbyPlace[] = [
       detail: "Complimentary seasonal junmai pour upon seating for hotel guests with dinner reservations.",
       claimHint: "Show Room Key",
     },
-    insiderTip: "Ask to sit at the robata counter to watch the chefs. The Hiramasa Kingfish with coriander infused ponzu is a must-order.",
+    insiderTip:
+      "Ask to sit at the robata counter to watch the chefs. The Hiramasa Kingfish with coriander infused ponzu is a must-order.",
     bookingUrl: "https://sakerestaurant.com.au/the-rocks",
     bookingLabel: "Reserve table on official site",
     bookingActionType: "reserve",
@@ -931,11 +936,10 @@ export const THE_ROCKS_EVENTS: NearbyEvent[] = [
     venueName: "Dawes Point Reserve",
     isLiveNow: true,
     heroImage: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1200&q=80",
-    photos: [
-      "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1200&q=80",
-    ],
+    photos: ["https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1200&q=80"],
     ticketPrice: "Free Public Access",
-    insiderTip: "Bring a takeaway gelato from Circular Quay and sit on the grass right beneath the southern pylon of the Harbour Bridge.",
+    insiderTip:
+      "Bring a takeaway gelato from Circular Quay and sit on the grass right beneath the southern pylon of the Harbour Bridge.",
   },
   {
     id: "opera-forecourt",
@@ -949,9 +953,7 @@ export const THE_ROCKS_EVENTS: NearbyEvent[] = [
     venueName: "Sydney Opera House Forecourt",
     isLiveNow: true,
     heroImage: "https://images.unsplash.com/photo-1624138784614-87fd1b6528f8?auto=format&fit=crop&w=1200&q=80",
-    photos: [
-      "https://images.unsplash.com/photo-1624138784614-87fd1b6528f8?auto=format&fit=crop&w=1200&q=80",
-    ],
+    photos: ["https://images.unsplash.com/photo-1624138784614-87fd1b6528f8?auto=format&fit=crop&w=1200&q=80"],
     ticketPrice: "Free walk-in",
     ticketUrl: "https://sydneyoperahouse.com",
     insiderTip: "Walk the western broadway boardwalk at dusk for the reflection of city lights.",

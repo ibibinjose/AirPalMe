@@ -1,4 +1,4 @@
-/** AirPal Mate request loop MVP: request → (manual) match → meet → review. No payments yet. */
+/** AirPal Mate request loop: request → match → book/pay (Stripe) → meet → review. */
 
 export const MATE_USE_CASES = [
   { id: "events", label: "Events", line: "Someone to come to this event with" },
@@ -100,9 +100,7 @@ export function matchAssignmentValid(mateUid: string, mateName: string): boolean
 }
 
 /** Understandable match reasons — never a mystery score (AGENTS.md §5). */
-export function matchReasons(
-  req: Pick<MateRequest, "suburb" | "date" | "time" | "mateKind" | "useCase">,
-): string[] {
+export function matchReasons(req: Pick<MateRequest, "suburb" | "date" | "time" | "mateKind" | "useCase">): string[] {
   const out: string[] = [];
   const suburb = req.suburb.trim();
   if (suburb) out.push(`In ${suburb}`);

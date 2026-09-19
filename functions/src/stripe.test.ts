@@ -1,5 +1,15 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("firebase-functions/params", () => ({
+  defineSecret: () => ({ value: () => "" }),
+}));
+
+vi.mock("stripe", () => ({
+  default: class StripeMock {
+    static webhooks = { constructEvent: vi.fn() };
+  },
+}));
+
 vi.mock("firebase-admin/app", () => ({
   getApps: vi.fn().mockReturnValue([{}]),
   initializeApp: vi.fn(),
@@ -22,9 +32,10 @@ vi.mock("firebase-functions/v2/https", () => ({
     }
   },
   onCall: vi.fn((_opts: unknown, handler: unknown) => handler),
+  onRequest: vi.fn((_opts: unknown, handler: unknown) => handler),
 }));
 
-import { sandboxBookingsAllowed } from "./stripe";
+import { sandboxBookingsAllowed, stripeLiveConfigured } from "./stripe";
 
 describe("sandboxBookingsAllowed", () => {
   afterEach(() => {
@@ -42,5 +53,23 @@ describe("sandboxBookingsAllowed", () => {
     delete process.env.ALLOW_SANDBOX_BOOKINGS;
     process.env.FUNCTIONS_EMULATOR = "true";
     expect(sandboxBookingsAllowed()).toBe(true);
+  });
+});
+
+describe("stripeLiveConfigured", () => {
+  afterEach(() => {
+    delete process.env.STRIPE_SECRET_KEY;
+    delete process.env.STRIPE_API_KEY;
+  });
+
+  it("is off when the key is missing or mock", () => {
+    expect(stripeLiveConfigured()).toBe(false);
+    process.env.STRIPE_SECRET_KEY = "mock_test";
+    expect(stripeLiveConfigured()).toBe(false);
+  });
+
+  it("is on for a real-looking secret", () => {
+    process.env.STRIPE_SECRET_KEY = "rk_test_not_a_real_key";
+    expect(stripeLiveConfigured()).toBe(true);
   });
 });

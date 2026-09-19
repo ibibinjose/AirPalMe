@@ -102,7 +102,7 @@ export function PhoneField({
           <select
             value={selectedCountry}
             onChange={(e) => handleCountryChange(e.target.value)}
-            className="h-12 w-32 md:w-36 rounded-2xl bg-card pl-3 pr-7 text-xs font-semibold border border-ink outline-none focus:ring-2 focus:ring-brand/40 appearance-none cursor-pointer focus:border-brand"
+            className="h-12 w-32 md:w-36 rounded-2xl bg-card pl-3 pr-7 text-xs font-semibold border border-line outline-none focus:ring-2 focus:ring-brand/40 appearance-none cursor-pointer focus:border-brand"
             aria-label="Country Code"
           >
             {HOST_COUNTRIES.map((c) => (
@@ -111,9 +111,7 @@ export function PhoneField({
               </option>
             ))}
           </select>
-          <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-mute text-[9px]">
-            ▼
-          </div>
+          <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-mute text-[9px]">▼</div>
         </div>
         <input
           value={national}

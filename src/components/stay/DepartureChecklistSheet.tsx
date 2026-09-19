@@ -34,7 +34,7 @@ export function DepartureChecklistSheet() {
               aria-pressed={item.done}
               className={cn(
                 "grid h-7 w-7 shrink-0 place-items-center rounded-full ring-1",
-                item.done ? "bg-ink text-white ring-ink" : "bg-card ring-line",
+                item.done ? "bg-brand text-white ring-ink" : "bg-card ring-line",
               )}
             >
               {item.done ? <Check size={14} /> : null}
@@ -64,14 +64,18 @@ export function DepartureChecklistSheet() {
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder={t("addYours")}
-          className="h-11 flex-1 rounded-full bg-paper px-4 text-[15px] outline-none border border-ink focus:border-brand"
+          className="h-11 flex-1 rounded-full bg-paper px-4 text-[15px] outline-none border border-line focus:border-brand"
         />
         <Button type="submit" size="sm" className="h-11 w-11 shrink-0 px-0" aria-label="Add">
           <Plus size={16} />
         </Button>
       </form>
 
-      <button type="button" onClick={reset} className="mt-4 flex w-full items-center justify-center gap-2 text-sm text-mute">
+      <button
+        type="button"
+        onClick={reset}
+        className="mt-4 flex w-full items-center justify-center gap-2 text-sm text-mute"
+      >
         <RotateCcw size={14} /> {t("reset")}
       </button>
     </Sheet>

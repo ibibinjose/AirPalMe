@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  STOP_ICON_OPTIONS,
-  STOP_ICON_CATEGORIES,
-  POPULAR_STOP_ICONS,
-  getStopIconDef,
-} from "./stopIcons";
+import { STOP_ICON_OPTIONS, STOP_ICON_CATEGORIES, POPULAR_STOP_ICONS, getStopIconDef } from "./stopIcons";
 
 describe("stopIcons", () => {
   it("includes coffee, food, petrol, and life event options", () => {

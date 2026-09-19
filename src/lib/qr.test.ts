@@ -20,6 +20,11 @@ describe("qr payload", () => {
     );
   });
 
+  it("routes a Wave QR to /w/CODE", () => {
+    expect(parseQrPayload("https://airpal.me/w/glen12")).toEqual({ kind: "url", href: "/w/GLEN12" });
+    expect(pathForIntent({ kind: "url", href: "/w/GLEN12" })).toBe("/w/GLEN12");
+  });
+
   it("keeps /q/{city}/{handle} as marker vanity", () => {
     expect(parseQrPayload("https://airpal.me/q/sydney/harbour-rocks-hotel")).toEqual({
       kind: "vanity",

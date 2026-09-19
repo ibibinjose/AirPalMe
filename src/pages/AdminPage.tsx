@@ -108,7 +108,7 @@ export function AdminPage() {
             aria-current={tab === t.id ? "page" : undefined}
             className={cn(
               "shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition",
-              tab === t.id ? "bg-ink text-white" : "bg-card text-mute ring-1 ring-line",
+              tab === t.id ? "bg-brand text-white" : "bg-card text-mute ring-1 ring-line",
             )}
           >
             {t.label}
@@ -128,7 +128,7 @@ export function AdminPage() {
           </div>
           <Link
             href="/admin/promotions"
-            className="mt-4 flex items-center justify-between rounded-2xl border-2 border-ink bg-card p-4"
+            className="mt-4 flex items-center justify-between rounded-2xl ring-1 ring-line bg-card p-4"
           >
             <span>
               <span className="block text-sm font-bold">Giveaways & Promotions</span>
@@ -138,7 +138,7 @@ export function AdminPage() {
           </Link>
           <Link
             href="/admin/notifications"
-            className="mt-2 flex items-center justify-between rounded-2xl border-2 border-ink bg-card p-4"
+            className="mt-2 flex items-center justify-between rounded-2xl ring-1 ring-line bg-card p-4"
           >
             <span>
               <span className="block text-sm font-bold">Broadcasts</span>
@@ -158,71 +158,73 @@ export function AdminPage() {
             </Button>
           </section>
           <section className="mt-8 rounded-[28px] bg-card p-4 ring-1 ring-line">
-            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">North-star (this device queue)</p>
-        <h2 className="font-display mt-1 text-lg font-semibold">WQGA / active QR context</h2>
-        <p className="mt-1 text-sm text-mute">
-          Verified qualified guest actions this week, excluding demo and duplicates. Production reports use server daily
-          facts.
-        </p>
-        <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4">
-          {[
-            { n: northStar.value.toFixed(2), l: "WQGA/Context" },
-            { n: northStar.qualifiedActions, l: "Qualified actions" },
-            { n: northStar.activeQrContexts, l: "Active QR contexts" },
-            { n: `${Math.round(northStar.firstValueRate * 100)}%`, l: "First-value rate" },
-          ].map((s) => (
-            <div key={s.l} className="rounded-2xl bg-paper p-3 text-center">
-              <p className="font-display text-2xl font-semibold">{s.n}</p>
-              <p className="text-[11px] text-mute">{s.l}</p>
+            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">
+              North-star (this device queue)
+            </p>
+            <h2 className="font-display mt-1 text-lg font-semibold">WQGA / active QR context</h2>
+            <p className="mt-1 text-sm text-mute">
+              Verified qualified guest actions this week, excluding demo and duplicates. Production reports use server
+              daily facts.
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4">
+              {[
+                { n: northStar.value.toFixed(2), l: "WQGA/Context" },
+                { n: northStar.qualifiedActions, l: "Qualified actions" },
+                { n: northStar.activeQrContexts, l: "Active QR contexts" },
+                { n: `${Math.round(northStar.firstValueRate * 100)}%`, l: "First-value rate" },
+              ].map((s) => (
+                <div key={s.l} className="rounded-2xl bg-paper p-3 text-center">
+                  <p className="font-display text-2xl font-semibold">{s.n}</p>
+                  <p className="text-[11px] text-mute">{s.l}</p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <p className="mt-3 text-[12px] text-mute">
-          Demo excluded {northStar.localDemoExcluded} · duplicates {northStar.duplicatesExcluded} · sessions{" "}
-          {northStar.uniqueSessions}
-        </p>
-        {liveBackendEnabled() && (
-          <Button
-            className="mt-4"
-            size="sm"
-            variant="ghost"
-            disabled={aggregating}
-            onClick={() => {
-              setAggregating(true);
-              void runAnalyticsAggregationRemote()
-                .then((res) => toast.success(`Aggregated ${res.output} daily facts from ${res.input} events`))
-                .catch((err) => toast.error(err instanceof Error ? err.message : "Aggregation failed"))
-                .finally(() => setAggregating(false));
-            }}
-          >
-            {aggregating ? "Aggregating…" : "Rebuild daily facts"}
-          </Button>
-        )}
-      </section>
+            <p className="mt-3 text-[12px] text-mute">
+              Demo excluded {northStar.localDemoExcluded} · duplicates {northStar.duplicatesExcluded} · sessions{" "}
+              {northStar.uniqueSessions}
+            </p>
+            {liveBackendEnabled() && (
+              <Button
+                className="mt-4"
+                size="sm"
+                variant="ghost"
+                disabled={aggregating}
+                onClick={() => {
+                  setAggregating(true);
+                  void runAnalyticsAggregationRemote()
+                    .then((res) => toast.success(`Aggregated ${res.output} daily facts from ${res.input} events`))
+                    .catch((err) => toast.error(err instanceof Error ? err.message : "Aggregation failed"))
+                    .finally(() => setAggregating(false));
+                }}
+              >
+                {aggregating ? "Aggregating…" : "Rebuild daily facts"}
+              </Button>
+            )}
+          </section>
 
-      <h2 className="font-display mt-8 mb-3 text-lg font-semibold">Public handles</h2>
-      <ul className="space-y-2">
-        {rows.map((row) => (
-          <li key={row.handle}>
-            <button
-              type="button"
-              onClick={() => nav(bioPath(row.handle))}
-              className="flex w-full items-center justify-between rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line"
-            >
-              <span>
-                <span className="block font-medium">@{row.handle}</span>
-                <span className="text-sm text-mute">{row.name}</span>
-              </span>
-              <span className="text-sm text-mute">{row.taps} taps</span>
-            </button>
-          </li>
-        ))}
-        {rows.length === 0 && <p className="text-sm text-mute">None yet.</p>}
-      </ul>
-      <div className="mt-10">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">AirPal Club</p>
-        <GuestListPanel clubId={AIRPAL_CLUB_ID} clubName="AirPal Club" />
-      </div>
+          <h2 className="font-display mt-8 mb-3 text-lg font-semibold">Public handles</h2>
+          <ul className="space-y-2">
+            {rows.map((row) => (
+              <li key={row.handle}>
+                <button
+                  type="button"
+                  onClick={() => nav(bioPath(row.handle))}
+                  className="flex w-full items-center justify-between rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line"
+                >
+                  <span>
+                    <span className="block font-medium">@{row.handle}</span>
+                    <span className="text-sm text-mute">{row.name}</span>
+                  </span>
+                  <span className="text-sm text-mute">{row.taps} taps</span>
+                </button>
+              </li>
+            ))}
+            {rows.length === 0 && <p className="text-sm text-mute">None yet.</p>}
+          </ul>
+          <div className="mt-10">
+            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">AirPal Club</p>
+            <GuestListPanel clubId={AIRPAL_CLUB_ID} clubName="AirPal Club" />
+          </div>
         </>
       )}
       {tab === "mates" && <CompanionAdmin />}

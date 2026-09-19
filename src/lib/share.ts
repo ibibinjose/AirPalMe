@@ -27,9 +27,7 @@ export function isShareSupported(): boolean {
  * with an automatic fallback to clipboard copy + toast when unsupported.
  */
 export async function shareContent(options: ShareOptions): Promise<ShareResult> {
-  const url =
-    options.url ||
-    (typeof window !== "undefined" ? window.location.href : "https://airpal.me");
+  const url = options.url || (typeof window !== "undefined" ? window.location.href : "https://airpal.me");
   const title = options.title || "AirPal";
   const text = options.text;
   const dialogTitle = options.dialogTitle || "Share via";
@@ -119,10 +117,7 @@ function isAbortOrCancel(err: unknown): boolean {
 /**
  * Share the user's current city/location and corresponding precinct guide.
  */
-export async function shareCurrentLocation(
-  city: string,
-  _options?: { source?: string },
-): Promise<ShareResult> {
+export async function shareCurrentLocation(city: string, _options?: { source?: string }): Promise<ShareResult> {
   const origin = typeof window !== "undefined" ? window.location.origin : "https://airpal.me";
   const targetCity = city || "Sydney";
   const url = `${origin}/guide?city=${encodeURIComponent(targetCity)}`;

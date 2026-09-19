@@ -17,15 +17,8 @@ interface CalendarAgendaViewProps {
 
 export function CalendarAgendaView({ events, onSelectEvent, onResetFilters, onSelectTag }: CalendarAgendaViewProps) {
   const groups = groupEventsByDate(events);
-  const {
-    isDragging,
-    draggedEvent,
-    dragOverDate,
-    dragCollision,
-    autoSnapOnCollision,
-    setDragOverDate,
-    dropOnDate,
-  } = useCalendarDrag();
+  const { isDragging, draggedEvent, dragOverDate, dragCollision, autoSnapOnCollision, setDragOverDate, dropOnDate } =
+    useCalendarDrag();
 
   const handleExportDay = (dateStr: string, dayEvents: CalendarEvent[], displayDate: string) => {
     downloadMultipleIcs(dayEvents, `sydney-events-${dateStr}.ics`);
@@ -35,7 +28,7 @@ export function CalendarAgendaView({ events, onSelectEvent, onResetFilters, onSe
 
   if (groups.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-ink bg-card p-10 text-center">
+      <div className="flex flex-col items-center justify-center rounded-3xl ring-1 ring-line bg-card p-10 text-center">
         <div className="grid h-14 w-14 place-items-center rounded-full bg-paper text-mute">
           <CalendarDays size={26} />
         </div>
@@ -69,11 +62,10 @@ export function CalendarAgendaView({ events, onSelectEvent, onResetFilters, onSe
             key={group.dateStr}
             className={cn(
               "relative rounded-3xl transition-all duration-200 p-2 sm:p-3 -m-2 sm:-m-3",
-              isOver && (
-                hasConflict
+              isOver &&
+                (hasConflict
                   ? "bg-amber-500/10 ring-2 ring-amber-500 shadow-md"
-                  : "bg-brand/10 ring-2 ring-brand shadow-md"
-              ),
+                  : "bg-brand/10 ring-2 ring-brand shadow-md"),
               isDragging && !isOver && "ring-1 ring-line/40 hover:ring-brand/50",
             )}
             onDragOver={(e) => {
@@ -99,12 +91,12 @@ export function CalendarAgendaView({ events, onSelectEvent, onResetFilters, onSe
             }}
           >
             {/* Date section header */}
-            <div className="z-20 mb-3.5 flex flex-wrap items-center justify-between gap-2 rounded-2xl border-2 border-ink bg-paper/95 px-4 py-2.5 shadow-xs backdrop-blur-md">
+            <div className="z-20 mb-3.5 flex flex-wrap items-center justify-between gap-2 rounded-2xl ring-1 ring-line bg-paper/95 px-4 py-2.5 shadow-xs backdrop-blur-md">
               <div className="flex flex-wrap items-center gap-2">
                 <span
                   className={cn(
                     "rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider shadow-xs",
-                    group.isToday ? "bg-amber-400 text-ink" : "bg-ink text-white",
+                    group.isToday ? "bg-amber-400 text-ink" : "bg-brand text-white",
                   )}
                 >
                   {group.dayBadge}
@@ -152,15 +144,16 @@ export function CalendarAgendaView({ events, onSelectEvent, onResetFilters, onSe
             </div>
 
             {/* Drag drop target banner */}
-            {isOver && (
-              hasConflict ? (
+            {isOver &&
+              (hasConflict ? (
                 <div className="mb-4 flex flex-col sm:flex-row items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-amber-500 bg-amber-500/15 p-3.5 text-center text-xs font-bold text-amber-950 shadow-xs animate-in fade-in">
                   <AlertTriangle size={18} className="text-amber-600 shrink-0 animate-bounce" />
                   <div className="flex flex-col sm:flex-row sm:items-center gap-1">
                     <span>⚠️ Conflict: {dragCollision.reason}.</span>
                     {autoSnapOnCollision && dragCollision.nearestOpening ? (
                       <span className="underline decoration-amber-600 text-amber-900 font-semibold">
-                        Auto-snapping to {dragCollision.nearestOpening.dayBadge} ({dragCollision.nearestOpening.formattedDate})
+                        Auto-snapping to {dragCollision.nearestOpening.dayBadge} (
+                        {dragCollision.nearestOpening.formattedDate})
                       </span>
                     ) : (
                       <span className="text-amber-900">Auto-snap disabled (will prompt).</span>
@@ -170,20 +163,16 @@ export function CalendarAgendaView({ events, onSelectEvent, onResetFilters, onSe
               ) : (
                 <div className="mb-4 flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-brand bg-brand/15 p-3.5 text-center text-xs font-bold text-brand shadow-xs animate-in fade-in">
                   <ArrowDownCircle size={18} className="animate-bounce" />
-                  <span>Slot Available: Drop "{draggedEvent?.title}" to move here ({group.displayDate})</span>
+                  <span>
+                    Slot Available: Drop "{draggedEvent?.title}" to move here ({group.displayDate})
+                  </span>
                 </div>
-              )
-            )}
+              ))}
 
             {/* Day's Event Cards */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {group.events.map((event) => (
-                <CalendarEventCard
-                  key={event.id}
-                  event={event}
-                  onSelect={onSelectEvent}
-                  onSelectTag={onSelectTag}
-                />
+                <CalendarEventCard key={event.id} event={event} onSelect={onSelectEvent} onSelectTag={onSelectTag} />
               ))}
             </div>
           </section>
@@ -192,4 +181,3 @@ export function CalendarAgendaView({ events, onSelectEvent, onResetFilters, onSe
     </div>
   );
 }
-

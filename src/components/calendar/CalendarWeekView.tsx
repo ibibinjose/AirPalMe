@@ -1,14 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-  GripVertical,
-  Clock,
-  MapPin,
-  Tag,
-  Download,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, GripVertical, Clock, MapPin, Tag, Download } from "lucide-react";
 import type { CalendarEvent } from "@shared/event";
 import {
   getWeekDays,
@@ -48,15 +39,8 @@ export function CalendarWeekView({
   onSelectTag,
 }: CalendarWeekViewProps) {
   const [tagMode, setTagMode] = useState<CalendarTagMode>("category");
-  const {
-    draggedEvent,
-    dragOverDate,
-    dragCollision,
-    startDrag,
-    endDrag,
-    setDragOverDate,
-    dropOnDate,
-  } = useCalendarDrag();
+  const { draggedEvent, dragOverDate, dragCollision, startDrag, endDrag, setDragOverDate, dropOnDate } =
+    useCalendarDrag();
 
   // Get the 7 days of the active week
   const weekDays = useMemo(() => {
@@ -71,18 +55,18 @@ export function CalendarWeekView({
     const sameMonth = first.getMonth() === last.getMonth();
     const sameYear = first.getFullYear() === last.getFullYear();
 
-    const startStr = new Intl.DateTimeFormat("en-AU", {
+    const startStr = new Intl.DateTimeFormat(undefined, {
       day: "numeric",
       month: sameMonth ? undefined : "short",
     }).format(first);
 
-    const endStr = new Intl.DateTimeFormat("en-AU", {
+    const endStr = new Intl.DateTimeFormat(undefined, {
       day: "numeric",
       month: "short",
       year: sameYear ? undefined : "numeric",
     }).format(last);
 
-    const yearStr = new Intl.DateTimeFormat("en-AU", { year: "numeric" }).format(last);
+    const yearStr = new Intl.DateTimeFormat(undefined, { year: "numeric" }).format(last);
 
     return `${startStr} – ${endStr}, ${yearStr}`;
   }, [weekDays]);
@@ -151,9 +135,7 @@ export function CalendarWeekView({
                 </span>
               )}
             </div>
-            <p className="text-xs text-mute mt-0.5">
-              Week view • Drag events across columns or click a day to inspect
-            </p>
+            <p className="text-xs text-mute mt-0.5">Week view • Drag events across columns or click a day to inspect</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -171,7 +153,7 @@ export function CalendarWeekView({
                 onClick={() => setTagMode("category")}
                 className={cn(
                   "rounded-full px-2.5 py-1 text-[11px] font-semibold transition active:scale-95 cursor-pointer",
-                  tagMode === "category" ? "bg-ink text-white shadow-2xs" : "text-mute hover:text-ink",
+                  tagMode === "category" ? "bg-brand text-white shadow-2xs" : "text-mute hover:text-ink",
                 )}
               >
                 <span>By Type</span>
@@ -183,7 +165,7 @@ export function CalendarWeekView({
                 onClick={() => setTagMode("booking")}
                 className={cn(
                   "rounded-full px-2.5 py-1 text-[11px] font-semibold transition active:scale-95 cursor-pointer",
-                  tagMode === "booking" ? "bg-ink text-white shadow-2xs" : "text-mute hover:text-ink",
+                  tagMode === "booking" ? "bg-brand text-white shadow-2xs" : "text-mute hover:text-ink",
                 )}
               >
                 <span>By Booking</span>
@@ -251,12 +233,11 @@ export function CalendarWeekView({
                 className={cn(
                   "group relative flex flex-col rounded-2xl p-2.5 transition-all duration-150 min-h-[180px]",
                   day.isToday ? "bg-amber-50/50 ring-1.5 ring-amber-300" : "bg-paper/80 ring-1 ring-line/60",
-                  isSelected && "ring-2 ring-ink bg-card shadow-xs",
-                  isOver && (
-                    hasConflict
+                  isSelected && "ring-2 ring-brand bg-card shadow-xs",
+                  isOver &&
+                    (hasConflict
                       ? "bg-amber-100/90 ring-2 ring-amber-500 scale-[1.02]"
-                      : "bg-brand/15 ring-2 ring-brand scale-[1.02]"
-                  ),
+                      : "bg-brand/15 ring-2 ring-brand scale-[1.02]"),
                 )}
               >
                 {/* Day Header Button */}
@@ -276,7 +257,7 @@ export function CalendarWeekView({
                         day.isToday
                           ? "bg-amber-500 text-white shadow-2xs"
                           : isSelected
-                            ? "bg-ink text-white"
+                            ? "bg-brand text-white"
                             : "text-ink group-hover:bg-card",
                       )}
                     >
@@ -366,9 +347,7 @@ export function CalendarWeekView({
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 className="font-display text-xl font-bold text-ink">
-              {selectedDate
-                ? `Events for ${formatRelativeBadge(selectedDate).label}`
-                : "Schedule for This Week"}
+              {selectedDate ? `Events for ${formatRelativeBadge(selectedDate).label}` : "Schedule for This Week"}
             </h3>
             <p className="text-xs text-mute mt-0.5">
               {selectedDate
@@ -403,12 +382,7 @@ export function CalendarWeekView({
         {/* Event Cards Grid */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {activeDisplayEvents.map((event) => (
-            <CalendarEventCard
-              key={event.id}
-              event={event}
-              onSelect={onSelectEvent}
-              onSelectTag={onSelectTag}
-            />
+            <CalendarEventCard key={event.id} event={event} onSelect={onSelectEvent} onSelectTag={onSelectTag} />
           ))}
         </div>
 

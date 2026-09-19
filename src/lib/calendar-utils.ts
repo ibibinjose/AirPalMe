@@ -1,4 +1,5 @@
 import type { CalendarEvent, CalendarEventCategory } from "@shared/event";
+import { deviceLocale } from "./local-time";
 
 export type CalendarFilter = "all" | "going" | "interested" | "liked" | "local" | "weekend" | "free";
 export type CalendarViewMode = "month" | "week" | "day" | "list";
@@ -40,7 +41,8 @@ export const CATEGORY_THEMES: Record<CalendarEventCategory, EventColorTheme> = {
     label: "Market",
     shortTag: "Market",
     badgeClass: "bg-emerald-50 text-emerald-800 ring-emerald-200",
-    tagClass: "bg-emerald-100/80 text-emerald-950 border-l-2 border-l-emerald-600 ring-1 ring-emerald-300/70 hover:bg-emerald-200/90",
+    tagClass:
+      "bg-emerald-100/80 text-emerald-950 border-l-2 border-l-emerald-600 ring-1 ring-emerald-300/70 hover:bg-emerald-200/90",
     dotClass: "bg-emerald-500",
     borderClass: "border-l-emerald-500",
     textClass: "text-emerald-950",
@@ -52,7 +54,8 @@ export const CATEGORY_THEMES: Record<CalendarEventCategory, EventColorTheme> = {
     label: "Live Music",
     shortTag: "Music",
     badgeClass: "bg-violet-50 text-violet-800 ring-violet-200",
-    tagClass: "bg-violet-100/80 text-violet-950 border-l-2 border-l-violet-600 ring-1 ring-violet-300/70 hover:bg-violet-200/90",
+    tagClass:
+      "bg-violet-100/80 text-violet-950 border-l-2 border-l-violet-600 ring-1 ring-violet-300/70 hover:bg-violet-200/90",
     dotClass: "bg-violet-500",
     borderClass: "border-l-violet-500",
     textClass: "text-violet-950",
@@ -64,7 +67,8 @@ export const CATEGORY_THEMES: Record<CalendarEventCategory, EventColorTheme> = {
     label: "Food & Drinks",
     shortTag: "Food",
     badgeClass: "bg-amber-50 text-amber-900 ring-amber-200",
-    tagClass: "bg-amber-100/80 text-amber-950 border-l-2 border-l-amber-600 ring-1 ring-amber-300/70 hover:bg-amber-200/90",
+    tagClass:
+      "bg-amber-100/80 text-amber-950 border-l-2 border-l-amber-600 ring-1 ring-amber-300/70 hover:bg-amber-200/90",
     dotClass: "bg-amber-500",
     borderClass: "border-l-amber-500",
     textClass: "text-amber-950",
@@ -100,7 +104,8 @@ export const CATEGORY_THEMES: Record<CalendarEventCategory, EventColorTheme> = {
     label: "Expo & Show",
     shortTag: "Expo",
     badgeClass: "bg-indigo-50 text-indigo-800 ring-indigo-200",
-    tagClass: "bg-indigo-100/80 text-indigo-950 border-l-2 border-l-indigo-600 ring-1 ring-indigo-300/70 hover:bg-indigo-200/90",
+    tagClass:
+      "bg-indigo-100/80 text-indigo-950 border-l-2 border-l-indigo-600 ring-1 ring-indigo-300/70 hover:bg-indigo-200/90",
     dotClass: "bg-indigo-500",
     borderClass: "border-l-indigo-500",
     textClass: "text-indigo-950",
@@ -129,7 +134,8 @@ export const BOOKING_THEMES: Record<BookingStatusType, EventColorTheme> = {
     label: "Confirmed Booking",
     shortTag: "Booked",
     badgeClass: "bg-emerald-100 text-emerald-800 ring-emerald-300",
-    tagClass: "bg-emerald-100/90 text-emerald-950 border-l-2 border-l-emerald-600 ring-1 ring-emerald-300/80 hover:bg-emerald-200/90",
+    tagClass:
+      "bg-emerald-100/90 text-emerald-950 border-l-2 border-l-emerald-600 ring-1 ring-emerald-300/80 hover:bg-emerald-200/90",
     dotClass: "bg-emerald-500",
     borderClass: "border-l-emerald-600",
     textClass: "text-emerald-950",
@@ -141,7 +147,8 @@ export const BOOKING_THEMES: Record<BookingStatusType, EventColorTheme> = {
     label: "Interested / Saved",
     shortTag: "Interested",
     badgeClass: "bg-amber-100 text-amber-900 ring-amber-300",
-    tagClass: "bg-amber-100/90 text-amber-950 border-l-2 border-l-amber-600 ring-1 ring-amber-300/80 hover:bg-amber-200/90",
+    tagClass:
+      "bg-amber-100/90 text-amber-950 border-l-2 border-l-amber-600 ring-1 ring-amber-300/80 hover:bg-amber-200/90",
     dotClass: "bg-amber-500",
     borderClass: "border-l-amber-600",
     textClass: "text-amber-950",
@@ -153,7 +160,8 @@ export const BOOKING_THEMES: Record<BookingStatusType, EventColorTheme> = {
     label: "Rescheduled",
     shortTag: "Moved",
     badgeClass: "bg-orange-100 text-orange-950 ring-orange-300",
-    tagClass: "bg-orange-100/90 text-orange-950 border-l-2 border-l-orange-600 ring-1 ring-orange-300/80 hover:bg-orange-200/90",
+    tagClass:
+      "bg-orange-100/90 text-orange-950 border-l-2 border-l-orange-600 ring-1 ring-orange-300/80 hover:bg-orange-200/90",
     dotClass: "bg-orange-500",
     borderClass: "border-l-orange-600",
     textClass: "text-orange-950",
@@ -165,7 +173,8 @@ export const BOOKING_THEMES: Record<BookingStatusType, EventColorTheme> = {
     label: "Available / Explore",
     shortTag: "Explore",
     badgeClass: "bg-slate-100 text-slate-800 ring-slate-200",
-    tagClass: "bg-slate-100/90 text-slate-900 border-l-2 border-l-slate-500 ring-1 ring-slate-300/70 hover:bg-slate-200/80",
+    tagClass:
+      "bg-slate-100/90 text-slate-900 border-l-2 border-l-slate-500 ring-1 ring-slate-300/70 hover:bg-slate-200/80",
     dotClass: "bg-slate-500",
     borderClass: "border-l-slate-500",
     textClass: "text-slate-900",
@@ -182,10 +191,7 @@ export function getEventBookingStatus(event: CalendarEvent): BookingStatusType {
   return "explore";
 }
 
-export function getEventSlotTagTheme(
-  event: CalendarEvent,
-  mode: CalendarTagMode = "category",
-): EventColorTheme {
+export function getEventSlotTagTheme(event: CalendarEvent, mode: CalendarTagMode = "category"): EventColorTheme {
   if (mode === "booking") {
     const status = getEventBookingStatus(event);
     return BOOKING_THEMES[status];
@@ -240,14 +246,12 @@ export function initialMonthFor(events: Array<{ date: string }>, todayStr: strin
  */
 export function formatTime(isoString: string): string {
   try {
-    const wall = isoString.match(
-      /T(\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?$/i,
-    );
+    const wall = isoString.match(/T(\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?$/i);
     if (wall) {
       const hours = Number(wall[1]);
       const minutes = Number(wall[2]);
       const utc = new Date(Date.UTC(2020, 0, 1, hours, minutes));
-      return new Intl.DateTimeFormat("en-AU", {
+      return new Intl.DateTimeFormat(deviceLocale(), {
         hour: "numeric",
         minute: "2-digit",
         hour12: true,
@@ -255,7 +259,7 @@ export function formatTime(isoString: string): string {
       }).format(utc);
     }
     const d = new Date(isoString);
-    return new Intl.DateTimeFormat("en-AU", {
+    return new Intl.DateTimeFormat(deviceLocale(), {
       hour: "numeric",
       minute: "2-digit",
       hour12: true,
@@ -317,10 +321,10 @@ export function formatRelativeBadge(dateStr: string, referenceDateStr?: string):
   if (dateStr === refStr) return { label: "Today", highlight: true };
   if (diffDays === 1) return { label: "Tomorrow", highlight: true };
   if (diffDays > 1 && diffDays <= 6) {
-    const weekday = new Intl.DateTimeFormat("en-AU", { weekday: "short" }).format(target);
+    const weekday = new Intl.DateTimeFormat(deviceLocale(), { weekday: "short" }).format(target);
     return { label: `This ${weekday}`, highlight: false };
   }
-  const formatted = new Intl.DateTimeFormat("en-AU", {
+  const formatted = new Intl.DateTimeFormat(deviceLocale(), {
     month: "short",
     day: "numeric",
   }).format(target);
@@ -439,9 +443,7 @@ export function getWeekDays(baseDate: Date, events: CalendarEvent[]): MonthDayCe
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
     const dateStr = toDateStr(d);
-    const dayEvents = (eventsByDate.get(dateStr) || []).sort((a, b) =>
-      a.startsAt.localeCompare(b.startsAt),
-    );
+    const dayEvents = (eventsByDate.get(dateStr) || []).sort((a, b) => a.startsAt.localeCompare(b.startsAt));
 
     cells.push({
       date: d,
@@ -483,7 +485,7 @@ export function groupEventsByDate(events: CalendarEvent[]): EventDateGroup[] {
   const groups: EventDateGroup[] = [];
   for (const [dateStr, evList] of Array.from(groupsMap.entries())) {
     const target = new Date(dateStr + "T00:00:00");
-    const displayDate = new Intl.DateTimeFormat("en-AU", {
+    const displayDate = new Intl.DateTimeFormat(deviceLocale(), {
       weekday: "short",
       month: "short",
       day: "numeric",
@@ -685,33 +687,22 @@ export function findNearestAvailableOpening(
       continue;
     }
 
-    const eventsOnCandidate = allEvents.filter(
-      (e) => e.date === candidateStr && e.id !== eventToMove.id,
-    );
+    const eventsOnCandidate = allEvents.filter((e) => e.date === candidateStr && e.id !== eventToMove.id);
 
     if (eventsOnCandidate.length >= MAX_EVENTS_PER_SLOT) {
       continue;
     }
 
-    const projected = computeRescheduledTimes(
-      eventToMove.startsAt,
-      eventToMove.endsAt,
-      candidateStr,
-    );
+    const projected = computeRescheduledTimes(eventToMove.startsAt, eventToMove.endsAt, candidateStr);
 
     const hasOverlap = eventsOnCandidate.some((other) =>
-      areTimeIntervalsOverlapping(
-        projected.startsAt,
-        projected.endsAt,
-        other.startsAt,
-        other.endsAt,
-      ),
+      areTimeIntervalsOverlapping(projected.startsAt, projected.endsAt, other.startsAt, other.endsAt),
     );
 
     if (!hasOverlap) {
       const rel = formatRelativeBadge(candidateStr, referenceDateStr);
-      const weekday = new Intl.DateTimeFormat("en-AU", { weekday: "short" }).format(candidate);
-      const monthDay = new Intl.DateTimeFormat("en-AU", { month: "short", day: "numeric" }).format(candidate);
+      const weekday = new Intl.DateTimeFormat(deviceLocale(), { weekday: "short" }).format(candidate);
+      const monthDay = new Intl.DateTimeFormat(deviceLocale(), { month: "short", day: "numeric" }).format(candidate);
       return {
         dateStr: candidateStr,
         diffDays: offset,
@@ -734,23 +725,12 @@ export function checkSlotCollision(
   allEvents: CalendarEvent[],
   referenceDateStr?: string,
 ): SlotCollisionResult {
-  const otherEventsOnTarget = allEvents.filter(
-    (e) => e.date === targetDateStr && e.id !== eventToMove.id,
-  );
+  const otherEventsOnTarget = allEvents.filter((e) => e.date === targetDateStr && e.id !== eventToMove.id);
 
-  const projected = computeRescheduledTimes(
-    eventToMove.startsAt,
-    eventToMove.endsAt,
-    targetDateStr,
-  );
+  const projected = computeRescheduledTimes(eventToMove.startsAt, eventToMove.endsAt, targetDateStr);
 
   const overlappingEvents = otherEventsOnTarget.filter((other) =>
-    areTimeIntervalsOverlapping(
-      projected.startsAt,
-      projected.endsAt,
-      other.startsAt,
-      other.endsAt,
-    ),
+    areTimeIntervalsOverlapping(projected.startsAt, projected.endsAt, other.startsAt, other.endsAt),
   );
 
   const isFullyBooked = otherEventsOnTarget.length >= MAX_EVENTS_PER_SLOT;

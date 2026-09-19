@@ -17,9 +17,7 @@ const EVENT_CATEGORIES: ReadonlySet<string> = new Set([
 ]);
 
 function asCategory(value: unknown): CalendarEventCategory {
-  return typeof value === "string" && EVENT_CATEGORIES.has(value)
-    ? (value as CalendarEventCategory)
-    : "community";
+  return typeof value === "string" && EVENT_CATEGORIES.has(value) ? (value as CalendarEventCategory) : "community";
 }
 
 function str(value: unknown): string {
@@ -103,7 +101,10 @@ export function recordToCalendarBase(e: EventRecord): Omit<CalendarEvent, "isGoi
 }
 
 /** Map a raw Firestore doc to a CalendarEvent base, or null when unusable. */
-export function docToCalendarBase(doc: Record<string, unknown>, id: string): Omit<CalendarEvent, "isGoing" | "isInterested" | "isLiked"> | null {
+export function docToCalendarBase(
+  doc: Record<string, unknown>,
+  id: string,
+): Omit<CalendarEvent, "isGoing" | "isInterested" | "isLiked"> | null {
   // EventRecord-shaped docs (organiser-created via upsertEvent).
   if (typeof doc.startsAt === "string" && typeof doc.name === "string") {
     const rec = {

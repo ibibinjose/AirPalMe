@@ -1,11 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import {
-  isShareSupported,
-  shareContent,
-  shareCurrentLocation,
-  shareCuratedGuide,
-  shareTour,
-} from "./share";
+import { isShareSupported, shareContent, shareCurrentLocation, shareCuratedGuide, shareTour } from "./share";
 
 describe("share utility (Web Share API & clipboard fallback)", () => {
   const originalNavigator = global.navigator;

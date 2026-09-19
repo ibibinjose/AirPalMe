@@ -8,17 +8,16 @@ import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
 import { cn } from "@/lib/cn";
 import { enterEase } from "@/lib/motion";
 import { tabFromPath } from "@/lib/tabs";
+import { saveDoor, type DoorId } from "@/lib/door";
 
 import { useLocale } from "@/contexts/LocaleContext";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Primary guest tabs mirror the mobile TabBar: Explore / Plan / Stay.
-// Calendar + Guide are one tap away inside Explore and global search (⌘K). Mate lives at /mate.
 const LINKS = [
-  { href: "/", id: "explore", key: "explore" },
-  { href: "/plan", id: "plan", key: "plan" },
-  { href: "/concierge", id: "stay", key: "stay" },
-] as const;
+  { href: "/", id: "explore" as const, key: "whatsOn" },
+  { href: "/plan", id: "plan" as const, key: "plan" },
+  { href: "/concierge", id: "stay" as const, key: "stay" },
+];
 
 export function TopNav({ path, enter = false }: { path: string; enter?: boolean }) {
   const [, nav] = useLocation();
@@ -33,18 +32,21 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
       transition={{ duration: 0.55, ease: enterEase, delay: 0.12 }}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:px-6">
-        <button onClick={() => nav("/")} className="shrink-0 text-left focus:outline-none" aria-label="AirPal Home">
+        <button onClick={() => nav("/")} className="shrink-0 text-left" aria-label="AirPal Home">
           <BrandMark />
         </button>
         <nav className="flex items-center justify-center gap-1">
           {LINKS.map((link) => (
             <button
               key={link.id}
-              onClick={() => nav(link.href)}
+              onClick={() => {
+                saveDoor(link.id as DoorId);
+                nav(link.href);
+              }}
               aria-current={active === link.id ? "page" : undefined}
               className={cn(
                 "h-9 touch-manipulation rounded-full px-3 text-sm font-medium lg:h-10 lg:px-4",
-                active === link.id ? "bg-ink text-white" : "text-mute hover:text-ink",
+                active === link.id ? "bg-brand text-white" : "text-mute hover:text-ink",
               )}
             >
               {t(link.key)}
@@ -56,6 +58,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
             onClick={openGlobalSearch}
             className="flex h-9 items-center gap-2 rounded-full bg-paper px-3 text-xs font-medium text-mute ring-1 ring-line hover:text-ink hover:bg-card transition lg:h-10 lg:px-3.5"
             title="Search AirPal (⌘K)"
+            aria-label="Search"
           >
             <Search size={15} className="text-brand" />
             <span className="hidden xl:inline">Search</span>
@@ -63,7 +66,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
               ⌘K
             </kbd>
           </button>
-          
+
           <button
             onClick={() => nav("/scan")}
             className="h-9 shrink-0 rounded-full bg-brand px-3.5 text-sm font-medium text-white lg:h-10 lg:px-4"
@@ -80,10 +83,10 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
           ) : (
             <button
               onClick={() => nav("/join")}
-              aria-label="Become a Host"
+              aria-label="Add your place"
               className="h-9 shrink-0 rounded-full bg-white px-3.5 text-sm font-medium ring-1 ring-line hover:bg-paper transition lg:h-10 lg:px-4"
             >
-              <span className="hidden xl:inline">Become a </span>Host
+              Add your place
             </button>
           )}
           <NotificationBell />

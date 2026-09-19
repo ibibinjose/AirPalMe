@@ -32,6 +32,7 @@ import { CITY_OPTIONS } from "@/lib/cities";
 import { cn } from "@/lib/cn";
 import { track } from "@/lib/analytics";
 import { enterEase, landing, landingItem } from "@/lib/motion";
+import { PayoutSetupCard } from "@/components/connect/PayoutSetupCard";
 
 const ROLE_ICONS = {
   friend: HeartHandshake,
@@ -85,8 +86,8 @@ function Chip({
       className={cn(
         "inline-flex min-h-[42px] touch-manipulation items-center gap-1.5 rounded-full px-4 text-[13px] font-medium transition duration-200 active:scale-[0.97] ring-1",
         selected
-          ? "bg-ink text-white ring-ink shadow-sm"
-          : "bg-paper/80 text-mute ring-line hover:text-ink hover:ring-ink/25",
+          ? "bg-brand text-white ring-brand shadow-sm"
+          : "bg-paper/80 text-mute ring-line hover:text-ink hover:ring-brand/25",
       )}
     >
       {children}
@@ -122,7 +123,7 @@ const inputCls =
   "h-12 w-full rounded-2xl bg-paper/70 px-4 text-[16px] md:text-[15px] ring-1 ring-line/90 outline-none transition duration-200 placeholder:text-mute/70 focus:bg-card focus:ring-2 focus:ring-brand/45 text-ink";
 
 const areaCls =
-  "w-full rounded-2xl border-2 border-ink bg-paper/70 p-4 text-[16px] md:text-[15px] outline-none transition duration-200 placeholder:text-mute/70 focus:border-brand focus:bg-card focus:ring-2 focus:ring-brand/45 text-ink leading-relaxed";
+  "w-full rounded-2xl ring-1 ring-line bg-paper/70 p-4 text-[16px] md:text-[15px] outline-none transition duration-200 placeholder:text-mute/70 focus:border-brand focus:bg-card focus:ring-2 focus:ring-brand/45 text-ink leading-relaxed";
 
 export function CompanionPage() {
   const [, nav] = useLocation();
@@ -228,7 +229,12 @@ export function CompanionPage() {
         className="pointer-events-none absolute -right-16 top-40 h-64 w-64 rounded-full bg-gold/15 blur-3xl"
       />
 
-      <div className={cn("relative mx-auto px-4 pb-28", showForm || submitted ? "max-w-2xl py-5 md:py-8" : "max-w-5xl py-5 md:py-8")}>
+      <div
+        className={cn(
+          "relative mx-auto px-4 pb-28",
+          showForm || submitted ? "max-w-2xl py-5 md:py-8" : "max-w-5xl py-5 md:py-8",
+        )}
+      >
         <header className="flex items-center gap-3">
           <button
             type="button"
@@ -269,7 +275,11 @@ export function CompanionPage() {
                       }}
                       className={cn(
                         "flex w-full items-center justify-center gap-1.5 rounded-full px-2 py-2 text-[12px] font-semibold transition duration-200",
-                        on ? "bg-ink text-white shadow-sm" : done ? "bg-brand/10 text-brand" : "text-mute hover:text-ink",
+                        on
+                          ? "bg-brand text-white shadow-sm"
+                          : done
+                            ? "bg-brand/10 text-brand"
+                            : "text-mute hover:text-ink",
                       )}
                     >
                       <span
@@ -343,6 +353,7 @@ export function CompanionPage() {
             onMe={() => nav("/me")}
           />
         )}
+        {submitted && application?.status === "approved" && <PayoutSetupCard />}
 
         {showForm && application && (
           <form onSubmit={handleSubmit} className="mt-5 space-y-5">
@@ -579,7 +590,9 @@ export function CompanionPage() {
                 {step === 2 && (
                   <section className="space-y-5 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm md:p-7">
                     <div>
-                      <h2 className="font-display text-2xl font-semibold tracking-tight text-ink">Roles & availability</h2>
+                      <h2 className="font-display text-2xl font-semibold tracking-tight text-ink">
+                        Roles & availability
+                      </h2>
                       <p className="mt-1 text-[13px] text-mute">Pick every role you’d actually show up for.</p>
                     </div>
                     {fieldErrors.roles && (
@@ -598,8 +611,8 @@ export function CompanionPage() {
                             className={cn(
                               "rounded-[22px] p-4 text-left ring-1 transition duration-200 active:scale-[0.98]",
                               on
-                                ? "bg-ink text-white ring-ink shadow-md"
-                                : "bg-paper/70 ring-line hover:ring-ink/25 hover:shadow-sm",
+                                ? "bg-brand text-white ring-brand shadow-md"
+                                : "bg-paper/70 ring-line hover:ring-brand/25 hover:shadow-sm",
                             )}
                           >
                             <span
@@ -614,7 +627,9 @@ export function CompanionPage() {
                               {on && <Check size={14} />}
                               {role.label}
                             </span>
-                            <span className={cn("mt-1 block text-[12px] leading-snug", on ? "text-white/70" : "text-mute")}>
+                            <span
+                              className={cn("mt-1 block text-[12px] leading-snug", on ? "text-white/70" : "text-mute")}
+                            >
                               {role.blurb}
                             </span>
                           </button>
@@ -667,7 +682,9 @@ export function CompanionPage() {
                               onClick={() => set({ pricingPreference: p })}
                               className={cn(
                                 "rounded-2xl px-3 py-3.5 text-[12px] font-semibold ring-1 transition duration-200 active:scale-[0.97]",
-                                on ? "bg-ink text-white ring-ink shadow-sm" : "bg-paper/70 text-mute ring-line hover:text-ink",
+                                on
+                                  ? "bg-brand text-white ring-brand shadow-sm"
+                                  : "bg-paper/70 text-mute ring-line hover:text-ink",
                               )}
                             >
                               {COMPANION_PRICING_LABEL[p]}
@@ -707,7 +724,9 @@ export function CompanionPage() {
                 {step === 3 && (
                   <section className="space-y-4 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm md:p-7">
                     <div>
-                      <h2 className="font-display text-2xl font-semibold tracking-tight text-ink">Applicant agreement</h2>
+                      <h2 className="font-display text-2xl font-semibold tracking-tight text-ink">
+                        Applicant agreement
+                      </h2>
                       <p className="mt-2 text-[13px] leading-relaxed text-mute">
                         AirPal is about human connection and shared experiences — never healthcare, therapy, nursing,
                         counselling or professional personal care. By applying you agree to the community guidelines,
@@ -732,7 +751,7 @@ export function CompanionPage() {
                           key={key}
                           className={cn(
                             "flex cursor-pointer items-start gap-3 rounded-[22px] p-4 text-[13px] leading-relaxed text-ink ring-1 transition duration-200",
-                            on ? "bg-brand/10 ring-brand/30" : "bg-paper/70 ring-line hover:ring-ink/20",
+                            on ? "bg-brand/10 ring-brand/30" : "bg-paper/70 ring-line hover:ring-brand/20",
                           )}
                         >
                           <span
@@ -801,7 +820,7 @@ function Landing({ onJoin }: { onJoin: () => void }) {
     >
       <motion.section
         variants={landingItem}
-        className="relative overflow-hidden rounded-[32px] bg-ink text-white shadow-lg"
+        className="relative overflow-hidden rounded-[32px] bg-brand text-white shadow-lg"
       >
         <Photo src={HERO_IMG} className="absolute inset-0 h-full w-full object-cover opacity-45" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/20" />
@@ -851,7 +870,9 @@ function Landing({ onJoin }: { onJoin: () => void }) {
 
       <motion.div variants={landingItem} className="mt-8">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">Three ways to show up</p>
-        <h3 className="font-display mt-1 text-2xl font-semibold tracking-tight text-ink md:text-3xl">Pick the roles that fit you</h3>
+        <h3 className="font-display mt-1 text-2xl font-semibold tracking-tight text-ink md:text-3xl">
+          Pick the roles that fit you
+        </h3>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {COMPANION_ROLES.map((role) => {
             const RoleIcon = ROLE_ICONS[role.id];
@@ -879,7 +900,10 @@ function Landing({ onJoin }: { onJoin: () => void }) {
         </div>
       </motion.div>
 
-      <motion.div variants={landingItem} className="mt-8 overflow-hidden rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm md:p-7">
+      <motion.div
+        variants={landingItem}
+        className="mt-8 overflow-hidden rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm md:p-7"
+      >
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">How it works</p>
         <h3 className="font-display mt-1 text-2xl font-semibold tracking-tight text-ink">From apply to approved</h3>
         <ol className="mt-5 grid gap-4 md:grid-cols-3">

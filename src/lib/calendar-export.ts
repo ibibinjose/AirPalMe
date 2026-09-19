@@ -5,7 +5,7 @@ export interface SimpleCalendarPayload {
   title: string;
   description?: string;
   startsAt: string; // ISO string
-  endsAt?: string;   // ISO string (defaults to +1 hour)
+  endsAt?: string; // ISO string (defaults to +1 hour)
   venue?: string;
   city?: string;
 }
@@ -38,15 +38,14 @@ function normalizePayload(event: CalendarEvent | SimpleCalendarPayload): {
 
 function formatIcsDate(isoString: string): string {
   const date = new Date(isoString);
-  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  return date
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d{3}/, "");
 }
 
 function escapeIcsText(text: string): string {
-  return text
-    .replace(/\\/g, "\\\\")
-    .replace(/;/g, "\\;")
-    .replace(/,/g, "\\,")
-    .replace(/\n/g, "\\n");
+  return text.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
 }
 
 export function generateIcs(event: CalendarEvent | SimpleCalendarPayload): string {
@@ -78,7 +77,10 @@ export function generateIcs(event: CalendarEvent | SimpleCalendarPayload): strin
   ].join("\r\n");
 }
 
-export function generateMultipleIcs(events: (CalendarEvent | SimpleCalendarPayload)[], calendarTitle = "AirPal Stay Itinerary"): string {
+export function generateMultipleIcs(
+  events: (CalendarEvent | SimpleCalendarPayload)[],
+  calendarTitle = "AirPal Stay Itinerary",
+): string {
   const dtStamp = formatIcsDate(new Date().toISOString());
   const vEvents = events.map((event) => {
     const norm = normalizePayload(event);
@@ -129,7 +131,10 @@ export function downloadIcs(event: CalendarEvent | SimpleCalendarPayload): void 
   URL.revokeObjectURL(url);
 }
 
-export function downloadMultipleIcs(events: (CalendarEvent | SimpleCalendarPayload)[], filename = "airpal-itinerary.ics"): void {
+export function downloadMultipleIcs(
+  events: (CalendarEvent | SimpleCalendarPayload)[],
+  filename = "airpal-itinerary.ics",
+): void {
   if (!events.length) return;
   const icsContent = generateMultipleIcs(events);
   const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
@@ -211,4 +216,3 @@ export function getYahooCalendarUrl(event: CalendarEvent | SimpleCalendarPayload
 
   return `https://calendar.yahoo.com/?${params.toString()}`;
 }
-

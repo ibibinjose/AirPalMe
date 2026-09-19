@@ -3,7 +3,18 @@ import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { nanoid } from "nanoid";
 import { Clock, MapPin, Trash2 } from "lucide-react";
-import { BIO_LINK_TYPES, bioPath, catalogDeals, handleError, isSocialLinkType, normalizeHandle, type BioCatalogItem, type BioCatalogKind, type BioLink, type BioLinkType } from "@shared/bio";
+import {
+  BIO_LINK_TYPES,
+  bioPath,
+  catalogDeals,
+  handleError,
+  isSocialLinkType,
+  normalizeHandle,
+  type BioCatalogItem,
+  type BioCatalogKind,
+  type BioLink,
+  type BioLinkType,
+} from "@shared/bio";
 import { Button } from "@/components/ui/Button";
 import { BioCatalogEditor } from "@/components/bio/BioCatalogEditor";
 import { useBio } from "@/contexts/BioContext";
@@ -13,6 +24,8 @@ import { cn } from "@/lib/cn";
 import { PhoneField } from "@/components/forms/PhoneField";
 import { isValidPhone } from "@shared/geo-address";
 import { fieldInput } from "@/components/forms/ValidField";
+import { GooglePlaceImportCard } from "@/components/business/GooglePlaceImport";
+import { bioLinksFromGooglePlace, mergeBioLinks } from "@shared/google-place";
 
 const SOCIAL_CONFIG: Partial<
   Record<
@@ -224,9 +237,15 @@ export function BioEditPage() {
   return (
     <div className="mx-auto max-w-md px-4 pb-10">
       <p className="pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">@{mine.handle}</p>
-      <h1 className="font-display mt-1 text-3xl font-semibold">{mine.kind === "business" ? "Edit business" : "Edit bio"}</h1>
+      <h1 className="font-display mt-1 text-3xl font-semibold">
+        {mine.kind === "business" ? "Edit business" : "Edit bio"}
+      </h1>
       {mine.kind !== "business" && (
-        <button type="button" className="mt-2 text-sm text-brand" onClick={() => nav(business ? "/business" : "/bio/setup?kind=business")}>
+        <button
+          type="button"
+          className="mt-2 text-sm text-brand"
+          onClick={() => nav(business ? "/business" : "/bio/setup?kind=business")}
+        >
           {business ? `@${business.handle}` : "Host a registered business"}
         </button>
       )}
@@ -240,7 +259,10 @@ export function BioEditPage() {
           <button
             key={id}
             onClick={() => setTab(id)}
-            className={cn("h-9 rounded-full px-4 text-sm capitalize", tab === id ? "bg-ink text-white" : "bg-white ring-1 ring-line")}
+            className={cn(
+              "h-9 rounded-full px-4 text-sm capitalize",
+              tab === id ? "bg-brand text-white" : "bg-white ring-1 ring-line",
+            )}
           >
             {id}
           </button>
@@ -254,9 +276,7 @@ export function BioEditPage() {
 
           {/* Name Field */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-mute">
-              Display Name
-            </label>
+            <label className="text-xs font-semibold uppercase tracking-wider text-mute">Display Name</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -268,9 +288,7 @@ export function BioEditPage() {
 
           {/* Tagline / Short Bio */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-mute">
-              Tagline / Short Bio
-            </label>
+            <label className="text-xs font-semibold uppercase tracking-wider text-mute">Tagline / Short Bio</label>
             <input
               value={shortWhy}
               onChange={(e) => setShortWhy(e.target.value)}
@@ -316,27 +334,25 @@ export function BioEditPage() {
 
           {/* Live Visitor Status */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-mute">
-              Live Visitor Status
-            </label>
+            <label className="text-xs font-semibold uppercase tracking-wider text-mute">Live Visitor Status</label>
             <button
               type="button"
               onClick={() => setOpenNow((v) => !v)}
               className={cn(
                 "flex h-12 w-full items-center justify-between rounded-2xl px-4 text-sm font-medium ring-1 transition",
-                openNow
-                  ? "bg-emerald-50 text-emerald-900 ring-emerald-300"
-                  : "bg-card text-mute ring-line"
+                openNow ? "bg-emerald-50 text-emerald-900 ring-emerald-300" : "bg-card text-mute ring-line",
               )}
             >
               <div className="flex items-center gap-2.5">
-                <span className={cn("h-2.5 w-2.5 rounded-full", openNow ? "animate-pulse bg-emerald-500" : "bg-mute/40")} />
+                <span
+                  className={cn("h-2.5 w-2.5 rounded-full", openNow ? "animate-pulse bg-emerald-500" : "bg-mute/40")}
+                />
                 <span>{openNow ? "Currently Open to Visitors" : "Currently Closed"}</span>
               </div>
               <span
                 className={cn(
                   "rounded-full px-2.5 py-1 text-xs font-semibold uppercase",
-                  openNow ? "bg-emerald-200/70 text-emerald-900" : "bg-line text-mute"
+                  openNow ? "bg-emerald-200/70 text-emerald-900" : "bg-line text-mute",
                 )}
               >
                 {openNow ? "Open" : "Closed"}
@@ -347,28 +363,29 @@ export function BioEditPage() {
 
           {/* Contact Phone */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-mute">
-              Contact Phone (Optional)
-            </label>
+            <label className="text-xs font-semibold uppercase tracking-wider text-mute">Contact Phone (Optional)</label>
             <PhoneField value={phone} onChange={setPhone} />
-            <p className="text-[11px] text-mute">Include country code (e.g. +61 400 123 456) for direct WhatsApp or calls.</p>
-          </div>
-
-          {/* Google Maps Place ID */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-mute">
-              Google Maps Place ID (Optional)
-            </label>
-            <input
-              value={mapsPlaceId}
-              onChange={(e) => setMapsPlaceId(e.target.value)}
-              placeholder="e.g. ChIJN1t_tDeuEmsRUsoyG83frY4"
-              className={`font-mono text-xs ${fieldInput}`}
-            />
             <p className="text-[11px] text-mute">
-              Directly links your bio to your Google Place reviews, navigation, and photos.
+              Include country code (e.g. +61 400 123 456) for direct WhatsApp or calls.
             </p>
           </div>
+
+          <GooglePlaceImportCard
+            importedPlaceId={mapsPlaceId}
+            onImport={(place) => {
+              setName(place.name);
+              setCity(place.city || city);
+              setHours(place.hours || hours);
+              setPhone(place.phone || phone);
+              setMapsPlaceId(place.placeId);
+              if (place.photoNames[0]) setCover(place.photoNames[0]);
+              if (place.photoNames[1] || place.photoNames[0])
+                setAvatar(place.photoNames[1] || place.photoNames[0] || "");
+              if (place.shortWhy && shortWhy.length < 10) setShortWhy(place.shortWhy);
+              setLinks((prev) => mergeBioLinks(prev, bioLinksFromGooglePlace(place)));
+              toast.success("Imported from Google — save to keep it");
+            }}
+          />
 
           <Button type="submit" className="mt-4 h-12 w-full text-base font-semibold shadow-md">
             Save Profile
@@ -376,176 +393,173 @@ export function BioEditPage() {
         </form>
       )}
 
-      {tab === "links" && (() => {
-        const social = SOCIAL_CONFIG[type];
-        const selectedLabel = BIO_LINK_TYPES.find((t) => t.id === type)?.label || type;
-        return (
-          <div className="mt-5 space-y-4">
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Actions</p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {BIO_LINK_TYPES.filter((t) => !isSocialLinkType(t.id)).map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => {
-                      setType(t.id);
-                      setHref("");
-                    }}
-                    className={cn(
-                      "h-9 rounded-full px-3 text-sm font-medium transition",
-                      type === t.id ? "bg-ink text-white" : "bg-white ring-1 ring-line hover:border-ink/40"
-                    )}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="pt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Social Media</p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {BIO_LINK_TYPES.filter((t) => isSocialLinkType(t.id)).map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => {
-                      setType(t.id);
-                      setHref("");
-                    }}
-                    className={cn(
-                      "h-9 rounded-full px-3.5 text-sm font-medium transition",
-                      type === t.id ? "bg-brand text-white shadow-sm" : "bg-white ring-1 ring-line hover:border-ink/40"
-                    )}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Input Form with Prefilled URL */}
-            <form
-              className="space-y-1.5 rounded-2xl border border-line bg-card p-3.5 shadow-sm"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!href.trim()) return;
-                const finalHref = formatFinalLinkHref(type, href);
-                if (!finalHref) return;
-                const next = [
-                  ...links,
-                  {
-                    id: nanoid(6),
-                    type,
-                    label: selectedLabel,
-                    href: finalHref,
-                  },
-                ];
-                setLinks(next);
-                setHref("");
-                void updateProfile({ handle: mine.handle, links: next });
-                toast.success(`Added ${selectedLabel}`);
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-mute">
-                  Add {selectedLabel}
-                </span>
-                {social && <span className="text-[11px] text-mute">{social.example}</span>}
-              </div>
-
-              <div className="flex items-center overflow-hidden rounded-xl bg-paper ring-1 ring-line transition focus-within:ring-2 focus-within:ring-ink">
-                {social ? (
-                  <span className="flex h-11 shrink-0 select-none items-center border-r border-line bg-black/[0.04] px-3 font-mono text-xs font-medium text-mute">
-                    {social.cleanPrefix}
-                  </span>
-                ) : type === "call" ? (
-                  <span className="flex h-11 shrink-0 select-none items-center border-r border-line bg-black/[0.04] px-3 font-mono text-xs font-medium text-mute">
-                    tel:
-                  </span>
-                ) : null}
-
-                <input
-                  value={href}
-                  onChange={(e) => setHref(e.target.value)}
-                  placeholder={
-                    social
-                      ? social.placeholder
-                      : type === "call"
-                      ? "+61 400 123 456"
-                      : "https://yourwebsite.com"
-                  }
-                  className="h-11 flex-1 bg-transparent px-3 text-sm outline-none placeholder:text-mute/60"
-                />
-
-                <Button type="submit" size="sm" className="m-1 h-9 shrink-0 px-4 font-medium">
-                  Add
-                </Button>
-              </div>
-
-              <p className="text-[11px] text-mute">
-                {social
-                  ? "Enter your handle only. We automatically format the complete profile URL."
-                  : type === "call"
-                  ? "Enter your phone number with international country code."
-                  : "Enter the complete destination web address."}
-              </p>
-            </form>
-
-            {/* Active Links List */}
-            <div className="space-y-2 pt-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-mute">
-                Your Added Links ({links.length})
-              </p>
-              {links.length === 0 ? (
-                <p className="rounded-2xl border border-dashed border-line p-4 text-center text-xs text-mute">
-                  No links added yet. Select a social platform or action above to add one.
-                </p>
-              ) : (
-                <ul className="space-y-2">
-                  {links.map((l) => (
-                    <li
-                      key={l.id}
-                      className="flex items-center justify-between rounded-2xl bg-card px-4 py-3 ring-1 ring-line shadow-sm"
+      {tab === "links" &&
+        (() => {
+          const social = SOCIAL_CONFIG[type];
+          const selectedLabel = BIO_LINK_TYPES.find((t) => t.id === type)?.label || type;
+          return (
+            <div className="mt-5 space-y-4">
+              <div>
+                <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Actions</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {BIO_LINK_TYPES.filter((t) => !isSocialLinkType(t.id)).map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        setType(t.id);
+                        setHref("");
+                      }}
+                      className={cn(
+                        "h-9 rounded-full px-3 text-sm font-medium transition",
+                        type === t.id ? "bg-brand text-white" : "bg-white ring-1 ring-line hover:border-ink/40",
+                      )}
                     >
-                      <div className="min-w-0 flex-1 pr-3">
-                        <div className="flex items-center gap-2">
-                          <span className="rounded-full bg-paper px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-mute">
-                            {l.type}
-                          </span>
-                          <span className="text-sm font-medium text-ink">{l.label}</span>
-                        </div>
-                        <a
-                          href={l.href}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="mt-0.5 block truncate text-xs text-brand hover:underline"
-                        >
-                          {l.href}
-                        </a>
-                      </div>
-                      <button
-                        type="button"
-                        className="rounded-full p-2 text-mute transition hover:bg-rose-50 hover:text-rose-600"
-                        title="Remove link"
-                        onClick={() => {
-                          const next = links.filter((x) => x.id !== l.id);
-                          setLinks(next);
-                          void updateProfile({ handle: mine.handle, links: next });
-                          toast.success("Link removed");
-                        }}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </li>
+                      {t.label}
+                    </button>
                   ))}
-                </ul>
-              )}
+                </div>
+              </div>
+
+              <div>
+                <p className="pt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Social Media</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {BIO_LINK_TYPES.filter((t) => isSocialLinkType(t.id)).map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        setType(t.id);
+                        setHref("");
+                      }}
+                      className={cn(
+                        "h-9 rounded-full px-3.5 text-sm font-medium transition",
+                        type === t.id
+                          ? "bg-brand text-white shadow-sm"
+                          : "bg-white ring-1 ring-line hover:border-ink/40",
+                      )}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Input Form with Prefilled URL */}
+              <form
+                className="space-y-1.5 rounded-2xl border border-line bg-card p-3.5 shadow-sm"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!href.trim()) return;
+                  const finalHref = formatFinalLinkHref(type, href);
+                  if (!finalHref) return;
+                  const next = [
+                    ...links,
+                    {
+                      id: nanoid(6),
+                      type,
+                      label: selectedLabel,
+                      href: finalHref,
+                    },
+                  ];
+                  setLinks(next);
+                  setHref("");
+                  void updateProfile({ handle: mine.handle, links: next });
+                  toast.success(`Added ${selectedLabel}`);
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-mute">Add {selectedLabel}</span>
+                  {social && <span className="text-[11px] text-mute">{social.example}</span>}
+                </div>
+
+                <div className="flex items-center overflow-hidden rounded-xl bg-paper ring-1 ring-line transition focus-within:ring-2 focus-within:ring-ink">
+                  {social ? (
+                    <span className="flex h-11 shrink-0 select-none items-center border-r border-line bg-black/[0.04] px-3 font-mono text-xs font-medium text-mute">
+                      {social.cleanPrefix}
+                    </span>
+                  ) : type === "call" ? (
+                    <span className="flex h-11 shrink-0 select-none items-center border-r border-line bg-black/[0.04] px-3 font-mono text-xs font-medium text-mute">
+                      tel:
+                    </span>
+                  ) : null}
+
+                  <input
+                    value={href}
+                    onChange={(e) => setHref(e.target.value)}
+                    placeholder={
+                      social ? social.placeholder : type === "call" ? "+61 400 123 456" : "https://yourwebsite.com"
+                    }
+                    className="h-11 flex-1 bg-transparent px-3 text-sm outline-none placeholder:text-mute/60"
+                  />
+
+                  <Button type="submit" size="sm" className="m-1 h-9 shrink-0 px-4 font-medium">
+                    Add
+                  </Button>
+                </div>
+
+                <p className="text-[11px] text-mute">
+                  {social
+                    ? "Enter your handle only. We automatically format the complete profile URL."
+                    : type === "call"
+                      ? "Enter your phone number with international country code."
+                      : "Enter the complete destination web address."}
+                </p>
+              </form>
+
+              {/* Active Links List */}
+              <div className="space-y-2 pt-1">
+                <p className="text-xs font-semibold uppercase tracking-wider text-mute">
+                  Your Added Links ({links.length})
+                </p>
+                {links.length === 0 ? (
+                  <p className="rounded-2xl border border-dashed border-line p-4 text-center text-xs text-mute">
+                    No links added yet. Select a social platform or action above to add one.
+                  </p>
+                ) : (
+                  <ul className="space-y-2">
+                    {links.map((l) => (
+                      <li
+                        key={l.id}
+                        className="flex items-center justify-between rounded-2xl bg-card px-4 py-3 ring-1 ring-line shadow-sm"
+                      >
+                        <div className="min-w-0 flex-1 pr-3">
+                          <div className="flex items-center gap-2">
+                            <span className="rounded-full bg-paper px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-mute">
+                              {l.type}
+                            </span>
+                            <span className="text-sm font-medium text-ink">{l.label}</span>
+                          </div>
+                          <a
+                            href={l.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-0.5 block truncate text-xs text-brand hover:underline"
+                          >
+                            {l.href}
+                          </a>
+                        </div>
+                        <button
+                          type="button"
+                          className="rounded-full p-2 text-mute transition hover:bg-rose-50 hover:text-rose-600"
+                          title="Remove link"
+                          onClick={() => {
+                            const next = links.filter((x) => x.id !== l.id);
+                            setLinks(next);
+                            void updateProfile({ handle: mine.handle, links: next });
+                            toast.success("Link removed");
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
       {tab === "shop" && (
         <BioCatalogEditor products={products} services={services} deals={deals} onChange={saveCatalog} />
@@ -557,14 +571,12 @@ export function BioEditPage() {
           <p className="font-medium">airpal.me/@{mine.handle}</p>
           <p className="text-sm text-mute">{tapsToday(mine.handle)} taps today</p>
           <label className="mt-2 flex items-center justify-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={zooHunt}
-              onChange={(e) => setZooHunt(e.target.checked)}
-            />
+            <input type="checkbox" checked={zooHunt} onChange={(e) => setZooHunt(e.target.checked)} />
             Air Zoo hunt — sticker on this QR
           </label>
-          <p className="text-[12px] text-mute">Print this QR. Guests scan, see the shop, then collect an Australian animal.</p>
+          <p className="text-[12px] text-mute">
+            Print this QR. Guests scan, see the shop, then collect an Australian animal.
+          </p>
           <Button
             className="w-full"
             onClick={() => {

@@ -10,6 +10,16 @@ export function deviceTimeZone(): string {
   }
 }
 
+/** Device BCP-47 locale for Intl formatting (en-IN grouping, en-AE dates, …).
+ *  Falls back to en so SSR/test environments never throw. */
+export function deviceLocale(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().locale || "en";
+  } catch {
+    return "en";
+  }
+}
+
 export type ZonedParts = {
   year: number;
   month: number;
@@ -21,7 +31,7 @@ export type ZonedParts = {
 
 export function zonedParts(date: Date, timeZone = deviceTimeZone()): ZonedParts {
   try {
-    const fmt = new Intl.DateTimeFormat("en-AU", {
+    const fmt = new Intl.DateTimeFormat(deviceLocale(), {
       timeZone,
       year: "numeric",
       month: "2-digit",

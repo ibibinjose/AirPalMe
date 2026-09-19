@@ -8,7 +8,6 @@ import {
   BedDouble,
   Building2,
   CalendarDays,
-  Check,
   CheckCircle2,
   Eye,
   EyeOff,
@@ -26,25 +25,21 @@ import {
   Users,
 } from "lucide-react";
 import { authErrorMessage } from "@shared/auth-email";
-import { handleFromName, normalizeHandle, randomHexHandle } from "@shared/bio";
-import { PASSWORD_RULES, isEmail, passwordIssues, passwordOk } from "@shared/validate";
+import { isEmail } from "@shared/validate";
 import { Button } from "@/components/ui/Button";
 import { ValidField, fieldInput } from "@/components/forms/ValidField";
 import { VerifyEmailBanner } from "@/components/auth/VerifyEmailBanner";
 import { AccountContacts } from "@/components/auth/AccountContacts";
 import { PhoneLogin } from "@/components/auth/PhoneLogin";
+import { SignupFlow } from "@/components/auth/SignupFlow";
+import { PhoneField } from "@/components/forms/PhoneField";
+import { phonePasswordNeedsSms, phoneReady } from "@shared/phone-auth";
 import { MeAvatar } from "@/components/auth/MeAvatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
-import { useHandleStatus } from "@/hooks/useHandleStatus";
+
 import { liveBackendEnabled } from "@/lib/functions";
-import {
-  normalizeInviteCode,
-  recordAppInvite,
-  resolveInviter,
-  stashInviteRef,
-  takeInviteRef,
-} from "@/lib/app-invites";
+import { normalizeInviteCode, recordAppInvite, resolveInviter, stashInviteRef, takeInviteRef } from "@/lib/app-invites";
 import { cn } from "@/lib/cn";
 
 type AuthMode = "signin" | "signup" | "reset";
@@ -77,10 +72,7 @@ function RoleHero({
       <p className="mx-auto mt-2 max-w-sm text-sm text-mute">{sub}</p>
       <div className="mt-4 space-y-2 text-left">
         {items.map((c) => (
-          <div
-            key={c.title}
-            className="flex items-center gap-3 rounded-2xl border-2 border-ink bg-card p-3"
-          >
+          <div key={c.title} className="flex items-center gap-3 rounded-2xl ring-1 ring-line bg-card p-3">
             <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-xl", c.tint)}>
               <c.icon size={17} strokeWidth={2.2} />
             </span>
@@ -112,8 +104,8 @@ export function StartPage() {
   const emailParam = params.get("email") || "";
   const [, nav] = useLocation();
 
-  const { login, register, user, sendVerificationEmail, requestPasswordReset, logout } = useAuth();
-  const { mine, business, createProfile } = useBio();
+  const { login, loginWithPhonePassword, user, sendVerificationEmail, requestPasswordReset, logout } = useAuth();
+  const { mine, business } = useBio();
 
   // Mode resolution
   const initialMode: AuthMode =
@@ -133,22 +125,16 @@ export function StartPage() {
   const [email, setEmail] = useState(emailParam);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [name, setName] = useState("");
-  const [handle, setHandle] = useState("");
-  const [handleTouched, setHandleTouched] = useState(false);
 
   // UI state
   const [busy, setBusy] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [phoneSignup, setPhoneSignup] = useState(false);
+  const [phoneLoginMode, setPhoneLoginMode] = useState<"sms" | "password">("password");
+  const [signInPhone, setSignInPhone] = useState("");
   const [inlineError, setInlineError] = useState<{ message: string; code?: string } | null>(null);
 
-  const handleStatus = useHandleStatus(handle);
-
   const emailOk = isEmail(email);
-  const passOk = passwordOk(password);
-  const nameOk = name.trim().length >= 2;
-  const handleOk = handleStatus.ok;
 
   // Invite attribution: keep the inviter's code across the flow, show who
   // invited, and record the join once the account exists.
@@ -227,10 +213,10 @@ export function StartPage() {
     if (target.includes("business") || target.includes("place")) {
       return {
         icon: Store,
-        kicker: "Local Business",
-        title: "Sign in to Place Portal",
-        signupTitle: "List your Local Business",
-        desc: "Claim your public @handle, publish local perks, and welcome neighbourhood visitors.",
+        kicker: "Your place",
+        title: "Sign in to add your place",
+        signupTitle: "Add your place",
+        desc: "Import from Google, publish offers, and show up when people nearby are making plans.",
         color: "text-emerald-600 dark:text-emerald-400",
         bg: "bg-emerald-500/10",
       };
@@ -262,7 +248,7 @@ export function StartPage() {
       kicker: "AirPal.Me",
       title: "Welcome back",
       signupTitle: "Create your AirPal account",
-      desc: "One secure login for your personal @handle, concierge stays, places, and events.",
+      desc: "One login for your Circle, plans, stays, and a public @handle.",
       color: "text-brand",
       bg: "bg-brand/10",
     };
@@ -273,15 +259,19 @@ export function StartPage() {
       nav(next);
       return;
     }
-    if (business) {
+    if (roleParam === "host") {
       nav("/host");
       return;
     }
-    if (mine) {
-      nav("/me");
+    if (roleParam === "business" || business) {
+      nav("/business");
       return;
     }
-    nav("/bio/setup");
+    if (roleParam === "event") {
+      nav("/event");
+      return;
+    }
+    nav("/circle");
   }
 
   useEffect(() => {
@@ -331,30 +321,18 @@ export function StartPage() {
       return;
     }
 
-    // Sign Up validation
-    if (mode === "signup") {
-      if (!nameOk) {
-        setInlineError({ message: "Please enter your full name (at least 2 characters)." });
-        return;
-      }
-      if (!handleOk) {
-        setInlineError({ message: handleStatus.reason || "Please choose a valid personal @handle." });
-        return;
-      }
-      if (!emailOk) {
-        setInlineError({ message: "Please enter a valid email address." });
-        return;
-      }
-      const missing = passwordIssues(password);
-      if (missing.length > 0) {
-        const labels = PASSWORD_RULES.filter((r) => missing.includes(r.id)).map((r) => r.label);
-        setInlineError({ message: `Password needs: ${labels.join(", ").toLowerCase()}.` });
-        return;
-      }
-    }
+    if (mode === "signup") return;
 
-    // Sign In validation
-    if (mode === "signin") {
+    if (mode === "signin" && method === "phone" && phoneLoginMode === "password") {
+      if (!phoneReady(signInPhone)) {
+        setInlineError({ message: "Enter your mobile number with country code." });
+        return;
+      }
+      if (!password) {
+        setInlineError({ message: "Please enter your password." });
+        return;
+      }
+    } else if (mode === "signin") {
       if (!emailOk) {
         setInlineError({ message: "Please enter a valid email address." });
         return;
@@ -367,38 +345,27 @@ export function StartPage() {
 
     setBusy(true);
     try {
-      if (mode === "signin") {
-        await login(email.trim(), password);
+      if (mode === "signin" && method === "phone" && phoneLoginMode === "password") {
+        await loginWithPhonePassword(signInPhone, password);
         toast.success("Signed in successfully!");
         afterIn();
       } else {
-        await register(email.trim(), name.trim(), { password });
-        try {
-          await createProfile({
-            handle: normalizeHandle(handle),
-            name: name.trim(),
-            city: "Sydney",
-            shortWhy: "On AirPal",
-            kind: "person",
-          });
-        } catch {
-          /* account is created; user can also pick or adjust handle in /bio/setup */
-        }
-        toast.success("Account created! Check your inbox to confirm your email.");
-        if (next) nav(next);
-        else nav("/me");
+        await login(email.trim(), password);
+        toast.success("Signed in successfully!");
+        afterIn();
       }
     } catch (err: unknown) {
       const errObj = err as { code?: string; message?: string };
       const code = errObj?.code || "";
-      const msg = authErrorMessage(err, mode === "signin" ? "Sign in failed" : "Sign up failed");
+      const msg = authErrorMessage(err, "Sign in failed");
 
-      if (!liveBackendEnabled() && mode === "signup") {
-        toast.message("Saved on this device (demo mode)");
-        nav(next || "/bio/setup");
-      } else if (!liveBackendEnabled()) {
+      if (!liveBackendEnabled()) {
         toast.message("Demo mode sign-in");
         afterIn();
+      } else if (method === "phone" && phoneLoginMode === "password" && phonePasswordNeedsSms(err)) {
+        setPhoneLoginMode("sms");
+        setInlineError({ message: msg, code });
+        toast.message(msg);
       } else {
         setInlineError({ message: msg, code });
         toast.error(msg);
@@ -409,7 +376,7 @@ export function StartPage() {
   }
 
   // Already logged in view
-  if (user && !phoneSignup) {
+  if (user && !phoneSignup && mode !== "signup") {
     const isHostUser = Boolean(user.propertyIds?.length || user.role === "host_admin" || user.role === "super_admin");
     return (
       <div className="mx-auto max-w-md px-4 py-10">
@@ -496,19 +463,37 @@ export function StartPage() {
             Find a place. Make&nbsp;a&nbsp;plan. Meet&nbsp;your&nbsp;people.
           </h1>
           <p className="mx-auto mt-2 max-w-sm text-sm text-mute">
-            AirPal is your local companion — venues, walks, events, mates, and plans in one app.
+            Find places and experiences, make plans with family and friends, and use Stay concierge — in one account.
           </p>
           <div className="mt-4 grid grid-cols-3 gap-2 text-left">
             {[
-              { icon: MapPin, title: "Find places", desc: "Near you tonight", to: "/discover", tint: "bg-emerald-500/10 text-emerald-700" },
-              { icon: CalendarDays, title: "Make plans", desc: "Crew & public", to: "/plan", tint: "bg-brand/10 text-brand" },
-              { icon: Users, title: "Meet mates", desc: "Friend & team", to: "/mate", tint: "bg-amber-500/10 text-amber-700" },
+              {
+                icon: MapPin,
+                title: "Find places",
+                desc: "Near you tonight",
+                to: "/",
+                tint: "bg-emerald-500/10 text-emerald-700",
+              },
+              {
+                icon: CalendarDays,
+                title: "Make plans",
+                desc: "Family & friends",
+                to: "/plan",
+                tint: "bg-brand/10 text-brand",
+              },
+              {
+                icon: Users,
+                title: "Start Circle",
+                desc: "People nearby",
+                to: "/circle",
+                tint: "bg-amber-500/10 text-amber-700",
+              },
             ].map((c) => (
               <button
                 key={c.to}
                 type="button"
                 onClick={() => nav(c.to)}
-                className="rounded-2xl border-2 border-ink bg-card p-3 transition hover:-translate-y-0.5 active:scale-[0.98]"
+                className="rounded-2xl ring-1 ring-line bg-card p-3 transition hover:-translate-y-0.5 active:scale-[0.98]"
               >
                 <span className={cn("grid h-8 w-8 place-items-center rounded-xl", c.tint)}>
                   <c.icon size={16} strokeWidth={2.2} />
@@ -530,14 +515,29 @@ export function StartPage() {
 
       {isBusinessStart && (
         <RoleHero
-          kicker="For local business"
-          title={<>Put your venue on AirPal&rsquo;s&nbsp;map.</>}
-          sub="Claim your @handle, publish perks guests redeem in-store, and welcome visitors staying nearby — free to list."
-          cta="List your business below — it takes a minute ↓"
+          kicker="Your place"
+          title={<>Add your place in one tap.</>}
+          sub="Import your Google listing — logo, address, phone, website, hours — then confirm it's yours and go live."
+          cta="Add your place below — it takes a minute ↓"
           items={[
-            { icon: Store, title: "Claim your @handle", desc: "Your public page on AirPal.Me", tint: "bg-emerald-500/10 text-emerald-700" },
-            { icon: BadgePercent, title: "Publish perks", desc: "Deals guests show at the till", tint: "bg-brand/10 text-brand" },
-            { icon: QrCode, title: "QR for your counter", desc: "Scans, taps and bookings tracked", tint: "bg-amber-500/10 text-amber-700" },
+            {
+              icon: Store,
+              title: "Import from Google",
+              desc: "Logo, location, contacts, website",
+              tint: "bg-emerald-500/10 text-emerald-700",
+            },
+            {
+              icon: BadgePercent,
+              title: "Publish offers",
+              desc: "Deals guests show at the till",
+              tint: "bg-brand/10 text-brand",
+            },
+            {
+              icon: QrCode,
+              title: "QR for your counter",
+              desc: "Guests scan and find you",
+              tint: "bg-amber-500/10 text-amber-700",
+            },
           ]}
         />
       )}
@@ -548,9 +548,24 @@ export function StartPage() {
           sub="List your rooms, approve every guest yourself, and get discovered by travellers staying nearby — you stay in control."
           cta="List your space below — it takes a minute ↓"
           items={[
-            { icon: BedDouble, title: "List your rooms", desc: "Rooms, bunks & crash pads", tint: "bg-emerald-500/10 text-emerald-700" },
-            { icon: ShieldCheck, title: "Approve every guest", desc: "Manual approval, your rules", tint: "bg-brand/10 text-brand" },
-            { icon: MapPin, title: "Get discovered", desc: "Show up in nearby stays", tint: "bg-amber-500/10 text-amber-700" },
+            {
+              icon: BedDouble,
+              title: "List your rooms",
+              desc: "Rooms, bunks & crash pads",
+              tint: "bg-emerald-500/10 text-emerald-700",
+            },
+            {
+              icon: ShieldCheck,
+              title: "Approve every guest",
+              desc: "Manual approval, your rules",
+              tint: "bg-brand/10 text-brand",
+            },
+            {
+              icon: MapPin,
+              title: "Get discovered",
+              desc: "Show up in nearby stays",
+              tint: "bg-amber-500/10 text-amber-700",
+            },
           ]}
         />
       )}
@@ -561,7 +576,12 @@ export function StartPage() {
           sub="Publish your event, sell stalls to local vendors, and track RSVPs in one place — free to list."
           cta="Publish your event below — it takes a minute ↓"
           items={[
-            { icon: Megaphone, title: "Publish your event", desc: "Your page on AirPal.Me", tint: "bg-emerald-500/10 text-emerald-700" },
+            {
+              icon: Megaphone,
+              title: "Publish your event",
+              desc: "Your page on AirPal.Me",
+              tint: "bg-emerald-500/10 text-emerald-700",
+            },
             { icon: Store, title: "Sell stalls", desc: "Vendors book & pay online", tint: "bg-brand/10 text-brand" },
             { icon: Users, title: "Track RSVPs", desc: "Know who's coming", tint: "bg-amber-500/10 text-amber-700" },
           ]}
@@ -574,9 +594,19 @@ export function StartPage() {
           sub="Plan outings together, vote on stops, and keep everyone in the loop — free to start."
           cta="Start your circle below — it takes a minute ↓"
           items={[
-            { icon: CalendarDays, title: "Plan together", desc: "Propose dates & places", tint: "bg-emerald-500/10 text-emerald-700" },
+            {
+              icon: CalendarDays,
+              title: "Plan together",
+              desc: "Propose dates & places",
+              tint: "bg-emerald-500/10 text-emerald-700",
+            },
             { icon: Users, title: "Vote on stops", desc: "Everyone gets a say", tint: "bg-brand/10 text-brand" },
-            { icon: Ticket, title: "Keep everyone posted", desc: "One page for the whole crew", tint: "bg-amber-500/10 text-amber-700" },
+            {
+              icon: Ticket,
+              title: "Keep everyone posted",
+              desc: "One page for the whole crew",
+              tint: "bg-amber-500/10 text-amber-700",
+            },
           ]}
         />
       )}
@@ -606,13 +636,13 @@ export function StartPage() {
       </div>
 
       {mode === "signup" && inviterHandle && (
-        <p className="mb-4 rounded-2xl border-2 border-ink bg-card px-4 py-3 text-center text-sm">
+        <p className="mb-4 rounded-2xl ring-1 ring-line bg-card px-4 py-3 text-center text-sm">
           You’re invited by <span className="font-semibold text-brand">@{inviterHandle}</span>
         </p>
       )}
 
       {/* Main Card */}
-      <div id="auth-card" className="rounded-3xl border-2 border-ink bg-card p-6 shadow-sm scroll-mt-4">
+      <div id="auth-card" className="rounded-3xl ring-1 ring-line bg-card p-6 shadow-sm scroll-mt-4">
         {mode === "reset" ? (
           /* Password Reset Flow */
           <div>
@@ -683,7 +713,7 @@ export function StartPage() {
                 onClick={() => switchMode("signin")}
                 className={cn(
                   "flex-1 rounded-full py-2 text-center text-xs font-semibold transition",
-                  mode === "signin" ? "bg-ink text-white shadow-xs" : "text-mute hover:text-ink",
+                  mode === "signin" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
                 )}
               >
                 Sign In
@@ -693,39 +723,40 @@ export function StartPage() {
                 onClick={() => switchMode("signup")}
                 className={cn(
                   "flex-1 rounded-full py-2 text-center text-xs font-semibold transition",
-                  mode === "signup" ? "bg-ink text-white shadow-xs" : "text-mute hover:text-ink",
+                  mode === "signup" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
                 )}
               >
                 Create Account
               </button>
             </div>
 
-            {/* Secondary Method Switcher: Email vs Mobile Phone */}
-            <div className="mt-4 flex items-center justify-center gap-2">
-              <button
-                type="button"
-                onClick={() => switchMethod("email")}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-medium transition",
-                  method === "email" ? "bg-brand/10 text-brand ring-1 ring-brand/30" : "text-mute hover:text-ink",
-                )}
-              >
-                <Mail size={13} />
-                <span>Email</span>
-              </button>
-              <span className="text-xs text-line">|</span>
-              <button
-                type="button"
-                onClick={() => switchMethod("phone")}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-medium transition",
-                  method === "phone" ? "bg-brand/10 text-brand ring-1 ring-brand/30" : "text-mute hover:text-ink",
-                )}
-              >
-                <Phone size={13} />
-                <span>Mobile SMS</span>
-              </button>
-            </div>
+            {mode === "signin" && (
+              <div className="mt-4 flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => switchMethod("email")}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-medium transition",
+                    method === "email" ? "bg-brand/10 text-brand ring-1 ring-brand/30" : "text-mute hover:text-ink",
+                  )}
+                >
+                  <Mail size={13} />
+                  <span>Email</span>
+                </button>
+                <span className="text-xs text-line">|</span>
+                <button
+                  type="button"
+                  onClick={() => switchMethod("phone")}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-medium transition",
+                    method === "phone" ? "bg-brand/10 text-brand ring-1 ring-brand/30" : "text-mute hover:text-ink",
+                  )}
+                >
+                  <Phone size={13} />
+                  <span>Mobile</span>
+                </button>
+              </div>
+            )}
 
             {/* Inline Actionable Error Banner */}
             {inlineError && (
@@ -757,73 +788,97 @@ export function StartPage() {
               </div>
             )}
 
-            {/* Form Area */}
-            {method === "phone" ? (
-              <div className="mt-4">
-                <PhoneLogin
-                  onBegin={() => setPhoneSignup(true)}
+            {mode === "signup" ? (
+              <div className="mt-5">
+                <SignupFlow
                   onDone={() => {
                     setPhoneSignup(false);
                     afterIn();
                   }}
                 />
               </div>
-            ) : (
-              <form onSubmit={onSubmit} className="mt-5 space-y-3.5">
-                {/* Sign Up extra fields */}
-                {mode === "signup" && (
-                  <>
-                    <ValidField label="Full Name" ok={nameOk} error={name && !nameOk ? "At least 2 characters" : null}>
-                      <div className="relative">
-                        <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
-                        <input
-                          value={name}
-                          onChange={(e) => {
-                            setName(e.target.value);
-                            if (!handleTouched) setHandle(handleFromName(e.target.value));
-                          }}
-                          placeholder="e.g. Alex Rivera"
-                          autoComplete="name"
-                          className={cn(fieldInput, "pl-10")}
-                          autoFocus
-                        />
-                      </div>
+            ) : method === "phone" ? (
+              <div className="mt-4">
+                <div className="mb-3 flex justify-center gap-1 rounded-full bg-paper p-1 ring-1 ring-line">
+                  <button
+                    type="button"
+                    onClick={() => setPhoneLoginMode("password")}
+                    className={cn(
+                      "rounded-full px-3 py-1 text-xs font-semibold",
+                      phoneLoginMode === "password" ? "bg-brand text-white" : "text-mute",
+                    )}
+                  >
+                    Password
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPhoneLoginMode("sms")}
+                    className={cn(
+                      "rounded-full px-3 py-1 text-xs font-semibold",
+                      phoneLoginMode === "sms" ? "bg-brand text-white" : "text-mute",
+                    )}
+                  >
+                    SMS code
+                  </button>
+                </div>
+                {phoneLoginMode === "sms" ? (
+                  <PhoneLogin
+                    onBegin={() => setPhoneSignup(true)}
+                    onDone={() => {
+                      setPhoneSignup(false);
+                      afterIn();
+                    }}
+                    onNeedAccount={() => {
+                      setPhoneSignup(true);
+                      switchMode("signup");
+                    }}
+                  />
+                ) : (
+                  <form onSubmit={onSubmit} className="space-y-3.5">
+                    <ValidField label="Mobile number" ok={phoneReady(signInPhone)}>
+                      <PhoneField value={signInPhone} onChange={setSignInPhone} />
                     </ValidField>
-
-                    <ValidField
-                      label={`Public @${normalizeHandle(handle) || "handle"}`}
-                      ok={handleOk}
-                      error={handle && !handleStatus.checking ? handleStatus.reason || null : null}
-                      hint={handleStatus.checking ? "Checking availability…" : "Unique username or hex id"}
-                    >
-                      <div className="flex gap-2">
+                    <ValidField label="Password" ok={Boolean(password)}>
+                      <div className="relative">
+                        <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
                         <input
-                          value={handle}
-                          onChange={(e) => {
-                            setHandleTouched(true);
-                            setHandle(e.target.value);
-                          }}
-                          placeholder="username"
-                          autoComplete="username"
-                          className={fieldInput}
+                          type={showPassword ? "text" : "password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="••••••••"
+                          autoComplete="current-password"
+                          className={cn(fieldInput, "pl-10 pr-10")}
                         />
                         <button
                           type="button"
-                          onClick={() => {
-                            setHandleTouched(true);
-                            setHandle(randomHexHandle(8));
-                          }}
-                          className="shrink-0 rounded-2xl bg-paper px-3 text-xs font-medium text-mute ring-1 ring-line hover:text-ink"
-                          title="Generate a unique hex code"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-mute hover:text-ink"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
                         >
-                          Hex ID
+                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
                       </div>
                     </ValidField>
-                  </>
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => switchMode("reset")}
+                        className="text-xs font-medium text-brand hover:underline"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
+                    <Button type="submit" className="w-full" disabled={busy} loading={busy}>
+                      {busy ? "Signing in…" : "Sign in"}
+                    </Button>
+                    <p className="text-center text-[12px] text-mute">
+                      SMS code always works if phone + password isn&apos;t set up yet.
+                    </p>
+                  </form>
                 )}
-
-                {/* Email Address */}
+              </div>
+            ) : (
+              <form onSubmit={onSubmit} className="mt-5 space-y-3.5">
                 <ValidField label="Email Address" ok={emailOk} error={email && !emailOk ? "Enter a valid email" : null}>
                   <div className="relative">
                     <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
@@ -836,17 +891,11 @@ export function StartPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@domain.com"
                       className={cn(fieldInput, "pl-10")}
-                      autoFocus={mode === "signin"}
+                      autoFocus
                     />
                   </div>
                 </ValidField>
-
-                {/* Password with Eye Toggle */}
-                <ValidField
-                  label="Password"
-                  ok={mode === "signin" ? Boolean(password) : passOk}
-                  error={null}
-                >
+                <ValidField label="Password" ok={Boolean(password)} error={null}>
                   <div className="relative">
                     <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
                     <input
@@ -854,7 +903,7 @@ export function StartPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                      autoComplete="current-password"
                       className={cn(fieldInput, "pl-10 pr-10")}
                     />
                     <button
@@ -867,49 +916,17 @@ export function StartPage() {
                     </button>
                   </div>
                 </ValidField>
-
-                {/* Sign Up Password Strength Indicator */}
-                {mode === "signup" && password && (
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-mute" aria-live="polite">
-                    {PASSWORD_RULES.map((rule) => {
-                      const met = !passwordIssues(password).includes(rule.id);
-                      return (
-                        <span
-                          key={rule.id}
-                          className={cn(
-                            "inline-flex items-center gap-1",
-                            met ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-mute",
-                          )}
-                        >
-                          <Check size={12} /> {rule.label}
-                        </span>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* Forgot Password Link on Sign In */}
-                {mode === "signin" && (
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => switchMode("reset")}
-                      className="text-xs font-medium text-brand hover:underline"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                )}
-
-                {/* Submit Button */}
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => switchMode("reset")}
+                    className="text-xs font-medium text-brand hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
                 <Button type="submit" className="w-full mt-2" disabled={busy} loading={busy}>
-                  {busy
-                    ? mode === "signin"
-                      ? "Signing in…"
-                      : "Creating account…"
-                    : mode === "signin"
-                      ? "Sign In"
-                      : "Create Free Account"}
+                  {busy ? "Signing in…" : "Sign In"}
                 </Button>
               </form>
             )}

@@ -1,22 +1,28 @@
+import { collection, doc, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
 import type { PlanType } from "@shared/plan";
+import { getFirebaseDb, isFirebaseConfigured } from "./firebase";
 
 export interface CatchUpItem {
   id: string;
   targetHandle: string;
+  targetOwnerUid?: string;
+  requesterUid?: string;
   requesterHandle?: string;
   requesterName: string;
   requesterPhoto?: string;
   type: PlanType | "catchup" | "meeting" | "nightout" | "casual" | string;
-  date?: string; // YYYY-MM-DD
-  time?: string; // HH:mm
+  date?: string;
+  time?: string;
   venue?: string;
   notes?: string;
+  planId?: string;
   createdAt: string;
   isReminderOnly?: boolean;
   status: "pending" | "accepted" | "scheduled" | "dismissed";
 }
 
 const STORAGE_KEY = "airpal:catchups:v1";
+let memory: CatchUpItem[] = [];
 
 function storage(): Storage | null {
   try {
@@ -26,6 +32,10 @@ function storage(): Storage | null {
   }
 }
 
+function omitUndefined<T extends Record<string, unknown>>(row: T): T {
+  return Object.fromEntries(Object.entries(row).filter(([, v]) => v !== undefined)) as T;
+}
+
 function normalizeHandle(handle: string): string {
   return handle.trim().replace(/^@/, "").toLowerCase();
 }
@@ -33,16 +43,21 @@ function normalizeHandle(handle: string): string {
 export function listCatchUps(): CatchUpItem[] {
   try {
     const raw = storage()?.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed;
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        memory = parsed;
+        return parsed;
+      }
+    }
   } catch {
-    return [];
+    /* use memory */
   }
+  return memory;
 }
 
 function persist(items: CatchUpItem[]): void {
+  memory = items;
   try {
     storage()?.setItem(STORAGE_KEY, JSON.stringify(items));
   } catch {
@@ -50,13 +65,21 @@ function persist(items: CatchUpItem[]): void {
   }
 }
 
-/** Get all incoming catch-up requests/interests for a target handle */
+function syncRemote(item: CatchUpItem) {
+  if (!isFirebaseConfigured) return;
+  const db = getFirebaseDb();
+  if (!db) return;
+  void setDoc(doc(db, "catchups", item.id), omitUndefined(item as unknown as Record<string, unknown>), {
+    merge: true,
+  }).catch(() => undefined);
+}
+
+/** Incoming proposals for a public bio (owner inbox). */
 export function listCatchUpsForHandle(targetHandle: string): CatchUpItem[] {
   const norm = normalizeHandle(targetHandle);
   return listCatchUps().filter((item) => normalizeHandle(item.targetHandle) === norm && item.status !== "dismissed");
 }
 
-/** Get all reminders saved by the current user to catch up with others */
 export function listMyCatchUpReminders(): CatchUpItem[] {
   return listCatchUps().filter((item) => item.isReminderOnly && item.status !== "dismissed");
 }
@@ -79,7 +102,7 @@ export function toggleCatchUpReminder(target: {
   if (existingIdx >= 0) {
     items.splice(existingIdx, 1);
     persist(items);
-    return false; // Removed
+    return false;
   }
 
   const newItem: CatchUpItem = {
@@ -95,11 +118,13 @@ export function toggleCatchUpReminder(target: {
   };
 
   persist([newItem, ...items]);
-  return true; // Added
+  return true;
 }
 
 export function recordCatchUpInterest(input: {
   targetHandle: string;
+  targetOwnerUid?: string;
+  requesterUid?: string;
   requesterHandle?: string;
   requesterName: string;
   requesterPhoto?: string;
@@ -108,6 +133,7 @@ export function recordCatchUpInterest(input: {
   time?: string;
   venue?: string;
   notes?: string;
+  planId?: string;
 }): CatchUpItem {
   const items = listCatchUps();
   const norm = normalizeHandle(input.targetHandle);
@@ -115,6 +141,8 @@ export function recordCatchUpInterest(input: {
   const item: CatchUpItem = {
     id: `cup-${Date.now()}-${Math.floor(Math.random() * 1e4)}`,
     targetHandle: norm,
+    targetOwnerUid: input.targetOwnerUid,
+    requesterUid: input.requesterUid,
     requesterHandle: input.requesterHandle ? normalizeHandle(input.requesterHandle) : undefined,
     requesterName: input.requesterName.trim(),
     requesterPhoto: input.requesterPhoto,
@@ -123,18 +151,45 @@ export function recordCatchUpInterest(input: {
     time: input.time,
     venue: input.venue,
     notes: input.notes,
+    planId: input.planId,
     createdAt: new Date().toISOString(),
     isReminderOnly: false,
     status: "pending",
   };
 
   persist([item, ...items]);
+  if (input.requesterUid) syncRemote(item);
   return item;
+}
+
+export function subscribeCatchUpsForOwner(ownerUid: string, onRows: (rows: CatchUpItem[]) => void): () => void {
+  if (!ownerUid || !isFirebaseConfigured) {
+    onRows(listCatchUps().filter((i) => i.targetOwnerUid === ownerUid && i.status !== "dismissed"));
+    return () => undefined;
+  }
+  const db = getFirebaseDb();
+  if (!db) {
+    onRows([]);
+    return () => undefined;
+  }
+  const q = query(collection(db, "catchups"), where("targetOwnerUid", "==", ownerUid));
+  return onSnapshot(
+    q,
+    (snap) => {
+      const rows = snap.docs.map((d) => d.data() as CatchUpItem).filter((i) => i.status !== "dismissed");
+      onRows(rows);
+    },
+    () => onRows(listCatchUpsForHandle("")),
+  );
 }
 
 export function updateCatchUpStatus(id: string, status: "pending" | "accepted" | "scheduled" | "dismissed"): void {
   const items = listCatchUps().map((item) => (item.id === id ? { ...item, status } : item));
   persist(items);
+  if (!isFirebaseConfigured) return;
+  const db = getFirebaseDb();
+  if (!db) return;
+  void updateDoc(doc(db, "catchups", id), { status }).catch(() => undefined);
 }
 
 export function removeCatchUp(id: string): void {

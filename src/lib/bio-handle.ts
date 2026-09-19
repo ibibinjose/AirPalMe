@@ -37,7 +37,9 @@ export function placeAsBio(place: NearbyPlace, handle: string): BioProfile {
       href: place.bookingUrl,
     });
   }
-  const category = (place.category === "shops" ? "shops" : place.category === "coffee" ? "coffee" : "eat") as BusinessCategoryId;
+  const category = (
+    place.category === "shops" ? "shops" : place.category === "coffee" ? "coffee" : "eat"
+  ) as BusinessCategoryId;
   return {
     id: `place-${place.id}`,
     handle: normalizeHandle(handle),
@@ -87,7 +89,10 @@ export function stallAsBio(stall: StallRecord, handle: string): BioProfile {
   };
 }
 
-export function resolvePublicBio(handle: string, byHandle: (h: string) => BioProfile | undefined): BioProfile | undefined {
+export function resolvePublicBio(
+  handle: string,
+  byHandle: (h: string) => BioProfile | undefined,
+): BioProfile | undefined {
   const h = normalizeHandle(handle);
   const owned = byHandle(h);
   if (owned) return owned;

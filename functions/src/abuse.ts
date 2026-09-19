@@ -1,11 +1,6 @@
 import { FieldValue, getFirestore, type Firestore } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
-import {
-  automatedActivityScore,
-  RATE_LIMITS,
-  rateLimitAllows,
-  type RateLimitAction,
-} from "../../shared/abuse";
+import { automatedActivityScore, RATE_LIMITS, rateLimitAllows, type RateLimitAction } from "../../shared/abuse";
 import type { ContentAudit } from "../../shared/content-meta";
 
 function db(): Firestore {
@@ -59,13 +54,15 @@ export async function noteAppCheck(request: CallableLike, action: string) {
   if (request.app) return;
   const uid = request.auth?.uid || "anonymous";
   try {
-    await db().collection("abuseSignals").add({
-      kind: "missing_app_check",
-      action,
-      uid,
-      anonymous: isAnonymousAuth(request),
-      at: FieldValue.serverTimestamp(),
-    });
+    await db()
+      .collection("abuseSignals")
+      .add({
+        kind: "missing_app_check",
+        action,
+        uid,
+        anonymous: isAnonymousAuth(request),
+        at: FieldValue.serverTimestamp(),
+      });
   } catch {
     /* monitoring must not fail the request */
   }
@@ -99,11 +96,11 @@ export async function flagAutomation(input: {
 }
 
 export async function writeAudit(row: Omit<ContentAudit, "id" | "at"> & { at?: string }) {
-  await db().collection("contentAudits").add({
-    ...row,
-    at: row.at || new Date().toISOString(),
-    createdAt: FieldValue.serverTimestamp(),
-  });
+  await db()
+    .collection("contentAudits")
+    .add({
+      ...row,
+      at: row.at || new Date().toISOString(),
+      createdAt: FieldValue.serverTimestamp(),
+    });
 }
-
-

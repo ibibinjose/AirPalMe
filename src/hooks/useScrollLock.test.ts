@@ -9,12 +9,7 @@ if (typeof globalThis.document === "undefined") {
   });
 }
 
-import {
-  forceUnlockBodyScroll,
-  getLockCount,
-  lockBodyScroll,
-  unlockBodyScroll,
-} from "./useScrollLock";
+import { forceUnlockBodyScroll, getLockCount, lockBodyScroll, unlockBodyScroll } from "./useScrollLock";
 
 describe("useScrollLock controller", () => {
   beforeEach(() => {

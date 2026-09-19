@@ -1,11 +1,6 @@
 {
   "name": "AirPal.me",
   "description": "Life Made Easy. People, places, things and experiences — made easier.",
-  "requestFramePermissions": [
-    "camera",
-    "geolocation"
-  ],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
+  "requestFramePermissions": ["camera", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -15,10 +15,9 @@ export async function locateBusiness(): Promise<{ geo: Geo; fields?: HostLocatio
   });
   const geo = { lat: pos.coords.latitude, lng: pos.coords.longitude };
   try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${geo.lat}&lon=${geo.lng}`,
-      { headers: { Accept: "application/json" } },
-    );
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${geo.lat}&lon=${geo.lng}`, {
+      headers: { Accept: "application/json" },
+    });
     if (!res.ok) return { geo };
     const data = (await res.json()) as { address?: Record<string, string>; lat?: string; lon?: string };
     return { geo, fields: locationFromNominatim({ ...data, lat: String(geo.lat), lon: String(geo.lng) }) };

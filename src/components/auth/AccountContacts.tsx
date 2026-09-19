@@ -153,7 +153,10 @@ export function AccountContacts({ compact }: { compact?: boolean }) {
                   />
                 </ValidField>
               )}
-              <div id={PHONE_RECAPTCHA_ID} className="flex min-h-[78px] justify-center overflow-hidden rounded-2xl bg-paper p-2 ring-1 ring-line" />
+              <div
+                id={PHONE_RECAPTCHA_ID}
+                className="flex min-h-[78px] justify-center overflow-hidden rounded-2xl bg-paper p-2 ring-1 ring-line"
+              />
               <div className="flex gap-2">
                 <Button type="submit" size="sm" disabled={busy} loading={busy}>
                   {busy ? "Please wait…" : codeStep ? "Save mobile" : "Send code"}
@@ -230,7 +233,15 @@ export function AccountContacts({ compact }: { compact?: boolean }) {
           ) : (
             <form className="mt-3 space-y-2" onSubmit={(e) => void saveEmail(e)}>
               <ValidField label="Email" ok={emailOk} error={email && !emailOk ? "Need a real email" : null}>
-                <input type="email" inputMode="email" autoCapitalize="none" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" className={fieldInput} />
+                <input
+                  type="email"
+                  inputMode="email"
+                  autoCapitalize="none"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  className={fieldInput}
+                />
               </ValidField>
               <div className="flex gap-2">
                 <Button type="submit" size="sm" disabled={busy || !emailOk} loading={busy}>

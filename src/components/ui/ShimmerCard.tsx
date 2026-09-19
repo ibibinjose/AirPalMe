@@ -5,10 +5,7 @@ export function ShimmerCard({ className }: { className?: string }) {
   return (
     <div
       aria-hidden="true"
-      className={cn(
-        "relative overflow-hidden rounded-3xl bg-card p-4 ring-1 ring-line/80 md:p-5",
-        className,
-      )}
+      className={cn("relative overflow-hidden rounded-3xl bg-card p-4 ring-1 ring-line/80 md:p-5", className)}
     >
       <div className="relative mb-3.5 h-44 w-full overflow-hidden rounded-2xl bg-gradient-to-r from-line/30 via-line/65 to-line/30 bg-[length:200%_100%] animate-shimmer md:h-52" />
       <div className="space-y-2.5">
@@ -36,4 +33,3 @@ export function ShimmerList({ count = 3, className }: { count?: number; classNam
     </div>
   );
 }
-

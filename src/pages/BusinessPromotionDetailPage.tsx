@@ -20,7 +20,14 @@ export function BusinessPromotionDetailPage() {
   const [loading, setLoading] = useState(true);
   const [redemptions, setRedemptions] = useState(0);
   const [busy, setBusy] = useState(false);
-  const [draft, setDraft] = useState({ title: "", description: "", prizeValue: "", eligibility: "", termsText: "", locationText: "" });
+  const [draft, setDraft] = useState({
+    title: "",
+    description: "",
+    prizeValue: "",
+    eligibility: "",
+    termsText: "",
+    locationText: "",
+  });
   const [announce, setAnnounce] = useState({ title: "", body: "", open: false });
 
   useEffect(() => {
@@ -61,7 +68,9 @@ export function BusinessPromotionDetailPage() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-12 text-center">
         <p className="font-display text-xl font-bold">Campaign not found.</p>
-        <Link href="/business/promotions"><Button className="mt-4">Back</Button></Link>
+        <Link href="/business/promotions">
+          <Button className="mt-4">Back</Button>
+        </Link>
       </div>
     );
   }
@@ -117,7 +126,7 @@ export function BusinessPromotionDetailPage() {
           [promo.entriesCount || 0, "Entries"],
           [redemptions, "Redeemed"],
         ].map(([n, label]) => (
-          <div key={String(label)} className="rounded-2xl border-2 border-ink bg-card p-3">
+          <div key={String(label)} className="rounded-2xl ring-1 ring-line bg-card p-3">
             <p className="font-display text-xl font-bold">{n}</p>
             <p className="text-[11px] text-mute">{label}</p>
           </div>
@@ -129,12 +138,12 @@ export function BusinessPromotionDetailPage() {
       )}
 
       {(promo.status === "live" || promo.status === "paused") && (
-        <div className="mt-4 rounded-2xl border-2 border-ink bg-card p-4">
+        <div className="mt-4 rounded-2xl ring-1 ring-line bg-card p-4">
           {!announce.open ? (
             <button
               type="button"
               onClick={() => setAnnounce((a) => ({ ...a, open: true }))}
-              className="w-full rounded-xl bg-ink px-4 py-2.5 text-sm font-bold text-white"
+              className="w-full rounded-xl bg-brand px-4 py-2.5 text-sm font-bold text-white"
             >
               Message entrants
             </button>
@@ -147,7 +156,7 @@ export function BusinessPromotionDetailPage() {
                 onChange={(e) => setAnnounce((a) => ({ ...a, title: e.target.value }))}
                 placeholder="Title (80 chars)"
                 maxLength={80}
-                className="w-full rounded-xl border-2 border-ink/15 p-2 text-sm"
+                className="w-full rounded-xl ring-1 ring-line/15 p-2 text-sm"
               />
               <textarea
                 value={announce.body}
@@ -155,13 +164,13 @@ export function BusinessPromotionDetailPage() {
                 placeholder="Your update (280 chars)"
                 maxLength={280}
                 rows={3}
-                className="w-full rounded-xl border-2 border-ink/15 p-2 text-sm"
+                className="w-full rounded-xl ring-1 ring-line/15 p-2 text-sm"
               />
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setAnnounce({ title: "", body: "", open: false })}
-                  className="flex-1 rounded-xl border-2 border-ink/15 px-4 py-2 text-sm font-bold"
+                  className="flex-1 rounded-xl ring-1 ring-line/15 px-4 py-2 text-sm font-bold"
                 >
                   Cancel
                 </button>
@@ -186,7 +195,7 @@ export function BusinessPromotionDetailPage() {
                       setBusy(false);
                     }
                   }}
-                  className="flex-1 rounded-xl bg-ink px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+                  className="flex-1 rounded-xl bg-brand px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
                 >
                   Submit for approval
                 </button>
@@ -197,32 +206,53 @@ export function BusinessPromotionDetailPage() {
       )}
 
       {canEdit ? (
-        <div className="mt-4 space-y-2 rounded-3xl border-2 border-ink bg-card p-4">
+        <div className="mt-4 space-y-2 rounded-3xl ring-1 ring-line bg-card p-4">
           {[
             ["title", "Title"],
             ["prizeValue", "Offer / prize value"],
             ["locationText", "Location"],
             ["eligibility", "Eligibility"],
           ].map(([k, label]) => (
-            <label key={k} className="block text-xs font-semibold">{label}
-              <input value={draft[k as keyof typeof draft]} onChange={(e) => set(k, e.target.value)} className="mt-1 w-full rounded-xl border-2 border-ink/15 p-2 text-sm font-normal" />
+            <label key={k} className="block text-xs font-semibold">
+              {label}
+              <input
+                value={draft[k as keyof typeof draft]}
+                onChange={(e) => set(k, e.target.value)}
+                className="mt-1 w-full rounded-xl ring-1 ring-line/15 p-2 text-sm font-normal"
+              />
             </label>
           ))}
-          <label className="block text-xs font-semibold">Description
-            <textarea value={draft.description} onChange={(e) => set("description", e.target.value)} rows={3} className="mt-1 w-full rounded-xl border-2 border-ink/15 p-2 text-sm font-normal" />
+          <label className="block text-xs font-semibold">
+            Description
+            <textarea
+              value={draft.description}
+              onChange={(e) => set("description", e.target.value)}
+              rows={3}
+              className="mt-1 w-full rounded-xl ring-1 ring-line/15 p-2 text-sm font-normal"
+            />
           </label>
-          <label className="block text-xs font-semibold">Terms & redemption rules
-            <textarea value={draft.termsText} onChange={(e) => set("termsText", e.target.value)} rows={3} className="mt-1 w-full rounded-xl border-2 border-ink/15 p-2 text-sm font-normal" />
+          <label className="block text-xs font-semibold">
+            Terms & redemption rules
+            <textarea
+              value={draft.termsText}
+              onChange={(e) => set("termsText", e.target.value)}
+              rows={3}
+              className="mt-1 w-full rounded-xl ring-1 ring-line/15 p-2 text-sm font-normal"
+            />
           </label>
           <div className="flex gap-2">
-            <Button onClick={save} disabled={busy} className="flex-1 bg-card text-ink border-2 border-ink">Save</Button>
+            <Button onClick={save} disabled={busy} className="flex-1 bg-card text-ink ring-1 ring-line">
+              Save
+            </Button>
             {(promo.status === "draft" || promo.status === "rejected") && (
-              <Button onClick={submit} disabled={busy} className="flex-1">Submit for review</Button>
+              <Button onClick={submit} disabled={busy} className="flex-1">
+                Submit for review
+              </Button>
             )}
           </div>
         </div>
       ) : (
-        <div className={cn("mt-4 rounded-2xl border-2 border-ink/15 bg-card p-4 text-sm text-mute")}>
+        <div className={cn("mt-4 rounded-2xl ring-1 ring-line/15 bg-card p-4 text-sm text-mute")}>
           {promo.status === "submitted" || promo.status === "under_review"
             ? "With the AirPal.Me team for review. You'll be notified of the decision."
             : "This campaign is locked while live. Contact support to request changes."}

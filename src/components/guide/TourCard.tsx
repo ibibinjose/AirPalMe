@@ -19,7 +19,9 @@ export function TourCard({ tour }: { tour: WalkingTour }) {
       <Photo src={TOUR_IMAGES[tour.id] || DEFAULT_TOUR_IMAGE} className="absolute inset-0 h-full w-full object-cover" />
       <div className="hero-scrim absolute inset-0" />
       <div className="absolute inset-x-0 bottom-0 p-5">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-white/70">{tour.duration} · {tour.distance}</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-white/70">
+          {tour.duration} · {tour.distance}
+        </p>
         <p className="font-display mt-1 text-2xl font-semibold text-white">{tour.title}</p>
       </div>
     </button>

@@ -1,11 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  addMemory,
-  listMemories,
-  memoriesWithPerson,
-  removeMemory,
-  updateMemory,
-} from "./memories";
+import { addMemory, listMemories, memoriesWithPerson, removeMemory, updateMemory } from "./memories";
 import { buildVCard, listPeople, removePerson, upsertPerson } from "./people";
 
 function memoryStorage() {

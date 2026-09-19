@@ -1,10 +1,27 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "wouter";
 import { collection, getDocs, limit, query as fsQuery, where } from "firebase/firestore";
-import { Search, MapPin, CalendarDays, Sparkles, Users, Building2, Wifi, ArrowRight, X, Compass, Footprints, HeartHandshake } from "lucide-react";
-import { activePlaces, toursForPrecinct } from "@/lib/catalog";
+import {
+  Search,
+  MapPin,
+  CalendarDays,
+  Sparkles,
+  Users,
+  Building2,
+  Wifi,
+  ArrowRight,
+  X,
+  Compass,
+  Footprints,
+  HeartHandshake,
+} from "lucide-react";
+import { activePlaces, placesForLocation, toursForPrecinct } from "@/lib/catalog";
+import { useLocalNow } from "@/hooks/useLocalNow";
+import { cityMatches } from "@/lib/remote-events";
+import { EVENT_NEAR_M, locatedNear } from "@/lib/location-scope";
 import { getFirebaseDb } from "@/lib/firebase";
-import type { Campaign } from "@shared/campaign";
+import { aud, type Campaign } from "@shared/campaign";
+import { isTicketed } from "@shared/plan";
 import type { PublicMate } from "@shared/companion";
 import { loadPublicMatesRemote } from "@/lib/companion-remote";
 import { loadTours } from "@/lib/tours-store";
@@ -41,6 +58,7 @@ export function GlobalSearchModal() {
   const [, nav] = useLocation();
   const { calendarEvents } = useEvents();
   const { plans } = usePlans();
+  const { here, city, usingGps } = useLocalNow();
   const [liveExperiences, setLiveExperiences] = useState<Campaign[]>([]);
   const [publicMates, setPublicMates] = useState<PublicMate[]>([]);
 
@@ -130,8 +148,8 @@ export function GlobalSearchModal() {
         {
           id: "qa-calendar",
           category: "event",
-          title: "Sydney Events & Live Gigs",
-          subtitle: "Explore weekend markets, harbour concerts & festivals",
+          title: `${city || "Local"} events`,
+          subtitle: "What's on near your location",
           badge: "Calendar",
           href: "/calendar",
           icon: CalendarDays,
@@ -150,7 +168,7 @@ export function GlobalSearchModal() {
     }
 
     // 1. Match Places (live listings only — empty DB means no place results)
-    for (const p of activePlaces()) {
+    for (const p of placesForLocation(activePlaces(), here, city, usingGps)) {
       if (
         p.name.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q) ||
@@ -171,6 +189,7 @@ export function GlobalSearchModal() {
 
     // 2. Match Events
     for (const e of calendarEvents) {
+      if (!cityMatches(e.city, city)) continue;
       if (
         e.title.toLowerCase().includes(q) ||
         e.category.toLowerCase().includes(q) ||
@@ -227,6 +246,27 @@ export function GlobalSearchModal() {
       });
     }
 
+    if (q.includes("ticket") || q.includes("experience") || q.includes("event")) {
+      items.push({
+        id: "event-create",
+        category: "event",
+        title: "Sell tickets",
+        subtitle: "Create a public event or experience",
+        badge: "Tickets",
+        href: "/event/new",
+        icon: CalendarDays,
+      });
+      items.push({
+        id: "join-tickets",
+        category: "experience",
+        title: "Buy tickets",
+        subtitle: "Public events and experiences nearby",
+        badge: "Join",
+        href: "/experiences",
+        icon: Sparkles,
+      });
+    }
+
     if (q.includes("mate") || q.includes("companion") || q.includes("someone")) {
       items.push({
         id: "mate-request",
@@ -240,7 +280,8 @@ export function GlobalSearchModal() {
     }
 
     for (const m of publicMates) {
-      const hay = `${m.firstName} ${m.suburb} ${m.city} ${m.interests.join(" ")} ${m.activities.join(" ")} ${m.introduction}`.toLowerCase();
+      const hay =
+        `${m.firstName} ${m.suburb} ${m.city} ${m.interests.join(" ")} ${m.activities.join(" ")} ${m.introduction}`.toLowerCase();
       if (q.length >= 2 && hay.includes(q)) {
         items.push({
           id: `mate-${m.uid}`,
@@ -263,7 +304,7 @@ export function GlobalSearchModal() {
           category: "experience",
           title: c.title,
           subtitle: `${c.businessName} · ${c.suburb} · ${c.date}`,
-          badge: "Experience",
+          badge: c.priceCents > 0 ? aud(c.priceCents) : "Free",
           href: "/experiences",
           icon: Sparkles,
         });
@@ -271,7 +312,12 @@ export function GlobalSearchModal() {
     }
 
     // 5. Match open Plans (one global search replaces per-page plan search)
-    const openPlans = plans.filter((p) => p.isPublic && p.status === "open");
+    const openPlans = plans.filter(
+      (p) =>
+        p.isPublic &&
+        p.status === "open" &&
+        locatedNear({ geo: p.geo, city: p.city || p.destination }, here, city, usingGps, EVENT_NEAR_M),
+    );
     for (const p of openPlans) {
       const hay = `${p.title} ${p.destination} ${p.city}`.toLowerCase();
       if (q.length >= 2 && hay.includes(q)) {
@@ -280,7 +326,7 @@ export function GlobalSearchModal() {
           category: "plan",
           title: p.title,
           subtitle: `${p.destination || p.city} · ${p.date}`,
-          badge: "Plan",
+          badge: isTicketed(p) ? `$${p.pricePerPerson}` : p.isExperience ? "Free" : "Plan",
           href: `/plan/${p.id}`,
           icon: Users,
         });
@@ -288,7 +334,7 @@ export function GlobalSearchModal() {
     }
 
     // 6. Match Walks / Tours (live tours only)
-    for (const t of toursForPrecinct("", loadTours())) {
+    for (const t of toursForPrecinct(usingGps ? city : city || "", loadTours())) {
       if (t.title.toLowerCase().includes(q) || t.city.toLowerCase().includes(q)) {
         items.push({
           id: `tour-${t.id}`,
@@ -328,7 +374,18 @@ export function GlobalSearchModal() {
     if (activeCategory === "experiences") return items.filter((i) => i.category === "experience");
 
     return items;
-  }, [query, calendarEvents, catalogVersion, plans, activeCategory, liveExperiences, publicMates]);
+  }, [
+    query,
+    calendarEvents,
+    catalogVersion,
+    plans,
+    activeCategory,
+    liveExperiences,
+    publicMates,
+    here,
+    city,
+    usingGps,
+  ]);
 
   // Keyboard navigation within list
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -354,17 +411,24 @@ export function GlobalSearchModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center p-3 pt-4 sm:p-6 sm:pt-20 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200">
-      {/* Backdrop */}
-      <div className="fixed inset-0 bg-ink/60 backdrop-blur-md transition-opacity" onClick={() => setOpen(false)} />
+      <button
+        type="button"
+        className="fixed inset-0 bg-ink/60 backdrop-blur-md transition-opacity"
+        aria-label="Close search"
+        onClick={() => setOpen(false)}
+      />
 
-      {/* Modal Container */}
-      <div className="relative w-full max-w-xl overflow-hidden rounded-3xl bg-card shadow-2xl ring-1 ring-line/80 safe-bottom">
-        {/* Search Input Bar */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search AirPal"
+        className="relative w-full max-w-xl overflow-hidden rounded-3xl bg-card shadow-2xl ring-1 ring-line/80 safe-bottom"
+      >
         <div className="flex items-center gap-3 border-b border-line px-4 py-3.5">
-          <Search size={20} className="shrink-0 text-gold" />
+          <Search size={20} className="shrink-0 text-gold" aria-hidden />
           <input
             ref={inputRef}
-            type="text"
+            type="search"
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -372,11 +436,14 @@ export function GlobalSearchModal() {
             }}
             onKeyDown={handleKeyDown}
             placeholder="Search people, places, events, stays, plans…"
+            aria-label="Search people, places, events, stays, plans"
             className="w-full bg-transparent text-[15px] font-medium text-ink placeholder:text-mute focus:outline-none"
           />
           {query && (
             <button
+              type="button"
               onClick={() => setQuery("")}
+              aria-label="Clear search"
               className="grid h-6 w-6 place-items-center rounded-full text-mute hover:bg-paper hover:text-ink"
             >
               <X size={14} />
@@ -409,7 +476,7 @@ export function GlobalSearchModal() {
               className={cn(
                 "h-7 rounded-full px-3 text-xs font-medium transition whitespace-nowrap",
                 activeCategory === c.id
-                  ? "bg-ink text-white"
+                  ? "bg-brand text-white"
                   : "bg-paper text-mute hover:bg-line hover:text-ink ring-1 ring-line",
               )}
             >

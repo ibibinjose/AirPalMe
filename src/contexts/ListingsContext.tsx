@@ -11,7 +11,13 @@ import {
 import type { PlaceDeal } from "@shared/nearby";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase";
 import { liveBackendEnabled, upsertBusinessDealRemote, upsertBusinessListingRemote } from "@/lib/functions";
-import { getCachedListings, hydrateListings, listingDefaults, subscribeListings, upsertCachedListing } from "@/lib/listings";
+import {
+  getCachedListings,
+  hydrateListings,
+  listingDefaults,
+  subscribeListings,
+  upsertCachedListing,
+} from "@/lib/listings";
 import { fetchPlaces, loadPlaces } from "@/lib/places-store";
 import { syncListingToBio } from "@/lib/identity";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,6 +35,8 @@ type SavePlaceInput = {
   geo?: { lat: number; lng: number };
   handle?: string;
   heroImage?: string;
+  mapsPlaceId?: string;
+  website?: string;
 };
 
 type ListingsValue = {
@@ -59,6 +67,8 @@ function fromFirestore(id: string, data: Record<string, unknown>): BusinessListi
     shortWhy: String(data.shortWhy || ""),
     heroImage: data.heroImage ? String(data.heroImage) : undefined,
     phone: data.phone ? String(data.phone) : undefined,
+    mapsPlaceId: data.mapsPlaceId ? String(data.mapsPlaceId) : undefined,
+    website: data.website ? String(data.website) : undefined,
     deal: (data.deal as PlaceDeal | undefined) || undefined,
     geo: {
       lat: Number(geo?.lat ?? geo?.latitude ?? DEFAULT_LISTING_GEO.lat),
@@ -66,6 +76,8 @@ function fromFirestore(id: string, data: Record<string, unknown>): BusinessListi
     },
     precinctId: String(data.precinctId || DEFAULT_PRECINCT_ID),
     status: data.status === "inactive" ? "inactive" : "active",
+    verifiedOwner: data.verifiedOwner === true,
+    plan: data.plan === "featured" || data.plan === "partner" ? data.plan : "presence",
     updatedAt: isoFromUnknown(data.updatedAt),
     hoursVerifiedAt: isoFromUnknown(data.hoursVerifiedAt) || isoFromUnknown(data.updatedAt),
   });
@@ -152,6 +164,8 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
           geo: input.geo || existing?.geo || DEFAULT_LISTING_GEO,
           handle: input.handle || existing?.handle,
           heroImage: input.heroImage !== undefined ? input.heroImage : existing?.heroImage,
+          mapsPlaceId: input.mapsPlaceId !== undefined ? input.mapsPlaceId : existing?.mapsPlaceId,
+          website: input.website !== undefined ? input.website : existing?.website,
           hoursVerifiedAt: new Date().toISOString(),
         });
         upsertCachedListing(listing);
@@ -183,6 +197,8 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
                     lng: listing.geo.lng,
                     precinctId: listing.precinctId,
                     heroImage: listing.heroImage,
+                    mapsPlaceId: listing.mapsPlaceId,
+                    website: listing.website,
                   });
                   listing.id = res.listingId;
                   listing.placeId = res.placeId;
@@ -222,6 +238,8 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
                     lng: listing.geo.lng,
                     precinctId: listing.precinctId,
                     heroImage: listing.heroImage,
+                    mapsPlaceId: listing.mapsPlaceId,
+                    website: listing.website,
                   });
                 }
               : undefined,

@@ -123,13 +123,7 @@ export function bioKindLabel(kind?: BioKind | null): "Individual" | "Business" {
   return isBusinessKind(kind) ? "Business" : "Individual";
 }
 
-export type AvailabilityStatus =
-  | "available"
-  | "busy"
-  | "dnd"
-  | "brb"
-  | "away"
-  | "offline";
+export type AvailabilityStatus = "available" | "busy" | "dnd" | "brb" | "away" | "offline";
 
 export interface AvailabilityStatusInfo {
   id: AvailabilityStatus;
@@ -268,7 +262,11 @@ export type BioProfile = {
 };
 
 export function normalizeHandle(raw: string) {
-  return raw.trim().toLowerCase().replace(/^@+/, "").replace(/[^a-z0-9._]/g, "");
+  return raw
+    .trim()
+    .toLowerCase()
+    .replace(/^@+/, "")
+    .replace(/[^a-z0-9._]/g, "");
 }
 
 export function handleError(raw: string): string | null {
@@ -317,11 +315,28 @@ export function socialLinks(links: BioLink[]) {
 }
 
 export function handleFromPlaceId(id: string) {
-  const h = id.trim().toLowerCase().replace(/[^a-z0-9._]/g, "");
+  const h = id
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._]/g, "");
   return handleError(h) ? null : h;
 }
 
-const HANDLE_STOP = new Set(["the", "a", "an", "and", "of", "at", "by", "pty", "ltd", "limited", "inc", "co", "company"]);
+const HANDLE_STOP = new Set([
+  "the",
+  "a",
+  "an",
+  "and",
+  "of",
+  "at",
+  "by",
+  "pty",
+  "ltd",
+  "limited",
+  "inc",
+  "co",
+  "company",
+]);
 
 export function nameWords(raw: string) {
   return raw
@@ -364,16 +379,19 @@ export function handleFromName(raw: string) {
 }
 
 export function handleFromDomain(raw: string) {
-  const host = raw.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0].split(":")[0];
+  const host = raw
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .split("/")[0]
+    .split(":")[0];
   const base = host.split(".")[0] || "";
   const h = normalizeHandle(base);
   return handleError(h) ? handleFromName(base) : h;
 }
 
-export function handleMatchesClaim(
-  handle: string,
-  parts: { name?: string; domain?: string; trademark?: string },
-) {
+export function handleMatchesClaim(handle: string, parts: { name?: string; domain?: string; trademark?: string }) {
   const h = normalizeHandle(handle);
   if (!h) return false;
   const pool = [parts.name, parts.domain, parts.trademark].filter(Boolean) as string[];
@@ -381,7 +399,13 @@ export function handleMatchesClaim(
     const fromName = handleFromName(p);
     const fromDomain = handleFromDomain(p);
     const compact = nameWords(p).join("");
-    return h === fromName || h === fromDomain || compact.includes(h) || (fromName && h.includes(fromName)) || (fromDomain && h.includes(fromDomain));
+    return (
+      h === fromName ||
+      h === fromDomain ||
+      compact.includes(h) ||
+      (fromName && h.includes(fromName)) ||
+      (fromDomain && h.includes(fromDomain))
+    );
   });
 }
 
@@ -409,7 +433,7 @@ export function isSafeBioHref(raw: unknown): boolean {
 export function sanitizeBioHref(raw: unknown): string | undefined {
   if (typeof raw !== "string") return undefined;
   const href = raw.trim().slice(0, 300);
-  return (href && isSafeBioHref(href) ? href : undefined);
+  return href && isSafeBioHref(href) ? href : undefined;
 }
 
 export function sanitizeCatalog(kind: BioCatalogKind, rows: unknown): BioCatalogItem[] {
@@ -424,9 +448,17 @@ export function sanitizeCatalog(kind: BioCatalogKind, rows: unknown): BioCatalog
       id: String(r.id || `${kind}-${out.length}`).slice(0, 32),
       kind,
       title: title.slice(0, 60),
-      detail: String(r.detail || "").trim().slice(0, 160),
-      price: String(r.price || "").trim().slice(0, 24) || undefined,
-      badge: String(r.badge || "").trim().slice(0, 32) || undefined,
+      detail: String(r.detail || "")
+        .trim()
+        .slice(0, 160),
+      price:
+        String(r.price || "")
+          .trim()
+          .slice(0, 24) || undefined,
+      badge:
+        String(r.badge || "")
+          .trim()
+          .slice(0, 32) || undefined,
       href: sanitizeBioHref(r.href),
     });
     if (out.length >= BIO_CATALOG_MAX) break;
@@ -471,7 +503,13 @@ export const SEED_BIO: BioProfile = {
     { id: "p-fries", kind: "product", title: "Duck-fat fries", detail: "Rosemary salt.", price: "$14" },
   ],
   services: [
-    { id: "s-private", kind: "service", title: "Private dining", detail: "Argyle room. From eight.", href: "https://thecut.bar" },
+    {
+      id: "s-private",
+      kind: "service",
+      title: "Private dining",
+      detail: "Argyle room. From eight.",
+      href: "https://thecut.bar",
+    },
     { id: "s-wine", kind: "service", title: "Wine pairing", detail: "Sommelier pour with the cut.", price: "$45" },
   ],
   links: [

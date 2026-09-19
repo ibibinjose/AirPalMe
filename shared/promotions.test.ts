@@ -37,15 +37,9 @@ describe("publishing gate", () => {
   });
 
   it("requires approved/scheduled status plus a satisfied legal gate", () => {
-    expect(
-      canPublish({ mechanicType: "giveaway", legalReviewStatus: "approved", status: "approved" }),
-    ).toBe(true);
-    expect(
-      canPublish({ mechanicType: "giveaway", legalReviewStatus: "pending", status: "approved" }),
-    ).toBe(false);
-    expect(
-      canPublish({ mechanicType: "giveaway", legalReviewStatus: "approved", status: "draft" }),
-    ).toBe(false);
+    expect(canPublish({ mechanicType: "giveaway", legalReviewStatus: "approved", status: "approved" })).toBe(true);
+    expect(canPublish({ mechanicType: "giveaway", legalReviewStatus: "pending", status: "approved" })).toBe(false);
+    expect(canPublish({ mechanicType: "giveaway", legalReviewStatus: "approved", status: "draft" })).toBe(false);
   });
 });
 

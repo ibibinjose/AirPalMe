@@ -14,7 +14,7 @@ export const LEGAL = {
   email: "hello@airpal.me",
   /** Direct mailbox for App Store / Play support and the contact form. */
   contacts: "AirPalMe@gmail.com",
-  updated: "18 September 2026",
+  updated: "19 September 2026",
 } as const;
 
 export const LEGAL_NAV = [

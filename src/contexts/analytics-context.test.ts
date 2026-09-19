@@ -52,11 +52,7 @@ describe("AnalyticsContext & AnalyticsProvider", () => {
   });
 
   it("renders children inside AnalyticsProvider", () => {
-    const tree = createElement(
-      AnalyticsProvider,
-      null,
-      createElement("div", { id: "child" }, "Hello Analytics"),
-    );
+    const tree = createElement(AnalyticsProvider, null, createElement("div", { id: "child" }, "Hello Analytics"));
 
     const html = renderToStaticMarkup(tree);
     expect(html).toContain('id="child"');
@@ -64,11 +60,7 @@ describe("AnalyticsContext & AnalyticsProvider", () => {
   });
 
   it("provides analytics context to consumer inside provider", () => {
-    const tree = createElement(
-      AnalyticsProvider,
-      null,
-      createElement(TestConsumer),
-    );
+    const tree = createElement(AnalyticsProvider, null, createElement(TestConsumer));
 
     const html = renderToStaticMarkup(tree);
     expect(html).toContain('data-testid="consumer"');

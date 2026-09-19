@@ -52,7 +52,7 @@ export function QuickAnswersSheet() {
             onClick={() => setTab(item.id)}
             className={cn(
               "h-9 rounded-full px-3.5 text-sm font-medium",
-              tab === item.id ? "bg-ink text-white" : "bg-paper ring-1 ring-line",
+              tab === item.id ? "bg-brand text-white" : "bg-paper ring-1 ring-line",
             )}
           >
             {item.label}

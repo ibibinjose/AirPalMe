@@ -87,14 +87,7 @@ export type UserEventState = {
   updatedAt: string;
 };
 
-export type CalendarEventCategory =
-  | "market"
-  | "music"
-  | "food"
-  | "culture"
-  | "community"
-  | "expo"
-  | "workshop";
+export type CalendarEventCategory = "market" | "music" | "food" | "culture" | "community" | "expo" | "workshop";
 
 export type CalendarEvent = {
   id: string;
@@ -236,7 +229,10 @@ export type ParsedStall = {
 };
 
 export function parseStallCsv(text: string): ParsedStall[] {
-  const lines = text.replace(/\r\n/g, "\n").split("\n").filter((line) => line.trim());
+  const lines = text
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .filter((line) => line.trim());
   if (lines.length < 2) return [];
   const header = splitCsvLine(lines[0]!).map((h) => h.toLowerCase());
   const col = (names: string[]) => names.map((n) => header.indexOf(n)).find((i) => i >= 0) ?? -1;
@@ -261,7 +257,12 @@ export function parseStallCsv(text: string): ParsedStall[] {
       booth: (boothI >= 0 ? cells[boothI] : "") || "",
       shortWhy: (whyI >= 0 ? cells[whyI] : "") || "",
       offer: offerI >= 0 ? cells[offerI] || undefined : undefined,
-      handle: rawHandle ? rawHandle.replace(/^@+/, "").toLowerCase().replace(/[^a-z0-9._]/g, "") || undefined : undefined,
+      handle: rawHandle
+        ? rawHandle
+            .replace(/^@+/, "")
+            .toLowerCase()
+            .replace(/[^a-z0-9._]/g, "") || undefined
+        : undefined,
     });
   }
   return rows;
@@ -284,13 +285,100 @@ export const SEED_EVENT: EventRecord = {
 };
 
 export const SEED_STALLS: StallRecord[] = [
-  { id: "st-salt", eventId: SEED_EVENT_ID, name: "Salted Caramel Co", category: "eat", booth: "A12", shortWhy: "Handmade caramels.", offer: "2 for $10", handle: "saltedcaramel", status: "active" },
-  { id: "st-linen", eventId: SEED_EVENT_ID, name: "Harbour Linen", category: "shops", booth: "B04", shortWhy: "Washed linen from Katoomba.", offer: "Tote with $40+", handle: "harbourlinen", status: "active" },
-  { id: "st-pour", eventId: SEED_EVENT_ID, name: "Laneway Pour", category: "coffee", booth: "C01", shortWhy: "Single origin, takeaway.", offer: "Second shot free", handle: "lanewaypour", status: "active" },
-  { id: "st-print", eventId: SEED_EVENT_ID, name: "Cut Print Studio", category: "shops", booth: "B18", shortWhy: "Harbour linocuts.", handle: "cutprint", status: "active" },
-  { id: "st-clay", eventId: SEED_EVENT_ID, name: "Argyle Clay", category: "shops", booth: "A07", shortWhy: "Small-batch cups.", offer: "15% this weekend", handle: "argyleclay", status: "active" },
-  { id: "st-bao", eventId: SEED_EVENT_ID, name: "Quay Bao", category: "eat", booth: "C08", shortWhy: "Pork and mushroom bao.", handle: "quaybao", status: "active" },
-  { id: "st-plants", eventId: SEED_EVENT_ID, name: "First Fleet Ferns", category: "things", booth: "D02", shortWhy: "Potted ferns for the ferry home.", handle: "fleetferns", status: "active" },
-  { id: "st-oil", eventId: SEED_EVENT_ID, name: "Soap & Oil", category: "wellness", booth: "A22", shortWhy: "Native botanicals.", offer: "Sample with any tin", handle: "soapandoil", status: "active" },
-  { id: "st-cutbar", eventId: SEED_EVENT_ID, name: "The Cut Bar & Grill", category: "eat", booth: "A01", shortWhy: "Dry-aged beef, market hours.", offer: "Welcome flute", handle: "cutbar", status: "active" },
+  {
+    id: "st-salt",
+    eventId: SEED_EVENT_ID,
+    name: "Salted Caramel Co",
+    category: "eat",
+    booth: "A12",
+    shortWhy: "Handmade caramels.",
+    offer: "2 for $10",
+    handle: "saltedcaramel",
+    status: "active",
+  },
+  {
+    id: "st-linen",
+    eventId: SEED_EVENT_ID,
+    name: "Harbour Linen",
+    category: "shops",
+    booth: "B04",
+    shortWhy: "Washed linen from Katoomba.",
+    offer: "Tote with $40+",
+    handle: "harbourlinen",
+    status: "active",
+  },
+  {
+    id: "st-pour",
+    eventId: SEED_EVENT_ID,
+    name: "Laneway Pour",
+    category: "coffee",
+    booth: "C01",
+    shortWhy: "Single origin, takeaway.",
+    offer: "Second shot free",
+    handle: "lanewaypour",
+    status: "active",
+  },
+  {
+    id: "st-print",
+    eventId: SEED_EVENT_ID,
+    name: "Cut Print Studio",
+    category: "shops",
+    booth: "B18",
+    shortWhy: "Harbour linocuts.",
+    handle: "cutprint",
+    status: "active",
+  },
+  {
+    id: "st-clay",
+    eventId: SEED_EVENT_ID,
+    name: "Argyle Clay",
+    category: "shops",
+    booth: "A07",
+    shortWhy: "Small-batch cups.",
+    offer: "15% this weekend",
+    handle: "argyleclay",
+    status: "active",
+  },
+  {
+    id: "st-bao",
+    eventId: SEED_EVENT_ID,
+    name: "Quay Bao",
+    category: "eat",
+    booth: "C08",
+    shortWhy: "Pork and mushroom bao.",
+    handle: "quaybao",
+    status: "active",
+  },
+  {
+    id: "st-plants",
+    eventId: SEED_EVENT_ID,
+    name: "First Fleet Ferns",
+    category: "things",
+    booth: "D02",
+    shortWhy: "Potted ferns for the ferry home.",
+    handle: "fleetferns",
+    status: "active",
+  },
+  {
+    id: "st-oil",
+    eventId: SEED_EVENT_ID,
+    name: "Soap & Oil",
+    category: "wellness",
+    booth: "A22",
+    shortWhy: "Native botanicals.",
+    offer: "Sample with any tin",
+    handle: "soapandoil",
+    status: "active",
+  },
+  {
+    id: "st-cutbar",
+    eventId: SEED_EVENT_ID,
+    name: "The Cut Bar & Grill",
+    category: "eat",
+    booth: "A01",
+    shortWhy: "Dry-aged beef, market hours.",
+    offer: "Welcome flute",
+    handle: "cutbar",
+    status: "active",
+  },
 ];

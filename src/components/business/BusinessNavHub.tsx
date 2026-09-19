@@ -26,15 +26,15 @@ export function BusinessNavHub({
   return (
     <div className="space-y-4">
       {/* Domain Role Quick Cards */}
-      <div className="rounded-3xl border-2 border-ink bg-card p-4 shadow-xs">
+      <div className="rounded-3xl ring-1 ring-line bg-card p-4 shadow-xs">
         <div className="flex items-center justify-between border-b border-line pb-3">
           <div>
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800">AirPal Business Hub</span>
-            <h2 className="text-base font-bold text-ink">{businessName || "Your Workspace"}</h2>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800">Your place</span>
+            <h2 className="text-base font-bold text-ink">{businessName || "Your place"}</h2>
           </div>
           <Link
             href="/business/onboard"
-            className="inline-flex items-center gap-1 rounded-full border border-ink/20 bg-paper px-3 py-1 text-xs font-semibold text-ink hover:bg-card transition"
+            className="inline-flex items-center gap-1 rounded-full border border-line/20 bg-paper px-3 py-1 text-xs font-semibold text-ink hover:bg-card transition"
           >
             <PlusCircle size={13} /> Claim Venue
           </Link>
@@ -83,17 +83,17 @@ export function BusinessNavHub({
             key={item.id}
             onClick={() => onTabChange(item.id)}
             className={cn(
-              "flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition whitespace-nowrap border-2",
+              "flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold transition whitespace-nowrap",
               activeTab === item.id
-                ? "border-ink bg-ink text-white"
-                : "border-ink/20 bg-card text-mute hover:border-ink/40 hover:text-ink"
+                ? "border-brand bg-brand text-white"
+                : "border-line bg-card text-mute hover:border-brand/30 hover:text-ink",
             )}
           >
             <span>{item.label}</span>
             <span
               className={cn(
                 "rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
-                activeTab === item.id ? "bg-white/20 text-white" : "bg-paper text-mute border border-line"
+                activeTab === item.id ? "bg-white/20 text-white" : "bg-paper text-mute border border-line",
               )}
             >
               {item.badge}

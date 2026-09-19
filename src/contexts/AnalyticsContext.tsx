@@ -1,13 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocation } from "wouter";
 import {
   getMeasurementId,
@@ -35,11 +26,7 @@ export interface AnalyticsContextValue {
   /** Direct event logger for Firebase Analytics */
   trackEvent: (name: string, params?: Record<string, unknown>) => Promise<boolean>;
   /** High-level tracker for engagement with core product features */
-  trackFeatureEngagement: (
-    feature: CoreFeature,
-    action: string,
-    details?: Record<string, unknown>,
-  ) => Promise<void>;
+  trackFeatureEngagement: (feature: CoreFeature, action: string, details?: Record<string, unknown>) => Promise<void>;
   /** Manual screen/page view logger */
   trackScreen: (screenName: string, path?: string) => Promise<void>;
 }
@@ -213,20 +200,13 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
   }, [currentPath]);
 
   // Core API: Track custom Firebase Analytics events
-  const trackEvent = useCallback(
-    async (name: string, params?: Record<string, unknown>) => {
-      return logFirebaseEvent(name, params);
-    },
-    [],
-  );
+  const trackEvent = useCallback(async (name: string, params?: Record<string, unknown>) => {
+    return logFirebaseEvent(name, params);
+  }, []);
 
   // Core API: Track core feature engagement
   const trackFeatureEngagement = useCallback(
-    async (
-      feature: CoreFeature,
-      action: string,
-      details: Record<string, unknown> = {},
-    ) => {
+    async (feature: CoreFeature, action: string, details: Record<string, unknown> = {}) => {
       // 1. Log to Firebase Analytics with measurement ID
       await logFeatureEngagement(feature, action, {
         city: activeCity,

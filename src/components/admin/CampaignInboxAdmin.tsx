@@ -42,7 +42,9 @@ export function CampaignInboxAdmin() {
       const now = new Date().toISOString();
       await updateDoc(doc(db, "campaigns", row.id), { status, adminNote: note.trim(), updatedAt: now });
       void logAdminAction(user?.uid ?? "", "campaign.status", "campaigns", row.id, row.status, status, note.trim());
-      setRows((list) => list.map((r) => (r.id === row.id ? { ...r, status, adminNote: note.trim(), updatedAt: now } : r)));
+      setRows((list) =>
+        list.map((r) => (r.id === row.id ? { ...r, status, adminNote: note.trim(), updatedAt: now } : r)),
+      );
       setNote("");
       setOpenId(null);
     } finally {
@@ -56,7 +58,9 @@ export function CampaignInboxAdmin() {
     <section className="mt-8 rounded-[28px] bg-card p-4 ring-1 ring-line">
       <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">B2B · revenue engine</p>
       <h2 className="font-display mt-1 text-lg font-semibold">Experience campaigns</h2>
-      <p className="mt-1 text-sm text-mute">Businesses fund experiences; the team takes them live and recruits guests.</p>
+      <p className="mt-1 text-sm text-mute">
+        Businesses fund experiences; the team takes them live and recruits guests.
+      </p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {FILTERS.map((f) => (
           <button
@@ -64,7 +68,7 @@ export function CampaignInboxAdmin() {
             onClick={() => setFilter(f)}
             className={cn(
               "rounded-full px-3 py-1 text-xs font-medium ring-1",
-              filter === f ? "bg-ink text-white ring-ink" : "bg-paper text-mute ring-line",
+              filter === f ? "bg-brand text-white ring-ink" : "bg-paper text-mute ring-line",
             )}
           >
             {f === "all" ? `All (${rows.length})` : `${f} (${rows.filter((r) => r.status === f).length})`}
@@ -74,12 +78,17 @@ export function CampaignInboxAdmin() {
       {loading ? (
         <p className="mt-4 text-sm text-mute">Loading campaigns…</p>
       ) : visible.length === 0 ? (
-        <p className="mt-4 rounded-2xl bg-paper p-4 text-sm text-mute">No {filter === "all" ? "" : `${filter} `}campaigns.</p>
+        <p className="mt-4 rounded-2xl bg-paper p-4 text-sm text-mute">
+          No {filter === "all" ? "" : `${filter} `}campaigns.
+        </p>
       ) : (
         <ul className="mt-3 space-y-2">
           {visible.map((r) => (
             <li key={r.id} className="rounded-2xl bg-paper p-3 ring-1 ring-line">
-              <button onClick={() => setOpenId(openId === r.id ? null : r.id)} className="flex w-full items-center gap-2 text-left">
+              <button
+                onClick={() => setOpenId(openId === r.id ? null : r.id)}
+                className="flex w-full items-center gap-2 text-left"
+              >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-semibold">{r.title}</span>
                   <span className="block truncate text-xs text-mute">
@@ -102,7 +111,7 @@ export function CampaignInboxAdmin() {
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
                     placeholder="Team note (terms agreed, launch plan…)"
-                    className="mt-2 w-full rounded-xl border border-ink bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
+                    className="mt-2 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
                   />
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {(["live", "completed", "cancelled"] as CampaignStatus[])

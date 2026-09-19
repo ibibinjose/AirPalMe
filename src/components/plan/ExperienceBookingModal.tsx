@@ -1,23 +1,10 @@
 import { useState } from "react";
-import {
-  CheckCircle,
-  CreditCard,
-  Lock,
-  Minus,
-  Plus,
-  QrCode,
-  Sparkles,
-  Users,
-  X,
-} from "lucide-react";
-import {
-  type HangoutPlan,
-  type PlanPricingTier,
-  formatTime12h,
-} from "@shared/plan";
+import { CheckCircle, CreditCard, Lock, Minus, Plus, QrCode, Sparkles, Users, X } from "lucide-react";
+import { type HangoutPlan, type PlanPricingTier, formatTime12h, isSoldOut, spotsLeft } from "@shared/plan";
 import { Button } from "@/components/ui/Button";
+import { currencyForCity, localeForCity } from "@/lib/cities";
+import { formatMoney } from "@/lib/regions";
 import { createExperienceCheckoutSessionRemote } from "@/lib/functions";
-import { createBookingForPlan } from "@/components/booking/BookingsSection";
 import { useAuth } from "@/contexts/AuthContext";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
@@ -35,12 +22,7 @@ interface ExperienceBookingModalProps {
   }) => void;
 }
 
-export function ExperienceBookingModal({
-  plan,
-  isOpen,
-  onClose,
-  onBookingSuccess,
-}: ExperienceBookingModalProps) {
+export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess }: ExperienceBookingModalProps) {
   const [spots, setSpots] = useState(1);
   const [selectedTierId, setSelectedTierId] = useState<string>(() => {
     return plan.pricingTiers && plan.pricingTiers.length > 0 ? plan.pricingTiers[0]!.id : "";
@@ -59,28 +41,32 @@ export function ExperienceBookingModal({
 
   if (!isOpen) return null;
 
-  const selectedTier: PlanPricingTier | undefined = (plan.pricingTiers || []).find(
-    (t) => t.id === selectedTierId,
-  );
+  const selectedTier: PlanPricingTier | undefined = (plan.pricingTiers || []).find((t) => t.id === selectedTierId);
 
   const basePricePerPerson = selectedTier ? selectedTier.price : plan.pricePerPerson || 0;
   const totalPrice = basePricePerPerson * spots;
 
-  const depositPerPerson =
-    plan.pricingModel === "deposit" && plan.depositConfig
-      ? plan.depositConfig.depositAmount
-      : 0;
+  const depositPerPerson = plan.pricingModel === "deposit" && plan.depositConfig ? plan.depositConfig.depositAmount : 0;
   const totalDeposit = depositPerPerson * spots;
   const remainingBalance = Math.max(0, totalPrice - totalDeposit);
 
-  const amountToChargeNow =
-    plan.pricingModel === "deposit" && paymentChoice === "deposit"
-      ? totalDeposit
-      : totalPrice;
+  const amountToChargeNow = plan.pricingModel === "deposit" && paymentChoice === "deposit" ? totalDeposit : totalPrice;
 
   const [bookingRefId, setBookingRefId] = useState<string>("");
 
+  const left = spotsLeft(plan);
+  const soldOut = isSoldOut(plan);
+  const maxSpots = left === null ? 20 : Math.max(1, left);
+  const currency = plan.currency || currencyForCity(plan.city) || "AUD";
+  const locale = localeForCity(plan.city);
+
   const handleConfirmBooking = async () => {
+    if (!requireUser("Sign in to buy a ticket.")) return;
+    if (!user) return;
+    if (soldOut) {
+      setBookingError("Sold out.");
+      return;
+    }
     setIsProcessing(true);
     setBookingError(null);
     void triggerHaptic("medium");
@@ -94,18 +80,19 @@ export function ExperienceBookingModal({
         isDeposit,
         guestName: guestName.trim() || undefined,
         guestEmail: guestEmail.trim() || undefined,
-      }).catch(() => null);
+      });
 
-      if (res && res.mode === "live_stripe" && res.checkoutUrl) {
+      if (res.mode === "live_stripe" && res.checkoutUrl) {
         window.location.href = res.checkoutUrl;
         return;
       }
 
-      if (!res || !res.bookingId) {
-        throw new Error("Booking could not be created. Check your connection and try again.");
+      if (!res.bookingId) {
+        throw new Error("Ticket could not be created. Check your connection and try again.");
       }
 
       setBookingRefId(res.bookingId);
+      setPayLater(res.mode === "sandbox_simulated");
       setIsProcessing(false);
       setConfirmedBooking(true);
       void triggerHaptic("success");
@@ -119,52 +106,7 @@ export function ExperienceBookingModal({
         });
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Booking failed. Please try again.";
-      // No Stripe key: complete the build with a pay-later booking instead of a dead end.
-      if (/not configured/i.test(message)) {
-        if (!requireUser("Sign in to book with pay-later.")) {
-          setIsProcessing(false);
-          return;
-        }
-        if (!user) {
-          setIsProcessing(false);
-          return;
-        }
-        try {
-          const id = await createBookingForPlan({
-            planId: plan.id,
-            providerUid: plan.creator.uid || "",
-            providerName: plan.creator.name || "Host",
-            title: plan.title,
-            suburb: plan.city || plan.destination || "Sydney",
-            date: plan.date,
-            time: plan.time,
-            customerUid: user.uid,
-            priceCents: Math.round(totalPrice * 100),
-          });
-          setBookingRefId(id);
-          setPayLater(true);
-          setIsProcessing(false);
-          setConfirmedBooking(true);
-          void triggerHaptic("success");
-          if (onBookingSuccess) {
-            onBookingSuccess({
-              spots,
-              tierId: selectedTierId || undefined,
-              totalAmount: totalPrice,
-              depositPaid: 0,
-              isDeposit: false,
-            });
-          }
-          return;
-        } catch (fallbackErr) {
-          setIsProcessing(false);
-          setBookingError(
-            fallbackErr instanceof Error ? fallbackErr.message : "Pay-later booking failed. Please try again.",
-          );
-          return;
-        }
-      }
+      const message = err instanceof Error ? err.message : "Ticket purchase failed. Please try again.";
       setIsProcessing(false);
       setBookingError(message);
     }
@@ -178,7 +120,7 @@ export function ExperienceBookingModal({
           <div>
             <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-brand">
               <Sparkles size={13} />
-              <span>Book AirPal Experience</span>
+              <span>Buy tickets</span>
             </div>
             <h2 className="text-base sm:text-lg font-bold text-ink mt-0.5">{plan.title}</h2>
             <p className="text-xs text-mute">
@@ -202,9 +144,9 @@ export function ExperienceBookingModal({
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-lg font-bold text-ink">Booking Confirmed!</h3>
+              <h3 className="text-lg font-bold text-ink">Ticket confirmed</h3>
               <p className="text-xs text-mute max-w-xs mx-auto">
-                You're officially booked for <strong>{plan.title}</strong>. Your ticket QR pass and host itinerary have been saved to your AirPal profile.
+                You're in for <strong>{plan.title}</strong>. Show this pass at the door.
               </p>
             </div>
 
@@ -213,7 +155,9 @@ export function ExperienceBookingModal({
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-bold text-mute uppercase">Booking Pass</span>
-                  <p className="text-sm font-bold text-ink font-mono">{bookingRefId || `${plan.inviteCode}-${Math.floor(1000 + Math.random() * 9000)}`}</p>
+                  <p className="text-sm font-bold text-ink font-mono">
+                    {bookingRefId || `${plan.inviteCode}-${Math.floor(1000 + Math.random() * 9000)}`}
+                  </p>
                 </div>
                 <div className="grid h-10 w-10 place-items-center rounded-xl bg-card ring-1 ring-line">
                   <QrCode size={22} className="text-ink" />
@@ -234,22 +178,18 @@ export function ExperienceBookingModal({
                 </div>
                 <div>
                   <span className="text-[10px] text-mute block">{payLater ? "Due at the door:" : "Total Paid:"}</span>
-                  <span className="font-bold text-brand">${amountToChargeNow} AUD</span>
+                  <span className="font-bold text-brand">{formatMoney(amountToChargeNow, currency, locale)}</span>
                 </div>
                 {remainingBalance > 0 && (
                   <div>
                     <span className="text-[10px] text-mute block">Balance Due:</span>
-                    <span className="font-bold text-amber-500">${remainingBalance} AUD</span>
+                    <span className="font-bold text-amber-500">{formatMoney(remainingBalance, currency, locale)}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            <Button
-              type="button"
-              onClick={onClose}
-              className="w-full max-w-sm mx-auto h-11 rounded-2xl font-bold"
-            >
+            <Button type="button" onClick={onClose} className="w-full max-w-sm mx-auto h-11 rounded-2xl font-bold">
               Done
             </Button>
           </div>
@@ -287,7 +227,7 @@ export function ExperienceBookingModal({
                           )}
                         </div>
                         <div className="text-right shrink-0">
-                          <span className="text-sm font-bold">${tier.price}</span>
+                          <span className="text-sm font-bold">{formatMoney(tier.price, currency, locale)}</span>
                           <span className="text-[10px] text-mute block">per guest</span>
                         </div>
                       </button>
@@ -303,7 +243,9 @@ export function ExperienceBookingModal({
                 <Users size={16} className="text-brand" />
                 <div>
                   <span className="text-xs font-bold text-ink block">Number of Guests</span>
-                  <span className="text-[10px] text-mute">${basePricePerPerson} AUD each</span>
+                  <span className="text-[10px] text-mute">
+                    {formatMoney(basePricePerPerson, currency, locale)} each
+                  </span>
                 </div>
               </div>
 
@@ -322,10 +264,10 @@ export function ExperienceBookingModal({
                 <span className="w-5 text-center text-sm font-bold text-ink tabular-nums">{spots}</span>
                 <button
                   type="button"
-                  disabled={spots >= 10}
+                  disabled={spots >= maxSpots || soldOut}
                   onClick={() => {
                     void triggerHaptic("light");
-                    setSpots((s) => s + 1);
+                    setSpots((s) => Math.min(maxSpots, s + 1));
                   }}
                   className="grid h-8 w-8 place-items-center rounded-xl bg-card ring-1 ring-line text-ink disabled:opacity-30 hover:bg-paper active:scale-95"
                 >
@@ -337,9 +279,7 @@ export function ExperienceBookingModal({
             {/* Deposit Payment Selector (if deposit supported) */}
             {plan.pricingModel === "deposit" && plan.depositConfig && (
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-ink block">
-                  Payment Option:
-                </label>
+                <label className="text-xs font-bold uppercase tracking-wider text-ink block">Payment Option:</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -355,9 +295,10 @@ export function ExperienceBookingModal({
                     )}
                   >
                     <span className="text-xs font-bold block">Pay Deposit Now</span>
-                    <span className="text-sm font-bold text-brand">${totalDeposit} AUD</span>
+                    <span className="text-sm font-bold text-brand">{formatMoney(totalDeposit, currency, locale)}</span>
                     <span className="text-[10px] text-mute block mt-0.5">
-                      Remaining ${remainingBalance} due {plan.depositConfig.balanceDueDaysBefore || 14} days before
+                      Remaining {formatMoney(remainingBalance, currency, locale)} due{" "}
+                      {plan.depositConfig.balanceDueDaysBefore || 14} days before
                     </span>
                   </button>
 
@@ -375,7 +316,7 @@ export function ExperienceBookingModal({
                     )}
                   >
                     <span className="text-xs font-bold block">Pay in Full</span>
-                    <span className="text-sm font-bold text-brand">${totalPrice} AUD</span>
+                    <span className="text-sm font-bold text-brand">{formatMoney(totalPrice, currency, locale)}</span>
                     <span className="text-[10px] text-mute block mt-0.5">Instant complete settlement</span>
                   </button>
                 </div>
@@ -393,7 +334,7 @@ export function ExperienceBookingModal({
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
                     placeholder="e.g. Sarah Jenkins"
-                    className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                    className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                   />
                 </div>
                 <div>
@@ -404,7 +345,7 @@ export function ExperienceBookingModal({
                     value={guestEmail}
                     onChange={(e) => setGuestEmail(e.target.value)}
                     placeholder="sarah@example.com"
-                    className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                    className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                   />
                 </div>
               </div>
@@ -416,7 +357,7 @@ export function ExperienceBookingModal({
                   value={specialRequests}
                   onChange={(e) => setSpecialRequests(e.target.value)}
                   placeholder="e.g. Vegetarian, surf beginner, celebration arrival"
-                  className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                  className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                 />
               </div>
             </div>
@@ -427,22 +368,25 @@ export function ExperienceBookingModal({
                 <span>
                   {spots} × {selectedTier ? selectedTier.name : "Experience Ticket"}
                 </span>
-                <span>${totalPrice} AUD</span>
+                <span>{formatMoney(totalPrice, currency, locale)}</span>
               </div>
               {plan.pricingModel === "deposit" && paymentChoice === "deposit" && (
                 <div className="flex items-center justify-between text-mute">
                   <span>Balance payable later:</span>
-                  <span>${remainingBalance} AUD</span>
+                  <span>{formatMoney(remainingBalance, currency, locale)}</span>
                 </div>
               )}
               <div className="flex items-center justify-between font-bold text-ink text-sm border-t border-line/60 pt-1.5 mt-1">
                 <span>Total Due Now:</span>
-                <span className="text-brand text-base">${amountToChargeNow} AUD</span>
+                <span className="text-brand text-base">{formatMoney(amountToChargeNow, currency, locale)}</span>
               </div>
             </div>
 
             {bookingError && (
-              <p role="alert" className="rounded-2xl bg-red-500/10 px-4 py-2.5 text-xs font-medium text-red-600 dark:text-red-400 ring-1 ring-red-500/30">
+              <p
+                role="alert"
+                className="rounded-2xl bg-red-500/10 px-4 py-2.5 text-xs font-medium text-red-600 dark:text-red-400 ring-1 ring-red-500/30"
+              >
                 {bookingError}
               </p>
             )}
@@ -450,23 +394,25 @@ export function ExperienceBookingModal({
             {/* Secure Checkout Button */}
             <Button
               type="button"
-              disabled={isProcessing}
-              onClick={handleConfirmBooking}
+              disabled={isProcessing || soldOut}
+              onClick={() => void handleConfirmBooking()}
               className="w-full h-12 rounded-2xl text-sm font-bold gap-2 shadow-md"
             >
               {isProcessing ? (
-                <span>Processing Reservation...</span>
+                <span>Opening checkout…</span>
+              ) : soldOut ? (
+                <span>Sold out</span>
               ) : (
                 <>
                   <Lock size={15} />
-                  <span>Reserve & Pay ${amountToChargeNow} AUD</span>
+                  <span>Pay {formatMoney(amountToChargeNow, currency, locale)}</span>
                 </>
               )}
             </Button>
 
             <div className="flex items-center justify-center gap-1 text-[11px] text-mute/80 text-center">
               <CreditCard size={12} />
-              <span>Instant confirmation pass & host itinerary delivered to your account</span>
+              <span>Card checkout on Stripe. Your ticket appears after payment.</span>
             </div>
           </div>
         )}

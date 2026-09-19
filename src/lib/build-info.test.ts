@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  formatDiagnosticsReport,
-  getBuildInfo,
-  getRuntimeDiagnostics,
-} from "./build-info";
+import { formatDiagnosticsReport, getBuildInfo, getRuntimeDiagnostics } from "./build-info";
 
 describe("build-info", () => {
   it("extracts build info with versionName and versionCode", () => {

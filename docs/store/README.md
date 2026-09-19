@@ -8,21 +8,21 @@ Support email: AirPalMe@gmail.com (App Store / Play contact) · hello@airpal.me 
 ## What Apple review / Play review will check
 
 - Sign-in works without a prior account: email, phone (SMS), and anonymous QR-guest sessions. No OAuth in the app, so no external-login headaches.
-- Camera permission → QR deal-scan and photo upload. Location permission → nearby stays and business locate-me. Photo library → profile/venue photos.
+- Camera → QR scan. Location (when in use) → nearby places. Photos → profile/listing images. NFC/Bluetooth optional for Wave. Full table: `docs/store/permissions.md`.
 - Paid paths are real-world services only: experience bookings and stay food orders check out with Stripe card payment (live when `STRIPE_SECRET_KEY` is set, sandbox otherwise). No digital goods or in-app currency, so no in-app-purchase conflict — still, re-read both stores' payments policies before release.
 - Reviewer path (no demo account needed): open the app → continue as guest (Scan/Start works with no account). Host features need any email account; food ordering works in sandbox mode. Account deletion: Settings → Delete account (type DELETE), or hello@airpal.me. Paste `docs/store/reviewer-notes.md` into the review notes field.
 - Content: user-generated venues, plans, and reviews. Safety tooling in-app: safety reports, blocks, manual claim review, admin audit log.
 
 ## Data safety (Play) / privacy labels (App Store) — fill verbatim
 
-| Data | Collected? | Why (in-app wording for the reviewer) |
-|---|---|---|
-| Precise location | Yes, optional | Nearby stays, locate-my-business. Runtime prompt, per-use. |
-| Photos / camera | Yes, optional | QR deal scan, profile and venue photos. |
-| Email, phone, name | Yes | Account sign-in and booking contact. |
-| App activity (taps, claims, RSVPs) | Yes | Core features: vouchers, plans, analytics in `admin_audits`. |
-| Purchase history (order/booking totals) | Yes | Experience bookings + stay food orders. Card numbers never touch the app — Stripe processes payment. |
-| Contacts | No | Never requested. |
+| Data                                                                                                                    | Collected?    | Why (in-app wording for the reviewer)                                                                |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------- |
+| Precise location                                                                                                        | Yes, optional | Nearby stays, locate-my-business. Runtime prompt, per-use.                                           |
+| Photos / camera                                                                                                         | Yes, optional | QR deal scan, profile and venue photos.                                                              |
+| Email, phone, name                                                                                                      | Yes           | Account sign-in and booking contact.                                                                 |
+| App activity (taps, claims, RSVPs)                                                                                      | Yes           | Core features: vouchers, plans, analytics in `admin_audits`.                                         |
+| Purchase history (order/booking totals)                                                                                 | Yes           | Experience bookings + stay food orders. Card numbers never touch the app — Stripe processes payment. |
+| Contacts                                                                                                                | No            | Never requested.                                                                                     |
 | Data is encrypted in transit (HTTPS + HSTS) and users can request deletion via Contact/support email. Data is not sold. |
 
 ## Needs-you (cannot be done from this checkout)
@@ -40,14 +40,14 @@ Support email: AirPalMe@gmail.com (App Store / Play contact) · hello@airpal.me 
 
 ## Store images
 
-| Asset | Status | File |
-|---|---|---|
-| App Store icon 1024×1024, flattened RGB (no alpha) | Ready | `docs/store/images/app-store-icon-1024.png` |
-| Play icon 512×512 | Ready | `public/icon-512.png` |
-| Feature graphic 1024×500 | Ready | `docs/store/images/play-feature-graphic-1024x500.png` |
-| Promo page `airpal.me/getAirPal` (badges, QR, share) | Live in app | `src/pages/GetAirPalPage.tsx` |
+| Asset                                                                                                                                                                                                     | Status          | File                                                                                                                                                                       |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| App Store icon 1024×1024, flattened RGB (no alpha)                                                                                                                                                        | Ready           | `docs/store/images/app-store-icon-1024.png`                                                                                                                                |
+| Play icon 512×512                                                                                                                                                                                         | Ready           | `public/icon-512.png`                                                                                                                                                      |
+| Feature graphic 1024×500                                                                                                                                                                                  | Ready           | `docs/store/images/play-feature-graphic-1024x500.png`                                                                                                                      |
+| Promo page `airpal.me/getAirPal` (badges, QR, share)                                                                                                                                                      | Live in app     | `src/pages/GetAirPalPage.tsx`                                                                                                                                              |
 | Phone screenshots (1080×1920, 1290×2796, 1320×2868 = 6.9", 1242×2688 = 6.5") + tablets (2064×2752 iPad, 1920×1200 Play) — Start, Discover, Plan, Experiences, Solutions, Giveaways, Promotions, getAirPal | Run on your Mac | `npm run screenshots` → `docs/store/images/screenshots/` (cold/guest state — sign-in-gated screens capture their auth gate, so shoot Circle/Host by hand if you want them) |
-| Marketing poster 1080×1350 (social/store creative) | Run on your Mac | `npm run screenshots` → `docs/store/images/marketing-poster-1080x1350.png` |
+| Marketing poster 1080×1350 (social/store creative)                                                                                                                                                        | Run on your Mac | `npm run screenshots` → `docs/store/images/marketing-poster-1080x1350.png`                                                                                                 |
 
 ## Promotion images (giveaways & campaigns)
 
@@ -70,15 +70,14 @@ card until you add photos to `public/media/`.
   saves native tokens through the same `fcmTokens` collection — no code change.
 - NFC in the native app needs one Mac step: install any maintained
   `capacitor-nfc` fork (they share `isSupported`/`startScan`/`writeNDEF`),
-  `npx cap sync`, and add the NFC tag-reading entitlement
-  (`com.apple.developer.nfc.readersession.formats`) to the App target in Xcode.
-  The usage string is already in `Info.plist` and Android already declares the
-  NFC permission as `required=false`. `src/lib/nfc.ts` shape-checks the plugin
-  at runtime — no code change. Web NFC on Android Chrome works with no plugin.
+  `npx cap sync`. The NDEF entitlement is already in `App.entitlements`; enable
+  **NFC Tag Reading** on the App ID in Apple Developer so signing succeeds.
+  Android already declares NFC as `required=false`. Web NFC on Android Chrome
+  works with no plugin.
 
 ## In-repo status (done)
 
 - Web PWA: manifest, 192/512 icons, apple-touch-icon, offline page, service worker, no-cache for `sw.js`, immutable assets, full CSP/HSTS headers — `firebase.json`.
 - Deep links: Android App Links intent-filter (autoVerify) + iOS `applinks:airpal.me` entitlement; verification files staged under `public/.well-known/` with correct Content-Type headers.
-- Android: `ACCESS_COARSE/FINE_LOCATION` (runtime-prompted), camera `uses-feature required=false` so camera-less devices aren't filtered. No `google-services.json` needed — Firebase runs through the web SDK, no native push plugin.
-- iOS: bundle id, 2.0.0 (2), camera/photo/location/NFC usage strings, `ITSAppUsesNonExemptEncryption`, associated domains, automatic signing, `PrivacyInfo.xcprivacy` (tracking off; UserDefaults/file-timestamp/boot-time/disk-space reasons declared) wired into the Xcode project.
+- Android: location, camera, NFC, BLE (scan neverForLocation), optional hardware so Play does not filter devices; App Links + `airpal://` scheme; queries for Maps/tel/mail. No `google-services.json` required — Firebase is the web SDK.
+- iOS: camera/photo/when-in-use location/NFC usage strings, custom URL schemes, associated domains (airpal.me, www, firebaseapp), NFC NDEF entitlement, `ITSAppUsesNonExemptEncryption`, privacy manifest collected-data types. Enable NFC Tag Reading on the App ID in Apple Developer.

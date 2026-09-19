@@ -72,7 +72,13 @@ function defaultsForKind(kind: HostPropertyKind) {
         price: "Included",
       },
       facilities: [
-        { name: "College office", hours: "8:00 AM – 6:00 PM", floor: "Main building", details: "Tap Staff in the companion", icon: "BellRing" },
+        {
+          name: "College office",
+          hours: "8:00 AM – 6:00 PM",
+          floor: "Main building",
+          details: "Tap Staff in the companion",
+          icon: "BellRing",
+        },
       ],
     };
   }
@@ -91,7 +97,13 @@ function defaultsForKind(kind: HostPropertyKind) {
         price: "Ask host",
       },
       facilities: [
-        { name: "Host desk", hours: "During service", floor: "Entrance", details: "Tap Staff in the companion", icon: "BellRing" },
+        {
+          name: "Host desk",
+          hours: "During service",
+          floor: "Entrance",
+          details: "Tap Staff in the companion",
+          icon: "BellRing",
+        },
       ],
     };
   }
@@ -110,7 +122,13 @@ function defaultsForKind(kind: HostPropertyKind) {
         price: "Included",
       },
       facilities: [
-        { name: "Front desk", hours: "24 Hours", floor: "Lobby", details: "Tap Staff in the companion", icon: "BellRing" },
+        {
+          name: "Front desk",
+          hours: "24 Hours",
+          floor: "Lobby",
+          details: "Tap Staff in the companion",
+          icon: "BellRing",
+        },
       ],
     };
   }

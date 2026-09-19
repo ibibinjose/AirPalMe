@@ -3,6 +3,9 @@ import { Link } from "wouter";
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { ArrowLeft, Megaphone, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { PayoutSetupCard } from "@/components/connect/PayoutSetupCard";
+import { completePaidBookingRemote } from "@/lib/functions";
+import type { Booking } from "@shared/booking";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { cn } from "@/lib/cn";
@@ -17,13 +20,14 @@ import {
 } from "@shared/campaign";
 
 const inputCls =
-  "mt-1 w-full rounded-xl border border-ink bg-paper px-3 py-2.5 text-sm outline-none placeholder:text-mute focus:border-brand";
+  "mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm outline-none placeholder:text-mute focus:border-brand";
 
 interface BookingRow {
   id: string;
   customerUid: string;
   status: string;
   createdAt: string;
+  paymentStatus?: string;
 }
 
 function moneyToCents(text: string): number {
@@ -77,18 +81,15 @@ export function BusinessCampaignsPage() {
       // Shared bookings engine (§9). Query by providerUid (rules-safe); filter campaign client-side.
       const snap = await getDocs(query(collection(db, "bookings"), where("providerUid", "==", user!.uid)));
       const list = snap.docs
-        .map((d) => {
-          const data = d.data() as Omit<BookingRow, "id"> & { status?: string; campaignId?: string };
-          return {
-            id: d.id,
-            customerUid: data.customerUid,
-            status: data.status || "pending",
-            createdAt: data.createdAt,
-            campaignId: data.campaignId,
-          };
-        })
+        .map((d) => ({ id: d.id, ...(d.data() as Omit<Booking, "id">) }))
         .filter((b) => b.campaignId === c.id && b.status !== "cancelled" && b.status !== "refunded")
-        .map(({ id, customerUid, status, createdAt }) => ({ id, customerUid, status, createdAt }));
+        .map((b) => ({
+          id: b.id,
+          customerUid: b.customerUid,
+          status: b.status,
+          createdAt: b.createdAt,
+          paymentStatus: b.paymentStatus,
+        }));
       list.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
       setRoster((r) => ({ ...r, [c.id]: list }));
     } catch {
@@ -154,9 +155,10 @@ export function BusinessCampaignsPage() {
       <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">AirPal Studio · B2B</p>
       <h1 className="font-display mt-2 text-3xl font-bold tracking-tight">Create an AirPal Experience</h1>
       <p className="mt-1 text-sm leading-6 text-mute">
-        Fund the experience, we recruit the guests, track bookings and report back. No banner ads — billing lands
-        with Stripe later; everything until then is free to file.
+        File the brief, go live, and guests buy tickets on AirPal. Your share is sent after you mark a booking
+        delivered.
       </p>
+      <PayoutSetupCard />
 
       <Button className="mt-4" onClick={() => setShowForm(!showForm)}>
         <Plus size={16} /> {showForm ? "Close brief" : "New campaign"}
@@ -167,25 +169,52 @@ export function BusinessCampaignsPage() {
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block">
               <span className="text-[13px] font-semibold">Business</span>
-              <input value={form.businessName} onChange={(e) => setForm((f) => ({ ...f, businessName: e.target.value }))} className={inputCls} placeholder="Harbour View Hotel" />
+              <input
+                value={form.businessName}
+                onChange={(e) => setForm((f) => ({ ...f, businessName: e.target.value }))}
+                className={inputCls}
+                placeholder="Harbour View Hotel"
+              />
             </label>
             <label className="block">
               <span className="text-[13px] font-semibold">Suburb</span>
-              <input value={form.suburb} onChange={(e) => setForm((f) => ({ ...f, suburb: e.target.value }))} className={inputCls} placeholder="The Rocks" />
+              <input
+                value={form.suburb}
+                onChange={(e) => setForm((f) => ({ ...f, suburb: e.target.value }))}
+                className={inputCls}
+                placeholder="The Rocks"
+              />
             </label>
           </div>
           <label className="block">
             <span className="text-[13px] font-semibold">Experience title</span>
-            <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} className={inputCls} placeholder="Rooftop tasting night" maxLength={80} />
+            <input
+              value={form.title}
+              onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+              className={inputCls}
+              placeholder="Rooftop tasting night"
+              maxLength={80}
+            />
           </label>
           <label className="block">
             <span className="text-[13px] font-semibold">The brief (min 20 characters)</span>
-            <textarea value={form.brief} onChange={(e) => setForm((f) => ({ ...f, brief: e.target.value }))} rows={3} className={inputCls} placeholder="Twenty guests, three pours, one harbour sunset. We host, AirPal recruits." maxLength={600} />
+            <textarea
+              value={form.brief}
+              onChange={(e) => setForm((f) => ({ ...f, brief: e.target.value }))}
+              rows={3}
+              className={inputCls}
+              placeholder="Twenty guests, three pours, one harbour sunset. We host, AirPal recruits."
+              maxLength={600}
+            />
           </label>
           <div className="grid gap-3 sm:grid-cols-3">
             <label className="block">
               <span className="text-[13px] font-semibold">Category</span>
-              <select value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))} className={inputCls}>
+              <select
+                value={form.category}
+                onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+                className={inputCls}
+              >
                 {CAMPAIGN_CATEGORIES.map((c) => (
                   <option key={c}>{c}</option>
                 ))}
@@ -193,29 +222,65 @@ export function BusinessCampaignsPage() {
             </label>
             <label className="block">
               <span className="text-[13px] font-semibold">Date</span>
-              <input type="date" value={form.date} onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))} className={inputCls} />
+              <input
+                type="date"
+                value={form.date}
+                onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+                className={inputCls}
+              />
             </label>
             <label className="block">
               <span className="text-[13px] font-semibold">Time</span>
-              <input type="time" value={form.time} onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))} className={inputCls} />
+              <input
+                type="time"
+                value={form.time}
+                onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))}
+                className={inputCls}
+              />
             </label>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <label className="block">
               <span className="text-[13px] font-semibold">Capacity</span>
-              <input type="number" min={2} max={500} value={form.capacity} onChange={(e) => setForm((f) => ({ ...f, capacity: Number(e.target.value) }))} className={inputCls} />
+              <input
+                type="number"
+                min={2}
+                max={500}
+                value={form.capacity}
+                onChange={(e) => setForm((f) => ({ ...f, capacity: Number(e.target.value) }))}
+                className={inputCls}
+              />
             </label>
             <label className="block">
               <span className="text-[13px] font-semibold">Recruit target</span>
-              <input type="number" min={1} max={500} value={form.recruitTarget} onChange={(e) => setForm((f) => ({ ...f, recruitTarget: Number(e.target.value) }))} className={inputCls} />
+              <input
+                type="number"
+                min={1}
+                max={500}
+                value={form.recruitTarget}
+                onChange={(e) => setForm((f) => ({ ...f, recruitTarget: Number(e.target.value) }))}
+                className={inputCls}
+              />
             </label>
             <label className="block">
-              <span className="text-[13px] font-semibold">Budget (AUD)</span>
-              <input inputMode="decimal" value={budgetText} onChange={(e) => setBudgetText(e.target.value)} className={inputCls} placeholder="1000" />
+              <span className="text-[13px] font-semibold">Budget</span>
+              <input
+                inputMode="decimal"
+                value={budgetText}
+                onChange={(e) => setBudgetText(e.target.value)}
+                className={inputCls}
+                placeholder="1000"
+              />
             </label>
             <label className="block">
-              <span className="text-[13px] font-semibold">Ticket (AUD)</span>
-              <input inputMode="decimal" value={priceText} onChange={(e) => setPriceText(e.target.value)} className={inputCls} placeholder="0 = free" />
+              <span className="text-[13px] font-semibold">Ticket price</span>
+              <input
+                inputMode="decimal"
+                value={priceText}
+                onChange={(e) => setPriceText(e.target.value)}
+                className={inputCls}
+                placeholder="0 = free"
+              />
             </label>
           </div>
           {error && <p className="rounded-xl bg-paper p-3 text-[13px] text-mute ring-1 ring-line">{error}</p>}
@@ -276,7 +341,7 @@ export function BusinessCampaignsPage() {
                         </dd>
                       </div>
                       <div className="flex justify-between gap-2">
-                        <dt className="text-mute">Projected revenue (pre-Stripe)</dt>
+                        <dt className="text-mute">Ticket revenue (paid + unpaid holds)</dt>
                         <dd className="font-semibold">{aud(projectedRevenue(c.priceCents, seats))}</dd>
                       </div>
                       <div className="flex justify-between gap-2">
@@ -290,6 +355,34 @@ export function BusinessCampaignsPage() {
                         </div>
                       )}
                     </dl>
+                    {(roster[c.id] || []).length > 0 && (
+                      <ul className="mt-3 divide-y divide-line">
+                        {(roster[c.id] || []).map((b) => (
+                          <li key={b.id} className="flex items-center justify-between gap-2 py-2">
+                            <span className="text-xs text-mute">
+                              {b.paymentStatus === "paid" ? "Paid" : "Unpaid"} · {b.status}
+                            </span>
+                            {b.paymentStatus === "paid" && b.status !== "completed" && (
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  void completePaidBookingRemote({ bookingId: b.id }).then(() => {
+                                    setRoster((r) => {
+                                      const next = { ...r };
+                                      delete next[c.id];
+                                      return next;
+                                    });
+                                    void loadRoster(c);
+                                  });
+                                }}
+                              >
+                                Mark delivered
+                              </Button>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 )}
               </li>

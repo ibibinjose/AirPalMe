@@ -4,6 +4,8 @@ import * as api from "./index";
 // Callable names are the deployed API surface: renaming or dropping one breaks
 // clients and deploys, so the barrel re-export list is pinned here.
 const CALLABLES = [
+  "completeAccountSignup",
+  "loginWithPhonePassword",
   "completeRegistration",
   "ensurePlatformAdmin",
   "setPropertyMember",
@@ -47,6 +49,13 @@ const CALLABLES = [
   "getPlanByInviteCode",
   "createExperienceCheckoutSession",
   "confirmExperienceBookingRemote",
+  "createBookingCheckoutSession",
+  "createConnectAccountLink",
+  "refreshConnectAccount",
+  "createConnectLoginLink",
+  "releaseHeldPayouts",
+  "completePaidBooking",
+  "stripeWebhook",
   "createPlan",
   "rsvpPlan",
   "addPlanStop",

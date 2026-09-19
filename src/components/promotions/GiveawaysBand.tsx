@@ -13,12 +13,7 @@ export function GiveawaysBand() {
     const db = getFirebaseDb();
     if (!db) return;
     void getDocs(
-      query(
-        collection(db, "promotions"),
-        where("kind", "==", "giveaway"),
-        where("status", "==", "live"),
-        limit(10),
-      ),
+      query(collection(db, "promotions"), where("kind", "==", "giveaway"), where("status", "==", "live"), limit(10)),
     )
       .then((snap) => {
         const list = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Promotion, "id">) }));
@@ -30,7 +25,7 @@ export function GiveawaysBand() {
 
   return (
     <section className="mx-4 mt-6 md:mx-6">
-      <div className="relative overflow-hidden rounded-3xl border-2 border-ink bg-slate-950 p-5 md:p-6 text-white shadow-md">
+      <div className="relative overflow-hidden rounded-3xl ring-1 ring-line bg-slate-950 p-5 md:p-6 text-white shadow-md">
         {/* Subtle Ambient Blue Glow */}
         <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-brand/25 blur-3xl pointer-events-none" />
 

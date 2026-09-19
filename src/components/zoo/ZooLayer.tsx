@@ -62,12 +62,5 @@ export function ZooLayer() {
   }, [byHandle, hunts, path]);
 
   if (!sheet) return null;
-  return (
-    <ZooSheet
-      open
-      hunt={sheet.hunt}
-      stop={sheet.stop}
-      onClose={() => setSheet(null)}
-    />
-  );
+  return <ZooSheet open hunt={sheet.hunt} stop={sheet.stop} onClose={() => setSheet(null)} />;
 }

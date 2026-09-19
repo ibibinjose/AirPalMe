@@ -125,11 +125,7 @@ describe("plan store", () => {
     addStopToPlan(plan.id, { name: "Second" });
     addStopToPlan(plan.id, { name: "Third" });
     reorderStopsInPlan(plan.id, 0, 2);
-    expect((getPlan(plan.id)?.stops ?? []).map((s) => s.name)).toEqual([
-      "Second",
-      "Third",
-      "First",
-    ]);
+    expect((getPlan(plan.id)?.stops ?? []).map((s) => s.name)).toEqual(["Second", "Third", "First"]);
   });
 
   it("toggles stop upvotes", () => {

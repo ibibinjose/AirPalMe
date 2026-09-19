@@ -14,6 +14,7 @@ import { ExpoDirectoryPage } from "./ExpoDirectoryPage";
 import { PageLoading } from "@/components/ui/PageLoading";
 import { NotFoundPage } from "./NotFoundPage";
 import { useLocalNow } from "@/hooks/useLocalNow";
+import { HereCheckIn } from "@/components/circle/HereCheckIn";
 
 export function EventPage() {
   const [, params] = useRoute("/e/:id");
@@ -87,11 +88,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
       {/* Hero Image */}
       {event.heroImage && (
         <div className="relative h-72 w-full overflow-hidden bg-paper">
-          <img
-            src={event.heroImage}
-            alt={event.title}
-            className="h-full w-full object-cover"
-          />
+          <img src={event.heroImage} alt={event.title} className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-paper via-transparent to-transparent" />
         </div>
       )}
@@ -105,7 +102,9 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
           <span
             className={cn(
               "rounded-full px-2.5 py-0.5 text-xs font-semibold",
-              relative.highlight ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300" : "bg-card text-mute ring-1 ring-line",
+              relative.highlight
+                ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300"
+                : "bg-card text-mute ring-1 ring-line",
             )}
           >
             {relative.label}
@@ -117,9 +116,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
           )}
         </div>
 
-        <h1 className="font-display mt-3 text-3xl font-bold tracking-tight text-ink md:text-4xl">
-          {event.title}
-        </h1>
+        <h1 className="font-display mt-3 text-3xl font-bold tracking-tight text-ink md:text-4xl">{event.title}</h1>
 
         <div className="mt-4 space-y-2 rounded-2xl bg-card p-4 ring-1 ring-line text-sm">
           <div className="flex items-center gap-2 font-medium text-ink">
@@ -132,7 +129,9 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
             className="flex items-center gap-2 text-mute hover:text-brand transition text-left"
           >
             <MapPin size={15} className="shrink-0 text-gold" />
-            <span>{event.venue}, {event.city}</span>
+            <span>
+              {event.venue}, {event.city}
+            </span>
           </button>
           {event.ticketPrice && (
             <p className="text-xs font-medium text-mute">
@@ -141,12 +140,12 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
           )}
         </div>
 
+        <HereCheckIn placeName={event.venue} eventId={event.id} />
+
         {/* Description */}
         <div className="mt-5">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-mute">Overview</h2>
-          <p className="mt-2 text-sm leading-relaxed text-ink whitespace-pre-line">
-            {event.description}
-          </p>
+          <p className="mt-2 text-sm leading-relaxed text-ink whitespace-pre-line">{event.description}</p>
         </div>
 
         {/* Attendance Action Bar */}
@@ -204,11 +203,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
                   : "bg-paper text-ink hover:bg-rose-50 ring-1 ring-line/80",
               )}
             >
-              <Heart
-                size={15}
-                className={event.isLiked ? "fill-white" : ""}
-                strokeWidth={event.isLiked ? 2.5 : 2}
-              />
+              <Heart size={15} className={event.isLiked ? "fill-white" : ""} strokeWidth={event.isLiked ? 2.5 : 2} />
             </button>
           </div>
         </div>
@@ -216,10 +211,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
         {/* Action Buttons */}
         <div className="mt-6 flex flex-col gap-2.5">
           {event.ticketUrl && (
-            <Button
-              className="w-full"
-              onClick={() => window.open(event.ticketUrl, "_blank")}
-            >
+            <Button className="w-full" onClick={() => window.open(event.ticketUrl, "_blank")}>
               Get Tickets / Official Info
             </Button>
           )}
@@ -240,7 +232,9 @@ function NearbyEventDetailView({ event: ev }: { event: NearbyEvent }) {
   const [, nav] = useLocation();
   return (
     <div className="mx-auto max-w-lg pb-10">
-      {ev.heroImage && <img src={ev.heroImage} alt="" referrerPolicy="no-referrer" className="h-72 w-full object-cover" />}
+      {ev.heroImage && (
+        <img src={ev.heroImage} alt="" referrerPolicy="no-referrer" className="h-72 w-full object-cover" />
+      )}
       <div className="px-4 pt-5">
         <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">{ev.when}</p>
         <h1 className="font-display mt-1 text-3xl font-semibold">{ev.title}</h1>

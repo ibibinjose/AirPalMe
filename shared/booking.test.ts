@@ -4,8 +4,13 @@ import {
   canCustomerCancel,
   canProviderComplete,
   canProviderConfirm,
+  canReleasePayout,
+  canRetryPayout,
+  checkoutPaymentCollected,
   isBookingStatus,
   paymentStatusForPrice,
+  payoutStatusAfterGuestPaid,
+  payoutStatusForPrice,
   isBusinessProviderBooking,
   isOpenProviderBooking,
   quoteFees,
@@ -86,15 +91,50 @@ describe("booking engine", () => {
     expect(isBookingStatus("shipped")).toBe(false);
     expect(paymentStatusForPrice(0)).toBe("paid");
     expect(paymentStatusForPrice(8000)).toBe("unpaid");
+    expect(payoutStatusForPrice(0)).toBe("transferred");
+    expect(payoutStatusForPrice(8000)).toBe("unpaid");
+    expect(payoutStatusAfterGuestPaid(8000)).toBe("held");
+    expect(checkoutPaymentCollected("paid")).toBe(true);
+    expect(checkoutPaymentCollected("unpaid")).toBe(false);
+    expect(
+      canReleasePayout({
+        paymentStatus: "paid",
+        payoutStatus: "held",
+        stripeChargeId: "ch_1",
+        stripeAccountId: "acct_1",
+        transfersActive: true,
+      }),
+    ).toBe(true);
+    expect(
+      canReleasePayout({
+        paymentStatus: "paid",
+        payoutStatus: "held",
+        stripeChargeId: "ch_1",
+        stripeAccountId: "acct_1",
+        transfersActive: false,
+      }),
+    ).toBe(false);
+    expect(
+      canRetryPayout({
+        status: "completed",
+        paymentStatus: "paid",
+        payoutStatus: "held",
+        priceCents: 8000,
+      }),
+    ).toBe(true);
+    expect(
+      canRetryPayout({
+        status: "confirmed",
+        paymentStatus: "paid",
+        payoutStatus: "held",
+        priceCents: 8000,
+      }),
+    ).toBe(false);
   });
 
   it("scopes business inbox to the owning provider", () => {
-    expect(
-      isBusinessProviderBooking({ providerKind: "business", providerUid: "biz1" }, "biz1"),
-    ).toBe(true);
-    expect(
-      isBusinessProviderBooking({ providerKind: "business", providerUid: "biz1" }, "other"),
-    ).toBe(false);
+    expect(isBusinessProviderBooking({ providerKind: "business", providerUid: "biz1" }, "biz1")).toBe(true);
+    expect(isBusinessProviderBooking({ providerKind: "business", providerUid: "biz1" }, "other")).toBe(false);
     expect(isBusinessProviderBooking({ providerKind: "mate", providerUid: "biz1" }, "biz1")).toBe(false);
     expect(isOpenProviderBooking("pending")).toBe(true);
     expect(isOpenProviderBooking("completed")).toBe(false);

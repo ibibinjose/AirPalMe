@@ -2,7 +2,9 @@ import { randomBytes } from "node:crypto";
 import { FieldValue, GeoPoint } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { DEFAULT_PRECINCT_ID, isBusinessCategory, placeCategoryFor } from "../../shared/business";
+import { clampBusinessPlan } from "../../shared/business-onboarding";
 import { stampContentMeta } from "../../shared/content-meta";
+import { emailMatchesWebsite } from "../../shared/google-place";
 import type { UpsertBusinessDealRequest, UpsertBusinessListingRequest } from "../../shared/airpal-security";
 import { enforceRateLimit, noteAppCheck, writeAudit } from "./abuse";
 import { writeAuthoritativeEvent } from "./analytics";
@@ -41,11 +43,25 @@ export const upsertBusinessListing = onCall(CALLABLE, async (request) => {
   const placeCategory = placeCategoryFor(category);
   const precinctId = String(data.precinctId || "").trim() || DEFAULT_PRECINCT_ID;
   const existingListing = await db.collection("listings").doc(listingId).get();
+  const previous = existingListing.exists ? existingListing.data() : undefined;
+  const website = String(data.website || "").trim() || String(previous?.website || "");
+  const domainProof = emailMatchesWebsite(email, website);
+  const abnProof = String(data.abnOrTaxId || "").replace(/\s/g, "").length >= 8 || Boolean(previous?.abnProof);
+  const plan = clampBusinessPlan(String(data.plan || previous?.plan || "presence"), {
+    domain: domainProof,
+    abn: abnProof,
+  });
   const meta = stampContentMeta(
     existingListing.exists
       ? (existingListing.data() as Partial<import("../../shared/content-meta").ContentMeta>)
       : undefined,
-    { ownerUid: uid, ownerEmail: email, source: "partner", verifiedOwner: true, reviewStatus: "approved" },
+    {
+      ownerUid: uid,
+      ownerEmail: email,
+      source: "partner",
+      verifiedOwner: domainProof,
+      reviewStatus: "approved",
+    },
   );
   const listing = {
     id: listingId,
@@ -65,6 +81,8 @@ export const upsertBusinessListing = onCall(CALLABLE, async (request) => {
     precinctId,
     source: meta.source,
     verifiedOwner: meta.verifiedOwner,
+    plan,
+    abnProof,
     reviewStatus: meta.reviewStatus,
     createdAt: existingListing.exists
       ? existingListing.data()?.createdAt || FieldValue.serverTimestamp()
@@ -72,6 +90,8 @@ export const upsertBusinessListing = onCall(CALLABLE, async (request) => {
     updatedAt: FieldValue.serverTimestamp(),
     hoursVerifiedAt: FieldValue.serverTimestamp(),
     expiresAt: meta.expiresAt || null,
+    mapsPlaceId: String(data.mapsPlaceId || "").trim() || String(previous?.mapsPlaceId || "") || null,
+    website: website || null,
   };
 
   await db.collection("listings").doc(listingId).set(listing, { merge: true });
@@ -92,9 +112,13 @@ export const upsertBusinessListing = onCall(CALLABLE, async (request) => {
         address,
         ownerUid: uid,
         heroImage: listing.heroImage,
-        verifiedPartner: true,
-        verifiedOwner: true,
+        verifiedPartner: plan === "featured" || plan === "partner",
+        verifiedOwner: domainProof,
+        plan,
         reviewStatus: meta.reviewStatus,
+        mapsPlaceId: listing.mapsPlaceId,
+        website: listing.website,
+        phone: listing.phone,
         updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true },

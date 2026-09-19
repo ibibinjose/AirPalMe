@@ -259,8 +259,14 @@ export function OrganiserEventPage() {
   if (!myEvent) {
     return (
       <div className="relative isolate overflow-hidden">
-        <div aria-hidden className="pointer-events-none absolute -left-20 top-[-6rem] h-64 w-64 rounded-full bg-brand/10 blur-3xl" />
-        <div aria-hidden className="pointer-events-none absolute -right-16 top-24 h-56 w-56 rounded-full bg-gold/15 blur-3xl" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-20 top-[-6rem] h-64 w-64 rounded-full bg-brand/10 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-16 top-24 h-56 w-56 rounded-full bg-gold/15 blur-3xl"
+        />
         <motion.div
           className="relative mx-auto max-w-2xl px-4 py-8 pb-24"
           initial={reduce ? false : "hidden"}
@@ -291,7 +297,7 @@ export function OrganiserEventPage() {
                       onClick={() => setFlavour(id)}
                       className={cn(
                         "rounded-[22px] p-4 text-left ring-1 transition duration-200 active:scale-[0.98]",
-                        on ? "bg-ink text-white ring-ink shadow-md" : "bg-card/90 ring-line hover:ring-ink/25",
+                        on ? "bg-brand text-white ring-brand shadow-md" : "bg-card/90 ring-line hover:ring-brand/25",
                       )}
                     >
                       <span
@@ -389,7 +395,7 @@ export function OrganiserEventPage() {
                       onClick={() => setStatus(id)}
                       className={cn(
                         "rounded-2xl px-4 py-3 text-sm font-semibold ring-1 transition",
-                        on ? "bg-ink text-white ring-ink" : "bg-card text-mute ring-line hover:text-ink",
+                        on ? "bg-brand text-white ring-ink" : "bg-card text-mute ring-line hover:text-ink",
                       )}
                     >
                       {label}
@@ -413,8 +419,14 @@ export function OrganiserEventPage() {
 
   return (
     <div className="relative isolate overflow-hidden">
-      <div aria-hidden className="pointer-events-none absolute -left-24 top-[-6rem] h-64 w-64 rounded-full bg-brand/10 blur-3xl" />
-      <div aria-hidden className="pointer-events-none absolute -right-16 top-28 h-56 w-56 rounded-full bg-gold/15 blur-3xl" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-24 top-[-6rem] h-64 w-64 rounded-full bg-brand/10 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-16 top-28 h-56 w-56 rounded-full bg-gold/15 blur-3xl"
+      />
 
       <div className="relative mx-auto max-w-2xl px-4 pb-16">
         <header className="pt-5">
@@ -460,7 +472,7 @@ export function OrganiserEventPage() {
               onClick={() => setTab(id)}
               className={cn(
                 "h-9 flex-1 rounded-full px-3 text-sm capitalize transition",
-                tab === id ? "bg-ink text-white shadow-sm" : "text-mute hover:text-ink",
+                tab === id ? "bg-brand text-white shadow-sm" : "text-mute hover:text-ink",
               )}
             >
               {id}
@@ -529,156 +541,173 @@ export function OrganiserEventPage() {
               const labels = stallFieldLabels(myEvent.flavour);
               return (
                 <>
-            <form className="space-y-3 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm" onSubmit={onAddStall}>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="font-display text-lg font-semibold">
-                    {editingStallId ? "Edit" : labels.addTitle}
-                  </h2>
-                  <p className="text-[13px] text-mute">
-                    Same fields for expo, market, and event space. Guests see them in the directory.
-                  </p>
-                </div>
-                {editingStallId && (
-                  <button type="button" className="text-xs font-semibold text-mute hover:text-ink" onClick={resetStallForm}>
-                    Cancel
-                  </button>
-                )}
-              </div>
-              <label className="block">
-                <span className="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink/70">{labels.business}</span>
-                <input
-                  value={stallName}
-                  onChange={(e) => setStallName(e.target.value)}
-                  placeholder={labels.businessPlaceholder}
-                  className={field}
-                />
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                <label className="block">
-                  <span className="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink/70">{labels.unit}</span>
-                  <input
-                    value={booth}
-                    onChange={(e) => setBooth(e.target.value)}
-                    placeholder={labels.unitPlaceholder}
-                    className={field}
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink/70">{labels.handle}</span>
-                  <input
-                    value={stallHandle}
-                    onChange={(e) => setStallHandle(e.target.value)}
-                    placeholder={labels.handlePlaceholder}
-                    className={field}
-                  />
-                </label>
-              </div>
-              <div>
-                <p className="mb-1.5 text-[12px] font-semibold tracking-wide text-ink/70">Category</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {STALL_CATEGORIES.map((c) => {
-                    const on = stallCategory === c.id;
-                    return (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onClick={() => setStallCategory(c.id)}
-                        className={cn(
-                          "h-9 rounded-full px-3.5 text-xs font-semibold ring-1 transition",
-                          on ? "bg-ink text-white ring-ink" : "bg-paper text-mute ring-line hover:text-ink",
-                        )}
-                      >
-                        {c.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <label className="block">
-                <span className="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink/70">{labels.about}</span>
-                <input
-                  value={stallWhy}
-                  onChange={(e) => setStallWhy(e.target.value)}
-                  placeholder="One line guests will read"
-                  className={field}
-                />
-              </label>
-              <label className="block">
-                <span className="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink/70">Offer for guests</span>
-                <input
-                  value={stallOffer}
-                  onChange={(e) => setStallOffer(e.target.value)}
-                  placeholder="Optional — e.g. 2 for $10"
-                  className={field}
-                />
-              </label>
-              <Button type="submit" className="w-full">
-                {editingStallId ? "Save changes" : labels.addTitle}
-              </Button>
-            </form>
+                  <form
+                    className="space-y-3 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm"
+                    onSubmit={onAddStall}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h2 className="font-display text-lg font-semibold">
+                          {editingStallId ? "Edit" : labels.addTitle}
+                        </h2>
+                        <p className="text-[13px] text-mute">
+                          Same fields for expo, market, and event space. Guests see them in the directory.
+                        </p>
+                      </div>
+                      {editingStallId && (
+                        <button
+                          type="button"
+                          className="text-xs font-semibold text-mute hover:text-ink"
+                          onClick={resetStallForm}
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </div>
+                    <label className="block">
+                      <span className="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink/70">
+                        {labels.business}
+                      </span>
+                      <input
+                        value={stallName}
+                        onChange={(e) => setStallName(e.target.value)}
+                        placeholder={labels.businessPlaceholder}
+                        className={field}
+                      />
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <label className="block">
+                        <span className="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink/70">
+                          {labels.unit}
+                        </span>
+                        <input
+                          value={booth}
+                          onChange={(e) => setBooth(e.target.value)}
+                          placeholder={labels.unitPlaceholder}
+                          className={field}
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink/70">
+                          {labels.handle}
+                        </span>
+                        <input
+                          value={stallHandle}
+                          onChange={(e) => setStallHandle(e.target.value)}
+                          placeholder={labels.handlePlaceholder}
+                          className={field}
+                        />
+                      </label>
+                    </div>
+                    <div>
+                      <p className="mb-1.5 text-[12px] font-semibold tracking-wide text-ink/70">Category</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {STALL_CATEGORIES.map((c) => {
+                          const on = stallCategory === c.id;
+                          return (
+                            <button
+                              key={c.id}
+                              type="button"
+                              onClick={() => setStallCategory(c.id)}
+                              className={cn(
+                                "h-9 rounded-full px-3.5 text-xs font-semibold ring-1 transition",
+                                on ? "bg-brand text-white ring-ink" : "bg-paper text-mute ring-line hover:text-ink",
+                              )}
+                            >
+                              {c.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <label className="block">
+                      <span className="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink/70">
+                        {labels.about}
+                      </span>
+                      <input
+                        value={stallWhy}
+                        onChange={(e) => setStallWhy(e.target.value)}
+                        placeholder="One line guests will read"
+                        className={field}
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink/70">
+                        Offer for guests
+                      </span>
+                      <input
+                        value={stallOffer}
+                        onChange={(e) => setStallOffer(e.target.value)}
+                        placeholder="Optional — e.g. 2 for $10"
+                        className={field}
+                      />
+                    </label>
+                    <Button type="submit" className="w-full">
+                      {editingStallId ? "Save changes" : labels.addTitle}
+                    </Button>
+                  </form>
 
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <label className="flex h-12 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-ink text-sm font-medium text-white">
-                <Upload size={16} />
-                Import CSV
-                <input
-                  type="file"
-                  accept=".csv,text/csv"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) void onCsv(file);
-                  }}
-                />
-              </label>
-              <Button
-                variant="ghost"
-                className="flex-1"
-                type="button"
-                onClick={() => {
-                  const blob = new Blob([stallCsvTemplate(myEvent.flavour)], { type: "text/csv;charset=utf-8" });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement("a");
-                  a.href = url;
-                  a.download = `airpal-${myEvent.flavour}-directory.csv`;
-                  a.click();
-                  URL.revokeObjectURL(url);
-                }}
-              >
-                Download template
-              </Button>
-            </div>
-            <p className="text-center text-[12px] text-mute">
-              CSV columns: business name, {labels.unit.toLowerCase()}, handle, category, about, offer
-            </p>
-
-            {stalls.length === 0 ? (
-              <p className="rounded-[22px] bg-card px-4 py-8 text-center text-sm text-mute ring-1 ring-line">
-                {labels.empty}
-              </p>
-            ) : (
-              <ul className="space-y-2">
-                {stalls.map((s) => (
-                  <li key={s.id}>
-                    <button
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <label className="flex h-12 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-ink text-sm font-medium text-white">
+                      <Upload size={16} />
+                      Import CSV
+                      <input
+                        type="file"
+                        accept=".csv,text/csv"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) void onCsv(file);
+                        }}
+                      />
+                    </label>
+                    <Button
+                      variant="ghost"
+                      className="flex-1"
                       type="button"
-                      onClick={() => editStall(s)}
-                      className="w-full rounded-[22px] bg-card px-4 py-3 text-left ring-1 ring-line transition hover:ring-ink/20"
+                      onClick={() => {
+                        const blob = new Blob([stallCsvTemplate(myEvent.flavour)], { type: "text/csv;charset=utf-8" });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = `airpal-${myEvent.flavour}-directory.csv`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                      }}
                     >
-                      <p className="text-[12px] text-mute">
-                        {stallUnitDisplay(myEvent.flavour, s.booth)}
-                        {" · "}
-                        {STALL_CATEGORIES.find((c) => c.id === s.category)?.label || s.category}
-                        {s.handle ? ` · @${s.handle}` : ""}
-                      </p>
-                      <p className="font-medium">{s.name}</p>
-                      {s.offer && <p className="text-[13px] text-gold">{s.offer}</p>}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+                      Download template
+                    </Button>
+                  </div>
+                  <p className="text-center text-[12px] text-mute">
+                    CSV columns: business name, {labels.unit.toLowerCase()}, handle, category, about, offer
+                  </p>
+
+                  {stalls.length === 0 ? (
+                    <p className="rounded-[22px] bg-card px-4 py-8 text-center text-sm text-mute ring-1 ring-line">
+                      {labels.empty}
+                    </p>
+                  ) : (
+                    <ul className="space-y-2">
+                      {stalls.map((s) => (
+                        <li key={s.id}>
+                          <button
+                            type="button"
+                            onClick={() => editStall(s)}
+                            className="w-full rounded-[22px] bg-card px-4 py-3 text-left ring-1 ring-line transition hover:ring-brand/20"
+                          >
+                            <p className="text-[12px] text-mute">
+                              {stallUnitDisplay(myEvent.flavour, s.booth)}
+                              {" · "}
+                              {STALL_CATEGORIES.find((c) => c.id === s.category)?.label || s.category}
+                              {s.handle ? ` · @${s.handle}` : ""}
+                            </p>
+                            <p className="font-medium">{s.name}</p>
+                            {s.offer && <p className="text-[13px] text-gold">{s.offer}</p>}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </>
               );
             })()}
@@ -731,7 +760,10 @@ export function OrganiserEventPage() {
         )}
 
         {tab === "settings" && (
-          <form className="mt-5 space-y-4 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm md:p-6" onSubmit={onSaveSettings}>
+          <form
+            className="mt-5 space-y-4 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm md:p-6"
+            onSubmit={onSaveSettings}
+          >
             <div>
               <h2 className="font-display text-lg font-semibold">Event details</h2>
               <p className="text-[13px] text-mute">Saved to the live event record guests already see.</p>
@@ -750,7 +782,7 @@ export function OrganiserEventPage() {
                     onClick={() => setFlavour(id)}
                     className={cn(
                       "h-9 rounded-full px-4 text-sm",
-                      flavour === id ? "bg-ink text-white" : "bg-paper ring-1 ring-line text-mute",
+                      flavour === id ? "bg-brand text-white" : "bg-paper ring-1 ring-line text-mute",
                     )}
                   >
                     {EVENT_FLAVOUR_LABELS[id]}
@@ -761,7 +793,12 @@ export function OrganiserEventPage() {
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block">
                 <span className="mb-1.5 block text-[12px] font-semibold tracking-wide text-ink/70">City</span>
-                <input value={city} list="event-cities-edit" onChange={(e) => setCity(e.target.value)} className={field} />
+                <input
+                  value={city}
+                  list="event-cities-edit"
+                  onChange={(e) => setCity(e.target.value)}
+                  className={field}
+                />
                 <datalist id="event-cities-edit">
                   {CITY_OPTIONS.map((c) => (
                     <option key={c.id} value={c.label} />
@@ -805,7 +842,7 @@ export function OrganiserEventPage() {
                       onClick={() => setStatus(id)}
                       className={cn(
                         "rounded-2xl px-3 py-2.5 text-xs font-semibold capitalize ring-1 transition",
-                        on ? "bg-ink text-white ring-ink" : "bg-paper text-mute ring-line",
+                        on ? "bg-brand text-white ring-ink" : "bg-paper text-mute ring-line",
                       )}
                     >
                       {on && <Check size={12} className="mr-1 inline" />}

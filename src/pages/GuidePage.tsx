@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 import { Share2 } from "lucide-react";
 import { TourCard } from "@/components/guide/TourCard";
 import { PlaceCard } from "@/components/discovery/PlaceCard";
-import { activePlaces, placesInCity, toursForPrecinct, withWalk } from "@/lib/catalog";
+import { activePlaces, placesAround, placesInCity, ROCKS_BROWSE, toursForPrecinct, withWalk } from "@/lib/catalog";
 import { fetchTours } from "@/lib/tours-store";
 import { shareCuratedGuide } from "@/lib/share";
 import type { WalkingTour } from "@shared/tours";
@@ -17,7 +17,8 @@ import { useOnDataReload } from "@/hooks/useDataReload";
 export function GuidePage() {
   const [, nav] = useLocation();
   const { t } = useLocale();
-  const { here, city } = useLocalNow();
+  const { here, city, usingGps, chooseLocation } = useLocalNow();
+  const aroundYou = usingGps;
   const { version, remoteLoaded } = useListings();
   const [tours, setTours] = useState<WalkingTour[]>(() => toursForPrecinct(city));
   const [toursLoaded, setToursLoaded] = useState(false);
@@ -40,16 +41,11 @@ export function GuidePage() {
     setTours(toursForPrecinct(city, rows));
   });
 
-  const sights = useMemo(
-    () =>
-      placesInCity(
-        activePlaces().filter((p) => p.category === "things"),
-        city,
-      )
-        .map((p) => withWalk(p, here))
-        .sort((a, b) => a.meters - b.meters),
-    [here, city, version],
-  );
+  const sights = useMemo(() => {
+    const pool = activePlaces().filter((p) => p.category === "things");
+    const scoped = aroundYou ? placesAround(pool, here) : placesInCity(pool, city);
+    return scoped.map((p) => withWalk(p, here)).sort((a, b) => a.meters - b.meters);
+  }, [here, city, aroundYou, version]);
 
   const handleShareGuide = () => {
     void shareCuratedGuide(city);
@@ -62,7 +58,8 @@ export function GuidePage() {
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-gold">{t("guide")}</p>
           <h1 className="font-display mt-1 text-3xl font-semibold">{t("walks")}</h1>
           <p className="mt-1 text-xs text-mute">
-            Curated walks &amp; sights in <span className="font-medium text-ink">{city || "Sydney"}</span>
+            Curated walks &amp; sights in{" "}
+            <span className="font-medium text-ink">{city || (aroundYou ? "your area" : "Sydney")}</span>
           </p>
         </div>
         <button
@@ -81,9 +78,13 @@ export function GuidePage() {
       ) : tours.length === 0 ? (
         <EmptyState
           title="No guided walks here yet"
-          body="When a host publishes a walk, it shows up here. Explore places around you in the meantime."
-          action={() => nav("/")}
-          actionLabel={t("explore")}
+          body={
+            aroundYou
+              ? "No walks published near you yet. The Rocks has walks you can browse."
+              : "When a host publishes a walk, it shows up here. Explore places around you in the meantime."
+          }
+          action={aroundYou ? () => chooseLocation(ROCKS_BROWSE) : () => nav("/")}
+          actionLabel={aroundYou ? "See The Rocks" : t("explore")}
         />
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
@@ -98,9 +99,13 @@ export function GuidePage() {
       ) : sights.length === 0 ? (
         <EmptyState
           title="No sights listed yet"
-          body="Scan a street marker or open Explore when venues are published for this city."
-          action={() => nav("/scan")}
-          actionLabel={t("scan")}
+          body={
+            aroundYou
+              ? "Nothing listed near you yet. Check The Rocks, or add your place."
+              : "Scan a street marker or open Explore when venues are published for this city."
+          }
+          action={aroundYou ? () => chooseLocation(ROCKS_BROWSE) : () => nav("/scan")}
+          actionLabel={aroundYou ? "See The Rocks" : t("scan")}
         />
       ) : (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
@@ -125,7 +130,7 @@ export function GuidePage() {
         <button
           type="button"
           onClick={handleShareGuide}
-          className="inline-flex shrink-0 items-center gap-2 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-ink/90 active:scale-95 transition cursor-pointer"
+          className="inline-flex shrink-0 items-center gap-2 rounded-full bg-brand px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand-ink active:scale-95 transition cursor-pointer"
         >
           <Share2 size={13} />
           <span>{t("share.guide") || "Share Guide"}</span>

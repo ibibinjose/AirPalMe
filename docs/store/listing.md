@@ -26,7 +26,7 @@ AirPal makes exploring people, places, and experiences effortless.
 Whether you are visiting a new precinct, checking into a stay, or discovering local highlights, AirPal connects you directly to what is around you:
 
 • Instant Scan: Tap or scan QR codes at venues, hotels, and precinct spots to access live concierge tools and guest passes.
-• Discover Nearby: Find local dining, hidden gems, upcoming events, and precinct highlights around your location.
+• Discover Nearby: Find dining, events, and places around your current location — or pick any city. If nothing is listed near you yet, add your place or host a night.
 • Plan & Catch Up: Organize plans with mates, manage shared event calendars, and keep itineraries in one spot.
 • Digital Profiles & NFC: Share your bio, links, and contact card seamlessly with a single tap.
 

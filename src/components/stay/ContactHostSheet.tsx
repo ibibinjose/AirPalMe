@@ -78,9 +78,7 @@ export function ContactHostSheet() {
       </p>
 
       <div className="scroll-container flex max-h-[40vh] flex-col gap-2 rounded-2xl bg-paper p-3 ring-1 ring-line">
-        {thread.length === 0 && (
-          <p className="text-[13px] text-mute">{t("frontDesk")}</p>
-        )}
+        {thread.length === 0 && <p className="text-[13px] text-mute">{t("frontDesk")}</p>}
         {thread.map((msg) => (
           <div
             key={msg.id}
@@ -112,14 +110,17 @@ export function ContactHostSheet() {
         value={contactDraft}
         onChange={(e) => setContactDraft(e.target.value)}
         rows={3}
-        className="mt-3 w-full rounded-2xl bg-paper p-3 text-[15px] outline-none border border-ink focus:border-brand"
+        className="mt-3 w-full rounded-2xl bg-paper p-3 text-[15px] outline-none border border-line focus:border-brand"
         placeholder="Message the property manager"
       />
       <Button className="mt-3 w-full" onClick={send}>
         <Send size={16} /> {t("send")}
       </Button>
       <div className="mt-3 grid grid-cols-2 gap-2">
-        <a href={`tel:${tel}`} className="flex h-11 items-center justify-center gap-2 rounded-full bg-paper text-sm ring-1 ring-line">
+        <a
+          href={`tel:${tel}`}
+          className="flex h-11 items-center justify-center gap-2 rounded-full bg-paper text-sm ring-1 ring-line"
+        >
           <Phone size={14} /> {t("call")}
         </a>
         <a

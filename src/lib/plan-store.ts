@@ -11,17 +11,7 @@ import {
   stopChangeRecipients,
 } from "@shared/plan";
 import { getFirebaseDb, isFirebaseConfigured } from "./firebase";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  onSnapshot,
-  query,
-  setDoc,
-  deleteDoc,
-  where,
-} from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, deleteDoc, where } from "firebase/firestore";
 
 const STORAGE_KEY = "airpal.plans.v3";
 
@@ -112,10 +102,7 @@ export function getPlan(idOrCode: string): HangoutPlan | undefined {
   const norm = idOrCode.trim().toLowerCase();
   const all = loadPlans();
   return all.find(
-    (p) =>
-      p.id.toLowerCase() === norm ||
-      p.inviteCode.toLowerCase() === norm ||
-      p.id.toLowerCase() === `plan-${norm}`,
+    (p) => p.id.toLowerCase() === norm || p.inviteCode.toLowerCase() === norm || p.id.toLowerCase() === `plan-${norm}`,
   );
 }
 
@@ -200,10 +187,7 @@ export function deletePlan(planId: string): boolean {
   return true;
 }
 
-export function respondToPlan(
-  planId: string,
-  attendee: Omit<PlanAttendee, "respondedAt">,
-): HangoutPlan | undefined {
+export function respondToPlan(planId: string, attendee: Omit<PlanAttendee, "respondedAt">): HangoutPlan | undefined {
   const plan = getPlan(planId);
   if (!plan) return undefined;
 
@@ -227,10 +211,7 @@ export function respondToPlan(
   return savePlan(updatedPlan);
 }
 
-export function addStopToPlan(
-  planId: string,
-  stop: Omit<PlanStop, "id">,
-): HangoutPlan | undefined {
+export function addStopToPlan(planId: string, stop: Omit<PlanStop, "id">): HangoutPlan | undefined {
   const plan = getPlan(planId);
   if (!plan) return undefined;
 
@@ -268,10 +249,7 @@ export function updateStopInPlan(
   return savePlan(updatedPlan);
 }
 
-export function removeStopFromPlan(
-  planId: string,
-  stopId: string,
-): HangoutPlan | undefined {
+export function removeStopFromPlan(planId: string, stopId: string): HangoutPlan | undefined {
   const plan = getPlan(planId);
   if (!plan) return undefined;
   if (!plan.stops.some((s) => s.id === stopId)) return plan;
@@ -285,11 +263,7 @@ export function removeStopFromPlan(
   return savePlan(updatedPlan);
 }
 
-export function reorderStopsInPlan(
-  planId: string,
-  fromIndex: number,
-  toIndex: number,
-): HangoutPlan | undefined {
+export function reorderStopsInPlan(planId: string, fromIndex: number, toIndex: number): HangoutPlan | undefined {
   const plan = getPlan(planId);
   if (!plan) return undefined;
 
@@ -302,11 +276,7 @@ export function reorderStopsInPlan(
   return savePlan(updatedPlan);
 }
 
-export function voteStopInPlan(
-  planId: string,
-  stopId: string,
-  userId: string,
-): HangoutPlan | undefined {
+export function voteStopInPlan(planId: string, stopId: string, userId: string): HangoutPlan | undefined {
   const plan = getPlan(planId);
   if (!plan) return undefined;
 
@@ -460,8 +430,7 @@ export function generatePlanIcs(plan: HangoutPlan): string {
   const startD = new Date(`${plan.date}T${plan.time}:00`);
   const endD = new Date(startD.getTime() + 3 * 60 * 60 * 1000); // 3-hour duration
 
-  const formatIcsTime = (d: Date) =>
-    d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  const formatIcsTime = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 
   const stopsSummary = plan.stops.map((s, i) => `${i + 1}. ${s.name}${s.time ? ` (${s.time})` : ""}`).join("\\n");
   const fullDesc = `${plan.notes || ""}\\n\\nItinerary:\\n${stopsSummary}\\n\\nCreated on AirPal.Me: ${planInviteUrl(plan.id, typeof window !== "undefined" ? window.location.origin : "https://airpal.me")}`;
@@ -503,8 +472,7 @@ export function getPlanGoogleCalendarUrl(plan: HangoutPlan): string {
   const startD = new Date(`${plan.date}T${plan.time}:00`);
   const endD = new Date(startD.getTime() + 3 * 60 * 60 * 1000);
 
-  const formatIsoUtc = (d: Date) =>
-    d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  const formatIsoUtc = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 
   const stopsSummary = plan.stops.map((s, i) => `${i + 1}. ${s.name}${s.time ? ` (${s.time})` : ""}`).join("\n");
   const details = `${plan.notes || ""}\n\nItinerary:\n${stopsSummary}\n\nAirPal Invite: ${planInviteUrl(plan.id, typeof window !== "undefined" ? window.location.origin : "https://airpal.me")}`;

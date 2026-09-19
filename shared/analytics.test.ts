@@ -140,9 +140,15 @@ describe("winnable loop (scan QR → first value in 60s)", () => {
 
 describe("eligibility and north-star", () => {
   it("does not count page views, demo events, or duplicate first_value", () => {
-    expect(isQualifiedAction(event({ eventName: "qr_scan", contextId: "prop_live_1", properties: { contextType: "property", contextId: "prop_live_1" } }))).toBe(
-      false,
-    );
+    expect(
+      isQualifiedAction(
+        event({
+          eventName: "qr_scan",
+          contextId: "prop_live_1",
+          properties: { contextType: "property", contextId: "prop_live_1" },
+        }),
+      ),
+    ).toBe(false);
     expect(
       isQualifiedAction(
         event({

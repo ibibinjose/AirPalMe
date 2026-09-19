@@ -16,16 +16,16 @@ import {
   type UserEventState,
 } from "@shared/event";
 import { computeRescheduledTimes, formatEventTimeRange } from "@/lib/calendar-utils";
-import {
-  docToCalendarBase,
-  docToEventRecord,
-  recordToCalendarBase,
-  toNearbyEvent,
-} from "@/lib/remote-events";
+import { docToCalendarBase, docToEventRecord, recordToCalendarBase, toNearbyEvent } from "@/lib/remote-events";
 import type { NearbyEvent } from "@shared/nearby";
 import { downloadMultipleIcs } from "@/lib/calendar-export";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase";
-import { liveBackendEnabled, saveAttendeeStallRemote, upsertEventRemote, upsertEventStallRemote } from "@/lib/functions";
+import {
+  liveBackendEnabled,
+  saveAttendeeStallRemote,
+  upsertEventRemote,
+  upsertEventStallRemote,
+} from "@/lib/functions";
 import { track } from "@/lib/analytics";
 import { useOptionalSync } from "@/contexts/SyncContext";
 import { stampContentMeta } from "@shared/content-meta";
@@ -222,18 +222,14 @@ export function EventsProvider({ children }: { children: ReactNode }) {
   );
 
   const calendarEvents = useMemo<CalendarEvent[]>(() => {
-    const overlay = (
-      base: Omit<CalendarEvent, "isGoing" | "isInterested" | "isLiked">,
-    ): CalendarEvent => {
+    const overlay = (base: Omit<CalendarEvent, "isGoing" | "isInterested" | "isLiked">): CalendarEvent => {
       const state = userStates[base.id];
       const isSaved = savedEvents.some((se) => se.eventId === base.id);
       const isRescheduled = Boolean(state?.rescheduledDate && state.rescheduledDate !== base.date);
       const date = state?.rescheduledDate || base.date;
       const startsAt = state?.rescheduledStartsAt || base.startsAt;
       const endsAt = state?.rescheduledEndsAt || base.endsAt;
-      const timeLabel = isRescheduled
-        ? formatEventTimeRange(startsAt, endsAt) || base.timeLabel
-        : base.timeLabel;
+      const timeLabel = isRescheduled ? formatEventTimeRange(startsAt, endsAt) || base.timeLabel : base.timeLabel;
       return {
         ...base,
         date,

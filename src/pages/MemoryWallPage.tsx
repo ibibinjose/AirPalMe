@@ -27,7 +27,11 @@ function downscale(image: HTMLImageElement, maxEdge = 1600): Promise<Blob> {
   ctx.imageSmoothingQuality = "high";
   ctx.drawImage(image, 0, 0, w, h);
   return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("Could not read that photo"))), "image/jpeg", 0.85);
+    canvas.toBlob(
+      (blob) => (blob ? resolve(blob) : reject(new Error("Could not read that photo"))),
+      "image/jpeg",
+      0.85,
+    );
   });
 }
 
@@ -91,7 +95,9 @@ export function MemoryWallPage() {
 
   const visible = initialWith
     ? memories.filter((m) =>
-        m.people.some((p) => p.trim().toLowerCase().replace(/^@/, "") === initialWith.trim().toLowerCase().replace(/^@/, "")),
+        m.people.some(
+          (p) => p.trim().toLowerCase().replace(/^@/, "") === initialWith.trim().toLowerCase().replace(/^@/, ""),
+        ),
       )
     : memories;
 
@@ -126,7 +132,10 @@ export function MemoryWallPage() {
     setSaving(true);
     try {
       const src = await storeMedia(draftBlob, { folder: "memories", kind: "memory" });
-      const people = withPeople.split(",").map((p) => p.trim()).filter(Boolean);
+      const people = withPeople
+        .split(",")
+        .map((p) => p.trim())
+        .filter(Boolean);
       const row = addMemory({ src, caption, people, place });
       setMemories([row, ...listMemories().filter((m) => m.id !== row.id)]);
       toast.success(src.startsWith("http") ? "Saved to your Memory Wall · backed up" : "Saved to your Memory Wall");
@@ -216,7 +225,10 @@ export function MemoryWallPage() {
       )}
 
       {composerOpen && draftUrl && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 p-4 backdrop-blur-sm sm:items-center [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200" onClick={closeComposer}>
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 p-4 backdrop-blur-sm sm:items-center [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
+          onClick={closeComposer}
+        >
           <div
             className="w-full max-w-sm max-h-[min(90dvh,calc(var(--visual-viewport-height,100dvh)-1.5rem))] overflow-y-auto rounded-[28px] bg-paper p-5 shadow-2xl ring-1 ring-line motion-safe:animate-[sheet-up_0.22s_ease-out] transition-all duration-200"
             onClick={(e) => e.stopPropagation()}

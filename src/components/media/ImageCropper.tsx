@@ -27,7 +27,9 @@ export function ImageCropper({
     [image, viewH, viewW],
   );
   const [scale, setScale] = useState(min);
-  const [origin, setOrigin] = useState(() => centeredOrigin(image.naturalWidth, image.naturalHeight, viewW, viewH, min));
+  const [origin, setOrigin] = useState(() =>
+    centeredOrigin(image.naturalWidth, image.naturalHeight, viewW, viewH, min),
+  );
   const [busy, setBusy] = useState(false);
   const drag = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null);
 

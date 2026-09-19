@@ -2,15 +2,21 @@
  * Unified notifications & creator messaging.
  *
  * Transactional notifications (entries, winners, reviews) send immediately.
- * Creator broadcasts to an audience need admin approval, then fan out into
- * the same inbox plus push where permitted.
+ * Circle announcements go to people who follow you — your audience, not the
+ * whole platform. Campaign / everyone blasts still need admin approval.
  */
 
 export const BROADCAST_STATUSES = ["draft", "submitted", "approved", "rejected", "sent"] as const;
 export type BroadcastStatus = (typeof BROADCAST_STATUSES)[number];
 
-export const BROADCAST_AUDIENCES = ["promotion_entrants", "everyone"] as const;
+export const BROADCAST_AUDIENCES = ["circle", "promotion_entrants", "everyone"] as const;
 export type BroadcastAudience = (typeof BROADCAST_AUDIENCES)[number];
+
+export const CIRCLE_BROADCAST_CAP = 250;
+
+export function broadcastNeedsReview(audience: string): boolean {
+  return audience === "everyone" || audience === "promotion_entrants";
+}
 
 export interface Broadcast {
   id: string;
@@ -50,6 +56,9 @@ export function validateBroadcast(input: Record<string, unknown>): string[] {
   if (String(input.body || "").length > 280) errors.push("Message must be 280 characters or fewer.");
   if (input.audience === "promotion_entrants" && !String(input.promotionId || "")) {
     errors.push("Choose the campaign whose entrants should receive this.");
+  }
+  if (input.audience && !BROADCAST_AUDIENCES.includes(input.audience as BroadcastAudience)) {
+    errors.push("Choose who should receive this.");
   }
   return errors;
 }

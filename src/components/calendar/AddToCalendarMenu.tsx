@@ -1,11 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import {
-  Calendar as CalendarIcon,
-  ChevronDown,
-  Download,
-  ExternalLink,
-  Sparkles,
-} from "lucide-react";
+import { Calendar as CalendarIcon, ChevronDown, Download, ExternalLink, Sparkles } from "lucide-react";
 import {
   downloadIcs,
   getGoogleCalendarUrl,
@@ -133,7 +127,7 @@ export function AddToCalendarMenu({
           size === "sm" && "h-8 px-3 text-xs rounded-xl",
           size === "md" && "h-10 px-4 text-xs rounded-full",
           size === "lg" && "h-12 px-5 text-sm rounded-full",
-          variant === "primary" && "bg-ink text-white shadow-sm hover:bg-ink/90",
+          variant === "primary" && "bg-brand text-white shadow-sm hover:bg-brand-ink",
           variant === "secondary" && "bg-card text-ink ring-1 ring-line shadow-xs hover:bg-paper",
           variant === "ghost" && "bg-transparent text-ink hover:bg-card/80",
           variant === "pill" && "bg-brand/10 text-brand ring-1 ring-brand/20 hover:bg-brand/15",
@@ -144,10 +138,7 @@ export function AddToCalendarMenu({
       >
         <CalendarIcon size={size === "sm" ? 13 : 15} className="text-gold shrink-0" />
         <span>{label}</span>
-        <ChevronDown
-          size={13}
-          className={cn("text-mute transition-transform duration-200", open && "rotate-180")}
-        />
+        <ChevronDown size={13} className={cn("text-mute transition-transform duration-200", open && "rotate-180")} />
       </button>
 
       {open && (

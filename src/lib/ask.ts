@@ -53,7 +53,9 @@ export function askLocal(
   if (/emergency|safe|help|000|police/.test(q)) {
     return {
       title: "Help",
-      body: p?.phone ? `${stayName} front desk: ${p.phone} · Emergency: 000` : "Emergency: 000. Ask the front desk for help.",
+      body: p?.phone
+        ? `${stayName} front desk: ${p.phone} · Emergency: 000`
+        : "Emergency: 000. Ask the front desk for help.",
     };
   }
   if (/pool|gym|laundry|facility/.test(q)) {
@@ -66,9 +68,14 @@ export function askLocal(
     return { title: "Campus", body: "Check your course timetable or ask the campus office for class locations." };
   }
   if (/walk|tour|sights|opera/.test(q)) {
-    const near = activePlaces().filter((pl) => pl.geo).slice(0, 3);
+    const near = activePlaces()
+      .filter((pl) => pl.geo)
+      .slice(0, 3);
     if (near.length) {
-      return { title: "Nearby walks", body: near.map((pl) => pl.name).join(" · ") + ". Open Explore for walking times." };
+      return {
+        title: "Nearby walks",
+        body: near.map((pl) => pl.name).join(" · ") + ". Open Explore for walking times.",
+      };
     }
     return { title: "Walks", body: "Open Explore to see walks near you once local places are listed." };
   }
@@ -84,5 +91,8 @@ export function askLocal(
   if (place) return { title: place.name, body: place.insiderTip || place.shortWhy };
 
   const room = ctx?.room ? `Room ${ctx.room}. ` : "";
-  return { title: p?.name || "Ask", body: p?.tagline ? `${room}${p.tagline}` : `${room}Ask the front desk — they know this place best.` };
+  return {
+    title: p?.name || "Ask",
+    body: p?.tagline ? `${room}${p.tagline}` : `${room}Ask the front desk — they know this place best.`,
+  };
 }

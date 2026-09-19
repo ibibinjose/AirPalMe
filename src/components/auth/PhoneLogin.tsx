@@ -19,9 +19,12 @@ import { cn } from "@/lib/cn";
 export function PhoneLogin({
   onBegin,
   onDone,
+  onNeedAccount,
 }: {
   onBegin?: () => void;
   onDone: () => void;
+  /** SMS confirmed but no AirPal account yet — send them to Create account. */
+  onNeedAccount?: () => void;
 }) {
   const { sendPhoneCode, confirmPhoneCode, completePhoneProfile } = useAuth();
   const { createProfile } = useBio();
@@ -134,6 +137,11 @@ export function PhoneLogin({
         await confirmPhoneCode(normalizeOtp(code));
         resetPhoneLogin();
         if (await finishIfReturning()) return;
+        if (onNeedAccount) {
+          toast.message("No AirPal account on this number yet — create one.");
+          onNeedAccount();
+          return;
+        }
         setStep("profile");
         toast.success("Mobile number confirmed!");
       } catch (err) {
@@ -166,7 +174,7 @@ export function PhoneLogin({
                   isDone
                     ? "bg-emerald-600 text-white dark:bg-emerald-500"
                     : isCurrent
-                      ? "bg-ink text-white ring-2 ring-brand/30"
+                      ? "bg-brand text-white ring-2 ring-brand/30"
                       : "bg-paper text-mute ring-1 ring-line",
                 )}
               >
@@ -218,7 +226,11 @@ export function PhoneLogin({
               </button>
             </div>
 
-            <ValidField label="6-Digit Verification Code" ok={codeOk} error={code && !codeOk ? "Must be 6 digits" : null}>
+            <ValidField
+              label="6-Digit Verification Code"
+              ok={codeOk}
+              error={code && !codeOk ? "Must be 6 digits" : null}
+            >
               <input
                 value={code}
                 onChange={(e) => setCode(normalizeOtp(e.target.value))}
@@ -312,7 +324,9 @@ export function PhoneLogin({
                 className={fieldInput}
               />
             </ValidField>
-            <p className="text-[11px] text-mute">We'll email a verification link. Your primary login stays on mobile SMS.</p>
+            <p className="text-[11px] text-mute">
+              We'll email a verification link. Your primary login stays on mobile SMS.
+            </p>
           </div>
         )}
 

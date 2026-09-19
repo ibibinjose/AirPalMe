@@ -1,21 +1,8 @@
 import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
-import {
-  ArrowLeft,
-  Calendar,
-  Check,
-  Clock,
-  MapPin,
-  Save,
-  Trash2,
-} from "lucide-react";
+import { ArrowLeft, Calendar, Check, Clock, MapPin, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import {
-  PLAN_THEMES,
-  PLAN_TYPES,
-  type PlanTheme,
-  type PlanType,
-} from "@shared/plan";
+import { PLAN_THEMES, PLAN_TYPES, type PlanTheme, type PlanType } from "@shared/plan";
 import { usePlans } from "@/contexts/PlanContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { PLAN_TYPE_ICONS } from "@/components/plan/planTypeIcons";
@@ -136,9 +123,7 @@ export function PlanEditPage() {
             <ArrowLeft size={18} />
           </button>
           <div>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
-              Host Settings
-            </span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Host Settings</span>
             <h1 className="font-display text-2xl md:text-3xl font-bold text-ink">Edit Plan Details</h1>
           </div>
         </div>
@@ -157,7 +142,7 @@ export function PlanEditPage() {
         {/* Occasion format */}
         <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs space-y-4">
           <label className="font-display text-base font-semibold text-ink block">Occasion Format</label>
-          
+
           <div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-gold mb-2 block">
               Life Milestones & Celebrations
@@ -232,7 +217,7 @@ export function PlanEditPage() {
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="h-11 w-full rounded-2xl bg-paper px-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand font-medium text-ink focus:border-brand"
+              className="h-11 w-full rounded-2xl bg-paper px-4 text-sm border border-line outline-none focus:ring-2 focus:ring-brand font-medium text-ink focus:border-brand"
             />
           </div>
 
@@ -246,7 +231,7 @@ export function PlanEditPage() {
                   required
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
+                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-line outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
                 />
               </div>
             </div>
@@ -260,7 +245,7 @@ export function PlanEditPage() {
                   required
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
+                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-line outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
                 />
               </div>
             </div>
@@ -273,7 +258,7 @@ export function PlanEditPage() {
                   type="time"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
+                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-line outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
                 />
               </div>
             </div>
@@ -288,7 +273,7 @@ export function PlanEditPage() {
                 required
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
-                className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
+                className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-line outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
               />
             </div>
           </div>
@@ -299,16 +284,16 @@ export function PlanEditPage() {
               rows={3}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-2xl bg-paper p-3.5 text-xs md:text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink leading-relaxed focus:border-brand"
+              className="w-full rounded-2xl bg-paper p-3.5 text-xs md:text-sm border border-line outline-none focus:ring-2 focus:ring-brand text-ink leading-relaxed focus:border-brand"
             />
           </div>
         </div>
 
-        {/* Cover Photo */}
-        <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs space-y-3">
-          <label className="font-display text-base font-semibold text-ink block">Cover Banner</label>
+        <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
           <ImageField
-            kind="cover"
+            kind="square"
+            folder="listings"
+            label="Photo"
             value={heroImage}
             onChange={(url) => setHeroImage(url)}
           />
@@ -328,7 +313,7 @@ export function PlanEditPage() {
                   onClick={() => setTheme(tKey)}
                   className={cn(
                     "relative rounded-2xl p-3.5 text-center transition ring-2",
-                    isSelected ? "ring-ink shadow-md" : "ring-black/5",
+                    isSelected ? "ring-brand shadow-md" : "ring-black/5",
                   )}
                   style={{ background: th.accentColor }}
                 >
@@ -349,9 +334,7 @@ export function PlanEditPage() {
           <div className="flex items-center justify-between gap-3 mb-4">
             <div>
               <label className="font-display text-base font-semibold text-ink block">Itinerary Stops & Schedule</label>
-              <p className="text-xs text-mute mt-0.5">
-                Add, edit, or reorder the stops and venues for this gathering
-              </p>
+              <p className="text-xs text-mute mt-0.5">Add, edit, or reorder the stops and venues for this gathering</p>
             </div>
             <span className="rounded-full bg-paper px-2.5 py-1 text-xs font-semibold text-mute ring-1 ring-line shrink-0">
               {plan.stops.length} {plan.stops.length === 1 ? "stop" : "stops"}
@@ -398,10 +381,7 @@ export function PlanEditPage() {
           >
             Cancel
           </Button>
-          <Button
-            type="submit"
-            className="flex-1 h-12 rounded-2xl font-semibold shadow-md gap-2"
-          >
+          <Button type="submit" className="flex-1 h-12 rounded-2xl font-semibold shadow-md gap-2">
             <Save size={16} />
             <span>Save Changes</span>
           </Button>

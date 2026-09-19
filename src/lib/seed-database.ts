@@ -70,10 +70,9 @@ export async function seedDatabase(): Promise<SeedResult> {
       try {
         const propRef = doc(db, "properties", stay.property.id);
         const stamped = new Date().toISOString();
-        void setDoc(
-          propRef,
-          cleanDoc({ ...stay.property, wifiUpdatedAt: stamped, updatedAt: stamped }),
-        ).catch(() => undefined);
+        void setDoc(propRef, cleanDoc({ ...stay.property, wifiUpdatedAt: stamped, updatedAt: stamped })).catch(
+          () => undefined,
+        );
         void setDoc(
           doc(db, "properties", stay.property.id, "private", "hostSecrets"),
           cleanDoc({ ...stay.secrets, updatedAt: new Date().toISOString() }),
@@ -231,9 +230,10 @@ export async function seedDatabase(): Promise<SeedResult> {
       upsertStoredMarker(marker);
       if (db) {
         try {
-          void setDoc(doc(db, "markers", marker.id), cleanDoc({ ...marker, updatedAt: new Date().toISOString() })).catch(
-            () => undefined,
-          );
+          void setDoc(
+            doc(db, "markers", marker.id),
+            cleanDoc({ ...marker, updatedAt: new Date().toISOString() }),
+          ).catch(() => undefined);
         } catch {
           /* ignore */
         }

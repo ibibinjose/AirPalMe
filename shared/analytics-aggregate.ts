@@ -40,7 +40,10 @@ export function dailyFactId(contextId: string, day: string, version: number = AN
   return `${safe}_${day}_${version}`;
 }
 
-export function aggregateDailyFacts(events: AnalyticsEvent[], version = ANALYTICS_AGGREGATION_VERSION): AnalyticsDailyFact[] {
+export function aggregateDailyFacts(
+  events: AnalyticsEvent[],
+  version = ANALYTICS_AGGREGATION_VERSION,
+): AnalyticsDailyFact[] {
   const seen = new Set<string>();
   const buckets = new Map<
     string,

@@ -51,12 +51,17 @@ export const createStaffTicket = onCall(CALLABLE, async (request) => {
   };
   ticket.priority = resolveTicketPriority(ticket);
 
-  await db.collection("properties").doc(propertyId).collection("tickets").doc(ticketId).set({
-    ...ticket,
-    uid,
-    createdAt: FieldValue.serverTimestamp(),
-    createdAtIso: ticket.createdAt,
-  });
+  await db
+    .collection("properties")
+    .doc(propertyId)
+    .collection("tickets")
+    .doc(ticketId)
+    .set({
+      ...ticket,
+      uid,
+      createdAt: FieldValue.serverTimestamp(),
+      createdAtIso: ticket.createdAt,
+    });
 
   return { ticketId };
 });
@@ -74,8 +79,7 @@ export const resolveStaffTicket = onCall(CALLABLE, async (request) => {
   const prop = propSnap.data() || {};
   const caller = (request.auth?.token || {}) as AccessClaims;
   const role = caller.properties?.[propertyId];
-  const allowed =
-    isPlatformAdmin(caller) || prop.ownerId === uid || role === "host_admin" || role === "staff";
+  const allowed = isPlatformAdmin(caller) || prop.ownerId === uid || role === "host_admin" || role === "staff";
   if (!allowed) throw new HttpsError("permission-denied", "Only the host can close this request.");
 
   const ref = db.collection("properties").doc(propertyId).collection("tickets").doc(ticketId);
@@ -93,61 +97,58 @@ export const resolveStaffTicket = onCall(CALLABLE, async (request) => {
   return { ok: true as const };
 });
 
-export const onStaffTicketCreated = onDocumentCreated(
-  "properties/{propertyId}/tickets/{ticketId}",
-  async (event) => {
-    const propertyId = String(event.params.propertyId || "");
-    const ticketId = String(event.params.ticketId || "");
-    const data = event.data?.data() || {};
-    if (!propertyId || data.status === "resolved") return;
+export const onStaffTicketCreated = onDocumentCreated("properties/{propertyId}/tickets/{ticketId}", async (event) => {
+  const propertyId = String(event.params.propertyId || "");
+  const ticketId = String(event.params.ticketId || "");
+  const data = event.data?.data() || {};
+  if (!propertyId || data.status === "resolved") return;
 
-    const propSnap = await db.collection("properties").doc(propertyId).get();
-    const prop = (propSnap.data() || {}) as Record<string, unknown>;
-    const place = String(prop.name || "AirPal stay");
-    const room = String(data.roomNumber || "Guest");
-    const details = String(data.details || "New guest request");
-    const title = `${place} · Room ${room}`;
-    const body = details.slice(0, 140);
-    const uids = hostUids(prop);
-    const tokens: string[] = [];
+  const propSnap = await db.collection("properties").doc(propertyId).get();
+  const prop = (propSnap.data() || {}) as Record<string, unknown>;
+  const place = String(prop.name || "AirPal stay");
+  const room = String(data.roomNumber || "Guest");
+  const details = String(data.details || "New guest request");
+  const title = `${place} · Room ${room}`;
+  const body = details.slice(0, 140);
+  const uids = hostUids(prop);
+  const tokens: string[] = [];
 
-    for (const hostUid of uids) {
-      await db.collection("users").doc(hostUid).collection("hostAlerts").doc(ticketId).set({
+  for (const hostUid of uids) {
+    await db.collection("users").doc(hostUid).collection("hostAlerts").doc(ticketId).set({
+      type: "staff_ticket",
+      propertyId,
+      ticketId,
+      title,
+      body,
+      createdAt: FieldValue.serverTimestamp(),
+      read: false,
+    });
+    const tokSnap = await db.collection("users").doc(hostUid).collection("fcmTokens").get();
+    for (const row of tokSnap.docs) {
+      const token = String(row.data().token || "");
+      if (token) tokens.push(token);
+    }
+  }
+
+  if (!tokens.length) return;
+  try {
+    const res = await getMessaging().sendEachForMulticast({
+      tokens,
+      notification: { title, body },
+      data: {
         type: "staff_ticket",
         propertyId,
         ticketId,
-        title,
-        body,
-        createdAt: FieldValue.serverTimestamp(),
-        read: false,
-      });
-      const tokSnap = await db.collection("users").doc(hostUid).collection("fcmTokens").get();
-      for (const row of tokSnap.docs) {
-        const token = String(row.data().token || "");
-        if (token) tokens.push(token);
-      }
-    }
-
-    if (!tokens.length) return;
-    try {
-      const res = await getMessaging().sendEachForMulticast({
-        tokens,
-        notification: { title, body },
-        data: {
-          type: "staff_ticket",
-          propertyId,
-          ticketId,
-        },
-        webpush: {
-          fcmOptions: { link: "https://airpal.me/host" },
-        },
-      });
-      res.responses.forEach((row) => {
-        if (row.success) return;
-        /* Invalid tokens are dropped the next time the host re-enables alerts. */
-      });
-    } catch {
-      /* push must not fail ticket create */
-    }
-  },
-);
+      },
+      webpush: {
+        fcmOptions: { link: "https://airpal.me/host" },
+      },
+    });
+    res.responses.forEach((row) => {
+      if (row.success) return;
+      /* Invalid tokens are dropped the next time the host re-enables alerts. */
+    });
+  } catch {
+    /* push must not fail ticket create */
+  }
+});

@@ -18,12 +18,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import type { CalendarEventCategory } from "@shared/event";
-import {
-  CALENDAR_CATEGORIES,
-  CATEGORY_THEMES,
-  type CalendarFilter,
-  type CalendarViewMode,
-} from "@/lib/calendar-utils";
+import { CALENDAR_CATEGORIES, CATEGORY_THEMES, type CalendarFilter, type CalendarViewMode } from "@/lib/calendar-utils";
 import { cn } from "@/lib/cn";
 
 export interface CalendarSidebarProps {
@@ -73,10 +68,7 @@ export function CalendarSidebar({
 }: CalendarSidebarProps) {
   const [showAllTags, setShowAllTags] = useState(false);
 
-  const hasActiveFilters =
-    searchQuery.trim().length > 0 ||
-    category !== "all" ||
-    filter !== "all";
+  const hasActiveFilters = searchQuery.trim().length > 0 || category !== "all" || filter !== "all";
 
   const displayedTags = showAllTags ? allTags : allTags.slice(0, 10);
 
@@ -94,7 +86,7 @@ export function CalendarSidebar({
       label: "All Events",
       count: statusCounts.all,
       icon: CalendarDays,
-      activeClass: "bg-ink text-white",
+      activeClass: "bg-brand text-white",
       softClass: "bg-ink/[0.04] ring-1 ring-ink/15 hover:bg-ink/[0.08]",
       iconClass: "text-ink",
     },
@@ -155,17 +147,12 @@ export function CalendarSidebar({
   ];
 
   return (
-    <aside
-      aria-label="Calendar search and filtering tools"
-      className={cn("flex flex-col gap-5", className)}
-    >
+    <aside aria-label="Calendar search and filtering tools" className={cn("flex flex-col gap-5", className)}>
       {/* Sidebar Header */}
       <div className="flex items-center justify-between pb-1 border-b border-line/70">
         <div className="flex items-center gap-2">
           <Filter size={16} className="text-brand" />
-          <h2 className="font-display text-sm font-bold tracking-tight text-ink">
-            Search & Filters
-          </h2>
+          <h2 className="font-display text-sm font-bold tracking-tight text-ink">Search & Filters</h2>
           {hasActiveFilters && (
             <span className="rounded-full bg-brand/15 px-2 py-0.5 text-[10px] font-bold text-brand ring-1 ring-brand/30">
               Active
@@ -216,9 +203,7 @@ export function CalendarSidebar({
             onClick={() => onViewModeChange("month")}
             className={cn(
               "flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition active:scale-95 cursor-pointer",
-              viewMode === "month"
-                ? "bg-ink text-white shadow-xs"
-                : "text-mute hover:text-ink hover:bg-card/70",
+              viewMode === "month" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink hover:bg-card/70",
             )}
           >
             <LayoutGrid size={13} />
@@ -231,9 +216,7 @@ export function CalendarSidebar({
             onClick={() => onViewModeChange("week")}
             className={cn(
               "flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition active:scale-95 cursor-pointer",
-              viewMode === "week"
-                ? "bg-ink text-white shadow-xs"
-                : "text-mute hover:text-ink hover:bg-card/70",
+              viewMode === "week" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink hover:bg-card/70",
             )}
           >
             <CalendarRange size={13} />
@@ -246,9 +229,7 @@ export function CalendarSidebar({
             onClick={() => onViewModeChange("day")}
             className={cn(
               "flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition active:scale-95 cursor-pointer",
-              viewMode === "day"
-                ? "bg-ink text-white shadow-xs"
-                : "text-mute hover:text-ink hover:bg-card/70",
+              viewMode === "day" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink hover:bg-card/70",
             )}
           >
             <CalendarDays size={13} />
@@ -261,9 +242,7 @@ export function CalendarSidebar({
             onClick={() => onViewModeChange("list")}
             className={cn(
               "flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition active:scale-95 cursor-pointer",
-              viewMode === "list"
-                ? "bg-ink text-white shadow-xs"
-                : "text-mute hover:text-ink hover:bg-card/70",
+              viewMode === "list" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink hover:bg-card/70",
             )}
           >
             <List size={13} />
@@ -281,10 +260,7 @@ export function CalendarSidebar({
           Search Events
         </label>
         <div className="relative">
-          <Search
-            size={15}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-mute pointer-events-none"
-          />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-mute pointer-events-none" />
           <input
             id="calendar-sidebar-search"
             type="search"
@@ -293,7 +269,7 @@ export function CalendarSidebar({
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search by title, tag (#jazz)..."
             aria-label="Search events by title or tag"
-            className="h-10 w-full rounded-xl bg-paper/90 pl-9 pr-8 text-xs text-ink placeholder:text-mute border border-ink outline-none transition focus:bg-card focus:ring-2 focus:ring-ink focus:border-brand"
+            className="h-10 w-full rounded-xl bg-paper/90 pl-9 pr-8 text-xs text-ink placeholder:text-mute border border-line outline-none transition focus:bg-card focus:ring-2 focus:ring-brand focus:border-brand"
           />
           {searchQuery && (
             <button
@@ -314,9 +290,7 @@ export function CalendarSidebar({
       {/* 2. Category Filters */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-mute">
-            Categories
-          </span>
+          <span className="text-[11px] font-bold uppercase tracking-wider text-mute">Categories</span>
           {category !== "all" && (
             <button
               type="button"
@@ -347,25 +321,17 @@ export function CalendarSidebar({
                       ? cn(theme.blockActiveClass, "shadow-xs")
                       : cn(theme.blockClass, "text-ink/90 font-medium")
                     : isSelected
-                      ? "bg-ink text-white font-medium shadow-xs"
+                      ? "bg-brand text-white font-medium shadow-xs"
                       : "bg-ink/[0.04] text-ink/85 ring-1 ring-ink/15 hover:bg-ink/[0.08]",
                 )}
               >
                 <div className="flex items-center gap-2 truncate">
                   {theme ? (
                     <span
-                      className={cn(
-                        "h-2.5 w-2.5 rounded-full shrink-0",
-                        isSelected ? "bg-white" : theme.dotClass,
-                      )}
+                      className={cn("h-2.5 w-2.5 rounded-full shrink-0", isSelected ? "bg-white" : theme.dotClass)}
                     />
                   ) : (
-                    <span
-                      className={cn(
-                        "h-2.5 w-2.5 rounded-full shrink-0",
-                        isSelected ? "bg-white" : "bg-ink/30",
-                      )}
-                    />
+                    <span className={cn("h-2.5 w-2.5 rounded-full shrink-0", isSelected ? "bg-white" : "bg-ink/30")} />
                   )}
                   <span className="truncate">{c.label}</span>
                 </div>
@@ -459,9 +425,7 @@ export function CalendarSidebar({
       {/* 4. Attendance & Status Filters */}
       <div className="space-y-2 border-t border-line/60 pt-4">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-mute">
-            Status & Picks
-          </span>
+          <span className="text-[11px] font-bold uppercase tracking-wider text-mute">Status & Picks</span>
           {filter !== "all" && (
             <button
               type="button"
@@ -486,9 +450,7 @@ export function CalendarSidebar({
                 aria-pressed={isSelected}
                 className={cn(
                   "w-full flex items-center justify-between rounded-xl px-3 py-2 text-xs transition cursor-pointer active:scale-[0.98]",
-                  isSelected
-                    ? cn(opt.activeClass, "shadow-xs")
-                    : cn(opt.softClass, "text-ink/90 font-medium"),
+                  isSelected ? cn(opt.activeClass, "shadow-xs") : cn(opt.softClass, "text-ink/90 font-medium"),
                 )}
               >
                 <div className="flex items-center gap-2">

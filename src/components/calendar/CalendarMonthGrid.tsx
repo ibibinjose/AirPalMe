@@ -61,7 +61,7 @@ export function CalendarMonthGrid({
   const [tagMode, setTagMode] = useState<CalendarTagMode>("category");
 
   const monthLabel = useMemo(() => {
-    return new Intl.DateTimeFormat("en-AU", { month: "long", year: "numeric" }).format(currentDate);
+    return new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" }).format(currentDate);
   }, [currentDate]);
 
   const cells = useMemo(() => {
@@ -186,9 +186,7 @@ export function CalendarMonthGrid({
               }}
               className={cn(
                 "rounded-full px-2.5 py-1 text-[11px] font-semibold transition active:scale-95",
-                tagMode === "category"
-                  ? "bg-ink text-white shadow-2xs"
-                  : "text-mute hover:text-ink",
+                tagMode === "category" ? "bg-brand text-white shadow-2xs" : "text-mute hover:text-ink",
               )}
               title="Color-code tags by event type (Market, Live Music, Food, Culture, Workshop, etc.)"
             >
@@ -204,9 +202,7 @@ export function CalendarMonthGrid({
               }}
               className={cn(
                 "rounded-full px-2.5 py-1 text-[11px] font-semibold transition active:scale-95",
-                tagMode === "booking"
-                  ? "bg-ink text-white shadow-2xs"
-                  : "text-mute hover:text-ink",
+                tagMode === "booking" ? "bg-brand text-white shadow-2xs" : "text-mute hover:text-ink",
               )}
               title="Color-code tags by booking / task status (Confirmed, Tentative, Rescheduled, Available)"
             >
@@ -268,7 +264,8 @@ export function CalendarMonthGrid({
                   ⚠️ <strong>Conflict on {dragOverDate}:</strong> {dragCollision.reason}.{" "}
                   {autoSnapOnCollision && dragCollision.nearestOpening ? (
                     <span className="font-semibold underline">
-                      Will snap to nearest opening: {dragCollision.nearestOpening.dayBadge} ({dragCollision.nearestOpening.formattedDate})
+                      Will snap to nearest opening: {dragCollision.nearestOpening.dayBadge} (
+                      {dragCollision.nearestOpening.formattedDate})
                     </span>
                   ) : (
                     <span>Auto-snap disabled (will prompt).</span>
@@ -330,9 +327,7 @@ export function CalendarMonthGrid({
               aria-label={`${day.full}${day.isWeekend ? " (Weekend column)" : ""}${isTodayCol ? " (Today's column)" : ""}`}
             >
               <div className="flex items-center gap-1">
-                <span className="font-bold text-[11px] sm:text-xs uppercase tracking-wider">
-                  {day.short}
-                </span>
+                <span className="font-bold text-[11px] sm:text-xs uppercase tracking-wider">{day.short}</span>
                 {isTodayCol && (
                   <span
                     className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse shrink-0"
@@ -342,11 +337,7 @@ export function CalendarMonthGrid({
                 )}
               </div>
               <span className="hidden md:block text-[10px] text-mute font-medium leading-tight mt-0.5">
-                {day.isWeekend ? (
-                  <span className="font-semibold text-amber-800">Weekend</span>
-                ) : (
-                  day.full
-                )}
+                {day.isWeekend ? <span className="font-semibold text-amber-800">Weekend</span> : day.full}
               </span>
             </div>
           );
@@ -409,27 +400,29 @@ export function CalendarMonthGrid({
                 // Non-current month
                 !cell.isCurrentMonth && "opacity-35 hover:opacity-60 bg-paper/20 ring-1 ring-line/40",
                 // Current month default state
-                cell.isCurrentMonth && !isSelected && !cell.isToday && (
-                  isWeekendCol
+                cell.isCurrentMonth &&
+                  !isSelected &&
+                  !cell.isToday &&
+                  (isWeekendCol
                     ? "bg-amber-500/[0.04] text-ink ring-1 ring-amber-200/50 hover:bg-amber-100/50 hover:ring-amber-300/70"
-                    : "bg-card text-ink ring-1 ring-line/80 hover:bg-paper/90 hover:ring-line"
-                ),
+                    : "bg-card text-ink ring-1 ring-line/80 hover:bg-paper/90 hover:ring-line"),
                 // Today styling
-                cell.isToday && !isSelected && "bg-amber-50/90 text-ink ring-2 ring-amber-400 shadow-xs hover:bg-amber-100/80",
+                cell.isToday &&
+                  !isSelected &&
+                  "bg-amber-50/90 text-ink ring-2 ring-amber-400 shadow-xs hover:bg-amber-100/80",
                 // Selected styling
-                isSelected && "bg-ink text-white shadow-md ring-2 ring-ink",
+                isSelected && "bg-brand text-white shadow-md ring-2 ring-ink",
                 // Active Dragging over this cell
                 isDragging && !isOver && "ring-dashed ring-brand/35 hover:ring-brand/60",
-                isOver && (
-                  dragCollision?.hasCollision
+                isOver &&
+                  (dragCollision?.hasCollision
                     ? "ring-2 ring-amber-500 bg-amber-500/20 scale-[1.03] shadow-lg z-20"
-                    : "ring-2 ring-brand bg-brand/15 scale-[1.03] shadow-lg z-20"
-                ),
+                    : "ring-2 ring-brand bg-brand/15 scale-[1.03] shadow-lg z-20"),
               )}
             >
               {/* Drop Target Overlay when dragged over */}
-              {isOver && (
-                dragCollision?.hasCollision ? (
+              {isOver &&
+                (dragCollision?.hasCollision ? (
                   <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl bg-amber-600/95 text-white p-1 shadow-lg pointer-events-none animate-in fade-in zoom-in-95 text-center">
                     <AlertTriangle size={15} className="text-amber-200 mb-0.5 animate-bounce" />
                     <span className="text-[10px] font-bold leading-tight line-clamp-1">
@@ -445,10 +438,11 @@ export function CalendarMonthGrid({
                   <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl bg-brand text-white p-1 shadow-lg pointer-events-none animate-in fade-in zoom-in-95 text-center">
                     <Sparkles size={14} className="text-amber-300 animate-spin mb-0.5" />
                     <span className="text-[10px] font-bold leading-tight">Drop to Move</span>
-                    <span className="text-[8px] text-white/85 font-medium">{cell.dayNumber} {monthLabel.split(" ")[0]} · Available</span>
+                    <span className="text-[8px] text-white/85 font-medium">
+                      {cell.dayNumber} {monthLabel.split(" ")[0]} · Available
+                    </span>
                   </div>
-                )
-              )}
+                ))}
 
               {/* Day Number Header Row */}
               <div className="flex items-center justify-between w-full">
@@ -511,14 +505,16 @@ export function CalendarMonthGrid({
                           className={cn(
                             "group/event relative flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-medium leading-tight truncate w-full transition cursor-grab active:cursor-grabbing hover:ring-1 hover:ring-brand shadow-2xs select-none",
                             isThisDragged && "opacity-40 ring-2 ring-brand ring-dashed",
-                            isSelected
-                              ? "bg-white/20 text-white border-l-2 border-l-white"
-                              : tagTheme.tagClass,
+                            isSelected ? "bg-white/20 text-white border-l-2 border-l-white" : tagTheme.tagClass,
                           )}
                           title={`${ev.title} · ${tagTheme.label} (${ev.timeLabel}) — Drag to reschedule`}
                         >
-                          <GripVertical size={9} className="opacity-40 shrink-0 -ml-0.5 group-hover/event:opacity-90" aria-hidden="true" />
-                          
+                          <GripVertical
+                            size={9}
+                            className="opacity-40 shrink-0 -ml-0.5 group-hover/event:opacity-90"
+                            aria-hidden="true"
+                          />
+
                           {/* Color-coded Tag Label */}
                           <span
                             className={cn(
@@ -541,10 +537,7 @@ export function CalendarMonthGrid({
                             />
                           )}
                           {tagMode === "category" && ev.isRescheduled && (
-                            <span
-                              className="text-[9px] font-bold text-orange-700 shrink-0"
-                              title="Rescheduled"
-                            >
+                            <span className="text-[9px] font-bold text-orange-700 shrink-0" title="Rescheduled">
                               ↺
                             </span>
                           )}
@@ -582,9 +575,7 @@ export function CalendarMonthGrid({
                       );
                     })}
                     {cell.events.length > 2 && (
-                      <span className="text-[8px] font-bold text-mute leading-none">
-                        +{cell.events.length - 2}
-                      </span>
+                      <span className="text-[8px] font-bold text-mute leading-none">+{cell.events.length - 2}</span>
                     )}
                   </div>
                 </div>
@@ -616,7 +607,10 @@ export function CalendarMonthGrid({
           <>
             {Object.entries(CATEGORY_THEMES).map(([catKey, theme]) => (
               <span key={catKey} className="flex items-center gap-1.5">
-                <span className={cn("h-2.5 w-2.5 rounded-xs border-l-2", theme.dotClass, theme.borderClass)} aria-hidden="true" />
+                <span
+                  className={cn("h-2.5 w-2.5 rounded-xs border-l-2", theme.dotClass, theme.borderClass)}
+                  aria-hidden="true"
+                />
                 <span className="font-medium text-ink/85">{theme.label}</span>
               </span>
             ))}
@@ -625,7 +619,10 @@ export function CalendarMonthGrid({
           <>
             {Object.entries(BOOKING_THEMES).map(([statusKey, theme]) => (
               <span key={statusKey} className="flex items-center gap-1.5">
-                <span className={cn("h-2.5 w-2.5 rounded-xs border-l-2", theme.dotClass, theme.borderClass)} aria-hidden="true" />
+                <span
+                  className={cn("h-2.5 w-2.5 rounded-xs border-l-2", theme.dotClass, theme.borderClass)}
+                  aria-hidden="true"
+                />
                 <span className="font-medium text-ink/85">{theme.label}</span>
               </span>
             ))}

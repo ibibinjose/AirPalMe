@@ -1,14 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "wouter";
-import {
-  BedDouble,
-  CalendarDays,
-  Coffee,
-  Compass,
-  ShoppingBag,
-  Ticket,
-  UtensilsCrossed,
-} from "lucide-react";
+import { BedDouble, CalendarDays, Coffee, Compass, ShoppingBag, Ticket, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { setShareMeta } from "@/lib/share-meta";
@@ -87,12 +79,26 @@ function MarketingPoster() {
 
         <div className="relative mt-[4cqi] grid flex-1 grid-cols-2 gap-[2.5cqi] overflow-hidden">
           <div className="relative overflow-hidden rounded-[3cqi]">
-            <img src="/media/harbour.jpg" alt="Harbour at golden hour" className="absolute inset-0 h-full w-full object-cover" />
-            <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#07090c] via-transparent to-[#07090c]/60" />
+            <img
+              src="/media/harbour.jpg"
+              alt="Harbour at golden hour"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div
+              aria-hidden
+              className="absolute inset-0 bg-gradient-to-t from-[#07090c] via-transparent to-[#07090c]/60"
+            />
           </div>
           <div className="relative overflow-hidden rounded-[3cqi]">
-            <img src="/media/walk.jpg" alt="Mates out on a walk" className="absolute inset-0 h-full w-full object-cover" />
-            <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#07090c] via-transparent to-[#07090c]/60" />
+            <img
+              src="/media/walk.jpg"
+              alt="Mates out on a walk"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div
+              aria-hidden
+              className="absolute inset-0 bg-gradient-to-t from-[#07090c] via-transparent to-[#07090c]/60"
+            />
           </div>
         </div>
 
@@ -139,8 +145,8 @@ export function MarketingPage() {
         Your world, all in one app
       </h1>
       <p className="mt-2 text-[15px] leading-relaxed text-mute">
-        The AirPal.Me promo creative — share the link anywhere, or export a crisp 1080×1350 PNG for the
-        stores with <span className="font-mono text-[13px] text-ink">npm run screenshots</span>.
+        The AirPal.Me promo creative — share the link anywhere, or export a crisp 1080×1350 PNG for the stores with{" "}
+        <span className="font-mono text-[13px] text-ink">npm run screenshots</span>.
       </p>
 
       <div className="mx-auto mt-5 max-w-[420px]">
@@ -160,7 +166,7 @@ export function MarketingPage() {
         >
           Copy creative link
         </Button>
-        <Button variant="ghost" onClick={() => nav("/getAirPal")} className="h-12 rounded-full border border-ink">
+        <Button variant="ghost" onClick={() => nav("/getAirPal")} className="h-12 rounded-full border border-line">
           Get the app
         </Button>
       </div>

@@ -16,7 +16,7 @@ export function BioKindIcon({ kind, className }: { kind?: BioKind | null; classN
       title={business ? "Business" : "Individual"}
       className={cn(
         "grid h-6 w-6 place-items-center rounded-full shadow-sm ring-2 ring-paper",
-        business ? "bg-gold text-ink" : "bg-ink text-white",
+        business ? "bg-gold text-ink" : "bg-brand text-white",
         className,
       )}
     >

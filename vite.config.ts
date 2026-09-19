@@ -113,6 +113,9 @@ export default defineConfig({
     port: 3000,
     host: "0.0.0.0",
     allowedHosts: true,
+    watch: {
+      ignored: ["**/android/app/src/main/assets/public/**", "**/ios/App/App/public/**"],
+    },
     // Suppress "Could not read source map" warnings for deps that don't ship maps.
     sourcemapIgnoreList: (sourcePath) => sourcePath.includes("node_modules"),
   },

@@ -38,6 +38,8 @@ describe("cityMatches", () => {
     expect(cityMatches("", "Sydney")).toBe(true);
     expect(cityMatches("Sydney", "")).toBe(true);
     expect(cityMatches("Melbourne", "Sydney")).toBe(false);
+    expect(cityMatches("Sydney", "Ashfield")).toBe(false);
+    expect(cityMatches("Sydney", "The Rocks, Sydney")).toBe(true);
   });
 });
 
@@ -64,8 +66,15 @@ describe("docToEventRecord", () => {
     expect(rec?.id).toBe("e9");
     expect(rec?.gatePath).toContain("e9");
     expect(docToEventRecord({ title: "Curated", when: "Tonight", status: "live" }, "e10")).toBeNull();
-    expect(docToEventRecord({ name: "No city", flavour: "market", startsAt: "2026-09-15T18:00:00+10:00" }, "e11")).toBeNull();
-    expect(docToEventRecord({ name: "Bad flavour", flavour: "rave", city: "Sydney", startsAt: "2026-09-15T18:00:00+10:00" }, "e12")).toBeNull();
+    expect(
+      docToEventRecord({ name: "No city", flavour: "market", startsAt: "2026-09-15T18:00:00+10:00" }, "e11"),
+    ).toBeNull();
+    expect(
+      docToEventRecord(
+        { name: "Bad flavour", flavour: "rave", city: "Sydney", startsAt: "2026-09-15T18:00:00+10:00" },
+        "e12",
+      ),
+    ).toBeNull();
   });
 });
 
@@ -81,10 +90,7 @@ describe("docToCalendarBase", () => {
   });
 
   it("maps CalendarEvent-shaped docs and rejects junk", () => {
-    const base = docToCalendarBase(
-      { title: "Jazz", startsAt: "2026-09-15T18:00:00+10:00", date: "2026-09-15" },
-      "e3",
-    );
+    const base = docToCalendarBase({ title: "Jazz", startsAt: "2026-09-15T18:00:00+10:00", date: "2026-09-15" }, "e3");
     expect(base?.id).toBe("e3");
     expect(base?.city).toBe("");
     expect(docToCalendarBase({ title: "x" }, "e4")).toBeNull();

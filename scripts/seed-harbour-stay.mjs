@@ -343,7 +343,9 @@ async function main() {
       }),
     );
     for (const item of menu) {
-      writes.push(docWrite(`properties/${property.id}/menu/${item.id}`, { ...item, propertyId: property.id, updatedAt: NOW }));
+      writes.push(
+        docWrite(`properties/${property.id}/menu/${item.id}`, { ...item, propertyId: property.id, updatedAt: NOW }),
+      );
     }
   }
 

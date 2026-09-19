@@ -31,12 +31,8 @@ import { BioShareModal } from "@/components/bio/BioShareModal";
 import { BioCatchUpModal } from "@/components/bio/BioCatchUpModal";
 import { BioStatusModal } from "@/components/bio/BioStatusModal";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
-import {
-  hasCatchUpReminder,
-  listCatchUpsForHandle,
-  updateCatchUpStatus,
-  type CatchUpItem,
-} from "@/lib/catchup";
+import { listCatchUpsForHandle, subscribeCatchUpsForOwner, updateCatchUpStatus, type CatchUpItem } from "@/lib/catchup";
+import { toZonedDateStr } from "@/lib/local-time";
 import { Photo } from "@/components/ui/Photo";
 import { Button } from "@/components/ui/Button";
 import { useBio } from "@/contexts/BioContext";
@@ -78,7 +74,6 @@ export function BioPublicPage() {
   const [statusModalOpen, setStatusModalOpen] = useState(false);
   const [catchUpModalOpen, setCatchUpModalOpen] = useState(false);
   const [catchUpInitialType, setCatchUpInitialType] = useState<PlanType>("catchup");
-  const [isCatchUpRemembered, setIsCatchUpRemembered] = useState(false);
   const [catchUpsList, setCatchUpsList] = useState<CatchUpItem[]>([]);
   const { stalls, getEvent } = useEvents();
   const local = resolvePublicBio(handle, byHandle);
@@ -88,10 +83,20 @@ export function BioPublicPage() {
   const viewed = useRef("");
 
   useEffect(() => {
-    if (!handle) return;
-    setIsCatchUpRemembered(hasCatchUpReminder(handle));
-    setCatchUpsList(listCatchUpsForHandle(handle));
-  }, [handle]);
+    const p = remote || local;
+    if (!p || !user) {
+      setCatchUpsList(p ? listCatchUpsForHandle(p.handle) : []);
+      return;
+    }
+    const owner = Boolean(
+      (p.ownerUid && p.ownerUid === user.uid) ||
+      (p.ownerEmail && p.ownerEmail === user.email) ||
+      (mine && mine.handle === p.handle),
+    );
+    if (!owner) return;
+    if (p.ownerUid) return subscribeCatchUpsForOwner(p.ownerUid, setCatchUpsList);
+    setCatchUpsList(listCatchUpsForHandle(p.handle));
+  }, [remote, local, user, mine]);
 
   useEffect(() => {
     let live = true;
@@ -173,7 +178,7 @@ export function BioPublicPage() {
   const isOwner = Boolean(
     (user && bio.ownerUid && bio.ownerUid === user.uid) ||
     (user && bio.ownerEmail && bio.ownerEmail === user.email) ||
-    (mine && mine.handle === bio.handle)
+    (mine && mine.handle === bio.handle),
   );
 
   const appearing = stalls.filter((s) => s.handle === bio.handle && s.status === "active");
@@ -240,8 +245,7 @@ export function BioPublicPage() {
   // WhatsApp URL resolution
   const whatsappLink = bio.links.find((l) => l.type === "whatsapp");
   const whatsappUrl =
-    whatsappLink?.href ||
-    (bio.phone ? `https://wa.me/${bio.phone.replace(/[^0-9]/g, "")}` : undefined);
+    whatsappLink?.href || (bio.phone ? `https://wa.me/${bio.phone.replace(/[^0-9]/g, "")}` : undefined);
 
   // Call / tel resolution
   const callLink = bio.links.find((l) => l.type === "call");
@@ -262,8 +266,7 @@ export function BioPublicPage() {
       : null;
 
   const statusKey: AvailabilityStatus =
-    bio.availabilityStatus ||
-    (bio.openNow === true ? "available" : bio.openNow === false ? "offline" : "available");
+    bio.availabilityStatus || (bio.openNow === true ? "available" : bio.openNow === false ? "offline" : "available");
   const statusInfo = AVAILABILITY_STATUSES[statusKey] || AVAILABILITY_STATUSES.available;
 
   return (
@@ -322,7 +325,6 @@ export function BioPublicPage() {
               className="inline-flex h-8 items-center gap-1.5 rounded-2xl bg-white/95 px-2.5 text-xs font-semibold text-ink shadow-md ring-1 ring-black/10 backdrop-blur-md hover:bg-white active:scale-95 transition"
               title="Set WhatsApp / Availability Status"
             >
-              <span className={cn("h-2 w-2 rounded-full", statusInfo.dotColor)} />
               <span>Status</span>
             </button>
           )}
@@ -348,14 +350,6 @@ export function BioPublicPage() {
                 </span>
               )}
             </div>
-            {/* Availability Dot Badge */}
-            <span
-              className={cn(
-                "absolute bottom-0 right-0 z-20 h-5 w-5 rounded-full border-2 border-paper shadow-sm transition-colors",
-                statusInfo.dotColor,
-              )}
-              title={statusInfo.label}
-            />
           </div>
 
           {/* Right Action (Edit profile / Claim / Connect) */}
@@ -432,9 +426,7 @@ export function BioPublicPage() {
 
         {/* Profile Info Left-Aligned */}
         <div className="mt-3 text-left">
-          <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-            {bio.name}
-          </h1>
+          <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">{bio.name}</h1>
           <p className="mt-0.5 text-sm font-medium text-mute">@{bio.handle}</p>
 
           {/* WhatsApp / Availability Status Pill */}
@@ -450,66 +442,35 @@ export function BioPublicPage() {
               )}
               title={isOwner ? "Click to change availability status" : statusInfo.description}
             >
-              <span className={cn("h-2 w-2 rounded-full shrink-0", statusInfo.dotColor)} />
               <span>{statusInfo.label}</span>
               {bio.customStatus && (
                 <>
                   <span className="opacity-40">·</span>
                   <span className="font-normal text-ink/90 truncate max-w-[220px]">
-                    {bio.customStatusEmoji && `${bio.customStatusEmoji} `}{bio.customStatus}
+                    {bio.customStatusEmoji && `${bio.customStatusEmoji} `}
+                    {bio.customStatus}
                   </span>
                 </>
               )}
               {isOwner && <Edit3 size={11} className="opacity-60 ml-0.5" />}
             </button>
 
-            {bio.hours && (
-              <span className="text-xs text-mute font-medium">
-                · {bio.hours}
-              </span>
-            )}
+            {bio.hours && <span className="text-xs text-mute font-medium">· {bio.hours}</span>}
           </div>
 
           {(bio.city || bio.category) && (
             <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-mute">
               <MapPin size={12} className="text-gold shrink-0" aria-hidden />
-              {[bio.city, BUSINESS_CATEGORIES.find((c) => c.id === bio.category)?.label]
-                .filter(Boolean)
-                .join(" · ")}
+              {[bio.city, BUSINESS_CATEGORIES.find((c) => c.id === bio.category)?.label].filter(Boolean).join(" · ")}
             </p>
           )}
 
-          {bio.shortWhy && (
-            <p className="mt-2 text-[14px] leading-relaxed text-ink/85 font-normal">
-              {bio.shortWhy}
-            </p>
-          )}
+          {bio.shortWhy && <p className="mt-2 text-[14px] leading-relaxed text-ink/85 font-normal">{bio.shortWhy}</p>}
         </div>
 
-        {/* Primary Action Row 1: Follow, Like, Catch Up, QR in one line */}
         <div className="mt-4 flex items-center gap-2">
           <FollowButton handle={bio.handle} name={bio.name} className="flex-1 h-10 text-xs font-semibold" />
           <LikeButton handle={bio.handle} name={bio.name} className="flex-1 h-10 text-xs font-semibold" />
-          
-          {/* Catch Up / Remember to Catch Up button */}
-          <button
-            type="button"
-            onClick={() => {
-              setCatchUpInitialType("catchup");
-              setCatchUpModalOpen(true);
-            }}
-            className={cn(
-              "inline-flex h-10 items-center justify-center gap-1.5 rounded-full px-3.5 text-xs font-semibold shadow-sm ring-1 transition active:scale-95 shrink-0",
-              isCatchUpRemembered
-                ? "bg-amber-500/15 text-amber-700 ring-amber-500/40 shadow-amber-500/10"
-                : "bg-card text-ink ring-line hover:bg-paper",
-            )}
-            title={isCatchUpRemembered ? "Catch up remembered (click to view/edit)" : `Remember to catch up with ${bio.name}`}
-          >
-            <Coffee size={15} className={isCatchUpRemembered ? "text-amber-600 fill-amber-600" : "text-amber-600"} />
-            <span>{isCatchUpRemembered ? "Catch Up ✓" : "Catch Up"}</span>
-          </button>
-
           <button
             type="button"
             onClick={() => setShareModalOpen(true)}
@@ -589,16 +550,14 @@ export function BioPublicPage() {
               </span>
             </div>
 
-            <p className="mt-1 text-xs text-mute">
-              People who want to meet, grab coffee or sync up with you.
-            </p>
+            <p className="mt-1 text-xs text-mute">People who want to meet, grab coffee or sync up with you.</p>
 
             <div className="mt-3 space-y-2.5">
               {catchUpsList.map((item) => {
                 const eventPayload = {
-                  title: `${item.type === "meeting" ? "Meeting" : "Catch Up"}: ${item.requesterName} & Me`,
-                  description: `${item.notes || `AirPal Catch Up with ${item.requesterName}`}\n\nVenue: ${item.venue || "TBD"}\nProfile: https://airpal.me/@${bio.handle}`,
-                  startsAt: `${item.date || new Date().toISOString().slice(0, 10)}T${item.time || "14:00"}:00`,
+                  title: `${item.type === "meeting" ? "Meeting" : item.type === "nightout" ? "Hangout" : "Catch Up"}: ${item.requesterName}`,
+                  description: `${item.notes || `AirPal with ${item.requesterName}`}\nVenue: ${item.venue || "TBD"}\nhttps://airpal.me/@${bio.handle}`,
+                  startsAt: `${item.date || toZonedDateStr(new Date())}T${item.time || "14:00"}:00`,
                   venue: item.venue,
                   city: bio.city,
                 };
@@ -631,7 +590,11 @@ export function BioPublicPage() {
                           )}
                         </div>
                         <p className="text-[11px] text-mute truncate mt-0.5">
-                          {item.type === "meeting" ? "📅 Meeting" : item.type === "nightout" ? "👥 Hangout" : "☕ Catch Up"}
+                          {item.type === "meeting"
+                            ? "📅 Meeting"
+                            : item.type === "nightout"
+                              ? "👥 Hangout"
+                              : "☕ Catch Up"}
                           {item.date && ` · ${item.date}`}
                           {item.time && ` @ ${item.time}`}
                           {item.venue && ` · ${item.venue}`}
@@ -668,103 +631,79 @@ export function BioPublicPage() {
           </div>
         )}
 
-        {/* Meet, Catch Up & Hangout with @handle */}
-        <div className="mt-5 rounded-3xl bg-gradient-to-br from-card via-paper to-card p-5 ring-1 ring-gold/40 shadow-xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
-              <Sparkles size={12} />
-              <span>Meet & Hangout</span>
+        {!isOwner && (
+          <div className="mt-6 rounded-3xl bg-card p-5 ring-1 ring-line">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Meet &amp; hangout</p>
+            <h3 className="font-display mt-1.5 text-lg font-semibold text-ink">Catch up or meet with {bio.name}</h3>
+            <p className="mt-1 text-[13px] leading-relaxed text-mute">
+              Propose a 1-on-1 coffee, schedule a sync meeting, or create a group hangout plan.
+            </p>
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              {(
+                [
+                  {
+                    type: "catchup" as const,
+                    label: "Catch Up",
+                    sub: "1-on-1 coffee",
+                    Icon: Coffee,
+                    tint: "bg-amber-500/15 text-amber-700",
+                  },
+                  {
+                    type: "meeting" as const,
+                    label: "Meeting",
+                    sub: "1-on-1 sync",
+                    Icon: Calendar,
+                    tint: "bg-sky-500/15 text-sky-700",
+                  },
+                  {
+                    type: "nightout" as const,
+                    label: "Hangout",
+                    sub: "Group plan",
+                    Icon: Users,
+                    tint: "bg-violet-500/15 text-violet-700",
+                  },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.type}
+                  type="button"
+                  onClick={() => {
+                    setCatchUpInitialType(opt.type);
+                    setCatchUpModalOpen(true);
+                  }}
+                  className="flex flex-col items-center rounded-2xl bg-paper px-2 py-3 text-center ring-1 ring-line transition hover:ring-brand/40 active:scale-[0.98]"
+                >
+                  <span className={cn("mb-1.5 grid h-10 w-10 place-items-center rounded-2xl", opt.tint)}>
+                    <opt.Icon size={18} />
+                  </span>
+                  <span className="text-xs font-bold text-ink">{opt.label}</span>
+                  <span className="mt-0.5 text-[10px] text-mute">{opt.sub}</span>
+                </button>
+              ))}
             </div>
-            <AddToCalendarMenu
-              event={{
-                title: `Catch Up & Coffee with ${bio.name}`,
-                description: `Meet with @${bio.handle} (${bio.name})\n\nCity: ${bio.city || "Sydney"}\nProfile: https://airpal.me/@${bio.handle}`,
-                startsAt: `${new Date().toISOString().slice(0, 10)}T14:00:00`,
-                venue: bio.city,
-                city: bio.city,
-              }}
-              size="sm"
-              variant="ghost"
-              label="Sync Calendar"
-              buttonClassName="text-[11px] text-mute hover:text-ink h-7 px-2.5 rounded-full"
-            />
           </div>
-
-          <h3 className="font-display mt-2 text-base sm:text-lg font-bold text-ink">
-            Catch up or meet with {bio.name}
-          </h3>
-          <p className="mt-1 text-xs text-mute leading-relaxed">
-            Propose a 1-on-1 coffee, schedule a sync meeting, or create a group hangout plan.
-          </p>
-
-          <div className="mt-3.5 grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setCatchUpInitialType("catchup");
-                setCatchUpModalOpen(true);
-              }}
-              className="flex flex-col items-center justify-center p-3 rounded-2xl bg-card ring-1 ring-line text-center hover:bg-paper hover:ring-amber-500/40 transition active:scale-95 group"
-            >
-              <div className="p-2 rounded-xl bg-amber-500/15 text-amber-600 mb-1.5 group-hover:scale-105 transition">
-                <Coffee size={18} />
-              </div>
-              <span className="text-xs font-bold text-ink">Catch Up</span>
-              <span className="text-[10px] text-mute mt-0.5">1-on-1 Coffee</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setCatchUpInitialType("meeting");
-                setCatchUpModalOpen(true);
-              }}
-              className="flex flex-col items-center justify-center p-3 rounded-2xl bg-card ring-1 ring-line text-center hover:bg-paper hover:ring-sky-500/40 transition active:scale-95 group"
-            >
-              <div className="p-2 rounded-xl bg-sky-500/15 text-sky-600 mb-1.5 group-hover:scale-105 transition">
-                <Calendar size={18} />
-              </div>
-              <span className="text-xs font-bold text-ink">Meeting</span>
-              <span className="text-[10px] text-mute mt-0.5">1-on-1 Sync</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setCatchUpInitialType("nightout");
-                setCatchUpModalOpen(true);
-              }}
-              className="flex flex-col items-center justify-center p-3 rounded-2xl bg-card ring-1 ring-line text-center hover:bg-paper hover:ring-purple-500/40 transition active:scale-95 group"
-            >
-              <div className="p-2 rounded-xl bg-purple-500/15 text-purple-600 mb-1.5 group-hover:scale-105 transition">
-                <Users size={18} />
-              </div>
-              <span className="text-xs font-bold text-ink">Hangout</span>
-              <span className="text-[10px] text-mute mt-0.5">Group Plan</span>
-            </button>
-          </div>
-        </div>
+        )}
 
         {/* What's On — Appearing at Events */}
         {appearing.length > 0 && (
           <div className="mt-7">
             <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">What’s On</p>
             <div className="mt-2 space-y-2">
-            {appearing.map((s) => {
-              const event = getEvent(s.eventId);
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => nav(`/e/${s.eventId}`)}
-                  className="w-full rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line transition hover:bg-card/80"
-                >
-                  <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-gold">Appearing at</p>
-                  <p className="font-medium">{event?.name || "Event / Market"}</p>
-                  {s.booth && <p className="text-sm text-mute">Booth {s.booth}</p>}
-                </button>
-              );
-            })}
+              {appearing.map((s) => {
+                const event = getEvent(s.eventId);
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => nav(`/e/${s.eventId}`)}
+                    className="w-full rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line transition hover:bg-card/80"
+                  >
+                    <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-gold">Appearing at</p>
+                    <p className="font-medium">{event?.name || "Event / Market"}</p>
+                    {s.booth && <p className="text-sm text-mute">Booth {s.booth}</p>}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -779,12 +718,10 @@ export function BioPublicPage() {
               </span>
               <span className="text-[11px] font-medium text-mute uppercase tracking-wider">AirPal Offer</span>
             </div>
-            <h3 className="font-display mt-2.5 text-xl font-bold leading-snug text-ink">
-              {liveOffer.title}
-            </h3>
+            <h3 className="font-display mt-2.5 text-xl font-bold leading-snug text-ink">{liveOffer.title}</h3>
             <p className="mt-1 text-sm leading-relaxed text-mute">{liveOffer.detail}</p>
             <Button
-              className="mt-4 w-full gap-2 bg-ink text-white hover:bg-ink/90"
+              className="mt-4 w-full gap-2 bg-brand text-white hover:bg-brand-ink"
               onClick={() =>
                 onClaimDeal({
                   id: "live-offer",
@@ -815,19 +752,21 @@ export function BioPublicPage() {
         {/* Outbound Link Stack */}
         {stacked.length > 0 && (
           <ul className="mt-5 space-y-2">
-            {stacked.filter((link) => isSafeBioHref(link.href)).map((link) => (
-              <li key={link.id}>
-                <a
-                  href={link.href}
-                  target={link.href.startsWith("http") ? "_blank" : undefined}
-                  rel="noreferrer"
-                  onClick={() => recordTap(bio.handle, link.type)}
-                  className="flex h-14 items-center justify-center rounded-full bg-ink text-[15px] font-semibold text-white transition hover:bg-ink/90 active:scale-[0.99]"
-                >
-                  {link.label || link.type}
-                </a>
-              </li>
-            ))}
+            {stacked
+              .filter((link) => isSafeBioHref(link.href))
+              .map((link) => (
+                <li key={link.id}>
+                  <a
+                    href={link.href}
+                    target={link.href.startsWith("http") ? "_blank" : undefined}
+                    rel="noreferrer"
+                    onClick={() => recordTap(bio.handle, link.type)}
+                    className="flex h-14 items-center justify-center rounded-full bg-brand text-[15px] font-semibold text-white transition hover:bg-brand-ink active:scale-[0.99]"
+                  >
+                    {link.label || link.type}
+                  </a>
+                </li>
+              ))}
           </ul>
         )}
 
@@ -874,7 +813,7 @@ export function BioPublicPage() {
               value={listName}
               onChange={(e) => setListName(e.target.value)}
               placeholder="Name"
-              className="h-12 w-full rounded-full bg-card px-4 border border-ink outline-none focus:border-brand"
+              className="h-12 w-full rounded-full bg-card px-4 border border-line outline-none focus:border-brand"
             />
             <input
               type="email"
@@ -885,9 +824,12 @@ export function BioPublicPage() {
               value={listEmail}
               onChange={(e) => setListEmail(e.target.value)}
               placeholder="Email"
-              className="h-12 w-full rounded-full bg-card px-4 border border-ink outline-none focus:border-brand"
+              className="h-12 w-full rounded-full bg-card px-4 border border-line outline-none focus:border-brand"
             />
-            <button type="submit" className="h-12 w-full rounded-full bg-ink text-sm font-medium text-white transition hover:bg-ink/90">
+            <button
+              type="submit"
+              className="h-12 w-full rounded-full bg-brand text-sm font-medium text-white transition hover:bg-brand-ink"
+            >
               Join the list
             </button>
             <p className="text-center text-[12px] text-mute">Also joins AirPal Club for invites and offers.</p>
@@ -920,8 +862,14 @@ export function BioPublicPage() {
 
       {/* Claim Redemption Modal */}
       {claim && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/60 px-6 backdrop-blur-sm" onClick={() => setClaim(null)}>
-          <div className="w-full max-w-sm rounded-[32px] bg-paper p-6 text-center shadow-2xl ring-1 ring-line" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-ink/60 px-6 backdrop-blur-sm"
+          onClick={() => setClaim(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-[32px] bg-paper p-6 text-center shadow-2xl ring-1 ring-line"
+            onClick={(e) => e.stopPropagation()}
+          >
             <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">{claim.badge}</p>
             <p className="font-mono mt-3 text-4xl font-bold tracking-widest text-ink">{claim.code}</p>
             <p className="mt-2 text-sm font-medium text-mute leading-relaxed">{claim.detail}</p>
@@ -930,7 +878,7 @@ export function BioPublicPage() {
             </div>
             <button
               type="button"
-              className="mt-5 w-full rounded-full bg-ink py-3 text-sm font-semibold text-white transition hover:bg-ink/90"
+              className="mt-5 w-full rounded-full bg-brand py-3 text-sm font-semibold text-white transition hover:bg-brand-ink"
               onClick={() => setClaim(null)}
             >
               Done
@@ -956,6 +904,7 @@ export function BioPublicPage() {
         name={bio.name}
         city={bio.city}
         avatar={avatar}
+        ownerUid={bio.ownerUid}
         initialType={catchUpInitialType}
       />
 
@@ -964,7 +913,10 @@ export function BioPublicPage() {
         open={statusModalOpen}
         onClose={() => setStatusModalOpen(false)}
         handle={bio.handle}
-        currentStatus={bio.availabilityStatus || (bio.openNow === true ? "available" : bio.openNow === false ? "offline" : "available")}
+        currentStatus={
+          bio.availabilityStatus ||
+          (bio.openNow === true ? "available" : bio.openNow === false ? "offline" : "available")
+        }
         currentCustomStatus={bio.customStatus}
         currentEmoji={bio.customStatusEmoji}
         onSaved={(newStatus, newCustom, newEmoji) => {

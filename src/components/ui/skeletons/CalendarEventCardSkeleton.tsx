@@ -1,19 +1,10 @@
 import { cn } from "@/lib/cn";
 
-export function CalendarEventCardSkeleton({
-  compact = false,
-  className,
-}: {
-  compact?: boolean;
-  className?: string;
-}) {
+export function CalendarEventCardSkeleton({ compact = false, className }: { compact?: boolean; className?: string }) {
   return (
     <div
       aria-hidden="true"
-      className={cn(
-        "relative flex flex-col rounded-3xl bg-card p-4 ring-1 ring-line/80 shadow-xs md:p-5",
-        className,
-      )}
+      className={cn("relative flex flex-col rounded-3xl bg-card p-4 ring-1 ring-line/80 shadow-xs md:p-5", className)}
     >
       {/* Top Banner / Image (if not compact) */}
       {!compact && (

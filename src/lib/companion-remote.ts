@@ -1,18 +1,5 @@
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  query,
-  setDoc,
-  where,
-  type Firestore,
-} from "firebase/firestore";
-import {
-  publicMateFromApplication,
-  type CompanionApplication,
-  type CompanionStatus,
-} from "@shared/companion";
+import { collection, deleteDoc, doc, getDocs, query, setDoc, where, type Firestore } from "firebase/firestore";
+import { publicMateFromApplication, type CompanionApplication, type CompanionStatus } from "@shared/companion";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 
 const APPS = "companion_applications";

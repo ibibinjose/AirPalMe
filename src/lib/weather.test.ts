@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { weekdayShort } from "./weather";
+import { pickReverseLocality } from "./weather";
 
-describe("weekdayShort", () => {
-  it("returns a short weekday for a valid date", () => {
-    expect(weekdayShort("2026-09-18", "Australia/Sydney")).toBe("Fri");
+describe("pickReverseLocality", () => {
+  it("prefers suburb over metro city so Ashfield is not labelled Sydney", () => {
+    expect(pickReverseLocality({ locality: "Ashfield", city: "Sydney", principalSubdivision: "New South Wales" })).toBe(
+      "Ashfield",
+    );
   });
 
-  it("returns empty string for invalid input instead of throwing", () => {
-    expect(weekdayShort("not-a-date", "Australia/Sydney")).toBe("");
-    expect(weekdayShort("", "Nope/Nowhere")).toBe("");
+  it("falls back to city when locality is missing", () => {
+    expect(pickReverseLocality({ city: "Sydney" })).toBe("Sydney");
   });
 });

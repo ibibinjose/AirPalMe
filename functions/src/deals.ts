@@ -20,6 +20,8 @@ import {
   type StayContextPayload,
   type SubmitPartnerClaimRequest,
 } from "../../shared/airpal-security";
+import { clampBusinessPlan } from "../../shared/business-onboarding";
+import { emailMatchesWebsite } from "../../shared/google-place";
 import { CATALOG_DEALS, CATALOG_VENUE_IDS } from "./catalog";
 import { hashPin, verifyPin } from "./pin";
 import { enforceRateLimit, isAnonymousAuth, noteAppCheck } from "./abuse";
@@ -203,7 +205,12 @@ export const redeemVoucher = onCall(CALLABLE, async (request) => {
     source: "internal",
     properties: { offerId: voucherId, partnerId: "venue", claimId: voucherId, redemptionChannel: "staff_pin" },
   });
-  return { ok: true as const, success: true as const, message: `Voucher ${voucherId} verified and redeemed.`, redeemedAt: now };
+  return {
+    ok: true as const,
+    success: true as const,
+    message: `Voucher ${voucherId} verified and redeemed.`,
+    redeemedAt: now,
+  };
 });
 
 export const providePartnerDeal = onCall(CALLABLE, async (request) => {
@@ -290,7 +297,10 @@ export const submitPartnerClaim = onCall(CALLABLE, async (request) => {
     role: data.role?.trim() || "Owner",
     customPerk: data.customPerk?.trim() || "",
     abnOrTaxId: data.abnOrTaxId?.trim() || "",
-    plan: ["presence", "featured", "partner"].includes(String(data.plan || "")) ? String(data.plan) : "presence",
+    plan: clampBusinessPlan(String(data.plan || "presence"), {
+      domain: false,
+      abn: String(data.abnOrTaxId || "").replace(/\s/g, "").length >= 8,
+    }),
     status: "pending" as const,
     createdAt: new Date().toISOString(),
   };
@@ -321,6 +331,12 @@ export const claimFreeVenuePresence = onCall(CALLABLE, async (request) => {
     };
   }
 
+  const ownerEmail = String(request.auth?.token?.email || "").toLowerCase();
+  const website = String(data.website || "").trim();
+  const plan = clampBusinessPlan(String(data.plan || "presence"), {
+    domain: emailMatchesWebsite(ownerEmail, website),
+    abn: String(data.abnOrTaxId || "").replace(/\s/g, "").length >= 8,
+  });
   const precinctId = String(data.precinctId || "").trim() || guessPrecinctIdFromCityText(address) || "local";
   const rawCategory = String(data.category || "eat");
   const category: PlaceCategory = isPlaceCategory(rawCategory) ? rawCategory : "eat";
@@ -347,7 +363,10 @@ export const claimFreeVenuePresence = onCall(CALLABLE, async (request) => {
       precinctId,
       markerId,
       placeId,
-      plan: "free",
+      plan,
+      mapsPlaceId: String(data.mapsPlaceId || "").trim() || null,
+      website: String(data.website || "").trim() || null,
+      heroImage: String(data.heroImage || "").trim() || null,
       createdAt: FieldValue.serverTimestamp(),
     });
   await db
@@ -364,6 +383,10 @@ export const claimFreeVenuePresence = onCall(CALLABLE, async (request) => {
       precinctId,
       address,
       propertyId: "",
+      mapsPlaceId: String(data.mapsPlaceId || "").trim() || null,
+      website: String(data.website || "").trim() || null,
+      heroImage: String(data.heroImage || "").trim() || null,
+      phone: String(data.phone || "").trim() || null,
       updatedAt: FieldValue.serverTimestamp(),
     });
   const venuePolicy = resolveCompetitorPolicy({

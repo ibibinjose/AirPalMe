@@ -106,7 +106,7 @@ export function CompanionAdmin() {
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as CompanionStatus | "all")}
           aria-label="Filter by status"
-          className="h-10 rounded-2xl bg-paper px-3 text-xs border border-ink outline-none text-ink focus:border-brand"
+          className="h-10 rounded-2xl bg-paper px-3 text-xs border border-line outline-none text-ink focus:border-brand"
         >
           <option value="all">All statuses</option>
           {COMPANION_STATUSES.map((s) => (
@@ -119,7 +119,7 @@ export function CompanionAdmin() {
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
           aria-label="Filter by role"
-          className="h-10 rounded-2xl bg-paper px-3 text-xs border border-ink outline-none text-ink focus:border-brand"
+          className="h-10 rounded-2xl bg-paper px-3 text-xs border border-line outline-none text-ink focus:border-brand"
         >
           <option value="all">All roles</option>
           {COMPANION_ROLES.map((r) => (
@@ -134,7 +134,7 @@ export function CompanionAdmin() {
           onChange={(e) => setLocationFilter(e.target.value)}
           placeholder="Filter by location…"
           aria-label="Filter by location"
-          className="h-10 rounded-2xl bg-paper px-3 text-xs border border-ink outline-none text-ink focus:border-brand"
+          className="h-10 rounded-2xl bg-paper px-3 text-xs border border-line outline-none text-ink focus:border-brand"
         />
       </div>
 
@@ -234,7 +234,7 @@ export function CompanionAdmin() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Private notes for reviewers only…"
-                    className="mt-1 w-full rounded-2xl bg-card p-3 text-xs border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
+                    className="mt-1 w-full rounded-2xl bg-card p-3 text-xs border border-line outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
                   />
                 </div>
 

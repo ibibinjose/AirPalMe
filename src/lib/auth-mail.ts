@@ -2,6 +2,7 @@ import {
   EmailAuthProvider,
   applyActionCode,
   confirmPasswordReset,
+  linkWithCredential,
   sendEmailVerification,
   sendPasswordResetEmail,
   unlink,
@@ -70,6 +71,25 @@ export async function setAuthDisplayName(user: User, name: string) {
   const trimmed = name.trim();
   if (!trimmed) return;
   await updateProfile(user, { displayName: trimmed });
+}
+
+/** Link email + password onto a phone-verified account, then send the verify email. */
+export async function linkEmailPasswordToAccount(email: string, password: string) {
+  const auth = requireAuth();
+  const user = auth.currentUser;
+  if (!user || user.isAnonymous) throw new Error("Confirm your mobile number first.");
+  const next = email.trim().toLowerCase();
+  if (!next || password.length < 8) throw new Error("Need a real email and password.");
+  const cred = EmailAuthProvider.credential(next, password);
+  if (!user.providerData.some((p) => p.providerId === EmailAuthProvider.PROVIDER_ID)) {
+    await linkWithCredential(user, cred);
+  } else if (user.email && user.email.toLowerCase() !== next) {
+    await updateEmail(user, next);
+  }
+  await user.reload();
+  if (!auth.currentUser?.emailVerified) {
+    await sendEmailVerification(auth.currentUser || user, emailActionSettings());
+  }
 }
 
 /** Attach email to a phone account after SMS verification (recent login). */

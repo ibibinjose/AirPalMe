@@ -1,5 +1,14 @@
 import { doc, getDoc } from "firebase/firestore";
-import { BIO_LINK_TYPES, isSafeBioHref, normalizeHandle, sanitizeCatalog, type BioKind, type BioLink, type BioLinkType, type BioProfile } from "@shared/bio";
+import {
+  BIO_LINK_TYPES,
+  isSafeBioHref,
+  normalizeHandle,
+  sanitizeCatalog,
+  type BioKind,
+  type BioLink,
+  type BioLinkType,
+  type BioProfile,
+} from "@shared/bio";
 import type { BusinessCategoryId } from "@shared/business";
 import { getFirebaseDb } from "./firebase";
 
@@ -79,14 +88,14 @@ export function profileFromDoc(id: string, data: Record<string, unknown>): BioPr
   const lat = Number(geoRaw?.lat ?? geoRaw?.latitude);
   const lng = Number(geoRaw?.lng ?? geoRaw?.longitude);
   const links = Array.isArray(data.links)
-    ? (data.links as Array<Record<string, unknown>>)
+    ? ((data.links as Array<Record<string, unknown>>)
         .filter((row) => LINK_TYPE.has(String(row.type || "")) && isSafeBioHref(row.href))
         .map((row, i) => ({
           id: String(row.id || `l-${i}`),
           type: String(row.type) as BioLinkType,
           label: String(row.label || ""),
           href: String(row.href).trim().slice(0, 300),
-        })) satisfies BioLink[]
+        })) satisfies BioLink[])
     : [];
   const offer = data.offer as { badge?: string; detail?: string } | null | undefined;
   return {

@@ -5,20 +5,23 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { logAdminAction } from "@/lib/admin-audit";
 import { getDoc } from "firebase/firestore";
+import { completePaidBookingRemote, createBookingCheckoutSessionRemote } from "@/lib/functions";
 import {
   bookingValid,
   canCustomerCancel,
   canProviderComplete,
   canProviderConfirm,
+  canRetryPayout,
   DEFAULT_FEE_CONFIG,
   paymentStatusForPrice,
+  payoutStatusForPrice,
   quoteFees,
   type Booking,
   type FeeConfig,
 } from "@shared/booking";
 
 const STATUS_LABEL: Record<string, string> = {
-  pending: "Awaiting mate",
+  pending: "Pending",
   confirmed: "Confirmed",
   cancelled: "Cancelled",
   in_progress: "In progress",
@@ -77,6 +80,35 @@ export function BookingsSection() {
     void reload(user.uid);
   }, [user]);
 
+  async function pay(b: Booking) {
+    if (!user) return;
+    setBusy(b.id);
+    try {
+      const res = await createBookingCheckoutSessionRemote({ bookingId: b.id });
+      if (res.checkoutUrl) {
+        window.location.href = res.checkoutUrl;
+        return;
+      }
+      await reload(user.uid);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function complete(b: Booking) {
+    if (!user) return;
+    setBusy(b.id);
+    try {
+      await completePaidBookingRemote({ bookingId: b.id });
+      if (isAdmin) {
+        void logAdminAction(user.uid, "booking.status", "bookings", b.id, b.status, "completed");
+      }
+      await reload(user.uid);
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function transition(b: Booking, status: Booking["status"], extra: Record<string, unknown> = {}) {
     const db = getFirebaseDb();
     if (!db || !user) return;
@@ -84,18 +116,6 @@ export function BookingsSection() {
     try {
       const now = new Date().toISOString();
       await updateDoc(doc(db, "bookings", b.id), { status, updatedAt: now, ...extra });
-      // Provider completing also closes the request loop (§30 acceptance).
-      if (status === "completed" && user.uid === b.providerUid && b.providerKind === "mate" && b.requestId) {
-        try {
-          await updateDoc(doc(db, "mate_requests", b.requestId), {
-            status: "completed",
-            completedAt: now,
-            updatedAt: now,
-          });
-        } catch {
-          // Request close is best-effort; admin can always intervene.
-        }
-      }
       if (isAdmin) {
         void logAdminAction(user.uid, "booking.status", "bookings", b.id, b.status, status);
       }
@@ -109,9 +129,10 @@ export function BookingsSection() {
 
   return (
     <section className="mt-6 rounded-2xl border border-line bg-card p-4">
-      <h2 className="font-display text-base font-bold">Bookings</h2>
+      <h2 className="font-display text-base font-bold">Tickets & bookings</h2>
       <p className="mt-0.5 text-[13px] text-mute">
-        $0 stays are confirmed as paid. Anything else stays unpaid until Stripe checkout is live for that booking.
+        Event tickets and Mate bookings. Paid ones go through Stripe. We hold the host’s share until they mark it
+        delivered.
       </p>
       <ul className="mt-2 divide-y divide-line">
         {rows.map((b) => {
@@ -125,6 +146,11 @@ export function BookingsSection() {
                     {mine ? `with ${b.providerName}` : `for ${b.title}`} · {b.suburb} · {b.date}
                     {b.priceCents > 0 ? ` · $${(b.priceCents / 100).toFixed(0)}` : " · free"}
                     {b.paymentStatus === "unpaid" ? " · unpaid" : b.paymentStatus === "paid" ? " · paid" : ""}
+                    {b.payoutStatus === "held"
+                      ? " · held for payout"
+                      : b.payoutStatus === "transferred" && b.priceCents > 0
+                        ? " · paid out"
+                        : ""}
                   </span>
                 </span>
                 <span className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-brand">
@@ -132,19 +158,39 @@ export function BookingsSection() {
                 </span>
               </span>
               <span className="mt-1.5 flex flex-wrap gap-1.5">
+                {mine && b.paymentStatus === "unpaid" && b.priceCents > 0 && (
+                  <Button size="sm" disabled={busy === b.id} loading={busy === b.id} onClick={() => void pay(b)}>
+                    Pay now
+                  </Button>
+                )}
                 {mine && canCustomerCancel(b.status) && (
-                  <Button size="sm" variant="ghost" disabled={busy === b.id} onClick={() => void transition(b, "cancelled")}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={busy === b.id}
+                    onClick={() => void transition(b, "cancelled")}
+                  >
                     Cancel booking
                   </Button>
                 )}
                 {!mine && canProviderConfirm(b.status) && (
-                  <Button size="sm" disabled={busy === b.id} loading={busy === b.id} onClick={() => void transition(b, "confirmed")}>
+                  <Button
+                    size="sm"
+                    disabled={busy === b.id}
+                    loading={busy === b.id}
+                    onClick={() => void transition(b, "confirmed")}
+                  >
                     Confirm
                   </Button>
                 )}
                 {!mine && canProviderComplete(b.status) && (
-                  <Button size="sm" disabled={busy === b.id} loading={busy === b.id} onClick={() => void transition(b, "completed")}>
+                  <Button size="sm" disabled={busy === b.id} loading={busy === b.id} onClick={() => void complete(b)}>
                     Mark delivered
+                  </Button>
+                )}
+                {!mine && canRetryPayout(b) && (
+                  <Button size="sm" disabled={busy === b.id} loading={busy === b.id} onClick={() => void complete(b)}>
+                    Get paid
                   </Button>
                 )}
               </span>
@@ -180,6 +226,7 @@ export async function createBookingForPlan(args: {
     ...input,
     feeCents: fees.feeCents,
     paymentStatus: paymentStatusForPrice(priceCents),
+    payoutStatus: payoutStatusForPrice(priceCents),
     status: "pending",
     cancelReason: "",
     createdAt: now,
@@ -211,6 +258,7 @@ export async function createBookingForRequest(args: {
     ...input,
     feeCents: fees.feeCents,
     paymentStatus: paymentStatusForPrice(priceCents),
+    payoutStatus: payoutStatusForPrice(priceCents),
     status: "pending",
     cancelReason: "",
     createdAt: now,
@@ -265,9 +313,11 @@ export async function createBookingForCampaign(args: {
     priceCents,
     feeCents: fees.feeCents,
     paymentStatus: paymentStatusForPrice(priceCents),
+    payoutStatus: payoutStatusForPrice(priceCents),
     status: "pending",
     cancelReason: "",
     campaignId: args.campaignId,
+    spots: 1,
     ...(args.listingId ? { listingId: args.listingId } : {}),
     createdAt: now,
     updatedAt: now,

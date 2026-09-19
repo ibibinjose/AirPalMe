@@ -1,5 +1,18 @@
 import { useEffect } from "react";
-import { Check, Heart, MapPin, Share2, Star, X, ExternalLink, Footprints, Sparkles, Navigation, Clock, RotateCcw } from "lucide-react";
+import {
+  Check,
+  Heart,
+  MapPin,
+  Share2,
+  Star,
+  X,
+  ExternalLink,
+  Footprints,
+  Sparkles,
+  Navigation,
+  Clock,
+  RotateCcw,
+} from "lucide-react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import type { CalendarEvent } from "@shared/event";
@@ -119,9 +132,7 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
             {relative.label}
           </span>
           {isWeekend && (
-            <span className="rounded-full bg-indigo-100 text-indigo-800 px-3 py-1 text-xs font-medium">
-              Weekend
-            </span>
+            <span className="rounded-full bg-indigo-100 text-indigo-800 px-3 py-1 text-xs font-medium">Weekend</span>
           )}
           {isFree && (
             <span className="rounded-full bg-emerald-100 text-emerald-800 px-3 py-1 text-xs font-semibold">
@@ -342,7 +353,7 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
                 onClose();
                 nav(event.gatePath!);
               }}
-              className="col-span-2 inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-ink px-4 text-xs font-medium text-white hover:bg-ink/90 transition shadow-sm"
+              className="col-span-2 inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-brand px-4 text-xs font-medium text-white hover:bg-brand-ink transition shadow-sm"
             >
               <span>Explore Market Directory & Stalls</span>
               <ExternalLink size={13} />

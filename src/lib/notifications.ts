@@ -1,10 +1,7 @@
 import { httpsCallable } from "firebase/functions";
 import { getMessaging, getToken, isSupported, onMessage } from "firebase/messaging";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import type {
-  CreateBroadcastRequest,
-  ReviewBroadcastRequest,
-} from "@shared/notifications";
+import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import type { CreateBroadcastRequest, ReviewBroadcastRequest } from "@shared/notifications";
 import { getFirebaseApp, getFirebaseAuth, getFirebaseDb, getFirebaseFunctions } from "./firebase";
 import { isNativeApp } from "./native";
 
@@ -17,17 +14,14 @@ async function callNotify<Req, Res>(name: string, data: Req): Promise<Res> {
 }
 
 export function createBroadcastRemote(data: CreateBroadcastRequest) {
-  return callNotify<CreateBroadcastRequest, { ok: boolean; broadcastId: string }>(
+  return callNotify<CreateBroadcastRequest, { ok: boolean; broadcastId: string; status?: string; sent?: number }>(
     "createBroadcast",
     data,
   );
 }
 
 export function reviewBroadcastRemote(data: ReviewBroadcastRequest) {
-  return callNotify<ReviewBroadcastRequest, { ok: boolean; status: string; sent?: number }>(
-    "reviewBroadcast",
-    data,
-  );
+  return callNotify<ReviewBroadcastRequest, { ok: boolean; status: string; sent?: number }>("reviewBroadcast", data);
 }
 
 const PREF_KEY = "airpal.notify.push";
@@ -152,5 +146,15 @@ export function markPopupShown(id: string) {
     localStorage.setItem(SHOWN_KEY, JSON.stringify(Array.from(shown).slice(-50)));
   } catch {
     /* ignore */
+  }
+}
+
+export async function markNotificationRead(id: string) {
+  const db = getFirebaseDb();
+  if (!db || !id) return;
+  try {
+    await updateDoc(doc(db, "promotion_notifications", id), { read: true });
+  } catch {
+    /* offline or already read */
   }
 }

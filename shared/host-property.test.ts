@@ -24,18 +24,10 @@ describe("buildHostProperty wifi defaults", () => {
   });
 
   it("keeps campus, hostel, and venue passwords empty until the host sets them", () => {
-    expect(
-      buildHostProperty({ propertyName: "College", ownerEmail: "a@b.c", kind: "campus" }).wifi.password,
-    ).toBe("");
-    expect(
-      buildHostProperty({ propertyName: "Hostel", ownerEmail: "a@b.c", kind: "hostel" }).wifi.password,
-    ).toBe("");
-    expect(
-      buildHostProperty({ propertyName: "The Hall", ownerEmail: "a@b.c", kind: "venue" }).kind,
-    ).toBe("venue");
-    expect(
-      buildHostProperty({ propertyName: "The Hall", ownerEmail: "a@b.c", kind: "venue" }).wifi.password,
-    ).toBe("");
+    expect(buildHostProperty({ propertyName: "College", ownerEmail: "a@b.c", kind: "campus" }).wifi.password).toBe("");
+    expect(buildHostProperty({ propertyName: "Hostel", ownerEmail: "a@b.c", kind: "hostel" }).wifi.password).toBe("");
+    expect(buildHostProperty({ propertyName: "The Hall", ownerEmail: "a@b.c", kind: "venue" }).kind).toBe("venue");
+    expect(buildHostProperty({ propertyName: "The Hall", ownerEmail: "a@b.c", kind: "venue" }).wifi.password).toBe("");
   });
 });
 

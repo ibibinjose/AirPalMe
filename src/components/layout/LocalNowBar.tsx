@@ -33,14 +33,14 @@ function SkyIcon({ code, isDay, size = 14 }: { code: number; isDay: boolean; siz
 }
 
 export function LocalNowBar() {
-  const { weather, time, day, loading, city, source, shareLocation } = useLocalNow();
+  const { weather, time, day, loading, city, source, usingGps, shareLocation } = useLocalNow();
   const { isLowBattery, powerSaveActive, percentageText, togglePowerSave } = useBattery();
   const { t } = useLocale();
   const { trackFeatureEngagement } = useAnalytics();
   const [picker, setPicker] = useState(false);
   const today = weather?.days[0];
   const condition = weather ? t(weatherLabelKey(weather.code, weather.isDay)) : "";
-  const placeLabel = weather?.city || city || (loading ? t("locating") : t("nearYou"));
+  const placeLabel = usingGps ? city : weather?.city || city || (loading ? t("locating") : t("nearYou"));
 
   return (
     <div className="border-b border-line/70 bg-paper/95 backdrop-blur-xl">
@@ -57,7 +57,10 @@ export function LocalNowBar() {
           aria-label={`Current location: ${placeLabel}. Tap to select location`}
         >
           <MapPin size={12} className="shrink-0 text-gold" />
-          <span className="truncate text-[12px] font-semibold sm:text-[13px]" title={source === "gps" ? t("nearYou") : placeLabel}>
+          <span
+            className="truncate text-[12px] font-semibold sm:text-[13px]"
+            title={source === "gps" ? t("nearYou") : placeLabel}
+          >
             {placeLabel}
           </span>
           {shareLocation && (
@@ -95,7 +98,9 @@ export function LocalNowBar() {
               <span className="shrink-0 text-gold">
                 <SkyIcon code={weather.code} isDay={weather.isDay} />
               </span>
-              <span className="font-display text-[13px] font-semibold leading-none sm:text-[14px]">{weather.temp}°</span>
+              <span className="font-display text-[13px] font-semibold leading-none sm:text-[14px]">
+                {weather.temp}°
+              </span>
               <span className="truncate text-[11px] text-mute sm:text-[12px]">{condition}</span>
               {today && (
                 <span className="hidden shrink-0 text-[11px] text-mute md:inline">

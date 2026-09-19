@@ -76,9 +76,7 @@ export function countryByCode(code?: string): HostCountry | undefined {
 
 export function countryFromPhone(raw: string): HostCountry | undefined {
   const compact = raw.replace(/[^\d+]/g, "");
-  return [...HOST_COUNTRIES]
-    .sort((a, b) => b.dial.length - a.dial.length)
-    .find((c) => compact.startsWith(c.dial));
+  return [...HOST_COUNTRIES].sort((a, b) => b.dial.length - a.dial.length).find((c) => compact.startsWith(c.dial));
 }
 
 export type AddressLayout = {
@@ -133,6 +131,86 @@ export function addressLayoutFor(countryCode?: string): AddressLayout {
         statePlaceholder: "Greater London",
         postalLabel: "Postcode",
         postalPlaceholder: "SW1A 2AA",
+      };
+    case "AE":
+      return {
+        streetPlaceholder: "Villa 12, Jumeirah Beach Rd",
+        cityLabel: "City / emirate",
+        cityPlaceholder: "Dubai",
+        stateLabel: "Emirate",
+        statePlaceholder: "Dubai",
+        postalLabel: "P.O. Box",
+        postalPlaceholder: "00000",
+      };
+    case "CA":
+      return {
+        streetPlaceholder: "123 Queen St W, Apt 4",
+        cityLabel: "City",
+        cityPlaceholder: "Toronto",
+        stateLabel: "Province / territory",
+        statePlaceholder: "ON",
+        postalLabel: "Postal code",
+        postalPlaceholder: "M5H 2N2",
+      };
+    case "IE":
+      return {
+        streetPlaceholder: "12 Grafton Street",
+        cityLabel: "Town / city",
+        cityPlaceholder: "Dublin",
+        stateLabel: "County",
+        statePlaceholder: "Dublin",
+        postalLabel: "Eircode",
+        postalPlaceholder: "D02 AF30",
+      };
+    case "FR":
+      return {
+        streetPlaceholder: "12 rue de Rivoli",
+        cityLabel: "Ville",
+        cityPlaceholder: "Paris",
+        stateLabel: "Région",
+        statePlaceholder: "Île-de-France",
+        postalLabel: "Code postal",
+        postalPlaceholder: "75001",
+      };
+    case "DE":
+      return {
+        streetPlaceholder: "Friedrichstraße 12",
+        cityLabel: "Stadt",
+        cityPlaceholder: "Berlin",
+        stateLabel: "Bundesland",
+        statePlaceholder: "Berlin",
+        postalLabel: "Postleitzahl",
+        postalPlaceholder: "10117",
+      };
+    case "ES":
+      return {
+        streetPlaceholder: "Calle Mayor 12, 2º",
+        cityLabel: "Ciudad",
+        cityPlaceholder: "Madrid",
+        stateLabel: "Comunidad autónoma",
+        statePlaceholder: "Madrid",
+        postalLabel: "Código postal",
+        postalPlaceholder: "28013",
+      };
+    case "IT":
+      return {
+        streetPlaceholder: "Via del Corso 12",
+        cityLabel: "Città",
+        cityPlaceholder: "Roma",
+        stateLabel: "Regione",
+        statePlaceholder: "Lazio",
+        postalLabel: "CAP",
+        postalPlaceholder: "00187",
+      };
+    case "NL":
+      return {
+        streetPlaceholder: "Damrak 12",
+        cityLabel: "Plaats",
+        cityPlaceholder: "Amsterdam",
+        stateLabel: "Provincie",
+        statePlaceholder: "Noord-Holland",
+        postalLabel: "Postcode",
+        postalPlaceholder: "1012 LG",
       };
     default:
       return {

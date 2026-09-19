@@ -18,7 +18,7 @@ import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { WALKTHROUGH_KINDS, emptyWalkthrough, walkthroughValid } from "@shared/studio";
 
 const inputCls =
-  "mt-1 w-full rounded-xl border border-ink bg-paper px-3 py-2.5 text-sm outline-none placeholder:text-mute focus:border-brand";
+  "mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm outline-none placeholder:text-mute focus:border-brand";
 
 const AUDIENCES = [
   {
@@ -109,8 +109,8 @@ export function StudioPage() {
         Run your business on AirPal.
       </h1>
       <p className="mt-3 max-w-md text-[15px] leading-7 text-mute">
-        One backend for your hotel, venue, events and brand. Claim your listing or book a walkthrough and the team
-        will set it up with you.
+        One backend for your hotel, venue, events and brand. Claim your listing or book a walkthrough and the team will
+        set it up with you.
       </p>
       <div className="mt-5 flex flex-wrap gap-2">
         <Link href="/business/onboard">
@@ -289,7 +289,13 @@ export function StudioPage() {
               />
             </label>
             {error && <p className="rounded-xl bg-paper p-3 text-[13px] text-mute ring-1 ring-line">{error}</p>}
-            <Button className="w-full" size="lg" disabled={!walkthroughValid(form) || sending} loading={sending} onClick={() => void book()}>
+            <Button
+              className="w-full"
+              size="lg"
+              disabled={!walkthroughValid(form) || sending}
+              loading={sending}
+              onClick={() => void book()}
+            >
               Book my walkthrough
             </Button>
           </div>

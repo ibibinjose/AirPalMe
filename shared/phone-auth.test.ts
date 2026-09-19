@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { formatPhoneDisplay, isOtp, normalizeOtp, phoneReady, toE164 } from "./phone-auth";
+import {
+  formatPhoneDisplay,
+  isOtp,
+  normalizeOtp,
+  phonePasswordNeedsSms,
+  phoneReady,
+  resolveFirebaseWebApiKey,
+  toE164,
+} from "./phone-auth";
 import { authErrorMessage } from "./auth-email";
 
 describe("phone login helpers", () => {
@@ -25,5 +33,25 @@ describe("phone auth errors", () => {
     expect(authErrorMessage({ code: "auth/invalid-verification-code" })).toMatch(/code/i);
     expect(authErrorMessage({ code: "auth/code-expired" })).toMatch(/expired/i);
     expect(authErrorMessage({ code: "auth/too-many-requests" })).toMatch(/minute/i);
+  });
+
+  it("prefers a Functions env web API key, else a valid client public key", () => {
+    expect(resolveFirebaseWebApiKey("AIzaSyEnvKeyAAAAAAAAAAAAAAAAAAA", "AIzaSyClientKeyBBBBBBBBBBBBBBB")).toBe(
+      "AIzaSyEnvKeyAAAAAAAAAAAAAAAAAAA",
+    );
+    expect(resolveFirebaseWebApiKey("", "AIzaSyClientKeyBBBBBBBBBBBBBBB")).toBe("AIzaSyClientKeyBBBBBBBBBBBBBBB");
+    expect(resolveFirebaseWebApiKey("not-a-key", "nope")).toBe("");
+  });
+
+  it("sends phone+password failures to SMS when the callable is not configured", () => {
+    expect(phonePasswordNeedsSms({ code: "functions/failed-precondition", message: "Use the SMS code." })).toBe(true);
+    expect(
+      phonePasswordNeedsSms(
+        new Error("This account signs in with SMS. Create a password from Sign up, or use the SMS code."),
+      ),
+    ).toBe(true);
+    expect(phonePasswordNeedsSms({ code: "unauthenticated", message: "Mobile number or password is wrong." })).toBe(
+      false,
+    );
   });
 });

@@ -71,7 +71,10 @@ export function upsertMember(input: Omit<ClubMember, "id" | "joinedAt"> & { id?:
 }
 
 export function removeMember(email: string) {
-  writeJson(MEMBERS_KEY, loadMembers().filter((row) => row.email !== normalizeEmail(email)));
+  writeJson(
+    MEMBERS_KEY,
+    loadMembers().filter((row) => row.email !== normalizeEmail(email)),
+  );
   bump();
 }
 

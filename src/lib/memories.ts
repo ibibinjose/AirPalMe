@@ -84,10 +84,7 @@ export function updateMemory(id: string, patch: Partial<Pick<Memory, "caption" |
   const next: Memory = {
     ...memories[idx],
     caption: patch.caption !== undefined ? patch.caption.trim() || undefined : memories[idx].caption,
-    people:
-      patch.people !== undefined
-        ? patch.people.map((p) => p.trim()).filter(Boolean)
-        : memories[idx].people,
+    people: patch.people !== undefined ? patch.people.map((p) => p.trim()).filter(Boolean) : memories[idx].people,
     place: patch.place !== undefined ? patch.place.trim() || undefined : memories[idx].place,
   };
   memories[idx] = next;

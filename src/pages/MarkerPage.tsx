@@ -110,7 +110,7 @@ export function MarkerPage() {
           type="button"
           onClick={goBack}
           aria-label="Go back"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-card transition hover:border-brand active:scale-95"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full ring-1 ring-line bg-card transition hover:ring-brand/40 active:scale-95"
         >
           <ArrowLeft size={16} />
         </button>
@@ -124,13 +124,21 @@ export function MarkerPage() {
       <div className="mt-4 grid grid-cols-4 gap-2">
         {[
           { label: "Ask", run: () => setAskOpen(true) },
-          { label: "Stay", run: () => marker?.propertyId && nav(`/g/${marker.propertyId}?room=101`), hide: !isStayMarker || !marker?.propertyId },
+          {
+            label: "Stay",
+            run: () => marker?.propertyId && nav(`/g/${marker.propertyId}?room=101`),
+            hide: !isStayMarker || !marker?.propertyId,
+          },
           { label: "Walk", run: () => nav("/guide") },
           { label: "Tonight", run: () => setChip("tonight") },
         ]
           .filter((x) => !x.hide)
           .map((x) => (
-            <button key={x.label} onClick={x.run} className="h-11 rounded-2xl bg-card text-sm font-medium ring-1 ring-line">
+            <button
+              key={x.label}
+              onClick={x.run}
+              className="h-11 rounded-2xl bg-card text-sm font-medium ring-1 ring-line"
+            >
               {x.label}
             </button>
           ))}
@@ -147,8 +155,14 @@ export function MarkerPage() {
             />
           )}
           {tonight.map((ev) => (
-            <button key={ev.id} onClick={() => nav(`/e/${ev.id}`)} className="block w-full overflow-hidden rounded-3xl text-left">
-              {ev.image && <img src={ev.image} alt="" referrerPolicy="no-referrer" className="h-36 w-full object-cover" />}
+            <button
+              key={ev.id}
+              onClick={() => nav(`/e/${ev.id}`)}
+              className="block w-full overflow-hidden rounded-3xl text-left"
+            >
+              {ev.image && (
+                <img src={ev.image} alt="" referrerPolicy="no-referrer" className="h-36 w-full object-cover" />
+              )}
               <div className="bg-card p-3 ring-1 ring-line">
                 <p className="text-[11px] text-gold">{ev.sub}</p>
                 <p className="font-display text-lg">{ev.title}</p>
@@ -186,7 +200,12 @@ export function MarkerPage() {
         >
           <div className="flex items-center gap-2 rounded-full bg-paper px-3 ring-1 ring-line">
             <Sparkles size={16} className="text-brand" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} className="h-11 w-full bg-transparent outline-none" placeholder="What’s near?" />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              className="h-11 w-full bg-transparent outline-none"
+              placeholder="What’s near?"
+            />
           </div>
           <Button type="submit" className="mt-3 w-full">
             Ask

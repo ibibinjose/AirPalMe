@@ -1,13 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Check,
-  Copy,
-  Download,
-  MessageCircle,
-  QrCode,
-  Share2,
-  X,
-} from "lucide-react";
+import { Check, Copy, Download, MessageCircle, QrCode, Share2, X } from "lucide-react";
 import { type HangoutPlan, formatPlanDate, planInviteUrl } from "@shared/plan";
 import { makeQrDataUrl } from "@/lib/qr";
 import { toast } from "sonner";
@@ -15,22 +7,13 @@ import { Button } from "@/components/ui/Button";
 import { shareNative, triggerHaptic } from "@/lib/native";
 import { useScrollLock } from "@/hooks/useScrollLock";
 
-export function PlanShareModal({
-  plan,
-  open,
-  onClose,
-}: {
-  plan: HangoutPlan;
-  open: boolean;
-  onClose: () => void;
-}) {
+export function PlanShareModal({ plan, open, onClose }: { plan: HangoutPlan; open: boolean; onClose: () => void }) {
   useScrollLock(open);
 
   const [copied, setCopied] = useState(false);
   const [qrUrl, setQrUrl] = useState<string>("");
 
-  const origin =
-    typeof window !== "undefined" ? window.location.origin : "https://airpal.me";
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://airpal.me";
   const inviteUrl = planInviteUrl(plan.id, origin);
 
   const shareText = `Hey mates! Join our plan: "${plan.title}" on ${formatPlanDate(plan.date, plan.time)}. Check out the stops and RSVP here: ${inviteUrl}`;
@@ -78,21 +61,14 @@ export function PlanShareModal({
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4">
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
       {/* Modal Dialog */}
       <div className="scroll-container modal-safe relative w-full max-w-md rounded-t-[32px] sm:rounded-[32px] bg-card p-6 ring-1 ring-line shadow-2xl max-h-[90vh]">
         <div className="flex items-center justify-between pb-4 border-b border-line/60">
           <div>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">
-              Share Invitation
-            </span>
-            <h2 className="font-display mt-0.5 text-xl font-bold text-ink">
-              Invite Your Mates
-            </h2>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Share Invitation</span>
+            <h2 className="font-display mt-0.5 text-xl font-bold text-ink">Invite Your Mates</h2>
           </div>
           <button
             type="button"
@@ -106,9 +82,7 @@ export function PlanShareModal({
 
         {/* Link Copy Box */}
         <div className="mt-5">
-          <label className="text-xs font-semibold text-ink/80 block mb-1.5">
-            Shareable Event Link
-          </label>
+          <label className="text-xs font-semibold text-ink/80 block mb-1.5">Shareable Event Link</label>
           <div className="flex items-center gap-2 rounded-2xl bg-paper p-1.5 ring-1 ring-line">
             <input
               type="text"
@@ -169,9 +143,7 @@ export function PlanShareModal({
 
         {/* QR Code Presentation */}
         <div className="mt-6 rounded-3xl bg-paper p-5 ring-1 ring-line text-center">
-          <p className="text-xs font-semibold text-ink">
-            Scan at the table with phone camera
-          </p>
+          <p className="text-xs font-semibold text-ink">Scan at the table with phone camera</p>
           <p className="text-[11px] text-mute mt-0.5">
             Zero app install required · Opens instant RSVP in mobile browser
           </p>

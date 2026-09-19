@@ -1,12 +1,6 @@
 import { cn } from "@/lib/cn";
 
-export function PlaceCardSkeleton({
-  large = false,
-  className,
-}: {
-  large?: boolean;
-  className?: string;
-}) {
+export function PlaceCardSkeleton({ large = false, className }: { large?: boolean; className?: string }) {
   return (
     <div
       aria-hidden="true"
@@ -53,10 +47,7 @@ export function PlaceCardSkeletonGrid({
     <div
       role="status"
       aria-label="Loading places"
-      className={cn(
-        "grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
-        className,
-      )}
+      className={cn("grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4", className)}
     >
       {Array.from({ length: count }).map((_, i) => (
         <PlaceCardSkeleton key={i} large={large} />

@@ -1,16 +1,10 @@
 import { describe, expect, it } from "vitest";
-import {
-  isMarketingKind,
-  isPriorityKind,
-  validateBroadcast,
-} from "./notifications";
+import { broadcastNeedsReview, isMarketingKind, isPriorityKind, validateBroadcast } from "./notifications";
 
 describe("broadcast validation", () => {
   it("requires a short title and body", () => {
     expect(validateBroadcast({ title: "", body: "" })).toContain("Title is required.");
-    expect(validateBroadcast({ title: "x".repeat(81), body: "ok" })).toContain(
-      "Title must be 80 characters or fewer.",
-    );
+    expect(validateBroadcast({ title: "x".repeat(81), body: "ok" })).toContain("Title must be 80 characters or fewer.");
     expect(validateBroadcast({ title: "Hi", body: "y".repeat(281) })).toContain(
       "Message must be 280 characters or fewer.",
     );
@@ -20,6 +14,9 @@ describe("broadcast validation", () => {
     expect(
       validateBroadcast({ title: "Hi", body: "Hello", audience: "promotion_entrants", promotionId: "p1" }),
     ).toEqual([]);
+    expect(validateBroadcast({ title: "Tonight", body: "Doors at 7.", audience: "circle" })).toEqual([]);
+    expect(broadcastNeedsReview("circle")).toBe(false);
+    expect(broadcastNeedsReview("everyone")).toBe(true);
   });
 });
 

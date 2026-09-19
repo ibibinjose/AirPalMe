@@ -1,10 +1,5 @@
 import { SENSITIVE_PROPERTY_KEYS, ANALYTICS_MAX_STRING } from "@shared/analytics";
-import {
-  analyticsEnabled,
-  analyticsEnvironment,
-  getFirebaseAnalytics,
-  getMeasurementId,
-} from "./firebase";
+import { analyticsEnabled, analyticsEnvironment, getFirebaseAnalytics, getMeasurementId } from "./firebase";
 import { getAnalyticsConsent } from "./analytics";
 
 const SENSITIVE = new Set<string>(SENSITIVE_PROPERTY_KEYS);
@@ -25,9 +20,7 @@ export type CoreFeature =
   | "zoo";
 
 /** Sanitizes parameters for Firebase Analytics according to privacy policy. */
-export function sanitizeAnalyticsParams(
-  raw: Record<string, unknown> = {},
-): Record<string, string | number> {
+export function sanitizeAnalyticsParams(raw: Record<string, unknown> = {}): Record<string, string | number> {
   const clean: Record<string, string | number> = {};
 
   for (const [key, value] of Object.entries(raw)) {
@@ -59,10 +52,7 @@ export function sanitizeAnalyticsParams(
 /**
  * Log an event directly to Firebase Analytics (GA4) with measurement ID.
  */
-export async function logFirebaseEvent(
-  eventName: string,
-  eventParams: Record<string, unknown> = {},
-): Promise<boolean> {
+export async function logFirebaseEvent(eventName: string, eventParams: Record<string, unknown> = {}): Promise<boolean> {
   if (typeof window === "undefined") return false;
   if (getAnalyticsConsent() === "denied") return false;
   if (!analyticsEnabled()) return false;
@@ -106,9 +96,7 @@ export async function setFirebaseUserId(userId: string | null): Promise<void> {
 /**
  * Set user properties in Firebase Analytics.
  */
-export async function setFirebaseUserProperties(
-  properties: Record<string, string | number | boolean>,
-): Promise<void> {
+export async function setFirebaseUserProperties(properties: Record<string, string | number | boolean>): Promise<void> {
   if (typeof window === "undefined") return;
   if (getAnalyticsConsent() === "denied") return;
   if (!analyticsEnabled()) return;

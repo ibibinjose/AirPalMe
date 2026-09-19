@@ -27,14 +27,14 @@ North-star metric: **WQGA/Context** (weekly qualified guest actions per active Q
 
 Set `ENFORCE_APPCHECK=true` on Functions once a reCAPTCHA site key is live. Callables already consume App Check tokens.
 
-| Who | Where |
-| --- | --- |
-| Anyone | `/scan` Scan · `/concierge` Stay · `/` Explore · `/calendar` |
-| Guest | `/g/:id` stay · `/q/:id` marker |
-| Host | `/start` · `/host` |
-| Campus | `/c/:id` |
-| Walks | `/guide` |
-| Companion | `/companion` |
+| Who       | Where                                                        |
+| --------- | ------------------------------------------------------------ |
+| Anyone    | `/scan` Scan · `/concierge` Stay · `/` Explore · `/calendar` |
+| Guest     | `/g/:id` stay · `/q/:id` marker                              |
+| Host      | `/start` · `/host`                                           |
+| Campus    | `/c/:id`                                                     |
+| Walks     | `/guide`                                                     |
+| Companion | `/companion`                                                 |
 
 ## Local time and maps
 
@@ -44,19 +44,19 @@ Stay maps need `VITE_GOOGLE_MAPS_API_KEY`. Setup: [docs/maps.md](./docs/maps.md)
 
 ## Docs
 
-| Doc | Topic |
-| --- | --- |
-| [AGENTS.md](./AGENTS.md) | Conventions for people and coding agents |
-| [docs/app-mind-map.md](./docs/app-mind-map.md) | Full app map + usefulness plan |
-| [docs/host-tickets.md](./docs/host-tickets.md) | Guest staff tickets → host inbox + push |
-| [docs/freshness.md](./docs/freshness.md) | Hours / events / Wi-Fi re-verify SLAs |
-| [docs/maps.md](./docs/maps.md) | Google Maps key, APIs, CSP, deploy |
-| [docs/local-now.md](./docs/local-now.md) | Timezone, GPS, tonight, open hours |
-| [docs/email-setup.md](./docs/email-setup.md) | Auth email from `email.airpal.me` |
-| [docs/phone-login.md](./docs/phone-login.md) | SMS login |
-| [docs/analytics-event-dictionary.md](./docs/analytics-event-dictionary.md) | Event contract |
-| [docs/analytics-checklist.md](./docs/analytics-checklist.md) | Instrumentation status |
-| [docs/client-handoff.md](./docs/client-handoff.md) | Handoff, agreed scope, real-app bar |
+| Doc                                                                        | Topic                                    |
+| -------------------------------------------------------------------------- | ---------------------------------------- |
+| [AGENTS.md](./AGENTS.md)                                                   | Conventions for people and coding agents |
+| [docs/app-mind-map.md](./docs/app-mind-map.md)                             | Full app map + usefulness plan           |
+| [docs/host-tickets.md](./docs/host-tickets.md)                             | Guest staff tickets → host inbox + push  |
+| [docs/freshness.md](./docs/freshness.md)                                   | Hours / events / Wi-Fi re-verify SLAs    |
+| [docs/maps.md](./docs/maps.md)                                             | Google Maps key, APIs, CSP, deploy       |
+| [docs/local-now.md](./docs/local-now.md)                                   | Timezone, GPS, tonight, open hours       |
+| [docs/email-setup.md](./docs/email-setup.md)                               | Auth email from `email.airpal.me`        |
+| [docs/phone-login.md](./docs/phone-login.md)                               | SMS login                                |
+| [docs/analytics-event-dictionary.md](./docs/analytics-event-dictionary.md) | Event contract                           |
+| [docs/analytics-checklist.md](./docs/analytics-checklist.md)               | Instrumentation status                   |
+| [docs/client-handoff.md](./docs/client-handoff.md)                         | Handoff, agreed scope, real-app bar      |
 
 ## Deploy
 

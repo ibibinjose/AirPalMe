@@ -10,7 +10,8 @@ function clip(value: string, max = 80): string {
 export function classifyError(err: unknown): string {
   const name = err instanceof Error ? err.name : "Error";
   const msg = err instanceof Error ? err.message : String(err || "");
-  if (/ChunkLoadError|Loading chunk|dynamically imported module/i.test(msg) || name === "ChunkLoadError") return "chunk";
+  if (/ChunkLoadError|Loading chunk|dynamically imported module/i.test(msg) || name === "ChunkLoadError")
+    return "chunk";
   if (/NetworkError|Failed to fetch|Load failed|network/i.test(msg) || name === "NetworkError") return "network";
   if (name === "TypeError") return "type";
   if (name === "SecurityError") return "security";

@@ -19,7 +19,10 @@ type ClubValue = {
   joinClub: (input: { email: string; name: string; city: string; invites: boolean; offers: boolean }) => ClubMember;
   leaveClub: (email: string) => void;
   guests: (clubId: string) => GuestEntry[];
-  addGuest: (clubId: string, input: { email: string; name: string; note?: string; source?: GuestEntry["source"] }) => GuestEntry;
+  addGuest: (
+    clubId: string,
+    input: { email: string; name: string; note?: string; source?: GuestEntry["source"] },
+  ) => GuestEntry;
   removeGuest: (clubId: string, email: string) => void;
   importClubToList: (clubId: string) => number;
   sendInvite: (clubId: string, subject: string, body: string, emails: string[]) => { href: string; copied: string };

@@ -7,12 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
 import { cn } from "@/lib/cn";
-import type {
-  PromotionEntry,
-  PromotionNotification,
-  RewardState,
-  RewardTransaction,
-} from "@shared/promotions";
+import type { PromotionEntry, PromotionNotification, RewardState, RewardTransaction } from "@shared/promotions";
 
 export function MyGiveawaysPage() {
   const { user, authReady, requireUser } = useAuth();
@@ -40,7 +35,9 @@ export function MyGiveawaysPage() {
           getDocs(query(collection(db, "promotion_entries"), where("uid", "==", user.uid))),
           getDoc(doc(db, "rewards", user.uid)),
           getDocs(query(collection(db, "reward_transactions"), where("uid", "==", user.uid), orderBy("at", "desc"))),
-          getDocs(query(collection(db, "promotion_notifications"), where("uid", "==", user.uid), orderBy("at", "desc"))),
+          getDocs(
+            query(collection(db, "promotion_notifications"), where("uid", "==", user.uid), orderBy("at", "desc")),
+          ),
           getDoc(doc(db, "users", user.uid)),
         ]);
         const e = eSnap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<PromotionEntry, "id">) }));
@@ -95,12 +92,12 @@ export function MyGiveawaysPage() {
       ) : (
         <>
           <div className="mt-4 grid grid-cols-2 gap-2">
-            <div className="rounded-2xl border-2 border-ink bg-card p-4 text-center">
+            <div className="rounded-2xl ring-1 ring-line bg-card p-4 text-center">
               <Star size={18} className="mx-auto text-gold" />
               <p className="font-display mt-1 text-2xl font-bold">{rewards?.points || 0}</p>
               <p className="text-[11px] text-mute">AirPal.Me points</p>
             </div>
-            <div className="rounded-2xl border-2 border-ink bg-card p-4 text-center">
+            <div className="rounded-2xl ring-1 ring-line bg-card p-4 text-center">
               <Gift size={18} className="mx-auto text-brand" />
               <p className="font-display mt-1 text-2xl font-bold">{entries.length}</p>
               <p className="text-[11px] text-mute">Entries</p>
@@ -109,7 +106,8 @@ export function MyGiveawaysPage() {
 
           <section className="mt-6">
             <h2 className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-mute">
-              <Bell size={13} /> Inbox {unread > 0 && <span className="rounded-full bg-brand px-1.5 text-[10px] text-white">{unread}</span>}
+              <Bell size={13} /> Inbox{" "}
+              {unread > 0 && <span className="rounded-full bg-brand px-1.5 text-[10px] text-white">{unread}</span>}
             </h2>
             {notes.length === 0 ? (
               <p className="rounded-2xl border-2 border-dashed border-ink/20 p-4 text-center text-xs text-mute">
@@ -154,15 +152,22 @@ export function MyGiveawaysPage() {
             {entries.length === 0 ? (
               <div className="rounded-2xl border-2 border-dashed border-ink/20 p-4 text-center text-xs text-mute">
                 No entries yet.
-                <Link href="/giveaways"><Button className="mt-2">Browse giveaways</Button></Link>
+                <Link href="/giveaways">
+                  <Button className="mt-2">Browse giveaways</Button>
+                </Link>
               </div>
             ) : (
               <div className="space-y-2">
                 {entries.map((e) => (
-                  <div key={e.id} className="flex items-center justify-between rounded-2xl border-2 border-ink/15 bg-card p-3">
+                  <div
+                    key={e.id}
+                    className="flex items-center justify-between rounded-2xl ring-1 ring-line/15 bg-card p-3"
+                  >
                     <div>
                       <p className="font-mono text-xs font-bold">{e.reference}</p>
-                      <p className="text-[11px] text-mute">{new Date(e.createdAt).toLocaleDateString()} · {e.status}</p>
+                      <p className="text-[11px] text-mute">
+                        {new Date(e.createdAt).toLocaleDateString()} · {e.status}
+                      </p>
                     </div>
                     <Link href={`/giveaways/${e.promotionId}`} className="text-xs font-bold text-brand hover:underline">
                       View
@@ -176,7 +181,7 @@ export function MyGiveawaysPage() {
           {txs.length > 0 && (
             <section className="mt-6">
               <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-mute">Points history</h2>
-              <div className="space-y-1 rounded-2xl border-2 border-ink/15 bg-card p-3">
+              <div className="space-y-1 rounded-2xl ring-1 ring-line/15 bg-card p-3">
                 {txs.slice(0, 15).map((t) => (
                   <p key={t.id} className="flex justify-between text-[11px]">
                     <span className="text-mute">{t.reason.replace(/_/g, " ")}</span>

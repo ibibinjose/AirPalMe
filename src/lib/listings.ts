@@ -1,9 +1,4 @@
-import {
-  DEFAULT_LISTING_GEO,
-  DEFAULT_PRECINCT_ID,
-  listingToPlace,
-  type BusinessListing,
-} from "@shared/business";
+import { DEFAULT_LISTING_GEO, DEFAULT_PRECINCT_ID, listingToPlace, type BusinessListing } from "@shared/business";
 import { isContentLive, stampContentMeta } from "@shared/content-meta";
 import type { NearbyPlace } from "@shared/nearby";
 
@@ -63,12 +58,15 @@ export function upsertCachedListing(listing: BusinessListing) {
   return listing;
 }
 
-export function listingDefaults(partial: Partial<BusinessListing> & Pick<BusinessListing, "id" | "name" | "category" | "placeCategory" | "address" | "shortWhy">): BusinessListing {
+export function listingDefaults(
+  partial: Partial<BusinessListing> &
+    Pick<BusinessListing, "id" | "name" | "category" | "placeCategory" | "address" | "shortWhy">,
+): BusinessListing {
   const meta = stampContentMeta(partial, {
     ownerUid: partial.ownerUid,
     ownerEmail: partial.ownerEmail,
     source: partial.source || "partner",
-    verifiedOwner: Boolean(partial.ownerUid),
+    verifiedOwner: partial.verifiedOwner ?? false,
     reviewStatus: partial.reviewStatus,
     createdAt: partial.createdAt,
     updatedAt: partial.updatedAt,

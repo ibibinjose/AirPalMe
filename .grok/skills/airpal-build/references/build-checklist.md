@@ -13,7 +13,7 @@ Only `done` is checked.
 
 ### Identity
 
-- [ ] `partial` `p0-auth` Sign-up / sign-in — Done when: email+password, phone SMS, email verify, session shared across verticals. Evidence: `src/contexts/AuthContext.tsx`, `src/pages/StartPage.tsx`, `src/lib/phone-auth.ts`. Gap: no government IDV; anonymous guests still used for browse.
+- [ ] `partial` `p0-auth` Sign-up / sign-in — Done when: email+password, phone SMS, email verify, session shared across verticals. Evidence: `src/contexts/AuthContext.tsx`, `src/pages/StartPage.tsx`, `functions/src/account.ts`. Gap: no government IDV; phone+password uses Identity Toolkit with Functions `FIREBASE_WEB_API_KEY` or the public client web key, else SMS is the path.
 - [ ] `todo` `p0-idv` Identity verification where required — Done when: Mate supply cannot reach `approved` without the required ID check, admin can review docs privately. Evidence: —
 - [ ] `partial` `p0-profile` Consumer profile — Done when: about, interests, general location (not home address), photo, verification badges, privacy/safety controls. Evidence: `src/pages/MePage.tsx`, `src/pages/BioSetupPage.tsx`, `src/contexts/BioContext.tsx`. Gap: no wallet, no response-rate/reliability, Mate public profile incomplete.
 
@@ -32,15 +32,15 @@ Only `done` is checked.
 ### Book → pay → complete → review
 
 - [x] `done` `p0-book` Shared booking engine — Done when: customer/provider/date/location/price/fees/status live on `bookings`; statuses Pending → Confirmed → Cancelled / In Progress → Completed / Disputed → Refunded. Evidence: `shared/booking.ts`, `BookingsSection.tsx`. Fees from `platform_settings/marketplace`. $0 = paid; else unpaid until Stripe.
-- [ ] `partial` `p0-pay` Payments (Stripe) — Done when: Mate booking charges through the platform, no raw cards stored, fees from admin config not literals. Evidence: fees are admin-configurable; Mate checkout still uses experience Stripe (`functions/src/stripe.ts`) — unpaid bookings wait on a Mate Checkout Session.
-- [ ] `todo` `p0-payout` Provider payouts — Done when: Stripe Connect for eligible Mates/businesses, payout records separate from profiles. Evidence: —
+- [ ] `partial` `p0-pay` Payments (Stripe) — Done when: Mate booking charges through the platform, no raw cards stored, fees from admin config not literals. Evidence: AirPal.Me sandbox Checkout Session created (`cs_test_`), webhook `https://airpal.me/api/stripe/webhook`, secrets in Functions, deploy 2026-09-19. Gap: run a signed-in Mate pay with test card `4242`.
+- [ ] `partial` `p0-payout` Provider payouts — Done when: Stripe Connect for eligible Mates/businesses, payout records separate from profiles. Evidence: Account Link + return refresh, `releaseHeldPayouts`, Express login, `PayoutSetupCard` on Me/event/business. Gap: sandbox must finish Stripe Connect platform activation for live transfers.
 - [x] `done` `p0-review` Reviews on completed bookings — Done when: both sides review after `completed`, reportable, no algorithmic trust score. Evidence: requester + Mate reviews on `src/pages/MatePage.tsx`, gated by `canLeaveReview`.
 
 ### Trust, admin, notifications
 
 - [x] `done` `p0-report` Report — Done when: user can file a safety report that opens an admin case. Evidence: `src/components/safety/SafetyMenu.tsx`, `shared/safety.ts`, `src/components/admin/SafetyInboxAdmin.tsx`.
 - [x] `done` `p0-block` Block — Done when: block is immediate and persisted. Evidence: `SafetyMenu` + `blocks` in `firestore.rules`.
-- [ ] `partial` `p0-notify` Event notifications — Done when: match, message, booking, application-status events fire with user controls. Evidence: FCM for host tickets (`src/lib/tickets-push.ts`); local companion notifications. Gap: no Mate-loop events.
+- [ ] `partial` `p0-notify` Event notifications — Done when: match, message, booking, application-status events fire with user controls. Evidence: FCM for host tickets; Circle announcements fan out to `promotion_notifications` + `/me/inbox`. Gap: Mate-loop events still local.
 - [ ] `partial` `p0-admin` Admin dashboard — Done when: operators can inspect users, Mates, requests, matches, bookings, reports, incidents and intervene. Evidence: `src/pages/AdminPage.tsx` + admin components. Gap: no user search/verification, GMV, finance, disputes.
 - [x] `done` `p0-audit` Audit log — Done when: status/safety/booking admin actions write `admin_audits`. Evidence: `src/lib/admin-audit.ts`, `src/components/admin/AuditTrailAdmin.tsx`.
 
@@ -53,6 +53,10 @@ Only `done` is checked.
 - [ ] `partial` `p1-saved` Saved items — Done when: one saved model across verticals. Evidence: `users/{id}/savedEvents`, `savedStalls`. Gap: not generic `saved_items`.
 - [ ] `partial` `p1-cancel` Cancellation flow — Done when: customer/provider cancel with visible policy. Evidence: `canCustomerCancel` in `shared/booking.ts`. Gap: no policy copy, no fees.
 - [ ] `todo` `p1-notify-controls` Notification preferences — Done when: user can mute types. Evidence: —
+- [x] `done` `p1-gtm-circle-plans` Circle + Plan go-to-market front door — Done when: tabs/home/signup/join promote Circle, Plans, places, Stay, and business listings; Mate is not in primary chrome. Evidence: `src/lib/tabs.ts`, `src/pages/DiscoverPage.tsx`, `src/pages/CirclePage.tsx`, `src/pages/JoinPage.tsx`.
+- [x] `done` `p1-circle-crm` Circle as creator CRM — Done when: a creator can see audience, set status, announce to followers, and read an inbox. Evidence: `src/pages/CirclePage.tsx`, `src/pages/InboxPage.tsx`, `createBroadcast` audience `circle` in `functions/src/notifications.ts`.
+- [x] `done` `biz-google-import` One-click listing import — Done when: a business can search a public listing (OSM/Nominatim without a Maps key; Google Places when a key exists), import address, phone, website, hours, and photo when the source has them. The import is a directory fill, not ownership; Featured needs work-email domain match or ABN. Evidence: `src/lib/osm-place-search.ts`, `src/components/business/GooglePlaceImport.tsx`, `src/pages/BusinessOnboardPage.tsx`, `shared/osm-place.ts`, `shared/google-place.ts`.
+- [x] `done` `p1-event-create` Simple event/experience create — Done when: a user can create a free or paid event with a square image, invite Circle, and share a link; guests buy paid tickets on Stripe. Evidence: `src/pages/EventCreatePage.tsx`, `ExperienceBookingModal`, `TicketPass`, `functions/src/stripe.ts`.
 
 ---
 
@@ -66,7 +70,7 @@ Only `done` is checked.
 
 ## P3 — Expansion (`later` unless the user named the vertical)
 
-- [ ] `partial` `p3-experiences` AirPal Experiences — Done when: provider apply → create → admin review → publish → book → pay → review, plus "Going alone? Find an AirPal." Evidence: `src/pages/ExperiencesPage.tsx`, `shared/campaign.ts`, plan Stripe checkout. Gap: RSVP is not the shared booking engine; payment deferred on campaigns.
+- [ ] `partial` `p3-experiences` AirPal Experiences — Done when: provider apply → create → admin review → publish → book → pay → review, plus "Going alone? Find an AirPal." Evidence: public plans sell tickets via Checkout; campaigns on `/experiences` now pay through `createBookingCheckoutSession`. Gap: campaign still needs admin `live` before it appears.
 - [ ] `partial` `p3-stay` AirPal Stay (commercial partners) — Done when: hotel/motel/serviced/hostel partners list rooms, availability, bookings. Evidence: `src/pages/StayPage.tsx`, `src/pages/HostPage.tsx`, `src/pages/ConciergePage.tsx`, `properties` rules. Gap: not a Stay booking marketplace; no residential STRA (correctly deferred).
 - [ ] `todo` `p3-fashion` AirPal Fashion — Done when: brand campaign first, not P2P store. Evidence: none (copy-only mentions).
 - [ ] `partial` `p3-daily` AirPal Daily — Done when: "What's happening near me?" drives Mate/book/stay CTAs. Evidence: `src/pages/DiscoverPage.tsx` hero is now Mate-first. Gap: Daily still isn't a separate transaction layer.
@@ -85,7 +89,7 @@ Only `done` is checked.
 
 Business is a dedicated dashboard on the **same** identity, listing, booking, payment, and review engine. Do not create a second user system.
 
-- [ ] `partial` `biz-onboard` Apply / claim venue — Done when: Find venue → owner → verify claim → plan → sign-off writes a real partner record. Evidence: `src/pages/BusinessOnboardPage.tsx`, `shared/business-onboarding.ts`. Gap: plans are placeholder prices; verify is self-attested.
+- [ ] `partial` `biz-onboard` Apply / claim venue — Done when: Find venue → owner → verify claim → plan → sign-off writes a real partner record. Evidence: `src/pages/BusinessOnboardPage.tsx` Register searches Google (`GooglePlaceImportCard` field variant) and `applyGooglePlace` fills the draft; `src/pages/BusinessShowcasePage.tsx`, `shared/business-onboarding.ts`. Gap: plan prices are placeholders; Presence is a directory claim; Featured is clamped to domain/ABN proof. Stripe for Featured is not live.
 - [ ] `partial` `biz-listing` Manage listing — Done when: owner edits place, hours, photos, deals; hours freshness SLA respected. Evidence: `src/pages/BusinessPage.tsx`, `shared/business.ts`, `listings` rules.
 - [ ] `partial` `biz-campaign` Create Experience campaign — Done when: business funds an Experience, admin reviews, guests book through shared bookings. Evidence: `src/pages/BusinessCampaignsPage.tsx`, `src/components/admin/CampaignInboxAdmin.tsx`. Gap: `paymentStatus: "deferred"`; RSVPs not `bookings`.
 - [x] `done` `biz-bookings` Business booking inbox — Done when: owner sees/confirm/completes bookings for their listings/experiences. Evidence: `src/components/booking/BusinessBookingsSection.tsx`, `src/pages/BusinessPage.tsx`, `createBookingForCampaign` in `src/components/booking/BookingsSection.tsx`, `src/pages/ExperiencesPage.tsx`.
@@ -110,7 +114,7 @@ A real user can:
 - [x] `done` `mvp-match` Match
 - [x] `done` `mvp-message` Message
 - [x] `done` `mvp-book` Book
-- [ ] `todo` `mvp-pay` Pay
+- [ ] `partial` `mvp-pay` Pay — Checkout Session path exists; live charge waits on AirPal Stripe keys.
 - [x] `done` `mvp-complete` Complete the activity
 - [x] `done` `mvp-review` Leave a review
 - [x] `done` `mvp-report` Report / block
@@ -122,6 +126,6 @@ The MVP is not complete until every row above is `done`.
 
 ## Next 3
 
-1. `p0-pay` — Mate Stripe Checkout Session (reuse `functions/src/stripe.ts` pattern); unpaid bookings are the honest gap.
-2. `p0-payout` — Stripe Connect for approved Mates.
-3. `p0-idv` — identity check before Mate `approved`.
+1. `p0-pay` — On airpal.me, sign in, book a paid Mate, pay with test card `4242`. Then Connect payouts (`p0-payout`).
+2. `biz-onboard` — venue claim still self-attested; tighten verify before paid supply.
+3. `p1-search` — businesses/fashion still not first-class search results.

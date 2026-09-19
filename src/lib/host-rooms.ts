@@ -90,7 +90,11 @@ export function validateRoomTypeDraft(draft: RoomTypeDraft, types: RoomType[]): 
   if (!draft.bedConfig.trim()) return "Add the bed setup (e.g. 1 King Bed)";
   if (!Number.isFinite(draft.capacity) || draft.capacity < 1) return "Sleeps must be at least 1";
   if (draft.startingPrice !== undefined && !(draft.startingPrice > 0)) return "Nightly price must be above $0";
-  const numbers = suggestRoomNumbers(types.flatMap((t) => t.roomNumbers || []), draft.startNumber, draft.count);
+  const numbers = suggestRoomNumbers(
+    types.flatMap((t) => t.roomNumbers || []),
+    draft.startNumber,
+    draft.count,
+  );
   if (numbers.length < 1) return "Add at least one room number";
   return null;
 }
@@ -111,7 +115,10 @@ export function buildRoomType(draft: RoomTypeDraft, types: RoomType[]): RoomType
     bedConfig: draft.bedConfig.trim(),
     totalRooms: roomNumbers.length,
     startingPrice: draft.startingPrice && draft.startingPrice > 0 ? draft.startingPrice : undefined,
-    features: draft.features.map((f) => f.trim()).filter(Boolean).slice(0, 12),
+    features: draft.features
+      .map((f) => f.trim())
+      .filter(Boolean)
+      .slice(0, 12),
     roomNumbers,
   };
 }
@@ -189,7 +196,10 @@ export function occupancySummary(statuses: Record<string, RoomStatus> | undefine
 }
 
 /** Find the room type that contains a guest's room number (case-insensitive). */
-export function roomTypeForNumber(types: RoomType[] | undefined, roomNumber: string | null | undefined): RoomType | null {
+export function roomTypeForNumber(
+  types: RoomType[] | undefined,
+  roomNumber: string | null | undefined,
+): RoomType | null {
   const target = (roomNumber || "").trim().toLowerCase();
   if (!target || !types) return null;
   for (const t of types) {

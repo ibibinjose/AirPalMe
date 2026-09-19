@@ -4,7 +4,11 @@ import { blockDocId, emptyReport, isReportReason, reportValid } from "./safety";
 describe("safety reports", () => {
   it("accepts a detailed report", () => {
     expect(
-      reportValid({ ...emptyReport("plan-1", "uid-2"), reason: "no-show", details: "They never arrived at the station." }),
+      reportValid({
+        ...emptyReport("plan-1", "uid-2"),
+        reason: "no-show",
+        details: "They never arrived at the station.",
+      }),
     ).toBe(true);
   });
 

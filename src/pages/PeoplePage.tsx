@@ -133,7 +133,8 @@ export function PeoplePage() {
               </div>
               <p className="font-display mt-3 text-lg font-bold">No catch-up reminders</p>
               <p className="mx-auto mt-1 max-w-xs text-sm text-mute">
-                Tap <strong>Catch Up</strong> on any bio profile (@username) to save a reminder or sync a meetup to your calendar.
+                Tap <strong>Catch Up</strong> on any bio profile (@username) to save a reminder or sync a meetup to your
+                calendar.
               </p>
             </div>
           ) : (
@@ -263,9 +264,7 @@ export function PeoplePage() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[15px] font-semibold">{p.name}</p>
                       <p className="truncate text-xs text-mute">
-                        {[p.handle ? `@${p.handle}` : null, p.whereMet, formatDay(p.metAt)]
-                          .filter(Boolean)
-                          .join(" · ")}
+                        {[p.handle ? `@${p.handle}` : null, p.whereMet, formatDay(p.metAt)].filter(Boolean).join(" · ")}
                       </p>
                       {memoryCount > 0 && (
                         <button

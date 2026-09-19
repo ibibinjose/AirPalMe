@@ -57,4 +57,4 @@ First milestone: 100 successful transactions by hand if needed. Downloads and fo
 - Mate loop entities (`mate_requests`, `matches`, `bookings`, `payments`, `reviews`, `payouts`) come before any new vertical UI.
 - Every vertical reuses core collections; no parallel identity/wallet/chat systems.
 - Paid paths always go through platform payments (Stripe Connect), never direct transfers.
-- Sydney zoned time everywhere; empty states stay honest when Firestore is empty.
+- Device locale and per-city timezones everywhere (Sydney default only as fallback); empty states stay honest when Firestore is empty.

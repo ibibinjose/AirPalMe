@@ -26,11 +26,7 @@ function daysAgo(ageMs: number) {
   return days === 1 ? "1 day ago" : `${days} days ago`;
 }
 
-export function freshnessOf(
-  iso: string | undefined | null,
-  kind: FreshnessKind,
-  now = Date.now(),
-): Freshness {
+export function freshnessOf(iso: string | undefined | null, kind: FreshnessKind, now = Date.now()): Freshness {
   const sla = FRESHNESS_SLA_MS[kind];
   const at = iso && !Number.isNaN(Date.parse(iso)) ? iso : null;
   if (!at) {
@@ -65,7 +61,12 @@ export function freshnessOf(
 
 export function isoFromUnknown(value: unknown): string | undefined {
   if (typeof value === "string" && value && !Number.isNaN(Date.parse(value))) return value;
-  if (value && typeof value === "object" && "toDate" in value && typeof (value as { toDate: () => Date }).toDate === "function") {
+  if (
+    value &&
+    typeof value === "object" &&
+    "toDate" in value &&
+    typeof (value as { toDate: () => Date }).toDate === "function"
+  ) {
     return (value as { toDate: () => Date }).toDate().toISOString();
   }
   return undefined;

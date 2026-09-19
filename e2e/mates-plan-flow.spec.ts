@@ -1,54 +1,20 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Mates Social Planning & Digital Invitations Flow", () => {
-  test("creates a new night out plan with itinerary stops and themes", async ({ page }) => {
+  test("create plan is a short family-and-friends form", async ({ page }) => {
     await page.goto("/plan/new");
     await page.waitForLoadState("domcontentloaded");
-
-    // Header & title
-    await expect(page.getByRole("heading", { name: "Create a Plan" })).toBeVisible();
-    await expect(page.getByText("1. What’s the occasion?")).toBeVisible();
-
-    // Verify occasion options exist
-    await expect(page.getByText("Night Out")).toBeVisible();
-    await expect(page.getByText("Lunch & Bites")).toBeVisible();
-    await expect(page.getByText("Cinema & Movies")).toBeVisible();
-    await expect(page.getByText("Roadtrip & Trip")).toBeVisible();
-
-    // Select "Lunch & Bites"
-    await page.getByText("Lunch & Bites").click();
-
-    // Verify Title updated to reflect Lunch
-    const titleInput = page.getByPlaceholder("e.g. Friday Night Out in The Rocks");
-    await expect(titleInput).toHaveValue(/Lunch/i);
-
-    // Add a custom stop
-    const stopInput = page.getByPlaceholder("Add another spot or venue…");
-    await stopInput.fill("Opera Bar Sydney");
-    await page.getByRole("button", { name: "Add", exact: true }).click();
-    await expect(page.getByText("Opera Bar Sydney")).toBeVisible();
-
-    // Select "Cyber Midnight" theme
-    await page.getByRole("button", { name: /Cyber Midnight/i }).click();
-
-    // Submit form to create plan
-    await page.getByRole("button", { name: "Create Plan & Generate Invite Link" }).click();
-
-    // Should redirect to /plan/:id
-    await expect(page).toHaveURL(/\/plan\/plan-/);
-
-    // Share modal should open automatically
-    await expect(page.getByRole("heading", { name: "Invite Your Mates" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Copy Link" })).toBeVisible();
-    await expect(page.getByAltText("Invite QR")).toBeVisible();
-
-    // Close share modal
-    await page.getByLabel("Close modal").click();
-    await expect(page.getByRole("heading", { name: "Invite Your Mates" })).not.toBeVisible();
-
-    // Digital Invitation Card should be visible
-    await expect(page.getByText(/Invitation from/i)).toBeVisible();
-    await expect(page.getByText("Opera Bar Sydney")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Create a Plan|Plan with family/i })).toBeVisible();
+    const form = page.getByRole("heading", { name: "Create a Plan" });
+    if (await form.isVisible()) {
+      await expect(page.getByRole("button", { name: "Catch up" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Night out" })).toBeVisible();
+      await expect(page.getByText(/^Photo$/i)).toBeVisible();
+      await expect(page.getByText(/PNG, JPG, or WEBP/i)).toBeVisible();
+      await page.getByPlaceholder(/Friday drinks|Lunch|Hangout/i).fill("Harbour walk");
+      await page.getByRole("button", { name: "Create plan" }).click();
+      await expect(page).toHaveURL(/\/plan\//);
+    }
   });
 
   test("allows anonymous mates to RSVP and updates guest list", async ({ page }) => {

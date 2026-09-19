@@ -49,7 +49,10 @@ export function ScrollProbe() {
       });
     };
     const onTouch = () => {
-      console.log("[scrolldebug] touchmove reached page, target:", tag(document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2)));
+      console.log(
+        "[scrolldebug] touchmove reached page, target:",
+        tag(document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2)),
+      );
     };
     window.addEventListener("wheel", onWheel, { capture: true, passive: true });
     window.addEventListener("touchmove", onTouch, { capture: true, passive: true, once: true });

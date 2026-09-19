@@ -119,7 +119,10 @@ export const recordAnalyticsBatch = onCall(CALLABLE, async (request) => {
   for (const item of eventsIn) {
     const validated = validateAnalyticsEvent(item);
     if (!validated.ok) {
-      rejected.push({ eventId: item && typeof item === "object" ? String((item as { eventId?: string }).eventId || "") : undefined, reason: validated.reason });
+      rejected.push({
+        eventId: item && typeof item === "object" ? String((item as { eventId?: string }).eventId || "") : undefined,
+        reason: validated.reason,
+      });
       continue;
     }
     const event = validated.event;
@@ -158,7 +161,13 @@ export const recordAnalyticsBatch = onCall(CALLABLE, async (request) => {
     acceptedIds.push(event.eventId);
   }
 
-  return { accepted: acceptedIds.length, rejected: rejected.length, duplicates, acceptedIds, rejectedReasons: rejected };
+  return {
+    accepted: acceptedIds.length,
+    rejected: rejected.length,
+    duplicates,
+    acceptedIds,
+    rejectedReasons: rejected,
+  };
 });
 
 async function runAggregationWindow(hours = 26) {
@@ -170,7 +179,11 @@ async function runAggregationWindow(hours = 26) {
   for (const fact of facts) {
     const day = calendarDay(fact.periodStart);
     const id = dailyFactId(fact.contextId, day, fact.aggregationVersion);
-    batch.set(db().collection("analyticsDaily").doc(id), { ...fact, computedAt: FieldValue.serverTimestamp() }, { merge: true });
+    batch.set(
+      db().collection("analyticsDaily").doc(id),
+      { ...fact, computedAt: FieldValue.serverTimestamp() },
+      { merge: true },
+    );
   }
   await batch.commit();
   return { input: events.length, output: facts.length };

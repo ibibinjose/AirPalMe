@@ -66,12 +66,15 @@ export function PromotionAdminDetailPage() {
     void reload();
   }, [locked, id]);
 
-  if (!authReady || loading) return <p className="mx-auto max-w-2xl px-4 py-16 text-center text-sm text-mute">Loading…</p>;
+  if (!authReady || loading)
+    return <p className="mx-auto max-w-2xl px-4 py-16 text-center text-sm text-mute">Loading…</p>;
   if (locked || !promo) {
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center">
         <p className="font-display text-xl font-bold">Restricted</p>
-        <Link href="/admin/promotions"><Button className="mt-4">Back</Button></Link>
+        <Link href="/admin/promotions">
+          <Button className="mt-4">Back</Button>
+        </Link>
       </div>
     );
   }
@@ -140,7 +143,7 @@ export function PromotionAdminDetailPage() {
           [promo.entriesCount || entries.length, "Entries"],
           [winners.length, "Winners"],
         ].map(([n, label]) => (
-          <div key={String(label)} className="rounded-2xl border-2 border-ink bg-card p-3">
+          <div key={String(label)} className="rounded-2xl ring-1 ring-line bg-card p-3">
             <p className="font-display text-xl font-bold">{n}</p>
             <p className="text-[11px] text-mute">{label}</p>
           </div>
@@ -154,7 +157,7 @@ export function PromotionAdminDetailPage() {
             type="button"
             disabled={busy === d}
             onClick={() => act(d)}
-            className="rounded-lg border border-ink/20 px-2 py-1 text-[11px] font-bold hover:bg-ink hover:text-white disabled:opacity-50"
+            className="rounded-lg border border-line/20 px-2 py-1 text-[11px] font-bold hover:bg-brand hover:text-white disabled:opacity-50"
           >
             {d}
           </button>
@@ -164,7 +167,9 @@ export function PromotionAdminDetailPage() {
       {promo.kind === "giveaway" && (promo.status === "live" || promo.status === "paused") && (
         <div className="mt-4 rounded-2xl border-2 border-gold bg-card p-4">
           <p className="text-sm font-bold">Close & draw winners</p>
-          <p className="mt-0.5 text-xs text-mute">Entries freeze at draw time. The draw, pool size and reason go to the audit log; winners are notified.</p>
+          <p className="mt-0.5 text-xs text-mute">
+            Entries freeze at draw time. The draw, pool size and reason go to the audit log; winners are notified.
+          </p>
           <div className="mt-2 flex gap-2">
             <input
               type="number"
@@ -172,7 +177,7 @@ export function PromotionAdminDetailPage() {
               max={10}
               value={winnerCount}
               onChange={(e) => setWinnerCount(Number(e.target.value))}
-              className="w-20 rounded-xl border-2 border-ink/15 p-2 text-sm"
+              className="w-20 rounded-xl ring-1 ring-line/15 p-2 text-sm"
               aria-label="Number of winners"
             />
             <Button onClick={draw} disabled={busy === "draw"} className="flex-1">
@@ -187,10 +192,12 @@ export function PromotionAdminDetailPage() {
           <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-mute">Winners (private)</h2>
           <div className="space-y-2">
             {winners.map((w) => (
-              <div key={w.id} className="rounded-2xl border-2 border-ink bg-card p-3">
+              <div key={w.id} className="rounded-2xl ring-1 ring-line bg-card p-3">
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-xs font-bold">{w.reference}</span>
-                  <span className="rounded-full bg-ink/10 px-2 py-0.5 text-[11px] font-bold">{w.status.replace("_", " ")}</span>
+                  <span className="rounded-full bg-ink/10 px-2 py-0.5 text-[11px] font-bold">
+                    {w.status.replace("_", " ")}
+                  </span>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {(WINNER_TRANSITIONS[w.status] || []).map((to) => (
@@ -199,7 +206,7 @@ export function PromotionAdminDetailPage() {
                       type="button"
                       disabled={busy === w.id + to}
                       onClick={() => advanceWinner(w, to)}
-                      className="rounded-lg border border-ink/20 px-2 py-1 text-[11px] font-bold hover:bg-ink hover:text-white disabled:opacity-50"
+                      className="rounded-lg border border-line/20 px-2 py-1 text-[11px] font-bold hover:bg-brand hover:text-white disabled:opacity-50"
                     >
                       → {to.replace("_", " ")}
                     </button>
@@ -214,9 +221,11 @@ export function PromotionAdminDetailPage() {
       <section className="mt-4">
         <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-mute">Entries ({entries.length})</h2>
         {entries.length === 0 ? (
-          <p className="rounded-2xl border-2 border-dashed border-ink/20 p-4 text-center text-xs text-mute">No entries yet.</p>
+          <p className="rounded-2xl border-2 border-dashed border-ink/20 p-4 text-center text-xs text-mute">
+            No entries yet.
+          </p>
         ) : (
-          <div className="max-h-56 space-y-1 overflow-y-auto rounded-2xl border-2 border-ink/15 bg-card p-2">
+          <div className="max-h-56 space-y-1 overflow-y-auto rounded-2xl ring-1 ring-line/15 bg-card p-2">
             {entries.map((e) => (
               <p key={e.id} className="flex justify-between font-mono text-[11px]">
                 <span>{e.reference}</span>
@@ -229,13 +238,23 @@ export function PromotionAdminDetailPage() {
 
       <section className="mt-4">
         <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-mute">Audit trail</h2>
-        <div className={cn("space-y-1 rounded-2xl border-2 border-ink/15 bg-card p-3", audit.length === 0 && "text-center text-xs text-mute")}>
-          {audit.length === 0 ? "No admin actions recorded." : audit.map((a) => (
-            <p key={a.id} className="text-[11px]">
-              <span className="font-bold">{a.action}</span> {a.from ? `${a.from} → ${a.to}` : ""}{" "}
-              <span className="text-mute">{a.at ? new Date(a.at).toLocaleString() : ""}{a.reason ? ` · ${a.reason}` : ""}</span>
-            </p>
-          ))}
+        <div
+          className={cn(
+            "space-y-1 rounded-2xl ring-1 ring-line/15 bg-card p-3",
+            audit.length === 0 && "text-center text-xs text-mute",
+          )}
+        >
+          {audit.length === 0
+            ? "No admin actions recorded."
+            : audit.map((a) => (
+                <p key={a.id} className="text-[11px]">
+                  <span className="font-bold">{a.action}</span> {a.from ? `${a.from} → ${a.to}` : ""}{" "}
+                  <span className="text-mute">
+                    {a.at ? new Date(a.at).toLocaleString() : ""}
+                    {a.reason ? ` · ${a.reason}` : ""}
+                  </span>
+                </p>
+              ))}
         </div>
       </section>
     </div>

@@ -50,7 +50,10 @@ export function buildQuickAnswers(property: PropertyInfo, kind: StayKind, room: 
       { label: "Cancel", value: property.cancellationPolicy || "See your booking." },
     ],
     rules: [
-      { label: "Quiet", value: bar ? `Keep it down after ${bar.hours.split("–").pop()?.trim() || "11 PM"}.` : "Quiet after 10:30 PM." },
+      {
+        label: "Quiet",
+        value: bar ? `Keep it down after ${bar.hours.split("–").pop()?.trim() || "11 PM"}.` : "Quiet after 10:30 PM.",
+      },
       { label: "Smoke", value: "Rooms are smoke-free. Use outdoor terraces." },
       { label: "Pool", value: pool ? `${pool.hours} · ${pool.floor}` : "Ask the desk." },
       { label: "Laundry", value: laundry ? `${laundry.hours} · ${laundry.floor}` : "Ask the desk." },

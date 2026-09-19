@@ -55,18 +55,69 @@ export type ZooHunt = {
 };
 
 const PILOT_STOPS: Array<{ placeId: string; animalId: ZooAnimalId; offer: { badge: string; detail: string } }> = [
-  { placeId: "glenmore", animalId: "koala", offer: { badge: "Guest schooner", detail: "Show your Koala sticker before 6 for a guest rate on a local schooner." } },
-  { placeId: "fortune-of-war", animalId: "kangaroo", offer: { badge: "Counter meal", detail: "Show Kangaroo at the bar for the counter-meal special." } },
-  { placeId: "australian-hotel", animalId: "wombat", offer: { badge: "Pizza slice", detail: "Wombat holders get a guest note on a pizza." } },
-  { placeId: "la-renaissance", animalId: "echidna", offer: { badge: "Tart of the day", detail: "Show Echidna for a pastry with coffee." } },
-  { placeId: "fine-food-store", animalId: "platypus", offer: { badge: "Espresso", detail: "Platypus in Zoo: mention AirPal for a guest espresso." } },
-  { placeId: "mecca-cq", animalId: "cockatoo", offer: { badge: "Takeaway pour", detail: "Cockatoo sticker: guest pour at the Quay window." } },
-  { placeId: "gumption-cq", animalId: "kookaburra", offer: { badge: "Single origin", detail: "Kookaburra holders: ask for the AirPal cup." } },
-  { placeId: "tea-cosy", animalId: "magpie", offer: { badge: "Scone", detail: "Show Magpie for a scone with the pot." } },
-  { placeId: "little-marionette", animalId: "cassowary", offer: { badge: "House roast", detail: "Cassowary in Zoo: guest note on a house roast." } },
-  { placeId: "gannon-house", animalId: "quokka", offer: { badge: "Print look", detail: "Quokka sticker: a look at the print rack with the desk." } },
-  { placeId: "craft-nsw", animalId: "dingo", offer: { badge: "Maker stall", detail: "Dingo holders: weekend stall guest greeting." } },
-  { placeId: "rocks-distillery", animalId: "wren", offer: { badge: "Tasting note", detail: "Fairy-wren: ask for the tasting flight note." } },
+  {
+    placeId: "glenmore",
+    animalId: "koala",
+    offer: {
+      badge: "Guest schooner",
+      detail: "Show your Koala sticker before 6 for a guest rate on a local schooner.",
+    },
+  },
+  {
+    placeId: "fortune-of-war",
+    animalId: "kangaroo",
+    offer: { badge: "Counter meal", detail: "Show Kangaroo at the bar for the counter-meal special." },
+  },
+  {
+    placeId: "australian-hotel",
+    animalId: "wombat",
+    offer: { badge: "Pizza slice", detail: "Wombat holders get a guest note on a pizza." },
+  },
+  {
+    placeId: "la-renaissance",
+    animalId: "echidna",
+    offer: { badge: "Tart of the day", detail: "Show Echidna for a pastry with coffee." },
+  },
+  {
+    placeId: "fine-food-store",
+    animalId: "platypus",
+    offer: { badge: "Espresso", detail: "Platypus in Zoo: mention AirPal for a guest espresso." },
+  },
+  {
+    placeId: "mecca-cq",
+    animalId: "cockatoo",
+    offer: { badge: "Takeaway pour", detail: "Cockatoo sticker: guest pour at the Quay window." },
+  },
+  {
+    placeId: "gumption-cq",
+    animalId: "kookaburra",
+    offer: { badge: "Single origin", detail: "Kookaburra holders: ask for the AirPal cup." },
+  },
+  {
+    placeId: "tea-cosy",
+    animalId: "magpie",
+    offer: { badge: "Scone", detail: "Show Magpie for a scone with the pot." },
+  },
+  {
+    placeId: "little-marionette",
+    animalId: "cassowary",
+    offer: { badge: "House roast", detail: "Cassowary in Zoo: guest note on a house roast." },
+  },
+  {
+    placeId: "gannon-house",
+    animalId: "quokka",
+    offer: { badge: "Print look", detail: "Quokka sticker: a look at the print rack with the desk." },
+  },
+  {
+    placeId: "craft-nsw",
+    animalId: "dingo",
+    offer: { badge: "Maker stall", detail: "Dingo holders: weekend stall guest greeting." },
+  },
+  {
+    placeId: "rocks-distillery",
+    animalId: "wren",
+    offer: { badge: "Tasting note", detail: "Fairy-wren: ask for the tasting flight note." },
+  },
 ];
 
 function placeName(placeId: string) {
@@ -154,7 +205,9 @@ export function zooStopForPlaceId(placeId: string, hunts: ZooHunt[] = []) {
 export function huntProgress(state: ZooState, huntId: string, hunts: ZooHunt[] = []) {
   const hunt = huntById(huntId, hunts);
   if (!hunt) return { have: 0, total: 0, label: "" };
-  const have = hunt.stops.filter((s) => state.stickers.some((st) => st.animalId === s.animalId && st.huntId === huntId)).length;
+  const have = hunt.stops.filter((s) =>
+    state.stickers.some((st) => st.animalId === s.animalId && st.huntId === huntId),
+  ).length;
   return { have, total: hunt.stops.length, label: `${hunt.name} ${have}/${hunt.stops.length}` };
 }
 
@@ -179,7 +232,12 @@ export function mergeZooState(local: ZooState, remote: ZooState): ZooState {
   return { stickers, shops };
 }
 
-export function collectAtStop(state: ZooState, hunt: ZooHunt, stop: ZooHuntStop, at = new Date().toISOString()): { state: ZooState; fresh: boolean } {
+export function collectAtStop(
+  state: ZooState,
+  hunt: ZooHunt,
+  stop: ZooHuntStop,
+  at = new Date().toISOString(),
+): { state: ZooState; fresh: boolean } {
   const already = state.stickers.some((s) => s.animalId === stop.animalId && s.huntId === hunt.id);
   const shops = [...state.shops];
   const i = shops.findIndex((s) => s.handle === stop.handle);

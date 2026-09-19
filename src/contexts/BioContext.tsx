@@ -1,14 +1,16 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { nanoid } from "nanoid";
-import {
-  handleError,
-  normalizeHandle,
-  type BioKind,
-  type BioOffer,
-  type BioProfile,
-} from "@shared/bio";
+import { handleError, normalizeHandle, type BioKind, type BioOffer, type BioProfile } from "@shared/bio";
 import { getFirebaseAuth } from "@/lib/firebase";
-import { liveBackendEnabled, checkHandleAvailableRemote, createBusinessProfileRemote, recordBioTapRemote, setBioOfferRemote, transferHandleRemote, updateBusinessProfileRemote } from "@/lib/functions";
+import {
+  liveBackendEnabled,
+  checkHandleAvailableRemote,
+  createBusinessProfileRemote,
+  recordBioTapRemote,
+  setBioOfferRemote,
+  transferHandleRemote,
+  updateBusinessProfileRemote,
+} from "@/lib/functions";
 import { useAuth } from "@/contexts/AuthContext";
 import { bumpTap, loadBios, persistBios, subscribeBios, tapCount } from "@/lib/bio-store";
 import { syncBioToListing } from "@/lib/identity";
@@ -60,13 +62,13 @@ export function BioProvider({ children }: { children: ReactNode }) {
     return profiles.filter((p) => p.ownerUid === user.uid || p.ownerEmail === user.email);
   }, [profiles, user]);
 
-  const mine = useMemo(
-    () => owned.find((p) => p.kind === "person") || owned[0] || null,
-    [owned],
-  );
+  const mine = useMemo(() => owned.find((p) => p.kind === "person") || owned[0] || null, [owned]);
 
   const business = useMemo(
-    () => owned.find((p) => (p.kind || "business") === "business" && p.kind !== "person") || owned.find((p) => p.kind === "business") || null,
+    () =>
+      owned.find((p) => (p.kind || "business") === "business" && p.kind !== "person") ||
+      owned.find((p) => p.kind === "business") ||
+      null,
     [owned],
   );
 
@@ -84,28 +86,25 @@ export function BioProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const handleFree = useCallback(
-    async (handle: string, exceptId?: string) => {
-      const err = handleError(handle);
-      if (err) return { ok: false, reason: err };
-      const h = normalizeHandle(handle);
-      const skip = exceptId || "";
-      const existing = loadBios().find((p) => p.handle === h && p.id !== skip);
-      if (existing) return { ok: false, reason: "Taken" };
-      const listingHit = getCachedListings().find((row) => row.handle === h && row.id !== skip);
-      if (listingHit) return { ok: false, reason: "Taken" };
-      if (liveBackendEnabled()) {
-        try {
-          const res = await checkHandleAvailableRemote({ handle: h });
-          if (!res.ok) return { ok: false, reason: res.reason || "Taken" };
-        } catch {
-          /* local already checked */
-        }
+  const handleFree = useCallback(async (handle: string, exceptId?: string) => {
+    const err = handleError(handle);
+    if (err) return { ok: false, reason: err };
+    const h = normalizeHandle(handle);
+    const skip = exceptId || "";
+    const existing = loadBios().find((p) => p.handle === h && p.id !== skip);
+    if (existing) return { ok: false, reason: "Taken" };
+    const listingHit = getCachedListings().find((row) => row.handle === h && row.id !== skip);
+    if (listingHit) return { ok: false, reason: "Taken" };
+    if (liveBackendEnabled()) {
+      try {
+        const res = await checkHandleAvailableRemote({ handle: h });
+        if (!res.ok) return { ok: false, reason: res.reason || "Taken" };
+      } catch {
+        /* local already checked */
       }
-      return { ok: true };
-    },
-    [],
-  );
+    }
+    return { ok: true };
+  }, []);
 
   const createProfile = useCallback(
     async (input: CreateBioInput) => {
@@ -158,7 +157,12 @@ export function BioProvider({ children }: { children: ReactNode }) {
       };
       persistBios([
         profile,
-        ...loadBios().filter((p) => p.handle !== h && p.id !== profile.id && !(p.ownerUid && p.ownerUid === profile.ownerUid && (p.kind || "business") === kind)),
+        ...loadBios().filter(
+          (p) =>
+            p.handle !== h &&
+            p.id !== profile.id &&
+            !(p.ownerUid && p.ownerUid === profile.ownerUid && (p.kind || "business") === kind),
+        ),
       ]);
       if (kind === "business") syncBioToListing(profile);
       refresh();
@@ -174,10 +178,7 @@ export function BioProvider({ children }: { children: ReactNode }) {
             listingId: profile.listingId,
           });
           profile.id = res.profileId;
-          persistBios([
-            profile,
-            ...loadBios().filter((p) => p.handle !== h && p.id !== profile.id),
-          ]);
+          persistBios([profile, ...loadBios().filter((p) => p.handle !== h && p.id !== profile.id)]);
           refresh();
         } catch {
           /* local profile is enough for demo */
@@ -193,7 +194,10 @@ export function BioProvider({ children }: { children: ReactNode }) {
       const current = loadBios().find((p) => p.handle === patch.handle);
       if (!current) throw new Error("No profile");
       const next = { ...current, ...patch };
-      if (patch.deals) next.offer = next.deals[0] ? { badge: next.deals[0].badge || next.deals[0].title, detail: next.deals[0].detail } : undefined;
+      if (patch.deals)
+        next.offer = next.deals[0]
+          ? { badge: next.deals[0].badge || next.deals[0].title, detail: next.deals[0].detail }
+          : undefined;
       persistBios([next, ...loadBios().filter((p) => p.handle !== next.handle)]);
       if ((next.kind || "business") === "business") syncBioToListing(next);
       refresh();
@@ -236,7 +240,12 @@ export function BioProvider({ children }: { children: ReactNode }) {
       refresh();
       if (liveBackendEnabled() && getFirebaseAuth()?.currentUser) {
         try {
-          await setBioOfferRemote({ handle, badge: offer?.badge || "", detail: offer?.detail || "", active: Boolean(offer) });
+          await setBioOfferRemote({
+            handle,
+            badge: offer?.badge || "",
+            detail: offer?.detail || "",
+            active: Boolean(offer),
+          });
         } catch {
           /* local save already applied */
         }
@@ -285,7 +294,19 @@ export function BioProvider({ children }: { children: ReactNode }) {
       setOffer,
       transferHandle,
     }),
-    [business, byHandle, createProfile, handleFree, mine, profiles, recordTap, setOffer, tapsToday, transferHandle, updateProfile],
+    [
+      business,
+      byHandle,
+      createProfile,
+      handleFree,
+      mine,
+      profiles,
+      recordTap,
+      setOffer,
+      tapsToday,
+      transferHandle,
+      updateProfile,
+    ],
   );
 
   return <BioContext.Provider value={value}>{children}</BioContext.Provider>;

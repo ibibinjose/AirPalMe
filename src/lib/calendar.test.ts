@@ -423,16 +423,31 @@ describe("Collision Prevention & Nearest Slot Opening", () => {
     });
 
     it("identifies booking status correctly for confirmed, tentative, and rescheduled events", () => {
-      const bookedEvent: CalendarEvent = { ...MOCK_EVENTS[0], isGoing: true, isInterested: false, isRescheduled: false };
+      const bookedEvent: CalendarEvent = {
+        ...MOCK_EVENTS[0],
+        isGoing: true,
+        isInterested: false,
+        isRescheduled: false,
+      };
       expect(getEventBookingStatus(bookedEvent)).toBe("booked");
 
-      const tentativeEvent: CalendarEvent = { ...MOCK_EVENTS[1], isGoing: false, isInterested: true, isRescheduled: false };
+      const tentativeEvent: CalendarEvent = {
+        ...MOCK_EVENTS[1],
+        isGoing: false,
+        isInterested: true,
+        isRescheduled: false,
+      };
       expect(getEventBookingStatus(tentativeEvent)).toBe("tentative");
 
       const rescheduledEvent: CalendarEvent = { ...MOCK_EVENTS[0], isRescheduled: true };
       expect(getEventBookingStatus(rescheduledEvent)).toBe("rescheduled");
 
-      const exploreEvent: CalendarEvent = { ...MOCK_EVENTS[2], isGoing: false, isInterested: false, isRescheduled: false };
+      const exploreEvent: CalendarEvent = {
+        ...MOCK_EVENTS[2],
+        isGoing: false,
+        isInterested: false,
+        isRescheduled: false,
+      };
       expect(getEventBookingStatus(exploreEvent)).toBe("explore");
     });
 

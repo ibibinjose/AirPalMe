@@ -92,14 +92,7 @@ export interface PlanComment {
 
 export type PlanStatus = "draft" | "open" | "confirmed" | "completed" | "cancelled";
 
-export type ExperienceCategory =
-  | "social"
-  | "tour"
-  | "workshop"
-  | "fitness"
-  | "getaway"
-  | "retreat"
-  | "other";
+export type ExperienceCategory = "social" | "tour" | "workshop" | "fitness" | "getaway" | "retreat" | "other";
 
 export interface ExperienceCategoryInfo {
   id: ExperienceCategory;
@@ -259,6 +252,24 @@ export interface HangoutPlan {
   updatedAt: string;
 }
 
+/** Paid public events/experiences sell tickets through Stripe Checkout. */
+export function isTicketed(plan: Pick<HangoutPlan, "isExperience" | "pricePerPerson" | "pricingModel">): boolean {
+  if (!plan.isExperience) return false;
+  if (plan.pricingModel === "free") return false;
+  return Number(plan.pricePerPerson || 0) > 0;
+}
+
+export function spotsLeft(plan: Pick<HangoutPlan, "capacity" | "spotsBooked">): number | null {
+  const cap = Number(plan.capacity || 0);
+  if (!Number.isFinite(cap) || cap <= 0) return null;
+  return Math.max(0, Math.floor(cap) - Math.max(0, Math.floor(Number(plan.spotsBooked || 0))));
+}
+
+export function isSoldOut(plan: Pick<HangoutPlan, "capacity" | "spotsBooked">): boolean {
+  const left = spotsLeft(plan);
+  return left !== null && left <= 0;
+}
+
 export const ACTIVITY_INTERESTS = [
   { id: "family", label: "Family & Milestones" },
   { id: "celebration", label: "Celebration" },
@@ -289,7 +300,8 @@ export function myInterestProfile(
 ): string[] {
   const tags = new Set<string>();
   for (const p of plans) {
-    const mine = (uid && (p.creator.uid === uid || p.attendees.some((a) => a.id === uid))) || (!uid && p.attendees.length > 0);
+    const mine =
+      (uid && (p.creator.uid === uid || p.attendees.some((a) => a.id === uid))) || (!uid && p.attendees.length > 0);
     if (mine) for (const t of p.interests || []) tags.add(t.toLowerCase());
   }
   return Array.from(tags);
@@ -313,11 +325,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Life Milestone",
     shortDesc: "Birthday celebrations, milestone bashes & dinners",
     defaultTitle: "Birthday Celebration & Drinks",
-    suggestedStops: [
-      "Welcome & Cocktail Arrival",
-      "Celebration Dinner & Speeches",
-      "Birthday Cake & Dance Floor",
-    ],
+    suggestedStops: ["Welcome & Cocktail Arrival", "Celebration Dinner & Speeches", "Birthday Cake & Dance Floor"],
   },
   wedding: {
     id: "wedding",
@@ -340,11 +348,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Life Milestone",
     shortDesc: "Education graduation, commencement & celebratory dinner",
     defaultTitle: "University Graduation & Family Dinner",
-    suggestedStops: [
-      "Commencement Ceremony & Stage Walk",
-      "Campus Family Photos",
-      "Graduation Toast & Dinner",
-    ],
+    suggestedStops: ["Commencement Ceremony & Stage Walk", "Campus Family Photos", "Graduation Toast & Dinner"],
   },
   housewarming: {
     id: "housewarming",
@@ -353,11 +357,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Life Milestone",
     shortDesc: "New home celebration, backyard BBQ & drinks",
     defaultTitle: "New Home Housewarming & BBQ",
-    suggestedStops: [
-      "House Tour & Welcome Drinks",
-      "Backyard BBQ & Food",
-      "Sunset Toast to New Memories",
-    ],
+    suggestedStops: ["House Tour & Welcome Drinks", "Backyard BBQ & Food", "Sunset Toast to New Memories"],
   },
   baby_shower: {
     id: "baby_shower",
@@ -379,10 +379,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Life Milestone",
     shortDesc: "Honouring a loved one, memorial service, wake & remembrance",
     defaultTitle: "Celebration of Life & Memorial Service",
-    suggestedStops: [
-      "Memorial Gathering & Tributes",
-      "Remembrance Reception & Sharing Stories",
-    ],
+    suggestedStops: ["Memorial Gathering & Tributes", "Remembrance Reception & Sharing Stories"],
   },
   anniversary: {
     id: "anniversary",
@@ -391,11 +388,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Life Milestone",
     shortDesc: "Milestone anniversaries, renewals & romantic dinner parties",
     defaultTitle: "Anniversary Celebration Dinner & Toast",
-    suggestedStops: [
-      "Anniversary Toast & Canapés",
-      "Fine Dining Dinner",
-      "Dessert & Speeches",
-    ],
+    suggestedStops: ["Anniversary Toast & Canapés", "Fine Dining Dinner", "Dessert & Speeches"],
   },
   nightout: {
     id: "nightout",
@@ -404,11 +397,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Social Outing",
     shortDesc: "Rooftop drinks, pubs, craft beers & late night spots",
     defaultTitle: "Friday Night Out in The Rocks",
-    suggestedStops: [
-      "The Glenmore Rooftop Bar",
-      "Fortune of War Sandstone Yard",
-      "The Cut Bar & Grill",
-    ],
+    suggestedStops: ["The Glenmore Rooftop Bar", "Fortune of War Sandstone Yard", "The Cut Bar & Grill"],
   },
   lunch: {
     id: "lunch",
@@ -417,11 +406,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Social Outing",
     shortDesc: "Café brunches, sunny patios, bakeries & foodie spots",
     defaultTitle: "Weekend Harbour Lunch & Wine",
-    suggestedStops: [
-      "The Rocks Café",
-      "Laneway Pour Specialty Coffee",
-      "Quay Bao Dumplings",
-    ],
+    suggestedStops: ["The Rocks Café", "Laneway Pour Specialty Coffee", "Quay Bao Dumplings"],
   },
   movies: {
     id: "movies",
@@ -430,10 +415,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Social Outing",
     shortDesc: "Indie theatres, IMAX, popcorn & post-film dinner",
     defaultTitle: "Evening Movies & Late Bites",
-    suggestedStops: [
-      "Cinema Premiere",
-      "Post-Movie Cocktails & Dessert",
-    ],
+    suggestedStops: ["Cinema Premiere", "Post-Movie Cocktails & Dessert"],
   },
   trip: {
     id: "trip",
@@ -442,11 +424,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Social Outing",
     shortDesc: "Weekend getaways, coastal drives, beaches & scenic routes",
     defaultTitle: "Sydney to Blue Mountains Weekend Trip",
-    suggestedStops: [
-      "Breakfast Pitstop",
-      "Scenic Lookout Vista",
-      "Sunset Campfire Dinner",
-    ],
+    suggestedStops: ["Breakfast Pitstop", "Scenic Lookout Vista", "Sunset Campfire Dinner"],
   },
   escape: {
     id: "escape",
@@ -455,11 +433,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Social Outing",
     shortDesc: "Coastal retreats, cabins, wine trails & nature getaways",
     defaultTitle: "Weekend Escape & Coastal Getaway",
-    suggestedStops: [
-      "Scenic Drive & Coffee Stop",
-      "Cabin / Beachside Check-In",
-      "Sunset Dinner & Firepit Drinks",
-    ],
+    suggestedStops: ["Scenic Drive & Coffee Stop", "Cabin / Beachside Check-In", "Sunset Dinner & Firepit Drinks"],
   },
   gig: {
     id: "gig",
@@ -468,11 +442,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Social Outing",
     shortDesc: "Concerts, jazz nights, harbour sessions & DJ sets",
     defaultTitle: "Live Jazz & Harbour Session",
-    suggestedStops: [
-      "Pre-Show Drinks",
-      "Live Stage & Main Act",
-      "Late Night Supper",
-    ],
+    suggestedStops: ["Pre-Show Drinks", "Live Stage & Main Act", "Late Night Supper"],
   },
   walk: {
     id: "walk",
@@ -481,11 +451,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Community",
     shortDesc: "Heritage precinct strolls, harbour views & coffee walks",
     defaultTitle: "Historic Rocks Walk & Coffee Catch-Up",
-    suggestedStops: [
-      "Morning Espresso Meetup",
-      "Sandstone Laneways Walk",
-      "Waterfront Gelato",
-    ],
+    suggestedStops: ["Morning Espresso Meetup", "Sandstone Laneways Walk", "Waterfront Gelato"],
   },
   catchup: {
     id: "catchup",
@@ -494,10 +460,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Social Outing",
     shortDesc: "Casual 1-on-1 coffee, drinks or lunch catch-up",
     defaultTitle: "Coffee & Catch Up",
-    suggestedStops: [
-      "Coffee & Catch Up",
-      "Laneway Walk & Conversation",
-    ],
+    suggestedStops: ["Coffee & Catch Up", "Laneway Walk & Conversation"],
   },
   meeting: {
     id: "meeting",
@@ -506,10 +469,7 @@ export const PLAN_TYPES: Record<PlanType, PlanTypeInfo> = {
     category: "Social Outing",
     shortDesc: "1-on-1 sync, consultation or advisory session",
     defaultTitle: "1-on-1 Sync & Discussion",
-    suggestedStops: [
-      "Meeting & Discussion",
-      "Next Steps & Wrap Up",
-    ],
+    suggestedStops: ["Meeting & Discussion", "Next Steps & Wrap Up"],
   },
   custom: {
     id: "custom",
@@ -765,7 +725,7 @@ export function formatPlanDate(dateStr: string, timeStr: string): string {
   try {
     const d = new Date(`${dateStr}T${timeStr}:00`);
     if (Number.isNaN(d.getTime())) return `${dateStr} at ${timeStr}`;
-    return new Intl.DateTimeFormat("en-AU", {
+    return new Intl.DateTimeFormat(undefined, {
       weekday: "short",
       day: "numeric",
       month: "short",
@@ -817,11 +777,7 @@ export function stopChangeRecipients(plan: Pick<HangoutPlan, "attendees" | "subs
 }
 
 /** Human-readable summary of a stop change, used for collaborator notifications. */
-export function buildStopChangeMessage(
-  action: StopChangeAction,
-  stopName: string,
-  actorName?: string,
-): string {
+export function buildStopChangeMessage(action: StopChangeAction, stopName: string, actorName?: string): string {
   const actor = actorName?.trim() ? ` by ${actorName.trim()}` : "";
   switch (action) {
     case "added":
@@ -880,7 +836,8 @@ export const SEED_PLANS: HangoutPlan[] = [
     city: "Sydney",
     destination: "Barangaroo & The Rocks",
     heroImage: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=1200&q=80",
-    notes: "Turning 30! Join us for sunset cocktails, dinner, birthday cake, and rooftop dance floor. Dress code: Smart Casual.",
+    notes:
+      "Turning 30! Join us for sunset cocktails, dinner, birthday cake, and rooftop dance floor. Dress code: Smart Casual.",
     stops: [
       {
         id: "stop-bday-1",
@@ -970,7 +927,8 @@ export const SEED_PLANS: HangoutPlan[] = [
     city: "Sydney",
     destination: "Royal Botanic Garden & Harbour Foreshore",
     heroImage: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80",
-    notes: "We invite you to celebrate our wedding day with ceremony, cocktail garden reception, and evening banquet dinner under the stars.",
+    notes:
+      "We invite you to celebrate our wedding day with ceremony, cocktail garden reception, and evening banquet dinner under the stars.",
     stops: [
       {
         id: "stop-wed-1",
@@ -1036,7 +994,8 @@ export const SEED_PLANS: HangoutPlan[] = [
     city: "Sydney",
     destination: "Balmain / The Rocks Peninsula",
     heroImage: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80",
-    notes: "We finally moved in! Come over to celebrate our new place with terrace drinks, Aussie BBQ, and sunset views.",
+    notes:
+      "We finally moved in! Come over to celebrate our new place with terrace drinks, Aussie BBQ, and sunset views.",
     stops: [
       {
         id: "stop-hw-1",
@@ -1093,7 +1052,8 @@ export const SEED_PLANS: HangoutPlan[] = [
     city: "Sydney",
     destination: "The Rocks, Sydney Harbour",
     heroImage: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80",
-    notes: "Meeting up for sunset rooftop drinks, sandstone pub dining, and live acoustic music down the cobblestone lanes!",
+    notes:
+      "Meeting up for sunset rooftop drinks, sandstone pub dining, and live acoustic music down the cobblestone lanes!",
     stops: [
       {
         id: "stop-1",
@@ -1272,7 +1232,8 @@ export const SEED_PLANS: HangoutPlan[] = [
     city: "Bali",
     destination: "Canggu & Uluwatu, Bali",
     heroImage: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80",
-    notes: "An all-inclusive 5-day tropical escape featuring daily sunrise vinyasa, guided reef surf coaching, organic chef-prepared meals, sound healing, and luxury private pool villa stays.",
+    notes:
+      "An all-inclusive 5-day tropical escape featuring daily sunrise vinyasa, guided reef surf coaching, organic chef-prepared meals, sound healing, and luxury private pool villa stays.",
     isExperience: true,
     experienceCategory: "retreat",
     durationMode: "multi_day",
@@ -1311,10 +1272,7 @@ export const SEED_PLANS: HangoutPlan[] = [
         "Guided surf lessons with video analysis",
         "Return Denpasar (DPS) airport transfers",
       ],
-      notIncluded: [
-        "International flights to Bali",
-        "Comprehensive travel insurance",
-      ],
+      notIncluded: ["International flights to Bali", "Comprehensive travel insurance"],
       whatToBring: [
         "Swimwear & rash guard",
         "Reef-safe sunscreen & sunglasses",
@@ -1327,19 +1285,56 @@ export const SEED_PLANS: HangoutPlan[] = [
         title: "Arrival, Villa Welcome & Sunset Blessing",
         description: "Check-in at our Canggu jungle villa, welcome mocktails and Balinese flower blessing.",
         stops: [
-          { id: "b1", name: "Denpasar Airport VIP Pickup", time: "14:00", icon: "stay", notes: "Private AC shuttle to Canggu sanctuary" },
-          { id: "b2", name: "Villa Check-in & Fresh Young Coconuts", time: "16:00", icon: "home", notes: "Unpack and explore the pool grounds" },
-          { id: "b3", name: "Opening Circle & Balinese Sunset Banquet", time: "18:30", icon: "food", notes: "Traditional organic Indonesian feast" },
+          {
+            id: "b1",
+            name: "Denpasar Airport VIP Pickup",
+            time: "14:00",
+            icon: "stay",
+            notes: "Private AC shuttle to Canggu sanctuary",
+          },
+          {
+            id: "b2",
+            name: "Villa Check-in & Fresh Young Coconuts",
+            time: "16:00",
+            icon: "home",
+            notes: "Unpack and explore the pool grounds",
+          },
+          {
+            id: "b3",
+            name: "Opening Circle & Balinese Sunset Banquet",
+            time: "18:30",
+            icon: "food",
+            notes: "Traditional organic Indonesian feast",
+          },
         ],
       },
       {
         dayNumber: 2,
         title: "Sunrise Flow & Guided Surf Coaching",
-        description: "Morning ocean breathwork, breakfast bowls, and video-analyzed beginner-to-intermediate surf session.",
+        description:
+          "Morning ocean breathwork, breakfast bowls, and video-analyzed beginner-to-intermediate surf session.",
         stops: [
-          { id: "b4", name: "Sunrise Ocean Yoga Flow", time: "07:00", icon: "sight", notes: "75-min rejuvenating vinyasa flow" },
-          { id: "b5", name: "Batu Bolong Surf Coaching", time: "09:30", icon: "walk", notes: "2 hours guided in-water surf lessons" },
-          { id: "b6", name: "Plant-based Grazing Lunch", time: "13:00", icon: "food", notes: "Fresh tropical poke and dragonfruit smoothies" },
+          {
+            id: "b4",
+            name: "Sunrise Ocean Yoga Flow",
+            time: "07:00",
+            icon: "sight",
+            notes: "75-min rejuvenating vinyasa flow",
+          },
+          {
+            id: "b5",
+            name: "Batu Bolong Surf Coaching",
+            time: "09:30",
+            icon: "walk",
+            notes: "2 hours guided in-water surf lessons",
+          },
+          {
+            id: "b6",
+            name: "Plant-based Grazing Lunch",
+            time: "13:00",
+            icon: "food",
+            notes: "Fresh tropical poke and dragonfruit smoothies",
+          },
         ],
       },
       {
@@ -1347,14 +1342,38 @@ export const SEED_PLANS: HangoutPlan[] = [
         title: "Uluwatu Cliffs & Sound Healing Sanctuary",
         description: "Day excursion to the scenic southern cliffs, crystal sound bath, and seafood sunset dinner.",
         stops: [
-          { id: "b7", name: "Pyramids of Chi Sound Bath", time: "11:00", icon: "music", notes: "Ancient Tibetan singing bowls & gong journey" },
-          { id: "b8", name: "Jimbaran Bay Sunset Seafood Feast", time: "18:00", icon: "food", notes: "Candlelit beach dining with waves at your feet" },
+          {
+            id: "b7",
+            name: "Pyramids of Chi Sound Bath",
+            time: "11:00",
+            icon: "music",
+            notes: "Ancient Tibetan singing bowls & gong journey",
+          },
+          {
+            id: "b8",
+            name: "Jimbaran Bay Sunset Seafood Feast",
+            time: "18:00",
+            icon: "food",
+            notes: "Candlelit beach dining with waves at your feet",
+          },
         ],
       },
     ],
     stops: [
-      { id: "b1", name: "Villa Check-in & Welcome", time: "16:00", icon: "home", notes: "Check-in and welcome coconuts" },
-      { id: "b2", name: "Opening Circle & Sunset Dinner", time: "18:30", icon: "food", notes: "Traditional Balinese dinner" },
+      {
+        id: "b1",
+        name: "Villa Check-in & Welcome",
+        time: "16:00",
+        icon: "home",
+        notes: "Check-in and welcome coconuts",
+      },
+      {
+        id: "b2",
+        name: "Opening Circle & Sunset Dinner",
+        time: "18:30",
+        icon: "food",
+        notes: "Traditional Balinese dinner",
+      },
     ],
     attendees: [
       { id: "user-maya", name: "Maya", status: "going", respondedAt: "2026-09-10T10:00:00Z" },
@@ -1387,7 +1406,8 @@ export const SEED_PLANS: HangoutPlan[] = [
     city: "Sydney",
     destination: "Surry Hills, Sydney",
     heroImage: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1200&q=80",
-    notes: "A 3.5-hour hosted evening tasting crawl through Surry Hills' hidden speakeasies, artisan tapas bars, and underground jazz lounges.",
+    notes:
+      "A 3.5-hour hosted evening tasting crawl through Surry Hills' hidden speakeasies, artisan tapas bars, and underground jazz lounges.",
     isExperience: true,
     experienceCategory: "tour",
     durationMode: "single_day",
@@ -1403,18 +1423,34 @@ export const SEED_PLANS: HangoutPlan[] = [
         "Expert local foodie host & history commentary",
         "VIP reserved lounge seating at all venues",
       ],
-      notIncluded: [
-        "Extra cocktails beyond scheduled tastings",
-      ],
-      whatToBring: [
-        "Valid 18+ photo ID",
-        "Comfortable walking shoes",
-      ],
+      notIncluded: ["Extra cocktails beyond scheduled tastings"],
+      whatToBring: ["Valid 18+ photo ID", "Comfortable walking shoes"],
     },
     stops: [
-      { id: "t1", name: "The Clock Speakeasy Greeting", time: "18:00", address: "470 Crown St, Surry Hills", icon: "drinks", notes: "Welcome signature gin fizz tasting" },
-      { id: "t2", name: "El Loco Tacos & Mezcal Pairing", time: "19:00", address: "64 Foveaux St, Surry Hills", icon: "food", notes: "Slow-cooked carnitas & smoked mezcal" },
-      { id: "t3", name: "Low 302 Vinyl & Jazz Lounge", time: "20:30", address: "302 Crown St, Surry Hills", icon: "music", notes: "Dessert cocktail & live vinyl jazz tunes" },
+      {
+        id: "t1",
+        name: "The Clock Speakeasy Greeting",
+        time: "18:00",
+        address: "470 Crown St, Surry Hills",
+        icon: "drinks",
+        notes: "Welcome signature gin fizz tasting",
+      },
+      {
+        id: "t2",
+        name: "El Loco Tacos & Mezcal Pairing",
+        time: "19:00",
+        address: "64 Foveaux St, Surry Hills",
+        icon: "food",
+        notes: "Slow-cooked carnitas & smoked mezcal",
+      },
+      {
+        id: "t3",
+        name: "Low 302 Vinyl & Jazz Lounge",
+        time: "20:30",
+        address: "302 Crown St, Surry Hills",
+        icon: "music",
+        notes: "Dessert cocktail & live vinyl jazz tunes",
+      },
     ],
     attendees: [
       { id: "user-liam", name: "Liam", status: "going", respondedAt: "2026-09-11T10:00:00Z" },
@@ -1431,7 +1467,6 @@ export const SEED_PLANS: HangoutPlan[] = [
   },
 ];
 
-
 // Plan Callable API Contracts
 export interface CreatePlanRequest {
   id?: string;
@@ -1447,7 +1482,14 @@ export interface CreatePlanRequest {
   notes?: string;
   isPublic?: boolean;
   interests?: string[];
-  initialStops?: Array<{ name: string; time?: string; notes?: string; icon?: string; placeId?: string; address?: string }>;
+  initialStops?: Array<{
+    name: string;
+    time?: string;
+    notes?: string;
+    icon?: string;
+    placeId?: string;
+    address?: string;
+  }>;
   isExperience?: boolean;
   experienceCategory?: ExperienceCategory;
   durationMode?: "single_day" | "multi_day";

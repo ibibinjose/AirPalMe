@@ -8,6 +8,9 @@ import {
   type GetPropertyWifiRequest,
   type GetPropertyWifiResponse,
   type SubmitPartnerClaimRequest,
+  type CompleteAccountSignupRequest,
+  type LoginWithPhonePasswordRequest,
+  type LoginWithPhonePasswordResponse,
 } from "@shared/airpal-security";
 import type {
   CreatePlanRequest,
@@ -42,11 +45,27 @@ export function completeRegistrationRemote(data: CompleteRegistrationRequest) {
 }
 export const completeRegistration = completeRegistrationRemote;
 
+export function completeAccountSignupRemote(data: CompleteAccountSignupRequest) {
+  return callFunction<CompleteAccountSignupRequest, { ok: true; phone: string }>(CALLABLES.completeAccountSignup, data);
+}
+
+export function loginWithPhonePasswordRemote(data: LoginWithPhonePasswordRequest) {
+  return callFunction<LoginWithPhonePasswordRequest, LoginWithPhonePasswordResponse>(
+    CALLABLES.loginWithPhonePassword,
+    data,
+  );
+}
+
 export function getPropertyWifiRemote(data: GetPropertyWifiRequest) {
   return callFunction<GetPropertyWifiRequest, GetPropertyWifiResponse>(CALLABLES.getPropertyWifi, data);
 }
 
-export function updatePropertyWifiRemote(data: { propertyId: string; network: string; password: string; speed: string }) {
+export function updatePropertyWifiRemote(data: {
+  propertyId: string;
+  network: string;
+  password: string;
+  speed: string;
+}) {
   return callFunction<typeof data, { ok: true; updatedAt: string }>(CALLABLES.updatePropertyWifi, data);
 }
 
@@ -103,6 +122,10 @@ export function upsertBusinessListingRemote(data: {
   lng?: number;
   precinctId?: string;
   heroImage?: string;
+  mapsPlaceId?: string;
+  website?: string;
+  plan?: string;
+  abnOrTaxId?: string;
 }) {
   return callFunction<typeof data, { listingId: string; placeId: string }>(CALLABLES.upsertBusinessListing, data);
 }
@@ -114,7 +137,10 @@ export function upsertBusinessDealRemote(data: {
   expiry?: string;
   active?: boolean;
 }) {
-  return callFunction<typeof data, { ok: true; deal: { badge: string; detail: string } | null }>(CALLABLES.upsertBusinessDeal, data);
+  return callFunction<typeof data, { ok: true; deal: { badge: string; detail: string } | null }>(
+    CALLABLES.upsertBusinessDeal,
+    data,
+  );
 }
 
 export function upsertEventRemote(data: {
@@ -179,9 +205,33 @@ export function updateBusinessProfileRemote(data: {
   listingId?: string;
   placeId?: string;
   links?: Array<{ id: string; type: string; label: string; href: string }>;
-  products?: Array<{ id: string; kind?: string; title: string; detail?: string; price?: string; badge?: string; href?: string }>;
-  services?: Array<{ id: string; kind?: string; title: string; detail?: string; price?: string; badge?: string; href?: string }>;
-  deals?: Array<{ id: string; kind?: string; title: string; detail?: string; price?: string; badge?: string; href?: string }>;
+  products?: Array<{
+    id: string;
+    kind?: string;
+    title: string;
+    detail?: string;
+    price?: string;
+    badge?: string;
+    href?: string;
+  }>;
+  services?: Array<{
+    id: string;
+    kind?: string;
+    title: string;
+    detail?: string;
+    price?: string;
+    badge?: string;
+    href?: string;
+  }>;
+  deals?: Array<{
+    id: string;
+    kind?: string;
+    title: string;
+    detail?: string;
+    price?: string;
+    badge?: string;
+    href?: string;
+  }>;
 }) {
   return callFunction<typeof data, { ok: true }>(CALLABLES.updateBusinessProfile, data);
 }
@@ -195,7 +245,10 @@ export function recordBioTapRemote(data: { handle: string; kind?: string }) {
 }
 
 export function claimBioOfferRemote(data: { handle: string; dealId: string }) {
-  return callFunction<typeof data, { code: string; badge: string; detail: string; expiresAt: string }>(CALLABLES.claimBioOffer, data);
+  return callFunction<typeof data, { code: string; badge: string; detail: string; expiresAt: string }>(
+    CALLABLES.claimBioOffer,
+    data,
+  );
 }
 
 export function transferHandleRemote(data: { from: string; to: string }) {
@@ -203,7 +256,10 @@ export function transferHandleRemote(data: { from: string; to: string }) {
 }
 
 export function listBioDirectoryRemote() {
-  return callFunction<Record<string, never>, { rows: Array<{ handle: string; name: string; ownerUid?: string; taps: number }> }>(CALLABLES.listBioDirectory, {});
+  return callFunction<
+    Record<string, never>,
+    { rows: Array<{ handle: string; name: string; ownerUid?: string; taps: number }> }
+  >(CALLABLES.listBioDirectory, {});
 }
 
 export function recordAnalyticsBatchRemote(data: { events: unknown[] }) {
@@ -270,16 +326,19 @@ export function createExperienceCheckoutSessionRemote(data: {
   successUrl?: string;
   cancelUrl?: string;
 }) {
-  return callFunction<typeof data, {
-    ok: boolean;
-    mode?: string;
-    bookingId?: string;
-    sessionId?: string;
-    checkoutUrl?: string;
-    totalAmount?: number;
-    currency?: string;
-    message?: string;
-  }>(CALLABLES.createExperienceCheckoutSession, data);
+  return callFunction<
+    typeof data,
+    {
+      ok: boolean;
+      mode?: string;
+      bookingId?: string;
+      sessionId?: string;
+      checkoutUrl?: string;
+      totalAmount?: number;
+      currency?: string;
+      message?: string;
+    }
+  >(CALLABLES.createExperienceCheckoutSession, data);
 }
 
 export function confirmExperienceBookingRemote(data: { planId: string; bookingId: string; paymentIntentId?: string }) {
@@ -289,6 +348,71 @@ export function confirmExperienceBookingRemote(data: { planId: string; bookingId
   );
 }
 export const confirmExperienceBookingRemoteCall = confirmExperienceBookingRemote;
+
+export function createBookingCheckoutSessionRemote(data: { bookingId: string }) {
+  return callFunction<
+    typeof data,
+    {
+      ok: boolean;
+      mode?: string;
+      bookingId?: string;
+      sessionId?: string;
+      checkoutUrl?: string | null;
+    }
+  >(CALLABLES.createBookingCheckoutSession, data);
+}
+
+export function createConnectAccountLinkRemote(data: { returnPath?: string } = {}) {
+  return callFunction<
+    typeof data,
+    {
+      ok: boolean;
+      url: string;
+      stripeAccountId: string;
+      transfersActive: boolean;
+    }
+  >(CALLABLES.createConnectAccountLink, data);
+}
+
+export function refreshConnectAccountRemote() {
+  return callFunction<
+    Record<string, never>,
+    {
+      ok: boolean;
+      transfersActive: boolean;
+      stripeAccountId: string;
+    }
+  >(CALLABLES.refreshConnectAccount, {});
+}
+
+export function createConnectLoginLinkRemote() {
+  return callFunction<Record<string, never>, { ok: boolean; url: string }>(CALLABLES.createConnectLoginLink, {});
+}
+
+export function releaseHeldPayoutsRemote() {
+  return callFunction<
+    Record<string, never>,
+    {
+      ok: boolean;
+      released: number;
+      held: number;
+      amountCents: number;
+    }
+  >(CALLABLES.releaseHeldPayouts, {});
+}
+
+export function completePaidBookingRemote(data: { bookingId: string }) {
+  return callFunction<
+    typeof data,
+    {
+      ok: boolean;
+      status: string;
+      payoutStatus: string;
+      transferId: string | null;
+      payoutReason?: string | null;
+    }
+  >(CALLABLES.completePaidBooking, data);
+}
 
 export function createStaffTicketRemote(data: {
   propertyId: string;

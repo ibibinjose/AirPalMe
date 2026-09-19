@@ -153,18 +153,25 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <div className="flex items-center justify-between">
-        <Link href={kind === "giveaway" ? "/giveaways" : "/promotions"} className="flex items-center gap-1 text-[13px] font-medium text-mute">
+        <Link
+          href={kind === "giveaway" ? "/giveaways" : "/promotions"}
+          className="flex items-center gap-1 text-[13px] font-medium text-mute"
+        >
           <ArrowLeft size={14} /> {kind === "giveaway" ? "Giveaways" : "Promotions"}
         </Link>
-        <button type="button" onClick={share} className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand hover:underline">
+        <button
+          type="button"
+          onClick={share}
+          className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand hover:underline"
+        >
           <Share2 size={14} /> Share
         </button>
       </div>
 
       {art ? (
-        <img src={art} alt={promo.title} className="mt-4 h-56 w-full rounded-3xl border-2 border-ink object-cover" />
+        <img src={art} alt={promo.title} className="mt-4 h-56 w-full rounded-3xl ring-1 ring-line object-cover" />
       ) : (
-        <div className="mt-4 grid h-40 w-full place-items-center rounded-3xl border-2 border-ink bg-gradient-to-br from-brand/15 via-sky-100 to-emerald-100">
+        <div className="mt-4 grid h-40 w-full place-items-center rounded-3xl ring-1 ring-line bg-gradient-to-br from-brand/15 via-sky-100 to-emerald-100">
           <Gift size={44} className="text-brand" />
         </div>
       )}
@@ -181,11 +188,15 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
       <div className="mt-4 grid grid-cols-2 gap-2">
         {[
           { icon: Gift, label: "Prize", value: promo.prizeValue || promo.prize.title },
-          { icon: CalendarDays, label: "Closes", value: promo.endAt ? new Date(promo.endAt).toLocaleDateString() : "—" },
+          {
+            icon: CalendarDays,
+            label: "Closes",
+            value: promo.endAt ? new Date(promo.endAt).toLocaleDateString() : "—",
+          },
           { icon: MapPin, label: "Where", value: promo.locationText || "Sydney" },
           { icon: User, label: "Eligibility", value: promo.eligibility.split(".")[0] },
         ].map((f) => (
-          <div key={f.label} className="rounded-2xl border-2 border-ink bg-card p-3">
+          <div key={f.label} className="rounded-2xl ring-1 ring-line bg-card p-3">
             <p className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-mute">
               <f.icon size={12} /> {f.label}
             </p>
@@ -197,7 +208,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
       <p className="mt-4 whitespace-pre-line text-[15px] leading-relaxed">{promo.description}</p>
 
       {promo.prize.included && promo.prize.included.length > 0 && (
-        <div className="mt-4 rounded-2xl border-2 border-ink bg-card p-4">
+        <div className="mt-4 rounded-2xl ring-1 ring-line bg-card p-4">
           <p className="text-sm font-bold">What's included</p>
           <ul className="mt-2 space-y-1.5">
             {promo.prize.included.map((item) => (
@@ -210,20 +221,19 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
       )}
 
       {target && !closed && (
-        <a
-          href={target}
-          onClick={() => promo.id && recordPromotionClickRemote(promo.id).catch(() => undefined)}
-        >
+        <a href={target} onClick={() => promo.id && recordPromotionClickRemote(promo.id).catch(() => undefined)}>
           <Button className="mt-4 w-full">View the experience</Button>
         </a>
       )}
 
       {promo.mechanicType === "member" && Number(promo.pointsCost) > 0 && !closed && (
-        <div className="mt-4 rounded-2xl border-2 border-ink bg-card p-4 text-center">
+        <div className="mt-4 rounded-2xl ring-1 ring-line bg-card p-4 text-center">
           {redeemCode ? (
             <>
               <p className="font-display text-lg font-bold">Redeemed</p>
-              <p className="mt-0.5 text-sm text-mute">Show <span className="font-mono font-bold text-ink">{redeemCode}</span> in-store.</p>
+              <p className="mt-0.5 text-sm text-mute">
+                Show <span className="font-mono font-bold text-ink">{redeemCode}</span> in-store.
+              </p>
             </>
           ) : (
             <>
@@ -244,7 +254,11 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
             <p className="mt-0.5 text-sm text-mute">
               Reference <span className="font-mono font-bold text-ink">{reference}</span>
             </p>
-            <p className="mt-1 text-xs text-mute">Entry never guarantees winning. Winners are announced {promo.winnerAnnouncementAt ? new Date(promo.winnerAnnouncementAt).toLocaleDateString() : "after closing"}.</p>
+            <p className="mt-1 text-xs text-mute">
+              Entry never guarantees winning. Winners are announced{" "}
+              {promo.winnerAnnouncementAt ? new Date(promo.winnerAnnouncementAt).toLocaleDateString() : "after closing"}
+              .
+            </p>
           </div>
         ) : canEnter ? (
           <div className="space-y-2">
@@ -253,7 +267,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="Promotional code"
-                className="w-full rounded-2xl border-2 border-ink bg-card p-3 text-sm font-semibold"
+                className="w-full rounded-2xl ring-1 ring-line bg-card p-3 text-sm font-semibold"
                 aria-label="Promotional code"
               />
             )}
@@ -262,7 +276,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
             </Button>
           </div>
         ) : closed ? (
-          <div className="rounded-2xl border-2 border-ink/20 bg-card p-4 text-center text-sm font-semibold text-mute">
+          <div className="rounded-2xl ring-1 ring-line/20 bg-card p-4 text-center text-sm font-semibold text-mute">
             This {kind} has closed.
           </div>
         ) : null}
@@ -274,10 +288,16 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
 
       {related.length > 0 && (
         <section className="mt-6">
-          <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-mute">More {promo.category.toLowerCase()} to discover</h2>
+          <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-mute">
+            More {promo.category.toLowerCase()} to discover
+          </h2>
           <div className="space-y-2">
             {related.map((r) => (
-              <Link key={r.id} href={`/${r.kind === "giveaway" ? "giveaways" : "promotions"}/${r.id}`} className="flex items-center gap-3 rounded-2xl border-2 border-ink/15 bg-card p-3">
+              <Link
+                key={r.id}
+                href={`/${r.kind === "giveaway" ? "giveaways" : "promotions"}/${r.id}`}
+                className="flex items-center gap-3 rounded-2xl ring-1 ring-line/15 bg-card p-3"
+              >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-bold">{r.title}</span>
                   <span className="block truncate text-xs text-mute">{r.prizeValue || r.sponsorName}</span>

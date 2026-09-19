@@ -6,7 +6,7 @@ test.describe("Concierge & Stay Companion Flow", () => {
     await page.waitForLoadState("domcontentloaded");
 
     // No stay session: guest sees Scan + Explore, never a fake demo room.
-    await expect(page.getByRole("button", { name: "Scan" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Scan a code|Scan/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /Try demo room/i })).toHaveCount(0);
   });
 

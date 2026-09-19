@@ -37,8 +37,12 @@ export function ZooSheet({
   return (
     <Sheet open={open} onClose={onClose}>
       <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">{hunt.name}</p>
-      <h2 className="font-display mt-1 text-2xl font-semibold">{inZoo ? `${animal?.name} is in your Zoo` : `${animal?.name}`}</h2>
-      <p className="mt-1 text-sm text-mute">{inZoo ? progress.label : "Add this sticker to your Zoo. The shop page stays open."}</p>
+      <h2 className="font-display mt-1 text-2xl font-semibold">
+        {inZoo ? `${animal?.name} is in your Zoo` : `${animal?.name}`}
+      </h2>
+      <p className="mt-1 text-sm text-mute">
+        {inZoo ? progress.label : "Add this sticker to your Zoo. The shop page stays open."}
+      </p>
       <div className="mx-auto mt-4 h-44 w-44">
         <ZooSticker animalId={stop.animalId} className="h-full w-full" />
       </div>
@@ -60,7 +64,7 @@ export function ZooSheet({
           }}
           className={cn(
             "flex h-11 flex-1 items-center justify-center gap-2 rounded-full text-sm font-medium ring-1",
-            shop?.liked ? "bg-ink text-white ring-ink" : "bg-white text-ink ring-line",
+            shop?.liked ? "bg-brand text-white ring-ink" : "bg-white text-ink ring-line",
           )}
         >
           <Heart size={16} fill={shop?.liked ? "currentColor" : "none"} />
@@ -74,7 +78,7 @@ export function ZooSheet({
           }}
           className={cn(
             "flex h-11 flex-1 items-center justify-center gap-2 rounded-full text-sm font-medium ring-1",
-            shop?.followed ? "bg-ink text-white ring-ink" : "bg-white text-ink ring-line",
+            shop?.followed ? "bg-brand text-white ring-ink" : "bg-white text-ink ring-line",
           )}
         >
           <UserPlus size={16} />

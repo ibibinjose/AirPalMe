@@ -27,8 +27,16 @@ export interface BatteryManager extends EventTarget {
   onchargingtimechange: ((this: BatteryManager, ev: Event) => void) | null;
   ondischargingtimechange: ((this: BatteryManager, ev: Event) => void) | null;
   onlevelchange: ((this: BatteryManager, ev: Event) => void) | null;
-  addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+  addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions,
+  ): void;
+  removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions,
+  ): void;
 }
 
 export type NavigatorWithBattery = Navigator & {

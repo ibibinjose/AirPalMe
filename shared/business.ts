@@ -55,6 +55,11 @@ export type BusinessListing = {
   expiresAt?: string;
   /** Last time opening hours were confirmed. Guest Open now hides when this is too old. */
   hoursVerifiedAt?: string;
+  mapsPlaceId?: string;
+  website?: string;
+  logoUrl?: string;
+  /** presence | featured | partner — Featured is server-clamped to domain or ABN proof. */
+  plan?: "presence" | "featured" | "partner";
 };
 
 export const DEFAULT_LISTING_GEO: Geo = { lat: -33.85955, lng: 151.20715 };
@@ -74,10 +79,11 @@ export function listingToPlace(listing: BusinessListing): NearbyPlace {
     address: listing.address,
     heroImage: listing.heroImage,
     deal: listing.deal,
-    verifiedPartner: true,
+    verifiedPartner: listing.plan === "featured" || listing.plan === "partner" || Boolean(listing.verifiedOwner),
     handle: listing.handle,
     phone: listing.phone,
     hoursVerifiedAt: listing.hoursVerifiedAt || listing.updatedAt,
+    mapsPlaceId: listing.mapsPlaceId,
   };
 }
 

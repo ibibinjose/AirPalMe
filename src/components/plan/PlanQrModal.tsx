@@ -1,14 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Check,
-  Copy,
-  Download,
-  Printer,
-  QrCode,
-  Share2,
-  Sparkles,
-  X,
-} from "lucide-react";
+import { Check, Copy, Download, Printer, QrCode, Share2, Sparkles, X } from "lucide-react";
 import { type HangoutPlan, formatPlanDate, planInviteUrl, PLAN_TYPES, EXPERIENCE_CATEGORIES } from "@shared/plan";
 import { makeQrDataUrl } from "@/lib/qr";
 import { toast } from "sonner";
@@ -30,14 +21,14 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
   const [copied, setCopied] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
 
-  const origin =
-    typeof window !== "undefined" ? window.location.origin : "https://airpal.me";
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://airpal.me";
   const inviteUrl = planInviteUrl(plan.id, origin);
 
   const typeInfo = PLAN_TYPES[plan.type] || PLAN_TYPES.custom;
-  const occasionBadge = plan.isExperience && plan.experienceCategory
-    ? `${EXPERIENCE_CATEGORIES[plan.experienceCategory]?.emoji || "✨"} ${EXPERIENCE_CATEGORIES[plan.experienceCategory]?.label || "Experience"}`
-    : typeInfo.label;
+  const occasionBadge =
+    plan.isExperience && plan.experienceCategory
+      ? `${EXPERIENCE_CATEGORIES[plan.experienceCategory]?.emoji || "✨"} ${EXPERIENCE_CATEGORIES[plan.experienceCategory]?.label || "Experience"}`
+      : typeInfo.label;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -96,10 +87,7 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4">
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/75 backdrop-blur-md transition-opacity"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/75 backdrop-blur-md transition-opacity" onClick={onClose} />
 
       {/* Modal Dialog */}
       <div className="scroll-container modal-safe relative w-full max-w-sm sm:max-w-md rounded-t-[32px] sm:rounded-[32px] bg-card p-6 ring-1 ring-line shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -113,9 +101,7 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
               <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold block">
                 Instant In-Person Scan
               </span>
-              <h2 className="font-display text-lg font-bold text-ink leading-tight">
-                Share as QR Code
-              </h2>
+              <h2 className="font-display text-lg font-bold text-ink leading-tight">Share as QR Code</h2>
             </div>
           </div>
 
@@ -154,9 +140,7 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
             <span className="inline-block rounded-full bg-paper px-3 py-1 text-[11px] font-bold text-ink ring-1 ring-line">
               {occasionBadge}
             </span>
-            <h3 className="font-display text-base font-bold text-ink line-clamp-1">
-              {plan.title}
-            </h3>
+            <h3 className="font-display text-base font-bold text-ink line-clamp-1">{plan.title}</h3>
             <p className="text-xs text-mute">
               {formatPlanDate(plan.date, plan.time)} · {plan.destination || plan.city}
             </p>

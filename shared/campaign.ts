@@ -1,7 +1,8 @@
 /**
  * AirPal B2B engine: a business funds an Experience, AirPal recruits guests,
- * tracks bookings and reports back. Money movement is Stripe-shaped but deferred —
- * `paymentStatus` stays "deferred" until Stripe lands.
+ * tracks bookings and reports back. Guest tickets charge through the shared
+ * `bookings` engine + Stripe Checkout. `paymentStatus` on the campaign row is
+ * the business's own campaign fee (still filed as deferred).
  */
 
 export const CAMPAIGN_STATUSES = ["draft", "pending", "live", "completed", "cancelled"] as const;
@@ -87,10 +88,16 @@ export function campaignValid(input: CampaignInput): boolean {
     (CAMPAIGN_CATEGORIES as readonly string[]).includes(input.category) &&
     input.suburb.trim().length >= 2 &&
     /^\d{4}-\d{2}-\d{2}$/.test(input.date) &&
-    Number.isInteger(input.capacity) && input.capacity >= 2 && input.capacity <= 500 &&
-    Number.isInteger(input.recruitTarget) && input.recruitTarget >= 1 && input.recruitTarget <= input.capacity &&
-    Number.isInteger(input.budgetCents) && input.budgetCents >= 0 &&
-    Number.isInteger(input.priceCents) && input.priceCents >= 0
+    Number.isInteger(input.capacity) &&
+    input.capacity >= 2 &&
+    input.capacity <= 500 &&
+    Number.isInteger(input.recruitTarget) &&
+    input.recruitTarget >= 1 &&
+    input.recruitTarget <= input.capacity &&
+    Number.isInteger(input.budgetCents) &&
+    input.budgetCents >= 0 &&
+    Number.isInteger(input.priceCents) &&
+    input.priceCents >= 0
   );
 }
 

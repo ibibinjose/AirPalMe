@@ -39,12 +39,15 @@ export function NotificationsAdminPage() {
     void reload();
   }, [locked]);
 
-  if (!authReady || loading) return <p className="mx-auto max-w-2xl px-4 py-16 text-center text-sm text-mute">Loading…</p>;
+  if (!authReady || loading)
+    return <p className="mx-auto max-w-2xl px-4 py-16 text-center text-sm text-mute">Loading…</p>;
   if (locked) {
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center">
         <p className="font-display text-xl font-bold">Restricted</p>
-        <Link href="/admin"><Button className="mt-4">Back</Button></Link>
+        <Link href="/admin">
+          <Button className="mt-4">Back</Button>
+        </Link>
       </div>
     );
   }
@@ -74,26 +77,33 @@ export function NotificationsAdminPage() {
       <h1 className="font-display mt-4 flex items-center gap-2 text-2xl font-bold">
         <Megaphone size={22} /> Broadcasts
       </h1>
-      <p className="mt-0.5 text-sm text-mute">Creator messages send only after approval. Transactional mail (entries, wins, reviews) never waits.</p>
+      <p className="mt-0.5 text-sm text-mute">
+        Creator messages send only after approval. Transactional mail (entries, wins, reviews) never waits.
+      </p>
 
-      <h2 className="mb-2 mt-6 text-xs font-bold uppercase tracking-wider text-mute">Waiting for review ({queue.length})</h2>
+      <h2 className="mb-2 mt-6 text-xs font-bold uppercase tracking-wider text-mute">
+        Waiting for review ({queue.length})
+      </h2>
       {queue.length === 0 ? (
-        <p className="rounded-2xl border-2 border-dashed border-ink/20 p-4 text-center text-xs text-mute">Queue is clear.</p>
+        <p className="rounded-2xl border-2 border-dashed border-ink/20 p-4 text-center text-xs text-mute">
+          Queue is clear.
+        </p>
       ) : (
         <div className="space-y-2">
           {queue.map((b) => (
-            <div key={b.id} className="rounded-2xl border-2 border-ink bg-card p-3">
+            <div key={b.id} className="rounded-2xl ring-1 ring-line bg-card p-3">
               <p className="text-sm font-bold">{b.title}</p>
               <p className="mt-0.5 whitespace-pre-line text-sm">{b.body}</p>
               <p className="mt-1 text-[11px] text-mute">
-                To {b.audience === "everyone" ? "everyone" : "campaign entrants"} · {new Date(b.createdAt).toLocaleString()}
+                To {b.audience === "everyone" ? "everyone" : "campaign entrants"} ·{" "}
+                {new Date(b.createdAt).toLocaleString()}
               </p>
               <div className="mt-2 flex gap-2">
                 <button
                   type="button"
                   disabled={busy === b.id + "approve"}
                   onClick={() => review(b, "approve")}
-                  className="flex-1 rounded-xl bg-ink px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
+                  className="flex-1 rounded-xl bg-brand px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
                 >
                   Approve & send
                 </button>
@@ -101,7 +111,7 @@ export function NotificationsAdminPage() {
                   type="button"
                   disabled={busy === b.id + "reject"}
                   onClick={() => review(b, "reject")}
-                  className="flex-1 rounded-xl border-2 border-ink/15 px-3 py-2 text-xs font-bold disabled:opacity-50"
+                  className="flex-1 rounded-xl ring-1 ring-line/15 px-3 py-2 text-xs font-bold disabled:opacity-50"
                 >
                   Reject
                 </button>
@@ -114,11 +124,14 @@ export function NotificationsAdminPage() {
       {history.length > 0 && (
         <>
           <h2 className="mb-2 mt-6 text-xs font-bold uppercase tracking-wider text-mute">History</h2>
-          <div className={cn("space-y-1 rounded-2xl border-2 border-ink/15 bg-card p-3")}>
+          <div className={cn("space-y-1 rounded-2xl ring-1 ring-line/15 bg-card p-3")}>
             {history.slice(0, 30).map((b) => (
               <p key={b.id} className="flex justify-between gap-2 text-[11px]">
                 <span className="truncate font-semibold">{b.title}</span>
-                <span className="shrink-0 text-mute">{b.status}{b.sentCount ? ` · ${b.sentCount}` : ""}</span>
+                <span className="shrink-0 text-mute">
+                  {b.status}
+                  {b.sentCount ? ` · ${b.sentCount}` : ""}
+                </span>
               </p>
             ))}
           </div>

@@ -16,6 +16,7 @@ const SolutionDetailPage = lazy(() =>
 const GuidePage = lazy(() => import("@/pages/GuidePage").then((m) => ({ default: m.GuidePage })));
 const TourPage = lazy(() => import("@/pages/TourPage").then((m) => ({ default: m.TourPage })));
 const ScanPage = lazy(() => import("@/pages/ScanPage").then((m) => ({ default: m.ScanPage })));
+const WavePage = lazy(() => import("@/pages/WavePage").then((m) => ({ default: m.WavePage })));
 const PlacePage = lazy(() => import("@/pages/PlacePage").then((m) => ({ default: m.PlacePage })));
 const EventPage = lazy(() => import("@/pages/EventPage").then((m) => ({ default: m.EventPage })));
 const CalendarPage = lazy(() => import("@/pages/CalendarPage").then((m) => ({ default: m.CalendarPage })));
@@ -23,7 +24,9 @@ const StallPage = lazy(() => import("@/pages/StallPage").then((m) => ({ default:
 const OrganiserEventPage = lazy(() =>
   import("@/pages/OrganiserEventPage").then((m) => ({ default: m.OrganiserEventPage })),
 );
+const EventCreatePage = lazy(() => import("@/pages/EventCreatePage").then((m) => ({ default: m.EventCreatePage })));
 const MePage = lazy(() => import("@/pages/MePage").then((m) => ({ default: m.MePage })));
+const InboxPage = lazy(() => import("@/pages/InboxPage").then((m) => ({ default: m.InboxPage })));
 const ZooPage = lazy(() => import("@/pages/ZooPage").then((m) => ({ default: m.ZooPage })));
 const MemoryWallPage = lazy(() => import("@/pages/MemoryWallPage").then((m) => ({ default: m.MemoryWallPage })));
 const PeoplePage = lazy(() => import("@/pages/PeoplePage").then((m) => ({ default: m.PeoplePage })));
@@ -38,6 +41,9 @@ const JoinPage = lazy(() => import("@/pages/JoinPage").then((m) => ({ default: m
 const BusinessPage = lazy(() => import("@/pages/BusinessPage").then((m) => ({ default: m.BusinessPage })));
 const BusinessOnboardPage = lazy(() =>
   import("@/pages/BusinessOnboardPage").then((m) => ({ default: m.BusinessOnboardPage })),
+);
+const BusinessShowcasePage = lazy(() =>
+  import("@/pages/BusinessShowcasePage").then((m) => ({ default: m.BusinessShowcasePage })),
 );
 const BioPublicPage = lazy(() => import("@/pages/BioPublicPage").then((m) => ({ default: m.BioPublicPage })));
 const BioSetupPage = lazy(() => import("@/pages/BioSetupPage").then((m) => ({ default: m.BioSetupPage })));
@@ -65,9 +71,7 @@ const BusinessPromotionNewPage = lazy(() =>
 const BusinessPromotionDetailPage = lazy(() =>
   import("@/pages/BusinessPromotionDetailPage").then((m) => ({ default: m.BusinessPromotionDetailPage })),
 );
-const MyGiveawaysPage = lazy(() =>
-  import("@/pages/MyGiveawaysPage").then((m) => ({ default: m.MyGiveawaysPage })),
-);
+const MyGiveawaysPage = lazy(() => import("@/pages/MyGiveawaysPage").then((m) => ({ default: m.MyGiveawaysPage })));
 const NotificationsAdminPage = lazy(() =>
   import("@/pages/NotificationsAdminPage").then((m) => ({ default: m.NotificationsAdminPage })),
 );
@@ -81,17 +85,13 @@ const CookiesPage = lazy(() => import("@/pages/CookiesPage").then((m) => ({ defa
 const ClubPage = lazy(() => import("@/pages/ClubPage").then((m) => ({ default: m.ClubPage })));
 const ClubListPage = lazy(() => import("@/pages/ClubListPage").then((m) => ({ default: m.ClubListPage })));
 const MatePage = lazy(() => import("@/pages/MatePage").then((m) => ({ default: m.MatePage })));
-const MateRequestPage = lazy(() =>
-  import("@/pages/MateRequestPage").then((m) => ({ default: m.MateRequestPage })),
-);
+const MateRequestPage = lazy(() => import("@/pages/MateRequestPage").then((m) => ({ default: m.MateRequestPage })));
 const StudioPage = lazy(() => import("@/pages/StudioPage").then((m) => ({ default: m.StudioPage })));
 const MarketingPage = lazy(() => import("@/pages/MarketingPage").then((m) => ({ default: m.MarketingPage })));
 const BusinessCampaignsPage = lazy(() =>
   import("@/pages/BusinessCampaignsPage").then((m) => ({ default: m.BusinessCampaignsPage })),
 );
-const ExperiencesPage = lazy(() =>
-  import("@/pages/ExperiencesPage").then((m) => ({ default: m.ExperiencesPage })),
-);
+const ExperiencesPage = lazy(() => import("@/pages/ExperiencesPage").then((m) => ({ default: m.ExperiencesPage })));
 const FashionPage = lazy(() => import("@/pages/FashionPage").then((m) => ({ default: m.FashionPage })));
 const PlanHubPage = lazy(() => import("@/pages/PlanHubPage").then((m) => ({ default: m.PlanHubPage })));
 const PlanCreatePage = lazy(() => import("@/pages/PlanCreatePage").then((m) => ({ default: m.PlanCreatePage })));
@@ -128,6 +128,7 @@ export function AppRoutes() {
         <Route path="/guide" component={GuidePage} />
         <Route path="/tour/:id" component={TourPage} />
         <Route path="/scan" component={ScanPage} />
+        <Route path="/w/:code" component={WavePage} />
         <Route path="/concierge" component={ConciergePage} />
         <Route path="/stay">
           <Redirect to="/concierge" />
@@ -151,10 +152,12 @@ export function AppRoutes() {
         <Route path="/plan/:id" component={PlanDetailPage} />
         <Route path="/plan" component={PlanHubPage} />
         <Route path="/invite/:code" component={PlanDetailPage} />
+        <Route path="/event/new" component={EventCreatePage} />
         <Route path="/event" component={OrganiserEventPage} />
         <Route path="/me/zoo" component={ZooPage} />
         <Route path="/me/memories" component={MemoryWallPage} />
         <Route path="/me/people" component={PeoplePage} />
+        <Route path="/me/inbox" component={InboxPage} />
         <Route path="/circle" component={CirclePage} />
         <Route path="/me" component={MePage} />
         <Route path="/settings" component={SettingsPage} />
@@ -173,6 +176,7 @@ export function AppRoutes() {
         <Route path="/club/list" component={ClubListPage} />
         <Route path="/club" component={ClubPage} />
         <Route path="/business/onboard" component={BusinessOnboardPage} />
+        <Route path="/business/setup" component={BusinessShowcasePage} />
         <Route path="/business/campaigns" component={BusinessCampaignsPage} />
         <Route path="/business" component={BusinessPage} />
         <Route path="/experiences" component={ExperiencesPage} />

@@ -13,10 +13,10 @@ export function YourRoomCard({
   checkOut?: string;
 }) {
   return (
-    <section aria-label="Your room" className="mt-4 rounded-3xl border-2 border-ink bg-card p-5 shadow-xs">
+    <section aria-label="Your room" className="mt-4 rounded-3xl ring-1 ring-line bg-card p-5 shadow-xs">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="inline-flex items-center gap-1 rounded-full bg-amber-400 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-slate-950 border border-ink shadow-xs">
+          <div className="inline-flex items-center gap-1 rounded-full bg-amber-400 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-slate-950 border border-line shadow-xs">
             <ShieldCheck size={12} />
             <span>AirPal Verified Stay</span>
           </div>
@@ -34,7 +34,7 @@ export function YourRoomCard({
             </p>
           )}
         </div>
-        <span className="shrink-0 rounded-2xl bg-ink border-2 border-ink px-3.5 py-2 font-display text-base font-extrabold text-white shadow-xs">
+        <span className="shrink-0 rounded-2xl bg-ink ring-1 ring-line px-3.5 py-2 font-display text-base font-extrabold text-white shadow-xs">
           Room {roomNumber}
         </span>
       </div>
@@ -42,7 +42,10 @@ export function YourRoomCard({
       {roomType && roomType.features.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
           {roomType.features.slice(0, 6).map((f) => (
-            <span key={f} className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-ink border border-ink/30">
+            <span
+              key={f}
+              className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-ink border border-line/30"
+            >
               {f}
             </span>
           ))}

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useLocation } from "wouter";
-import { Building2, CalendarDays, CheckCircle2, Lock, ShieldCheck, Sparkles, Store } from "lucide-react";
+import { Bell, Building2, CalendarDays, CheckCircle2, Lock, ShieldCheck, Sparkles, Store } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 
@@ -19,19 +19,61 @@ export function AuthGate({
 
   const roleInfo = useMemo(() => {
     const target = (next || kicker || title || "").toLowerCase();
+    if (target.includes("circle")) {
+      return {
+        icon: Sparkles,
+        role: "guest",
+        badge: kicker || "AirPal Circle",
+        title: title || "Start your Circle",
+        description: lede || "Sign in to invite your audience, set a status, announce, and make a plan.",
+        benefits: [
+          "Bring followers and friends into one Circle",
+          "Announce, or share I’m here at an event",
+          "Set a status. Plan together.",
+        ],
+        accentColor: "text-brand",
+        accentBg: "bg-brand/10",
+      };
+    }
+    if (target.includes("/w/") || target.includes("wave")) {
+      return {
+        icon: Sparkles,
+        role: "guest",
+        badge: kicker || "Wave",
+        title: title || "Wave back",
+        description: lede || "Someone nearby is greeting AirPals. Sign in to wave back — no phone numbers.",
+        benefits: [
+          "Greet the venue or person in the room",
+          "They see your @handle, not your number",
+          "Follow up in Circle if you want",
+        ],
+        accentColor: "text-brand",
+        accentBg: "bg-brand/10",
+      };
+    }
+    if (target.includes("inbox") || target.includes("notification")) {
+      return {
+        icon: Bell,
+        role: "guest",
+        badge: kicker || "Notifications",
+        title: title || "Your inbox",
+        description: lede || "Announcements from Circles you follow, plans, and results — in one quiet list.",
+        benefits: ["Circle announcements from people you follow", "Plan updates in one list", "Alerts you control"],
+        accentColor: "text-brand",
+        accentBg: "bg-brand/10",
+      };
+    }
     if (target.includes("plan")) {
       return {
         icon: Sparkles,
         role: "guest",
-        badge: kicker || "AirPal Plan Studio",
-        title: title || "AirPal Account Required",
-        description:
-          lede ||
-          "Sign in or create your free AirPal.Me account to launch custom hangout plans, build multi-stop itineraries, and share VIP digital invitations.",
+        badge: kicker || "AirPal Plan",
+        title: title || "Make a plan",
+        description: lede || "Sign in or create a free AirPal account to plan with family, friends, and people nearby.",
         benefits: [
-          "Create and host custom hangout plans & multi-stop itineraries",
-          "Generate instant VIP passes & dynamic QR codes for guests",
-          "Live RSVP tracking, guest chat, and collaborative stop voting",
+          "Plan with family and friends",
+          "Invite your Circle with a link",
+          "Ticketed public nights live under Create event",
         ],
         accentColor: "text-brand",
         accentBg: "bg-brand/10",
@@ -59,11 +101,11 @@ export function AuthGate({
       return {
         icon: Store,
         role: "business",
-        badge: kicker || "Business Listing",
-        title: title || "Business Portal Access",
+        badge: kicker || "Your place",
+        title: title || "Add your place",
         description:
           lede ||
-          "Sign in or create an account to claim your local place, publish exclusive member deals, and connect with neighbourhood guests.",
+          "Sign in to import your Google listing, publish offers, and show up when people nearby are making plans.",
         benefits: [
           "Claim your verified local @handle and public card",
           "Publish live discounts & perks (e.g. 15% off for guests)",
@@ -71,6 +113,22 @@ export function AuthGate({
         ],
         accentColor: "text-emerald-600 dark:text-emerald-400",
         accentBg: "bg-emerald-500/10",
+      };
+    }
+    if (target.includes("/event/new") || (title || "").toLowerCase().includes("create an event")) {
+      return {
+        icon: CalendarDays,
+        role: "event",
+        badge: kicker || "Event",
+        title: title || "Create an event",
+        description: lede || "Public nights and ticketed shows. Plans with family stay on Create plan.",
+        benefits: [
+          "Free or paid tickets for a public event",
+          "Show up in Explore and Calendar",
+          "Guests pay by card — you get paid after the night",
+        ],
+        accentColor: "text-brand",
+        accentBg: "bg-brand/10",
       };
     }
     if (target.includes("event")) {
@@ -96,13 +154,11 @@ export function AuthGate({
       role: "guest",
       badge: kicker || "AirPal Account",
       title: title || "Sign in to continue",
-      description:
-        lede ||
-        "Log in or sign up to save places, bookmark events, access stay companions, and unlock AirPal Club privileges.",
+      description: lede || "Log in or sign up to start a Circle, make plans, save places, and use Stay concierge.",
       benefits: [
-        "Sync saved places and itinerary across your devices",
-        "1-tap Wi-Fi connection at partner stays & venues",
-        "Exclusive club invites and local partner offers",
+        "Invite family and friends into your Circle",
+        "Make plans with people nearby",
+        "Stay Wi-Fi, tickets, and saved places on one login",
       ],
       accentColor: "text-brand",
       accentBg: "bg-brand/10",
@@ -116,7 +172,13 @@ export function AuthGate({
     <div className="mx-auto max-w-md px-4 py-12 md:py-16">
       <div className="rounded-3xl bg-card p-6 md:p-8 ring-1 ring-line shadow-sm text-center">
         {/* Role Icon */}
-        <div className={cn("mx-auto grid h-14 w-14 place-items-center rounded-2xl", roleInfo.accentBg, roleInfo.accentColor)}>
+        <div
+          className={cn(
+            "mx-auto grid h-14 w-14 place-items-center rounded-2xl",
+            roleInfo.accentBg,
+            roleInfo.accentColor,
+          )}
+        >
           <RoleIcon size={26} strokeWidth={2} />
         </div>
 
@@ -166,4 +228,3 @@ export function AuthGate({
     </div>
   );
 }
-

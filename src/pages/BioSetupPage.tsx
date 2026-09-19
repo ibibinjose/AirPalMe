@@ -5,7 +5,15 @@ import { stallByHandle } from "@/lib/bio-handle";
 import { toast } from "sonner";
 import { BUSINESS_CATEGORIES, type BusinessCategoryId } from "@shared/business";
 import { handleFromDomain, handleFromName, handleMatchesClaim, normalizeHandle, randomHexHandle } from "@shared/bio";
-import { addressOk, countryByCode, emptyAddress, formatAddress, formatGps, isValidPhone, type AddressParts } from "@shared/geo-address";
+import {
+  addressOk,
+  countryByCode,
+  emptyAddress,
+  formatAddress,
+  formatGps,
+  isValidPhone,
+  type AddressParts,
+} from "@shared/geo-address";
 import { authErrorMessage } from "@shared/auth-email";
 import { isEmail, passwordOk } from "@shared/validate";
 import { Button } from "@/components/ui/Button";
@@ -177,9 +185,13 @@ export function BioSetupPage() {
     return (
       <AuthGate
         next={asBusiness ? "/bio/setup?kind=business" : "/bio/setup"}
-        kicker={asBusiness ? "Host" : "Account"}
-        title={asBusiness ? "List your place" : "Choose your handle"}
-        lede="Sign in or create an account first. Full name, personal @ or hex id, email, password, then a confirm email."
+        kicker={asBusiness ? "Your place" : "Account"}
+        title={asBusiness ? "Add your place" : "Your personal profile"}
+        lede={
+          asBusiness
+            ? "Sign in with your personal account first. Your @handle is you — the place is a separate business profile."
+            : "Create an account first: @handle and mobile, then name, email, and password."
+        }
       />
     );
   }
@@ -215,16 +227,26 @@ export function BioSetupPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-8">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">{asBusiness ? "Host" : "AirPal.Me/@"}</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">
+        {asBusiness ? "Host" : "AirPal.Me/@"}
+      </p>
       <h1 className="font-display mt-1 text-3xl font-semibold">{asBusiness ? "List your place" : "Your handle"}</h1>
       <p className="mt-2 text-sm text-mute">
-        {asBusiness ? "Three short steps. Handle must be unique and match the registered name, mark, or domain." : "Pick a unique @. Ticks mean it checks out."}
+        {asBusiness
+          ? "Three short steps. Handle must be unique and match the registered name, mark, or domain."
+          : "Pick a unique @. Ticks mean it checks out."}
       </p>
 
       {asBusiness && (
         <div className="mt-4 flex gap-2">
           {([1, 2, 3] as const).map((n) => (
-            <span key={n} className={cn("h-8 flex-1 rounded-full text-center text-sm leading-8", step === n ? "bg-ink text-white" : "bg-white ring-1 ring-line")}>
+            <span
+              key={n}
+              className={cn(
+                "h-8 flex-1 rounded-full text-center text-sm leading-8",
+                step === n ? "bg-brand text-white" : "bg-white ring-1 ring-line",
+              )}
+            >
               {n}
             </span>
           ))}
@@ -248,7 +270,13 @@ export function BioSetupPage() {
             label={`@${normalizeHandle(handle) || "handle"}`}
             ok={handleOk}
             error={handleStatus.reason || (handleStatus.checking ? undefined : null)}
-            hint={handleStatus.checking ? "Checking…" : suggested && suggested !== normalizeHandle(handle) ? `Suggested @${suggested}` : "Unique"}
+            hint={
+              handleStatus.checking
+                ? "Checking…"
+                : suggested && suggested !== normalizeHandle(handle)
+                  ? `Suggested @${suggested}`
+                  : "Unique"
+            }
           >
             <input value={handle} onChange={(e) => setHandle(e.target.value)} className={fieldInput} />
           </ValidField>
@@ -258,10 +286,24 @@ export function BioSetupPage() {
           {!user && (
             <>
               <ValidField label="Email" ok={emailOk} error={email && !emailOk ? "Need a real email" : null}>
-                <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(e) => setEmail(e.target.value)} className={fieldInput} />
+                <input
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  autoCapitalize="none"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={fieldInput}
+                />
               </ValidField>
               <ValidField label="Password" ok={passOk} error={password && !passOk ? "At least 8 characters" : null}>
-                <input type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} className={fieldInput} />
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={fieldInput}
+                />
               </ValidField>
             </>
           )}
@@ -292,7 +334,11 @@ export function BioSetupPage() {
             <input value={handle} onChange={(e) => setHandle(e.target.value)} className={fieldInput} />
           </ValidField>
           <ValidField label="ABN / company number" ok={registrationNumber.trim().length >= 5}>
-            <input value={registrationNumber} onChange={(e) => setRegistrationNumber(e.target.value)} className={fieldInput} />
+            <input
+              value={registrationNumber}
+              onChange={(e) => setRegistrationNumber(e.target.value)}
+              className={fieldInput}
+            />
           </ValidField>
           <ValidField label="Domain (optional)">
             <input
@@ -329,11 +375,7 @@ export function BioSetupPage() {
           <Button variant="ghost" className="w-full" disabled={locating} onClick={() => void locate()}>
             {locating ? "Locating…" : geo ? `Pinned ${formatGps(geo.lat, geo.lng)} · update` : "Use current location"}
           </Button>
-          {geo && (
-            <p className="text-center text-[12px] text-mute">
-              {formatGps(geo.lat, geo.lng)}
-            </p>
-          )}
+          {geo && <p className="text-center text-[12px] text-mute">{formatGps(geo.lat, geo.lng)}</p>}
           <AddressFields value={address} onChange={setAddress} />
           <PhoneField value={phone} onChange={setPhone} required />
           <div className="flex gap-2">
@@ -355,7 +397,10 @@ export function BioSetupPage() {
                 key={c.id}
                 type="button"
                 onClick={() => setCategory(c.id)}
-                className={cn("h-9 rounded-full px-3 text-sm", category === c.id ? "bg-brand text-white" : "bg-white ring-1 ring-line")}
+                className={cn(
+                  "h-9 rounded-full px-3 text-sm",
+                  category === c.id ? "bg-brand text-white" : "bg-white ring-1 ring-line",
+                )}
               >
                 {c.label}
               </button>
@@ -365,15 +410,34 @@ export function BioSetupPage() {
             <input value={hours} onChange={(e) => setHours(e.target.value)} className={fieldInput} />
           </ValidField>
           <ValidField label="Short why" ok={shortWhy.trim().length >= 4}>
-            <input value={shortWhy} onChange={(e) => setShortWhy(e.target.value)} placeholder="Why guests come" className={fieldInput} />
+            <input
+              value={shortWhy}
+              onChange={(e) => setShortWhy(e.target.value)}
+              placeholder="Why guests come"
+              className={fieldInput}
+            />
           </ValidField>
           {!user && (
             <>
               <ValidField label="Email" ok={emailOk}>
-                <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(e) => setEmail(e.target.value)} className={fieldInput} />
+                <input
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  autoCapitalize="none"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={fieldInput}
+                />
               </ValidField>
               <ValidField label="Password" ok={passOk}>
-                <input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className={fieldInput} />
+                <input
+                  type="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={fieldInput}
+                />
               </ValidField>
             </>
           )}
@@ -389,7 +453,11 @@ export function BioSetupPage() {
       )}
 
       {!asBusiness && (
-        <button type="button" className="mt-5 w-full text-center text-sm text-brand" onClick={() => nav("/bio/setup?kind=business")}>
+        <button
+          type="button"
+          className="mt-5 w-full text-center text-sm text-brand"
+          onClick={() => nav("/bio/setup?kind=business")}
+        >
           Host a registered business
         </button>
       )}

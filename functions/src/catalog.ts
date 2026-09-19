@@ -154,7 +154,8 @@ export const CATALOG_DEALS: Record<string, CatalogDeal> = {
     categoryLabel: "Laundry & Dry Valet",
     title: "Free Doorstep Pickup & 20% Off Wash & Fold",
     description: "3-hour turnaround eco-friendly laundry service.",
-    guestPerk: "Free pickup and delivery to your hotel room, hostel front desk or campus residence + 20% off wash & fold",
+    guestPerk:
+      "Free pickup and delivery to your hotel room, hostel front desk or campus residence + 20% off wash & fold",
     dealType: "service_booking",
     discountBadge: "Free Pickup + 20% OFF",
     targetAudiences: ["hotel", "hostel", "campus", "event", "tour"],

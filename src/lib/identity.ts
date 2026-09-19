@@ -6,16 +6,20 @@ import { loadBios, persistBios } from "./bio-store";
 export function syncBioToListing(bio: BioProfile) {
   if (bio.kind === "person") return;
   const listings = getCachedListings();
-  const hit = listings.find((row) => row.id === bio.listingId || row.handle === bio.handle || row.placeId === bio.placeId);
+  const hit = listings.find(
+    (row) => row.id === bio.listingId || row.handle === bio.handle || row.placeId === bio.placeId,
+  );
   const id = bio.listingId || hit?.id || `list-${bio.handle}`;
-  const base = hit || listingDefaults({
-    id,
-    name: bio.name,
-    category: bio.category,
-    placeCategory: placeCategoryFor(bio.category),
-    address: bio.city,
-    shortWhy: bio.shortWhy,
-  });
+  const base =
+    hit ||
+    listingDefaults({
+      id,
+      name: bio.name,
+      category: bio.category,
+      placeCategory: placeCategoryFor(bio.category),
+      address: bio.city,
+      shortWhy: bio.shortWhy,
+    });
   upsertCachedListing({
     ...base,
     id,
@@ -33,7 +37,17 @@ export function syncBioToListing(bio: BioProfile) {
   });
 }
 
-export function syncListingToBio(listing: { id: string; name: string; hours: string; shortWhy: string; phone?: string; handle?: string; heroImage?: string; deal?: { badge: string; detail: string }; geo?: { lat: number; lng: number } }) {
+export function syncListingToBio(listing: {
+  id: string;
+  name: string;
+  hours: string;
+  shortWhy: string;
+  phone?: string;
+  handle?: string;
+  heroImage?: string;
+  deal?: { badge: string; detail: string };
+  geo?: { lat: number; lng: number };
+}) {
   const bios = loadBios();
   const bio = bios.find((row) => row.listingId === listing.id || (listing.handle && row.handle === listing.handle));
   if (!bio) return;

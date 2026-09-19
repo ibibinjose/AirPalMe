@@ -16,6 +16,8 @@ import { BrandMark } from "@/components/brand/BrandMark";
 import { ProfileMenu } from "@/components/auth/ProfileMenu";
 
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+
+import { TicketAlertBar } from "@/components/host/TicketAlertBar";
 import { NotificationPopup } from "@/components/notifications/NotificationPopup";
 import { PresencePublisher } from "@/components/layout/PresencePublisher";
 import { useLocale } from "@/contexts/LocaleContext";
@@ -85,10 +87,19 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-paper">
       {bare ? (
-        <main className="flex-1">{children}</main>
+        <main id="main-content" className="flex-1">
+          {children}
+        </main>
       ) : (
         <>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[100] focus:rounded-full focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+          >
+            Skip to content
+          </a>
           <div className="fixed-element sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
+            <TicketAlertBar />
             <LocalNowBar />
             {workspace ? (
               <header className="overflow-visible border-b border-line bg-paper">
@@ -111,7 +122,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                       aria-current={path === "/" ? "page" : undefined}
                       className={cn(
                         "hidden md:inline-flex h-9 touch-manipulation items-center rounded-full px-3 text-sm font-medium",
-                        path === "/" ? "bg-ink text-white" : "text-mute hover:text-ink",
+                        path === "/" ? "bg-brand text-white" : "text-mute hover:text-ink",
                       )}
                     >
                       {t("explore")}
@@ -121,12 +132,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                       aria-current={path.startsWith("/calendar") ? "page" : undefined}
                       className={cn(
                         "hidden md:inline-flex h-9 touch-manipulation items-center rounded-full px-3 text-sm font-medium",
-                        path.startsWith("/calendar") ? "bg-ink text-white" : "text-mute hover:text-ink",
+                        path.startsWith("/calendar") ? "bg-brand text-white" : "text-mute hover:text-ink",
                       )}
                     >
                       {t("calendar")}
                     </Link>
-                    
+
                     <NotificationBell />
                     <ProfileMenu />
                   </div>
@@ -152,7 +163,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     >
                       <Search size={17} />
                     </button>
-                    
+
                     <NotificationBell />
                     <ProfileMenu />
                   </div>
@@ -162,11 +173,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <BatteryWarningBanner />
             <SyncStatusBar />
           </div>
-          <main className="flex-1 flex flex-col min-w-0">
+          <main id="main-content" className="flex-1 flex flex-col min-w-0" tabIndex={-1}>
             <PullToRefreshContainer state={pullToRefresh}>
-              <div className={cn("flex-1", !showFooter && !workspace && "pb-28 lg:pb-8")}>
-                {children}
-              </div>
+              <div className={cn("flex-1", !showFooter && !workspace && "pb-28 lg:pb-8")}>{children}</div>
               {showFooter && <SiteFooter hasTabBar={!workspace} />}
             </PullToRefreshContainer>
           </main>

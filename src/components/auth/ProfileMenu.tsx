@@ -4,7 +4,6 @@ import {
   Building2,
   CalendarDays,
   Cat,
-  HeartHandshake,
   Images,
   Languages,
   LogIn,
@@ -91,7 +90,8 @@ export function ProfileMenu() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const clubMember = user?.email ? Boolean(memberByEmail(user.email)) : false;
 
-  const currentStatusKey: AvailabilityStatus = mine?.availabilityStatus || (mine?.openNow ? "available" : user ? "available" : "offline");
+  const currentStatusKey: AvailabilityStatus =
+    mine?.availabilityStatus || (mine?.openNow ? "available" : user ? "available" : "offline");
   const statusInfo = AVAILABILITY_STATUSES[currentStatusKey] || AVAILABILITY_STATUSES.available;
 
   useEffect(() => {
@@ -178,7 +178,9 @@ export function ProfileMenu() {
               <div className="flex min-w-0 items-center gap-2 truncate">
                 <span className="truncate text-[11px] font-semibold">
                   {statusInfo.label}
-                  {mine.customStatus ? ` · ${mine.customStatusEmoji ? `${mine.customStatusEmoji} ` : ""}${mine.customStatus}` : ""}
+                  {mine.customStatus
+                    ? ` · ${mine.customStatusEmoji ? `${mine.customStatusEmoji} ` : ""}${mine.customStatus}`
+                    : ""}
                 </span>
               </div>
               <span className="ml-1 shrink-0 text-[10px] font-bold uppercase text-ink/60">Edit</span>
@@ -197,7 +199,10 @@ export function ProfileMenu() {
         </div>
 
         {/* Language selector in the profile menu */}
-        <div id="profile-menu-language-selector" className="mt-2.5 flex items-center justify-between rounded-xl border border-line/80 bg-paper/60 px-2.5 py-1.5">
+        <div
+          id="profile-menu-language-selector"
+          className="mt-2.5 flex items-center justify-between rounded-xl border border-line/80 bg-paper/60 px-2.5 py-1.5"
+        >
           <div className="flex items-center gap-1.5 text-xs font-medium text-mute">
             <Languages size={15} className="text-gold shrink-0" />
             <span>Language</span>
@@ -207,30 +212,25 @@ export function ProfileMenu() {
       </div>
 
       <div className="my-1 h-px bg-line" />
+      <Row icon={Users} label="Circle" hint="Family, friends, people nearby" highlight onClick={() => go("/circle")} />
+      <Row icon={CalendarDays} label="Plans" hint="Make a plan with your people" onClick={() => go("/plan")} />
       {mine ? (
         <Row
           icon={Sparkles}
-          label="Bio"
-          hint={`AirPal.Me/@${mine.handle}`}
-          highlight
+          label={`@${mine.handle}`}
+          hint="Your public bio — share to network"
           onClick={() => go(`/@${mine.handle}`)}
         />
       ) : (
         <Row
           icon={Sparkles}
-          label="Bio"
-          hint="Claim your @handle"
-          highlight
+          label="Claim @handle"
+          hint="So your Circle can find you"
           onClick={() => go("/bio/setup")}
         />
       )}
       {mine && (
-        <Row
-          icon={PencilLine}
-          label="Edit bio"
-          hint="Profile, links, shop, share"
-          onClick={() => go("/bio/edit")}
-        />
+        <Row icon={PencilLine} label="Edit bio" hint="Profile, links, shop, share" onClick={() => go("/bio/edit")} />
       )}
       <Row
         icon={UserRound}
@@ -238,40 +238,28 @@ export function ProfileMenu() {
         hint={mine ? `@${mine.handle}` : "Dashboard, zoo, workspaces"}
         onClick={() => go("/me")}
       />
-      <Row icon={Users} label="Circle" hint="Met, following, likes you" onClick={() => go("/circle")} />
       {mine && <Row icon={Cat} label="Air Zoo" hint="Stickers, shops, hunts" onClick={() => go("/me/zoo")} />}
       <Row icon={Images} label="Memory Wall" hint="Keepsakes & moments" onClick={() => go("/me/memories")} />
-      <Row icon={HeartHandshake} label="Become an AirPal" hint="Friend, teammate, companion" onClick={() => go("/companion")} />
 
       <div className="my-1 h-px bg-line" />
       <p className="px-2.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold">Workspaces</p>
       {isHost ? (
         <Row icon={Building2} label="Host Workspace" hint="Hotel, venue, campus" onClick={() => go("/host")} />
       ) : (
-        <Row icon={Building2} label="Become a Host" hint="List a hotel, venue, or stay" onClick={() => go("/join")} />
+        <Row icon={Building2} label="Stay host" hint="Hotel, hostel, or room concierge" onClick={() => go("/join")} />
       )}
 
       {business ? (
         <>
-          <Row
-            icon={Store}
-            label="View business"
-            hint={`AirPal.Me/@${business.handle}`}
-            onClick={() => go(`/@${business.handle}`)}
-          />
-          <Row
-            icon={PencilLine}
-            label="Edit business"
-            hint="Place, offers, listing"
-            onClick={() => go("/business")}
-          />
+          <Row icon={Store} label="Your place" hint={`AirPal.Me/@${business.handle}`} onClick={() => go("/business")} />
+          <Row icon={PencilLine} label="Edit profile" hint="Logo, links, offers" onClick={() => go("/bio/edit")} />
         </>
       ) : (
         <Row
           icon={Store}
-          label="List a Business"
-          hint="Café, shop, local perks"
-          onClick={() => go("/bio/setup?kind=business")}
+          label="Add your place"
+          hint="Import from Google, then go live"
+          onClick={() => go("/business/onboard")}
         />
       )}
 
@@ -302,10 +290,13 @@ export function ProfileMenu() {
     <>
       <div className="px-2.5 pb-2 pt-1">
         <p className="text-xs font-semibold text-ink">Welcome to AirPal</p>
-        <p className="text-[11px] text-mute">Sign in for saved stays, @handle & club perks.</p>
+        <p className="text-[11px] text-mute">Sign in to start a Circle, make plans, and list a place.</p>
 
         {/* Language selector under welcome header */}
-        <div id="profile-menu-guest-language-selector" className="mt-2.5 flex items-center justify-between rounded-xl border border-line/80 bg-paper/60 px-2.5 py-1.5">
+        <div
+          id="profile-menu-guest-language-selector"
+          className="mt-2.5 flex items-center justify-between rounded-xl border border-line/80 bg-paper/60 px-2.5 py-1.5"
+        >
           <div className="flex items-center gap-1.5 text-xs font-medium text-mute">
             <Languages size={15} className="text-gold shrink-0" />
             <span>Language</span>
@@ -323,10 +314,16 @@ export function ProfileMenu() {
       />
 
       <div className="my-1 h-px bg-line" />
-      <p className="px-2.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold">Partners & Creators</p>
-      <Row icon={HeartHandshake} label="Become an AirPal" hint="Join the companion waitlist" onClick={() => go("/companion")} />
+      <p className="px-2.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gold">Get started</p>
+      <Row
+        icon={Users}
+        label="Start your Circle"
+        hint="Family, friends, people nearby"
+        highlight
+        onClick={() => go("/circle")}
+      />
+      <Row icon={Store} label="Add your place" hint="Import from Google, then go live" onClick={() => go("/join")} />
       <Row icon={Building2} label="Become a Host" hint="Hotel, venue, hostel, campus" onClick={() => go("/join")} />
-      <Row icon={Store} label="List a Business" hint="Café, shop, local deals" onClick={() => go("/join")} />
       <Row icon={CalendarDays} label="Organise an Event" hint="Market, expo, festival" onClick={() => go("/join")} />
 
       <div className="my-1 h-px bg-line" />
@@ -342,11 +339,7 @@ export function ProfileMenu() {
         id="profile-menu-button"
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label={
-          user
-            ? `Account menu, ${statusInfo.label}`
-            : "Menu and sign in"
-        }
+        aria-label={user ? `Account menu, ${statusInfo.label}` : "Menu and sign in"}
         title={user ? `${statusInfo.label}${mine?.customStatus ? ` · ${mine.customStatus}` : ""}` : "Sign in"}
         onClick={() => setOpen((v) => !v)}
         className={cn(

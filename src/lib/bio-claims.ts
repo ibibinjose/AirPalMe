@@ -33,7 +33,9 @@ export function claimCode() {
 
 export function loadClaim(handle: string, dealId: string) {
   const now = Date.now();
-  return read().find((row) => row.handle === handle && row.dealId === dealId && new Date(row.expiresAt).getTime() > now);
+  return read().find(
+    (row) => row.handle === handle && row.dealId === dealId && new Date(row.expiresAt).getTime() > now,
+  );
 }
 
 export function saveClaim(row: BioClaim) {

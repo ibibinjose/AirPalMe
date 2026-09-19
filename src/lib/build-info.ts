@@ -30,17 +30,9 @@ export interface RuntimeDiagnostics extends BuildInfo {
  */
 export function getBuildInfo(): BuildInfo {
   const versionName =
-    typeof __APP_VERSION_NAME__ !== "undefined" && __APP_VERSION_NAME__
-      ? __APP_VERSION_NAME__
-      : "2.0.0";
-  const versionCode =
-    typeof __APP_VERSION_CODE__ !== "undefined" && __APP_VERSION_CODE__
-      ? __APP_VERSION_CODE__
-      : "2";
-  const buildTimestamp =
-    typeof __BUILD_TIMESTAMP__ !== "undefined" && __BUILD_TIMESTAMP__
-      ? __BUILD_TIMESTAMP__
-      : "";
+    typeof __APP_VERSION_NAME__ !== "undefined" && __APP_VERSION_NAME__ ? __APP_VERSION_NAME__ : "2.0.0";
+  const versionCode = typeof __APP_VERSION_CODE__ !== "undefined" && __APP_VERSION_CODE__ ? __APP_VERSION_CODE__ : "2";
+  const buildTimestamp = typeof __BUILD_TIMESTAMP__ !== "undefined" && __BUILD_TIMESTAMP__ ? __BUILD_TIMESTAMP__ : "";
 
   return {
     versionName,
@@ -64,9 +56,7 @@ export function getRuntimeDiagnostics(): RuntimeDiagnostics {
   if (isBrowser) {
     try {
       storageCount = window.localStorage.length;
-      hasAnon = Object.keys(window.localStorage).some(
-        (k) => k.startsWith("firebase:authUser") || k.includes("airpal"),
-      );
+      hasAnon = Object.keys(window.localStorage).some((k) => k.startsWith("firebase:authUser") || k.includes("airpal"));
     } catch {
       /* ignore storage access restrictions */
     }

@@ -15,7 +15,15 @@ import { cn } from "@/lib/cn";
 import { GuestListPanel } from "@/components/club/GuestListPanel";
 import { AddressFields } from "@/components/forms/AddressFields";
 import { PhoneField } from "@/components/forms/PhoneField";
-import { addressOk, countryByCode, emptyAddress, formatAddress, formatGps, isValidPhone, type AddressParts } from "@shared/geo-address";
+import {
+  addressOk,
+  countryByCode,
+  emptyAddress,
+  formatAddress,
+  formatGps,
+  isValidPhone,
+  type AddressParts,
+} from "@shared/geo-address";
 import { locateBusiness } from "@/lib/locate";
 import { ImageField } from "@/components/media/ImageField";
 import { collection, getDocs, query, where } from "firebase/firestore";
@@ -23,13 +31,18 @@ import { getFirebaseDb } from "@/lib/firebase";
 import { HostFreshnessBanner } from "@/components/host/HostFreshnessBanner";
 import { fieldInput, fieldTextarea } from "@/components/forms/ValidField";
 import { BusinessBookingsSection } from "@/components/booking/BusinessBookingsSection";
+import { PayoutSetupCard } from "@/components/connect/PayoutSetupCard";
 import { BusinessNavHub } from "@/components/business/BusinessNavHub";
+import { GooglePlaceImportCard } from "@/components/business/GooglePlaceImport";
+import { bioLinksFromGooglePlace, mergeBioLinks } from "@shared/google-place";
+import { NAMES } from "@shared/names";
+import { WaveHostCard } from "@/components/wave/WaveHostCard";
 
 export function BusinessPage() {
   const [, nav] = useLocation();
   const { user, authReady } = useAuth();
   const { mine, savePlace, saveDeal, confirmHours } = useListings();
-  const { mine: bio } = useBio();
+  const { mine: bio, business, updateProfile } = useBio();
   const [tab, setTab] = useState<"place" | "offer" | "bookings" | "list">("place");
   const [name, setName] = useState("");
   const [address, setAddress] = useState<AddressParts>(emptyAddress("AU"));
@@ -80,12 +93,19 @@ export function BusinessPage() {
 
   if (!mine) {
     return (
-      <div className="grid min-h-[40vh] place-items-center px-6 text-center">
+      <div className="mx-auto grid min-h-[50vh] max-w-lg place-items-center px-6 text-center">
         <div>
-          <p className="font-display text-2xl">No listing yet</p>
-          <Button className="mt-4" onClick={() => nav("/join")}>
-            List
-          </Button>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-gold">AirPal Business</p>
+          <p className="font-display mt-2 text-3xl font-bold">List your place</p>
+          <p className="mt-2 text-sm text-mute">
+            Import from Google, then add offers, products and services people nearby can find.
+          </p>
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
+            <Button onClick={() => nav("/business/onboard")}>{NAMES.addPlace}</Button>
+            <Button variant="ghost" className="ring-1 ring-line" onClick={() => nav("/bio/setup?kind=business")}>
+              Create a profile
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -99,7 +119,17 @@ export function BusinessPage() {
     }
     setBusy(true);
     try {
-      await savePlace({ name, category, address: formatAddress(address), hours, shortWhy, phone, geo, handle: mine!.handle, heroImage: hero });
+      await savePlace({
+        name,
+        category,
+        address: formatAddress(address),
+        hours,
+        shortWhy,
+        phone,
+        geo,
+        handle: mine!.handle,
+        heroImage: hero,
+      });
       toast.success("Saved");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed");
@@ -150,18 +180,48 @@ export function BusinessPage() {
   }, [user]);
 
   const handle = mine.handle || bio?.handle;
-  const preview = withWalk(listingToPlace({ ...mine, name, category, placeCategory: mine.placeCategory, address: formatAddress(address), hours, shortWhy, deal: badge ? { badge, detail } : mine.deal, handle, heroImage: mine.heroImage, geo: geo || mine.geo, phone }));
+  const preview = withWalk(
+    listingToPlace({
+      ...mine,
+      name,
+      category,
+      placeCategory: mine.placeCategory,
+      address: formatAddress(address),
+      hours,
+      shortWhy,
+      deal: badge ? { badge, detail } : mine.deal,
+      handle,
+      heroImage: mine.heroImage,
+      geo: geo || mine.geo,
+      phone,
+    }),
+  );
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-10">
       <div className="relative -mx-4 overflow-hidden">
         <Photo src={hero || mine.heroImage || "/media/harbour.jpg"} className="h-40 w-full object-cover" />
         <div className="hero-scrim absolute inset-0" />
-        <p className="absolute left-4 top-4 text-[11px] font-medium uppercase tracking-[0.16em] text-white/80">Your place</p>
+        <p className="absolute left-4 top-4 text-[11px] font-medium uppercase tracking-[0.16em] text-white/80">
+          {NAMES.yourPlace}
+        </p>
         <BioHandleButton handle={handle} className="absolute bottom-3 right-4 z-10" />
       </div>
       <h1 className="font-display mt-4 text-3xl font-semibold">{mine.name}</h1>
-      
+      <div className="mt-4">
+        <WaveHostCard placeName={mine.name} placeId={mine.placeId} listingId={mine.id} handle={handle} />
+      </div>
+      {!(business?.products?.length || business?.services?.length || business?.deals?.length) && (
+        <button
+          type="button"
+          onClick={() => nav("/business/setup")}
+          className="mt-3 w-full rounded-2xl border border-brand bg-brand/5 px-4 py-3 text-left"
+        >
+          <span className="block font-semibold">Add 3 things</span>
+          <span className="block text-[13px] text-mute">Product, service, offer — so people nearby can find you.</span>
+        </button>
+      )}
+
       <div className="mt-4">
         <BusinessNavHub
           activeTab={tab}
@@ -176,6 +236,51 @@ export function BusinessPage() {
 
       {tab === "place" && (
         <form className="mt-5 space-y-3" onSubmit={onPlace}>
+          <GooglePlaceImportCard
+            importedPlaceId={mine.mapsPlaceId}
+            onImport={(place) => {
+              setName(place.name);
+              setHours(place.hours || hours);
+              setShortWhy(place.shortWhy || shortWhy);
+              setPhone(place.phone || phone);
+              setCategory(place.category);
+              if (place.geo) setGeo(place.geo);
+              if (place.photoNames[0]) setHero(place.photoNames[0]);
+              const parts = place.address.split(",").map((p) => p.trim());
+              setAddress({
+                ...emptyAddress("AU"),
+                line1: parts[0] || place.address,
+                city: place.city || parts[1] || "",
+              });
+              void savePlace({
+                name: place.name,
+                category: place.category,
+                address: place.address,
+                hours: place.hours || hours,
+                shortWhy: place.shortWhy || shortWhy,
+                phone: place.phone || phone,
+                geo: place.geo,
+                handle: mine.handle,
+                heroImage: place.photoNames[0] || hero,
+                mapsPlaceId: place.placeId,
+                website: place.website,
+              }).then(() => toast.success("Imported from Google"));
+              if (bio?.handle) {
+                void updateProfile({
+                  handle: bio.handle,
+                  name: place.name,
+                  shortWhy: place.shortWhy || bio.shortWhy,
+                  hours: place.hours || bio.hours,
+                  phone: place.phone || bio.phone,
+                  city: place.city || bio.city,
+                  avatar: place.photoNames[1] || place.photoNames[0] || bio.avatar,
+                  cover: place.photoNames[0] || bio.cover,
+                  mapsPlaceId: place.placeId,
+                  links: mergeBioLinks(bio.links, bioLinksFromGooglePlace(place)),
+                });
+              }
+            }}
+          />
           <ImageField
             kind="hero"
             folder="listings"
@@ -202,7 +307,10 @@ export function BusinessPage() {
                 key={c.id}
                 type="button"
                 onClick={() => setCategory(c.id)}
-                className={cn("h-9 rounded-full px-3 text-sm", category === c.id ? "bg-brand text-white" : "bg-white ring-1 ring-line")}
+                className={cn(
+                  "h-9 rounded-full px-3 text-sm",
+                  category === c.id ? "bg-brand text-white" : "bg-white ring-1 ring-line",
+                )}
               >
                 {c.label}
               </button>
@@ -256,15 +364,23 @@ export function BusinessPage() {
         </form>
       )}
 
-      {tab === "bookings" && <BusinessBookingsSection />}
-
-      {tab === "list" && (
-        <GuestListPanel clubId={handle || mine.id} clubName={mine.name} />
+      {tab === "bookings" && (
+        <>
+          <PayoutSetupCard />
+          <BusinessBookingsSection />
+        </>
       )}
+
+      {tab === "list" && <GuestListPanel clubId={handle || mine.id} clubName={mine.name} />}
 
       {tab === "offer" && (
         <form className="mt-5 space-y-3" onSubmit={onDeal}>
-          <input value={badge} onChange={(e) => setBadge(e.target.value)} placeholder="15% off" className={fieldInput} />
+          <input
+            value={badge}
+            onChange={(e) => setBadge(e.target.value)}
+            placeholder="15% off"
+            className={fieldInput}
+          />
           <textarea
             value={detail}
             onChange={(e) => setDetail(e.target.value)}

@@ -5,15 +5,8 @@ import { useLocale } from "@/contexts/LocaleContext";
 import { useAnalytics } from "@/contexts/AnalyticsContext";
 
 export function BatteryWarningBanner() {
-  const {
-    percentageText,
-    charging,
-    isLowBattery,
-    powerSaveActive,
-    bannerDismissed,
-    dismissBanner,
-    togglePowerSave,
-  } = useBattery();
+  const { percentageText, charging, isLowBattery, powerSaveActive, bannerDismissed, dismissBanner, togglePowerSave } =
+    useBattery();
   const { t } = useLocale();
   const { trackFeatureEngagement } = useAnalytics();
 
@@ -75,9 +68,7 @@ export function BatteryWarningBanner() {
                 className="rounded-full bg-amber-200/80 px-2.5 py-0.5 text-[11px] font-medium text-amber-900 hover:bg-amber-300/80 active:scale-95 transition"
                 aria-label={powerSaveActive ? "Turn off Power Saver" : "Turn on Power Saver"}
               >
-                {powerSaveActive
-                  ? t("battery.turnOff") || "Turn Off"
-                  : t("battery.turnOn") || "Turn On"}
+                {powerSaveActive ? t("battery.turnOff") || "Turn Off" : t("battery.turnOn") || "Turn On"}
               </button>
               <button
                 type="button"

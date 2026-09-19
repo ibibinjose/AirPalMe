@@ -202,8 +202,14 @@ export function HostPage() {
 
   return (
     <div className="relative isolate overflow-hidden">
-      <div aria-hidden className="pointer-events-none absolute -left-24 top-[-6rem] h-64 w-64 rounded-full bg-brand/10 blur-3xl" />
-      <div aria-hidden className="pointer-events-none absolute -right-16 top-32 h-56 w-56 rounded-full bg-gold/15 blur-3xl" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-24 top-[-6rem] h-64 w-64 rounded-full bg-brand/10 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-16 top-32 h-56 w-56 rounded-full bg-gold/15 blur-3xl"
+      />
 
       <div className="relative mx-auto max-w-3xl px-4 pb-16">
         {user.emailVerified === false && <VerifyEmailBanner email={user.email} onSend={sendVerificationEmail} />}
@@ -253,7 +259,7 @@ export function HostPage() {
               onClick={() => setTab(t)}
               className={cn(
                 "h-9 flex-1 rounded-full px-3 text-sm capitalize transition",
-                tab === t ? "bg-ink text-white shadow-sm" : "text-mute hover:text-ink",
+                tab === t ? "bg-brand text-white shadow-sm" : "text-mute hover:text-ink",
               )}
             >
               {t}

@@ -117,17 +117,13 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
         </div>
 
         {typeof navigator !== "undefined" && "share" in navigator && (
-          <Button size="sm" onClick={handleNativeShare} className="mt-2 w-full gap-1.5 bg-ink text-white">
+          <Button size="sm" onClick={handleNativeShare} className="mt-2 w-full gap-1.5 bg-brand text-white">
             <Share2 size={15} />
             Share via…
           </Button>
         )}
 
-        <button
-          type="button"
-          onClick={onClose}
-          className="mt-4 text-xs font-medium text-mute hover:text-ink"
-        >
+        <button type="button" onClick={onClose} className="mt-4 text-xs font-medium text-mute hover:text-ink">
           Done
         </button>
       </div>

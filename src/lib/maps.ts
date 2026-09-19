@@ -54,4 +54,3 @@ export function mapsEmbedSrc(geo: Geo, name?: string) {
   }
   return `https://www.google.com/maps?q=${encodeURIComponent(q)}&z=16&output=embed`;
 }
-

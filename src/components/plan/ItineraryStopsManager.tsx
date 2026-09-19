@@ -16,16 +16,8 @@ import {
   FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import {
-  formatTime12h,
-  type PlanType,
-  type StopIconType,
-} from "@shared/plan";
-import {
-  STOP_ICON_OPTIONS,
-  STOP_ICON_CATEGORIES,
-  getStopIconDef,
-} from "./stopIcons";
+import { formatTime12h, type PlanType, type StopIconType } from "@shared/plan";
+import { STOP_ICON_OPTIONS, STOP_ICON_CATEGORIES, getStopIconDef } from "./stopIcons";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
@@ -52,93 +44,308 @@ export interface OccasionStopTemplate {
 
 export const OCCASION_STOP_TEMPLATES: Record<PlanType, OccasionStopTemplate[]> = {
   birthday: [
-    { name: "Welcome Cocktails & Arrival", icon: "drinks", offsetMinutes: 0, notes: "Welcome cocktails, arrivals and greeting the crew" },
-    { name: "Celebration Dinner & Table Toast", icon: "food", offsetMinutes: 60, notes: "Dinner table reservation with share plates" },
-    { name: "Birthday Speeches & Cheers", icon: "speech", offsetMinutes: 135, notes: "Speeches, funny memories & toast to the birthday mate" },
-    { name: "Birthday Cake & Candles", icon: "cake", offsetMinutes: 165, notes: "Singing, candles blown & cake cutting" },
-    { name: "Dance Floor & Late Night Tunes", icon: "music", offsetMinutes: 210, notes: "Party vibes and late night celebrations" },
+    {
+      name: "Welcome Cocktails & Arrival",
+      icon: "drinks",
+      offsetMinutes: 0,
+      notes: "Welcome cocktails, arrivals and greeting the crew",
+    },
+    {
+      name: "Celebration Dinner & Table Toast",
+      icon: "food",
+      offsetMinutes: 60,
+      notes: "Dinner table reservation with share plates",
+    },
+    {
+      name: "Birthday Speeches & Cheers",
+      icon: "speech",
+      offsetMinutes: 135,
+      notes: "Speeches, funny memories & toast to the birthday mate",
+    },
+    {
+      name: "Birthday Cake & Candles",
+      icon: "cake",
+      offsetMinutes: 165,
+      notes: "Singing, candles blown & cake cutting",
+    },
+    {
+      name: "Dance Floor & Late Night Tunes",
+      icon: "music",
+      offsetMinutes: 210,
+      notes: "Party vibes and late night celebrations",
+    },
   ],
   wedding: [
-    { name: "Ceremony & Exchange of Vows", icon: "ceremony", offsetMinutes: 0, notes: "Processional, official vows and rings exchange" },
-    { name: "Cocktail Hour & Photo Session", icon: "photo", offsetMinutes: 60, notes: "Champagne, canapés and family portraits" },
-    { name: "Reception Dinner & Speeches", icon: "speech", offsetMinutes: 120, notes: "Banquet dining, bridal party speeches & wine" },
-    { name: "Wedding Cake Cutting", icon: "cake", offsetMinutes: 210, notes: "Cutting the wedding cake & dessert table" },
-    { name: "First Dance & Celebration", icon: "music", offsetMinutes: 240, notes: "First dance and open celebration dance floor" },
+    {
+      name: "Ceremony & Exchange of Vows",
+      icon: "ceremony",
+      offsetMinutes: 0,
+      notes: "Processional, official vows and rings exchange",
+    },
+    {
+      name: "Cocktail Hour & Photo Session",
+      icon: "photo",
+      offsetMinutes: 60,
+      notes: "Champagne, canapés and family portraits",
+    },
+    {
+      name: "Reception Dinner & Speeches",
+      icon: "speech",
+      offsetMinutes: 120,
+      notes: "Banquet dining, bridal party speeches & wine",
+    },
+    {
+      name: "Wedding Cake Cutting",
+      icon: "cake",
+      offsetMinutes: 210,
+      notes: "Cutting the wedding cake & dessert table",
+    },
+    {
+      name: "First Dance & Celebration",
+      icon: "music",
+      offsetMinutes: 240,
+      notes: "First dance and open celebration dance floor",
+    },
     { name: "Sparkler Send-Off & Farewell", icon: "toast", offsetMinutes: 330, notes: "Sparkler farewell toast" },
   ],
   graduation: [
-    { name: "Commencement Ceremony & Stage Walk", icon: "ceremony", offsetMinutes: 0, notes: "Academic procession, caps & degree conferral" },
-    { name: "Campus Portraits & Cap Toss", icon: "photo", offsetMinutes: 90, notes: "Family photos and the iconic cap tossing moment" },
-    { name: "Graduation Toast & Canapés", icon: "toast", offsetMinutes: 150, notes: "Champagne toast to the graduate's achievement" },
-    { name: "Celebration Family Dinner", icon: "food", offsetMinutes: 210, notes: "Fine dining celebratory family dinner" },
+    {
+      name: "Commencement Ceremony & Stage Walk",
+      icon: "ceremony",
+      offsetMinutes: 0,
+      notes: "Academic procession, caps & degree conferral",
+    },
+    {
+      name: "Campus Portraits & Cap Toss",
+      icon: "photo",
+      offsetMinutes: 90,
+      notes: "Family photos and the iconic cap tossing moment",
+    },
+    {
+      name: "Graduation Toast & Canapés",
+      icon: "toast",
+      offsetMinutes: 150,
+      notes: "Champagne toast to the graduate's achievement",
+    },
+    {
+      name: "Celebration Family Dinner",
+      icon: "food",
+      offsetMinutes: 210,
+      notes: "Fine dining celebratory family dinner",
+    },
   ],
   housewarming: [
-    { name: "House Tour & Welcome Drinks", icon: "home", offsetMinutes: 0, notes: "Guided home tour and welcome refreshments" },
-    { name: "Backyard BBQ & Grazing Table", icon: "food", offsetMinutes: 60, notes: "BBQ sizzle, grazing table and salads" },
-    { name: "Sunset Toast to New Memories", icon: "toast", offsetMinutes: 150, notes: "Housewarming cheers to the new home" },
-    { name: "Firepit & Outdoor Hangout", icon: "drinks", offsetMinutes: 210, notes: "Drinks and stories around the firepit" },
+    {
+      name: "House Tour & Welcome Drinks",
+      icon: "home",
+      offsetMinutes: 0,
+      notes: "Guided home tour and welcome refreshments",
+    },
+    {
+      name: "Backyard BBQ & Grazing Table",
+      icon: "food",
+      offsetMinutes: 60,
+      notes: "BBQ sizzle, grazing table and salads",
+    },
+    {
+      name: "Sunset Toast to New Memories",
+      icon: "toast",
+      offsetMinutes: 150,
+      notes: "Housewarming cheers to the new home",
+    },
+    {
+      name: "Firepit & Outdoor Hangout",
+      icon: "drinks",
+      offsetMinutes: 210,
+      notes: "Drinks and stories around the firepit",
+    },
   ],
   baby_shower: [
-    { name: "Welcome Refreshments & Grazing Table", icon: "coffee", offsetMinutes: 0, notes: "Mocktails, punch, tea and grazing table" },
-    { name: "Baby Shower Games & Trivia", icon: "gift", offsetMinutes: 60, notes: "Fun baby predictions, trivia and shower games" },
-    { name: "Gift Opening & Family Blessings", icon: "gift", offsetMinutes: 120, notes: "Opening presents with friends and family" },
-    { name: "Celebration Cake & Afternoon Toast", icon: "cake", offsetMinutes: 165, notes: "Cake cutting and cheers for baby" },
+    {
+      name: "Welcome Refreshments & Grazing Table",
+      icon: "coffee",
+      offsetMinutes: 0,
+      notes: "Mocktails, punch, tea and grazing table",
+    },
+    {
+      name: "Baby Shower Games & Trivia",
+      icon: "gift",
+      offsetMinutes: 60,
+      notes: "Fun baby predictions, trivia and shower games",
+    },
+    {
+      name: "Gift Opening & Family Blessings",
+      icon: "gift",
+      offsetMinutes: 120,
+      notes: "Opening presents with friends and family",
+    },
+    {
+      name: "Celebration Cake & Afternoon Toast",
+      icon: "cake",
+      offsetMinutes: 165,
+      notes: "Cake cutting and cheers for baby",
+    },
   ],
   memorial: [
-    { name: "Memorial Service & Tributes", icon: "ceremony", offsetMinutes: 0, notes: "Memorial gathering, readings and honouring loved one" },
-    { name: "Eulogies & Sharing Stories", icon: "speech", offsetMinutes: 45, notes: "Heartfelt stories and remembrance tributes" },
-    { name: "Remembrance Wake & Tea Reception", icon: "toast", offsetMinutes: 90, notes: "Refreshments, photo memories and fellowship" },
+    {
+      name: "Memorial Service & Tributes",
+      icon: "ceremony",
+      offsetMinutes: 0,
+      notes: "Memorial gathering, readings and honouring loved one",
+    },
+    {
+      name: "Eulogies & Sharing Stories",
+      icon: "speech",
+      offsetMinutes: 45,
+      notes: "Heartfelt stories and remembrance tributes",
+    },
+    {
+      name: "Remembrance Wake & Tea Reception",
+      icon: "toast",
+      offsetMinutes: 90,
+      notes: "Refreshments, photo memories and fellowship",
+    },
   ],
   anniversary: [
-    { name: "Champagne Arrival & Toast", icon: "toast", offsetMinutes: 0, notes: "Champagne flutes and milestone celebration cheers" },
+    {
+      name: "Champagne Arrival & Toast",
+      icon: "toast",
+      offsetMinutes: 0,
+      notes: "Champagne flutes and milestone celebration cheers",
+    },
     { name: "Multi-Course Gourmet Dinner", icon: "food", offsetMinutes: 45, notes: "Special anniversary dinner table" },
-    { name: "Anniversary Speeches & Dessert", icon: "speech", offsetMinutes: 120, notes: "Dessert, toasts, memories and gratitude" },
+    {
+      name: "Anniversary Speeches & Dessert",
+      icon: "speech",
+      offsetMinutes: 120,
+      notes: "Dessert, toasts, memories and gratitude",
+    },
   ],
   nightout: [
-    { name: "Sunset Rooftop Cocktails", icon: "drinks", offsetMinutes: 0, notes: "Golden hour drinks with harbour/city views" },
+    {
+      name: "Sunset Rooftop Cocktails",
+      icon: "drinks",
+      offsetMinutes: 0,
+      notes: "Golden hour drinks with harbour/city views",
+    },
     { name: "Dinner & Share Plates", icon: "food", offsetMinutes: 75, notes: "Main dinner table booking" },
-    { name: "Craft Cocktail Bar & Banter", icon: "drinks", offsetMinutes: 150, notes: "Cocktail lounge and high energy vibes" },
+    {
+      name: "Craft Cocktail Bar & Banter",
+      icon: "drinks",
+      offsetMinutes: 150,
+      notes: "Cocktail lounge and high energy vibes",
+    },
     { name: "Live DJ & Dance Floor", icon: "music", offsetMinutes: 225, notes: "Late night dancing and tunes" },
   ],
   lunch: [
-    { name: "Laneway Coffee & Meetup", icon: "coffee", offsetMinutes: 0, notes: "Artisan espresso and meeting the mates" },
+    {
+      name: "Laneway Coffee & Meetup",
+      icon: "coffee",
+      offsetMinutes: 0,
+      notes: "Artisan espresso and meeting the mates",
+    },
     { name: "Sunny Patio Lunch & Wine", icon: "food", offsetMinutes: 45, notes: "Al fresco dining and shared dishes" },
-    { name: "Waterfront Stroll & Gelato", icon: "walk", offsetMinutes: 120, notes: "Scenic promenade stroll with artisanal gelato" },
+    {
+      name: "Waterfront Stroll & Gelato",
+      icon: "walk",
+      offsetMinutes: 120,
+      notes: "Scenic promenade stroll with artisanal gelato",
+    },
   ],
   movies: [
     { name: "Pre-Movie Drinks & Snacks", icon: "drinks", offsetMinutes: 0, notes: "Gathering before the film starts" },
     { name: "Cinema Premiere & Popcorn", icon: "sight", offsetMinutes: 45, notes: "Main movie screening in theatre" },
-    { name: "Post-Movie Debrief & Dessert", icon: "food", offsetMinutes: 165, notes: "Discussing film highlights over dessert" },
+    {
+      name: "Post-Movie Debrief & Dessert",
+      icon: "food",
+      offsetMinutes: 165,
+      notes: "Discussing film highlights over dessert",
+    },
   ],
   trip: [
-    { name: "Morning Fuel & Flat Whites", icon: "petrol", offsetMinutes: 0, notes: "Fill up petrol tank and grab morning coffee" },
-    { name: "Scenic Mountain / Coast Lookout", icon: "sight", offsetMinutes: 90, notes: "Panoramic vista and group photo stop" },
-    { name: "Country Bakery / Seaside Lunch", icon: "food", offsetMinutes: 180, notes: "Famous local bakery pies & fresh lunch" },
-    { name: "Arrival & Sunset Campfire", icon: "stay", offsetMinutes: 300, notes: "Check-in, sunset views and campfire dinner" },
+    {
+      name: "Morning Fuel & Flat Whites",
+      icon: "petrol",
+      offsetMinutes: 0,
+      notes: "Fill up petrol tank and grab morning coffee",
+    },
+    {
+      name: "Scenic Mountain / Coast Lookout",
+      icon: "sight",
+      offsetMinutes: 90,
+      notes: "Panoramic vista and group photo stop",
+    },
+    {
+      name: "Country Bakery / Seaside Lunch",
+      icon: "food",
+      offsetMinutes: 180,
+      notes: "Famous local bakery pies & fresh lunch",
+    },
+    {
+      name: "Arrival & Sunset Campfire",
+      icon: "stay",
+      offsetMinutes: 300,
+      notes: "Check-in, sunset views and campfire dinner",
+    },
   ],
   escape: [
-    { name: "Scenic Roadtrip Departure", icon: "petrol", offsetMinutes: 0, notes: "Hit the road with roadtrip playlist" },
+    {
+      name: "Scenic Roadtrip Departure",
+      icon: "petrol",
+      offsetMinutes: 0,
+      notes: "Hit the road with roadtrip playlist",
+    },
     { name: "Cabin / Beach Retreat Check-in", icon: "stay", offsetMinutes: 120, notes: "Unpack and explore the stay" },
     { name: "Seaside Dinner & Wine", icon: "food", offsetMinutes: 240, notes: "Fresh local produce and sunset drinks" },
   ],
   gig: [
-    { name: "Pre-Show Drinks & Merch", icon: "drinks", offsetMinutes: 0, notes: "Meetup before doors open & grab tour merch" },
+    {
+      name: "Pre-Show Drinks & Merch",
+      icon: "drinks",
+      offsetMinutes: 0,
+      notes: "Meetup before doors open & grab tour merch",
+    },
     { name: "Live Stage & Headliner Set", icon: "music", offsetMinutes: 75, notes: "Live concert performance" },
     { name: "Late Night Slice & Review", icon: "food", offsetMinutes: 180, notes: "Post-gig pizza and debrief" },
   ],
   walk: [
     { name: "Espresso Bar Greeting", icon: "coffee", offsetMinutes: 0, notes: "Takeaway coffee and morning meetup" },
-    { name: "Boardwalk & Laneways Walk", icon: "walk", offsetMinutes: 30, notes: "Scenic walking route and harbour views" },
+    {
+      name: "Boardwalk & Laneways Walk",
+      icon: "walk",
+      offsetMinutes: 30,
+      notes: "Scenic walking route and harbour views",
+    },
     { name: "Waterfront Lunch & Refreshments", icon: "food", offsetMinutes: 90, notes: "Casual lunch in the sun" },
   ],
   catchup: [
-    { name: "Coffee & Greeting", icon: "coffee", offsetMinutes: 0, notes: "Grab flat whites, iced matcha, and sit down to chat" },
-    { name: "Laneway Walk & Conversation", icon: "walk", offsetMinutes: 45, notes: "Casual stroll and good conversation" },
+    {
+      name: "Coffee & Greeting",
+      icon: "coffee",
+      offsetMinutes: 0,
+      notes: "Grab flat whites, iced matcha, and sit down to chat",
+    },
+    {
+      name: "Laneway Walk & Conversation",
+      icon: "walk",
+      offsetMinutes: 45,
+      notes: "Casual stroll and good conversation",
+    },
     { name: "Bites or Drinks Wrap Up", icon: "food", offsetMinutes: 90, notes: "Quick bites or casual drinks wrap up" },
   ],
   meeting: [
-    { name: "Meeting & Discussion", icon: "pin", offsetMinutes: 0, notes: "Sync agenda, project review and discussion" },
-    { name: "Action Items & Wrap Up", icon: "pin", offsetMinutes: 45, notes: "Next steps, key decisions and calendar follow-ups" },
+    {
+      name: "Meeting & Discussion",
+      icon: "pin",
+      offsetMinutes: 0,
+      notes: "Sync agenda, project review and discussion",
+    },
+    {
+      name: "Action Items & Wrap Up",
+      icon: "pin",
+      offsetMinutes: 45,
+      notes: "Next steps, key decisions and calendar follow-ups",
+    },
   ],
   custom: [
     { name: "Meeting Point & Welcome", icon: "pin", offsetMinutes: 0, notes: "Gather at the main entrance" },
@@ -267,7 +474,13 @@ export interface ItineraryStopsManagerProps {
   isEditable?: boolean;
   canVote?: boolean;
   currentUserId?: string;
-  onAddStop: (stop: { name: string; time?: string; notes?: string; icon?: StopIconType | string; address?: string }) => void;
+  onAddStop: (stop: {
+    name: string;
+    time?: string;
+    notes?: string;
+    icon?: StopIconType | string;
+    address?: string;
+  }) => void;
   onUpdateStop: (index: number, patch: Partial<ItineraryStopData>) => void;
   onRemoveStop: (index: number) => void;
   onReorderStops: (fromIdx: number, toIdx: number) => void;
@@ -446,10 +659,7 @@ export function ItineraryStopsManager({
                   </div>
 
                   {/* Icon Selector in Edit Mode */}
-                  <VisibleIconPicker
-                    selectedIcon={editIcon}
-                    onSelect={(icon) => setEditIcon(icon)}
-                  />
+                  <VisibleIconPicker selectedIcon={editIcon} onSelect={(icon) => setEditIcon(icon)} />
 
                   {/* Name & Time row */}
                   <div className="flex flex-col sm:flex-row gap-2">
@@ -458,7 +668,7 @@ export function ItineraryStopsManager({
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       placeholder="Venue / stop name"
-                      className="h-10 flex-1 rounded-2xl bg-paper px-3.5 text-xs sm:text-sm font-medium text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                      className="h-10 flex-1 rounded-2xl bg-paper px-3.5 text-xs sm:text-sm font-medium text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                     />
 
                     <div className="flex items-center gap-1.5 rounded-2xl bg-paper px-3 h-10 ring-1 ring-line shrink-0">
@@ -486,7 +696,7 @@ export function ItineraryStopsManager({
                         value={editAddress}
                         onChange={(e) => setEditAddress(e.target.value)}
                         placeholder="Address / Landmark (e.g. 100 George St, The Rocks)"
-                        className="h-9 w-full rounded-xl bg-paper pl-8 pr-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                        className="h-9 w-full rounded-xl bg-paper pl-8 pr-3 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                       />
                     </div>
                     <div className="relative">
@@ -496,7 +706,7 @@ export function ItineraryStopsManager({
                         value={editNotes}
                         onChange={(e) => setEditNotes(e.target.value)}
                         placeholder="Host Notes (e.g. Table booked under Sarah)"
-                        className="h-9 w-full rounded-xl bg-paper pl-8 pr-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                        className="h-9 w-full rounded-xl bg-paper pl-8 pr-3 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                       />
                     </div>
                   </div>
@@ -582,9 +792,7 @@ export function ItineraryStopsManager({
                       <span className="truncate">{stop.address}</span>
                     </p>
                   )}
-                  {stop.addedByName && (
-                    <p className="text-[9px] text-mute/70 mt-0.5">Added by {stop.addedByName}</p>
-                  )}
+                  {stop.addedByName && <p className="text-[9px] text-mute/70 mt-0.5">Added by {stop.addedByName}</p>}
                 </div>
 
                 {/* Action buttons */}
@@ -724,10 +932,7 @@ export function ItineraryStopsManager({
           </div>
 
           {/* Direct Visible Icon Selector */}
-          <VisibleIconPicker
-            selectedIcon={newIcon}
-            onSelect={(icon) => setNewIcon(icon)}
-          />
+          <VisibleIconPicker selectedIcon={newIcon} onSelect={(icon) => setNewIcon(icon)} />
 
           {/* Main Input Row: Venue Name + Time + Add Button */}
           <div className="flex flex-col sm:flex-row gap-2">
@@ -742,7 +947,7 @@ export function ItineraryStopsManager({
                   handleAddSubmit();
                 }
               }}
-              className="h-11 flex-1 rounded-2xl bg-paper px-3.5 text-xs sm:text-sm font-medium border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
+              className="h-11 flex-1 rounded-2xl bg-paper px-3.5 text-xs sm:text-sm font-medium border border-line outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
             />
 
             <div className="flex items-center gap-2">
@@ -803,7 +1008,7 @@ export function ItineraryStopsManager({
                   value={newAddress}
                   onChange={(e) => setNewAddress(e.target.value)}
                   placeholder="Address / Landmark (e.g. 1 Macquarie St, Sydney)"
-                  className="h-10 w-full rounded-xl bg-paper pl-9 pr-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                  className="h-10 w-full rounded-xl bg-paper pl-9 pr-3 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                 />
               </div>
               <div className="relative">
@@ -813,7 +1018,7 @@ export function ItineraryStopsManager({
                   value={newNotes}
                   onChange={(e) => setNewNotes(e.target.value)}
                   placeholder="Host Notes (e.g. Meet in lobby, dress code smart casual)"
-                  className="h-10 w-full rounded-xl bg-paper pl-9 pr-3 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                  className="h-10 w-full rounded-xl bg-paper pl-9 pr-3 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                 />
               </div>
             </div>

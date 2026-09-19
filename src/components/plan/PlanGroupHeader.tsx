@@ -117,7 +117,10 @@ export function PlanGroupHeader({
           </div>
 
           {/* Right: Quick Action Buttons */}
-          <div className="flex items-center gap-2 shrink-0 self-end sm:self-center" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="flex items-center gap-2 shrink-0 self-end sm:self-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             {onInvite && (
               <button
                 type="button"
@@ -148,7 +151,9 @@ export function PlanGroupHeader({
           <div className="relative w-full max-w-md rounded-3xl bg-card p-6 ring-1 ring-line shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Group Participants</span>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">
+                  Group Participants
+                </span>
                 <h3 className="font-display text-xl font-bold text-ink">{plan.title}</h3>
                 <p className="text-xs text-mute mt-0.5">{plan.attendees.length} members in this occasion group</p>
               </div>

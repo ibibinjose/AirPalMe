@@ -20,12 +20,14 @@ Signed in → Settings → Delete account → type DELETE. This removes the logi
 
 No in-app digital goods. Bookings for real-world experiences may show as unpaid until Stripe checkout is live. Guests are not charged to browse.
 
-## Permissions
+## Permissions (all optional — deny and the app still browses)
 
-- Camera: QR scan (Scan tab). Optional.
-- Location: nearby places. Optional; deny still works.
-- Photos: profile / venue upload. Optional.
-- NFC: optional bio card. App works without NFC hardware.
+- **Camera:** Scan tab — place QR, stay key, event pass, Wave. Guest browse works without it (type a code).
+- **Location (when in use):** nearby places, plans, events. Not a home address. Deny → pick a city in the location pin (The Rocks is the launch catalogue).
+- **Photos:** profile, plan, or listing image you pick. Not required to browse.
+- **NFC:** optional Wave greeting. No NFC hardware required.
+- **Bluetooth (Android):** optional Wave scan. iOS does not request Bluetooth.
+- Never requested: microphone, contacts, always-on location, tracking.
 
 ## Content
 

@@ -8,13 +8,7 @@ export type AccessClaims = {
   properties?: Record<string, PropertyMemberRole>;
 };
 
-export const TICKET_CATEGORIES = [
-  "reception",
-  "housekeeping",
-  "maintenance",
-  "dining",
-  "late_checkout",
-] as const;
+export const TICKET_CATEGORIES = ["reception", "housekeeping", "maintenance", "dining", "late_checkout"] as const;
 
 export const FUNCTIONS_REGION = "us-central1";
 
@@ -51,6 +45,12 @@ export const CALLABLES = {
   runAnalyticsAggregation: "runAnalyticsAggregation",
   createExperienceCheckoutSession: "createExperienceCheckoutSession",
   confirmExperienceBookingRemote: "confirmExperienceBookingRemote",
+  createBookingCheckoutSession: "createBookingCheckoutSession",
+  createConnectAccountLink: "createConnectAccountLink",
+  refreshConnectAccount: "refreshConnectAccount",
+  createConnectLoginLink: "createConnectLoginLink",
+  releaseHeldPayouts: "releaseHeldPayouts",
+  completePaidBooking: "completePaidBooking",
   createStaffTicket: "createStaffTicket",
   resolveStaffTicket: "resolveStaffTicket",
   askAirPal: "askAirPal",
@@ -66,7 +66,31 @@ export const CALLABLES = {
   postPlanCommentRemote: "postPlanCommentRemote",
   getPlanByInviteCode: "getPlanByInviteCode",
   confirmExperienceBooking: "confirmExperienceBookingRemote",
+  completeAccountSignup: "completeAccountSignup",
+  loginWithPhonePassword: "loginWithPhonePassword",
+  shareHere: "shareHere",
+  stopHere: "stopHere",
+  startWave: "startWave",
+  waveAt: "waveAt",
+  stopWave: "stopWave",
 } as const;
+
+export type CompleteAccountSignupRequest = {
+  handle: string;
+  name: string;
+  email: string;
+};
+
+export type LoginWithPhonePasswordRequest = {
+  phone: string;
+  password: string;
+  /** Public web API key (same as the client app). Optional if Functions has FIREBASE_WEB_API_KEY. */
+  apiKey?: string;
+};
+
+export type LoginWithPhonePasswordResponse = {
+  token: string;
+};
 
 /** Canonical platform Super Admin. Extra addresses can be added via PLATFORM_ADMIN_EMAILS. */
 export const CANONICAL_PLATFORM_ADMIN_EMAILS = ["bibin.inc@gmail.com"];
@@ -215,6 +239,11 @@ export type ClaimFreeVenuePresenceRequest = {
   lat?: number;
   lng?: number;
   guestPerk?: string;
+  mapsPlaceId?: string;
+  website?: string;
+  heroImage?: string;
+  plan?: string;
+  abnOrTaxId?: string;
 };
 
 export type ClaimFreeVenuePresenceResponse = {
@@ -238,6 +267,10 @@ export type UpsertBusinessListingRequest = {
   heroImage?: string;
   handle?: string;
   hoursVerifiedAt?: string;
+  mapsPlaceId?: string;
+  website?: string;
+  plan?: string;
+  abnOrTaxId?: string;
 };
 
 export type UpsertBusinessDealRequest = {
@@ -302,9 +335,33 @@ export type UpdateBusinessProfileRequest = {
   listingId?: string;
   placeId?: string;
   links?: Array<{ id: string; type: string; label: string; href: string }>;
-  products?: Array<{ id: string; kind?: string; title: string; detail?: string; price?: string; badge?: string; href?: string }>;
-  services?: Array<{ id: string; kind?: string; title: string; detail?: string; price?: string; badge?: string; href?: string }>;
-  deals?: Array<{ id: string; kind?: string; title: string; detail?: string; price?: string; badge?: string; href?: string }>;
+  products?: Array<{
+    id: string;
+    kind?: string;
+    title: string;
+    detail?: string;
+    price?: string;
+    badge?: string;
+    href?: string;
+  }>;
+  services?: Array<{
+    id: string;
+    kind?: string;
+    title: string;
+    detail?: string;
+    price?: string;
+    badge?: string;
+    href?: string;
+  }>;
+  deals?: Array<{
+    id: string;
+    kind?: string;
+    title: string;
+    detail?: string;
+    price?: string;
+    badge?: string;
+    href?: string;
+  }>;
 };
 export type ClaimBioOfferRequest = { handle: string; dealId: string };
 export type ClaimBioOfferResponse = { code: string; badge: string; detail: string; expiresAt: string };
@@ -346,11 +403,7 @@ export function isPlatformAdminEmail(email: string, extra: string[] = []): boole
 }
 
 /** Client-requested roles never include staff or super_admin. Allowlist is server-only. */
-export function resolveRegistrationRole(
-  email: string,
-  requested: string,
-  platformAdminEmails: string[],
-): UserRole {
+export function resolveRegistrationRole(email: string, requested: string, platformAdminEmails: string[]): UserRole {
   const normalized = normalizeEmail(email);
   const allow = new Set([...CANONICAL_PLATFORM_ADMIN_EMAILS, ...platformAdminEmails.map(normalizeEmail)]);
   if (allow.has(normalized)) return "super_admin";
@@ -365,12 +418,7 @@ export function roleFromAccessToken(
   if (!claims) return profileRole || "guest";
   if (claims.platform_admin === true) return "super_admin";
   const tokenRole = claims.role;
-  if (
-    tokenRole === "super_admin" ||
-    tokenRole === "host_admin" ||
-    tokenRole === "staff" ||
-    tokenRole === "guest"
-  ) {
+  if (tokenRole === "super_admin" || tokenRole === "host_admin" || tokenRole === "staff" || tokenRole === "guest") {
     return tokenRole;
   }
   return profileRole || "guest";

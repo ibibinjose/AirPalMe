@@ -3,13 +3,7 @@ import { useLocale } from "@/contexts/LocaleContext";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
-export function LanguageSwitch({
-  className,
-  size = "md",
-}: {
-  className?: string;
-  size?: "sm" | "md";
-}) {
+export function LanguageSwitch({ className, size = "md" }: { className?: string; size?: "sm" | "md" }) {
   const { lang, setLang } = useLocale();
   const isSm = size === "sm";
 
@@ -36,7 +30,7 @@ export function LanguageSwitch({
           className={cn(
             "rounded-full font-semibold transition touch-manipulation cursor-pointer",
             isSm ? "h-6 sm:h-7 px-2 text-[10px]" : "h-7 sm:h-8 px-2.5 text-[11px]",
-            lang === item.id ? "bg-ink text-white shadow-xs" : "text-mute hover:text-ink",
+            lang === item.id ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
           )}
         >
           {item.label}
@@ -45,4 +39,3 @@ export function LanguageSwitch({
     </div>
   );
 }
-

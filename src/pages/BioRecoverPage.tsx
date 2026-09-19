@@ -46,20 +46,68 @@ export function BioRecoverPage() {
       <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Trade mark</p>
       <h1 className="font-display mt-1 text-3xl font-semibold">Recover a handle</h1>
       <p className="mt-2 text-sm text-mute">
-        If someone claimed @{handleFromName(name) || "yourname"} and you own the registered business name, trade mark, or matching domain, we give the handle to you.{" "}
+        If someone claimed @{handleFromName(name) || "yourname"} and you own the registered business name, trade mark,
+        or matching domain, we give the handle to you.{" "}
         <Link href="/terms" className="text-brand">
           Terms
         </Link>
       </p>
       <form className="mt-6 space-y-3" onSubmit={onSubmit}>
-        <input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="@handle" required className={fieldInput} />
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Registered business name" required className={fieldInput} />
-        <input value={registrationNumber} onChange={(e) => setRegistrationNumber(e.target.value)} placeholder="ABN / company number" required className={fieldInput} />
-        <input value={domain} onChange={(e) => setDomain(e.target.value)} autoComplete="url" autoCapitalize="none" placeholder="Domain you own" className={fieldInput} />
-        <input value={trademark} onChange={(e) => setTrademark(e.target.value)} placeholder="Trade mark number or words" className={fieldInput} />
-        <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className={fieldInput} />
-        <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Evidence (optional)" className={fieldTextarea} />
-        {handle && !matches && <p className="text-[12px] text-mute">The handle must match the name, mark, or domain.</p>}
+        <input
+          value={handle}
+          onChange={(e) => setHandle(e.target.value)}
+          placeholder="@handle"
+          required
+          className={fieldInput}
+        />
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Registered business name"
+          required
+          className={fieldInput}
+        />
+        <input
+          value={registrationNumber}
+          onChange={(e) => setRegistrationNumber(e.target.value)}
+          placeholder="ABN / company number"
+          required
+          className={fieldInput}
+        />
+        <input
+          value={domain}
+          onChange={(e) => setDomain(e.target.value)}
+          autoComplete="url"
+          autoCapitalize="none"
+          placeholder="Domain you own"
+          className={fieldInput}
+        />
+        <input
+          value={trademark}
+          onChange={(e) => setTrademark(e.target.value)}
+          placeholder="Trade mark number or words"
+          className={fieldInput}
+        />
+        <input
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          autoCapitalize="none"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
+          required
+          className={fieldInput}
+        />
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Evidence (optional)"
+          className={fieldTextarea}
+        />
+        {handle && !matches && (
+          <p className="text-[12px] text-mute">The handle must match the name, mark, or domain.</p>
+        )}
         <Button type="submit" className="w-full">
           Request recovery
         </Button>

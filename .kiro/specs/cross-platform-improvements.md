@@ -17,10 +17,12 @@ Comprehensive audit and improvement of the AirPalMe app across web, iOS, and And
 #### 1.1 Current State Analysis
 
 **Issue Found:**
+
 - `body` has `touch-action: manipulation` which blocks pan gestures (vertical scrolling via trackpad/touch)
 - Already fixed to `touch-action: pan-y pinch-zoom` in src/index.css
 
 **Additional Touch Improvements Needed:**
+
 - No `touch-action` properties on scroll containers or interactive elements beyond base CSS
 - Individual buttons/links use Tailwind's `touch-manipulation` class correctly
 - Need to ensure scroll containers allow smooth touch scrolling
@@ -46,6 +48,7 @@ Comprehensive audit and improvement of the AirPalMe app across web, iOS, and And
 ```
 
 **Apply to modals and sheets that have scrollable content:**
+
 - `GlobalSearchModal` results list
 - `ProfileMenu` dropdown
 - `Sheet` component content areas
@@ -58,6 +61,7 @@ Comprehensive audit and improvement of the AirPalMe app across web, iOS, and And
 #### 2.1 Current State Analysis
 
 **Issues Found:**
+
 1. `AppShell` uses `pt-[env(safe-area-inset-top)]` on sticky header ✅
 2. `TabBar` uses `safe-bottom` class but it's not defined in CSS ❌
 3. Fixed bottom bars (PlanDetailPage action bar) use `safe-bottom` class ❌
@@ -135,8 +139,12 @@ Add these utility classes:
 **Solution:** Ensure `viewport-fit=cover` in meta tag (already present ✅) and test all pages have proper top padding
 
 **File:** `index.html` - verify meta tag:
+
 ```html
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
+/>
 ```
 
 #### 3.2 iOS Keyboard Handling
@@ -144,11 +152,13 @@ Add these utility classes:
 **Current:** `interactive-widget=resizes-content` in viewport meta ✅
 
 **Additional fixes needed:**
+
 - Ensure form inputs scroll into view when keyboard appears
 - Prevent body scroll when input is focused
 - Add `inputMode` to all number/tel/email inputs for native keyboards
 
 **Files to audit:**
+
 - All form components in `src/components/forms/`
 - All page forms (BioEditPage, BusinessPage, ContactPage, etc.)
 
@@ -194,7 +204,7 @@ App.addListener("backButton", ({ canGoBack }) => {
   if (modalCloseHandler && modalCloseHandler()) {
     return; // Modal was closed, don't navigate
   }
-  
+
   if (canGoBack) {
     window.history.back();
   } else {
@@ -204,6 +214,7 @@ App.addListener("backButton", ({ canGoBack }) => {
 ```
 
 **Apply to all modal components:**
+
 - Register handler on mount
 - Unregister on unmount
 - Return true if modal was closed
@@ -225,6 +236,7 @@ App.addListener("backButton", ({ canGoBack }) => {
 **Current:** Basic manifest exists ✅
 
 **Enhancements needed:**
+
 - Add `shortcuts` for quick actions
 - Add `categories`
 - Verify icon sizes and purposes
@@ -282,6 +294,7 @@ App.addListener("backButton", ({ canGoBack }) => {
 #### 6.1 Fixed/Sticky Element Z-Index Management
 
 **Current Analysis:**
+
 - TabBar: `z-40` ✅
 - AppShell sticky header: `z-30` ✅
 - Modals: `z-50`, `z-60`, `z-70`, `z-90` mixed usage ❌
@@ -311,6 +324,7 @@ App.addListener("backButton", ({ canGoBack }) => {
 ```
 
 **Update components:**
+
 - TabBar: `z-[var(--z-nav)]` or keep `z-40`
 - PlanDetailPage action bar: `z-40`
 - All modals: `z-50` (overlay) + `z-60` (content)
@@ -333,12 +347,14 @@ App.addListener("backButton", ({ canGoBack }) => {
 #### 7.1 Input Modes for Native Keyboards
 
 **Current:**
+
 - PhoneField uses `inputMode="tel"` ✅
 - OTP inputs use `inputMode="numeric"` ✅
 
 **Audit needed:** Check all other inputs for proper inputMode
 
 **Add to:**
+
 - Email inputs: `inputMode="email"`
 - URL inputs: `inputMode="url"`
 - Search inputs: `inputMode="search"`
@@ -347,6 +363,7 @@ App.addListener("backButton", ({ canGoBack }) => {
 #### 7.2 Auto-capitalize and Autocomplete
 
 **Add to relevant inputs:**
+
 - Name fields: `autoCapitalize="words"`
 - Email fields: `autoCapitalize="none" autoComplete="email"`
 - Password fields: `autoComplete="current-password"` or `new-password`
@@ -371,6 +388,7 @@ App.addListener("backButton", ({ canGoBack }) => {
 **Enhancement:** Ensure all interactive elements show visual feedback
 
 **Add active states:**
+
 ```css
 .interactive:active {
   transform: scale(0.98);
@@ -416,6 +434,7 @@ useEffect(() => {
 ```
 
 **Enhancements:**
+
 1. Add iOS-specific status bar config
 2. Add Keyboard plugin config
 
@@ -451,19 +470,21 @@ useEffect(() => {
 **Install:** `@capacitor/keyboard`
 
 **Add to package.json:**
+
 ```bash
 npm install @capacitor/keyboard
 ```
 
 **Use in forms to handle keyboard show/hide:**
-```typescript
-import { Keyboard } from '@capacitor/keyboard';
 
-Keyboard.addListener('keyboardWillShow', info => {
+```typescript
+import { Keyboard } from "@capacitor/keyboard";
+
+Keyboard.addListener("keyboardWillShow", (info) => {
   // Adjust layout if needed
 });
 
-Keyboard.addListener('keyboardWillHide', () => {
+Keyboard.addListener("keyboardWillHide", () => {
   // Restore layout
 });
 ```
@@ -475,6 +496,7 @@ Keyboard.addListener('keyboardWillHide', () => {
 **File:** `android/app/src/main/AndroidManifest.xml`
 
 **Add:**
+
 ```xml
 <!-- Soft input mode for keyboard -->
 <activity
@@ -494,39 +516,46 @@ Keyboard.addListener('keyboardWillHide', () => {
 ## Implementation Tasks
 
 ### Phase 1: Critical Scroll & Touch Fixes
+
 1. ✅ Fix `touch-action` on body (already done)
 2. Add smooth scroll container utilities to CSS
 3. Apply scroll container classes to modals with lists
 4. Test scroll on iOS/Android/web
 
 ### Phase 2: Safe Area System
+
 1. Verify safe area classes exist in CSS (they do!)
 2. Apply `safe-bottom` to all fixed bottom bars
 3. Apply `modal-safe` or individual safe classes to all modals
 4. Test on iPhone with notch and Android with gestures
 
 ### Phase 3: Platform-Specific Enhancements
+
 1. Add Android back button modal handling
 2. Install and configure Keyboard plugin
 3. Update Android manifest with permissions
 4. Update Capacitor config with Keyboard settings
 
 ### Phase 4: Form Input Improvements
+
 1. Audit all form inputs for inputMode
 2. Add autocapitalize and autocomplete attributes
 3. Test on iOS/Android native keyboards
 
 ### Phase 5: Z-Index & Layout
+
 1. Standardize z-index values across modals
 2. Verify no scroll container height issues
 3. Test all pages at mobile/tablet/desktop widths
 
 ### Phase 6: PWA & Web Enhancements
+
 1. Update manifest.json with shortcuts
 2. Verify source map suppression (already done)
 3. Test PWA install on mobile browsers
 
 ### Phase 7: Testing & Validation
+
 1. Test on physical iOS device
 2. Test on physical Android device
 3. Test in Chrome/Safari/Firefox desktop
@@ -538,6 +567,7 @@ Keyboard.addListener('keyboardWillHide', () => {
 ## Testing Checklist
 
 ### iOS (iPhone with notch)
+
 - [ ] Status bar doesn't overlay content
 - [ ] TabBar respects home indicator area
 - [ ] Modals have proper padding from screen edges
@@ -547,6 +577,7 @@ Keyboard.addListener('keyboardWillHide', () => {
 - [ ] Haptic feedback works on interactions
 
 ### Android
+
 - [ ] Status bar color matches theme
 - [ ] Back button closes modals before navigation
 - [ ] Keyboard doesn't cover form inputs
@@ -555,6 +586,7 @@ Keyboard.addListener('keyboardWillHide', () => {
 - [ ] Haptic feedback works (if supported)
 
 ### Web (Desktop & Mobile browsers)
+
 - [ ] Trackpad/mouse wheel scrolling works
 - [ ] Touch scrolling works on mobile web
 - [ ] PWA install works
@@ -563,6 +595,7 @@ Keyboard.addListener('keyboardWillHide', () => {
 - [ ] Keyboard shortcuts work (⌘K for search)
 
 ### Cross-Platform
+
 - [ ] All pages scroll properly
 - [ ] No layout shift on route change
 - [ ] Modals center correctly and are dismissible
@@ -576,6 +609,7 @@ Keyboard.addListener('keyboardWillHide', () => {
 ## Files to Modify
 
 ### High Priority
+
 1. `src/index.css` - Add scroll container utilities
 2. `src/components/layout/TabBar.tsx` - Verify safe-bottom
 3. `src/pages/PlanDetailPage.tsx` - Add safe-bottom to action bar
@@ -584,12 +618,14 @@ Keyboard.addListener('keyboardWillHide', () => {
 6. `android/app/src/main/AndroidManifest.xml` - Add permissions
 
 ### Medium Priority
+
 7. All modal components - Add safe area classes
 8. All form inputs - Add inputMode, autocomplete
 9. `public/manifest.json` - Add shortcuts
 10. Modal z-index standardization
 
 ### Low Priority
+
 11. Active state animations for better touch feedback
 12. Keyboard plugin integration in forms
 13. Additional PWA enhancements
@@ -615,4 +651,3 @@ Keyboard.addListener('keyboardWillHide', () => {
 - Safe area classes already exist, just need consistent application
 - Native plugins (Capacitor) working correctly
 - Focus on polish and consistency across platforms
-

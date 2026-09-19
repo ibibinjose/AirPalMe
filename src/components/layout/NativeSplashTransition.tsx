@@ -21,10 +21,7 @@ interface NativeSplashTransitionProps {
  * SplashScreen plugin to fade out the native splash window, and smoothly dissolves
  * the branded overlay into the app shell.
  */
-export function NativeSplashTransition({
-  holdDuration = 250,
-  fadeDuration = 350,
-}: NativeSplashTransitionProps) {
+export function NativeSplashTransition({ holdDuration = 250, fadeDuration = 350 }: NativeSplashTransitionProps) {
   const [mounted, setMounted] = useState(true);
   const [fading, setFading] = useState(false);
 
@@ -68,9 +65,7 @@ export function NativeSplashTransition({
         <div className="font-display text-2xl font-bold tracking-tight text-ink">
           AirPal<span className="text-brand">.me</span>
         </div>
-        <div className="text-[11px] font-semibold tracking-widest uppercase text-gold mt-1.5">
-          {BRAND_TAGLINE}
-        </div>
+        <div className="text-[11px] font-semibold tracking-widest uppercase text-gold mt-1.5">{BRAND_TAGLINE}</div>
       </div>
     </div>
   );

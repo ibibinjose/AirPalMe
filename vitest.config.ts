@@ -9,7 +9,7 @@ export default defineConfig({
     __FIREBASE_APPLET_CONFIG__: JSON.stringify({}),
   },
   test: {
-    include: ["shared/**/*.test.ts", "src/**/*.test.ts"],
+    include: ["shared/**/*.test.ts", "src/**/*.test.ts", "functions/src/**/*.test.ts"],
     environment: "node",
   },
   resolve: {

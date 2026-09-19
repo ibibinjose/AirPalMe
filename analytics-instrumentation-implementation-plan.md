@@ -25,11 +25,11 @@ The implementation should follow these principles:
 
 ## 2. Architecture options
 
-| Approach | What it does | Tradeoffs | Cost | Setup complexity |
-|---|---|---|---|---|
-| **A. Firebase-first event ledger plus optional GA4** | Sends product events through a typed client module, writes authoritative events through callable Functions or a controlled Firestore path, and optionally mirrors privacy-safe events to Firebase Analytics/GA4. Scheduled aggregation creates per-context and per-tenant KPI documents. | Best operator reporting and auditability; more engineering and Firestore volume; requires retention and aggregation controls. | Firebase usage plus optional GA4; usually modest at pilot volume. | Medium to high |
-| **B. Lightweight GA4/Firebase Analytics only** | Calls `logEvent()` from the client and builds reports in GA4/Explorations. Backend domain records remain the source for claims and other transactions. | Fastest and cheapest; weak tenant isolation, historical reproducibility, and operator-facing reporting; sampled/retained analytics may not support all business questions. | Low additional cost. | Low |
-| **C. Hybrid recommended for a commercial pilot** | Uses GA4/Firebase Analytics for UX diagnostics and a minimal server-side event ledger for QR attribution, first value, qualified actions, claims/redemptions, operator activation, and support outcomes. Aggregates only the events needed for business reporting. | Balances speed and durable business measurement; requires careful event ownership so the two streams do not drift. | Low to moderate at pilot volume. | Medium |
+| Approach                                             | What it does                                                                                                                                                                                                                                                                             | Tradeoffs                                                                                                                                                                  | Cost                                                              | Setup complexity |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ---------------- |
+| **A. Firebase-first event ledger plus optional GA4** | Sends product events through a typed client module, writes authoritative events through callable Functions or a controlled Firestore path, and optionally mirrors privacy-safe events to Firebase Analytics/GA4. Scheduled aggregation creates per-context and per-tenant KPI documents. | Best operator reporting and auditability; more engineering and Firestore volume; requires retention and aggregation controls.                                              | Firebase usage plus optional GA4; usually modest at pilot volume. | Medium to high   |
+| **B. Lightweight GA4/Firebase Analytics only**       | Calls `logEvent()` from the client and builds reports in GA4/Explorations. Backend domain records remain the source for claims and other transactions.                                                                                                                                   | Fastest and cheapest; weak tenant isolation, historical reproducibility, and operator-facing reporting; sampled/retained analytics may not support all business questions. | Low additional cost.                                              | Low              |
+| **C. Hybrid recommended for a commercial pilot**     | Uses GA4/Firebase Analytics for UX diagnostics and a minimal server-side event ledger for QR attribution, first value, qualified actions, claims/redemptions, operator activation, and support outcomes. Aggregates only the events needed for business reporting.                       | Balances speed and durable business measurement; requires careful event ownership so the two streams do not drift.                                                         | Low to moderate at pilot volume.                                  | Medium           |
 
 **Suggested implementation baseline:** use **Option C**. It is light enough to ship incrementally, while preserving the server-side facts needed to prove operator value and calculate the north-star metric by tenant, context, and campaign. Option B is acceptable for a short prototype, but should not be the final architecture if AirPal.me intends to sell operator subscriptions or partner reporting.
 
@@ -114,18 +114,18 @@ A rising WQGA/Context with rising errors, stale content, or unverified claims is
 
 Add or formalize these identifiers across the app:
 
-| Identifier | Meaning | Lifetime | Examples |
-|---|---|---|---|
-| `eventId` | Unique telemetry event ID generated once per event | Permanent for retained event | UUID or `nanoid` |
-| `anonymousSessionId` | Browser session identifier, not an account identity | Session or 30 days | Stored in first-party session/local storage |
-| `visitorId` | Optional privacy-safe first-party identifier | 30–90 days, consent-dependent | Random UUID; do not derive from email/device fingerprint |
-| `tenantId` | Paying/operating organisation boundary | Permanent | Property group, campus, organiser, precinct |
-| `contextId` | QR-enabled experience being measured | Permanent | Property, room, marker, campus, event gate |
-| `contextType` | Context taxonomy | Permanent | `property`, `room`, `marker`, `campus`, `event`, `business`, `bio` |
-| `qrCampaignId` | Printed or distributed QR placement/campaign | Permanent | `hotel-lobby-2026-q3`, generated placement ID |
-| `contentId` | Specific answer, place, offer, event, stall, or profile | Permanent | Existing domain IDs |
-| `source` | Acquisition source | Event-level | `qr`, `direct`, `share`, `referral`, `internal`, `unknown` |
-| `backendState` | Whether the action was live, cached, queued, or demo | Event-level | `live`, `offline_queued`, `local_demo`, `failed` |
+| Identifier           | Meaning                                                 | Lifetime                      | Examples                                                           |
+| -------------------- | ------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------ |
+| `eventId`            | Unique telemetry event ID generated once per event      | Permanent for retained event  | UUID or `nanoid`                                                   |
+| `anonymousSessionId` | Browser session identifier, not an account identity     | Session or 30 days            | Stored in first-party session/local storage                        |
+| `visitorId`          | Optional privacy-safe first-party identifier            | 30–90 days, consent-dependent | Random UUID; do not derive from email/device fingerprint           |
+| `tenantId`           | Paying/operating organisation boundary                  | Permanent                     | Property group, campus, organiser, precinct                        |
+| `contextId`          | QR-enabled experience being measured                    | Permanent                     | Property, room, marker, campus, event gate                         |
+| `contextType`        | Context taxonomy                                        | Permanent                     | `property`, `room`, `marker`, `campus`, `event`, `business`, `bio` |
+| `qrCampaignId`       | Printed or distributed QR placement/campaign            | Permanent                     | `hotel-lobby-2026-q3`, generated placement ID                      |
+| `contentId`          | Specific answer, place, offer, event, stall, or profile | Permanent                     | Existing domain IDs                                                |
+| `source`             | Acquisition source                                      | Event-level                   | `qr`, `direct`, `share`, `referral`, `internal`, `unknown`         |
+| `backendState`       | Whether the action was live, cached, queued, or demo    | Event-level                   | `live`, `offline_queued`, `local_demo`, `failed`                   |
 
 `tenantId` and `contextId` must come from server-authoritative records for reporting. The client may propose them, but a server-side validation step must reject events for unknown or unauthorized reporting contexts.
 
@@ -180,27 +180,27 @@ Add runtime validation. Only allow an explicit property allowlist per event name
 
 ### 4.3 Event property allowlist
 
-| Event | Required properties | Optional properties | Counts toward north star? |
-|---|---|---|---|
-| `session_started` | `entryPath`, `source` | `referrerClass`, `locale` | No |
-| `qr_scan` | `contextType`, `contextId` | `qrCampaignId`, `placementType`, `source` | No |
-| `context_view` | `contextType`, `contextId`, `loadStatus` | `loadMs`, `backendState` | No |
-| `context_load_failed` | `contextType`, `contextId`, `errorClass` | `loadMs` | No |
-| `first_value` | `valueType`, `contextId` | `contentId`, `timeFromSessionStartMs` | Yes, one per session/context/day maximum |
-| `content_action` | `actionType`, `contextId` | `contentId`, `category`, `destination` | Yes for approved action types |
-| `ask_submitted` | `contextId`, `questionCategory` | `answerSource`, `latencyMs` | No; `ask_answered` may count when useful |
-| `ask_answered` | `contextId`, `answerStatus` | `questionCategory`, `helpful` | Yes if the answer is successfully shown |
-| `offer_view` | `offerId`, `partnerId`, `contextId` | `placement` | No |
-| `offer_claim` | `offerId`, `partnerId`, `claimId`, `contextId` | `expiryBucket` | Yes |
-| `offer_redeem` | `offerId`, `partnerId`, `claimId` | `redemptionChannel` | Yes; authoritative server event |
-| `event_save` | `eventId`, `contextId` | `stallId`, `source` | Yes |
-| `event_check_in` | `eventId`, `contextId`, `checkInId` | `method` | Yes; authoritative server event |
-| `support_request` | `contextId`, `requestId`, `category` | `priority` | Yes when successfully created |
-| `support_resolved` | `contextId`, `requestId`, `resolutionStatus` | `resolutionTimeMs` | Yes when resolved |
-| `host_activation` | `tenantId`, `activationStep` | `contextId`, `actorRole` | No |
-| `content_publish` | `tenantId`, `contentType`, `contentId` | `contextId`, `actorRole` | No |
-| `rating_submitted` | `targetType`, `targetId`, `contextId` | `ratingBucket` | Yes if tied to an eligible interaction |
-| `share_created` | `shareType`, `contextId` | `contentId`, `destination` | No |
+| Event                 | Required properties                            | Optional properties                       | Counts toward north star?                |
+| --------------------- | ---------------------------------------------- | ----------------------------------------- | ---------------------------------------- |
+| `session_started`     | `entryPath`, `source`                          | `referrerClass`, `locale`                 | No                                       |
+| `qr_scan`             | `contextType`, `contextId`                     | `qrCampaignId`, `placementType`, `source` | No                                       |
+| `context_view`        | `contextType`, `contextId`, `loadStatus`       | `loadMs`, `backendState`                  | No                                       |
+| `context_load_failed` | `contextType`, `contextId`, `errorClass`       | `loadMs`                                  | No                                       |
+| `first_value`         | `valueType`, `contextId`                       | `contentId`, `timeFromSessionStartMs`     | Yes, one per session/context/day maximum |
+| `content_action`      | `actionType`, `contextId`                      | `contentId`, `category`, `destination`    | Yes for approved action types            |
+| `ask_submitted`       | `contextId`, `questionCategory`                | `answerSource`, `latencyMs`               | No; `ask_answered` may count when useful |
+| `ask_answered`        | `contextId`, `answerStatus`                    | `questionCategory`, `helpful`             | Yes if the answer is successfully shown  |
+| `offer_view`          | `offerId`, `partnerId`, `contextId`            | `placement`                               | No                                       |
+| `offer_claim`         | `offerId`, `partnerId`, `claimId`, `contextId` | `expiryBucket`                            | Yes                                      |
+| `offer_redeem`        | `offerId`, `partnerId`, `claimId`              | `redemptionChannel`                       | Yes; authoritative server event          |
+| `event_save`          | `eventId`, `contextId`                         | `stallId`, `source`                       | Yes                                      |
+| `event_check_in`      | `eventId`, `contextId`, `checkInId`            | `method`                                  | Yes; authoritative server event          |
+| `support_request`     | `contextId`, `requestId`, `category`           | `priority`                                | Yes when successfully created            |
+| `support_resolved`    | `contextId`, `requestId`, `resolutionStatus`   | `resolutionTimeMs`                        | Yes when resolved                        |
+| `host_activation`     | `tenantId`, `activationStep`                   | `contextId`, `actorRole`                  | No                                       |
+| `content_publish`     | `tenantId`, `contentType`, `contentId`         | `contextId`, `actorRole`                  | No                                       |
+| `rating_submitted`    | `targetType`, `targetId`, `contextId`          | `ratingBucket`                            | Yes if tied to an eligible interaction   |
+| `share_created`       | `shareType`, `contextId`                       | `contentId`, `destination`                | No                                       |
 
 The taxonomy intentionally avoids recording the actual free-text question, notes, email, phone number, Wi-Fi password, or full referral URL.
 
@@ -413,15 +413,15 @@ Eligibility requires:
 
 Recommended dedupe windows:
 
-| Event type | Dedupe key | Window |
-|---|---|---|
-| `first_value` | session + context + calendar day | Once per session/context/day |
-| `content_action` | session + context + action type + content ID | 24 hours |
-| `offer_claim` | claim ID | Permanent |
-| `offer_redeem` | redemption ID | Permanent |
-| `event_check_in` | check-in ID | Permanent |
-| `support_request` | request ID | Permanent |
-| `rating_submitted` | rating ID or session + target | 24 hours |
+| Event type         | Dedupe key                                   | Window                       |
+| ------------------ | -------------------------------------------- | ---------------------------- |
+| `first_value`      | session + context + calendar day             | Once per session/context/day |
+| `content_action`   | session + context + action type + content ID | 24 hours                     |
+| `offer_claim`      | claim ID                                     | Permanent                    |
+| `offer_redeem`     | redemption ID                                | Permanent                    |
+| `event_check_in`   | check-in ID                                  | Permanent                    |
+| `support_request`  | request ID                                   | Permanent                    |
+| `rating_submitted` | rating ID or session + target                | 24 hours                     |
 
 ### 6.2 Reporting views
 
@@ -548,18 +548,18 @@ The analytics implementation is ready for pilot use when:
 
 Set targets after a one-week baseline, but use provisional thresholds to guide the pilot:
 
-| Metric | Initial target |
-|---|---:|
-| Context view success | ≥ 99% |
-| p95 context load time | ≤ 2.5 seconds |
-| First-value rate | ≥ 40% of eligible guest sessions |
-| Qualified-action rate | ≥ 30% of eligible guest sessions |
-| Analytics accepted-event rate | ≥ 98% |
-| Duplicate/rejected event rate | < 5% excluding deliberate abuse tests |
-| Local/demo events in production reports | 0% |
-| Active contexts with owner and freshness timestamp | 100% |
-| Operator setup completed without staff repair | ≥ 80% |
-| Support requests with a final status | ≥ 95% |
+| Metric                                             |                        Initial target |
+| -------------------------------------------------- | ------------------------------------: |
+| Context view success                               |                                 ≥ 99% |
+| p95 context load time                              |                         ≤ 2.5 seconds |
+| First-value rate                                   |      ≥ 40% of eligible guest sessions |
+| Qualified-action rate                              |      ≥ 30% of eligible guest sessions |
+| Analytics accepted-event rate                      |                                 ≥ 98% |
+| Duplicate/rejected event rate                      | < 5% excluding deliberate abuse tests |
+| Local/demo events in production reports            |                                    0% |
+| Active contexts with owner and freshness timestamp |                                  100% |
+| Operator setup completed without staff repair      |                                 ≥ 80% |
+| Support requests with a final status               |                                 ≥ 95% |
 
 These are starting hypotheses, not universal benchmarks. The purpose of the first pilot is to establish a trustworthy baseline and identify which qualified actions actually correlate with operator renewal.
 

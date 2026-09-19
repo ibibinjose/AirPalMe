@@ -37,7 +37,7 @@ export function SyncStatusBar() {
       role="status"
       className={cn(
         "flex items-center justify-center gap-2 px-3 py-1.5 text-[12px]",
-        failed ? "bg-ink text-white" : "bg-card/90 text-mute",
+        failed ? "bg-brand text-white" : "bg-card/90 text-mute",
       )}
     >
       {state === "syncing" && <LoaderCircle size={12} className="animate-spin" />}
@@ -48,9 +48,7 @@ export function SyncStatusBar() {
         {job.label}: {t(`sync.${state}`) || syncLabel(state, powerSave)}
       </span>
       {powerSave && state === "pending_retry" && (
-        <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-300">
-          Power Saver (delayed)
-        </span>
+        <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-300">Power Saver (delayed)</span>
       )}
       {state === "failed" && sync && (
         <button

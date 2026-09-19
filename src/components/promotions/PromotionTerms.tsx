@@ -17,7 +17,7 @@ function Row({ label, value }: { label: string; value: string }) {
 export function PromotionTerms({ promotion, defaultOpen = false }: { promotion: Promotion; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="rounded-2xl border-2 border-ink bg-card">
+    <div className="rounded-2xl ring-1 ring-line bg-card">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -33,27 +33,18 @@ export function PromotionTerms({ promotion, defaultOpen = false }: { promotion: 
           <Row label="What is it" value={promotion.description} />
           <Row label="Who is eligible" value={promotion.eligibility} />
           <Row label="How it works" value={promotion.entryRules} />
-          <Row
-            label="When it ends"
-            value={promotion.endAt ? new Date(promotion.endAt).toLocaleString() : ""}
-          />
+          <Row label="When it ends" value={promotion.endAt ? new Date(promotion.endAt).toLocaleString() : ""} />
           <Row label="Prize" value={promotion.prizeValue || promotion.prize.title} />
           <Row label="Winner method" value={promotion.winnerSelectionMethod} />
           <Row
             label="Winner announcement"
-            value={
-              promotion.winnerAnnouncementAt
-                ? new Date(promotion.winnerAnnouncementAt).toLocaleString()
-                : ""
-            }
+            value={promotion.winnerAnnouncementAt ? new Date(promotion.winnerAnnouncementAt).toLocaleString() : ""}
           />
           <Row label="Sponsor" value={promotion.sponsorName} />
           <Row label="Contact" value={promotion.contactEmail} />
           <Row label="Jurisdiction" value={promotion.jurisdiction} />
           <Row label="Privacy" value={promotion.privacyNote} />
-          {promotion.termsText && (
-            <p className="whitespace-pre-line pt-3 text-sm text-mute">{promotion.termsText}</p>
-          )}
+          {promotion.termsText && <p className="whitespace-pre-line pt-3 text-sm text-mute">{promotion.termsText}</p>}
           <p className="pt-3 text-xs text-mute">Subject to the official promotion terms.</p>
         </div>
       )}

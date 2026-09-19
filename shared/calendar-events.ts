@@ -4,7 +4,8 @@ export const CURATED_LOCAL_EVENTS: Omit<CalendarEvent, "isGoing" | "isInterested
   {
     id: "evt-argyle-jazz",
     title: "Argyle Laneway Jazz & Acoustic Sessions",
-    description: "Intimate acoustic string duo and jazz quartet resonating beneath the historic Argyle Cut sandstone arches. Grab a hot cider or local brew.",
+    description:
+      "Intimate acoustic string duo and jazz quartet resonating beneath the historic Argyle Cut sandstone arches. Grab a hot cider or local brew.",
     startsAt: "2026-09-11T18:00:00+10:00",
     endsAt: "2026-09-11T21:00:00+10:00",
     date: "2026-09-11",
@@ -23,7 +24,8 @@ export const CURATED_LOCAL_EVENTS: Omit<CalendarEvent, "isGoing" | "isInterested
   {
     id: "evt-dawes-sunset",
     title: "Sunset at Dawes Point Reserve",
-    description: "Relax on the harbour lawn under the Harbour Bridge as the Opera House sails glow golden at twilight. Bring a blanket and takeaway gelato.",
+    description:
+      "Relax on the harbour lawn under the Harbour Bridge as the Opera House sails glow golden at twilight. Bring a blanket and takeaway gelato.",
     startsAt: "2026-09-11T17:30:00+10:00",
     endsAt: "2026-09-11T19:30:00+10:00",
     date: "2026-09-11",
@@ -41,7 +43,8 @@ export const CURATED_LOCAL_EVENTS: Omit<CalendarEvent, "isGoing" | "isInterested
   {
     id: "evt-rocks-market",
     title: "The Rocks Weekend Market",
-    description: "Over 80 curated Australian makers, independent jewellers, ceramicists, and street food stalls lining the cobblestone laneways of George and Playfair.",
+    description:
+      "Over 80 curated Australian makers, independent jewellers, ceramicists, and street food stalls lining the cobblestone laneways of George and Playfair.",
     startsAt: "2026-09-12T10:00:00+10:00",
     endsAt: "2026-09-12T17:00:00+10:00",
     date: "2026-09-12",
@@ -61,7 +64,8 @@ export const CURATED_LOCAL_EVENTS: Omit<CalendarEvent, "isGoing" | "isInterested
   {
     id: "evt-opera-forecourt",
     title: "Sydney Opera House Forecourt Live",
-    description: "Twilight acoustic sets and modern string ensembles performing live against the harbour backdrop on the monument steps.",
+    description:
+      "Twilight acoustic sets and modern string ensembles performing live against the harbour backdrop on the monument steps.",
     startsAt: "2026-09-12T19:00:00+10:00",
     endsAt: "2026-09-12T22:00:00+10:00",
     date: "2026-09-12",
@@ -80,7 +84,8 @@ export const CURATED_LOCAL_EVENTS: Omit<CalendarEvent, "isGoing" | "isInterested
   {
     id: "evt-sunrise-yoga",
     title: "Harbour Sunrise Yoga & Breathwork",
-    description: "Early morning mindful Vinyasa flow overlooking Circular Quay and the Sydney Opera House. Mats and herbal teas provided for all levels.",
+    description:
+      "Early morning mindful Vinyasa flow overlooking Circular Quay and the Sydney Opera House. Mats and herbal teas provided for all levels.",
     startsAt: "2026-09-13T06:30:00+10:00",
     endsAt: "2026-09-13T07:45:00+10:00",
     date: "2026-09-13",
@@ -99,7 +104,8 @@ export const CURATED_LOCAL_EVENTS: Omit<CalendarEvent, "isGoing" | "isInterested
   {
     id: "evt-rocks-market-sun",
     title: "The Rocks Sunday Market & Artisans",
-    description: "Sunday edition of the iconic open-air market with live street performers, handmade leather goods, indigenous prints, and gourmet food trucks.",
+    description:
+      "Sunday edition of the iconic open-air market with live street performers, handmade leather goods, indigenous prints, and gourmet food trucks.",
     startsAt: "2026-09-13T10:00:00+10:00",
     endsAt: "2026-09-13T17:00:00+10:00",
     date: "2026-09-13",
@@ -119,7 +125,8 @@ export const CURATED_LOCAL_EVENTS: Omit<CalendarEvent, "isGoing" | "isInterested
   {
     id: "evt-botanical-weaving",
     title: "Native Botanical & Weaving Workshop",
-    description: "Hands-on cultural weaving workshop using native Australian grasses and fibrous plants led by local First Nations artisans.",
+    description:
+      "Hands-on cultural weaving workshop using native Australian grasses and fibrous plants led by local First Nations artisans.",
     startsAt: "2026-09-13T14:00:00+10:00",
     endsAt: "2026-09-13T16:00:00+10:00",
     date: "2026-09-13",
@@ -137,7 +144,8 @@ export const CURATED_LOCAL_EVENTS: Omit<CalendarEvent, "isGoing" | "isInterested
   {
     id: "evt-quay-coffee-walk",
     title: "Circular Quay Artisan Coffee Tasting Trail",
-    description: "Curated walking tour through hidden roasters and heritage espresso bars across The Rocks and Quay laneways with single-origin cupping.",
+    description:
+      "Curated walking tour through hidden roasters and heritage espresso bars across The Rocks and Quay laneways with single-origin cupping.",
     startsAt: "2026-09-15T09:00:00+10:00",
     endsAt: "2026-09-15T11:30:00+10:00",
     date: "2026-09-15",
@@ -156,7 +164,8 @@ export const CURATED_LOCAL_EVENTS: Omit<CalendarEvent, "isGoing" | "isInterested
   {
     id: "evt-glenmore-twilight",
     title: "The Glenmore Rooftop Twilight Sessions",
-    description: "Sunset craft beers, signature botanical cocktails, and acoustic soul with uninterrupted views of the Opera House and harbour ferry channels.",
+    description:
+      "Sunset craft beers, signature botanical cocktails, and acoustic soul with uninterrupted views of the Opera House and harbour ferry channels.",
     startsAt: "2026-09-18T17:00:00+10:00",
     endsAt: "2026-09-18T20:30:00+10:00",
     date: "2026-09-18",
@@ -175,7 +184,8 @@ export const CURATED_LOCAL_EVENTS: Omit<CalendarEvent, "isGoing" | "isInterested
   {
     id: "evt-craft-beer-fest",
     title: "Sydney Craft Beer & Food Truck Laneway Fest",
-    description: "Over 16 independent NSW microbreweries pouring craft ales, sours, and crisp lagers alongside Sydney's premier street food trucks.",
+    description:
+      "Over 16 independent NSW microbreweries pouring craft ales, sours, and crisp lagers alongside Sydney's premier street food trucks.",
     startsAt: "2026-09-19T12:00:00+10:00",
     endsAt: "2026-09-19T20:00:00+10:00",
     date: "2026-09-19",
@@ -194,7 +204,8 @@ export const CURATED_LOCAL_EVENTS: Omit<CalendarEvent, "isGoing" | "isInterested
   {
     id: "evt-sandstone-lantern-tour",
     title: "Heritage Sandstone & Lantern Night Tour",
-    description: "Atmospheric lantern-lit walking tour exploring 19th-century convict history, sailor taverns, and hidden passageways through The Rocks.",
+    description:
+      "Atmospheric lantern-lit walking tour exploring 19th-century convict history, sailor taverns, and hidden passageways through The Rocks.",
     startsAt: "2026-09-19T19:30:00+10:00",
     endsAt: "2026-09-19T21:00:00+10:00",
     date: "2026-09-19",
@@ -213,7 +224,8 @@ export const CURATED_LOCAL_EVENTS: Omit<CalendarEvent, "isGoing" | "isInterested
   {
     id: "evt-maritime-trail",
     title: "Barangaroo to The Rocks Maritime Sculpture Trail",
-    description: "Guided harbour foreshore walk featuring contemporary outdoor maritime sculptures, native headland landscaping, and harbour lookouts.",
+    description:
+      "Guided harbour foreshore walk featuring contemporary outdoor maritime sculptures, native headland landscaping, and harbour lookouts.",
     startsAt: "2026-09-20T10:00:00+10:00",
     endsAt: "2026-09-20T12:30:00+10:00",
     date: "2026-09-20",
@@ -231,7 +243,8 @@ export const CURATED_LOCAL_EVENTS: Omit<CalendarEvent, "isGoing" | "isInterested
   {
     id: "evt-sydney-maker-fair",
     title: "Harbour Makers & Ceramic Design Fair",
-    description: "Annual showcase of studio ceramicists, woodworkers, printmakers, and sustainable fashion designers exhibiting one-off handcrafted works.",
+    description:
+      "Annual showcase of studio ceramicists, woodworkers, printmakers, and sustainable fashion designers exhibiting one-off handcrafted works.",
     startsAt: "2026-09-26T10:00:00+10:00",
     endsAt: "2026-09-26T16:00:00+10:00",
     date: "2026-09-26",

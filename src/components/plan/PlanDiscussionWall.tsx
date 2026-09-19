@@ -61,14 +61,16 @@ export function PlanDiscussionWall({
                 key={comment.id}
                 className={cn(
                   "flex gap-3 rounded-2xl p-3.5 ring-1 transition",
-                  isMe
-                    ? "bg-brand/5 ring-brand/20 ml-4 sm:ml-8"
-                    : "bg-paper ring-line mr-4 sm:mr-8",
+                  isMe ? "bg-brand/5 ring-brand/20 ml-4 sm:ml-8" : "bg-paper ring-line mr-4 sm:mr-8",
                 )}
               >
                 <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-card text-xs font-bold text-ink ring-1 ring-line uppercase">
                   {comment.authorAvatar ? (
-                    <img src={comment.authorAvatar} alt={comment.authorName} className="h-full w-full rounded-xl object-cover" />
+                    <img
+                      src={comment.authorAvatar}
+                      alt={comment.authorName}
+                      className="h-full w-full rounded-xl object-cover"
+                    />
                   ) : (
                     <span>{comment.authorName.charAt(0)}</span>
                   )}
@@ -77,7 +79,9 @@ export function PlanDiscussionWall({
                   <div className="flex items-center justify-between gap-2">
                     <p className="truncate text-xs font-semibold text-ink">
                       {comment.authorName}
-                      {comment.authorHandle && <span className="text-mute font-normal"> (@{comment.authorHandle})</span>}
+                      {comment.authorHandle && (
+                        <span className="text-mute font-normal"> (@{comment.authorHandle})</span>
+                      )}
                       {isMe && <span className="ml-1 text-[10px] text-brand font-medium">(You)</span>}
                     </p>
                     <span className="text-[10px] text-mute shrink-0">
@@ -89,7 +93,11 @@ export function PlanDiscussionWall({
                   </p>
                   {comment.photoUrl && (
                     <div className="mt-2.5 overflow-hidden rounded-xl ring-1 ring-line max-w-xs">
-                      <img src={comment.photoUrl} alt="Drop from crew" className="w-full h-auto object-cover max-h-48" />
+                      <img
+                        src={comment.photoUrl}
+                        alt="Drop from crew"
+                        className="w-full h-auto object-cover max-h-48"
+                      />
                     </div>
                   )}
                 </div>
@@ -131,7 +139,7 @@ export function PlanDiscussionWall({
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Post a message, meeting spot update, or photo..."
-            className="h-11 flex-1 rounded-2xl bg-paper px-4 text-xs sm:text-sm border border-ink outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
+            className="h-11 flex-1 rounded-2xl bg-paper px-4 text-xs sm:text-sm border border-line outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
           />
           <button
             type="button"

@@ -17,7 +17,6 @@ import {
   venueTradeOf,
 } from "./nearby";
 
-
 describe("nearby helpers", () => {
   it("only defaults The Rocks for the Sydney pilot city", () => {
     expect(resolvePrecinctId("kovalam-beach", "sydney")).toBe("kovalam-beach");
@@ -88,9 +87,9 @@ describe("nearby helpers", () => {
   });
 
   it("sends room markers to stay dining and others to nearby eat", () => {
-    expect(
-      conciergeOrderHref({ kind: "room", propertyId: "p_abc", roomToken: "Tok/1" }),
-    ).toBe("/g/p_abc?r=Tok%2F1&type=dining");
+    expect(conciergeOrderHref({ kind: "room", propertyId: "p_abc", roomToken: "Tok/1" })).toBe(
+      "/g/p_abc?r=Tok%2F1&type=dining",
+    );
     expect(conciergeOrderHref({ kind: "lobby", propertyId: "p_abc" })).toBeUndefined();
   });
 

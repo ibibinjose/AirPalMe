@@ -25,7 +25,7 @@ function Card({ p, featured }: { p: Promotion; featured?: boolean }) {
     <Link
       href={`/giveaways/${p.id}`}
       className={cn(
-        "block overflow-hidden rounded-3xl border-2 border-ink bg-card shadow-sm transition-transform hover:-translate-y-0.5",
+        "block overflow-hidden rounded-3xl ring-1 ring-line bg-card shadow-sm transition-transform hover:-translate-y-0.5",
         featured && "border-gold",
       )}
     >
@@ -35,7 +35,9 @@ function Card({ p, featured }: { p: Promotion; featured?: boolean }) {
         <div
           className={cn(
             "grid h-40 w-full place-items-center",
-            featured ? "bg-gradient-to-br from-gold/30 via-amber-100 to-brand/20" : "bg-gradient-to-br from-brand/15 via-sky-100 to-emerald-100",
+            featured
+              ? "bg-gradient-to-br from-gold/30 via-amber-100 to-brand/20"
+              : "bg-gradient-to-br from-brand/15 via-sky-100 to-emerald-100",
           )}
         >
           {closed ? <Trophy size={40} className="text-gold" /> : <Gift size={40} className="text-brand" />}
@@ -43,7 +45,12 @@ function Card({ p, featured }: { p: Promotion; featured?: boolean }) {
       )}
       <div className="p-4">
         <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider">
-          <span className={cn("rounded-full px-2 py-0.5", closed ? "bg-ink/10 text-mute" : "bg-emerald-500/10 text-emerald-700")}>
+          <span
+            className={cn(
+              "rounded-full px-2 py-0.5",
+              closed ? "bg-ink/10 text-mute" : "bg-emerald-500/10 text-emerald-700",
+            )}
+          >
             {closed ? "Closed" : p.status === "live" ? "Open" : "Coming soon"}
           </span>
           {p.category && <span className="text-mute">{p.category}</span>}
@@ -52,9 +59,15 @@ function Card({ p, featured }: { p: Promotion; featured?: boolean }) {
         <p className="mt-1 line-clamp-2 text-sm text-mute">{p.prize.title || p.description}</p>
         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-mute">
           {p.prizeValue && <span className="font-semibold text-ink">{p.prizeValue}</span>}
-          <span className="inline-flex items-center gap-1"><Clock size={12} />{closingLabel(p)}</span>
+          <span className="inline-flex items-center gap-1">
+            <Clock size={12} />
+            {closingLabel(p)}
+          </span>
           {p.locationText && (
-            <span className="inline-flex items-center gap-1"><MapPin size={12} />{p.locationText}</span>
+            <span className="inline-flex items-center gap-1">
+              <MapPin size={12} />
+              {p.locationText}
+            </span>
           )}
         </div>
         <p className="mt-1 truncate text-xs text-mute">by {p.sponsorName}</p>
@@ -86,7 +99,11 @@ export function GiveawaysPage() {
       return;
     }
     void getDocs(
-      query(collection(db, "promotions"), where("kind", "==", "giveaway"), where("status", "in", ["live", "closed", "scheduled", "approved"])),
+      query(
+        collection(db, "promotions"),
+        where("kind", "==", "giveaway"),
+        where("status", "in", ["live", "closed", "scheduled", "approved"]),
+      ),
     )
       .then((snap) => {
         const list = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Promotion, "id">) }));
@@ -150,7 +167,7 @@ export function GiveawaysPage() {
             onClick={() => setCategory(c)}
             className={cn(
               "shrink-0 rounded-full border-2 px-3 py-1 text-xs font-semibold",
-              category === c ? "border-ink bg-ink text-white" : "border-ink/15 bg-card",
+              category === c ? "border-brand bg-brand text-white" : "border-ink/15 bg-card",
             )}
           >
             {c}
@@ -176,9 +193,13 @@ export function GiveawaysPage() {
               <h2 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gold">
                 <CalendarDays size={13} /> AirPal.Me Weekly
               </h2>
-              <p className="mt-1 text-sm text-mute">Every week. Something to discover. Something to experience. Something to win.</p>
+              <p className="mt-1 text-sm text-mute">
+                Every week. Something to discover. Something to experience. Something to win.
+              </p>
               {weekly.giveaway ? (
-                <div className="mt-3"><Card p={weekly.giveaway} featured /></div>
+                <div className="mt-3">
+                  <Card p={weekly.giveaway} featured />
+                </div>
               ) : weekly.campaign.destination ? (
                 <p className="font-display mt-2 text-lg font-bold">This week: {weekly.campaign.destination}</p>
               ) : null}
@@ -193,19 +214,31 @@ export function GiveawaysPage() {
           {endingSoon.length > 0 && (
             <section>
               <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-mute">Ending soon</h2>
-              <div className="space-y-4">{endingSoon.map((p) => <Card key={p.id} p={p} />)}</div>
+              <div className="space-y-4">
+                {endingSoon.map((p) => (
+                  <Card key={p.id} p={p} />
+                ))}
+              </div>
             </section>
           )}
           {active.length > 0 && (
             <section>
               <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-mute">Active giveaways</h2>
-              <div className="space-y-4">{active.map((p) => <Card key={p.id} p={p} />)}</div>
+              <div className="space-y-4">
+                {active.map((p) => (
+                  <Card key={p.id} p={p} />
+                ))}
+              </div>
             </section>
           )}
           {upcoming.length > 0 && (
             <section>
               <h2 className="mb-3 text-xs font-bold uppercase tracking-wider text-mute">Upcoming</h2>
-              <div className="space-y-4">{upcoming.map((p) => <Card key={p.id} p={p} />)}</div>
+              <div className="space-y-4">
+                {upcoming.map((p) => (
+                  <Card key={p.id} p={p} />
+                ))}
+              </div>
             </section>
           )}
           {winners.length > 0 && (
@@ -213,7 +246,11 @@ export function GiveawaysPage() {
               <h2 className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-mute">
                 <Trophy size={13} /> Previous winners
               </h2>
-              <div className="space-y-4">{winners.map((p) => <Card key={p.id} p={p} />)}</div>
+              <div className="space-y-4">
+                {winners.map((p) => (
+                  <Card key={p.id} p={p} />
+                ))}
+              </div>
             </section>
           )}
         </div>

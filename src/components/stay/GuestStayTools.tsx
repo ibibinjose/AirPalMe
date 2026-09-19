@@ -7,7 +7,20 @@ import { ContactHostSheet } from "./ContactHostSheet";
 import { DepartureChecklistSheet } from "./DepartureChecklistSheet";
 import { useLocale } from "@/contexts/LocaleContext";
 
-const HIDE = [/^\/scan/, /^\/host/, /^\/start/, /^\/admin/, /^\/partners/, /^\/join/, /^\/business/, /^\/event/, /^\/me/, /^\/e\//, /^\/bio/, /^\/@/];
+const HIDE = [
+  /^\/scan/,
+  /^\/host/,
+  /^\/start/,
+  /^\/admin/,
+  /^\/partners/,
+  /^\/join/,
+  /^\/business/,
+  /^\/event/,
+  /^\/me/,
+  /^\/e\//,
+  /^\/bio/,
+  /^\/@/,
+];
 
 export function GuestStayTools() {
   const [path] = useLocation();

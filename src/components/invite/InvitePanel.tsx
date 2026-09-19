@@ -29,7 +29,7 @@ export function InvitePanel({ handle }: { handle?: string }) {
 
   if (!handle) {
     return (
-      <div className="rounded-[28px] border-2 border-ink bg-card p-5 text-center">
+      <div className="rounded-[28px] ring-1 ring-line bg-card p-5 text-center">
         <p className="font-display text-lg font-semibold">Invite friends to AirPal</p>
         <p className="mt-1 text-sm text-mute">Claim your @handle first — it becomes your invite code.</p>
         <Button className="mt-4" onClick={() => nav("/bio/setup")}>
@@ -59,7 +59,7 @@ export function InvitePanel({ handle }: { handle?: string }) {
   }
 
   return (
-    <div className="rounded-[28px] border-2 border-ink bg-card p-5">
+    <div className="rounded-[28px] ring-1 ring-line bg-card p-5">
       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Your invite code</p>
       <p className="font-display mt-1 text-2xl font-semibold">@{handle}</p>
 
@@ -69,12 +69,12 @@ export function InvitePanel({ handle }: { handle?: string }) {
           type="button"
           onClick={() => void copy()}
           aria-label="Copy invite link"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ink text-white transition active:scale-95"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand text-white transition active:scale-95"
         >
           {copied ? <Check size={15} /> : <Copy size={15} />}
         </button>
       </div>
-      <Button variant="ghost" className="mt-2 w-full border border-ink" onClick={share}>
+      <Button variant="ghost" className="mt-2 w-full border border-line" onClick={share}>
         <Send size={14} /> Send invite
       </Button>
 
@@ -94,15 +94,13 @@ export function InvitePanel({ handle }: { handle?: string }) {
               <li key={r.inviteeUid} className="flex items-center justify-between gap-2 text-sm">
                 <span className="truncate font-medium">{r.inviteeLabel}</span>
                 <span className="shrink-0 text-xs text-mute">
-                  {new Date(r.createdAt).toLocaleDateString("en-AU", { day: "numeric", month: "short" })}
+                  {new Date(r.createdAt).toLocaleDateString(undefined, { day: "numeric", month: "short" })}
                 </span>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="mt-1 text-[13px] text-mute">
-            Nobody yet — share your link and they’ll show up here.
-          </p>
+          <p className="mt-1 text-[13px] text-mute">Nobody yet — share your link and they’ll show up here.</p>
         )}
       </div>
     </div>

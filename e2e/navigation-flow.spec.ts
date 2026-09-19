@@ -1,6 +1,36 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Global Navigation & Profile Flow", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem("airpal.door.v1", "explore");
+      } catch {
+        /* ignore */
+      }
+    });
+  });
+
+  test("first visit is three doors, not a feed", async ({ page }) => {
+    await page.addInitScript(() => {
+      try {
+        localStorage.removeItem("airpal.door.v1");
+      } catch {
+        /* ignore */
+      }
+    });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+    await page.waitForLoadState("domcontentloaded");
+    await expect(page.getByRole("heading", { name: /What do you need/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Plan with people/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /See what’s on|See what's on/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /I’m staying here|I'm staying here/i })).toBeVisible();
+    await page.getByRole("button", { name: /See what’s on|See what's on/i }).click();
+    await expect(page).toHaveURL("/");
+    await expect(page.getByPlaceholder("Search places")).toBeVisible();
+  });
+
   test("desktop top navigation links between major application hubs", async ({ page }) => {
     // TopNav is visible on large screens (default viewport in playwright desktop is 1280x720)
     await page.setViewportSize({ width: 1280, height: 800 });
@@ -18,12 +48,10 @@ test.describe("Global Navigation & Profile Flow", () => {
     await header.getByRole("button", { name: "Plan" }).click();
     await expect(page).toHaveURL(/\/plan/);
 
-    // Navigate to Explore (home)
-    await header.getByRole("button", { name: "Explore" }).click();
+    await header.getByRole("button", { name: /On|What's on|Explore/i }).click();
     await expect(page).toHaveURL("/");
 
-    // Become a host button in header
-    await header.getByRole("button", { name: "Become a Host" }).click();
+    await header.getByRole("button", { name: "Add your place" }).click();
     await expect(page).toHaveURL(/\/join/);
   });
 
@@ -57,8 +85,9 @@ test.describe("Global Navigation & Profile Flow", () => {
     const menu = page.getByRole("menu");
     await expect(menu.getByText("Welcome to AirPal")).toBeVisible();
     await expect(menu.getByRole("menuitem", { name: /Sign in \/ Create account/i })).toBeVisible();
+    await expect(menu.getByRole("menuitem", { name: /Start your Circle/i })).toBeVisible();
+    await expect(menu.getByRole("menuitem", { name: /Add your place/i })).toBeVisible();
     await expect(menu.getByRole("menuitem", { name: /Become a Host/i })).toBeVisible();
-    await expect(menu.getByRole("menuitem", { name: /List a Business/i })).toBeVisible();
     await expect(menu.getByRole("menuitem", { name: /Organise an Event/i })).toBeVisible();
 
     // Click Sign in / Create account -> goes to /start
@@ -83,9 +112,14 @@ test.describe("Global Navigation & Profile Flow", () => {
     await tabNav.getByRole("button", { name: "Stay" }).click();
     await expect(page).toHaveURL(/\/concierge/);
 
-    // Navigate back to Explore via bottom tab
-    await tabNav.getByRole("button", { name: "Explore" }).click();
+    await tabNav.getByRole("button", { name: /On|What's on|Explore/i }).click();
     await expect(page).toHaveURL("/");
+
+    await tabNav.getByRole("button", { name: /Scan QR|Scan/i }).click();
+    await expect(page).toHaveURL(/\/scan/);
+
+    await tabNav.getByRole("button", { name: /My bio/i }).click();
+    await expect(page).toHaveURL(/\/start|\/bio\/setup|\/@|\/me/);
   });
 
   test("universal quick search command palette opens and navigates to places and tools", async ({ page }) => {
@@ -96,7 +130,7 @@ test.describe("Global Navigation & Profile Flow", () => {
     const searchBtn = page.getByRole("button", { name: "Search" }).first();
     await searchBtn.click();
 
-    const searchInput = page.getByPlaceholder(/Search places, events, stays, plans/i);
+    const searchInput = page.getByPlaceholder(/Search people, places, events, stays, plans/i);
     await expect(searchInput).toBeVisible();
 
     // Search for Glenmore

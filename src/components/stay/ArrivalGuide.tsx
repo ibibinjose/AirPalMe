@@ -5,13 +5,7 @@ import { useStayUi } from "@/contexts/StayUiContext";
 import { nearbyParking } from "@/lib/catalog";
 import { stayOrigin } from "@/lib/highlights";
 import { mapsDriveUrl, mapsPlaceUrl, mapsWalkUrl } from "@/lib/maps";
-import {
-  arrivalPhase,
-  countdownLabel,
-  defaultCheckInAt,
-  formatWhen,
-  type ArrivalPhase,
-} from "@/lib/arrival";
+import { arrivalPhase, countdownLabel, defaultCheckInAt, formatWhen, type ArrivalPhase } from "@/lib/arrival";
 import { cn } from "@/lib/cn";
 import { trackMapClick } from "@/lib/analytics";
 import { useLocale } from "@/contexts/LocaleContext";

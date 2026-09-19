@@ -1,9 +1,4 @@
-export type PendingIntentKind =
-  | "like-event"
-  | "going-event"
-  | "interested-event"
-  | "follow-handle"
-  | "like-handle";
+export type PendingIntentKind = "like-event" | "going-event" | "interested-event" | "follow-handle" | "like-handle";
 
 export interface PendingIntent {
   kind: PendingIntentKind;
@@ -20,13 +15,7 @@ function storage(): Storage | null {
   }
 }
 
-const KINDS: PendingIntentKind[] = [
-  "like-event",
-  "going-event",
-  "interested-event",
-  "follow-handle",
-  "like-handle",
-];
+const KINDS: PendingIntentKind[] = ["like-event", "going-event", "interested-event", "follow-handle", "like-handle"];
 
 function valid(intent: unknown): intent is PendingIntent {
   if (!intent || typeof intent !== "object") return false;

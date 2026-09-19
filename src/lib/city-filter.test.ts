@@ -2,10 +2,11 @@ import { describe, expect, it } from "vitest";
 import { businessCategoryForPlace } from "@shared/business";
 import { KERALA_PLACES } from "@shared/kerala-data";
 import { THE_ROCKS_PLACES } from "@shared/the-rocks-data";
-import { placesInCity, toursForPrecinct } from "./catalog";
+import { placesAround, placesInCity, toursForPrecinct } from "./catalog";
 
 const ROCKS = { lat: -33.85945, lng: 151.20835 };
 const MELB = { lat: -37.8136, lng: 144.9631 };
+const ASHFIELD = { lat: -33.8889, lng: 151.1256 };
 
 const rows = [
   { id: "rox-cafe", precinctId: "the-rocks", geo: ROCKS },
@@ -20,9 +21,23 @@ const tours = [
 ] as Parameters<typeof toursForPrecinct>[1];
 
 describe("city-strict catalog", () => {
+  it("does not treat Ashfield GPS as The Rocks catalogue", () => {
+    expect(placesAround(rows, ASHFIELD).map((r) => r.id)).toEqual([]);
+    expect(
+      placesAround(rows, ROCKS)
+        .map((r) => r.id)
+        .sort(),
+    ).toEqual(["local-shop", "rox-cafe"]);
+  });
+
   it("shows Sydney stock for Sydney", () => {
-    expect(placesInCity(rows, "Sydney").map((r) => r.id).sort()).toEqual(["local-shop", "rox-cafe"]);
-    expect(placesInCity(rows, undefined).map((r) => r.id).sort()).toEqual(["local-shop", "rox-cafe"]);
+    expect(
+      placesInCity(rows, "Sydney")
+        .map((r) => r.id)
+        .sort(),
+    ).toEqual(["local-shop", "rox-cafe"]);
+    // No city, no default stock: honest empty instead of another city's dump.
+    expect(placesInCity(rows, undefined)).toEqual([]);
   });
 
   it("shows only places near the chosen city, never The Rocks", () => {
@@ -31,7 +46,11 @@ describe("city-strict catalog", () => {
   });
 
   it("resolves every Kerala seed under its own city with a real photo", () => {
-    expect(placesInCity(KERALA_PLACES, "Kovalam").map((p) => p.id).sort()).toEqual([
+    expect(
+      placesInCity(KERALA_PLACES, "Kovalam")
+        .map((p) => p.id)
+        .sort(),
+    ).toEqual([
       "bait-leela-kovalam",
       "kovalam-beach-market",
       "kovalam-eves",
@@ -44,14 +63,22 @@ describe("city-strict catalog", () => {
     ]);
     const kovalamCats = new Set(placesInCity(KERALA_PLACES, "Kovalam").map((p) => p.category));
     expect([...kovalamCats].sort()).toEqual(["eat", "shops", "stay", "things"]);
-    expect(placesInCity(KERALA_PLACES, "Kochi").map((p) => p.id).sort()).toEqual([
+    expect(
+      placesInCity(KERALA_PLACES, "Kochi")
+        .map((p) => p.id)
+        .sort(),
+    ).toEqual([
       "alleppey-houseboat",
       "chinese-nets-kochi",
       "infopark-kochi",
       "kumarakom-bird-sanctuary",
       "mattancherry-palace",
     ]);
-    expect(placesInCity(KERALA_PLACES, "Trivandrum").map((p) => p.id).sort()).toEqual([
+    expect(
+      placesInCity(KERALA_PLACES, "Trivandrum")
+        .map((p) => p.id)
+        .sort(),
+    ).toEqual([
       "bait-leela-kovalam",
       "kovalam-beach-market",
       "kovalam-eves",
@@ -62,10 +89,11 @@ describe("city-strict catalog", () => {
       "uday-samudra-kovalam",
       "varkala-cliff",
     ]);
-    expect(placesInCity(KERALA_PLACES, "Munnar").map((p) => p.id).sort()).toEqual([
-      "eravikulam-np",
-      "munnar-tea-gardens",
-    ]);
+    expect(
+      placesInCity(KERALA_PLACES, "Munnar")
+        .map((p) => p.id)
+        .sort(),
+    ).toEqual(["eravikulam-np", "munnar-tea-gardens"]);
     expect(placesInCity(KERALA_PLACES, "Wayanad").map((p) => p.id)).toEqual(["edakkal-caves"]);
     expect(placesInCity(KERALA_PLACES, "Sydney")).toEqual([]);
     // Every photo must be a verified Commons file — no guessed URLs. Two

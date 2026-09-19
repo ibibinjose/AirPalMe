@@ -27,9 +27,7 @@ export function GuestListPanel({ clubId, clubName }: { clubId: string; clubName:
 
   function onSend() {
     try {
-      const emails = airpal
-        ? members.filter((m) => m.invites).map((m) => m.email)
-        : rows.map((r) => r.email);
+      const emails = airpal ? members.filter((m) => m.invites).map((m) => m.email) : rows.map((r) => r.email);
       const { href, copied } = sendInvite(clubId, subject, body, emails);
       void navigator.clipboard.writeText(copied).then(
         () => toast.success(`${emails.length} copied. Mail app opening.`),
@@ -51,8 +49,25 @@ export function GuestListPanel({ clubId, clubName }: { clubId: string; clubName:
       {!airpal && (
         <form className="space-y-2" onSubmit={onAdd}>
           <div className="flex gap-2">
-            <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" autoCapitalize="words" placeholder="Name" className="h-11 flex-1 rounded-full bg-card px-4 border border-ink outline-none focus:border-brand" />
-            <input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="h-11 flex-1 rounded-full bg-card px-4 border border-ink outline-none focus:border-brand" />
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoComplete="name"
+              autoCapitalize="words"
+              placeholder="Name"
+              className="h-11 flex-1 rounded-full bg-card px-4 border border-line outline-none focus:border-brand"
+            />
+            <input
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              autoCapitalize="none"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              className="h-11 flex-1 rounded-full bg-card px-4 border border-line outline-none focus:border-brand"
+            />
           </div>
           <div className="flex gap-2">
             <Button type="submit" size="sm" className="h-11">
@@ -89,7 +104,9 @@ export function GuestListPanel({ clubId, clubName }: { clubId: string; clubName:
           </li>
         ))}
         {(airpal ? members.filter((m) => m.invites) : rows).length === 0 && (
-          <p className="text-sm text-mute">{airpal ? "Nobody in AirPal Club yet." : "Add a name, or import AirPal Club."}</p>
+          <p className="text-sm text-mute">
+            {airpal ? "Nobody in AirPal Club yet." : "Add a name, or import AirPal Club."}
+          </p>
         )}
       </ul>
 
@@ -100,7 +117,9 @@ export function GuestListPanel({ clubId, clubName }: { clubId: string; clubName:
         <Button className="w-full" onClick={onSend}>
           Open mail app
         </Button>
-        <p className="text-[12px] text-mute">Opens your mail app with the list on BCC. We do not send bulk mail from our servers yet.</p>
+        <p className="text-[12px] text-mute">
+          Opens your mail app with the list on BCC. We do not send bulk mail from our servers yet.
+        </p>
       </div>
     </div>
   );

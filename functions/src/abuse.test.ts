@@ -7,9 +7,11 @@ vi.mock("firebase-admin/firestore", () => {
   });
   const doc = vi.fn().mockReturnValue({ id: "test-doc" });
   const collection = vi.fn().mockReturnValue({ doc });
-  const runTransaction = vi.fn().mockImplementation(async (cb: (tx: { get: typeof get; set: typeof set }) => Promise<unknown>) => {
-    return cb({ get, set });
-  });
+  const runTransaction = vi
+    .fn()
+    .mockImplementation(async (cb: (tx: { get: typeof get; set: typeof set }) => Promise<unknown>) => {
+      return cb({ get, set });
+    });
   return {
     getFirestore: vi.fn().mockReturnValue({
       collection,

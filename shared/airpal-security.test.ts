@@ -36,7 +36,9 @@ describe("canClaimDeal", () => {
   it("blocks inactive deals, duplicates, and exhausted inventory", () => {
     expect(canClaimDeal({ active: false, claimsCount: 0, existingActiveForUser: false }).ok).toBe(false);
     expect(canClaimDeal({ active: true, claimsCount: 0, existingActiveForUser: true }).ok).toBe(false);
-    expect(canClaimDeal({ active: true, claimsCount: 10, claimLimit: 10, existingActiveForUser: false }).ok).toBe(false);
+    expect(canClaimDeal({ active: true, claimsCount: 10, claimLimit: 10, existingActiveForUser: false }).ok).toBe(
+      false,
+    );
     expect(canClaimDeal({ active: true, claimsCount: 2, claimLimit: 10, existingActiveForUser: false }).ok).toBe(true);
   });
 });
@@ -74,11 +76,7 @@ describe("pin and email helpers", () => {
   });
 
   it("parses the platform admin allowlist", () => {
-    expect(parsePlatformAdminEmails("A@x.com, b@y.com ")).toEqual([
-      "bibin.inc@gmail.com",
-      "a@x.com",
-      "b@y.com",
-    ]);
+    expect(parsePlatformAdminEmails("A@x.com, b@y.com ")).toEqual(["bibin.inc@gmail.com", "a@x.com", "b@y.com"]);
     expect(parsePlatformAdminEmails("")).toEqual(["bibin.inc@gmail.com"]);
     expect(normalizeEmail("  Host@AirPal.ME ")).toBe("host@airpal.me");
   });

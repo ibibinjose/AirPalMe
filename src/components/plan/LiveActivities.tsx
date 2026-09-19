@@ -59,7 +59,7 @@ export function LiveActivities({ city }: { city?: string }) {
         <button
           type="button"
           onClick={() => nav("/plan/new")}
-          className="inline-flex h-9 items-center gap-1.5 rounded-2xl bg-ink px-4 text-xs font-bold text-white hover:bg-slate-800 transition cursor-pointer shadow-xs"
+          className="inline-flex h-9 items-center gap-1.5 rounded-2xl bg-brand px-4 text-xs font-bold text-white hover:bg-slate-800 transition cursor-pointer shadow-xs"
         >
           <Plus size={14} />
           <span>Create</span>
@@ -73,7 +73,7 @@ export function LiveActivities({ city }: { city?: string }) {
             <article
               key={plan.id}
               className={cn(
-                "w-72 shrink-0 rounded-3xl border-2 border-ink bg-card p-5 shadow-xs hover:-translate-y-0.5 transition flex flex-col justify-between",
+                "w-72 shrink-0 rounded-3xl ring-1 ring-line bg-card p-5 shadow-xs hover:-translate-y-0.5 transition flex flex-col justify-between",
                 plan.isExperience && "border-brand/40 bg-brand/5",
               )}
             >
@@ -86,8 +86,11 @@ export function LiveActivities({ city }: { city?: string }) {
                     </span>
                   )}
                   {plan.isExperience && (
-                    <span className="inline-flex items-center rounded-full bg-slate-950 px-2.5 py-0.5 text-[10px] font-bold text-white border border-ink">
-                      ${plan.pricePerPerson || 0} {plan.pricingModel === "deposit" && plan.depositConfig ? `($${plan.depositConfig.depositAmount} dep)` : ""}
+                    <span className="inline-flex items-center rounded-full bg-slate-950 px-2.5 py-0.5 text-[10px] font-bold text-white border border-line">
+                      ${plan.pricePerPerson || 0}{" "}
+                      {plan.pricingModel === "deposit" && plan.depositConfig
+                        ? `($${plan.depositConfig.depositAmount} dep)`
+                        : ""}
                     </span>
                   )}
                 </div>
@@ -108,7 +111,10 @@ export function LiveActivities({ city }: { city?: string }) {
                 {plan.interests && plan.interests.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-1">
                     {plan.interests.slice(0, 3).map((t) => (
-                      <span key={t} className="rounded-full bg-paper px-2.5 py-0.5 text-[11px] font-semibold text-ink border border-line">
+                      <span
+                        key={t}
+                        className="rounded-full bg-paper px-2.5 py-0.5 text-[11px] font-semibold text-ink border border-line"
+                      >
                         {ACTIVITY_INTERESTS.find((tag) => tag.id === t)?.label || t}
                       </span>
                     ))}
@@ -122,11 +128,11 @@ export function LiveActivities({ city }: { city?: string }) {
                   else rsvpPlan(plan.id, "going");
                 }}
                 className={cn(
-                  "mt-4 h-10 w-full rounded-2xl text-xs font-black transition cursor-pointer shadow-xs border border-ink",
+                  "mt-4 h-10 w-full rounded-2xl text-xs font-black transition cursor-pointer shadow-xs border border-line",
                   going
                     ? "bg-emerald-500/15 text-emerald-900 border-emerald-500/30"
                     : plan.isExperience
-                      ? "bg-ink text-white hover:bg-slate-800"
+                      ? "bg-brand text-white hover:bg-slate-800"
                       : "bg-brand text-white hover:bg-brand-ink",
                 )}
               >

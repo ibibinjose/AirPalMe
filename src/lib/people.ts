@@ -24,7 +24,8 @@ function clean(row: unknown): PersonMet | null {
   if (typeof r.name !== "string" || !r.name.trim()) return null;
   return {
     id: typeof r.id === "string" && r.id ? r.id : `p-${Date.now()}`,
-    handle: typeof r.handle === "string" && r.handle.trim() ? r.handle.trim().replace(/^@/, "").toLowerCase() : undefined,
+    handle:
+      typeof r.handle === "string" && r.handle.trim() ? r.handle.trim().replace(/^@/, "").toLowerCase() : undefined,
     name: r.name.trim(),
     photo: typeof r.photo === "string" && r.photo ? r.photo : undefined,
     whereMet: typeof r.whereMet === "string" && r.whereMet.trim() ? r.whereMet.trim() : undefined,
@@ -64,9 +65,7 @@ export function newPersonId(): string {
 export function upsertPerson(input: Omit<PersonMet, "id" | "metAt"> & { id?: string; metAt?: string }): PersonMet {
   const people = listPeople();
   const handle = input.handle?.trim().replace(/^@/, "").toLowerCase() || undefined;
-  const idx = people.findIndex((p) =>
-    handle ? p.handle === handle : input.id != null && p.id === input.id,
-  );
+  const idx = people.findIndex((p) => (handle ? p.handle === handle : input.id != null && p.id === input.id));
   if (idx >= 0) {
     const next: PersonMet = {
       ...people[idx],
@@ -130,7 +129,12 @@ export function downloadVCard(input: VCardInput): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${input.name.trim().replace(/[^\w\- ]+/g, "").replace(/\s+/g, "-") || "contact"}.vcf`;
+  a.download = `${
+    input.name
+      .trim()
+      .replace(/[^\w\- ]+/g, "")
+      .replace(/\s+/g, "-") || "contact"
+  }.vcf`;
   document.body.appendChild(a);
   a.click();
   a.remove();

@@ -148,7 +148,12 @@ export function InvitationCard({
 
         {/* Title & Host */}
         <div className="mt-5">
-          <p className={cn("flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.16em]", theme.onThemeMutedClass)}>
+          <p
+            className={cn(
+              "flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.16em]",
+              theme.onThemeMutedClass,
+            )}
+          >
             <span>
               Invitation from {plan.creator.name}
               {plan.creator.handle ? ` (@${plan.creator.handle})` : ""}
@@ -160,10 +165,12 @@ export function InvitationCard({
               </span>
             )}
           </p>
-          <h1 className="font-display mt-1 text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">
-            {plan.title}
-          </h1>
-          {plan.notes && <p className={cn("mt-2.5 text-xs sm:text-sm leading-relaxed max-w-xl", theme.onThemeMutedClass)}>{plan.notes}</p>}
+          <h1 className="font-display mt-1 text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">{plan.title}</h1>
+          {plan.notes && (
+            <p className={cn("mt-2.5 text-xs sm:text-sm leading-relaxed max-w-xl", theme.onThemeMutedClass)}>
+              {plan.notes}
+            </p>
+          )}
         </div>
 
         {/* Details Grid */}
@@ -227,7 +234,10 @@ export function InvitationCard({
                 {plan.attendees.length > goingCount ? ` · ${plan.attendees.length - goingCount} maybe` : ""}
               </span>
               <span className={cn("text-[11px] truncate block max-w-xs", theme.onThemeMutedClass)}>
-                {plan.attendees.map((a) => a.name).slice(0, 3).join(", ")}
+                {plan.attendees
+                  .map((a) => a.name)
+                  .slice(0, 3)
+                  .join(", ")}
                 {plan.attendees.length > 3 ? ` +${plan.attendees.length - 3}` : ""}
               </span>
             </div>
@@ -276,14 +286,7 @@ export function InvitationCard({
       </div>
 
       {/* Dynamic In-Person QR Modal */}
-      {showQrModal && (
-        <PlanQrModal
-          plan={plan}
-          isOpen={showQrModal}
-          onClose={() => setShowQrModal(false)}
-        />
-      )}
+      {showQrModal && <PlanQrModal plan={plan} isOpen={showQrModal} onClose={() => setShowQrModal(false)} />}
     </>
   );
 }
-

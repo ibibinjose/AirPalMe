@@ -37,8 +37,11 @@ import { PlanDiscussionWall } from "@/components/plan/PlanDiscussionWall";
 import { SafetyMenu } from "@/components/safety/SafetyMenu";
 import { ItineraryStopsManager } from "@/components/plan/ItineraryStopsManager";
 import { ExperienceBookingModal } from "@/components/plan/ExperienceBookingModal";
+import { HereCheckIn } from "@/components/circle/HereCheckIn";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
-import { EXPERIENCE_CATEGORIES, type HangoutPlan } from "@shared/plan";
+import { EXPERIENCE_CATEGORIES, isSoldOut, isTicketed, type HangoutPlan } from "@shared/plan";
+import { TicketPass } from "@/components/plan/TicketPass";
+import { TicketSalesPanel } from "@/components/plan/TicketSalesPanel";
 import { exportPlanItineraryPdf } from "@/lib/plan-pdf";
 import { NotFoundPage } from "./NotFoundPage";
 import { localTodayStr, shouldAutoOpenInviteRsvp } from "@/lib/plan-invite";
@@ -97,6 +100,10 @@ export function PlanDetailPage() {
   const autoRsvpShown = useRef(false);
   const arrivedViaInvite = Boolean(paramsInvite?.code);
 
+  const bookedId = searchParams.get("booked") || "";
+  const ticketed = plan ? isTicketed(plan) : false;
+  const soldOut = plan ? isSoldOut(plan) : false;
+
   const isHost = useMemo(() => {
     if (!plan || !user) return false;
     return Boolean(plan.creator.uid && plan.creator.uid === user.uid);
@@ -112,6 +119,7 @@ export function PlanDetailPage() {
   // who haven't joined yet — the link does the inviting, one tap completes it.
   useEffect(() => {
     if (autoRsvpShown.current) return;
+    if (ticketed) return;
     if (
       shouldAutoOpenInviteRsvp({
         arrivedViaInvite,
@@ -126,7 +134,7 @@ export function PlanDetailPage() {
       autoRsvpShown.current = true;
       setRsvpOpen(true);
     }
-  }, [arrivedViaInvite, loading, plan, isHost, userAttendee]);
+  }, [arrivedViaInvite, loading, plan, isHost, userAttendee, ticketed]);
 
   const isSubscribed = useMemo(() => {
     if (!plan) return false;
@@ -220,11 +228,7 @@ export function PlanDetailPage() {
 
       {/* WhatsApp-Style Group Header Bar */}
       <div className="mb-6">
-        <PlanGroupHeader
-          plan={plan}
-          onInvite={() => setShareOpen(true)}
-          onRsvp={() => setRsvpOpen(true)}
-        />
+        <PlanGroupHeader plan={plan} onInvite={() => setShareOpen(true)} onRsvp={() => setRsvpOpen(true)} />
       </div>
 
       {/* Main Luxury Digital VIP Invitation Card */}
@@ -239,8 +243,14 @@ export function PlanDetailPage() {
       {isHost && (
         <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-card px-4 py-3 ring-1 ring-line">
           <span className="inline-flex min-w-0 items-center gap-2 text-xs font-medium text-mute">
-            {plan.isPublic ? <Radar size={14} className="shrink-0 text-brand" /> : <Lock size={14} className="shrink-0" />}
-            <span className="truncate">{plan.isPublic ? "Public · live on discover map" : "Private · invite-only"}</span>
+            {plan.isPublic ? (
+              <Radar size={14} className="shrink-0 text-brand" />
+            ) : (
+              <Lock size={14} className="shrink-0" />
+            )}
+            <span className="truncate">
+              {plan.isPublic ? "Public · live on discover map" : "Private · invite-only"}
+            </span>
           </span>
           <button
             type="button"
@@ -248,10 +258,7 @@ export function PlanDetailPage() {
             aria-checked={Boolean(plan.isPublic)}
             aria-label="Who can discover this plan"
             onClick={() => updatePlan(plan.id, { isPublic: !plan.isPublic })}
-            className={cn(
-              "relative h-7 w-12 shrink-0 rounded-full transition",
-              plan.isPublic ? "bg-brand" : "bg-line",
-            )}
+            className={cn("relative h-7 w-12 shrink-0 rounded-full transition", plan.isPublic ? "bg-brand" : "bg-line")}
           >
             <span
               className={cn(
@@ -312,27 +319,38 @@ export function PlanDetailPage() {
             label="Sync Calendar"
           />
 
-          {plan.isExperience && (
+          {ticketed && (
             <Button
               size="sm"
+              disabled={soldOut}
               onClick={() => setBookingOpen(true)}
               className="rounded-full shrink-0 gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md hover:from-amber-600 hover:to-amber-700"
             >
               <CreditCard size={14} />
-              <span>{plan.pricingModel === "deposit" && plan.depositConfig ? `Reserve • $${plan.depositConfig.depositAmount}` : `Book Spot • $${plan.pricePerPerson || 0}`}</span>
+              <span>
+                {soldOut
+                  ? "Sold out"
+                  : plan.pricingModel === "deposit" && plan.depositConfig
+                    ? `Reserve • $${plan.depositConfig.depositAmount}`
+                    : `Buy ticket • $${plan.pricePerPerson || 0}`}
+              </span>
             </Button>
           )}
 
-          <Button
-            variant={userAttendee ? "ghost" : plan.isExperience ? "ghost" : "primary"}
-            size="sm"
-            onClick={() => setRsvpOpen(true)}
-            className="rounded-full shrink-0"
-          >
-            {userAttendee ? "Change RSVP" : "RSVP (Free)"}
-          </Button>
+          {!ticketed && (
+            <Button
+              variant={userAttendee ? "ghost" : "primary"}
+              size="sm"
+              onClick={() => setRsvpOpen(true)}
+              className="rounded-full shrink-0"
+            >
+              {userAttendee ? "Change RSVP" : "RSVP (Free)"}
+            </Button>
+          )}
         </div>
       </div>
+
+      <HereCheckIn placeName={plan.destination} planId={plan.id} />
 
       {/* Experience Showcase & Booking Card (When plan is marked as experience) */}
       {plan.isExperience && (
@@ -348,26 +366,28 @@ export function PlanDetailPage() {
                   {plan.durationMode === "multi_day" ? "🌴 Multi-Day Retreat" : "⚡ Single-Day Event"}
                 </span>
               </div>
-              <h2 className="font-display text-2xl font-bold text-ink mt-2">
-                Curated Experience Pass & Pricing
-              </h2>
+              <h2 className="font-display text-2xl font-bold text-ink mt-2">Curated Experience Pass & Pricing</h2>
             </div>
 
             <Button
               onClick={() => setBookingOpen(true)}
+              disabled={soldOut}
               className="gap-2 rounded-2xl h-11 px-5 font-bold shadow-lg bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700"
             >
               <CreditCard size={16} />
-              <span>Book Spot / Reserve</span>
+              <span>{soldOut ? "Sold out" : ticketed ? "Buy ticket" : "Book spot"}</span>
             </Button>
           </div>
 
           {/* Pricing Highlight Row */}
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="rounded-2xl bg-paper p-4 ring-1 ring-line">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-mute block">Price Per Person</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-mute block">
+                Price Per Person
+              </span>
               <p className="font-display text-2xl font-black text-ink mt-1">
-                ${plan.pricePerPerson || 0} <span className="text-xs font-medium text-mute">{plan.currency || "AUD"}</span>
+                ${plan.pricePerPerson || 0}{" "}
+                <span className="text-xs font-medium text-mute">{plan.currency || "AUD"}</span>
               </p>
               <p className="text-[11px] text-mute mt-0.5">
                 {plan.pricingModel === "deposit"
@@ -385,18 +405,23 @@ export function PlanDetailPage() {
                   <span>Deposit Lock-In Option</span>
                 </div>
                 <p className="font-display text-2xl font-black text-amber-900 dark:text-amber-200 mt-1">
-                  ${plan.depositConfig.depositAmount} <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">Lock-in</span>
+                  ${plan.depositConfig.depositAmount}{" "}
+                  <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">Lock-in</span>
                 </p>
                 <p className="text-[11px] text-amber-800/80 dark:text-amber-300/80 mt-0.5">
-                  {plan.depositConfig.balanceDueDescription || `Remaining balance due ${plan.depositConfig.dueDateDaysBefore} days before start`}
+                  {plan.depositConfig.balanceDueDescription ||
+                    `Remaining balance due ${plan.depositConfig.dueDateDaysBefore} days before start`}
                 </p>
               </div>
             )}
 
             <div className="rounded-2xl bg-paper p-4 ring-1 ring-line">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-mute block">Capacity & Spots</span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-mute block">
+                Capacity & Spots
+              </span>
               <p className="font-display text-2xl font-black text-ink mt-1">
-                {Math.max(0, (plan.capacity || 20) - goingAttendees.length)} <span className="text-xs font-medium text-mute">spots left</span>
+                {Math.max(0, (plan.capacity || 20) - goingAttendees.length)}{" "}
+                <span className="text-xs font-medium text-mute">spots left</span>
               </p>
               <p className="text-[11px] text-mute mt-0.5">
                 {goingAttendees.length} already booked · max capacity {plan.capacity || 20}
@@ -407,9 +432,7 @@ export function PlanDetailPage() {
           {/* Pricing Tiers / Room Packages if present */}
           {plan.pricingTiers && plan.pricingTiers.length > 0 && (
             <div className="mt-6 border-t border-line/60 pt-5">
-              <h3 className="font-display text-base font-bold text-ink mb-3">
-                Available Package & Room Tiers
-              </h3>
+              <h3 className="font-display text-base font-bold text-ink mb-3">Available Package & Room Tiers</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {plan.pricingTiers.map((tier) => (
                   <div
@@ -419,11 +442,11 @@ export function PlanDetailPage() {
                     <div>
                       <div className="flex items-center justify-between">
                         <h4 className="text-sm font-bold text-ink">{tier.name}</h4>
-                        <span className="text-sm font-black text-ink">${tier.price} {plan.currency || "AUD"}</span>
+                        <span className="text-sm font-black text-ink">
+                          ${tier.price} {plan.currency || "AUD"}
+                        </span>
                       </div>
-                      {tier.description && (
-                        <p className="text-xs text-mute mt-1">{tier.description}</p>
-                      )}
+                      {tier.description && <p className="text-xs text-mute mt-1">{tier.description}</p>}
                       {tier.depositAmount && (
                         <span className="inline-block mt-2 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
                           ${tier.depositAmount} Deposit option
@@ -446,9 +469,7 @@ export function PlanDetailPage() {
           {/* Inclusions Breakdown */}
           {plan.inclusions && (
             <div className="mt-6 border-t border-line/60 pt-5 space-y-4">
-              <h3 className="font-display text-base font-bold text-ink">
-                What to Expect & Inclusions
-              </h3>
+              <h3 className="font-display text-base font-bold text-ink">What to Expect & Inclusions</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {plan.inclusions.included && plan.inclusions.included.length > 0 && (
@@ -553,9 +574,7 @@ export function PlanDetailPage() {
               title={previewMode ? "Back to editing" : "Preview clean timeline"}
               className={cn(
                 "inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 transition active:scale-95",
-                previewMode
-                  ? "bg-ink text-white ring-ink"
-                  : "bg-paper text-mute ring-line hover:text-ink",
+                previewMode ? "bg-brand text-white ring-ink" : "bg-paper text-mute ring-line hover:text-ink",
               )}
             >
               {previewMode ? <EyeOff size={13} /> : <Eye size={13} />}
@@ -714,6 +733,9 @@ export function PlanDetailPage() {
       </div>
 
       {/* Host Danger Zone (Delete) */}
+      {bookedId ? <TicketPass bookingId={bookedId} /> : null}
+      {isHost && ticketed ? <TicketSalesPanel planId={plan.id} /> : null}
+
       {isHost && (
         <div className="mt-8 border-t border-line/60 pt-6 flex justify-end">
           <button
@@ -739,13 +761,20 @@ export function PlanDetailPage() {
             <span>Share Link</span>
           </Button>
 
-          {plan.isExperience ? (
+          {ticketed ? (
             <Button
               onClick={() => setBookingOpen(true)}
+              disabled={soldOut}
               className="flex-1 rounded-full h-11 text-xs font-semibold gap-1.5 shadow-md bg-gradient-to-r from-amber-500 to-amber-600 text-white"
             >
               <CreditCard size={15} />
-              <span>{plan.pricingModel === "deposit" && plan.depositConfig ? `Reserve $${plan.depositConfig.depositAmount}` : `Book $${plan.pricePerPerson || 0}`}</span>
+              <span>
+                {soldOut
+                  ? "Sold out"
+                  : plan.pricingModel === "deposit" && plan.depositConfig
+                    ? `Reserve $${plan.depositConfig.depositAmount}`
+                    : `Buy $${plan.pricePerPerson || 0}`}
+              </span>
             </Button>
           ) : (
             <Button

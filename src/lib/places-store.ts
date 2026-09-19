@@ -1,11 +1,5 @@
 import { collection, getDocs, query, where } from "firebase/firestore";
-import {
-  PLACE_CATEGORIES,
-  type Geo,
-  type NearbyPlace,
-  type PlaceCategory,
-  type PlaceDeal,
-} from "@shared/nearby";
+import { PLACE_CATEGORIES, type Geo, type NearbyPlace, type PlaceCategory, type PlaceDeal } from "@shared/nearby";
 import { getFirebaseDb } from "./firebase";
 
 const KEY = "airpal.places.v1";
@@ -58,10 +52,13 @@ export function parsePlaceDoc(id: string, data: Record<string, unknown>): Nearby
   if (status !== "active") return null;
   const source = data.source === "host" || data.source === "partner" ? data.source : "seed";
   const category = isCategory(data.category) ? data.category : "things";
-  const photos = Array.isArray(data.photos) ? data.photos.filter((p): p is string => typeof p === "string" && Boolean(p)) : undefined;
-  const priceLevel = typeof data.priceLevel === "string" && (PRICE_LEVELS as readonly string[]).includes(data.priceLevel)
-    ? (data.priceLevel as NearbyPlace["priceLevel"])
+  const photos = Array.isArray(data.photos)
+    ? data.photos.filter((p): p is string => typeof p === "string" && Boolean(p))
     : undefined;
+  const priceLevel =
+    typeof data.priceLevel === "string" && (PRICE_LEVELS as readonly string[]).includes(data.priceLevel)
+      ? (data.priceLevel as NearbyPlace["priceLevel"])
+      : undefined;
   const bookingAction = data.bookingActionType;
   const bookingActionType =
     bookingAction === "reserve" ||

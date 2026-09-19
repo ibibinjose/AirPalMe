@@ -1,14 +1,5 @@
 import { useState } from "react";
-import {
-  DollarSign,
-  Plus,
-  Trash2,
-  CheckCircle2,
-  Calendar,
-  Sparkles,
-  HelpCircle,
-  Users,
-} from "lucide-react";
+import { DollarSign, Plus, Trash2, CheckCircle2, Calendar, Sparkles, HelpCircle, Users } from "lucide-react";
 import {
   EXPERIENCE_CATEGORIES,
   type ExperienceCategory,
@@ -42,11 +33,7 @@ interface ExperiencePricingManagerProps {
   baseStartDate?: string;
 }
 
-export function ExperiencePricingManager({
-  data,
-  onChange,
-  baseStartDate,
-}: ExperiencePricingManagerProps) {
+export function ExperiencePricingManager({ data, onChange, baseStartDate }: ExperiencePricingManagerProps) {
   const [newIncludedItem, setNewIncludedItem] = useState("");
   const [newNotIncludedItem, setNewNotIncludedItem] = useState("");
   const [newBringItem, setNewBringItem] = useState("");
@@ -142,7 +129,8 @@ export function ExperiencePricingManager({
               <h3 className="text-sm font-bold text-ink">Publish as a Public Bookable Experience</h3>
             </div>
             <p className="text-xs text-mute leading-relaxed">
-              Monetize your plan as an open event ticket, guided tour, weekend getaway, or wellness retreat in the AirPal Explore Marketplace.
+              Monetize your plan as an open event ticket, guided tour, weekend getaway, or wellness retreat in the
+              AirPal Explore Marketplace.
             </p>
           </div>
 
@@ -162,8 +150,8 @@ export function ExperiencePricingManager({
             <div className="flex items-center gap-2.5 rounded-2xl bg-brand/5 p-3.5 text-xs text-ink ring-1 ring-brand/25">
               <Sparkles size={16} className="shrink-0 text-brand" />
               <span>
-                <strong>Pay-later bookings are live:</strong> guests book spots now and pay at the door. Card
-                payments and host payouts switch on with Stripe — your pricing below carries straight over.
+                <strong>Pay-later bookings are live:</strong> guests book spots now and pay at the door. Card payments
+                and host payouts switch on with Stripe — your pricing below carries straight over.
               </span>
             </div>
 
@@ -253,7 +241,7 @@ export function ExperiencePricingManager({
                       type="date"
                       value={data.endDate || ""}
                       onChange={(e) => onChange({ endDate: e.target.value })}
-                      className="h-9 rounded-xl bg-card px-3 text-xs font-medium text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                      className="h-9 rounded-xl bg-card px-3 text-xs font-medium text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                     />
                   </div>
                 </div>
@@ -306,7 +294,9 @@ export function ExperiencePricingManager({
                 {data.pricingModel === "fixed" && (
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div>
-                      <label className="text-[11px] font-semibold text-mute block mb-1">Price per Guest (AUD)</label>
+                      <label className="text-[11px] font-semibold text-mute block mb-1">
+                        Price per Guest ({data.currency || "AUD"})
+                      </label>
                       <div className="flex items-center gap-1 rounded-xl bg-card px-3 h-10 ring-1 ring-line">
                         <DollarSign size={14} className="text-mute shrink-0" />
                         <input
@@ -378,7 +368,9 @@ export function ExperiencePricingManager({
                       </div>
 
                       <div>
-                        <label className="text-[11px] font-semibold text-mute block mb-1">Balance Due (Days Before)</label>
+                        <label className="text-[11px] font-semibold text-mute block mb-1">
+                          Balance Due (Days Before)
+                        </label>
                         <input
                           type="number"
                           min="1"
@@ -391,7 +383,7 @@ export function ExperiencePricingManager({
                               },
                             })
                           }
-                          className="h-10 w-full rounded-xl bg-card px-3 text-xs font-medium text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                          className="h-10 w-full rounded-xl bg-card px-3 text-xs font-medium text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                         />
                       </div>
                     </div>
@@ -413,10 +405,7 @@ export function ExperiencePricingManager({
                     </div>
 
                     {(data.pricingTiers || []).map((tier, idx) => (
-                      <div
-                        key={tier.id || idx}
-                        className="p-3 rounded-xl bg-card ring-1 ring-line space-y-2 relative"
-                      >
+                      <div key={tier.id || idx} className="p-3 rounded-xl bg-card ring-1 ring-line space-y-2 relative">
                         <button
                           type="button"
                           onClick={() => handleRemoveTier(tier.id)}
@@ -434,7 +423,7 @@ export function ExperiencePricingManager({
                               value={tier.name}
                               onChange={(e) => handleUpdateTier(tier.id, { name: e.target.value })}
                               placeholder="e.g. Shared Master Suite"
-                              className="h-8 w-full rounded-lg bg-paper px-2 text-xs font-semibold text-ink border border-ink outline-none focus:border-brand"
+                              className="h-8 w-full rounded-lg bg-paper px-2 text-xs font-semibold text-ink border border-line outline-none focus:border-brand"
                             />
                           </div>
 
@@ -444,7 +433,7 @@ export function ExperiencePricingManager({
                               type="number"
                               value={tier.price}
                               onChange={(e) => handleUpdateTier(tier.id, { price: parseFloat(e.target.value) || 0 })}
-                              className="h-8 w-full rounded-lg bg-paper px-2 text-xs font-semibold text-ink border border-ink outline-none focus:border-brand"
+                              className="h-8 w-full rounded-lg bg-paper px-2 text-xs font-semibold text-ink border border-line outline-none focus:border-brand"
                             />
                           </div>
 
@@ -453,8 +442,10 @@ export function ExperiencePricingManager({
                             <input
                               type="number"
                               value={tier.capacity}
-                              onChange={(e) => handleUpdateTier(tier.id, { capacity: parseInt(e.target.value, 10) || 1 })}
-                              className="h-8 w-full rounded-lg bg-paper px-2 text-xs font-semibold text-ink border border-ink outline-none focus:border-brand"
+                              onChange={(e) =>
+                                handleUpdateTier(tier.id, { capacity: parseInt(e.target.value, 10) || 1 })
+                              }
+                              className="h-8 w-full rounded-lg bg-paper px-2 text-xs font-semibold text-ink border border-line outline-none focus:border-brand"
                             />
                           </div>
                         </div>
@@ -465,7 +456,7 @@ export function ExperiencePricingManager({
                             value={tier.description || ""}
                             onChange={(e) => handleUpdateTier(tier.id, { description: e.target.value })}
                             placeholder="Description (e.g. Twin room, outdoor rain shower, pool access)"
-                            className="h-7 w-full rounded-lg bg-paper px-2 text-[11px] text-mute border border-ink outline-none focus:border-brand"
+                            className="h-7 w-full rounded-lg bg-paper px-2 text-[11px] text-mute border border-line outline-none focus:border-brand"
                           />
                         </div>
                       </div>
@@ -499,7 +490,7 @@ export function ExperiencePricingManager({
                           handleAddInclusion("included");
                         }
                       }}
-                      className="h-8 flex-1 rounded-xl bg-card px-2.5 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                      className="h-8 flex-1 rounded-xl bg-card px-2.5 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                     />
                     <button
                       type="button"
@@ -547,7 +538,7 @@ export function ExperiencePricingManager({
                           handleAddInclusion("whatToBring");
                         }
                       }}
-                      className="h-8 flex-1 rounded-xl bg-card px-2.5 text-xs text-ink border border-ink outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                      className="h-8 flex-1 rounded-xl bg-card px-2.5 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                     />
                     <button
                       type="button"

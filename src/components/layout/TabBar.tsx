@@ -1,30 +1,28 @@
-import { AtSign, BedDouble, CalendarDays, Compass, QrCode } from "lucide-react";
+import { AtSign, BedDouble, CalendarDays, QrCode, Sparkles } from "lucide-react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { bioPath } from "@shared/bio";
 import { cn } from "@/lib/cn";
 import { enterEase } from "@/lib/motion";
-import { useBio } from "@/contexts/BioContext";
 import { useLocale } from "@/contexts/LocaleContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useBio } from "@/contexts/BioContext";
 import { triggerHaptic } from "@/lib/native";
 import { useVirtualKeyboard } from "@/lib/keyboard";
-import { tabFromPath } from "@/lib/tabs";
+import { tabFromPath, type GuestTab } from "@/lib/tabs";
+import { saveDoor, type DoorId } from "@/lib/door";
 
 export { tabFromPath };
 
-// Primary mobile tabs: Explore / Plan / Scan (center) / Stay / Mates.
-// Matches GuestTab in lib/tabs so every tab can actually light up.
 const SIDES = {
   left: [
-    { href: "/", id: "explore", labelKey: "explore", icon: Compass },
-    { href: "/plan", id: "plan", labelKey: "plan", icon: CalendarDays },
+    { href: "/", id: "explore" as const, labelKey: "whatsOn", icon: Sparkles },
+    { href: "/plan", id: "plan" as const, labelKey: "plan", icon: CalendarDays },
   ],
   right: [
-    { href: "/concierge", id: "stay", labelKey: "stay", icon: BedDouble },
-    // Your public bio: airpal.me/@you, or setup when you have no handle yet.
-    { href: "/bio/setup", id: "you", labelKey: "you", icon: AtSign },
+    { href: "/concierge", id: "stay" as const, labelKey: "stay", icon: BedDouble },
+    { href: "/me", id: "me" as const, labelKey: "atMe", icon: AtSign },
   ],
-} as const;
+};
 
 function TabItem({
   href,
@@ -35,40 +33,38 @@ function TabItem({
   onClick,
 }: {
   href: string;
-  id: string;
+  id: GuestTab;
   labelKey: string;
-  icon: typeof Compass;
+  icon: typeof Sparkles;
   active: string;
   onClick: (href: string) => void;
 }) {
   const { t } = useLocale();
   const on = active === id;
+  const label = id === "me" ? "Me" : t(labelKey) || id;
 
   return (
     <button
       type="button"
       aria-current={on ? "page" : undefined}
+      aria-label={id === "explore" ? "What's on" : id === "me" ? "My bio" : t(labelKey) || id}
       onClick={() => {
         void triggerHaptic("light");
+        if (id === "explore" || id === "plan" || id === "stay") saveDoor(id as DoorId);
         onClick(href);
       }}
       className={cn(
-        "relative flex h-12 min-w-0 flex-1 touch-manipulation flex-col items-center justify-center gap-0.5 rounded-2xl transition-all duration-200 cursor-pointer",
-        on
-          ? "text-white font-extrabold"
-          : "text-white/60 hover:text-white/90 active:scale-95 font-medium"
+        "relative flex h-12 min-w-0 flex-1 touch-manipulation flex-col items-center justify-center gap-0.5 transition-all duration-200 cursor-pointer active:scale-95",
+        on ? "text-white font-extrabold" : "text-white/55 hover:text-white/90 font-medium",
       )}
     >
-      {on && (
-        <motion.div
-          layoutId="activeTabPill"
-          className="absolute inset-x-1 inset-y-1 rounded-2xl apple-liquid-glass-active"
-          transition={{ type: "spring", stiffness: 400, damping: 30 }}
-        />
-      )}
-      <span className="relative z-10 flex flex-col items-center justify-center gap-0.5">
-        <Icon size={20} strokeWidth={on ? 2.5 : 1.8} className={cn("transition-transform", on && "scale-110")} />
-        <span className="text-[11px] font-semibold tracking-tight">{t(labelKey) || id}</span>
+      <span className="relative z-10 flex flex-col items-center justify-center gap-0">
+        {id === "me" ? (
+          <span className={cn("text-[17px] font-bold leading-none", on && "scale-110")}>@</span>
+        ) : (
+          <Icon size={20} strokeWidth={on ? 2.5 : 1.8} className={cn("transition-transform", on && "scale-110")} />
+        )}
+        <span className="text-[11px] font-semibold tracking-tight">{label}</span>
       </span>
     </button>
   );
@@ -77,16 +73,17 @@ function TabItem({
 export function TabBar({ path, enter = false }: { path: string; enter?: boolean }) {
   const [, nav] = useLocation();
   const { t } = useLocale();
+  const { user } = useAuth();
+  const { mine } = useBio();
   const active = tabFromPath(path);
   const { isKeyboardOpen } = useVirtualKeyboard();
-  const { mine } = useBio();
+  const meHref = !user ? "/start" : mine?.handle ? `/@${mine.handle}` : "/bio/setup";
   const scanOn = active === "scan";
-  const youHref = mine?.handle ? bioPath(mine.handle) : "/bio/setup";
 
   return (
     <motion.nav
       className={cn(
-        "fixed-element safe-bottom fixed inset-x-0 bottom-0 z-40 lg:hidden keyboard-hide transition-all duration-200 ease-out pointer-events-none",
+        "fixed-element fixed inset-x-0 bottom-0 z-40 lg:hidden keyboard-hide transition-all duration-200 ease-out pointer-events-none",
         isKeyboardOpen && "translate-y-full opacity-0",
       )}
       aria-hidden={isKeyboardOpen}
@@ -94,18 +91,14 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
       animate={{ opacity: isKeyboardOpen ? 0 : 1, y: isKeyboardOpen ? 32 : 0 }}
       transition={{ duration: 0.25, ease: enterEase }}
     >
-      <div className="relative mx-auto max-w-md px-3 pb-[max(0.6rem,env(safe-area-inset-bottom))] pointer-events-auto">
-        {/* Floating Apple Liquid Glass Dock Shell */}
-        <div className="relative flex items-center justify-between rounded-3xl apple-liquid-glass-dark p-1.5 text-white">
-          
-          {/* Left Navigation Items */}
+      <div className="relative mx-auto max-w-md pointer-events-auto">
+        <div className="relative flex items-center justify-between rounded-t-3xl apple-liquid-glass-dark px-2.5 pt-1.5 pb-[max(0.4rem,env(safe-area-inset-bottom,0px))] text-white">
           <div className="flex flex-1 items-center gap-1">
             {SIDES.left.map((tab) => (
               <TabItem key={tab.id} {...tab} active={active} onClick={nav} />
             ))}
           </div>
 
-          {/* Center Elevated Floating Hero Action Button */}
           <div className="relative flex h-12 w-14 shrink-0 items-center justify-center">
             <button
               type="button"
@@ -119,10 +112,14 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
             >
               <span
                 className={cn(
-                  "relative grid h-14 w-14 place-items-center rounded-full border-4 border-slate-950 shadow-xl transition-transform duration-200 group-hover:scale-105 active:scale-95",
+                  "relative grid h-14 w-14 place-items-center overflow-hidden rounded-full border-4 border-slate-950 shadow-xl transition-transform duration-200 group-hover:scale-105 active:scale-95",
                   scanOn ? "bg-gold text-ink shadow-gold/50" : "bg-brand text-white shadow-brand/50",
                 )}
               >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-2 top-1 h-1/2 rounded-full bg-gradient-to-b from-white/45 to-white/0"
+                />
                 <QrCode size={22} className="group-hover:rotate-12 transition-transform duration-300" />
                 {!scanOn && (
                   <span className="absolute -inset-0.5 motion-safe:animate-pulse rounded-full bg-brand/30 blur-md pointer-events-none" />
@@ -131,19 +128,11 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
             </button>
           </div>
 
-          {/* Right Navigation Items */}
           <div className="flex flex-1 items-center gap-1">
             {SIDES.right.map((tab) => (
-              <TabItem
-                key={tab.id}
-                {...tab}
-                href={tab.id === "you" ? youHref : tab.href}
-                active={active}
-                onClick={nav}
-              />
+              <TabItem key={tab.id} {...tab} href={tab.id === "me" ? meHref : tab.href} active={active} onClick={nav} />
             ))}
           </div>
-
         </div>
       </div>
     </motion.nav>

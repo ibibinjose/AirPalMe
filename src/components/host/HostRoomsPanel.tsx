@@ -68,7 +68,10 @@ export function HostRoomsPanel({
     setSaving(true);
     try {
       const liveNumbers = next.flatMap((t) => t.roomNumbers || []);
-      const patch: { roomTypes: RoomType[]; roomStatuses?: Record<string, "occupied" | "vacant" | "maintenance" | "cleaning"> } = {
+      const patch: {
+        roomTypes: RoomType[];
+        roomStatuses?: Record<string, "occupied" | "vacant" | "maintenance" | "cleaning">;
+      } = {
         roomTypes: next,
       };
       if (statuses) patch.roomStatuses = pruneRoomStatuses(statuses, liveNumbers);
@@ -257,7 +260,7 @@ export function HostRoomsPanel({
                   {t.sizeSqm ? ` · ${t.sizeSqm} m²` : ""}
                 </p>
               </div>
-              <span className="shrink-0 rounded-full bg-ink px-2.5 py-1 text-[11px] font-semibold text-white">
+              <span className="shrink-0 rounded-full bg-brand px-2.5 py-1 text-[11px] font-semibold text-white">
                 {numbers.length || t.totalRooms || 0} rooms
               </span>
             </div>
@@ -332,7 +335,7 @@ export function HostRoomsPanel({
                       }}
                       className={cn(
                         "rounded-full px-3 py-1.5 text-xs font-medium capitalize transition",
-                        active ? "bg-ink text-white" : "ring-1 ring-line hover:ring-brand/40",
+                        active ? "bg-brand text-white" : "ring-1 ring-line hover:ring-brand/40",
                       )}
                     >
                       {s}
@@ -389,7 +392,10 @@ export function HostRoomsPanel({
               </button>
               <button
                 type="button"
-                className={cn("text-xs font-medium", confirmDeleteId === t.id ? "text-red-600" : "text-mute hover:text-red-600")}
+                className={cn(
+                  "text-xs font-medium",
+                  confirmDeleteId === t.id ? "text-red-600" : "text-mute hover:text-red-600",
+                )}
                 onClick={() => {
                   if (confirmDeleteId !== t.id) {
                     setConfirmDeleteId(t.id);

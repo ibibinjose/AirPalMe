@@ -39,7 +39,7 @@ export function ZooPage() {
           type="button"
           onClick={() => nav("/me")}
           aria-label="Back to profile"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-card transition hover:border-brand active:scale-95"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full ring-1 ring-line bg-card transition hover:ring-brand/40 active:scale-95"
         >
           <ArrowLeft size={16} />
         </button>
@@ -47,7 +47,8 @@ export function ZooPage() {
       </div>
       <h1 className="font-display mt-1 text-3xl font-semibold">Your Zoo</h1>
       <p className="mt-2 text-sm text-mute">
-        {progress.label || (hunt ? `Scan a shop QR on the ${hunt.name}.` : "No hunts published yet — scan a shop QR to begin.")}
+        {progress.label ||
+          (hunt ? `Scan a shop QR on the ${hunt.name}.` : "No hunts published yet — scan a shop QR to begin.")}
         {!user ? " Sign in to keep this Zoo on your account." : ""}
       </p>
       {!user && state.stickers.length > 0 && (
@@ -64,7 +65,7 @@ export function ZooPage() {
             onClick={() => setTab(id)}
             className={cn(
               "h-9 shrink-0 rounded-full px-4 text-sm capitalize",
-              tab === id ? "bg-ink text-white" : "bg-white ring-1 ring-line",
+              tab === id ? "bg-brand text-white" : "bg-white ring-1 ring-line",
             )}
           >
             {id === "offers" ? "Offers & deals" : id === "shops" ? "Shops" : id === "hunts" ? "Hunts" : "Stickers"}
@@ -74,18 +75,11 @@ export function ZooPage() {
 
       {tab === "stickers" && (
         <div className="mt-5 grid grid-cols-3 gap-3">
-          {stops.length === 0 && (
-            <p className="col-span-3 text-sm text-mute">No hunt stops published yet.</p>
-          )}
+          {stops.length === 0 && <p className="col-span-3 text-sm text-mute">No hunt stops published yet.</p>}
           {stops.map((stop) => {
             const have = state.stickers.some((s) => s.animalId === stop.animalId);
             return (
-              <button
-                key={stop.animalId}
-                type="button"
-                onClick={() => nav(bioPath(stop.handle))}
-                className="text-left"
-              >
+              <button key={stop.animalId} type="button" onClick={() => nav(bioPath(stop.handle))} className="text-left">
                 <ZooSticker animalId={stop.animalId} locked={!have} className="aspect-square" />
                 <p className="mt-1.5 truncate text-[12px] font-medium">{animalById(stop.animalId)?.name}</p>
                 <p className="truncate text-[11px] text-mute">{have ? stop.name : "Not yet"}</p>

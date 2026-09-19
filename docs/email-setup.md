@@ -15,15 +15,15 @@ Do not invent DNS values. Firebase shows the exact TXT/CNAME strings after you c
 
 ## What is already true
 
-| Piece | Status |
-|---|---|
-| App sends verify + reset via Firebase Auth | Yes (`src/lib/auth-mail.ts`) |
-| Branded HTML templates in repo | Yes (`emails/verify-account.html`, `emails/reset-password.html`) |
-| Handler page | Yes (`/auth/action`) |
-| `email.airpal.me` DNS (SPF + `firebase=airpalme-app`) | Verified (`customDomainState: SUCCEEDED`) |
-| Apex MX / SPF for `hello@airpal.me` | Live (17 Sep 2026): `mx1/mx2.improvmx.com` + `v=spf1 include:spf.improvmx.com ~all`. Hosting TXT `hosting-site=airpalme-app` kept. DMARC not set (optional). |
-| Firebase **Apply custom domain** | Not applied — mail still From `noreply@airpalme-app.firebaseapp.com` |
-| Template HTML + action URL in Console | Still Firebase defaults — links still open `airpalme-app.firebaseapp.com/__/auth/action` |
+| Piece                                                 | Status                                                                                                                                                       |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| App sends verify + reset via Firebase Auth            | Yes (`src/lib/auth-mail.ts`)                                                                                                                                 |
+| Branded HTML templates in repo                        | Yes (`emails/verify-account.html`, `emails/reset-password.html`)                                                                                             |
+| Handler page                                          | Yes (`/auth/action`)                                                                                                                                         |
+| `email.airpal.me` DNS (SPF + `firebase=airpalme-app`) | Verified (`customDomainState: SUCCEEDED`)                                                                                                                    |
+| Apex MX / SPF for `hello@airpal.me`                   | Live (17 Sep 2026): `mx1/mx2.improvmx.com` + `v=spf1 include:spf.improvmx.com ~all`. Hosting TXT `hosting-site=airpalme-app` kept. DMARC not set (optional). |
+| Firebase **Apply custom domain**                      | Not applied — mail still From `noreply@airpalme-app.firebaseapp.com`                                                                                         |
+| Template HTML + action URL in Console                 | Still Firebase defaults — links still open `airpalme-app.firebaseapp.com/__/auth/action`                                                                     |
 
 The API refuses `EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED`. Paste templates and set the action URL in [Authentication → Templates](https://console.firebase.google.com/project/airpalme-app/authentication/emails), then click **Apply custom domain**. Until that click, Google still sends as **`noreply@airpalme-app.firebaseapp.com`**.
 
@@ -33,11 +33,11 @@ The API refuses `EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED`. Paste templates and set the
 
 Use a **mail subdomain** so website DNS on `airpal.me` stays untouched.
 
-| Address | Purpose |
-|---|---|
-| `noreply@email.airpal.me` | From address for verify + password reset (Firebase sends these) |
-| `hello@airpal.me` | Human inbox (contact, replies). Separate from Firebase sending. |
-| https://airpal.me/auth/action | Link inside those emails |
+| Address                       | Purpose                                                         |
+| ----------------------------- | --------------------------------------------------------------- |
+| `noreply@email.airpal.me`     | From address for verify + password reset (Firebase sends these) |
+| `hello@airpal.me`             | Human inbox (contact, replies). Separate from Firebase sending. |
+| https://airpal.me/auth/action | Link inside those emails                                        |
 
 `email.airpal.me` is the sending domain. It is not a website.
 
@@ -66,11 +66,11 @@ DNS → `airpal.me` → add **exactly** the records Firebase displayed.
 
 Typical shape (values **must** come from the console):
 
-| Type | Host | Value (example only) |
-|---|---|---|
-| TXT | `email` | Firebase verification string (`google-site-verification=…` or similar) |
-| CNAME | `email` or a Firebase-generated hostname | Firebase mail CNAME |
-| TXT | `email` | `v=spf1 include:_spf.firebasemail.com ~all` (or the SPF Firebase shows) |
+| Type  | Host                                     | Value (example only)                                                    |
+| ----- | ---------------------------------------- | ----------------------------------------------------------------------- |
+| TXT   | `email`                                  | Firebase verification string (`google-site-verification=…` or similar)  |
+| CNAME | `email` or a Firebase-generated hostname | Firebase mail CNAME                                                     |
+| TXT   | `email`                                  | `v=spf1 include:_spf.firebasemail.com ~all` (or the SPF Firebase shows) |
 
 Rules:
 
@@ -115,11 +115,11 @@ NS is already `launch1.spaceship.net` / `launch2.spaceship.net`, so Spaceship ca
 
 Create a free alias `hello@airpal.me` → `bibin.inc@gmail.com` at [improvmx.com](https://improvmx.com), then in Spaceship **Advanced DNS** add:
 
-| Type | Host | Value | Priority |
-|---|---|---|---|
-| MX | `@` | `mx1.improvmx.com` | 10 |
-| MX | `@` | `mx2.improvmx.com` | 20 |
-| TXT | `@` | `v=spf1 include:spf.improvmx.com ~all` | — |
+| Type | Host | Value                                  | Priority |
+| ---- | ---- | -------------------------------------- | -------- |
+| MX   | `@`  | `mx1.improvmx.com`                     | 10       |
+| MX   | `@`  | `mx2.improvmx.com`                     | 20       |
+| TXT  | `@`  | `v=spf1 include:spf.improvmx.com ~all` | —        |
 
 Confirm:
 

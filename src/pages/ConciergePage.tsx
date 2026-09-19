@@ -1,5 +1,16 @@
 import { useState, useEffect, useMemo } from "react";
-import { ArrowRight, Bell, CalendarDays, CircleHelp, ClipboardCheck, HeartHandshake, Shield, Sparkles, Utensils, Wifi } from "lucide-react";
+import {
+  ArrowRight,
+  Bell,
+  CalendarDays,
+  CircleHelp,
+  ClipboardCheck,
+  HeartHandshake,
+  Shield,
+  Sparkles,
+  Utensils,
+  Wifi,
+} from "lucide-react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/Button";
 import { Sheet } from "@/components/ui/Sheet";
@@ -127,22 +138,24 @@ export function ConciergePage() {
   if (!hasStay && session.kind !== "marker") {
     return (
       <div className="mx-auto max-w-lg px-4 pb-10">
-        <div className="relative mt-2 overflow-hidden rounded-[28px] border-2 border-ink bg-ink shadow-xs">
+        <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
           {property.heroImage && <img src={property.heroImage} alt="" className="h-72 w-full object-cover" />}
           <div className="hero-scrim absolute inset-0" />
           <div className="absolute inset-x-0 bottom-0 p-6">
-            <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-slate-950 border border-ink shadow-xs mb-2">
+            <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-slate-950 border border-line shadow-xs mb-2">
               Guest Companion · Sydney 🇦🇺
             </span>
-            <h1 className="font-display text-3xl font-bold text-white">{t("scanRoom")}</h1>
-            <p className="mt-1 text-sm text-white/80">Scan your room or lobby QR code to access instant Wi-Fi, front desk requests, and local dining.</p>
+            <h1 className="font-display text-3xl font-bold text-white">I&apos;m staying here</h1>
+            <p className="mt-1 text-sm text-white/80">
+              Scan the room or lobby code for Wi-Fi, the desk, and what&apos;s around the stay.
+            </p>
           </div>
         </div>
         <div className="mt-5 grid gap-3">
           <Button className="w-full font-bold h-12 shadow-xs" onClick={() => nav("/scan")}>
-            {t("scan")}
+            Scan a code
           </Button>
-          <Button variant="ghost" className="w-full font-bold h-12 border-2 border-ink" onClick={() => nav("/")}>
+          <Button variant="ghost" className="w-full font-bold h-12 ring-1 ring-line" onClick={() => nav("/")}>
             {t("explore")}
           </Button>
         </div>
@@ -153,10 +166,10 @@ export function ConciergePage() {
   if (loadingProperty && !property.name) {
     return (
       <div className="mx-auto max-w-lg px-4 pb-10">
-        <div className="mt-2 h-48 animate-pulse rounded-3xl bg-card border-2 border-ink" />
+        <div className="mt-2 h-48 animate-pulse rounded-3xl bg-card ring-1 ring-line" />
         <div className="mt-5 grid grid-cols-2 gap-2">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-14 animate-pulse rounded-2xl bg-card border-2 border-ink" />
+            <div key={i} className="h-14 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
           ))}
         </div>
       </div>
@@ -177,11 +190,11 @@ export function ConciergePage() {
   return (
     <div className="mx-auto max-w-lg px-4 pb-10">
       {/* Header Banner */}
-      <div className="relative mt-2 overflow-hidden rounded-[28px] border-2 border-ink bg-ink shadow-xs">
+      <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
         {property.heroImage && <img src={property.heroImage} alt="" className="h-48 w-full object-cover" />}
         <div className="hero-scrim absolute inset-0" />
         <div className="absolute inset-x-0 bottom-0 p-5">
-          <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-slate-950 border border-ink shadow-xs mb-1.5">
+          <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-slate-950 border border-line shadow-xs mb-1.5">
             {roomLabel ? `Room ${roomLabel}` : property.city || property.destination || "AirPal Stay Concierge"}
           </span>
           <h1 className="font-display text-2xl font-extrabold text-white">{property.name || t("scanRoom")}</h1>
@@ -195,13 +208,15 @@ export function ConciergePage() {
       </div>
 
       {/* AirPal Companion Integration Banner */}
-      <div className="mt-4 rounded-3xl border-2 border-ink bg-gradient-to-r from-brand/10 via-amber-500/10 to-purple-500/10 p-4 shadow-xs flex items-center justify-between gap-3">
+      <div className="mt-4 rounded-3xl ring-1 ring-line bg-gradient-to-r from-brand/10 via-amber-500/10 to-purple-500/10 p-4 shadow-xs flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
             <HeartHandshake size={20} />
           </span>
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">AirPal Mate Priority</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
+              AirPal Mate Priority
+            </p>
             <p className="text-xs font-bold text-ink">Exploring Sydney alone?</p>
             <p className="text-[11px] text-mute">Find a local AirPal Mate to go with you.</p>
           </div>
@@ -230,7 +245,7 @@ export function ConciergePage() {
             key={t.id}
             type="button"
             onClick={t.run}
-            className="flex touch-manipulation items-center gap-3 rounded-2xl border-2 border-ink bg-card px-4 py-3.5 shadow-xs transition hover:bg-paper active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            className="flex touch-manipulation items-center gap-3 rounded-2xl ring-1 ring-line bg-card px-4 py-3.5 shadow-xs transition hover:bg-paper active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             <t.icon size={18} className="shrink-0 text-brand" />
             <span className="truncate text-sm font-bold text-ink">{t.label}</span>
@@ -240,7 +255,7 @@ export function ConciergePage() {
 
       {/* Ask AirPal Input */}
       <form
-        className="mt-5 flex items-center gap-2 rounded-full border-2 border-ink bg-card px-4 py-2 shadow-xs transition focus-within:ring-2 focus-within:ring-brand"
+        className="mt-5 flex items-center gap-2 rounded-full ring-1 ring-line bg-card px-4 py-2 shadow-xs transition focus-within:ring-2 focus-within:ring-brand"
         onSubmit={(e) => {
           e.preventDefault();
           if (!ask.trim()) return;
@@ -269,7 +284,7 @@ export function ConciergePage() {
         </button>
       </div>
       {nearby.length === 0 ? (
-        <p className="mt-3 rounded-2xl border-2 border-ink bg-card px-4 py-5 text-center text-sm text-mute shadow-xs">
+        <p className="mt-3 rounded-2xl ring-1 ring-line bg-card px-4 py-5 text-center text-sm text-mute shadow-xs">
           {t("aroundEmpty")}
         </p>
       ) : (
@@ -307,7 +322,9 @@ export function ConciergePage() {
             </Button>
           </>
         ) : (
-          <p className="mt-4 text-xs text-mute">Scan the room or lobby QR code for the live password, or ask front desk.</p>
+          <p className="mt-4 text-xs text-mute">
+            Scan the room or lobby QR code for the live password, or ask front desk.
+          </p>
         )}
       </Sheet>
 
@@ -317,7 +334,7 @@ export function ConciergePage() {
           onChange={(e) => setTicket(e.target.value)}
           placeholder="Towels, extra pillow, AC…"
           aria-label="Describe your request for the front desk"
-          className="h-28 w-full rounded-2xl bg-paper p-3 text-[15px] outline-none border-2 border-ink transition focus:ring-2 focus:ring-brand focus:border-brand font-medium"
+          className="h-28 w-full rounded-2xl bg-paper p-3 text-[15px] outline-none ring-1 ring-line transition focus:ring-2 focus:ring-brand focus:border-brand font-medium"
         />
         <div className="mt-3 grid grid-cols-3 gap-2">
           {["Towels", "Clean", "Late checkout", "Extra night", "Room move", "Early check-in"].map((quick) => {
@@ -330,8 +347,8 @@ export function ConciergePage() {
                 onClick={() => setTicket(quick)}
                 className={
                   selected
-                    ? "h-10 rounded-full bg-brand text-xs font-bold text-white border-2 border-ink transition active:scale-95 shadow-xs"
-                    : "h-10 rounded-full bg-paper text-xs font-bold text-ink border-2 border-ink transition hover:bg-card active:scale-95 shadow-xs"
+                    ? "h-10 rounded-full bg-brand text-xs font-bold text-white ring-1 ring-line transition active:scale-95 shadow-xs"
+                    : "h-10 rounded-full bg-paper text-xs font-bold text-ink ring-1 ring-line transition hover:bg-card active:scale-95 shadow-xs"
                 }
               >
                 {quick}
@@ -390,21 +407,25 @@ export function ConciergePage() {
       </Sheet>
 
       <Sheet open={sheet === "dining"} onClose={() => setSheet(null)} title={t("dining")}>
-        <p className="text-xs font-bold text-mute">{property.breakfast?.hours || "Dining hours — ask the front desk"}</p>
+        <p className="text-xs font-bold text-mute">
+          {property.breakfast?.hours || "Dining hours — ask the front desk"}
+        </p>
         <div className="mt-4 space-y-3">
-          <div className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-xs">
+          <div className="rounded-2xl ring-1 ring-line bg-paper p-4 shadow-xs">
             <p className="font-bold text-ink">{property.breakfast?.type || "Breakfast & Dining"}</p>
             <p className="text-xs text-mute mt-1">{property.breakfast?.location || property.address || "On site"}</p>
             <p className="text-xs font-bold text-brand mt-1">{property.breakfast?.price || "Ask front desk"}</p>
           </div>
           {menu.length > 0 &&
             menu.slice(0, 8).map((item) => (
-              <div key={item.id} className="rounded-2xl border-2 border-ink bg-paper p-4 shadow-xs">
+              <div key={item.id} className="rounded-2xl ring-1 ring-line bg-paper p-4 shadow-xs">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-[10px] font-extrabold uppercase tracking-wider text-mute">{item.category}</p>
                     <p className="font-bold text-ink">{item.name}</p>
-                    {item.description ? <p className="mt-1 text-xs text-mute leading-relaxed">{item.description}</p> : null}
+                    {item.description ? (
+                      <p className="mt-1 text-xs text-mute leading-relaxed">{item.description}</p>
+                    ) : null}
                   </div>
                   <p className="shrink-0 text-sm font-extrabold text-brand">${item.price}</p>
                 </div>
@@ -414,7 +435,9 @@ export function ConciergePage() {
       </Sheet>
 
       <Sheet open={sheet === "safety"} onClose={() => setSheet(null)} title={t("help")}>
-        <p className="text-sm font-bold text-ink">{property.name ? `${property.name} Front Desk & Duty Manager` : "Front Desk & Duty Manager"}</p>
+        <p className="text-sm font-bold text-ink">
+          {property.name ? `${property.name} Front Desk & Duty Manager` : "Front Desk & Duty Manager"}
+        </p>
         <p className="mt-2 text-xs text-mute leading-relaxed">
           {property.address || "Contact staff at front desk for emergency procedures"}
         </p>
@@ -423,9 +446,26 @@ export function ConciergePage() {
             {property.phone}
           </a>
         )}
-        <a className="mt-2 block text-xs font-bold text-mute" href="tel:000">
-          Emergency Services (Australia): 000
-        </a>
+        <div className="mt-2 space-y-1 text-xs font-bold text-mute">
+          <a className="block" href="tel:000">
+            Emergency (Australia): 000
+          </a>
+          <a className="block" href="tel:112">
+            Emergency (India): 112
+          </a>
+          <a className="block" href="tel:999">
+            Police (UAE): 999 · Ambulance: 998 · Fire: 997
+          </a>
+          <a className="block" href="tel:999">
+            Emergency (UK): 999
+          </a>
+          <a className="block" href="tel:911">
+            Emergency (US &amp; Canada): 911
+          </a>
+          <a className="block" href="tel:112">
+            Emergency (EU): 112
+          </a>
+        </div>
       </Sheet>
 
       <Sheet open={sheet === "ask"} onClose={() => setSheet(null)} title={answer?.title || "Ask AirPal"}>

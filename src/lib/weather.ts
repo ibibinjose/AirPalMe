@@ -129,29 +129,19 @@ function writeCache(origin: WeatherOrigin, data: LocalWeather) {
   }
 }
 
-export function requestDeviceGeo(): Promise<Geo | null> {
-  return new Promise((resolve) => {
-    if (typeof navigator === "undefined" || !navigator.geolocation) {
-      resolve(null);
-      return;
-    }
-    const timer = window.setTimeout(() => resolve(null), 7000);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        window.clearTimeout(timer);
-        resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-      },
-      () => {
-        window.clearTimeout(timer);
-        resolve(null);
-      },
-      { enableHighAccuracy: false, timeout: 6500, maximumAge: 5 * 60 * 1000 },
-    );
-  });
-}
+export { requestDeviceGeo, watchDeviceGeo } from "./geo-locate";
 
 function cacheBucket(origin: WeatherOrigin) {
   return `${CACHE_KEY}:${origin.source}:${origin.lat.toFixed(2)}:${origin.lng.toFixed(2)}`;
+}
+
+/** Prefer suburb (Ashfield) over metro city (Sydney) so GPS is not labelled The Rocks. */
+export function pickReverseLocality(json: { locality?: string; city?: string; principalSubdivision?: string }): string {
+  const locality = String(json.locality || "").trim();
+  const city = String(json.city || "").trim();
+  const state = String(json.principalSubdivision || "").trim();
+  if (locality && locality.toLowerCase() !== city.toLowerCase()) return locality;
+  return locality || city || state;
 }
 
 async function reverseCity(lat: number, lng: number, timezone: string) {
@@ -161,7 +151,7 @@ async function reverseCity(lat: number, lng: number, timezone: string) {
     );
     if (!res.ok) throw new Error("geo");
     const json = (await res.json()) as { city?: string; locality?: string; principalSubdivision?: string };
-    return json.city || json.locality || json.principalSubdivision || cityFromTimezone(timezone);
+    return pickReverseLocality(json) || cityFromTimezone(timezone);
   } catch {
     return cityFromTimezone(timezone);
   }
@@ -171,7 +161,10 @@ async function fetchForecast(lat: number, lng: number): Promise<OpenMeteo> {
   const url = new URL("https://api.open-meteo.com/v1/forecast");
   url.searchParams.set("latitude", String(lat));
   url.searchParams.set("longitude", String(lng));
-  url.searchParams.set("current", "temperature_2m,weather_code,is_day,apparent_temperature,relative_humidity_2m,wind_speed_10m");
+  url.searchParams.set(
+    "current",
+    "temperature_2m,weather_code,is_day,apparent_temperature,relative_humidity_2m,wind_speed_10m",
+  );
   url.searchParams.set("daily", "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max");
   url.searchParams.set("forecast_days", "3");
   url.searchParams.set("timezone", "auto");

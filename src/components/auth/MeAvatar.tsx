@@ -25,7 +25,8 @@ export function AvatarFace({
   const src = useMediaSrc(raw) || (raw && !raw.startsWith("idb:") ? raw : undefined);
   const letter = (mine?.name || user?.displayName || user?.email || "M").trim().charAt(0).toUpperCase();
 
-  const statusKey: AvailabilityStatus = mine?.availabilityStatus || (mine?.openNow ? "available" : user ? "available" : "offline");
+  const statusKey: AvailabilityStatus =
+    mine?.availabilityStatus || (mine?.openNow ? "available" : user ? "available" : "offline");
   const statusInfo = AVAILABILITY_STATUSES[statusKey];
 
   return (

@@ -26,14 +26,13 @@ export function StallPage() {
   const stall = stallsFor(eventId).find((s) => s.id === params?.stallId);
   if (!event || !stall) {
     if (!stallsReady) {
-      return (
-        <div className="mx-auto max-w-lg px-4 py-16 text-center text-sm text-mute">Loading…</div>
-      );
+      return <div className="mx-auto max-w-lg px-4 py-16 text-center text-sm text-mute">Loading…</div>;
     }
     return <NotFoundPage />;
   }
   const saved = isSaved(stall.id);
-  const handle = stall.handle || loadBios().find((p) => p.stallId === stall.id)?.handle || handleFromPlaceId(stall.id) || undefined;
+  const handle =
+    stall.handle || loadBios().find((p) => p.stallId === stall.id)?.handle || handleFromPlaceId(stall.id) || undefined;
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-10">

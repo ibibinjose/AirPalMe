@@ -4,7 +4,17 @@
     "details": [
       {
         "appID": "26WGXSNG58.me.airpal.app",
-        "paths": ["*"]
+        "paths": [
+          "*",
+          "/p/*",
+          "/plan/*",
+          "/w/*",
+          "/g/*",
+          "/q/*",
+          "/circle",
+          "/scan",
+          "/start"
+        ]
       }
     ]
   }

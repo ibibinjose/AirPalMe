@@ -20,6 +20,10 @@ export type BookingProviderKind = "mate" | "business" | "host";
 export const PAYMENT_STATUSES = ["unpaid", "paid", "deferred", "refunded"] as const;
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 
+/** Provider payout after the guest has paid. Funds stay on the platform until the booking is completed. */
+export const PAYOUT_STATUSES = ["unpaid", "held", "transferred", "reversed"] as const;
+export type PayoutStatus = (typeof PAYOUT_STATUSES)[number];
+
 export interface FeeConfig {
   platformFeeBps: number;
   minimumPlatformFeeCents: number;
@@ -55,6 +59,14 @@ export interface Booking {
   listingId?: string;
   /** Optional Experience campaign this booking is for. */
   campaignId?: string;
+  payoutStatus?: PayoutStatus;
+  stripeCheckoutSessionId?: string;
+  stripePaymentIntentId?: string;
+  stripeChargeId?: string;
+  stripeTransferId?: string;
+  stripeAccountId?: string;
+  /** Ticket quantity for events/experiences. Mate bookings are 1. */
+  spots?: number;
 }
 
 export interface BookingInput {
@@ -80,14 +92,62 @@ export function quoteFees(
   config: FeeConfig = DEFAULT_FEE_CONFIG,
 ): { priceCents: number; feeCents: number; providerCents: number } {
   const safe = Math.max(0, Math.floor(priceCents));
-  const bps = Number.isFinite(config.platformFeeBps) ? Math.max(0, Math.min(5000, Math.floor(config.platformFeeBps))) : DEFAULT_FEE_CONFIG.platformFeeBps;
-  const minFee = Number.isFinite(config.minimumPlatformFeeCents) ? Math.max(0, Math.floor(config.minimumPlatformFeeCents)) : 0;
+  const bps = Number.isFinite(config.platformFeeBps)
+    ? Math.max(0, Math.min(5000, Math.floor(config.platformFeeBps)))
+    : DEFAULT_FEE_CONFIG.platformFeeBps;
+  const minFee = Number.isFinite(config.minimumPlatformFeeCents)
+    ? Math.max(0, Math.floor(config.minimumPlatformFeeCents))
+    : 0;
   const feeCents = safe === 0 ? 0 : Math.max(minFee, Math.floor((safe * bps) / 10000));
   return { priceCents: safe, feeCents, providerCents: Math.max(0, safe - feeCents) };
 }
 
 export function paymentStatusForPrice(priceCents: number): PaymentStatus {
   return priceCents <= 0 ? "paid" : "unpaid";
+}
+
+export function payoutStatusForPrice(priceCents: number): PayoutStatus {
+  return priceCents <= 0 ? "transferred" : "unpaid";
+}
+
+/** Guest paid on Checkout — fulfill only when Stripe says the session is collected. */
+export function checkoutPaymentCollected(paymentStatus: string | null | undefined): boolean {
+  return paymentStatus === "paid" || paymentStatus === "no_payment_required";
+}
+
+export function payoutStatusAfterGuestPaid(priceCents: number): PayoutStatus {
+  return priceCents <= 0 ? "transferred" : "held";
+}
+
+export function canReleasePayout(input: {
+  paymentStatus: PaymentStatus;
+  payoutStatus?: PayoutStatus | string;
+  stripeChargeId?: string;
+  stripeAccountId?: string;
+  transfersActive: boolean;
+}): boolean {
+  const held = input.payoutStatus === "held" || input.payoutStatus === undefined || input.payoutStatus === "";
+  return (
+    input.paymentStatus === "paid" &&
+    held &&
+    Boolean(input.stripeChargeId?.trim()) &&
+    Boolean(input.stripeAccountId?.trim()) &&
+    input.transfersActive
+  );
+}
+
+export function isPayoutStatus(s: string): s is PayoutStatus {
+  return (PAYOUT_STATUSES as readonly string[]).includes(s);
+}
+
+/** Completed, guest paid, share still sitting on the platform — vendor can pull it once payouts are on. */
+export function canRetryPayout(b: Pick<Booking, "status" | "paymentStatus" | "payoutStatus" | "priceCents">): boolean {
+  return (
+    b.priceCents > 0 &&
+    b.paymentStatus === "paid" &&
+    (b.payoutStatus === "held" || b.payoutStatus === undefined) &&
+    b.status === "completed"
+  );
 }
 
 export function isPaymentStatus(s: string): s is PaymentStatus {

@@ -39,7 +39,9 @@ export function CampusPage() {
       <div className="mx-auto max-w-lg px-4 py-16 text-center">
         <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Unknown campus</p>
         <h1 className="font-display mt-1 text-3xl font-semibold">This campus isn’t listed</h1>
-        <Button className="mt-6" onClick={() => nav("/")}>Explore nearby</Button>
+        <Button className="mt-6" onClick={() => nav("/")}>
+          Explore nearby
+        </Button>
       </div>
     );
   }
@@ -55,7 +57,7 @@ export function CampusPage() {
             else nav("/");
           }}
           aria-label="Go back"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-card transition hover:border-brand active:scale-95"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full ring-1 ring-line bg-card transition hover:ring-brand/40 active:scale-95"
         >
           <ArrowLeft size={16} />
         </button>
@@ -67,7 +69,7 @@ export function CampusPage() {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`h-9 rounded-full px-4 text-sm capitalize ${tab === t ? "bg-ink text-white" : "bg-white ring-1 ring-line"}`}
+            className={`h-9 rounded-full px-4 text-sm capitalize ${tab === t ? "bg-brand text-white" : "bg-white ring-1 ring-line"}`}
           >
             {t}
           </button>
@@ -130,14 +132,17 @@ export function CampusPage() {
             Wi-Fi
           </Button>
           {CAMPUS.security && (
-            <a href={`tel:${CAMPUS.security}`} className="flex h-11 items-center justify-center rounded-full bg-white ring-1 ring-line">
+            <a
+              href={`tel:${CAMPUS.security}`}
+              className="flex h-11 items-center justify-center rounded-full bg-white ring-1 ring-line"
+            >
               Security
             </a>
           )}
           {CAMPUS.phone && (
             <a
               href={`tel:${CAMPUS.phone}`}
-              className="flex h-12 items-center justify-center rounded-2xl border-2 border-ink bg-card text-sm font-semibold"
+              className="flex h-12 items-center justify-center rounded-2xl ring-1 ring-line bg-card text-sm font-semibold"
             >
               Call campus office
             </a>

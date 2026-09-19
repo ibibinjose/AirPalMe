@@ -5,11 +5,30 @@ test.describe("Discover & Places Flow", () => {
     await page.addInitScript(() => {
       try {
         window.sessionStorage.setItem("airpal_disable_zoo", "1");
+        localStorage.setItem("airpal.door.v1", "explore");
       } catch {
         /* ignore */
       }
     });
   });
+  test("Ashfield GPS does not dump The Rocks — offers See The Rocks", async ({ page, context }) => {
+    await context.grantPermissions(["geolocation"]);
+    await context.setGeolocation({ latitude: -33.8889, longitude: 151.1256 });
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem("airpal.location.v1", JSON.stringify({ mode: "gps" }));
+      } catch {
+        /* ignore */
+      }
+    });
+    await page.goto("/");
+    await page.waitForLoadState("domcontentloaded");
+    await expect(page.getByRole("button", { name: /See The Rocks/i })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/Nothing listed near/i)).toBeVisible();
+    await page.getByRole("button", { name: /See The Rocks/i }).click();
+    await expect(page.locator("a[href^='/@'], a[href^='/p/']").first()).toBeVisible({ timeout: 10_000 });
+  });
+
   test("renders discovery feed with category chips and places", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
@@ -25,7 +44,7 @@ test.describe("Discover & Places Flow", () => {
     await expect(page.getByRole("button", { name: "Deals", exact: true })).toBeVisible();
 
     // At least one place card exists
-    await expect(page.locator("div[role='link']").first()).toBeVisible();
+    await expect(page.locator("a[href^='/@'], a[href^='/p/']").first()).toBeVisible();
   });
 
   test("filters places by category chip", async ({ page }) => {
@@ -36,7 +55,7 @@ test.describe("Discover & Places Flow", () => {
     await page.getByRole("button", { name: "Coffee", exact: true }).click();
 
     // Verify places are displayed under Coffee filter
-    await expect(page.locator("div[role='link']").first()).toBeVisible();
+    await expect(page.locator("a[href^='/@'], a[href^='/p/']").first()).toBeVisible();
   });
 
   test("navigates into Place detail and uses floating back button", async ({ page }) => {

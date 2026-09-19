@@ -52,7 +52,13 @@ export async function localImageUrl(id: string): Promise<string | undefined> {
 
 export function isStoredSrc(src?: string) {
   if (!src) return false;
-  return src.startsWith("idb:") || src.startsWith("http") || src.startsWith("/") || src.startsWith("blob:") || src.startsWith("data:");
+  return (
+    src.startsWith("idb:") ||
+    src.startsWith("http") ||
+    src.startsWith("/") ||
+    src.startsWith("blob:") ||
+    src.startsWith("data:")
+  );
 }
 
 export async function rasterizeCrop(image: HTMLImageElement, view: CropView, maxEdge: number): Promise<Blob> {
@@ -73,10 +79,7 @@ export async function rasterizeCrop(image: HTMLImageElement, view: CropView, max
   return blob;
 }
 
-export async function storeMedia(
-  blob: Blob,
-  dest: { folder: MediaFolder; kind: string },
-): Promise<string> {
+export async function storeMedia(blob: Blob, dest: { folder: MediaFolder; kind: string }): Promise<string> {
   if (blob.size > 5 * 1024 * 1024) throw new Error("Under 5 MB");
   const auth = getFirebaseAuth()?.currentUser;
   const storage = getFirebaseStorage();

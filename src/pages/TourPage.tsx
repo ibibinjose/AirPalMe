@@ -41,7 +41,7 @@ export function TourPage() {
           type="button"
           onClick={() => nav("/guide")}
           aria-label="Back to all walks"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-card transition hover:border-brand active:scale-95"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full ring-1 ring-line bg-card transition hover:ring-brand/40 active:scale-95"
         >
           <ArrowLeft size={16} />
         </button>

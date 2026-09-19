@@ -1,28 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import {
-  Bell,
-  Calendar,
-  Clock,
-  Coffee,
-  MapPin,
-  MessageSquare,
-  Sparkles,
-  Users,
-  X,
-  Zap,
-} from "lucide-react";
+import { Bell, Calendar, Clock, Coffee, MapPin, MessageSquare, Sparkles, Users, X, Zap } from "lucide-react";
 import { Photo } from "@/components/ui/Photo";
 import { Button } from "@/components/ui/Button";
 import { usePlans } from "@/contexts/PlanContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
-import {
-  recordCatchUpInterest,
-  toggleCatchUpReminder,
-  hasCatchUpReminder,
-} from "@/lib/catchup";
+import { recordCatchUpInterest, toggleCatchUpReminder, hasCatchUpReminder } from "@/lib/catchup";
+import { toZonedDateStr } from "@/lib/local-time";
 import type { PlanType } from "@shared/plan";
 import { toast } from "sonner";
 import { cn } from "@/lib/cn";
@@ -34,7 +20,14 @@ interface BioCatchUpModalProps {
   name: string;
   city?: string;
   avatar?: string;
+  ownerUid?: string;
   initialType?: PlanType;
+}
+
+function localDate(offsetDays = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return toZonedDateStr(d);
 }
 
 export function BioCatchUpModal({
@@ -44,27 +37,30 @@ export function BioCatchUpModal({
   name,
   city = "Sydney",
   avatar,
+  ownerUid,
   initialType = "catchup",
 }: BioCatchUpModalProps) {
   const [, nav] = useLocation();
   const { createPlan } = usePlans();
-  const { requireUser } = useAuth();
-
+  const { user, requireUser } = useAuth();
+  const { mine } = useBio();
   const [selectedType, setSelectedType] = useState<PlanType>(initialType);
-
-  const getLocalDate = (offsetDays = 0) => {
-    const d = new Date();
-    d.setDate(d.getDate() + offsetDays);
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  };
-
-  const [date, setDate] = useState(() => getLocalDate(1)); // Tomorrow
+  const [date, setDate] = useState(() => localDate(1));
   const [time, setTime] = useState("14:00");
-  const [venue, setVenue] = useState(`${city} Precinct`);
+  const [venue, setVenue] = useState("");
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRemembered, setIsRemembered] = useState(() => hasCatchUpReminder(handle));
 
-  if (!open) return null;
+  useEffect(() => {
+    if (!open) return;
+    setSelectedType(initialType);
+    setDate(localDate(1));
+    setTime(initialType === "meeting" ? "10:00" : initialType === "nightout" ? "18:30" : "14:00");
+    setVenue(city ? `${city}` : "");
+    setNotes("");
+    setIsRemembered(hasCatchUpReminder(handle));
+  }, [open, initialType, handle, city]);
 
   const typeOptions: Array<{
     type: PlanType;
@@ -77,152 +73,125 @@ export function BioCatchUpModal({
   }> = [
     {
       type: "catchup",
-      label: "1-on-1 Catch Up",
-      sublabel: "Coffee, drinks or casual lunch sync",
+      label: "Catch Up",
+      sublabel: "1-on-1 coffee",
       icon: Coffee,
-      badge: "Casual",
+      badge: "1-on-1",
       color: "from-amber-500/20 to-orange-500/20 text-amber-600 border-amber-500/30",
-      defaultTitle: `Coffee & Catch Up with ${name}`,
+      defaultTitle: `Coffee with ${name}`,
     },
     {
       type: "meeting",
-      label: "Book a Meeting",
-      sublabel: "1-on-1 discussion, sync or advisory",
+      label: "Meeting",
+      sublabel: "1-on-1 sync",
       icon: Calendar,
-      badge: "Sync",
+      badge: "1-on-1",
       color: "from-sky-500/20 to-blue-500/20 text-sky-600 border-sky-500/30",
-      defaultTitle: `Meeting & Sync with ${name}`,
+      defaultTitle: `Sync with ${name}`,
     },
     {
       type: "nightout",
-      label: "Group Hangout",
-      sublabel: "Drinks, dining or group outing with the crew",
+      label: "Hangout",
+      sublabel: "Group plan",
       icon: Users,
       badge: "Group",
       color: "from-purple-500/20 to-pink-500/20 text-purple-600 border-purple-500/30",
-      defaultTitle: `Hangout & Outing with ${name}`,
+      defaultTitle: `Hangout with ${name}`,
     },
   ];
 
-  const currentOption = typeOptions.find((o) => o.type === selectedType) || typeOptions[0];
+  const currentOption = typeOptions.find((o) => o.type === selectedType) || typeOptions[0]!;
 
-  const { mine } = useBio();
-  const [isRemembered, setIsRemembered] = useState(() => hasCatchUpReminder(handle));
+  if (!open) return null;
 
   const handleToggleReminder = () => {
-    const nextState = toggleCatchUpReminder({
-      handle,
-      name,
-      photo: avatar,
-      city,
-    });
+    const nextState = toggleCatchUpReminder({ handle, name, photo: avatar, city });
     setIsRemembered(nextState);
-    if (nextState) {
-      toast.success(`Saved reminder to catch up with ${name}!`);
-    } else {
-      toast.info(`Removed catch up reminder for ${name}`);
-    }
+    toast[nextState ? "success" : "info"](
+      nextState ? `Saved a reminder to catch up with ${name}` : `Removed reminder for ${name}`,
+    );
   };
 
   const handleLaunch = () => {
-    if (!requireUser("Sign in to create and invite friends to Hangout Plans.")) {
-      return;
-    }
-
+    if (!requireUser("Sign in to propose a catch-up, meeting, or hangout.")) return;
+    const place = venue.trim() || city;
     setIsSubmitting(true);
     try {
-      const planTitle = currentOption.defaultTitle;
-      const initialStops =
-        selectedType === "catchup"
-          ? [
-              { name: `Coffee & Catch Up at ${venue}`, time, notes: "Catch up and good conversation", icon: "coffee", address: venue },
-              { name: "Laneway Walk & Chat", notes: "Scenic walk together", icon: "walk" },
-            ]
-          : selectedType === "meeting"
-            ? [
-                { name: `Meeting at ${venue}`, time, notes: notes || "Agenda review & discussion", icon: "pin", address: venue },
-                { name: "Action Items & Wrap Up", notes: "Next steps", icon: "pin" },
-              ]
-            : [
-                { name: `Meeting Spot: ${venue}`, time, notes: "Gather and say cheers", icon: "drinks", address: venue },
-                { name: "Dinner & Banter", notes: "Great food and music", icon: "food" },
-              ];
-
+      const oneOnOne = selectedType !== "nightout";
       const created = createPlan({
-        title: planTitle,
+        title: currentOption.defaultTitle,
         type: selectedType,
         theme: selectedType === "catchup" ? "emerald" : selectedType === "meeting" ? "jetblack" : "gold",
         date,
         time,
         city,
-        destination: venue,
-        notes: notes || `Inviting @${handle} (${name}) to meet up and hangout!`,
-        isPublic: true,
-        initialStops,
+        destination: place,
+        notes: notes || `With @${handle}`,
+        isPublic: !oneOnOne,
+        invited: [{ id: ownerUid || `h-${handle}`, name, handle }],
+        initialStops:
+          selectedType === "catchup"
+            ? [{ name: `Coffee at ${place}`, time, notes: "Catch up", icon: "coffee", address: place }]
+            : selectedType === "meeting"
+              ? [{ name: `Meeting at ${place}`, time, notes: notes || "Sync", icon: "pin", address: place }]
+              : [{ name: place, time, notes: "Meet here", icon: "drinks", address: place }],
       });
 
-      // Also record catch-up interest so recipient sees in their inbox
       recordCatchUpInterest({
         targetHandle: handle,
+        targetOwnerUid: ownerUid,
+        requesterUid: user?.uid,
         requesterHandle: mine?.handle,
-        requesterName: mine?.name || "Friend on AirPal",
+        requesterName: mine?.name || user?.displayName || "AirPal",
         requesterPhoto: mine?.avatar,
         type: selectedType,
         date,
         time,
-        venue,
+        venue: place,
         notes,
+        planId: created.id,
       });
 
-      toast.success(`Hangout Plan created with @${handle}!`);
       onClose();
-      nav(`/plan/${created.id}`);
+      nav(`/plan/${created.id}?share=true`);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to create plan");
+      toast.error(err instanceof Error ? err.message : "Couldn’t create the plan");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleFullBuilder = () => {
-    onClose();
-    nav(`/plan/new?with=${handle}&name=${encodeURIComponent(name)}&type=${selectedType}&city=${encodeURIComponent(city)}`);
-  };
-
-  // Construct calendar payload for instant calendar sync
   const eventPayload = {
-    title: `${currentOption.label}: ${name} & Me`,
-    description: `${notes || `AirPal Catch Up with @${handle}`}\n\nVenue: ${venue}\nOrganised on https://airpal.me/@${handle}`,
+    title: `${currentOption.label} with ${name}`,
+    description: `${notes || `AirPal ${currentOption.label} with @${handle}`}\nVenue: ${venue || city}\nhttps://airpal.me/@${handle}`,
     startsAt: `${date}T${time || "14:00"}:00`,
-    venue,
+    venue: venue || city,
     city,
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-ink/65 p-4 backdrop-blur-sm sm:p-6 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
+      className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-ink/65 p-4 backdrop-blur-sm sm:p-6"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="catchup-modal-title"
     >
       <div
-        className="relative w-full max-w-lg overflow-hidden rounded-[32px] bg-paper shadow-2xl ring-1 ring-line animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-lg overflow-hidden rounded-[32px] bg-paper shadow-2xl ring-1 ring-line"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header Ribbon */}
-        <div className="relative bg-gradient-to-r from-card via-paper to-card px-6 pt-6 pb-4 border-b border-line/60">
+        <div className="relative border-b border-line px-6 pb-4 pt-6">
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-card ring-1 ring-line text-mute hover:text-ink hover:bg-paper transition"
+            className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-card text-mute ring-1 ring-line hover:text-ink"
             aria-label="Close dialog"
           >
             <X size={16} />
           </button>
-
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-12 overflow-hidden rounded-full ring-2 ring-gold/40 shadow-sm shrink-0">
+          <div className="flex items-center gap-3 pr-10">
+            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full ring-1 ring-line">
               {avatar ? (
                 <Photo src={avatar} className="h-full w-full object-cover" />
               ) : (
@@ -232,26 +201,22 @@ export function BioCatchUpModal({
               )}
             </div>
             <div>
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold">
+              <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gold">
                 <Sparkles size={10} />
-                Hangout & Catch Up
-              </div>
-              <h2 id="catchup-modal-title" className="font-display mt-0.5 text-lg font-bold text-ink truncate">
-                Meet with {name}
+                Meet &amp; hangout
+              </p>
+              <h2 id="catchup-modal-title" className="font-display text-lg font-semibold text-ink">
+                Catch up or meet with {name}
               </h2>
-              <p className="text-xs text-mute font-medium">@{handle} · {city}</p>
+              <p className="text-xs text-mute">@{handle}</p>
             </div>
           </div>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
-          {/* Meeting Type Selection */}
+        <div className="max-h-[70vh] space-y-5 overflow-y-auto p-6">
           <div>
-            <label className="text-xs font-semibold text-ink uppercase tracking-wider block mb-2">
-              Choose Meeting Style
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-mute">How</p>
+            <div className="grid grid-cols-3 gap-2">
               {typeOptions.map((opt) => {
                 const Icon = opt.icon;
                 const isSelected = selectedType === opt.type;
@@ -261,180 +226,109 @@ export function BioCatchUpModal({
                     type="button"
                     onClick={() => setSelectedType(opt.type)}
                     className={cn(
-                      "flex flex-col items-start p-3 rounded-2xl border text-left transition-all relative",
-                      isSelected
-                        ? "bg-card border-brand shadow-sm ring-1 ring-brand/30"
-                        : "bg-card/50 border-line hover:bg-card hover:border-line/80",
+                      "flex flex-col items-center rounded-2xl p-3 text-center ring-1 transition",
+                      isSelected ? "bg-card ring-brand" : "bg-card/60 ring-line hover:bg-card",
                     )}
                   >
-                    <div className="flex items-center justify-between w-full mb-1.5">
-                      <div className={cn("p-1.5 rounded-xl border", opt.color)}>
-                        <Icon size={16} />
-                      </div>
-                      <span className="text-[10px] font-semibold text-mute">{opt.badge}</span>
-                    </div>
-                    <span className="text-xs font-bold text-ink block">{opt.label}</span>
-                    <span className="text-[11px] text-mute leading-tight mt-0.5">{opt.sublabel}</span>
+                    <span className={cn("mb-1.5 rounded-xl border p-2", opt.color)}>
+                      <Icon size={16} />
+                    </span>
+                    <span className="text-xs font-bold text-ink">{opt.label}</span>
+                    <span className="mt-0.5 text-[10px] text-mute">{opt.sublabel}</span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Date & Time Selectors */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-ink uppercase tracking-wider block mb-1.5">
-                Date
-              </label>
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-mute">Date</label>
               <div className="relative">
                 <Calendar size={14} className="absolute left-3.5 top-3.5 text-mute" />
                 <input
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="h-11 w-full rounded-2xl bg-card pl-9 pr-3 text-xs font-semibold text-ink border border-ink outline-none focus:ring-brand focus:border-brand"
+                  className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-xs font-semibold outline-none focus:border-brand"
                 />
               </div>
-              <div className="flex gap-1.5 mt-1.5">
-                <button
-                  type="button"
-                  onClick={() => setDate(getLocalDate(0))}
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-card ring-1 ring-line text-mute hover:text-ink"
-                >
-                  Today
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDate(getLocalDate(1))}
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-card ring-1 ring-line text-mute hover:text-ink"
-                >
-                  Tomorrow
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDate(getLocalDate(3))}
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-card ring-1 ring-line text-mute hover:text-ink"
-                >
-                  Weekend
-                </button>
+              <div className="mt-1.5 flex gap-1.5">
+                {[
+                  ["Today", 0],
+                  ["Tomorrow", 1],
+                ].map(([label, days]) => (
+                  <button
+                    key={String(label)}
+                    type="button"
+                    onClick={() => setDate(localDate(Number(days)))}
+                    className="rounded-lg bg-card px-2 py-0.5 text-[10px] font-semibold text-mute ring-1 ring-line hover:text-ink"
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             </div>
-
             <div>
-              <label className="text-xs font-semibold text-ink uppercase tracking-wider block mb-1.5">
-                Time
-              </label>
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-mute">Time</label>
               <div className="relative">
                 <Clock size={14} className="absolute left-3.5 top-3.5 text-mute" />
                 <input
                   type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="h-11 w-full rounded-2xl bg-card pl-9 pr-3 text-xs font-semibold text-ink border border-ink outline-none focus:ring-brand focus:border-brand"
+                  className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-xs font-semibold outline-none focus:border-brand"
                 />
-              </div>
-              <div className="flex gap-1.5 mt-1.5">
-                <button
-                  type="button"
-                  onClick={() => setTime("10:00")}
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-card ring-1 ring-line text-mute hover:text-ink"
-                >
-                  10:00 AM
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTime("14:00")}
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-card ring-1 ring-line text-mute hover:text-ink"
-                >
-                  2:00 PM
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTime("18:30")}
-                  className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-card ring-1 ring-line text-mute hover:text-ink"
-                >
-                  6:30 PM
-                </button>
               </div>
             </div>
           </div>
 
-          {/* Suggested Venue / Meeting Point */}
           <div>
-            <label className="text-xs font-semibold text-ink uppercase tracking-wider block mb-1.5">
-              Venue / Meeting Point
-            </label>
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-mute">Where</label>
             <div className="relative">
-              <MapPin size={14} className="absolute left-3.5 top-3.5 text-gold" />
+              <MapPin size={14} className="absolute left-3.5 top-3.5 text-mute" />
               <input
                 type="text"
                 value={venue}
                 onChange={(e) => setVenue(e.target.value)}
-                placeholder="e.g. The Rocks Café, Sydney"
-                className="h-11 w-full rounded-2xl bg-card pl-9 pr-3 text-xs font-semibold text-ink border border-ink outline-none focus:ring-brand focus:border-brand"
+                placeholder={city || "A café nearby"}
+                className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-xs font-semibold outline-none focus:border-brand"
               />
             </div>
           </div>
 
-          {/* Notes / Agenda */}
           <div>
-            <label className="text-xs font-semibold text-ink uppercase tracking-wider block mb-1.5">
-              Personal Note or Agenda (Optional)
-            </label>
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-mute">Note</label>
             <div className="relative">
               <MessageSquare size={14} className="absolute left-3.5 top-3 text-mute" />
               <textarea
                 rows={2}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder={`e.g. Looking forward to chatting about upcoming collabs!`}
-                className="w-full rounded-2xl bg-card pl-9 pr-3 py-2.5 text-xs text-ink border border-ink outline-none focus:ring-brand resize-none focus:border-brand"
+                placeholder="Optional"
+                className="w-full resize-none rounded-2xl border border-line bg-card py-2.5 pl-9 pr-3 text-xs outline-none focus:border-brand"
               />
             </div>
           </div>
         </div>
 
-        {/* Modal Footer / CTAs */}
-        <div className="p-6 bg-card/50 border-t border-line/60 space-y-3">
-          <div className="flex flex-col sm:flex-row items-center gap-2.5">
-            <Button
-              type="button"
-              className="w-full sm:flex-1 h-12 rounded-full bg-ink text-white font-semibold text-sm gap-2 shadow-md hover:bg-ink/90 active:scale-[0.99]"
-              onClick={handleLaunch}
-              disabled={isSubmitting}
-            >
-              <Zap size={16} className="text-gold" />
-              <span>Create & Launch Plan</span>
-            </Button>
-
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full sm:w-auto h-12 rounded-full border border-line bg-card text-ink font-semibold text-xs px-4 hover:bg-paper"
-              onClick={handleFullBuilder}
-            >
-              Full Plan Builder →
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-between gap-2 pt-1 border-t border-line/40">
-            {/* Remember to Catch Up Toggle */}
+        <div className="space-y-3 border-t border-line bg-card/40 p-5">
+          <Button className="h-12 w-full gap-2 rounded-full" onClick={handleLaunch} disabled={isSubmitting}>
+            <Zap size={16} />
+            Create plan
+          </Button>
+          <div className="flex items-center justify-between gap-2">
             <button
               type="button"
               onClick={handleToggleReminder}
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition active:scale-95",
-                isRemembered
-                  ? "bg-amber-500/15 border-amber-500/30 text-amber-700"
-                  : "bg-card border-line text-ink hover:bg-paper",
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ring-1",
+                isRemembered ? "bg-amber-500/15 text-amber-800 ring-amber-500/30" : "bg-card text-ink ring-line",
               )}
             >
-              <Bell size={13} className={isRemembered ? "text-amber-500 fill-amber-500" : "text-mute"} />
-              <span>{isRemembered ? "Remembered to Catch Up" : "Remember to Catch Up"}</span>
+              <Bell size={13} />
+              {isRemembered ? "Reminder on" : "Remind me"}
             </button>
-
-            {/* Direct Calendar Sync Menu */}
             <AddToCalendarMenu
               event={eventPayload}
               size="sm"

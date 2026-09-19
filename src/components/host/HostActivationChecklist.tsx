@@ -163,7 +163,7 @@ export function HostActivationChecklist({
                   saveFlag(TEST_SCAN_PREFIX + propertyId, true);
                   nav(`/g/${propertyId}`);
                 }}
-                className="h-9 shrink-0 rounded-full bg-ink px-3.5 text-xs font-semibold text-white"
+                className="h-9 shrink-0 rounded-full bg-brand px-3.5 text-xs font-semibold text-white"
               >
                 Open guest view
               </button>

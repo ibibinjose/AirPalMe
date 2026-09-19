@@ -48,11 +48,21 @@ export function generateMarkerId(): string {
 
 /** Public vanity handle from a display name (separate from propertyId). */
 export function slugifyHandle(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "property";
+  return (
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "property"
+  );
 }
 
 export function slugifyCity(city: string): string {
-  return city.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "city";
+  return (
+    city
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "city"
+  );
 }
 
 export type VanityPath =

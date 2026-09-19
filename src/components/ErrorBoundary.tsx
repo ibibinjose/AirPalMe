@@ -19,7 +19,9 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Error</p>
             <p className="font-display mt-2 text-2xl">Something broke</p>
-            <p className="mt-2 text-sm text-mute">Reload the page. If it keeps happening, scan a code or write to us.</p>
+            <p className="mt-2 text-sm text-mute">
+              Reload the page. If it keeps happening, scan a code or write to us.
+            </p>
             <div className="mt-5 flex flex-wrap justify-center gap-3">
               <button
                 type="button"
@@ -28,7 +30,10 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
               >
                 Reload
               </button>
-              <a href="/" className="inline-flex h-11 items-center rounded-full bg-white px-5 text-sm font-medium ring-1 ring-line">
+              <a
+                href="/"
+                className="inline-flex h-11 items-center rounded-full bg-white px-5 text-sm font-medium ring-1 ring-line"
+              >
                 Explore
               </a>
             </div>

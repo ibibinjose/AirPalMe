@@ -39,11 +39,7 @@ describe("PullToRefreshContainer", () => {
     };
 
     const html = renderToStaticMarkup(
-      createElement(
-        PullToRefreshContainer,
-        { state: mockState },
-        createElement("div", null, "Refreshing View"),
-      ),
+      createElement(PullToRefreshContainer, { state: mockState }, createElement("div", null, "Refreshing View")),
     );
 
     expect(html).toContain("Reloading data...");
@@ -61,11 +57,7 @@ describe("PullToRefreshContainer", () => {
     };
 
     const html = renderToStaticMarkup(
-      createElement(
-        PullToRefreshContainer,
-        { state: mockState },
-        createElement("div", null, "Updated View"),
-      ),
+      createElement(PullToRefreshContainer, { state: mockState }, createElement("div", null, "Updated View")),
     );
 
     expect(html).toContain("Updated");

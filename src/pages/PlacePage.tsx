@@ -7,6 +7,7 @@ import { bioPath } from "@shared/bio";
 import { mapsWalkUrl, mapsPlaceUrl, mapsPlaceIdUrl } from "@/lib/maps";
 import { openMap } from "@/lib/analytics";
 import { Button } from "@/components/ui/Button";
+import { HereCheckIn } from "@/components/circle/HereCheckIn";
 import { BioHandleButton } from "@/components/bio/BioHandleButton";
 import { Photo } from "@/components/ui/Photo";
 import { useStay } from "@/contexts/StayContext";
@@ -82,14 +83,24 @@ export function PlacePage() {
         </div>
 
         <div className="absolute inset-x-0 bottom-0 p-5 pr-14">
-          {place.deal && <span className="rounded-full bg-gold px-2.5 py-1 text-[11px] font-semibold text-white">{place.deal.badge}</span>}
+          {place.deal && (
+            <span className="rounded-full bg-gold px-2.5 py-1 text-[11px] font-semibold text-white">
+              {place.deal.badge}
+            </span>
+          )}
           <h1 className="font-display mt-2 text-3xl font-semibold text-white">{place.name}</h1>
           <p className="text-sm text-white/75">
             {[
               walked.walk,
               place.priceLevel,
               place.hours,
-              open == null ? (hoursFresh.hideOpenNow ? t("hoursUnverified") : null) : open ? t("openNow") : t("closedNow"),
+              open == null
+                ? hoursFresh.hideOpenNow
+                  ? t("hoursUnverified")
+                  : null
+                : open
+                  ? t("openNow")
+                  : t("closedNow"),
             ]
               .filter(Boolean)
               .join(" · ")}
@@ -105,15 +116,28 @@ export function PlacePage() {
           </Button>
         )}
         <div className={handle ? "mt-3 flex gap-3" : "mt-6 flex gap-3"}>
-          <Button className="flex-1" variant={handle ? "ghost" : "primary"} onClick={() => openMap(mapsWalkUrl(from, place.geo), { contentId: place.id, destination: "walk" })}>
+          <Button
+            className="flex-1"
+            variant={handle ? "ghost" : "primary"}
+            onClick={() => openMap(mapsWalkUrl(from, place.geo), { contentId: place.id, destination: "walk" })}
+          >
             Walk
           </Button>
-          <Button variant="ghost" className="flex-1" onClick={() => openMap(maps, { contentId: place.id, destination: "maps" })}>
+          <Button
+            variant="ghost"
+            className="flex-1"
+            onClick={() => openMap(maps, { contentId: place.id, destination: "maps" })}
+          >
             Maps
           </Button>
         </div>
+        <HereCheckIn placeName={place.name} placeId={place.id} />
         {place.bookingUrl && (
-          <Button variant="ghost" className="mt-3 w-full" onClick={() => window.open(place.bookingUrl, "_blank", "noopener,noreferrer")}>
+          <Button
+            variant="ghost"
+            className="mt-3 w-full"
+            onClick={() => window.open(place.bookingUrl, "_blank", "noopener,noreferrer")}
+          >
             {place.bookingLabel || "Book"}
           </Button>
         )}

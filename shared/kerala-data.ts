@@ -295,8 +295,7 @@ export const KERALA_PLACES: NearbyPlace[] = [
     rating: 4.8,
     reviewCount: 21000,
     subTitle: "Tea Estates · Factory Tours",
-    heroImage:
-      "https://upload.wikimedia.org/wikipedia/commons/a/af/Blue_Hills_and_Tea_Garden_at_Munnar_Kerala.jpg",
+    heroImage: "https://upload.wikimedia.org/wikipedia/commons/a/af/Blue_Hills_and_Tea_Garden_at_Munnar_Kerala.jpg",
   },
   {
     id: "eravikulam-np",
@@ -382,7 +381,6 @@ export const KERALA_PLACES: NearbyPlace[] = [
     rating: 4.4,
     reviewCount: 5400,
     subTitle: "Bird Sanctuary · Vembanad Lake",
-    heroImage:
-      "https://upload.wikimedia.org/wikipedia/commons/5/52/Kumarakam_Bird_Sanctuary%2C_Kerala%2C_India.jpg",
+    heroImage: "https://upload.wikimedia.org/wikipedia/commons/5/52/Kumarakam_Bird_Sanctuary%2C_Kerala%2C_India.jpg",
   },
 ];

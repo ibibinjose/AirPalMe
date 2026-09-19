@@ -4,7 +4,10 @@ import { useBio } from "@/contexts/BioContext";
 
 export function useHandleStatus(handle: string, exceptId?: string) {
   const { handleFree } = useBio();
-  const [state, setState] = useState<{ ok: boolean; reason?: string; checking: boolean }>({ ok: false, checking: false });
+  const [state, setState] = useState<{ ok: boolean; reason?: string; checking: boolean }>({
+    ok: false,
+    checking: false,
+  });
 
   useEffect(() => {
     const h = normalizeHandle(handle);

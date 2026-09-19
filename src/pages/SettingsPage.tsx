@@ -137,7 +137,8 @@ export function SettingsPage() {
           </button>
           <h2 className="font-display mt-10 text-xl text-rose-700">Delete account</h2>
           <p className="mt-2 text-sm text-mute">
-            This signs you out and removes your login. Type DELETE to confirm. We keep a deletion record for 30 days so we can finish clearing bookings and reports.
+            This signs you out and removes your login. Type DELETE to confirm. We keep a deletion record for 30 days so
+            we can finish clearing bookings and reports.
           </p>
           <input
             value={deleteConfirm}

@@ -6,7 +6,7 @@ import { deletePropertyMenuItem, savePropertyMenuItem } from "@/lib/properties";
 
 const CATEGORIES: MenuItem["category"][] = ["Starters", "Mains", "Desserts", "Drinks", "Breakfast", "Late Night"];
 const field =
-  "mt-1 h-12 w-full rounded-2xl border-2 border-ink bg-paper/70 px-4 text-[16px] md:text-[15px] outline-none transition focus:border-brand focus:bg-card focus:ring-2 focus:ring-brand/45";
+  "mt-1 h-12 w-full rounded-2xl ring-1 ring-line bg-paper/70 px-4 text-[16px] md:text-[15px] outline-none transition focus:border-brand focus:bg-card focus:ring-2 focus:ring-brand/45";
 
 export function HostDiningPanel({ propertyId, menu }: { propertyId: string; menu: MenuItem[] }) {
   const [name, setName] = useState("");
@@ -73,7 +73,10 @@ export function HostDiningPanel({ propertyId, menu }: { propertyId: string; menu
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-mute">{cat}</p>
                 <ul className="mt-2 space-y-2">
                   {items.map((item) => (
-                    <li key={item.id} className="flex items-start justify-between gap-3 rounded-2xl bg-paper/70 px-4 py-3 ring-1 ring-line">
+                    <li
+                      key={item.id}
+                      className="flex items-start justify-between gap-3 rounded-2xl bg-paper/70 px-4 py-3 ring-1 ring-line"
+                    >
                       <div className="min-w-0">
                         <p className="font-medium">{item.name}</p>
                         {item.description ? <p className="mt-0.5 text-xs text-mute">{item.description}</p> : null}
@@ -110,11 +113,21 @@ export function HostDiningPanel({ propertyId, menu }: { propertyId: string; menu
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
             <span className="text-[12px] font-semibold text-ink/70">Price</span>
-            <input value={price} onChange={(e) => setPrice(e.target.value)} inputMode="decimal" placeholder="26" className={field} />
+            <input
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              inputMode="decimal"
+              placeholder="26"
+              className={field}
+            />
           </label>
           <label className="block">
             <span className="text-[12px] font-semibold text-ink/70">Category</span>
-            <select value={category} onChange={(e) => setCategory(e.target.value as MenuItem["category"])} className={field}>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as MenuItem["category"])}
+              className={field}
+            >
               {CATEGORIES.map((c) => (
                 <option key={c} value={c}>
                   {c}

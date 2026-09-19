@@ -5,7 +5,7 @@ import { Bell, BellRing } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
-import { enableWebPush, listenForegroundPush, pushPrefEnabled } from "@/lib/notifications";
+import { enableWebPush, listenForegroundPush, markNotificationRead, pushPrefEnabled } from "@/lib/notifications";
 import { openTicketCount, subscribePropertyTickets, type StaffTicket } from "@/lib/tickets-store";
 import { enableHostTicketPush, notifyHostForeground, ticketPushPrefEnabled } from "@/lib/tickets-push";
 import { hostWatchPropertyIds } from "@/lib/host-workspace";
@@ -38,14 +38,11 @@ export function NotificationBell() {
       return;
     }
     void getDocs(
-      query(
-        collection(db, "promotion_notifications"),
-        where("uid", "==", user.uid),
-        orderBy("at", "desc"),
-        limit(10),
-      ),
+      query(collection(db, "promotion_notifications"), where("uid", "==", user.uid), orderBy("at", "desc"), limit(10)),
     )
-      .then((snap) => setNotes(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<PromotionNotification, "id">) }))))
+      .then((snap) =>
+        setNotes(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<PromotionNotification, "id">) }))),
+      )
       .catch(() => setNotes([]));
   }, [user]);
 
@@ -88,9 +85,7 @@ export function NotificationBell() {
 
   const tickets = useMemo(() => {
     const rows = Object.values(byProperty).flat();
-    return rows
-      .filter((t) => t.status !== "resolved")
-      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return rows.filter((t) => t.status !== "resolved").sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [byProperty]);
 
   if (!user) return null;
@@ -104,7 +99,12 @@ export function NotificationBell() {
       const state = await enableWebPush();
       if (state === "granted") toast.success("Notifications on — results and winners will find you.");
       else if (state === "denied") toast.error("Notifications blocked — allow them in your browser settings.");
-      else toast.message(isNativeApp() ? "Native push configures on first install." : "Push isn't supported here — your inbox still works.");
+      else
+        toast.message(
+          isNativeApp()
+            ? "Native push configures on first install."
+            : "Push isn't supported here — your inbox still works.",
+        );
     } finally {
       setEnabling(false);
     }
@@ -127,48 +127,66 @@ export function NotificationBell() {
         )}
       </button>
       {open && (
-        <div className="absolute right-0 z-40 mt-2 max-h-96 w-80 overflow-y-auto rounded-2xl bg-paper shadow-lg ring-1 ring-line">
+        <div className="absolute right-0 z-40 mt-2 max-h-96 w-[22rem] overflow-y-auto rounded-[22px] bg-card shadow-xl ring-1 ring-line/80">
           {canWatch && (
             <>
-              <div className="flex items-center justify-between px-3 py-2">
-                <p className="text-xs font-semibold">Front desk {openTickets > 0 && `(${openTickets})`}</p>
-                <button type="button" className="text-[11px] text-brand" onClick={() => { setOpen(false); nav("/host"); }}>
-                  Open host tools
+              <div className="flex items-center justify-between px-4 py-3">
+                <p className="text-[13px] font-semibold">Front desk {openTickets > 0 && `(${openTickets})`}</p>
+                <button
+                  type="button"
+                  className="text-[13px] font-semibold text-brand"
+                  onClick={() => {
+                    setOpen(false);
+                    nav("/host");
+                  }}
+                >
+                  Host
                 </button>
               </div>
               {tickets.length === 0 ? (
-                <p className="px-3 pb-2 text-xs text-mute">No open guest requests.</p>
+                <p className="px-4 pb-3 text-[13px] text-mute">No open guest requests.</p>
               ) : (
                 tickets.slice(0, 4).map((t) => (
                   <button
                     key={t.id}
                     type="button"
-                    onClick={() => { setOpen(false); nav("/host"); }}
-                    className="block w-full border-t border-line/60 px-3 py-2 text-left hover:bg-card"
+                    onClick={() => {
+                      setOpen(false);
+                      nav("/host");
+                    }}
+                    className="block w-full border-t border-line/60 px-4 py-2.5 text-left"
                   >
-                    <p className="text-[11px] text-mute">
+                    <p className="text-[12px] text-mute">
                       Room {t.roomNumber} · {t.category}
                       {t.urgency === "urgent" ? " · urgent" : ""}
                     </p>
-                    <p className="truncate text-xs font-medium">{t.details}</p>
+                    <p className="truncate text-[14px] font-medium">{t.details}</p>
                   </button>
                 ))
               )}
             </>
           )}
-          <div className="flex items-center justify-between px-3 py-2">
-            <p className="text-xs font-semibold">Notifications</p>
-            <Link href="/me/giveaways" onClick={() => setOpen(false)} className="text-[11px] font-bold text-brand hover:underline">
-              Open inbox
+          <div className="flex items-center justify-between px-4 py-3">
+            <p className="text-[13px] font-semibold">Notifications</p>
+            <Link href="/me/inbox" onClick={() => setOpen(false)} className="text-[13px] font-semibold text-brand">
+              Inbox
             </Link>
           </div>
           {notes.length === 0 && (
-            <p className="px-3 pb-3 text-xs text-mute">Nothing yet. Giveaway results and campaign news land here.</p>
+            <p className="px-4 pb-4 text-[13px] text-mute">Circle announcements and plan updates land here.</p>
           )}
           {notes.map((n) => (
-            <Link key={n.id} href={n.href || "/me/giveaways"} onClick={() => setOpen(false)} className="block border-t border-line/60 px-3 py-2 hover:bg-card">
-              <p className={cn("text-xs", n.read ? "font-medium text-mute" : "font-bold")}>{n.title}</p>
-              <p className="line-clamp-2 text-[11px] text-mute">{n.body}</p>
+            <Link
+              key={n.id}
+              href={n.href || "/me/inbox"}
+              onClick={() => {
+                if (!n.read) void markNotificationRead(n.id);
+                setOpen(false);
+              }}
+              className="block border-t border-line/60 px-4 py-2.5"
+            >
+              <p className={cn("text-[14px] leading-5", n.read ? "text-ink" : "font-semibold")}>{n.title}</p>
+              <p className="mt-0.5 line-clamp-2 text-[12px] text-mute">{n.body}</p>
             </Link>
           ))}
           {!pushPrefEnabled() && (
@@ -177,9 +195,9 @@ export function NotificationBell() {
                 type="button"
                 onClick={enable}
                 disabled={enabling}
-                className="w-full rounded-xl bg-ink px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
+                className="w-full rounded-full bg-brand px-3 py-2.5 text-[13px] font-semibold text-white disabled:opacity-50"
               >
-                {enabling ? "Enabling…" : "Turn on push notifications"}
+                {enabling ? "Enabling…" : "Turn on alerts"}
               </button>
             </div>
           )}

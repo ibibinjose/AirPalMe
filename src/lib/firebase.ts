@@ -18,8 +18,7 @@ const firebaseConfig = {
     (import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string | undefined) || appletConfig.messagingSenderId,
   appId: (import.meta.env.VITE_FIREBASE_APP_ID as string | undefined) || appletConfig.appId,
   measurementId:
-    ((import.meta.env.VITE_FIREBASE_MEASUREMENT_ID ||
-      import.meta.env.VITE_GA_MEASUREMENT_ID) as string | undefined) ||
+    ((import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || import.meta.env.VITE_GA_MEASUREMENT_ID) as string | undefined) ||
     appletConfig.measurementId ||
     undefined,
 };
@@ -33,6 +32,11 @@ export function getMeasurementId(): string | undefined {
 }
 
 export const isFirebaseConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId);
+
+/** Browser API key is public (same value as the web app). Used by phone+password Cloud Function. */
+export function firebaseWebApiKey(): string {
+  return String(firebaseConfig.apiKey || "").trim();
+}
 
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
