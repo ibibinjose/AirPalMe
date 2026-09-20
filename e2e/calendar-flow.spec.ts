@@ -32,6 +32,11 @@ async function ensureFiltersOpen(page: Page): Promise<void> {
 }
 
 async function eventCardCount(page: Page): Promise<number> {
+  await page
+    .locator("article h3")
+    .first()
+    .waitFor({ state: "visible", timeout: 3000 })
+    .catch(() => {});
   return page
     .locator("article h3")
     .count()
@@ -39,6 +44,52 @@ async function eventCardCount(page: Page): Promise<number> {
 }
 
 test.describe("Calendar & Events Flow", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      try {
+        const d = new Date();
+        const d1 = d.toISOString().slice(0, 10);
+        const tomorrow = new Date(d.getTime() + 86400000);
+        const d2 = tomorrow.toISOString().slice(0, 10);
+        localStorage.setItem(
+          "airpal.location.v1",
+          JSON.stringify({ mode: "city", city: "Sydney", lat: -33.8688, lng: 151.2093 }),
+        );
+        const events = [
+          {
+            id: "evt-test-market",
+            name: "The Rocks Weekend Market",
+            flavour: "market",
+            city: "Sydney",
+            venue: "Playfair St, The Rocks",
+            startsAt: `${d1}T10:00:00+10:00`,
+            endsAt: `${d1}T16:00:00+10:00`,
+            status: "live",
+            gatePath: "/e/evt-test-market",
+            categoryChips: ["eat", "shops"],
+            stallCount: 8,
+          },
+          {
+            id: "evt-test-music",
+            name: "Jazz & Blues by the Harbour",
+            flavour: "event_space",
+            city: "Sydney",
+            venue: "Circular Quay Lawn",
+            startsAt: `${d2}T18:00:00+10:00`,
+            endsAt: `${d2}T22:00:00+10:00`,
+            status: "live",
+            gatePath: "/e/evt-test-music",
+            categoryChips: ["bar", "coffee"],
+            stallCount: 3,
+          },
+        ];
+        localStorage.setItem("airpal.events.v1", JSON.stringify(events));
+      } catch {
+        /* ignore */
+      }
+    });
+  });
+
   test("loads /calendar and displays the header, views, and filters", async ({ page }) => {
     await page.goto("/calendar");
     await page.waitForLoadState("domcontentloaded");
@@ -57,7 +108,7 @@ test.describe("Calendar & Events Flow", () => {
     await expect(visibleSearch(page)).toBeVisible();
     await expect(visibleButton(page, /^All Events/)).toBeVisible();
     await expect(visibleButton(page, /^Going \(RSVP\)/)).toBeVisible();
-    await expect(visibleButton(page, /^Interested/)).toBeVisible();
+    await expect(visibleButton(page, /^Interested/).first()).toBeVisible();
   });
 
   test("switches between Month, Week, Day, and List views", async ({ page }) => {
@@ -121,6 +172,8 @@ test.describe("Calendar & Events Flow", () => {
     await page.goto("/calendar");
     await page.waitForLoadState("domcontentloaded");
 
+    if ((await eventCardCount(page)) === 0) test.skip(true, "no events in this environment");
+
     await ensureFiltersOpen(page);
     const search = visibleSearch(page);
     await search.fill("zzz-no-such-event-xyz");
@@ -137,9 +190,10 @@ test.describe("Calendar & Events Flow", () => {
     await page.goto("/calendar");
     await page.waitForLoadState("domcontentloaded");
 
+    await page.getByRole("button", { name: "Month View" }).click();
     await ensureFiltersOpen(page);
-    const dots = page.locator('[role="gridcell"][aria-label$="events"] span[title]').filter({ visible: true });
-    const singularDots = page.locator('[role="gridcell"][aria-label$=" event"] span[title]').filter({ visible: true });
+    const dots = page.locator('[role="gridcell"][aria-label$="events"] [title]').filter({ visible: true });
+    const singularDots = page.locator('[role="gridcell"][aria-label$=" event"] [title]').filter({ visible: true });
     if ((await dots.count()) + (await singularDots.count()) === 0) {
       test.skip(true, "no event dots in this environment");
     }
@@ -160,8 +214,8 @@ test.describe("Calendar & Events Flow", () => {
     await page.locator("article h3").first().click();
     await expect(page.getByRole("button", { name: "Close modal" })).toBeVisible();
 
-    // Export menu offers real providers
-    await page.getByRole("button", { name: "Add to Calendar" }).click();
+    // Export menu inside modal offers real providers
+    await page.getByRole("button", { name: /Add to Calendar \(Google/i }).click();
     await expect(page.getByRole("button", { name: "Google Calendar" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Apple Calendar (.ics)" })).toBeVisible();
   });

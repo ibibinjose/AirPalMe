@@ -18,7 +18,7 @@ test.describe("Concierge & Stay Companion Flow", () => {
 
     // Verify key action tiles exist in the 8-tile grid
     const main = page.getByRole("main");
-    await expect(main.getByRole("button", { name: "Wi-Fi" })).toBeVisible();
+    await expect(main.getByRole("button", { name: "Wi-Fi", exact: true })).toBeVisible();
     await expect(main.getByRole("button", { name: "Staff" })).toBeVisible();
     await expect(main.getByRole("button", { name: "Dining" })).toBeVisible();
     await expect(main.getByRole("button", { name: "Calendar" })).toBeVisible();
@@ -29,7 +29,7 @@ test.describe("Concierge & Stay Companion Flow", () => {
     await page.waitForLoadState("domcontentloaded");
 
     // Click Wi-Fi tile in main content
-    await page.getByRole("main").getByRole("button", { name: "Wi-Fi" }).click();
+    await page.getByRole("main").getByRole("button", { name: "Wi-Fi", exact: true }).click();
 
     // The demo stay publishes a network name but no password: the sheet must
     // point at the front desk and offer no password to copy.
