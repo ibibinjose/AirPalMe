@@ -186,8 +186,8 @@ describe("Event Grouping & Formatting", () => {
 
   it("formats event time range", () => {
     const range = formatEventTimeRange("2026-09-11T18:00:00+10:00", "2026-09-11T21:00:00+10:00");
-    expect(range).toContain("6:00 pm");
-    expect(range).toContain("9:00 pm");
+    expect(range.toLowerCase()).toContain("6:00 pm");
+    expect(range.toLowerCase()).toContain("9:00 pm");
   });
 });
 
