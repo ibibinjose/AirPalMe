@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { AtSign, Cake, Check, Eye, EyeOff, KeyRound, Lock, Mail, Phone, User } from "lucide-react";
 import { authErrorMessage } from "@shared/auth-email";
-import { normalizeHandle, randomHexHandle } from "@shared/bio";
+import { normalizeHandle } from "@shared/bio";
 import { isOtp, normalizeOtp, phoneReady } from "@shared/phone-auth";
 import { PASSWORD_RULES, isAdultBirthDate, isEmail, passwordIssues, passwordOk, sydneyToday } from "@shared/validate";
 import { Button } from "@/components/ui/Button";
