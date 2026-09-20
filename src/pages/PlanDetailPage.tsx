@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PageLoading } from "@/components/ui/PageLoading";
+import { setShareMeta } from "@/lib/share-meta";
 import { usePlans } from "@/contexts/PlanContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { InvitationCard } from "@/components/plan/InvitationCard";
@@ -91,6 +92,18 @@ export function PlanDetailPage() {
   }, [targetId, getPlan, fetchPlan]);
 
   const plan = getPlan(targetId) || localPlan;
+
+  useEffect(() => {
+    if (!plan) return;
+    const where = plan.destination || plan.city || "Sydney";
+    setShareMeta({
+      title: `${plan.title} · AirPal`,
+      description:
+        `${plan.title} in ${where}${plan.date ? ` on ${plan.date}` : ""} — join the plan on AirPal.Me.`.slice(0, 160),
+      image: plan.heroImage || undefined,
+      url: `${window.location.origin}/plan/${plan.id}`,
+    });
+  }, [plan]);
 
   const [shareOpen, setShareOpen] = useState(() => searchParams.get("share") === "true");
   const [qrModalOpen, setQrModalOpen] = useState(false);

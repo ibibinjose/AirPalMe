@@ -147,6 +147,19 @@ export function TermsPage() {
         If you believe content infringes your copyright or that an @handle infringes your trade mark, registered name,
         or domain, write to {LEGAL.email} or use <Link href="/bio/recover">handle recovery</Link>.
       </p>
+      <p>
+        A copyright notice should include: (a) identification of the copyrighted work; (b) the exact listing, photo, or
+        @handle you say infringes, with a link or screenshot; (c) your name, address, and email; (d) a statement that
+        you have a good-faith belief the use is not authorised; and (e) a statement, made on penalty of perjury or an
+        equivalent declaration under your law, that you own the right or are authorised to act for the owner. We may
+        remove or disable the content while we assess the notice.
+      </p>
+      <p>
+        If your content was removed after a notice you believe is wrong, you may send a counter-notice with your name,
+        address, the removed content&apos;s location before removal, and your consent to the jurisdiction of{" "}
+        {LEGAL.courts}. Unless the original complainant files court proceedings within 10–14 business days, we may
+        restore the content. Repeat infringers lose their accounts.
+      </p>
 
       <h2>7. Disclaimers</h2>
       <p>

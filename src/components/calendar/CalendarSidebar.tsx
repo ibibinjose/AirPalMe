@@ -46,6 +46,8 @@ export interface CalendarSidebarProps {
   onResetFilters: () => void;
   onCloseMobile?: () => void;
   className?: string;
+  /** Prefix for element ids — the sidebar mounts twice (desktop + mobile drawer). */
+  idPrefix?: string;
 }
 
 export function CalendarSidebar({
@@ -65,6 +67,7 @@ export function CalendarSidebar({
   onResetFilters,
   onCloseMobile,
   className,
+  idPrefix = "calendar-sidebar",
 }: CalendarSidebarProps) {
   const [showAllTags, setShowAllTags] = useState(false);
 
@@ -186,7 +189,7 @@ export function CalendarSidebar({
       </div>
 
       {/* View Mode Toggle Control (Week, Month, Day) */}
-      <div className="space-y-1.5" id="calendar-sidebar-view-mode">
+      <div className="space-y-1.5" id={`${idPrefix}-view-mode`}>
         <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-mute">
           <span>Calendar View</span>
           <span className="text-[10px] font-semibold capitalize text-brand">{viewMode} mode</span>
@@ -254,7 +257,7 @@ export function CalendarSidebar({
       {/* 1. Search Bar */}
       <div className="space-y-1.5">
         <label
-          htmlFor="calendar-sidebar-search"
+          htmlFor={`${idPrefix}-search`}
           className="block text-[11px] font-bold uppercase tracking-wider text-mute"
         >
           Search Events
@@ -262,7 +265,7 @@ export function CalendarSidebar({
         <div className="relative">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-mute pointer-events-none" />
           <input
-            id="calendar-sidebar-search"
+            id={`${idPrefix}-search`}
             type="search"
             inputMode="search"
             value={searchQuery}

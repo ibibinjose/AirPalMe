@@ -211,7 +211,10 @@ export function AppRoutes() {
           <PromotionDetailPage kind="promotion" />
         </Route>
         <Route path="/promotions" component={PromotionsPage} />
-        <Route path="/getAirPal" component={GetAirPalPage} />
+        <Route path="/getAirPalApp" component={GetAirPalPage} />
+        <Route path="/getAirPal">
+          <Redirect to="/getAirPalApp" />
+        </Route>
         <Route path="/about" component={AboutPage} />
         <Route path="/contact" component={ContactPage} />
         <Route path="/privacy" component={PrivacyPage} />

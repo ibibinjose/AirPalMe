@@ -58,7 +58,7 @@ type AuthValue = {
   confirmPhoneCode: (code: string) => Promise<void>;
   completePhoneProfile: (input: { name: string; email: string }) => Promise<void>;
   linkEmailPassword: (email: string, password: string) => Promise<void>;
-  completeAccount: (input: { handle: string; name: string; email: string }) => Promise<void>;
+  completeAccount: (input: { handle: string; name: string; email: string; birthDate: string }) => Promise<void>;
   updateEmailAddress: (email: string) => Promise<void>;
   removeEmailAddress: () => Promise<void>;
   sendAccountPhoneCode: (phone: string) => Promise<void>;
@@ -243,6 +243,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             handle: input.handle,
             name: input.name,
             email: normalizeEmail(input.email),
+            birthDate: input.birthDate,
           });
         }
         await pullUser();

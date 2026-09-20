@@ -11,7 +11,7 @@ test.describe("Discover & Places Flow", () => {
       }
     });
   });
-  test("Ashfield GPS does not dump The Rocks — offers See The Rocks", async ({ page, context }) => {
+  test("Ashfield GPS does not dump The Rocks — honest empty state", async ({ page, context }) => {
     await context.grantPermissions(["geolocation"]);
     await context.setGeolocation({ latitude: -33.8889, longitude: 151.1256 });
     await page.addInitScript(() => {
@@ -23,10 +23,12 @@ test.describe("Discover & Places Flow", () => {
     });
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
-    await expect(page.getByRole("button", { name: /See The Rocks/i })).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText(/Nothing listed near/i)).toBeVisible();
-    await page.getByRole("button", { name: /See The Rocks/i }).click();
-    await expect(page.locator("a[href^='/@'], a[href^='/p/']").first()).toBeVisible({ timeout: 10_000 });
+
+    // Honest empty for Ashfield…
+    await expect(page.getByText(/Nothing listed near/i).first()).toBeVisible({ timeout: 15_000 });
+    // …with zero Rocks place cards leaking in, and a host onboarding path.
+    await expect(page.locator("a[href^='/@'], a[href^='/p/']")).toHaveCount(0);
+    await expect(page.locator("#main-content").getByRole("button", { name: "Add your place" })).toBeVisible();
   });
 
   test("renders discovery feed with category chips and places", async ({ page }) => {

@@ -26,7 +26,7 @@ import { makeQrDataUrl } from "@/lib/qr";
 /** Replace with live store IDs after first listing is approved. */
 const APP_STORE_URL = "#";
 const PLAY_STORE_URL = "#";
-const PAGE_URL = "https://airpal.me/getAirPal";
+const PAGE_URL = "https://airpal.me/getAirPalApp";
 
 function StoreBadge({ store, href }: { store: "apple" | "play"; href: string }) {
   const comingSoon = href === "#";
@@ -147,9 +147,14 @@ export function GetAirPalPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 md:px-6">
+    <div className="relative mx-auto max-w-4xl overflow-hidden px-4 py-8 md:px-6">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 left-1/2 h-[380px] w-[720px] -translate-x-1/2 rounded-full opacity-20 blur-3xl"
+        style={{ background: "linear-gradient(90deg,#d4af37,#2563eb)" }}
+      />
       {/* Top Header Navigation */}
-      <div className="flex items-center justify-between">
+      <div className="relative flex items-center justify-between">
         <Link
           href="/"
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-mute transition hover:text-ink"
@@ -157,60 +162,59 @@ export function GetAirPalPage() {
           <ArrowLeft size={16} /> Back to Discover
         </Link>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-line/25 bg-card px-3 py-1 text-xs font-semibold text-mute">
-          Built in Australia 🇦🇺
+          Made in Sydney
         </span>
       </div>
 
       {/* Hero Section */}
-      <div className="mt-8 text-center">
+      <div className="relative mt-10 text-center">
         <img
           src="/logo-mark.png"
           alt="AirPal"
-          className="mx-auto h-24 w-24 rounded-3xl ring-1 ring-line bg-white p-2 shadow-md object-contain"
+          className="mx-auto h-28 w-28 rounded-[2rem] bg-white object-contain p-2 shadow-xl ring-1 ring-line"
         />
 
-        <h1 className="font-display mt-5 text-4xl font-extrabold tracking-tight md:text-5xl text-ink">Get AirPal</h1>
-        <p className="mt-2 text-lg font-bold text-brand">Life Made Easy.</p>
-        <p className="mx-auto mt-3 max-w-lg text-base text-mute leading-relaxed">
-          The trusted marketplace connecting you with{" "}
-          <strong className="text-ink font-semibold">people, places, experiences and things</strong> — starting in
-          Sydney, Australia.
+        <p className="mt-6 text-xs font-bold uppercase tracking-[0.24em] text-brand">iPhone · Android · Web</p>
+        <h1 className="font-display mt-2 text-5xl font-bold tracking-tight text-ink md:text-6xl">Get AirPal</h1>
+        <p className="mx-auto mt-4 max-w-lg text-balance text-base leading-relaxed text-mute md:text-lg">
+          Your networking app, your link-in-bio, and your guide to life around you —{" "}
+          <strong className="font-semibold text-ink">people, places, experiences and things</strong>, starting in
+          Sydney.
         </p>
+
+        {/* Store badges up front */}
+        <div className="mx-auto mt-6 flex max-w-md flex-col gap-2.5">
+          <StoreBadge store="apple" href={APP_STORE_URL} />
+          <StoreBadge store="play" href={PLAY_STORE_URL} />
+        </div>
       </div>
 
       {/* Primary Action & Download Section */}
-      <div className="mt-8 grid gap-6 md:grid-cols-2 items-center">
-        {/* Web App Launch & Store Badges Card */}
-        <div className="rounded-3xl ring-1 ring-line bg-card p-6 shadow-xs flex flex-col justify-between h-full">
+      <div className="mt-10 grid items-stretch gap-4 md:grid-cols-2">
+        {/* Web App Launch Card */}
+        <div className="flex h-full flex-col justify-between rounded-[1.8rem] bg-card p-6 shadow-xs ring-1 ring-line md:p-7">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-500/30 flex items-center gap-1">
-                <Globe size={13} /> Progressive Web App
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-700">
+                <Globe size={13} /> No download needed
               </span>
-              <span className="text-xs text-mute font-medium">No Download Needed</span>
             </div>
-            <h2 className="mt-3 text-2xl font-bold text-ink">Use AirPal Instantly</h2>
-            <p className="mt-1 text-sm text-mute leading-relaxed">
-              Open directly in your browser on iPhone, Android, or desktop. Add to home screen for full app experience.
+            <h2 className="mt-3 text-2xl font-bold tracking-tight text-ink">Use AirPal instantly</h2>
+            <p className="mt-1.5 text-sm leading-relaxed text-mute">
+              Opens in your browser on iPhone, Android, or desktop — then install it to your home screen for the full
+              app experience.
             </p>
           </div>
 
-          <div className="mt-6 space-y-3">
-            <Link href="/" className="block">
-              <Button size="lg" className="w-full text-base font-bold shadow-sm">
-                Launch Web App Now <ExternalLink size={16} />
-              </Button>
-            </Link>
-
-            <div className="flex flex-col gap-2.5 pt-3 border-t border-line/60">
-              <StoreBadge store="apple" href={APP_STORE_URL} />
-              <StoreBadge store="play" href={PLAY_STORE_URL} />
-            </div>
-          </div>
+          <Link href="/" className="mt-6 block">
+            <Button size="lg" className="h-12 w-full gap-1.5 rounded-full text-base font-bold shadow-sm">
+              Launch the app <ExternalLink size={16} />
+            </Button>
+          </Link>
         </div>
 
         {/* Scan & Share Card */}
-        <div className="rounded-3xl ring-1 ring-line bg-card p-6 text-center shadow-xs flex flex-col items-center justify-between h-full">
+        <div className="flex h-full flex-col items-center justify-between rounded-[1.8rem] bg-card p-6 text-center shadow-xs ring-1 ring-line md:p-7">
           <div className="w-full">
             <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-xs font-bold text-brand border border-brand/20">
               <Smartphone size={13} /> Scan on Mobile
@@ -220,7 +224,7 @@ export function GetAirPalPage() {
 
           <div className="my-4 rounded-2xl ring-1 ring-line bg-white p-3 shadow-inner">
             {qr ? (
-              <img src={qr} alt="QR code for AirPal.Me/getAirPal" className="h-36 w-36" />
+              <img src={qr} alt="QR code for AirPal.Me/getAirPalApp" className="h-36 w-36" />
             ) : (
               <div className="grid h-36 w-36 place-items-center text-xs text-mute">Generating QR…</div>
             )}
@@ -246,7 +250,7 @@ export function GetAirPalPage() {
       </div>
 
       {/* PWA Install Instructions ("Add to Home Screen") */}
-      <div className="mt-10 rounded-3xl ring-1 ring-line bg-paper p-6 md:p-8">
+      <div className="mt-12 rounded-[1.8rem] bg-paper p-6 ring-1 ring-line md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-line pb-4">
           <div>
             <h3 className="text-xl font-bold text-ink flex items-center gap-2">
@@ -364,11 +368,13 @@ export function GetAirPalPage() {
       </div>
 
       {/* One Platform — 6 Verticals Section */}
-      <div className="mt-12 text-center">
-        <span className="text-[11px] font-extrabold uppercase tracking-widest text-amber-800">One Platform Engine</span>
-        <h2 className="mt-1 text-3xl font-extrabold text-ink">Explore Everything AirPal Offers</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-mute">
-          Designed for Sydney local discovery, experiences, stays, and connection.
+      <div className="mt-16 text-center">
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-brand">One platform engine</p>
+        <h2 className="font-display mx-auto mt-2 max-w-xl text-balance text-3xl font-bold tracking-tight text-ink md:text-4xl">
+          Everything AirPal offers
+        </h2>
+        <p className="mx-auto mt-3 max-w-md text-[15px] text-mute">
+          Mates, stays, experiences, fashion, daily discovery and trips — one login across it all.
         </p>
 
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">

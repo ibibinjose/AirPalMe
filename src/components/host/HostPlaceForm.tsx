@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { HostFreshnessBanner } from "@/components/host/HostFreshnessBanner";
-import type { FacilityItem, PropertyInfo } from "@shared/airpal-data";
+import type { FacilityItem, PropertyInfo, StaffPick } from "@shared/airpal-data";
 import { savePropertyProfile, updatePropertyWifi } from "@/lib/properties";
 import { stampWifiSavedAt, wifiSavedAt } from "@/components/host/HostActivationChecklist";
 import { getPropertyWifiRemote, liveBackendEnabled } from "@/lib/functions";
@@ -27,6 +27,9 @@ export function HostPlaceForm({
   const [checkOut, setCheckOut] = useState(property.checkOut || "");
   const [breakfast, setBreakfast] = useState(property.breakfast);
   const [facilities, setFacilities] = useState<FacilityItem[]>(property.facilities || []);
+  const [picks, setPicks] = useState<StaffPick[]>(property.staffPicks || []);
+  const [winbackTitle, setWinbackTitle] = useState(property.winbackOffer?.title || "");
+  const [winbackDetail, setWinbackDetail] = useState(property.winbackOffer?.detail || "");
   const [network, setNetwork] = useState(property.wifi?.network || "");
   const [password, setPassword] = useState("");
   const [speed, setSpeed] = useState(property.wifi?.speed || "");
@@ -43,6 +46,9 @@ export function HostPlaceForm({
     setCheckOut(property.checkOut || "");
     setBreakfast(property.breakfast);
     setFacilities(property.facilities || []);
+    setPicks(property.staffPicks || []);
+    setWinbackTitle(property.winbackOffer?.title || "");
+    setWinbackDetail(property.winbackOffer?.detail || "");
     setNetwork(property.wifi?.network || "");
     setSpeed(property.wifi?.speed || "");
   }, [
@@ -57,6 +63,8 @@ export function HostPlaceForm({
     property.breakfast,
     property.facilities,
     property.wifi,
+    property.staffPicks,
+    property.winbackOffer,
   ]);
 
   useEffect(() => {
@@ -78,6 +86,14 @@ export function HostPlaceForm({
     }
     setSaving(true);
     try {
+      const cleanPicks = picks
+        .map((p, i) => {
+          const detail = p.detail?.trim();
+          return { id: p.id || `pick-${i}`, title: p.title.trim(), ...(detail ? { detail } : {}) };
+        })
+        .filter((p) => p.title)
+        .slice(0, 3);
+      const winback = winbackTitle.trim();
       const next = await savePropertyProfile(property.id, {
         name: name.trim(),
         tagline: tagline.trim(),
@@ -88,6 +104,13 @@ export function HostPlaceForm({
         checkOut: checkOut.trim(),
         breakfast,
         facilities: facilities.filter((f) => f.name.trim()),
+        staffPicks: cleanPicks,
+        winbackOffer: winback
+          ? {
+              title: winback,
+              ...(winbackDetail.trim() ? { detail: winbackDetail.trim() } : {}),
+            }
+          : undefined,
         confirmHours: true,
       });
       onSaved(next);
@@ -273,6 +296,75 @@ export function HostPlaceForm({
               </li>
             ))}
           </ul>
+        </div>
+        <div>
+          <div className="flex items-center justify-between">
+            <p className="text-[12px] font-semibold text-ink/70">Staff picks (shows in the guest companion)</p>
+            {picks.length < 3 && (
+              <button
+                type="button"
+                className="text-xs font-semibold text-brand"
+                onClick={() => setPicks((rows) => [...rows, { id: `pick-${Date.now()}`, title: "", detail: "" }])}
+              >
+                Add
+              </button>
+            )}
+          </div>
+          <ul className="mt-2 space-y-2">
+            {picks.map((row, i) => (
+              <li key={row.id || i} className="rounded-2xl bg-paper/70 p-3 ring-1 ring-line">
+                <div className="grid gap-2">
+                  <input
+                    value={row.title}
+                    placeholder="Tonight: harbourside dinner cruise"
+                    onChange={(e) =>
+                      setPicks((rows) => rows.map((r, n) => (n === i ? { ...r, title: e.target.value } : r)))
+                    }
+                    className={field + " mt-0"}
+                  />
+                  <input
+                    value={row.detail || ""}
+                    placeholder="Why guests love it (optional)"
+                    onChange={(e) =>
+                      setPicks((rows) => rows.map((r, n) => (n === i ? { ...r, detail: e.target.value } : r)))
+                    }
+                    className={field + " mt-0"}
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="mt-2 text-xs text-mute hover:text-ink"
+                  onClick={() => setPicks((rows) => rows.filter((_, n) => n !== i))}
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+          {picks.length === 0 && (
+            <p className="mt-2 text-xs text-mute">No picks yet — guests just see the standard companion.</p>
+          )}
+        </div>
+        <div className="grid gap-3">
+          <p className="text-[12px] font-semibold text-ink/70">Return-visit offer (shows after the guest rates)</p>
+          <label className="block">
+            <span className="text-[12px] text-mute">Offer title</span>
+            <input
+              value={winbackTitle}
+              onChange={(e) => setWinbackTitle(e.target.value)}
+              placeholder="10% off your next stay"
+              className={field}
+            />
+          </label>
+          <label className="block">
+            <span className="text-[12px] text-mute">Details</span>
+            <input
+              value={winbackDetail}
+              onChange={(e) => setWinbackDetail(e.target.value)}
+              placeholder="Mention this screen at checkout"
+              className={field}
+            />
+          </label>
         </div>
         <Button type="submit" className="w-full" disabled={saving}>
           {saving ? "Saving…" : "Save stay details"}

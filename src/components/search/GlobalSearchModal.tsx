@@ -444,7 +444,7 @@ export function GlobalSearchModal() {
               type="button"
               onClick={() => setQuery("")}
               aria-label="Clear search"
-              className="grid h-6 w-6 place-items-center rounded-full text-mute hover:bg-paper hover:text-ink"
+              className="grid h-11 w-11 -m-2 place-items-center rounded-full text-mute hover:bg-paper hover:text-ink"
             >
               <X size={14} />
             </button>
@@ -474,7 +474,7 @@ export function GlobalSearchModal() {
                 setSelectedIndex(0);
               }}
               className={cn(
-                "h-7 rounded-full px-3 text-xs font-medium transition whitespace-nowrap",
+                "h-11 rounded-full px-4 text-xs font-medium transition whitespace-nowrap",
                 activeCategory === c.id
                   ? "bg-brand text-white"
                   : "bg-paper text-mute hover:bg-line hover:text-ink ring-1 ring-line",

@@ -8,6 +8,7 @@ import { LocalNowBar } from "./LocalNowBar";
 import { BatteryWarningBanner } from "./BatteryWarningBanner";
 import { SyncStatusBar } from "./SyncStatusBar";
 import { NetworkStatusToast } from "./NetworkStatusToast";
+import { applyRouteMeta } from "@/lib/share-meta";
 import { GlobalSearchModal, openGlobalSearch } from "@/components/search/GlobalSearchModal";
 import { trackPageView } from "@/lib/analytics";
 import { forceUnlockBodyScroll } from "@/hooks/useScrollLock";
@@ -57,6 +58,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     window.scrollTo(0, 0);
     trackPageView(path);
+    applyRouteMeta(path);
     forceUnlockBodyScroll();
   }, [path]);
   const workspace = WORKSPACE.some((re) => re.test(path));

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { Button } from "@/components/ui/Button";
+import { TabPills } from "@/components/ui/TabPills";
 import { Link, useLocation } from "wouter";
 import { activePlaces } from "@/lib/catalog";
 import { useEvents } from "@/contexts/EventsContext";
@@ -18,7 +19,7 @@ import { SafetyInboxAdmin } from "@/components/admin/SafetyInboxAdmin";
 import { CampaignInboxAdmin } from "@/components/admin/CampaignInboxAdmin";
 import { AuditTrailAdmin } from "@/components/admin/AuditTrailAdmin";
 import { ADMIN_TABS, AdminOverview, type AdminTab } from "@/components/admin/AdminOverview";
-import { cn } from "@/lib/cn";
+
 import { AIRPAL_CLUB_ID } from "@/contexts/ClubContext";
 import { seedDatabase } from "@/lib/seed-database";
 import { toast } from "sonner";
@@ -100,21 +101,7 @@ export function AdminPage() {
         <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">AirPal OS · platform admin</p>
         <h1 className="font-display mt-1 text-3xl font-semibold">Operations</h1>
       </header>
-      <nav aria-label="Admin sections" className="no-scrollbar -mx-4 mt-4 flex gap-1.5 overflow-x-auto px-4 pb-1">
-        {ADMIN_TABS.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            aria-current={tab === t.id ? "page" : undefined}
-            className={cn(
-              "shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition",
-              tab === t.id ? "bg-brand text-white" : "bg-card text-mute ring-1 ring-line",
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </nav>
+      <TabPills ariaLabel="Admin sections" className="mt-4" items={ADMIN_TABS} active={tab} onChange={setTab} />
       {tab === "overview" && (
         <>
           <AdminOverview onSelectTab={setTab} />

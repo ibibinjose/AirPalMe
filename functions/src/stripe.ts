@@ -78,7 +78,7 @@ function integrationId(kind: string): string {
   return `airpal-${kind}-${randomBytes(4).toString("hex")}`;
 }
 
-function headerOrigin(request: { rawRequest?: { headers?: Record<string, unknown> } }): string {
+export function headerOrigin(request: { rawRequest?: { headers?: Record<string, unknown> } }): string {
   const headers = request.rawRequest?.headers || {};
   const origin = String(headers.origin || "").trim();
   if (/^https:\/\//i.test(origin) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin)) {
@@ -196,7 +196,7 @@ async function applyPaidTicketToPlan(booking: Booking, spots: number, guestName:
   });
 }
 
-function safeReturnPath(raw: unknown): string {
+export function safeReturnPath(raw: unknown): string {
   const s = String(raw || "").trim();
   if (!s.startsWith("/") || s.startsWith("//") || s.includes("://")) return "/me";
   return s.slice(0, 240);
@@ -853,6 +853,113 @@ async function reverseTransferForDispute(chargeId: string): Promise<void> {
   });
 }
 
+type StoreDoc = {
+  get: () => Promise<{ exists: boolean; data: () => unknown }>;
+  set: (data: Record<string, unknown>, opts?: Record<string, unknown>) => Promise<unknown>;
+  collection: (name: string) => { doc: (id: string) => StoreDoc };
+};
+
+type ManagedPaymentStore = {
+  collection: (name: string) => { doc: (id: string) => StoreDoc };
+};
+
+/**
+ * Handles the blueprint's checkout.session.completed event for Managed
+ * Payments. Marks the `managed_payments` ledger doc paid, writes the
+ * `payments` record, and persists the Stripe customer id for reuse.
+ * Idempotent — Stripe may redeliver the event.
+ */
+export async function recordManagedCheckoutCompleted(
+  session: Stripe.Checkout.Session,
+  store: ManagedPaymentStore = db,
+): Promise<boolean> {
+  const paymentId = String(session.metadata?.managedPaymentId || "").trim();
+  if (!paymentId) return false;
+  if (!checkoutPaymentCollected(session.payment_status)) return false;
+  const ref = store.collection("managed_payments").doc(paymentId);
+  const snap = await ref.get();
+  if (!snap.exists) return false;
+  const row = snap.data() as { status?: string; buyerUid?: string; productId?: string };
+  if (row.status === "paid") return false;
+  const customerId =
+    typeof session.customer === "string" ? session.customer : (session.customer?.id as string | undefined) || "";
+  const paymentIntentId =
+    typeof session.payment_intent === "string" ? session.payment_intent : (session.payment_intent?.id as string) || "";
+  const now = new Date().toISOString();
+  await ref.set(
+    {
+      status: "paid",
+      stripeSessionId: session.id,
+      stripeCustomerId: customerId,
+      stripePaymentIntentId: paymentIntentId,
+      amountTotal: session.amount_total || 0,
+      paidAt: now,
+      updatedAt: now,
+    },
+    { merge: true },
+  );
+  if (customerId && row.buyerUid) {
+    await store
+      .collection("users")
+      .doc(row.buyerUid)
+      .set({ stripeCustomerId: customerId, updatedAt: now }, { merge: true });
+  }
+  await store
+    .collection("payments")
+    .doc(session.id)
+    .set(
+      {
+        id: session.id,
+        managedPaymentId: paymentId,
+        productId: String(row.productId || ""),
+        buyerUid: String(row.buyerUid || ""),
+        amountTotal: session.amount_total || 0,
+        currency: session.currency || "aud",
+        paymentIntentId,
+        customerId,
+        createdAt: now,
+      },
+      { merge: true },
+    );
+  return true;
+}
+
+/**
+ * Marks a dining order paid after its Managed Payments checkout completes.
+ * Idempotent — skips orders already past pending.
+ */
+export async function recordDiningOrderPaid(args: {
+  propertyId: string;
+  orderId: string;
+  session: Stripe.Checkout.Session;
+  paymentIntentId: string;
+  store?: ManagedPaymentStore;
+}): Promise<boolean> {
+  const store = args.store || db;
+  const ref = store.collection("properties").doc(args.propertyId).collection("dining_orders").doc(args.orderId);
+  const snap = await ref.get();
+  if (!snap.exists) return false;
+  const row = snap.data() as { status?: string };
+  if (row.status !== "pending") return false;
+  const customerId =
+    typeof args.session.customer === "string"
+      ? args.session.customer
+      : (args.session.customer?.id as string | undefined) || "";
+  const now = new Date().toISOString();
+  await ref.set(
+    {
+      status: "paid",
+      stripeCheckoutSessionId: args.session.id,
+      stripePaymentIntentId: args.paymentIntentId,
+      stripeCustomerId: customerId,
+      paidAt: now,
+      updatedAt: now,
+    },
+    { merge: true },
+  );
+  return true;
+}
+
 export const stripeWebhook = onRequest(
   { cors: false, invoker: "public", secrets: [stripeSecret, stripeWebhookSecret] },
   async (req, res) => {
@@ -883,6 +990,23 @@ export const stripeWebhook = onRequest(
     try {
       if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
         const session = event.data.object as Stripe.Checkout.Session;
+        if (String(session.metadata?.managedPaymentId || "").trim()) {
+          await recordManagedCheckoutCompleted(session);
+          res.json({ received: true, managed: true });
+          return;
+        }
+        if (String(session.metadata?.diningOrderId || "").trim()) {
+          const piRef = session.payment_intent;
+          await recordDiningOrderPaid({
+            propertyId: String(session.metadata?.propertyId || ""),
+            orderId: String(session.metadata?.diningOrderId || ""),
+            session,
+            paymentIntentId: typeof piRef === "string" ? piRef : piRef?.id || "",
+            store: db,
+          });
+          res.json({ received: true, dining: true });
+          return;
+        }
         if (!checkoutPaymentCollected(session.payment_status)) {
           res.json({ received: true, skipped: "unpaid" });
           return;

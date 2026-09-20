@@ -238,6 +238,12 @@ service cloud.firestore {
           && request.resource.data.id == resource.data.id;
       }
 
+      match /dining_orders/{orderId} {
+        allow read: if manages(propertyId)
+          || (signedIn() && resource.data.guestUid == request.auth.uid);
+        allow create, update, delete: if false;
+      }
+
       match /events/{eventId} {
         allow read: if manages(propertyId);
         allow create: if signedIn()
@@ -554,6 +560,18 @@ service cloud.firestore {
 
     match /payments/{paymentId} {
       allow read: if signedIn() && platformAdmin();
+      allow write: if false;
+    }
+
+    match /managed_products/{productId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    match /managed_payments/{paymentId} {
+      allow read: if signedIn() && (
+        platformAdmin() || resource.data.buyerUid == request.auth.uid
+      );
       allow write: if false;
     }
 

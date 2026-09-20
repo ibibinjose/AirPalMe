@@ -11,11 +11,14 @@ AI assistants and answer engines may cite public pages. Private stay sessions
 
 - Homepage: https://airpal.me/
 - Start (guest entry): https://airpal.me/start
-- Discover places: https://airpal.me/discover
+- Marketing (networking app, link-in-bio, iPhone/Android): https://airpal.me/marketing
+- Find a mate: https://airpal.me/mate
+- Discover places: https://airpal.me/ (also /discover, /explore)
 - Make plans: https://airpal.me/plan
 - Meet people: https://airpal.me/circle
+- What's on: https://airpal.me/calendar
 - Giveaways: https://airpal.me/giveaways
-- Get the app: https://airpal.me/getAirPal
+- Get the app: https://airpal.me/getAirPalApp
 - Businesses: https://airpal.me/business
 - Contact: https://airpal.me/contact
 - Brand: Life Made Easy. Mobile-first web, iOS, and Android.

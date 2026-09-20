@@ -362,6 +362,60 @@ export function createBookingCheckoutSessionRemote(data: { bookingId: string }) 
   >(CALLABLES.createBookingCheckoutSession, data);
 }
 
+export function createManagedProductRemote(data: {
+  name: string;
+  description?: string;
+  amountCents: number;
+  currency?: string;
+  taxCode?: string;
+  planId?: string;
+}) {
+  return callFunction<typeof data, { ok: boolean; productId: string; stripeProductId: string; stripePriceId: string }>(
+    CALLABLES.createManagedProduct,
+    data,
+  );
+}
+
+export function createManagedCheckoutSessionRemote(data: {
+  productId: string;
+  customerEmail?: string;
+  successUrl?: string;
+  cancelUrl?: string;
+}) {
+  return callFunction<typeof data, { ok: boolean; paymentId: string; sessionId: string; checkoutUrl?: string | null }>(
+    CALLABLES.createManagedCheckoutSession,
+    data,
+  );
+}
+
+export function placeDiningOrderRemote(data: {
+  propertyId: string;
+  roomNumber?: string;
+  items: Array<{ menuItemId: string; qty: number }>;
+  successUrl?: string;
+  cancelUrl?: string;
+}) {
+  return callFunction<
+    typeof data,
+    {
+      ok: boolean;
+      orderId: string;
+      totalCents: number;
+      currency: string;
+      payAtDesk?: boolean;
+      checkoutUrl?: string | null;
+      sessionId?: string;
+    }
+  >(CALLABLES.placeDiningOrder, data);
+}
+
+export function updateDiningOrderStatusRemote(data: { propertyId: string; orderId: string; status: string }) {
+  return callFunction<typeof data, { ok: boolean; orderId: string; status: string }>(
+    CALLABLES.updateDiningOrderStatus,
+    data,
+  );
+}
+
 export function createConnectAccountLinkRemote(data: { returnPath?: string } = {}) {
   return callFunction<
     typeof data,

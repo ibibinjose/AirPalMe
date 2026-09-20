@@ -1,5 +1,31 @@
 @import "tailwindcss";
 
+/* Self-hosted fonts (OFL-licensed DM Sans + Outfit). No third-party font
+ * requests, so no visitor IPs leak to font CDNs. */
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/dm-sans.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "DM Sans";
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/dm-sans-italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 500 800;
+  font-display: swap;
+  src: url("/fonts/outfit.woff2") format("woff2");
+}
+
 @theme inline {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", "DM Sans", sans-serif;
@@ -349,7 +375,7 @@ body.keyboard-open .keyboard-hide {
 .apple-liquid-glass-dark {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 28%, rgba(255, 255, 255, 0) 55%),
-    linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0) 40%), rgba(12, 16, 34, 0.52);
+    linear-gradient(0deg, rgba(4, 6, 18, 0.55) 0%, rgba(4, 6, 18, 0) 52%), rgba(12, 16, 34, 0.6);
   backdrop-filter: blur(30px) saturate(200%) brightness(1.12);
   -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.12);
   border: 0;

@@ -10,8 +10,9 @@ AirPal.me (scan-first guest concierge + precinct guide, no account for guests)
 │
 ├── SHELL (every route shares this)
 │   ├── AppShell + AppRoutes (wouter, lazy-split; `/` eager)
-│   ├── Providers (order matters): Locale → Auth → Sync → Stay → LocalNow → StayUi
-│   │   → Listings → Events → Social → Bio → Club → Zoo → Plan → Companion
+│   ├── Providers (order matters): Locale → Auth → Battery → Sync → Stay → LocalNow
+│   │   → StayUi → Analytics → Listings → Events → Bio → Social → Club → Zoo → Plan
+│   │   → Companion (see src/app/providers.tsx)
 │   ├── Cross-cutting: ErrorBoundary, Toaster, ZooLayer, SignInPrompt, ScrollProbe
 │   ├── LocalNow clock (src/contexts/LocalNowContext.tsx): today/time/day/timeZone/city,
 │   │   `here` (GPS else stay/precinct), `anchor` (stay pin). Weather (Open-Meteo at `here`).
@@ -36,11 +37,13 @@ AirPal.me (scan-first guest concierge + precinct guide, no account for guests)
 │   └── Bio /@:handle — public business/creator profile (see Identity below)
 │
 ├── PLAN & TIME
+│   ├── /mate, /mate/request — the wedge: find someone to go with (request loop)
 │   ├── /plan, /plan/new, /plan/:id, /plan/:id/edit, /invite/:code
 │   │   Hangout co-planning: my/public/past tabs, types (PLAN_TYPES), stops, RSVP,
 │   │   votes, comments, public geo pins on Explore map, Stripe experience checkout
-│   ├── /calendar (/events → /calendar) — month/week/day, filters, tags, drag-reschedule,
-│   │   ICS export, save (event_save), tonight correctness via local-events + hours
+│   ├── /calendar (/events → /calendar) — month/week/day/list, filters, tags, drag-reschedule,
+│   │   ICS export, save (event_save), tonight correctness via local-events + hours.
+│   │   Calendar lives in the desktop header only, not the bottom tabs.
 │   └── /guide + /tour/:id — precinct walks (toursForPrecinct), sights sorted by walk distance
 │
 ├── PEOPLE / IDENTITY / SOCIAL
@@ -62,6 +65,11 @@ AirPal.me (scan-first guest concierge + precinct guide, no account for guests)
 │
 ├── TELL THE STORY
 │   ├── /solutions, /solutions/:id — buyer narratives (print → scan → go)
+│   ├── /marketing — Apple-style product page (networking, link-in-bio, discover,
+│   │   iPhone/Android) + dark-stage poster; `?bare=1` feeds `npm run screenshots`
+│   ├── /getAirPalApp — install page: PWA steps, QR, store badges (Soon until listed)
+│   ├── /fashion, /experiences — vertical surfaces (brand-collab first for fashion)
+│   ├── /promotions, /giveaways, /business/*, /club, /studio — commerce + operator
 │   ├── /about /contact /privacy /terms /cookies /legal → /privacy
 │   └── ExpoDirectory, Stall, MemoryWall, Settings, AuthAction, NotFound
 │
@@ -96,7 +104,8 @@ operator side (host/business/event/admin) already exists end-to-end.
   implicit; stale Wi-Fi/hours had no freshness signal.
 - Companion had no 18+ gate and no funnel events; Stripe bookings and deal
   claims were only partly measured.
-- Primary tabs included Calendar, so there was no forced 4-tab IA.
+- Bottom tabs are Scan / Stay / Explore / Plan / Me — Calendar moved to the
+  desktop header only (Sep 2026).
 
 ## 3. What to change / add (priority order)
 

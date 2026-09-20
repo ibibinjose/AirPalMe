@@ -1,4 +1,4 @@
-import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, setDoc } from "firebase/firestore";
+import { collection, deleteDoc, deleteField, doc, getDoc, getDocs, onSnapshot, setDoc } from "firebase/firestore";
 import type { MenuItem, PropertyInfo } from "@shared/airpal-data";
 import { buildHostProperty, parseHostPropertyKind } from "@shared/host-property";
 import { isoFromUnknown } from "@shared/freshness";
@@ -290,6 +290,8 @@ export type PropertyProfilePatch = {
   checkIn?: string;
   checkOut?: string;
   heroImage?: string;
+  staffPicks?: PropertyInfo["staffPicks"];
+  winbackOffer?: PropertyInfo["winbackOffer"];
   breakfast?: PropertyInfo["breakfast"];
   facilities?: PropertyInfo["facilities"];
   roomTypes?: PropertyInfo["roomTypes"];
@@ -311,10 +313,15 @@ export async function savePropertyProfile(propertyId: string, patch: PropertyPro
   const db = getFirebaseDb();
   if (db) {
     const { confirmHours, ...rest } = patch;
+    // Firestore rejects undefined: an explicitly-undefined field clears the stored value.
+    const cleaned: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(rest)) {
+      cleaned[key] = value === undefined ? deleteField() : value;
+    }
     await setDoc(
       doc(db, "properties", propertyId),
       {
-        ...rest,
+        ...cleaned,
         ...(confirmHours ? { hoursVerifiedAt: new Date().toISOString() } : {}),
         updatedAt: new Date().toISOString(),
       },

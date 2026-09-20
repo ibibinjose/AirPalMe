@@ -30,7 +30,7 @@ must(sitemap.includes("<urlset"), "sitemap.xml must be a urlset");
 const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
 must(locs.length >= 10, `sitemap.xml must list public routes (found ${locs.length})`);
 must(locs.includes("https://airpal.me/"), "sitemap.xml must list the homepage");
-must(locs.includes("https://airpal.me/getAirPal"), "sitemap.xml must list the app page");
+must(locs.includes("https://airpal.me/getAirPalApp"), "sitemap.xml must list the app page");
 must(
   locs.every((l) => l.startsWith("https://airpal.me/")),
   "sitemap.xml locs must be absolute airpal.me URLs",
@@ -51,7 +51,12 @@ must(head.includes('rel="canonical" href="https://airpal.me/"'), "index.html mus
 must(head.includes('name="robots"'), "index.html must carry a robots meta");
 must(head.includes('"@type": "WebSite"'), "index.html must include WebSite JSON-LD");
 must(head.includes('"@type": "Organization"'), "index.html must include Organization JSON-LD");
-must(head.includes("og-share-preview.jpg"), "index.html must keep the share image");
+must(head.includes("og-share.jpg"), "index.html must keep the share image");
+must(head.includes('og:image:width" content="1200"'), "index.html must size the share image");
+must(locs.includes("https://airpal.me/mate"), "sitemap.xml must list the Mate page");
+must(locs.includes("https://airpal.me/concierge"), "sitemap.xml must list the concierge page");
+must(locs.includes("https://airpal.me/fashion"), "sitemap.xml must list the fashion page");
+must(read("src/lib/share-meta.ts").includes("applyRouteMeta"), "share-meta must apply per-route titles");
 
 // Per-route canonicals follow client-side navigation.
 must(read("src/lib/share-meta.ts").includes('rel="canonical"'), "share-meta must update the canonical link");

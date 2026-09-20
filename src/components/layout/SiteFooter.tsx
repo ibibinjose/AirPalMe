@@ -71,14 +71,14 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
             <Link href="/" className="inline-flex items-center transition hover:opacity-85" aria-label="AirPal Home">
               <BrandMark compact={false} invert withTagline />
             </Link>
-            <p className="mt-3 max-w-md text-[15px] leading-relaxed text-white/65 md:max-w-none md:whitespace-nowrap">
+            <p className="mt-3 max-w-md text-[15px] leading-relaxed text-white/70 md:max-w-none md:whitespace-nowrap">
               Life Made Easy. People, places, things and experiences — made easier.
             </p>
           </div>
 
           {isNative && (
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/8 px-3 py-1.5 text-xs font-medium text-white/70 select-none ring-1 ring-white/10">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/8 px-3 py-1.5 text-xs font-medium text-white/80 select-none ring-1 ring-white/10">
                 <Smartphone size={12} className="text-gold" />
                 <span className="capitalize">{platform === "ios" ? "iOS App" : "Android App"}</span>
               </span>
@@ -89,11 +89,11 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
         {/* Links */}
         <nav aria-label="Footer" className="mt-10 grid grid-cols-2 gap-8 border-t border-white/10 pt-8 sm:grid-cols-3">
           <div>
-            <p className="text-[13px] font-semibold text-white/85">Explore</p>
+            <p className="text-[13px] font-semibold text-white/90">Explore</p>
             <ul className="mt-4 space-y-2.5 text-sm">
               {NAV_EXPLORE.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-white/55 transition hover:text-white">
+                  <Link href={item.href} className="text-white/70 transition hover:text-white">
                     {item.label}
                   </Link>
                 </li>
@@ -102,11 +102,11 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
           </div>
 
           <div>
-            <p className="text-[13px] font-semibold text-white/85">Stays & Business</p>
+            <p className="text-[13px] font-semibold text-white/90">Stays & Business</p>
             <ul className="mt-4 space-y-2.5 text-sm">
               {NAV_HOSPITALITY.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-white/55 transition hover:text-white">
+                  <Link href={item.href} className="text-white/70 transition hover:text-white">
                     {item.label}
                   </Link>
                 </li>
@@ -115,11 +115,11 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
           </div>
 
           <div className="col-span-2 sm:col-span-1">
-            <p className="text-[13px] font-semibold text-white/85">Trust & Legal</p>
+            <p className="text-[13px] font-semibold text-white/90">Trust & Legal</p>
             <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2.5 text-sm sm:flex-col sm:gap-0 sm:space-y-2.5">
               {NAV_LEGAL.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-white/55 transition hover:text-white">
+                  <Link href={item.href} className="text-white/70 transition hover:text-white">
                     {item.label}
                   </Link>
                 </li>
@@ -129,7 +129,7 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
         </nav>
 
         {/* Bottom bar */}
-        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-white/10 py-6 text-xs text-white/45 sm:flex-row">
+        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-white/10 py-6 text-xs text-white/60 sm:flex-row">
           <p className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center sm:justify-start sm:text-left">
             <span>
               © {new Date().getFullYear()} {LEGAL.byline}
@@ -138,7 +138,7 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
             <button
               type="button"
               onClick={openDebugOverlay}
-              className="font-mono text-[11px] text-white/40 transition hover:text-white hover:underline cursor-pointer"
+              className="font-mono text-[11px] text-white/55 transition hover:text-white hover:underline cursor-pointer"
               title="App diagnostics & debug info (from build.gradle)"
             >
               v{buildInfo.versionName}
@@ -152,7 +152,7 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
           <button
             type="button"
             onClick={handleScrollTop}
-            className="flex items-center gap-1.5 rounded-full bg-white/8 px-4 py-2 text-xs font-semibold text-white/75 ring-1 ring-white/10 transition hover:bg-white/15 hover:text-white active:scale-95"
+            className="flex items-center gap-1.5 rounded-full bg-white/8 px-4 py-2 text-xs font-semibold text-white/85 ring-1 ring-white/10 transition hover:bg-white/15 hover:text-white active:scale-95"
             aria-label="Back to top"
           >
             <ArrowUp size={12} />

@@ -37,6 +37,8 @@ export {
   postPlanCommentRemote,
   getPlanByInviteCode,
 } from "./plans";
+export { createManagedProduct, createManagedCheckoutSession } from "./managed-payments";
+export { placeDiningOrder, updateDiningOrderStatus } from "./dining";
 export {
   createExperienceCheckoutSession,
   confirmExperienceBooking,

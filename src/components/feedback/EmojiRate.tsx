@@ -14,9 +14,11 @@ type Props = {
   stallId?: string;
   stallName?: string;
   propertyId?: string;
+  winbackTitle?: string;
+  winbackDetail?: string;
 };
 
-export function EmojiRate({ target, eventId, stallId, stallName, propertyId }: Props) {
+export function EmojiRate({ target, eventId, stallId, stallName, propertyId, winbackTitle, winbackDetail }: Props) {
   const existing = useMemo(
     () =>
       loadRatings().find((r) =>
@@ -114,6 +116,13 @@ export function EmojiRate({ target, eventId, stallId, stallName, propertyId }: P
       )}
       {sent && mood && (
         <p className="mt-3 text-center text-sm text-mute">{RATE_MOODS.find((m) => m.id === mood)?.emoji} to the host</p>
+      )}
+      {sent && winbackTitle && (
+        <div className="mt-3 rounded-2xl bg-brand/10 px-4 py-3 text-center ring-1 ring-brand/20">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-brand">Come back soon</p>
+          <p className="mt-0.5 text-sm font-bold text-ink">{winbackTitle}</p>
+          {winbackDetail ? <p className="mt-0.5 text-xs text-mute">{winbackDetail}</p> : null}
+        </div>
       )}
     </section>
   );

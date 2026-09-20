@@ -14,7 +14,7 @@ const SHOTS = [
   { route: "/solutions", name: "05-solutions" },
   { route: "/giveaways", name: "06-giveaways" },
   { route: "/promotions", name: "07-promotions" },
-  { route: "/getAirPal", name: "08-getairpal" },
+  { route: "/getAirPalApp", name: "08-getairpal" },
 ];
 const SIZES = [
   // Phones: Play + App Store 6.7".

@@ -1,10 +1,10 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { AtSign, Check, Eye, EyeOff, KeyRound, Lock, Mail, Phone, User } from "lucide-react";
+import { AtSign, Cake, Check, Eye, EyeOff, KeyRound, Lock, Mail, Phone, User } from "lucide-react";
 import { authErrorMessage } from "@shared/auth-email";
 import { normalizeHandle, randomHexHandle } from "@shared/bio";
 import { isOtp, normalizeOtp, phoneReady } from "@shared/phone-auth";
-import { PASSWORD_RULES, isEmail, passwordIssues, passwordOk } from "@shared/validate";
+import { PASSWORD_RULES, isAdultBirthDate, isEmail, passwordIssues, passwordOk, sydneyToday } from "@shared/validate";
 import { Button } from "@/components/ui/Button";
 import { PhoneField } from "@/components/forms/PhoneField";
 import { ValidField, fieldInput } from "@/components/forms/ValidField";
@@ -27,6 +27,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState(mine?.name || "");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [wait, setWait] = useState(0);
@@ -38,6 +39,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
   const nameOk = name.trim().length >= 2;
   const emailOk = isEmail(email);
   const passOk = passwordOk(password);
+  const adultOk = isAdultBirthDate(birthDate.trim());
 
   useEffect(() => () => resetPhoneLogin(), []);
   useEffect(() => {
@@ -100,6 +102,10 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
   }
 
   async function finishAccount() {
+    if (!adultOk) {
+      toast.error("AirPal accounts are for people 18 or older");
+      return;
+    }
     if (!nameOk || !emailOk || !passOk) {
       toast.error("Add your name, email, and a strong password");
       return;
@@ -121,7 +127,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
         });
       }
       try {
-        await completeAccount({ handle: h, name: name.trim(), email: email.trim() });
+        await completeAccount({ handle: h, name: name.trim(), email: email.trim(), birthDate: birthDate.trim() });
       } catch {
         /* local profile already saved */
       }
@@ -320,10 +326,33 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
                 })}
               </div>
             )}
+            <ValidField
+              label="Date of birth"
+              ok={adultOk}
+              error={birthDate && !adultOk ? "You must be 18 or older" : null}
+              hint="AirPal involves meeting people in person — accounts are 18+"
+            >
+              <div className="relative">
+                <Cake size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
+                <input
+                  type="date"
+                  value={birthDate}
+                  max={sydneyToday()}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  aria-label="Date of birth"
+                  className={cn(fieldInput, "pl-10")}
+                />
+              </div>
+            </ValidField>
             <p className="text-[11px] text-mute">
               @{normalizeHandle(handle) || "handle"} is your personal profile. Add a place later if you run a business.
             </p>
-            <Button type="submit" className="w-full" disabled={busy || !nameOk || !emailOk || !passOk} loading={busy}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={busy || !nameOk || !emailOk || !passOk || !adultOk}
+              loading={busy}
+            >
               {busy ? "Creating account…" : "Create account"}
             </Button>
           </>

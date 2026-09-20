@@ -91,6 +91,51 @@ export interface PropertyInfo {
   wifiUpdatedAt?: string;
   /** ISO time the host last confirmed check-in, breakfast, or facility hours. */
   hoursVerifiedAt?: string;
+  /** Host-curated picks surfaced in the guest companion. */
+  staffPicks?: StaffPick[];
+  /** Return-visit offer shown after the guest rates the stay. */
+  winbackOffer?: WinbackOffer;
+}
+
+/** Host-curated recommendation shown in the guest companion ("staff picks"). */
+export interface StaffPick {
+  id: string;
+  title: string;
+  detail?: string;
+}
+
+export interface WinbackOffer {
+  title: string;
+  detail?: string;
+}
+
+export interface DiningOrderItem {
+  menuItemId: string;
+  name: string;
+  /** Whole cents — resolved server-side from the live menu, never trusted from the client. */
+  unitCents: number;
+  qty: number;
+}
+
+export type DiningOrderStatus = "pending" | "paid" | "preparing" | "ready" | "delivered" | "cancelled";
+
+export interface DiningOrder {
+  id: string;
+  propertyId: string;
+  roomNumber: string;
+  guestUid?: string;
+  items: DiningOrderItem[];
+  totalCents: number;
+  currency: string;
+  status: DiningOrderStatus;
+  /** checkout = Stripe; desk = pay at the desk / room charge. */
+  paymentMode: "checkout" | "desk";
+  stripeCheckoutSessionId?: string;
+  stripePaymentIntentId?: string;
+  stripeCustomerId?: string;
+  createdAt: string;
+  paidAt?: string;
+  updatedAt: string;
 }
 
 export interface FacilityItem {

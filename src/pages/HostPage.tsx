@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { TabPills } from "@/components/ui/TabPills";
 import { ValidField, fieldInput } from "@/components/forms/ValidField";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { VerifyEmailBanner } from "@/components/auth/VerifyEmailBanner";
@@ -11,7 +12,7 @@ import { fetchProperty, subscribeProperty, subscribePropertyMenu, unknownPropert
 import { makeQrDataUrl, stayQrPayload } from "@/lib/qr";
 import { buildMarkerUrl } from "@shared/airpal-urls";
 import { propertyKindLabel, type HostPropertyKind } from "@shared/host-property";
-import type { MenuItem, PropertyInfo, StaffTicket } from "@shared/airpal-data";
+import type { DiningOrder, MenuItem, PropertyInfo, StaffTicket } from "@shared/airpal-data";
 import { authErrorMessage } from "@shared/auth-email";
 import { track } from "@/lib/analytics";
 import { HostActivationChecklist } from "@/components/host/HostActivationChecklist";
@@ -20,10 +21,10 @@ import { HostRoomsPanel } from "@/components/host/HostRoomsPanel";
 import { HostDiningPanel } from "@/components/host/HostDiningPanel";
 import { HostPrintPanel } from "@/components/host/HostPrintPanel";
 import { openTicketCount, resolveStaffTicket, subscribePropertyTickets } from "@/lib/tickets-store";
+import { activeOrderCount, subscribePropertyDiningOrders } from "@/lib/dining-store";
 import { enableHostTicketPush, ticketPushPrefEnabled } from "@/lib/tickets-push";
 import { hostWorkspacePropertyId, roomTokenEntries } from "@/lib/host-workspace";
-import { getPropertyWifiRemote, liveBackendEnabled } from "@/lib/functions";
-import { cn } from "@/lib/cn";
+import { getPropertyWifiRemote, liveBackendEnabled, updateDiningOrderStatusRemote } from "@/lib/functions";
 
 type Tab = "today" | "rooms" | "place" | "dining" | "print";
 
@@ -37,6 +38,7 @@ export function HostPage() {
   );
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [tickets, setTickets] = useState<StaffTicket[]>([]);
+  const [orders, setOrders] = useState<DiningOrder[]>([]);
   const [alertsOn, setAlertsOn] = useState(() => ticketPushPrefEnabled());
   const [wifiLive, setWifiLive] = useState(false);
   const [qrReady, setQrReady] = useState(false);
@@ -67,6 +69,14 @@ export function HostPage() {
   useEffect(() => {
     if (!workspaceId) return;
     return subscribePropertyTickets(workspaceId, setTickets);
+  }, [workspaceId]);
+
+  useEffect(() => {
+    if (!workspaceId) {
+      setOrders([]);
+      return;
+    }
+    return subscribePropertyDiningOrders(workspaceId, setOrders);
   }, [workspaceId]);
 
   useEffect(() => {
@@ -251,21 +261,14 @@ export function HostPage() {
           </Button>
         </div>
 
-        <div className="mt-5 flex gap-1 rounded-full bg-card/80 p-1 ring-1 ring-line shadow-sm backdrop-blur">
-          {(["today", "rooms", "place", "dining", "print"] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTab(t)}
-              className={cn(
-                "h-9 flex-1 rounded-full px-3 text-sm capitalize transition",
-                tab === t ? "bg-brand text-white shadow-sm" : "text-mute hover:text-ink",
-              )}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+        <TabPills
+          layout="contained"
+          ariaLabel="Host sections"
+          className="mt-5"
+          items={["today", "rooms", "place", "dining", "print"].map((t) => ({ id: t as Tab, label: t }))}
+          active={tab}
+          onChange={setTab}
+        />
 
         {tab === "today" && (
           <>
@@ -385,6 +388,77 @@ export function HostPage() {
                       </button>
                     </li>
                   ))
+              )}
+            </ul>
+
+            <div className="mt-6 mb-2 flex items-center justify-between gap-2">
+              <h2 className="text-sm font-semibold text-mute">
+                Dining orders{activeOrderCount(orders) ? ` · ${activeOrderCount(orders)} active` : ""}
+              </h2>
+            </div>
+            <ul className="space-y-2">
+              {activeOrderCount(orders) === 0 ? (
+                <li className="rounded-[22px] bg-card p-6 text-center text-sm text-mute ring-1 ring-line">
+                  No active dining orders.
+                </li>
+              ) : (
+                orders
+                  .filter(
+                    (o) =>
+                      o.status === "pending" || o.status === "paid" || o.status === "preparing" || o.status === "ready",
+                  )
+                  .slice(0, 8)
+                  .map((o) => {
+                    const next = o.status === "ready" ? "delivered" : o.status === "preparing" ? "ready" : "preparing";
+                    const nextLabel = next === "delivered" ? "Delivered" : next === "ready" ? "Ready" : "Prepare";
+                    return (
+                      <li
+                        key={o.id}
+                        className="flex items-center justify-between gap-3 rounded-[22px] bg-card px-4 py-3 ring-1 ring-line"
+                      >
+                        <div className="min-w-0">
+                          <p className="text-[12px] text-mute">
+                            Room {o.roomNumber} · {o.status}
+                            {o.paymentMode === "desk" ? " · pay at desk" : ""}
+                          </p>
+                          <p className="truncate font-medium">{o.items.map((l) => `${l.qty}× ${l.name}`).join(", ")}</p>
+                          <p className="text-[12px] text-mute">A${(o.totalCents / 100).toFixed(2)}</p>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-3">
+                          <button
+                            className="text-sm text-mute"
+                            onClick={() => {
+                              void updateDiningOrderStatusRemote({
+                                propertyId: property.id,
+                                orderId: o.id,
+                                status: "cancelled",
+                              })
+                                .then(() => toast.success("Order cancelled"))
+                                .catch((err) => toast.error(err instanceof Error ? err.message : "Couldn't cancel"));
+                            }}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            className="text-sm font-semibold text-brand"
+                            onClick={() => {
+                              void updateDiningOrderStatusRemote({
+                                propertyId: property.id,
+                                orderId: o.id,
+                                status: next,
+                              })
+                                .then(() => {
+                                  toast.success(nextLabel);
+                                })
+                                .catch((err) => toast.error(err instanceof Error ? err.message : "Couldn't update"));
+                            }}
+                          >
+                            {nextLabel}
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })
               )}
             </ul>
           </>

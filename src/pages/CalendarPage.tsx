@@ -806,6 +806,7 @@ function CalendarPageContent() {
                 setFilter("all");
               }}
               onCloseMobile={() => setIsMobileDrawerOpen(false)}
+              idPrefix="calendar-drawer"
             />
           </div>
         </div>

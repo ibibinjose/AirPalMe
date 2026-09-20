@@ -189,7 +189,7 @@ export function DiscoverPage() {
               aria-selected={view === "list"}
               onClick={() => setView("list")}
               className={cn(
-                "inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold transition",
+                "inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition",
                 view === "list" ? "bg-brand text-white" : "text-mute hover:text-ink",
               )}
             >
@@ -202,7 +202,7 @@ export function DiscoverPage() {
               aria-selected={view === "map"}
               onClick={() => setView("map")}
               className={cn(
-                "inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold transition",
+                "inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition",
                 view === "map" ? "bg-brand text-white" : "text-mute hover:text-ink",
               )}
             >
@@ -298,10 +298,12 @@ export function DiscoverPage() {
                   {ev.image && <Photo src={ev.image} className="absolute inset-0 h-full w-full object-cover" />}
                   <div className="hero-scrim absolute inset-0" />
                   <div className="absolute inset-x-0 bottom-0 p-3 text-left">
-                    <p className="text-[11px] text-gold">
+                    <p className="truncate text-[11px] text-gold">
                       {ev.stale ? t("checkTimes") : liveIds.has(ev.id) ? t("happeningNow") : ev.sub}
                     </p>
-                    <p className="font-display text-[16px] font-semibold text-white">{ev.title}</p>
+                    <p className="font-display line-clamp-2 text-[16px] font-semibold leading-snug text-white">
+                      {ev.title}
+                    </p>
                   </div>
                 </button>
               ))}

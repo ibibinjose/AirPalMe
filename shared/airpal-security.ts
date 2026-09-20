@@ -53,6 +53,10 @@ export const CALLABLES = {
   completePaidBooking: "completePaidBooking",
   createStaffTicket: "createStaffTicket",
   resolveStaffTicket: "resolveStaffTicket",
+  createManagedProduct: "createManagedProduct",
+  createManagedCheckoutSession: "createManagedCheckoutSession",
+  placeDiningOrder: "placeDiningOrder",
+  updateDiningOrderStatus: "updateDiningOrderStatus",
   askAirPal: "askAirPal",
   createPlan: "createPlanRemote",
   createPlanRemote: "createPlanRemote",
@@ -79,6 +83,8 @@ export type CompleteAccountSignupRequest = {
   handle: string;
   name: string;
   email: string;
+  /** YYYY-MM-DD birth date. Server verifies 18+ and stores only a boolean. */
+  birthDate: string;
 };
 
 export type LoginWithPhonePasswordRequest = {

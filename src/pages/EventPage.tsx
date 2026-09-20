@@ -7,6 +7,7 @@ import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { useEvents } from "@/contexts/EventsContext";
 import { formatRelativeBadge } from "@/lib/calendar-utils";
 import { shareContent } from "@/lib/share";
+import { setShareMeta } from "@/lib/share-meta";
 import { cn } from "@/lib/cn";
 import type { CalendarEvent } from "@shared/event";
 import type { NearbyEvent } from "@shared/nearby";
@@ -44,6 +45,15 @@ export function EventPage() {
 function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
   const [, nav] = useLocation();
   const { toggleGoing, toggleInterested, toggleLiked } = useEvents();
+
+  useEffect(() => {
+    setShareMeta({
+      title: `${event.title} · AirPal`,
+      description: `${event.title} in ${event.city} on ${event.timeLabel} — find it on AirPal.Me.`.slice(0, 160),
+      image: event.heroImage || undefined,
+      url: `${window.location.origin}/e/${event.id}`,
+    });
+  }, [event.id, event.title, event.city, event.timeLabel, event.heroImage]);
 
   const { today } = useLocalNow();
   const relative = formatRelativeBadge(event.date, today);
@@ -230,6 +240,14 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
 
 function NearbyEventDetailView({ event: ev }: { event: NearbyEvent }) {
   const [, nav] = useLocation();
+  useEffect(() => {
+    setShareMeta({
+      title: `${ev.title} · AirPal`,
+      description: `${ev.title} — ${ev.insiderTip || ev.detail || "find it on AirPal.Me."}`.slice(0, 160),
+      image: ev.heroImage || undefined,
+      url: `${window.location.origin}/e/${ev.id}`,
+    });
+  }, [ev.id, ev.title, ev.insiderTip, ev.detail, ev.heroImage]);
   return (
     <div className="mx-auto max-w-lg pb-10">
       {ev.heroImage && (

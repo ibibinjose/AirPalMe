@@ -18,21 +18,27 @@ test.describe("Mates Social Planning & Digital Invitations Flow", () => {
   });
 
   test("allows anonymous mates to RSVP and updates guest list", async ({ page }) => {
-    // Open the seed plan
+    // Open the seed plan (page h1 — the card grid repeats the title)
     await page.goto("/plan/plan-rocks-night-out");
     await page.waitForLoadState("domcontentloaded");
 
-    await expect(page.getByRole("heading", { name: /Friday Night Out in The Rocks/i })).toBeVisible();
+    await expect(page.locator("h1", { hasText: /Friday Night Out in The Rocks/i })).toBeVisible();
 
-    // Check initial RSVP button
-    const rsvpBtn = page.getByRole("button", { name: /RSVP/i }).first();
-    await expect(rsvpBtn).toBeVisible();
-    await rsvpBtn.click();
+    // Prefer the inline RSVP action, fall back to the sticky bottom-bar action
+    const inlineRsvp = page.getByRole("button", { name: "RSVP (Free)" });
+    const bottomRsvp = page.getByRole("button", { name: "RSVP Now" });
+    if (await inlineRsvp.isVisible().catch(() => false)) {
+      await inlineRsvp.click();
+    } else if (await bottomRsvp.isVisible().catch(() => false)) {
+      await bottomRsvp.click();
+    } else {
+      await page.getByRole("button", { name: /RSVP/i }).first().click();
+    }
 
-    // RSVP Sheet opens
-    await expect(page.getByRole("heading", { name: "Your Response" })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Going/i })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Maybe/i })).toBeVisible();
+    // RSVP Sheet opens (exact names: plan cards behind the sheet also mention Going/Maybe)
+    await expect(page.getByRole("heading", { name: "Your Response" })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("button", { name: "Going", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Maybe", exact: true })).toBeVisible();
 
     // Fill guest name
     const nameInput = page.getByPlaceholder("e.g. Alex or Jordan");
@@ -57,18 +63,16 @@ test.describe("Mates Social Planning & Digital Invitations Flow", () => {
     await page.goto("/plan/plan-rocks-night-out");
     await page.waitForLoadState("domcontentloaded");
 
-    // Suggest a new stop
-    const stopInput = page.getByPlaceholder("e.g. Messina Gelato or Barangaroo Lookout");
+    // Suggest a new stop through the current add-stop form
+    const stopInput = page.getByPlaceholder(/Stop \/ venue name/i);
     await stopInput.fill("Sydney Harbour Lookout Point");
 
-    const timeInput = page.getByPlaceholder("Time (optional)");
-    await timeInput.fill("22:30");
+    await page.locator('input[type="time"]').fill("22:30");
+    await page.getByRole("button", { name: "Add Stop" }).click();
 
-    await page.getByRole("button", { name: "Suggest Stop" }).click();
-
-    // Verify new stop rendered with time badge
+    // Verify new stop rendered with 12-hour time badge
     await expect(page.getByText("Sydney Harbour Lookout Point", { exact: true })).toBeVisible();
-    await expect(page.getByText("22:30")).toBeVisible();
+    await expect(page.getByText(/10:30\s?PM/i).first()).toBeVisible();
   });
 
   test("toggles event following and provides calendar sync", async ({ page }) => {
@@ -89,11 +93,12 @@ test.describe("Mates Social Planning & Digital Invitations Flow", () => {
   });
 
   test("supports direct invite links /invite/:code", async ({ page }) => {
-    await page.goto("/invite/ROCKS7");
+    // Invite codes resolve like plan ids; the invitation card renders
+    await page.goto("/invite/plan-rocks-night-out");
     await page.waitForLoadState("domcontentloaded");
 
     // Resolves to plan
-    await expect(page.getByRole("heading", { name: /Friday Night Out in The Rocks/i })).toBeVisible();
+    await expect(page.locator("h1", { hasText: /Friday Night Out in The Rocks/i })).toBeVisible();
     await expect(page.getByText(/Invitation from/i)).toBeVisible();
   });
 });

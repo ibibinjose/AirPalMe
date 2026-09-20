@@ -31,9 +31,11 @@ test.describe("Concierge & Stay Companion Flow", () => {
     // Click Wi-Fi tile in main content
     await page.getByRole("main").getByRole("button", { name: "Wi-Fi" }).click();
 
-    // Sheet opens with ask-the-desk guidance and no Copy button (no password known).
-    await expect(page.getByText(/ask the desk/i).first()).toBeVisible();
-    await expect(page.getByRole("button", { name: "Copy" })).toHaveCount(0);
+    // The demo stay publishes a network name but no password: the sheet must
+    // point at the front desk and offer no password to copy.
+    await expect(page.getByText(/ask front desk/i).first()).toBeVisible();
+    await expect(page.getByText("Password", { exact: true })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Copy Password" })).toHaveCount(0);
   });
 
   test("Calendar tile in concierge navigates directly to /calendar", async ({ page }) => {

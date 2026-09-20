@@ -54,8 +54,8 @@ function TabItem({
         onClick(href);
       }}
       className={cn(
-        "relative flex h-12 min-w-0 flex-1 touch-manipulation flex-col items-center justify-center gap-0.5 transition-all duration-200 cursor-pointer active:scale-95",
-        on ? "text-white font-extrabold" : "text-white/55 hover:text-white/90 font-medium",
+        "relative flex h-11 min-w-0 flex-1 touch-manipulation flex-col items-center justify-center gap-0.5 transition-all duration-200 cursor-pointer active:scale-95",
+        on ? "text-white font-extrabold" : "text-white/70 hover:text-white font-medium",
       )}
     >
       <span className="relative z-10 flex flex-col items-center justify-center gap-0">
@@ -64,7 +64,7 @@ function TabItem({
         ) : (
           <Icon size={20} strokeWidth={on ? 2.5 : 1.8} className={cn("transition-transform", on && "scale-110")} />
         )}
-        <span className="text-[11px] font-semibold tracking-tight">{label}</span>
+        <span className="max-w-full truncate px-0.5 text-[11px] font-semibold tracking-tight">{label}</span>
       </span>
     </button>
   );
@@ -92,7 +92,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
       transition={{ duration: 0.25, ease: enterEase }}
     >
       <div className="relative mx-auto max-w-md pointer-events-auto">
-        <div className="relative flex items-center justify-between rounded-t-3xl apple-liquid-glass-dark px-2.5 pt-1.5 pb-[max(0.4rem,env(safe-area-inset-bottom,0px))] text-white">
+        <div className="relative flex items-center justify-between rounded-t-3xl apple-liquid-glass-dark px-2.5 pt-1 pb-[env(safe-area-inset-bottom,0px)] text-white">
           <div className="flex flex-1 items-center gap-1">
             {SIDES.left.map((tab) => (
               <TabItem key={tab.id} {...tab} active={active} onClick={nav} />

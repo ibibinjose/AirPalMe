@@ -59,10 +59,15 @@ export function PlaceCard({ place, walk, large = false }: { place: NearbyPlace; 
         )}
       </div>
       <div className="absolute inset-x-0 bottom-0 p-3.5">
-        <p className={cn("font-display text-[17px] font-semibold leading-tight", onPhoto ? "text-white" : "text-ink")}>
+        <p
+          className={cn(
+            "font-display line-clamp-2 text-[17px] font-semibold leading-tight",
+            onPhoto ? "text-white" : "text-ink",
+          )}
+        >
           {place.name}
         </p>
-        <p className={cn("mt-0.5 text-[12px]", onPhoto ? "text-white/75" : "text-mute")}>
+        <p className={cn("mt-0.5 truncate text-[12px]", onPhoto ? "text-white/75" : "text-mute")}>
           {[walk, place.priceLevel, place.rating ? `${place.rating}` : null].filter(Boolean).join(" · ")}
         </p>
       </div>
