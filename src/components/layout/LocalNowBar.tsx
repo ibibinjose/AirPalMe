@@ -85,9 +85,9 @@ export function LocalNowBar() {
 
         <span className="h-3.5 w-px shrink-0 bg-line" />
 
-        <p className="shrink-0 font-display text-[13px] font-semibold tabular-nums leading-none sm:text-[14px]">
+        <p className="shrink-0 font-display text-[12px] font-semibold tabular-nums leading-none sm:text-[14px]">
           {time}
-          <span className="ml-1.5 hidden text-[11px] font-medium text-mute sm:inline">{day}</span>
+          <span className="ml-1 text-[11px] font-medium text-mute opacity-90 sm:ml-1.5">{day}</span>
         </p>
 
         <span className="h-3.5 w-px shrink-0 bg-line" />
