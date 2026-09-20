@@ -1,0 +1,18 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "26WGXSNG58.me.airpal.app",
+        "paths": [
+          "/*",
+          "/b/*",
+          "/plan/*",
+          "/invite/*",
+          "/e/*",
+          "/concierge/*"
+        ]
+      }
+    ]
+  }
+}

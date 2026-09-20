@@ -62,6 +62,7 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   overflow-x: hidden;
   overflow-x: clip;
   width: 100%;
@@ -98,11 +99,16 @@ button:not(:disabled) {
   cursor: pointer;
 }
 
+/* Clear outline for mouse/touch clicks, show high-contrast ring only for keyboard navigation. */
+:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
 /* Visible keyboard focus everywhere (brand ring, offset from the element). */
 :focus-visible {
   outline: 2px solid var(--color-brand);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 /* iOS auto-zooms on focus when inputs are under 16px. Keep mobile form text at 16px. */
