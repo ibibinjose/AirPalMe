@@ -30,6 +30,7 @@ import { SiteFooter } from "./SiteFooter";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useDataReload } from "@/hooks/useDataReload";
 import { PullToRefreshContainer } from "./PullToRefreshContainer";
+import { useLocalNow } from "@/hooks/useLocalNow";
 
 const WORKSPACE = [
   /^\/host/,
@@ -86,6 +87,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       }
     : {};
 
+  const { day } = useLocalNow();
+
   return (
     <div className="flex min-h-dvh flex-col bg-paper">
       {bare ? (
@@ -100,15 +103,20 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             Skip to content
           </a>
-          <div className="fixed-element sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
+          <div className="fixed-element sticky top-0 z-30 bg-paper/95 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
             <TicketAlertBar />
             <LocalNowBar />
             {workspace ? (
               <header className="overflow-visible border-b border-line bg-paper">
                 <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-3 sm:px-4 md:h-16 md:px-6">
-                  <Link href="/" className="flex items-center min-w-0">
-                    <BrandMark compact={false} />
-                  </Link>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Link href="/" className="flex items-center min-w-0">
+                      <BrandMark compact={false} />
+                    </Link>
+                    <span className="text-[12px] font-semibold text-mute font-display">
+                      {day}
+                    </span>
+                  </div>
                   <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <button
                       type="button"
@@ -152,9 +160,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                   {...chrome}
                   className="flex h-14 items-center justify-between border-b border-line/70 bg-paper/90 px-3 backdrop-blur-xl sm:px-4 lg:hidden"
                 >
-                  <Link href="/" className="flex items-center min-w-0" aria-label="AirPal Home">
-                    <BrandMark compact={false} />
-                  </Link>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Link href="/" className="flex items-center min-w-0" aria-label="AirPal Home">
+                      <BrandMark compact={false} />
+                    </Link>
+                    <span className="text-[12px] font-semibold text-mute font-display">
+                      {day}
+                    </span>
+                  </div>
                   <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <button
                       type="button"

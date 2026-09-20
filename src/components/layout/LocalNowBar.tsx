@@ -87,7 +87,7 @@ export function LocalNowBar() {
 
         <p className="shrink-0 font-display text-[12px] font-semibold tabular-nums leading-none sm:text-[14px]">
           {time}
-          <span className="ml-1 text-[11px] font-medium text-mute opacity-90 sm:ml-1.5">{day}</span>
+          <span className="ml-1.5 font-normal text-mute text-[12px]">{day}</span>
         </p>
 
         <span className="h-3.5 w-px shrink-0 bg-line" />
@@ -103,8 +103,17 @@ export function LocalNowBar() {
               </span>
               <span className="truncate text-[11px] text-mute sm:text-[12px]">{condition}</span>
               {today && (
-                <span className="hidden shrink-0 text-[11px] text-mute md:inline">
-                  {today.high}° / {today.low}°
+                <span className="shrink-0 text-[11px] font-medium text-mute flex items-center gap-1.5">
+                  {today.rain > 0 ? (
+                    <span className="inline-flex items-center gap-0.5 font-semibold text-blue-600 dark:text-blue-400">
+                      ☔ {today.rain}%
+                    </span>
+                  ) : (
+                    <span className="hidden text-[10px] text-mute/80 md:inline">☔ 0%</span>
+                  )}
+                  <span className="hidden text-[11px] text-mute md:inline">
+                    {today.high}° / {today.low}°
+                  </span>
                 </span>
               )}
             </>
