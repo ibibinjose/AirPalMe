@@ -75,7 +75,7 @@ const VERTICALS = [
   {
     title: "AirPal Stay",
     badge: "Boutique Accommodations",
-    description: "Discover verified Sydney hotels, boutique stays, hostels, and serviced apartments.",
+    description: "Discover verified hotels, boutique stays, hostels, and serviced apartments worldwide.",
     icon: Bed,
     color: "bg-amber-500/10 text-amber-600 border-amber-500/20",
   },
@@ -89,13 +89,13 @@ const VERTICALS = [
   {
     title: "AirPal Fashion",
     badge: "Rent, Swap & Style",
-    description: "Access curated Sydney fashion collections, rentals, and exclusive brand drops.",
+    description: "Access curated fashion collections, rentals, and exclusive brand drops anywhere.",
     icon: Shirt,
     color: "bg-purple-500/10 text-purple-600 border-purple-500/20",
   },
   {
     title: "AirPal Daily",
-    badge: "Local Sydney Discovery",
+    badge: "Local Discovery",
     description: "What's happening near you today: live events, pop-up offers, and local giveaways.",
     icon: Sparkles,
     color: "bg-rose-500/10 text-rose-600 border-rose-500/20",
@@ -122,7 +122,7 @@ export function GetAirPalPage() {
   async function share() {
     const data = {
       title: "Get AirPal",
-      text: "AirPal — Life Made Easy. Connect with people, places, things & experiences in Sydney.",
+      text: "AirPal — Life Made Easy. Connect with friends, family, colleagues, and mates in any city worldwide.",
       url: PAGE_URL,
     };
     try {
@@ -162,7 +162,7 @@ export function GetAirPalPage() {
           <ArrowLeft size={16} /> Back to Discover
         </Link>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-line/25 bg-card px-3 py-1 text-xs font-semibold text-mute">
-          Made in Sydney
+          Global Marketplace
         </span>
       </div>
 
@@ -177,9 +177,9 @@ export function GetAirPalPage() {
         <p className="mt-6 text-xs font-bold uppercase tracking-[0.24em] text-brand">iPhone · Android · Web</p>
         <h1 className="font-display mt-2 text-5xl font-bold tracking-tight text-ink md:text-6xl">Get AirPal</h1>
         <p className="mx-auto mt-4 max-w-lg text-balance text-base leading-relaxed text-mute md:text-lg">
-          Your networking app, your link-in-bio, and your guide to life around you —{" "}
-          <strong className="font-semibold text-ink">people, places, experiences and things</strong>, starting in
-          Sydney.
+          Your global networking app, link-in-bio, and guide to life around you — connecting{" "}
+          <strong className="font-semibold text-ink">friends, family, colleagues, and mates</strong> with places,
+          stays, experiences and things in any city worldwide.
         </p>
 
         {/* Store badges up front */}

@@ -21,9 +21,9 @@ const PILLARS = [
   {
     icon: Compass,
     t: "Discover life around you",
-    d: "Tonight's gigs, weekend plans, boutique stays and fresh local drops — one discovery layer for Sydney and the world around you.",
+    d: "Tonight's gigs, weekend plans, boutique stays and fresh local drops — one discovery layer for any city worldwide.",
     href: "/",
-    cta: "Explore Sydney",
+    cta: "Explore nearby",
   },
   {
     icon: Smartphone,
@@ -53,9 +53,9 @@ export function AboutPage() {
           People, places, things and experiences — made easier.
         </h1>
         <p className="mt-4 text-[15px] leading-relaxed text-ink/85">
-          AirPal.Me is your networking app, your link-in-bio, and your guide to life and the world around you. Starting
-          in Sydney: find someone to go with you, make a plan together, and discover what&apos;s on nearby — mates,
-          stays, experiences, fashion and more, all in one app.
+          AirPal.Me is your global networking app, link-in-bio, and guide to life around you. In any city worldwide:
+          connect your friends, family, work colleagues, and local mates — make plans together, find someone to go
+          with you, and discover what&apos;s on nearby across stays, experiences, fashion and more.
         </p>
 
         <ul className="mt-6 space-y-3">

@@ -145,7 +145,7 @@ function PhoneMock() {
       </div>
       <div className="absolute -right-2 bottom-24 z-10 hidden items-center gap-2 whitespace-nowrap rounded-2xl bg-card/85 px-3 py-2 shadow-lg ring-1 ring-line backdrop-blur-md lg:flex">
         <Sparkles size={16} className="text-gold" />
-        <span className="text-xs font-bold text-ink">Tonight in Sydney</span>
+        <span className="text-xs font-bold text-ink">Tonight nearby</span>
       </div>
 
       {/* titanium unibody frame — slimmer 18 Pro Max bezels */}
@@ -179,7 +179,7 @@ function PhoneMock() {
           </div>
 
           <div className="px-4 pb-3 pt-1">
-            <p className="text-[11px] font-medium text-neutral-500">Good evening, Sydney</p>
+            <p className="text-[11px] font-medium text-neutral-500">Good evening, nearby</p>
             <p className="text-[22px] font-bold leading-[1.15] tracking-tight text-neutral-900">
               What are you
               <br />
@@ -434,8 +434,8 @@ export function MarketingPage() {
               Life Made Easy. <span className="text-brand">All in one app.</span>
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-balance text-[15px] leading-relaxed text-mute md:mx-0 md:text-lg">
-              Your networking app, your link-in-bio, and your guide to life and the world around you — mates, stays,
-              experiences and more, starting in Sydney.
+              Your global networking app, link-in-bio, and guide to life around you — connecting friends, family,
+              colleagues and mates with places, stays, experiences and more in any city worldwide.
             </p>
             <div className="mt-7 flex flex-col items-center justify-center gap-2.5 sm:flex-row md:justify-start">
               <Button onClick={() => nav("/getAirPalApp")} className="h-12 gap-1.5 rounded-full px-7 text-[15px]">
@@ -446,7 +446,7 @@ export function MarketingPage() {
                 variant="ghost"
                 className="h-12 rounded-full border border-line px-7 text-[15px]"
               >
-                Explore Sydney <ArrowRight size={16} />
+                Explore nearby <ArrowRight size={16} />
               </Button>
             </div>
             <p className="mt-4 text-xs font-semibold text-mute">

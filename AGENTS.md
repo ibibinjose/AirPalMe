@@ -4,9 +4,9 @@
 
 AirPal.me — Life Made Easy.
 
-AirPal is a trusted, people-powered marketplace and discovery platform connecting people with:
+AirPal is a trusted, people-powered global marketplace and discovery platform connecting friends, family, colleagues, and mates with:
 
-- People — AirPal Mate
+- People — AirPal Mate & Social Circles (Friends, Family, Colleagues)
 - Places — AirPal Stay
 - Experiences — AirPal Experiences
 - Things — AirPal Fashion
@@ -15,13 +15,13 @@ AirPal is a trusted, people-powered marketplace and discovery platform connectin
 
 Brand mechanism: ME = Made Easy. The .me is intentional and part of the brand identity.
 
-Core positioning: a trusted marketplace connecting people with people, places, things and experiences. Do not position AirPal publicly as six unrelated apps. One platform, verticals on one shared marketplace engine.
+Core positioning: a trusted global marketplace connecting people (friends, family, colleagues, mates) with places, things, and experiences anywhere in the world. Do not position AirPal publicly as six unrelated apps. One platform, verticals on one shared marketplace engine.
 
 ## 2. Critical Product Strategy
 
 Build the marketplace engine first. Do not build all verticals as fully operational marketplaces at the same time.
 
-Initial commercial wedge: AirPal Mate — Find someone to go with you. Initial launch market: Sydney, Australia.
+Initial commercial wedge: AirPal Mate — Find someone to go with you. Designed for global scale across any city worldwide (initial launch market: Sydney, Australia).
 
 The first objective is not downloads. It is Completed AirPal experiences. Prove this loop: Intent → Request → Match → Connect → Book → Meet/Experience → Complete → Review → Repeat. Expand into other verticals only after the core loop works.
 

@@ -17,11 +17,13 @@ export function PhoneField({
   onChange,
   required,
   label = "Mobile Number",
+  stacked = false,
 }: {
   value: string;
   onChange: (next: string) => void;
   required?: boolean;
   label?: string;
+  stacked?: boolean;
 }) {
   const initialCountry = countryFromPhone(value)?.code || "AU";
   const [selectedCountry, setSelectedCountry] = useState<string>(initialCountry);
@@ -89,6 +91,52 @@ export function PhoneField({
               : selectedCountry === "SG"
                 ? "9123 4567"
                 : "Mobile number";
+
+  if (stacked) {
+    return (
+      <div className="space-y-3">
+        <ValidField label="Choose your Country" ok={true}>
+          <div className="relative">
+            <select
+              value={selectedCountry}
+              onChange={(e) => handleCountryChange(e.target.value)}
+              className="h-12 w-full rounded-2xl bg-card pl-3.5 pr-8 text-xs font-semibold border border-line outline-none focus:ring-2 focus:ring-brand/40 appearance-none cursor-pointer focus:border-brand"
+              aria-label="Choose your Country"
+            >
+              {HOST_COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {countryFlag(c.code)} {c.name} ({c.dial})
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-mute text-xs">▼</div>
+          </div>
+        </ValidField>
+
+        <ValidField
+          label={label}
+          ok={ok}
+          error={value && !ok ? "Enter a valid mobile number (8–15 digits)" : null}
+          hint={!value && required ? "Enter local mobile number" : undefined}
+        >
+          <div className="relative flex items-center">
+            <span className="absolute left-3.5 text-xs font-semibold text-mute select-none">
+              {activeCountry.dial}
+            </span>
+            <input
+              value={national}
+              onChange={(e) => handleNumberChange(e.target.value)}
+              inputMode="tel"
+              autoComplete="tel-national"
+              placeholder={placeholder}
+              className={cn(fieldInput, "pl-14 w-full")}
+              aria-label="Mobile Number"
+            />
+          </div>
+        </ValidField>
+      </div>
+    );
+  }
 
   return (
     <ValidField

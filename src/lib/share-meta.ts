@@ -8,7 +8,7 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
     match: /^\/mate(\/|$)/,
     title: "AirPal Mate · Find someone to go with you",
     description:
-      "Going alone? Find a verified local AirPal Mate for food, culture, fitness, events and more across Sydney.",
+      "Going alone? Find a verified local AirPal Mate for food, culture, fitness, events and more in your city.",
   },
   {
     match: /^\/plan(\/|$)/,

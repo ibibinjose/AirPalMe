@@ -17,7 +17,7 @@ export const DICT: Record<Lang, Record<string, string>> = {
     host: "Host",
     stay: "Stay",
     explore: "Explore",
-    whatsOn: "On",
+    whatsOn: "What's On",
     atMe: "@",
     calendar: "Calendar",
     plan: "Plan",

@@ -192,36 +192,22 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
       <form className="space-y-3.5" onSubmit={(e) => void onSubmit(e)}>
         {step === "handle" && (
           <>
-            <p className="text-xs leading-relaxed text-mute">
-              Pick your personal @handle and confirm your mobile. You can add a business place later.
-            </p>
             <ValidField
-              label={`Personal @${normalizeHandle(handle) || "handle"}`}
+              label="Choose your Personal @handle"
               ok={handleOk}
               error={handle && !handleStatus.checking ? handleStatus.reason || null : null}
               hint={handleStatus.checking ? "Checking…" : "This is you — not your café or hotel"}
             >
-              <div className="flex gap-2">
-                <input
-                  value={handle}
-                  onChange={(e) => setHandle(e.target.value)}
-                  placeholder="maya"
-                  autoComplete="username"
-                  className={fieldInput}
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={() => setHandle(randomHexHandle(8))}
-                  className="shrink-0 rounded-2xl bg-paper px-3 text-xs font-medium text-mute ring-1 ring-line hover:text-ink"
-                >
-                  Hex ID
-                </button>
-              </div>
+              <input
+                value={handle}
+                onChange={(e) => setHandle(e.target.value)}
+                placeholder="maya"
+                autoComplete="username"
+                className={fieldInput}
+                autoFocus
+              />
             </ValidField>
-            <ValidField label="Mobile number" ok={phoneOk} error={phone && !phoneOk ? "Include country code" : null}>
-              <PhoneField value={phone} onChange={setPhone} />
-            </ValidField>
+            <PhoneField value={phone} onChange={setPhone} stacked label="Mobile Number" />
             <Button type="submit" className="w-full" disabled={busy || !handleOk || !phoneOk} loading={busy}>
               {busy ? "Sending…" : "Send SMS code"}
             </Button>
@@ -309,21 +295,44 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
               </div>
             </ValidField>
             {password && (
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-mute">
-                {PASSWORD_RULES.map((rule) => {
-                  const met = !passwordIssues(password).includes(rule.id);
-                  return (
-                    <span
-                      key={rule.id}
-                      className={cn(
-                        "inline-flex items-center gap-1",
-                        met ? "font-medium text-emerald-600" : "text-mute",
-                      )}
-                    >
-                      <Check size={12} /> {rule.label}
-                    </span>
-                  );
-                })}
+              <div className="space-y-1.5">
+                {/* Visual Password Strength Meter */}
+                <div className="flex items-center gap-1.5">
+                  {[1, 2, 3, 4].map((barIndex) => {
+                    const issuesCount = passwordIssues(password).length;
+                    const score = Math.max(1, 4 - issuesCount);
+                    const isActive = barIndex <= score;
+                    let colorClass = "bg-line";
+                    if (isActive) {
+                      if (score === 1) colorClass = "bg-red-500";
+                      else if (score === 2) colorClass = "bg-amber-500";
+                      else if (score === 3) colorClass = "bg-emerald-500";
+                      else colorClass = "bg-emerald-600";
+                    }
+                    return (
+                      <div
+                        key={barIndex}
+                        className={cn("h-1 flex-1 rounded-full transition-all duration-300", colorClass)}
+                      />
+                    );
+                  })}
+                </div>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-mute">
+                  {PASSWORD_RULES.map((rule) => {
+                    const met = !passwordIssues(password).includes(rule.id);
+                    return (
+                      <span
+                        key={rule.id}
+                        className={cn(
+                          "inline-flex items-center gap-1",
+                          met ? "font-medium text-emerald-600" : "text-mute",
+                        )}
+                      >
+                        <Check size={12} /> {rule.label}
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
             )}
             <ValidField
