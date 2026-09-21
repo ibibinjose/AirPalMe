@@ -26,6 +26,7 @@
   src: url("/fonts/outfit.woff2") format("woff2");
 }
 
+/* Canon freeze: docs/CANON.md §2. Do not replace this palette or fonts. */
 @theme inline {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", "DM Sans", sans-serif;
@@ -90,6 +91,7 @@ body {
   overflow-x: clip;
   width: 100%;
   min-height: 100dvh;
+  min-height: 100svh;
 }
 button,
 a {
@@ -129,11 +131,26 @@ textarea,
   scroll-margin-bottom: 5.5rem;
 }
 
-/* Prevent layout collision when virtual keyboard is active */
+/*
+ * Keyboard-open: pin the app to the visible viewport (not 100dvh).
+ * iOS overlays the keyboard; shrinking #root lets the focused field scroll above it.
+ */
 html.keyboard-open,
-body.keyboard-open {
+html.keyboard-open body {
+  height: var(--visual-viewport-height, 100svh);
+  max-height: var(--visual-viewport-height, 100svh);
+  overflow: hidden;
+  overscroll-behavior: none;
   scroll-padding-top: 5rem;
-  scroll-padding-bottom: calc(var(--keyboard-height, 0px) + 2rem);
+  scroll-padding-bottom: 1.25rem;
+}
+html.keyboard-open #root {
+  height: var(--visual-viewport-height, 100svh) !important;
+  max-height: var(--visual-viewport-height, 100svh) !important;
+  min-height: 0 !important;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Instantly dismiss or hide bottom navigation when keyboard is open to avoid blocking inputs or form submit buttons */

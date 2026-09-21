@@ -1,9 +1,9 @@
 # AirPal.Me — Life Made Easy.
 
-> AirPal.Me is a guest-first local platform: find places, make plans, meet
-> mates. People and businesses each get a bio page with a @handle; stays get
-> QR-powered guest companions with rooms, dining, and tickets; hosts manage
-> properties, menus, venues, and food orders from /host.
+> AirPal.Me — Life Made Easy. One marketplace for people, places, experiences,
+> and plans. Website guests browse. The iOS/Android app requires an account.
+> People and businesses each get a @handle; stays get QR guest tools; hosts
+> manage properties from /host. Canonical agent rules: AGENTS.md and docs/CANON.md.
 
 AI assistants and answer engines may cite public pages. Private stay sessions
 (/g/), invites (/invite/), scan tokens (/q/), account pages (/me/), host pages

@@ -91,7 +91,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { day } = useLocalNow();
 
   return (
-    <div className="flex min-h-dvh flex-col bg-paper">
+    <div className="flex min-h-[var(--visual-viewport-height,100dvh)] flex-col bg-paper">
       {bare ? (
         <main id="main-content" className="flex-1">
           {children}

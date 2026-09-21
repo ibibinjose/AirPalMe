@@ -1,6 +1,6 @@
 # Reviewer notes (paste into App Store Connect / Play Console)
 
-**App:** AirPal (`me.airpal.app`) 2.0.0 (iOS build 11)  
+**App:** AirPal (`me.airpal.app`) 2.0.0 (iOS build 13)  
 **Seller:** SarvamDaily Pty Ltd trading as AirPal.Me · ABN 83 702 462 977  
 **Apple Team:** ZEN KAPITAL PTY LTD (`26WGXSNG58`)  
 **Support:** AirPalMe@gmail.com · hello@airpal.me  

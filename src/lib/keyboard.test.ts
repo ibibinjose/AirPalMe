@@ -13,6 +13,7 @@ if (typeof globalThis.document === "undefined") {
       contains: (cls: string) => classList.has(cls),
     },
     style: {
+      paddingBottom: "",
       setProperty: (k: string, v: string) => {
         styleProps[k] = v;
       },
@@ -35,6 +36,8 @@ if (typeof globalThis.document === "undefined") {
       body: mockElement,
       activeElement: null,
       createElement: () => ({ ...mockElement }),
+      querySelectorAll: () => [],
+      getElementById: () => null,
       addEventListener: () => {},
       removeEventListener: () => {},
     },
@@ -52,7 +55,8 @@ if (typeof globalThis.document === "undefined") {
       },
       addEventListener: () => {},
       removeEventListener: () => {},
-      requestAnimationFrame: (cb: FrameRequestCallback) => setTimeout(cb, 0),
+      requestAnimationFrame: (cb: FrameRequestCallback) => setTimeout(cb, 0) as unknown as number,
+      scrollBy: () => {},
     },
     writable: true,
   });
@@ -87,19 +91,23 @@ describe("keyboard manager", () => {
     expect(document.documentElement.classList.contains("keyboard-open")).toBe(false);
   });
 
-  it("safely invokes ensureElementInView on target elements", () => {
+  it("scrolls a covered field up by the amount under the keyboard", () => {
+    const scrollBy = vi.fn();
+    (window as unknown as { scrollBy: typeof scrollBy }).scrollBy = scrollBy;
     const mockInput = {
       isConnected: true,
-      scrollIntoView: vi.fn(),
+      parentElement: document.body,
       getBoundingClientRect: () => ({ top: 780, bottom: 820, left: 0, right: 100, width: 100, height: 40 }),
       tagName: "INPUT",
     } as unknown as HTMLElement;
 
-    ensureElementInView(mockInput);
+    ensureElementInView(mockInput, { topClearance: 0, bottomClearance: 20, behavior: "auto" });
 
     return new Promise<void>((resolve) => {
       setTimeout(() => {
-        expect(mockInput.scrollIntoView).toHaveBeenCalled();
+        expect(scrollBy).toHaveBeenCalled();
+        const arg = scrollBy.mock.calls[0]?.[0] as { top: number };
+        expect(arg.top).toBeGreaterThan(0);
         resolve();
       }, 50);
     });

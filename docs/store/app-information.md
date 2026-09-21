@@ -11,6 +11,8 @@ Privacy https://airpal.me/privacy · Terms https://airpal.me/terms · Contact ht
 
 Native app is **18+**. Website guests can browse. Native iOS/Android require an account.
 
+This pack: iOS **2.0.0 (12)** · Android **versionCode 6** · Apple ID **6811351322**. TestFlight: select **2.0.0 (12)**, not 1.0 (`docs/store/testflight.md`).
+
 ---
 
 ## App Store Connect — Localizable + General

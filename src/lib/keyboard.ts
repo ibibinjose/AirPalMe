@@ -15,6 +15,7 @@ let currentState: VirtualKeyboardState = {
 const listeners = new Set<(state: VirtualKeyboardState) => void>();
 let initialized = false;
 let cleanupFn: (() => void) | null = null;
+let liftTimer: ReturnType<typeof setTimeout> | null = null;
 
 function notifyListeners() {
   listeners.forEach((listener) => {
@@ -26,9 +27,41 @@ function notifyListeners() {
   });
 }
 
-/**
- * Updates DOM CSS variables, dataset, and classes for the active keyboard state.
- */
+function visibleFrame(): { top: number; bottom: number; height: number } {
+  const vv = typeof window !== "undefined" ? window.visualViewport : null;
+  if (vv) {
+    return { top: vv.offsetTop, bottom: vv.offsetTop + vv.height, height: vv.height };
+  }
+  const h = Math.max(120, window.innerHeight - currentState.keyboardHeight);
+  return { top: 0, bottom: h, height: h };
+}
+
+function syncViewportVars() {
+  if (typeof document === "undefined" || typeof window === "undefined") return;
+  const docEl = document.documentElement;
+  const vv = window.visualViewport;
+  const frame = visibleFrame();
+  docEl.style.setProperty("--visual-viewport-height", `${Math.round(frame.height)}px`);
+  docEl.style.setProperty("--visual-viewport-offset-top", `${Math.round(vv?.offsetTop || 0)}px`);
+  docEl.style.setProperty("--keyboard-height", `${currentState.keyboardHeight}px`);
+}
+
+function lockRootToVisibleViewport(on: boolean) {
+  const root = document.getElementById?.("root") as HTMLElement | null;
+  if (!root) return;
+  if (on) {
+    const h = Math.round(visibleFrame().height);
+    root.style.height = `${h}px`;
+    root.style.maxHeight = `${h}px`;
+    root.style.overflowY = "auto";
+    (root.style as CSSStyleDeclaration & { webkitOverflowScrolling?: string }).webkitOverflowScrolling = "touch";
+  } else {
+    root.style.height = "";
+    root.style.maxHeight = "";
+    root.style.overflowY = "";
+  }
+}
+
 function applyKeyboardStateToDom(isOpen: boolean, height: number) {
   if (typeof document === "undefined") return;
 
@@ -41,22 +74,22 @@ function applyKeyboardStateToDom(isOpen: boolean, height: number) {
   };
 
   if (isOpen) {
-    docEl.style.setProperty("--keyboard-height", `${height}px`);
     docEl.classList.add("keyboard-open");
     body?.classList.add("keyboard-open");
     docEl.setAttribute("data-keyboard-open", "true");
   } else {
-    docEl.style.setProperty("--keyboard-height", "0px");
     docEl.classList.remove("keyboard-open");
     body?.classList.remove("keyboard-open");
     docEl.setAttribute("data-keyboard-open", "false");
+    document.querySelectorAll?.("[data-kb-pad]").forEach((node) => {
+      const el = node as HTMLElement;
+      el.style.paddingBottom = el.dataset.kbPad || "";
+      delete el.dataset.kbPad;
+    });
   }
 
-  if (typeof window !== "undefined" && window.visualViewport) {
-    docEl.style.setProperty("--visual-viewport-height", `${window.visualViewport.height}px`);
-    docEl.style.setProperty("--visual-viewport-offset-top", `${window.visualViewport.offsetTop}px`);
-  }
-
+  syncViewportVars();
+  lockRootToVisibleViewport(isOpen);
   notifyListeners();
 }
 
@@ -70,10 +103,26 @@ const safeRequestAnimationFrame = (cb: FrameRequestCallback) => {
   return setTimeout(cb, 16);
 };
 
+function nearestScrollParent(el: HTMLElement): HTMLElement | "window" {
+  const root = document.getElementById?.("root") as HTMLElement | null;
+  if (root) {
+    const oy = root.style.overflowY || (typeof window.getComputedStyle === "function" ? window.getComputedStyle(root).overflowY : "");
+    if (oy === "auto" || oy === "scroll") return root;
+  }
+  let node: HTMLElement | null = el.parentElement;
+  while (node && node !== document.body && node !== document.documentElement) {
+    const style = typeof window.getComputedStyle === "function" ? window.getComputedStyle(node) : null;
+    const oy = style?.overflowY || "";
+    if ((oy === "auto" || oy === "scroll" || oy === "overlay") && node.scrollHeight > node.clientHeight + 4) {
+      return node;
+    }
+    node = node.parentElement;
+  }
+  return "window";
+}
+
 /**
- * Ensures an interactive element (input, textarea, select, or contenteditable)
- * is smoothly scrolled into the safe visible viewport region without being obscured
- * by top navigation bars or the virtual keyboard.
+ * Scroll the focused field so it sits fully visible just above the keyboard.
  */
 export function ensureElementInView(
   target: HTMLElement | null | undefined,
@@ -86,44 +135,73 @@ export function ensureElementInView(
 ): void {
   if (!target || typeof window === "undefined") return;
 
-  const {
-    block = "center",
-    topClearance = 70, // Keep space for sticky headers / TopNav
-    bottomClearance = 24, // Keep space above virtual keyboard
-    behavior = "smooth",
-  } = options;
+  const { topClearance = 72, bottomClearance = 16, behavior = "smooth" } = options;
 
-  // Use safeRequestAnimationFrame so any layout or viewport resize has commenced
   safeRequestAnimationFrame(() => {
     if (!target.isConnected) return;
 
+    const scroller = nearestScrollParent(target);
+    const frame =
+      scroller === "window"
+        ? visibleFrame()
+        : (() => {
+            const r = scroller.getBoundingClientRect();
+            return { top: r.top, bottom: r.bottom, height: r.height };
+          })();
+
+    const safeTop = frame.top + topClearance;
+    const safeBottom = frame.bottom - bottomClearance;
     const rect = target.getBoundingClientRect();
-    const vHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    const vTop = window.visualViewport ? window.visualViewport.offsetTop : 0;
 
-    const safeTop = vTop + topClearance;
-    const safeBottom = vTop + vHeight - bottomClearance;
+    let delta = 0;
+    if (rect.bottom > safeBottom) delta = rect.bottom - safeBottom;
+    else if (rect.top < safeTop) delta = rect.top - safeTop;
+    if (Math.abs(delta) < 3) return;
 
-    const isAboveSafeZone = rect.top < safeTop;
-    const isBelowSafeZone = rect.bottom > safeBottom;
-
-    if (isAboveSafeZone || isBelowSafeZone) {
-      try {
-        target.scrollIntoView({
-          behavior,
-          block,
-          inline: "nearest",
-        });
-      } catch {
-        target.scrollIntoView();
-      }
+    if (scroller === "window") {
+      window.scrollBy({ top: delta, left: 0, behavior });
+      return;
     }
+    const prev = scroller.dataset.kbPad;
+    if (prev === undefined) scroller.dataset.kbPad = scroller.style.paddingBottom || "";
+    const pad = Math.max(currentState.keyboardHeight, 24);
+    scroller.style.paddingBottom = `${pad}px`;
+    scroller.scrollTop += delta;
   });
+}
+
+function scheduleLift(target: HTMLElement | null) {
+  if (!target) return;
+  const run = () => ensureElementInView(target);
+  run();
+  if (liftTimer) clearTimeout(liftTimer);
+  const delays = [50, 160, 280, 450];
+  delays.forEach((ms, i) => {
+    setTimeout(run, ms);
+    if (i === delays.length - 1) liftTimer = setTimeout(run, ms);
+  });
+}
+
+function isEditableElement(el: HTMLElement): boolean {
+  const tagName = el.tagName.toLowerCase();
+  if (tagName === "textarea" || tagName === "select") return true;
+  if (tagName === "input") {
+    const type = (el as HTMLInputElement).type?.toLowerCase() || "text";
+    return !["checkbox", "radio", "range", "hidden", "button", "submit", "reset", "file"].includes(type);
+  }
+  return el.isContentEditable;
+}
+
+function focusedEditable(): HTMLElement | null {
+  const active = document.activeElement as HTMLElement | null;
+  if (active && isEditableElement(active)) return active;
+  return null;
 }
 
 /**
  * Initializes listeners for mobile virtual keyboard changes.
- * Handles both Capacitor native environments (iOS/Android) and Web (window.visualViewport).
+ * iOS: keyboard overlays; we shrink #root to the visual viewport and scroll the field up.
+ * Android: WebView adjustResize plus the same visual-viewport lock.
  */
 export function initKeyboardManager(): () => void {
   if (typeof window === "undefined" || typeof document === "undefined") {
@@ -136,112 +214,70 @@ export function initKeyboardManager(): () => void {
 
   initialized = true;
   const isNative = Capacitor.isNativePlatform();
-
-  // Set initial viewport height
-  if (window.visualViewport) {
-    document.documentElement.style.setProperty("--visual-viewport-height", `${window.visualViewport.height}px`);
-  } else {
-    document.documentElement.style.setProperty("--visual-viewport-height", `${window.innerHeight}px`);
-  }
+  syncViewportVars();
 
   const unsubs: Array<() => void> = [];
 
-  // 1. Native Capacitor Keyboard Plugin Listeners
   if (isNative) {
-    let willShowSub: { remove: () => void } | null = null;
-    let willHideSub: { remove: () => void } | null = null;
+    const nativeSubs: Array<{ remove: () => void }> = [];
 
-    Keyboard.addListener("keyboardWillShow", (info: KeyboardInfo) => {
-      applyKeyboardStateToDom(true, info.keyboardHeight || 300);
-      const active = document.activeElement as HTMLElement | null;
-      if (active && isEditableElement(active)) {
-        setTimeout(() => ensureElementInView(active), 100);
-        setTimeout(() => ensureElementInView(active), 300);
-      }
-    })
-      .then((sub) => {
-        willShowSub = sub;
-      })
-      .catch(() => {
-        /* ignore */
-      });
+    const onNativeShow = (info: KeyboardInfo) => {
+      const h = Math.max(info.keyboardHeight || 0, 240);
+      applyKeyboardStateToDom(true, h);
+      scheduleLift(focusedEditable());
+    };
 
-    Keyboard.addListener("keyboardWillHide", () => {
-      applyKeyboardStateToDom(false, 0);
-    })
-      .then((sub) => {
-        willHideSub = sub;
-      })
-      .catch(() => {
-        /* ignore */
-      });
+    Keyboard.addListener("keyboardWillShow", onNativeShow)
+      .then((sub) => nativeSubs.push(sub))
+      .catch(() => undefined);
+    Keyboard.addListener("keyboardDidShow", onNativeShow)
+      .then((sub) => nativeSubs.push(sub))
+      .catch(() => undefined);
+    Keyboard.addListener("keyboardWillHide", () => applyKeyboardStateToDom(false, 0))
+      .then((sub) => nativeSubs.push(sub))
+      .catch(() => undefined);
+    Keyboard.addListener("keyboardDidHide", () => applyKeyboardStateToDom(false, 0))
+      .then((sub) => nativeSubs.push(sub))
+      .catch(() => undefined);
 
-    unsubs.push(() => {
-      willShowSub?.remove();
-      willHideSub?.remove();
-    });
+    unsubs.push(() => nativeSubs.forEach((sub) => sub.remove()));
   }
 
-  // 2. Web Visual Viewport Listener (standard on iOS Safari & Android Chrome)
   if (window.visualViewport) {
     const onViewportChange = () => {
       const vport = window.visualViewport;
       if (!vport) return;
-
-      document.documentElement.style.setProperty("--visual-viewport-height", `${vport.height}px`);
-      document.documentElement.style.setProperty("--visual-viewport-offset-top", `${vport.offsetTop}px`);
-
-      // If the visual viewport shrank by more than 130px, keyboard is active
       const screenH = window.innerHeight;
-      const heightDiff = screenH - vport.height;
-      const activeEl = document.activeElement as HTMLElement | null;
-      const hasEditableFocus = activeEl && isEditableElement(activeEl);
-
-      const isKbOpen = heightDiff > 130 && Boolean(hasEditableFocus);
-      const computedKbHeight = isKbOpen ? Math.round(heightDiff) : 0;
-
+      const heightDiff = Math.max(0, screenH - vport.height - (vport.offsetTop || 0));
+      const activeEl = focusedEditable();
+      const isKbOpen = (heightDiff > 80 && Boolean(activeEl)) || (currentState.isKeyboardOpen && heightDiff > 40);
+      const computedKbHeight = isKbOpen ? Math.round(Math.max(heightDiff, currentState.keyboardHeight || 0)) : 0;
       applyKeyboardStateToDom(isKbOpen, computedKbHeight);
-
-      if (isKbOpen && activeEl) {
-        ensureElementInView(activeEl);
-      }
+      if (isKbOpen && activeEl) ensureElementInView(activeEl);
     };
 
     window.visualViewport.addEventListener("resize", onViewportChange, { passive: true });
     window.visualViewport.addEventListener("scroll", onViewportChange, { passive: true });
-
     unsubs.push(() => {
       window.visualViewport?.removeEventListener("resize", onViewportChange);
       window.visualViewport?.removeEventListener("scroll", onViewportChange);
     });
   }
 
-  // 3. Focusin / Focusout Listeners to proactively prepare and position elements
   const onFocusIn = (e: FocusEvent) => {
     const target = e.target as HTMLElement | null;
     if (!target || !isEditableElement(target)) return;
-
-    // Small sequential delays to sync with keyboard appearance animation
-    safeRequestAnimationFrame(() => ensureElementInView(target));
-    setTimeout(() => ensureElementInView(target), 120);
-    setTimeout(() => ensureElementInView(target), 320);
+    scheduleLift(target);
   };
 
   const onFocusOut = () => {
-    // If no other editable element took focus, reset after slight delay
     setTimeout(() => {
-      const active = document.activeElement as HTMLElement | null;
-      if (!active || !isEditableElement(active)) {
-        if (!isNative) {
-          applyKeyboardStateToDom(false, 0);
-        }
-      }
-    }, 150);
+      if (!focusedEditable() && !isNative) applyKeyboardStateToDom(false, 0);
+    }, 180);
   };
 
   window.addEventListener("focusin", onFocusIn, { passive: true });
   window.addEventListener("focusout", onFocusOut, { passive: true });
-
   unsubs.push(() => {
     window.removeEventListener("focusin", onFocusIn);
     window.removeEventListener("focusout", onFocusOut);
@@ -250,6 +286,7 @@ export function initKeyboardManager(): () => void {
   cleanupFn = () => {
     unsubs.forEach((u) => u());
     applyKeyboardStateToDom(false, 0);
+    lockRootToVisibleViewport(false);
     initialized = false;
     cleanupFn = null;
   };
@@ -257,22 +294,6 @@ export function initKeyboardManager(): () => void {
   return cleanupFn;
 }
 
-/**
- * Checks if an element is an interactive text input or editable surface.
- */
-function isEditableElement(el: HTMLElement): boolean {
-  const tagName = el.tagName.toLowerCase();
-  if (tagName === "textarea" || tagName === "select") return true;
-  if (tagName === "input") {
-    const type = (el as HTMLInputElement).type?.toLowerCase() || "text";
-    return !["checkbox", "radio", "range", "hidden", "button", "submit", "reset", "file"].includes(type);
-  }
-  return el.isContentEditable;
-}
-
-/**
- * React hook to observe virtual keyboard visibility and height.
- */
 export function useVirtualKeyboard(): VirtualKeyboardState {
   const [state, setState] = useState<VirtualKeyboardState>(currentState);
 
@@ -280,7 +301,6 @@ export function useVirtualKeyboard(): VirtualKeyboardState {
     initKeyboardManager();
     listeners.add(setState);
     setState(currentState);
-
     return () => {
       listeners.delete(setState);
     };

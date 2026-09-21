@@ -11,7 +11,7 @@ Inspect the path before creating a sibling. Shared domain types live in `shared/
 | Bottom tabs   | `src/components/layout/TabBar.tsx`, `src/lib/tabs.ts` |
 | Global search | `src/components/search/GlobalSearchModal.tsx`         |
 
-Guest tabs today: Explore / Plan / Scan / Stay / Circle. Mate is `/mate`, not a tab — later. Do not dump every vertical into the tab bar.
+Shipped tabs: What's on / Plan / Scan / Stay / Me (`src/lib/tabs.ts`). Circle is under Plan. Mate is `/mate`, not a tab. Do not dump every vertical into the tab bar. Freeze: `docs/CANON.md`.
 
 ## Mate loop
 

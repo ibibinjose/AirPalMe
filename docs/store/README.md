@@ -1,6 +1,11 @@
 # AirPal store submission pack
 
-App: **AirPal** · ID `me.airpal.app` · version 2.0.0 (iOS build 11, Android versionCode 5)
+App: **AirPal** · ID `me.airpal.app` · version **2.0.0** (iOS build **12**, Android versionCode 6)
+
+TestFlight: use **2.0.0 (12)**, not 1.0. Steps: `docs/store/testflight.md`.
+
+Pack 21 Sep 2026 (rebuild): iOS **2.0.0 (12)** IPA `ios/App/build/export/AirPal.Me.ipa`. Android **versionCode 6** AAB `android/app/build/outputs/bundle/release/app-release.aab`. App Information paste: `docs/store/app-information.md`.
+
 Legal entity: **SarvamDaily Pty Ltd** trading as **AirPal.Me** · ABN **83 702 462 977** · Apple Team ID **26WGXSNG58**
 Web: https://airpal.me · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms · Contact: https://airpal.me/contact
 Support email: AirPalMe@gmail.com (App Store / Play contact) · hello@airpal.me (brand)
@@ -33,9 +38,9 @@ Support email: AirPalMe@gmail.com (App Store / Play contact) · hello@airpal.me 
 4. **Signing & upload** → run these on your Mac (builds need your keychain/keys; they cannot run in a sandboxed agent):
    ```sh
    npm run build && npx cap sync
-   cd android && ./gradlew :app:bundleRelease   # → app/build/outputs/bundle/release/app-release.aab
+   cd android && ./gradlew :app:bundleRelease   # → android/app/build/outputs/bundle/release/app-release.aab
    ```
-   Upload the AAB to Play Console (first upload uses your keystore; Play App Signing after that). iOS: `npx cap open ios`, pick your Team (automatic signing already on), Product → Archive → Distribute to App Store Connect. Then fill the SHA-256/Team-ID placeholders (items 1–2) and redeploy hosting so App Links verify.
+   This pack (21 Sep 2026): signed AAB **versionCode 6** at that path; iOS IPA **2.0.0 (11)** at `ios/App/build/export/AirPal.Me.ipa` (includes `NSLocationAlwaysAndWhenInUseUsageDescription`). Upload the AAB to Play Console. Select build **11** in App Store Connect (upload if it is not Processing yet). Then paste Play App Signing SHA-256 (item 1) and redeploy hosting.
 5. **App Information / questionnaires** → paste `docs/store/app-information.md` into App Store Connect App Information (name, subtitle, categories, content rights, age ratings) and Play Console listing + IARC + Data safety (`docs/store/play-data-safety.md`). 17+ App Store / 18+ Play. No ads. No IAP server URLs.
 
 ## Store images

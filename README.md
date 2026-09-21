@@ -1,15 +1,12 @@
 # AirPal.me
 
-> Canonical merged build: full codebase merged here from the previous build folder,
-> same Firebase project `airpalme-app`. No remote wired yet — say the word before pushing.
+**Life Made Easy.** One marketplace: people, places, experiences, things, discovery, trips.
 
-Scan-first guest concierge and precinct guide.
+Production: https://airpal.me · Firebase `airpalme-app` · Native `me.airpal.app`.
 
-Guests never create an account. Hosts print a QR. Discovery, stay, campus, and street markers share one shell.
+**Agents (Grok, Claude, Gemini, Muse, Cursor, Copilot):** read **[AGENTS.md](./AGENTS.md)** then **[docs/CANON.md](./docs/CANON.md)** before editing. Do not revert shipped chrome, style, or features.
 
-Production: https://airpal.me · Firebase project `airpalme-app`.
-
-Agent / contributor source of truth: **[AGENTS.md](./AGENTS.md)**.
+Website guests browse. Native iOS/Android require an account. Tabs: What's on · Plan · Scan · Stay · Me.
 
 ```
 npm install
@@ -21,20 +18,20 @@ npm run ci           # clean install, verify, dependency audit
 
 Copy `.env.example` → `.env`. Restart Vite after changing `VITE_*` values.
 
-Primary chrome is **Scan / Stay / Explore**. Bios, clubs, companion, and operator tools sit behind role-specific menus.
-
-North-star metric: **WQGA/Context** (weekly qualified guest actions per active QR context). Dictionary: `docs/analytics-event-dictionary.md`. Checklist: `docs/analytics-checklist.md`.
+Primary chrome is **What's on / Plan / Scan / Stay / Me**. Mate is `/mate`, not a tab. North star: Completed AirPal Experiences. Analytics dictionary: `docs/analytics-event-dictionary.md`.
 
 Set `ENFORCE_APPCHECK=true` on Functions once a reCAPTCHA site key is live. Callables already consume App Check tokens.
 
-| Who       | Where                                                        |
-| --------- | ------------------------------------------------------------ |
-| Anyone    | `/scan` Scan · `/concierge` Stay · `/` Explore · `/calendar` |
-| Guest     | `/g/:id` stay · `/q/:id` marker                              |
-| Host      | `/start` · `/host`                                           |
-| Campus    | `/c/:id`                                                     |
-| Walks     | `/guide`                                                     |
-| Companion | `/companion`                                                 |
+| Who | Where |
+| --- | --- |
+| Anyone (web) | `/` What's on · `/plan` · `/scan` · `/concierge` Stay · `/calendar` |
+| Person | `/me` · `/@handle` · `/circle` · `/start` |
+| Stay guest | `/g/:id` (device session) · `/q/:id` marker |
+| Host / business | `/host` · `/business` · `/join` |
+| Mate | `/mate` demand · `/companion` supply |
+| Admin | `/admin` |
+
+Full case list: [docs/CANON.md](./docs/CANON.md) §5. Store pack: [docs/store/README.md](./docs/store/README.md).
 
 ## Local time and maps
 
@@ -46,7 +43,8 @@ Stay maps need `VITE_GOOGLE_MAPS_API_KEY`. Setup: [docs/maps.md](./docs/maps.md)
 
 | Doc                                                                        | Topic                                    |
 | -------------------------------------------------------------------------- | ---------------------------------------- |
-| [AGENTS.md](./AGENTS.md)                                                   | Conventions for people and coding agents |
+| [AGENTS.md](./AGENTS.md)                                                   | Product rules for people and coding agents |
+| [docs/CANON.md](./docs/CANON.md)                                           | Shipped freeze — do not revert           |
 | [docs/app-mind-map.md](./docs/app-mind-map.md)                             | Full app map + usefulness plan           |
 | [docs/host-tickets.md](./docs/host-tickets.md)                             | Guest staff tickets → host inbox + push  |
 | [docs/freshness.md](./docs/freshness.md)                                   | Hours / events / Wi-Fi re-verify SLAs    |

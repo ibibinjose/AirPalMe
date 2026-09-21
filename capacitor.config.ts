@@ -53,7 +53,9 @@ const config: CapacitorConfig = {
       splashImmersive: false,
     },
     Keyboard: {
-      resize: "body",
+      // Overlay the keyboard; JS pads and scrolls the focused field above it.
+      // `body`/`native` resize fights 100dvh layouts and leaves the field covered.
+      resize: "none",
       style: "light",
       resizeOnFullScreen: true,
     },

@@ -11,12 +11,12 @@ description: >
 
 # AirPal build
 
-Operate this repo as one marketplace engine. Product rules live in `AGENTS.md`. Build status lives in `references/build-checklist.md`. Code map lives in `references/surfaces.md`. Do not copy those files into chat or into new docs.
+Operate this repo as one marketplace engine. Product rules live in `AGENTS.md`. Shipped freeze lives in `docs/CANON.md`. Build status lives in `references/build-checklist.md`. Code map lives in `references/surfaces.md`. Do not copy those files into chat or into new docs.
 
 ## On every invoke
 
-1. Read `AGENTS.md` (repo root) and `.grok/skills/airpal-build/references/build-checklist.md`.
-2. Read `.grok/skills/airpal-build/references/surfaces.md` before adding files.
+1. Read `AGENTS.md` (repo root) and `docs/CANON.md` (shipped freeze — do not revert).
+2. Read `.grok/skills/airpal-build/references/build-checklist.md` and `references/surfaces.md` before adding files.
 3. Name the next item you will touch (its checklist `id`) and the smallest change that moves it toward `done`.
 4. After shipping, update the checklist row: status, checkbox, evidence path, date. Never mark `done` without a real path a user can exercise.
 
@@ -65,7 +65,7 @@ Do not delete rows. Demote with `later` and a reason. Bots treat unknown ids as 
 - `/companion` is Mate **supply** (application + admin approval). `/mate` is Mate **demand** (request → match → message → book → review).
 - Bookings already exist (`bookings` + `shared/booking.ts`). Payments are deferred (`paymentStatus: "deferred"`). Extend this engine; do not add a second one.
 - `companion_applications` is the Mate application collection. There is no separate `mates` collection yet — approved applications **are** supply.
-- Guests browse Stay/Explore/Scan without auth. Do not gate those.
+- Website guests browse Stay/Explore/Scan without auth. Native apps require sign-in. Do not gate the website. Do not remove the native login gate.
 - Sydney zoned dates: `toZonedDateStr` / `useLocalNow`. Never `new Date().toISOString().slice(0,10)` for calendar dates.
 - Conflict order: Safety → Security → Correctness → Transaction integrity → UX → Performance → Growth.
 
