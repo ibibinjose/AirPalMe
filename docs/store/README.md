@@ -1,6 +1,6 @@
 # AirPal store submission pack
 
-App: **AirPal** · ID `me.airpal.app` · version 2.0.0 (iOS build 2, Android versionCode 2)
+App: **AirPal** · ID `me.airpal.app` · version 2.0.0 (iOS build 8, Android versionCode 3)
 Legal entity: **SarvamDaily Pty Ltd** trading as **AirPal.Me** · ABN **83 702 462 977** · Apple Team ID **26WGXSNG58**
 Web: https://airpal.me · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms · Contact: https://airpal.me/contact
 Support email: AirPalMe@gmail.com (App Store / Play contact) · hello@airpal.me (brand)

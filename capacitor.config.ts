@@ -5,8 +5,21 @@ const config: CapacitorConfig = {
   appName: "AirPal",
   webDir: "dist",
   server: {
+    // WebView origin must be the live domain so Firebase Auth, phone reCAPTCHA,
+    // and authorized domains match https://airpal.me — not capacitor://localhost.
+    hostname: "airpal.me",
     androidScheme: "https",
-    iosScheme: "capacitor",
+    iosScheme: "https",
+    allowNavigation: [
+      "airpal.me",
+      "www.airpal.me",
+      "airpalme-app.web.app",
+      "airpalme-app.firebaseapp.com",
+      "*.firebaseapp.com",
+      "*.googleapis.com",
+      "www.google.com",
+      "www.recaptcha.net",
+    ],
   },
   plugins: {
     StatusBar: {

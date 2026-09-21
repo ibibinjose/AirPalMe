@@ -23,7 +23,7 @@ Not declared on purpose: microphone, contacts, calendar database, always/backgro
 ## iOS files
 
 - `ios/App/App/Info.plist` — usage strings, URL schemes `airpal` / `me.airpal.app`, query schemes
-- `ios/App/App/App.entitlements` — `applinks:airpal.me`, `www.airpal.me`, `airpalme-app.web.app`; NFC NDEF/TAG
+- `ios/App/App/App.entitlements` — `applinks:airpal.me`, `www.airpal.me`, `airpalme-app.web.app`; NFC TAG (NDEF is disallowed on iOS 17+ / SDK 27)
 - `ios/App/App/PrivacyInfo.xcprivacy` — no tracking; location, photos, email, phone, name, user ID, device ID, product interaction, purchase history (app functionality)
 
 Enable **Near Field Communication Tag Reading** on the App ID in Apple Developer if Wave NFC should work on iPhone. Signing fails without that capability.

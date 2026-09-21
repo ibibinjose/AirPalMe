@@ -5,7 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { logAdminAction } from "@/lib/admin-audit";
 import { cn } from "@/lib/cn";
-import { REPORT_REASON_LABELS, type SafetyReportStatus } from "@shared/safety";
+import {
+  REPORT_REASON_LABELS,
+  sortSafetyCasesEmergenciesFirst,
+  type SafetyReportStatus,
+} from "@shared/safety";
 
 interface CaseRow {
   id: string;
@@ -45,7 +49,11 @@ export function SafetyInboxAdmin() {
       .finally(() => setLoading(false));
   }, [isAdmin]);
 
-  const visible = useMemo(() => (filter === "all" ? rows : rows.filter((r) => r.status === filter)), [rows, filter]);
+  const visible = useMemo(() => {
+    const filtered = filter === "all" ? rows : rows.filter((r) => r.status === filter);
+    return sortSafetyCasesEmergenciesFirst(filtered);
+  }, [rows, filter]);
+  const emergencyCount = useMemo(() => rows.filter((r) => r.reason === "emergency" && r.status === "new").length, [rows]);
 
   async function act(row: CaseRow, status: SafetyReportStatus) {
     const db = getFirebaseDb();
@@ -79,7 +87,15 @@ export function SafetyInboxAdmin() {
     <section className="mt-8 rounded-[28px] bg-card p-4 ring-1 ring-line">
       <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Trust & safety</p>
       <h2 className="font-display mt-1 text-lg font-semibold">Safety cases</h2>
-      <p className="mt-1 text-sm text-mute">Every report opens a case. Emergencies first, always.</p>
+      <p className="mt-1 text-sm text-mute">
+        Every report opens a case. Emergencies first, always — new emergency cases target review within 4 hours.
+        In danger now? Call local emergency services first; AirPal never guarantees personal safety.
+        {emergencyCount > 0 && (
+          <span className="mt-1 block font-semibold text-red-600">
+            {emergencyCount} new {emergencyCount === 1 ? "emergency" : "emergencies"} waiting.
+          </span>
+        )}
+      </p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {FILTERS.map((f) => (
           <button

@@ -19,13 +19,23 @@ jobs:
         run: npm run ci:install
       - name: Typecheck
         run: npm run typecheck
+      - name: Functions typecheck
+        run: npm run functions:typecheck
+      - name: Lint
+        run: npm run lint
       - name: Tests
         run: npm test
+      - name: Functions tests
+        run: npm run functions:test
       - name: Build web
         run: npm run build
       - name: Build Functions
         run: npm run functions:build
       - name: Validate Firebase rules
         run: npm run rules:check
+      - name: Scan for leaked secrets
+        run: npm run secrets:check
+      - name: Validate SEO routes
+        run: npm run seo:check
       - name: Security / dependency audit
         run: npm run audit

@@ -172,6 +172,36 @@ export function BioPublicPage() {
       </div>
     );
   }
+  if (!profile && tried) {
+    if (handle) {
+      return (
+        <div className="mx-auto max-w-md px-4 py-16 text-center">
+          <div className="rounded-3xl border border-line bg-card p-6 shadow-sm">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand">
+              <Sparkles size={28} />
+            </div>
+            <h1 className="font-display mt-4 text-2xl font-bold text-ink">@{handle} is available!</h1>
+            <p className="mt-2 text-sm text-mute">
+              This AirPal handle hasn’t been set up yet. Be the first to claim <strong>@{handle}</strong> and create your public bio page.
+            </p>
+            <div className="mt-6 flex flex-col gap-2">
+              <Button
+                size="lg"
+                className="w-full gap-2 rounded-2xl bg-brand font-semibold text-white shadow-md hover:brightness-110"
+                onClick={() => nav(`/bio/setup?handle=${handle}`)}
+              >
+                Claim @{handle}
+              </Button>
+              <Button variant="ghost" className="w-full rounded-2xl" onClick={() => nav("/")}>
+                Explore AirPal
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return <NotFoundPage />;
+  }
   if (!profile) return <NotFoundPage />;
   const bio = profile;
 

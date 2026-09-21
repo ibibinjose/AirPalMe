@@ -58,3 +58,21 @@ export function reportValid(input: SafetyReportInput): boolean {
 export function blockDocId(blockerUid: string, blockedUid: string): string {
   return `${blockerUid}_${blockedUid}`.replace(/[^a-zA-Z0-9_-]/g, "_");
 }
+
+/** Launch triage: emergency cases sort before all others, then newest first. */
+export function isEmergencyReason(reason: string): boolean {
+  return reason === "emergency";
+}
+
+export function sortSafetyCasesEmergenciesFirst<
+  T extends { reason: string; createdAt: string },
+>(rows: T[]): T[] {
+  return [...rows].sort((a, b) => {
+    const aEmergency = isEmergencyReason(a.reason) ? 0 : 1;
+    const bEmergency = isEmergencyReason(b.reason) ? 0 : 1;
+    if (aEmergency !== bEmergency) return aEmergency - bEmergency;
+    if (b.createdAt < a.createdAt) return -1;
+    if (b.createdAt > a.createdAt) return 1;
+    return 0;
+  });
+}

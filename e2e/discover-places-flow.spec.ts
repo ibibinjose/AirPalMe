@@ -6,6 +6,10 @@ test.describe("Discover & Places Flow", () => {
       try {
         window.sessionStorage.setItem("airpal_disable_zoo", "1");
         localStorage.setItem("airpal.door.v1", "explore");
+        localStorage.setItem(
+          "airpal.location.v1",
+          JSON.stringify({ mode: "city", city: "Sydney", lat: -33.8688, lng: 151.2093 }),
+        );
       } catch {
         /* ignore */
       }

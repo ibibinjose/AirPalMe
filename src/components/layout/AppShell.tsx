@@ -26,6 +26,7 @@ import { cn } from "@/lib/cn";
 import { enterEase, takeShellEnter } from "@/lib/motion";
 import { parseAtHandle } from "@shared/bio";
 import { shouldShowFooter } from "@/lib/footer-rules";
+import { isNativeApp } from "@/lib/native";
 import { SiteFooter } from "./SiteFooter";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useDataReload } from "@/hooks/useDataReload";
@@ -67,7 +68,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   // rendering the tab bar too would stack two fixed bars on mobile.
   // (/plan/new keeps the tab bar: it has no action bar of its own.)
   const isPlanDetail = (path.startsWith("/plan/") && path !== "/plan/new") || path.startsWith("/invite/");
-  const showFooter = shouldShowFooter(path);
+  const showFooter = !isNativeApp() && shouldShowFooter(path);
   const bare = Boolean(parseAtHandle(path));
   const reduce = useReducedMotion();
   const [play] = useState(() => !reduce && takeShellEnter());

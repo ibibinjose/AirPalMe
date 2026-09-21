@@ -107,6 +107,7 @@ export function StartPage() {
 
   const { login, loginWithPhonePassword, user, sendVerificationEmail, requestPasswordReset, logout } = useAuth();
   const { mine, business } = useBio();
+  const [pendingGo, setPendingGo] = useState(false);
 
   // Mode resolution
   const initialMode: AuthMode =
@@ -255,29 +256,22 @@ export function StartPage() {
     };
   }, [roleParam, next]);
 
-  function afterIn() {
-    if (next) {
-      nav(next);
-      return;
-    }
-    if (roleParam === "host") {
-      nav("/host");
-      return;
-    }
-    if (roleParam === "business" || business) {
-      nav("/business");
-      return;
-    }
-    if (roleParam === "event") {
-      nav("/event");
-      return;
-    }
-    nav("/circle");
+  function afterInPath(): string {
+    const dest = next.trim();
+    if (dest.startsWith("/") && !dest.startsWith("//") && !dest.startsWith("/start")) return dest;
+    if (roleParam === "host") return "/host";
+    if (roleParam === "business" || business) return "/business";
+    if (roleParam === "event") return "/event";
+    return "/circle";
   }
 
   useEffect(() => {
-    if (user && next && !phoneSignup) nav(next);
-  }, [user, next, nav, phoneSignup]);
+    if (!user || phoneSignup) return;
+    if (pendingGo || (next && !next.startsWith("/start"))) {
+      setPendingGo(false);
+      nav(afterInPath());
+    }
+  }, [user, pendingGo, next, nav, phoneSignup, roleParam, business]);
 
   function switchMode(newMode: AuthMode) {
     setMode(newMode);
@@ -349,11 +343,11 @@ export function StartPage() {
       if (mode === "signin" && method === "phone" && phoneLoginMode === "password") {
         await loginWithPhonePassword(signInPhone, password);
         toast.success("Signed in successfully!");
-        afterIn();
+        setPendingGo(true);
       } else {
         await login(email.trim(), password);
         toast.success("Signed in successfully!");
-        afterIn();
+        setPendingGo(true);
       }
     } catch (err: unknown) {
       const errObj = err as { code?: string; message?: string };
@@ -362,7 +356,7 @@ export function StartPage() {
 
       if (!liveBackendEnabled()) {
         toast.message("Demo mode sign-in");
-        afterIn();
+        setPendingGo(true);
       } else if (method === "phone" && phoneLoginMode === "password" && phonePasswordNeedsSms(err)) {
         setPhoneLoginMode("sms");
         setInlineError({ message: msg, code });
@@ -794,7 +788,7 @@ export function StartPage() {
                 <SignupFlow
                   onDone={() => {
                     setPhoneSignup(false);
-                    afterIn();
+                    setPendingGo(true);
                   }}
                 />
               </div>
@@ -827,7 +821,7 @@ export function StartPage() {
                     onBegin={() => setPhoneSignup(true)}
                     onDone={() => {
                       setPhoneSignup(false);
-                      afterIn();
+                      setPendingGo(true);
                     }}
                     onNeedAccount={() => {
                       setPhoneSignup(true);

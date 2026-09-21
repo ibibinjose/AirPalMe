@@ -1,5 +1,14 @@
+import { Capacitor } from "@capacitor/core";
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { connectAuthEmulator, getAuth, signInAnonymously, type Auth } from "firebase/auth";
+import {
+  browserLocalPersistence,
+  connectAuthEmulator,
+  getAuth,
+  indexedDBLocalPersistence,
+  initializeAuth,
+  signInAnonymously,
+  type Auth,
+} from "firebase/auth";
 import { connectFirestoreEmulator, getFirestore, type Firestore } from "firebase/firestore";
 import { connectStorageEmulator, getStorage, type FirebaseStorage } from "firebase/storage";
 import { connectFunctionsEmulator, getFunctions, type Functions } from "firebase/functions";
@@ -95,7 +104,17 @@ export function getFirebaseAuth(): Auth | null {
   if (auth) return auth;
   const firebaseApp = getFirebaseApp();
   if (!firebaseApp) return null;
-  auth = getAuth(firebaseApp);
+  if (Capacitor.isNativePlatform()) {
+    try {
+      auth = initializeAuth(firebaseApp, {
+        persistence: [indexedDBLocalPersistence, browserLocalPersistence],
+      });
+    } catch {
+      auth = getAuth(firebaseApp);
+    }
+  } else {
+    auth = getAuth(firebaseApp);
+  }
   if (shouldUseEmulators() && !emulators.auth) {
     connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
     emulators.auth = true;
@@ -175,17 +194,62 @@ export async function getFirebaseAnalytics(): Promise<Analytics | null> {
 
 let anonAuthPromise: Promise<string | null> | null = null;
 let anonCooldownUntil = 0;
+let authUpgradeDepth = 0;
+
+function signedInUid(firebaseAuth: Auth | null): string | null {
+  const user = firebaseAuth?.currentUser;
+  if (!user) return null;
+  return user.uid;
+}
+
+function hasRealAccount(firebaseAuth: Auth | null): boolean {
+  const user = firebaseAuth?.currentUser;
+  return Boolean(user && !user.isAnonymous);
+}
+
+export function hasRealFirebaseUser(): boolean {
+  return hasRealAccount(getFirebaseAuth());
+}
+
+/** Call around email/phone/password sign-in so a guest anonymous session cannot replace it. */
+export function beginAuthUpgrade(): void {
+  authUpgradeDepth += 1;
+}
+
+export function endAuthUpgrade(): void {
+  authUpgradeDepth = Math.max(0, authUpgradeDepth - 1);
+}
+
+export function isAuthUpgradeInProgress(): boolean {
+  return authUpgradeDepth > 0;
+}
+
+export async function awaitPendingAnonymousSession(): Promise<void> {
+  if (anonAuthPromise) await anonAuthPromise.catch(() => {});
+}
+
+export async function withAuthUpgrade<T>(run: () => Promise<T>): Promise<T> {
+  beginAuthUpgrade();
+  try {
+    await awaitPendingAnonymousSession();
+    return await run();
+  } finally {
+    endAuthUpgrade();
+  }
+}
 
 export function resetAnonymousSessionStateForTesting(): void {
   anonAuthPromise = null;
   anonCooldownUntil = 0;
+  authUpgradeDepth = 0;
   auth = null;
 }
 
 export async function ensureAnonymousSession(): Promise<string | null> {
   const firebaseAuth = getFirebaseAuth();
   if (!firebaseAuth) return null;
-  if (firebaseAuth.currentUser) return firebaseAuth.currentUser.uid;
+  if (hasRealAccount(firebaseAuth) || firebaseAuth.currentUser) return signedInUid(firebaseAuth);
+  if (authUpgradeDepth > 0) return signedInUid(firebaseAuth);
   if (Date.now() < anonCooldownUntil) return null;
 
   if (anonAuthPromise) return anonAuthPromise;
@@ -195,10 +259,12 @@ export async function ensureAnonymousSession(): Promise<string | null> {
       if (typeof firebaseAuth.authStateReady === "function") {
         await firebaseAuth.authStateReady();
       }
-      if (firebaseAuth.currentUser) return firebaseAuth.currentUser.uid;
+      if (hasRealAccount(firebaseAuth) || firebaseAuth.currentUser) return signedInUid(firebaseAuth);
+      if (authUpgradeDepth > 0) return signedInUid(firebaseAuth);
       if (Date.now() < anonCooldownUntil) return null;
 
       const credential = await signInAnonymously(firebaseAuth);
+      if (hasRealAccount(firebaseAuth)) return signedInUid(firebaseAuth);
       return credential.user.uid;
     } catch {
       // Back off on error or rate-limiting (e.g. TOO_MANY_ATTEMPTS_TRY_LATER)

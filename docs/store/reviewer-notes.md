@@ -23,7 +23,7 @@ No in-app digital goods. Bookings for real-world experiences may show as unpaid 
 ## Permissions (all optional — deny and the app still browses)
 
 - **Camera:** Scan tab — place QR, stay key, event pass, Wave. Guest browse works without it (type a code).
-- **Location (when in use):** nearby places, plans, events. Not a home address. Deny → pick a city in the location pin (The Rocks is the launch catalogue).
+- **Location (when in use):** nearby places, plans, events. Not a home address. Deny → pick any city in the location pin.
 - **Photos:** profile, plan, or listing image you pick. Not required to browse.
 - **NFC:** optional Wave greeting. No NFC hardware required.
 - **Bluetooth (Android):** optional Wave scan. iOS does not request Bluetooth.

@@ -27,7 +27,14 @@ import {
   sendAccountPhoneCode as sendLinkedSms,
   sendPhoneCode as sendSms,
 } from "@/lib/phone-auth";
-import { firebaseWebApiKey, getFirebaseAuth, getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
+import {
+  firebaseWebApiKey,
+  getFirebaseAuth,
+  getFirebaseDb,
+  hasRealFirebaseUser,
+  isFirebaseConfigured,
+  withAuthUpgrade,
+} from "@/lib/firebase";
 import { clearPendingIntent, savePendingIntent, type PendingIntent } from "@/lib/pending-intent";
 import {
   completeAccountSignupRemote,
@@ -210,7 +217,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     return {
       user,
-      authReady,
+      authReady: Boolean(user) || (authReady && !hasRealFirebaseUser()),
       role: user?.role || "guest",
       isHost:
         user?.role === "host_admin" ||
@@ -221,17 +228,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async login(email, password) {
         const auth = getFirebaseAuth();
         if (!auth) throw new Error("Sign-in needs Firebase.");
-        await signInWithEmailAndPassword(auth, normalizeEmail(email), password);
+        await withAuthUpgrade(() => signInWithEmailAndPassword(auth, normalizeEmail(email), password));
       },
       async loginWithPhonePassword(phone, password) {
         const auth = getFirebaseAuth();
         if (!auth) throw new Error("Sign-in needs Firebase.");
-        const { token } = await loginWithPhonePasswordRemote({
-          phone,
-          password,
-          apiKey: firebaseWebApiKey() || undefined,
+        await withAuthUpgrade(async () => {
+          const { token } = await loginWithPhonePasswordRemote({
+            phone,
+            password,
+            apiKey: firebaseWebApiKey() || undefined,
+          });
+          await signInWithCustomToken(auth, token);
         });
-        await signInWithCustomToken(auth, token);
       },
       async linkEmailPassword(email, password) {
         await linkEmailPasswordToAccount(normalizeEmail(email), password);
@@ -252,7 +261,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await sendSms(phone);
       },
       async confirmPhoneCode(code) {
-        await confirmSms(code);
+        await withAuthUpgrade(() => confirmSms(code));
       },
       refreshUser: pullUser,
       async updateEmailAddress(email) {
@@ -298,7 +307,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const auth = getFirebaseAuth();
         if (!auth) throw new Error("Sign-up needs Firebase.");
         const cleanEmail = normalizeEmail(email);
-        const cred = await createUserWithEmailAndPassword(auth, cleanEmail, opts?.password || "");
+        const cred = await withAuthUpgrade(() => createUserWithEmailAndPassword(auth, cleanEmail, opts?.password || ""));
         await setAuthDisplayName(cred.user, name);
         try {
           await sendAccountVerificationEmail(cred.user);

@@ -629,8 +629,9 @@ service cloud.firestore {
       allow create: if signedIn()
         && !isAnonymous()
         && request.resource.data.blockerUid == request.auth.uid;
-      allow get, update, delete: if signedIn() && resource.data.blockerUid == request.auth.uid;
-      allow list: if false;
+      allow get: if signedIn() && (resource.data.blockerUid == request.auth.uid || platformAdmin());
+      allow list: if signedIn() && platformAdmin();
+      allow update, delete: if signedIn() && resource.data.blockerUid == request.auth.uid;
     }
 
     // AirPal Mate requests: owner + assigned mate; approved Mates can read open ones and accept.

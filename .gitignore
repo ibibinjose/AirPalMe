@@ -129,3 +129,7 @@ client/public/__manus__/version.json
 *.pem
 *serviceAccount*.json
 *-firebase-adminsdk*.json
+*.jks
+*.keystore
+android/keystore.properties
+android/app/keystore.properties

@@ -22,6 +22,11 @@ if (typeof globalThis.localStorage === "undefined" || !globalThis.localStorage.c
 vi.mock("firebase/auth", () => {
   return {
     signInAnonymously: vi.fn(),
+    getAuth: vi.fn(),
+    initializeAuth: vi.fn(),
+    connectAuthEmulator: vi.fn(),
+    indexedDBLocalPersistence: {},
+    browserLocalPersistence: {},
   };
 });
 
@@ -33,7 +38,13 @@ vi.mock("./functions", () => {
 });
 
 import { signInAnonymously } from "firebase/auth";
-import { ensureAnonymousSession, resetAnonymousSessionStateForTesting, setFirebaseAuthForTesting } from "./firebase";
+import {
+  beginAuthUpgrade,
+  endAuthUpgrade,
+  ensureAnonymousSession,
+  resetAnonymousSessionStateForTesting,
+  setFirebaseAuthForTesting,
+} from "./firebase";
 import { flushAnalyticsQueue, track, setAnalyticsConsent } from "./analytics";
 import { recordAnalyticsBatchRemote } from "./functions";
 
@@ -107,6 +118,32 @@ describe("Firebase Anonymous Session & Analytics Queue", () => {
 
     const uid = await ensureAnonymousSession();
     expect(uid).toBe("restored-user-456");
+    expect(signInAnonymously).not.toHaveBeenCalled();
+  });
+
+  it("does not start an anonymous session while a real sign-in is in progress", async () => {
+    beginAuthUpgrade();
+    const uid = await ensureAnonymousSession();
+    endAuthUpgrade();
+    expect(uid).toBeNull();
+    expect(signInAnonymously).not.toHaveBeenCalled();
+  });
+
+  it("keeps a real account and skips signInAnonymously", async () => {
+    fakeAuth.currentUser = { uid: "email-user", isAnonymous: false };
+    const uid = await ensureAnonymousSession();
+    expect(uid).toBe("email-user");
+    expect(signInAnonymously).not.toHaveBeenCalled();
+  });
+
+  it("does not replace a real user if they sign in during authStateReady", async () => {
+    fakeAuth.authStateReady = vi.fn(async () => {
+      fakeAuth.currentUser = { uid: "email-user", isAnonymous: false };
+    });
+    vi.mocked(signInAnonymously).mockResolvedValue({ user: { uid: "anon-should-not-win" } } as any);
+
+    const uid = await ensureAnonymousSession();
+    expect(uid).toBe("email-user");
     expect(signInAnonymously).not.toHaveBeenCalled();
   });
 });

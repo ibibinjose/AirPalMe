@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useLocation } from "wouter";
 import { LogIn, UserPlus, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useScrollLock } from "@/hooks/useScrollLock";
@@ -18,6 +19,7 @@ function currentNext(): string {
  */
 export function SignInPrompt() {
   const { signInPrompt, dismissSignInPrompt } = useAuth();
+  const [, nav] = useLocation();
 
   useScrollLock(Boolean(signInPrompt));
 
@@ -37,7 +39,7 @@ export function SignInPrompt() {
   const next = encodeURIComponent(currentNext());
   const go = (tab: "signin" | "signup") => {
     dismissSignInPrompt();
-    window.location.assign(`/start?tab=${tab}&next=${next}`);
+    nav(`/start?tab=${tab}&next=${next}`);
   };
 
   return (
