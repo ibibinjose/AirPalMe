@@ -15,7 +15,9 @@ Last sealed: 21 September 2026. Product: AirPal.me — Life Made Easy. One marke
 4. For store/native, read `docs/store/README.md` and `docs/store/app-information.md`.
 5. Smallest change that solves the request. Do not rewrite the stack, restyle the app, or delete a shipped surface.
 
-Mobile keyboard: Capacitor `Keyboard.resize` is `none`. `src/lib/keyboard.ts` pads the page and scrolls the focused field above the keyboard. Do not switch back to `resize: body` without re-testing iOS/Android forms.
+Mobile keyboard: Capacitor `Keyboard.resize` is `none`. `src/lib/keyboard.ts` locks `#root` to the visual viewport and scrolls the focused field above the keyboard. Do not switch back to `resize: body` without re-testing iOS/Android forms.
+
+iOS Xcode: 0 errors is shippable. Two yellow deprecations in `@capacitor-firebase/authentication` (`fetchSignInMethods`, native `updateEmail`) are upstream; AirPal does not call them. Do not patch the plugin to silence them. Notes: `docs/store/ios-compiler-warnings.md`.
 
 ---
 

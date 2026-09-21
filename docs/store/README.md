@@ -2,7 +2,7 @@
 
 App: **AirPal** · ID `me.airpal.app` · version **2.0.0** (iOS build **12**, Android versionCode 6)
 
-TestFlight: use **2.0.0 (12)**, not 1.0. Steps: `docs/store/testflight.md`.
+TestFlight: use **2.0.0**, not 1.0. Steps: `docs/store/testflight.md`. Xcode yellows: `docs/store/ios-compiler-warnings.md`.
 
 Pack 21 Sep 2026 (rebuild): iOS **2.0.0 (12)** IPA `ios/App/build/export/AirPal.Me.ipa`. Android **versionCode 6** AAB `android/app/build/outputs/bundle/release/app-release.aab`. App Information paste: `docs/store/app-information.md`.
 
