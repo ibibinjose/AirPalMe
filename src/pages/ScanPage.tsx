@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import jsQR from "jsqr";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
-import { Camera, Image as ImageIcon, QrCode, Sparkles, Upload } from "lucide-react";
+import { Image as ImageIcon, Upload } from "lucide-react";
 import { decodeQrFromImageFile, parseQrPayload, pathForIntent } from "@/lib/qr";
 import { useStay } from "@/contexts/StayContext";
 import { useLocale } from "@/contexts/LocaleContext";

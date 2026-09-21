@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { nanoid } from "nanoid";
 import {
   ArrowLeft,
-  Briefcase,
   Check,
   Clock,
   Copy,
@@ -21,9 +20,7 @@ import {
   QrCode,
   Share2,
   Sparkles,
-  Tag,
   Trash2,
-  UserPlus,
   X,
 } from "lucide-react";
 import {
@@ -39,7 +36,6 @@ import {
   type BioCatalogKind,
   type BioLink,
   type BioLinkType,
-  type BioProfile,
 } from "@shared/bio";
 import { Button } from "@/components/ui/Button";
 import { BioCatalogEditor } from "@/components/bio/BioCatalogEditor";
@@ -312,31 +308,6 @@ export function BioEditPage() {
     await updateProfile({ handle: mine!.handle, products: nextProducts, services: nextServices, deals: nextDeals });
     toast.success("Catalog saved");
   }
-
-  // Simulated live profile preview object
-  const livePreviewProfile: BioProfile = {
-    ...mine,
-    name: name || mine.name,
-    shortWhy: shortWhy || mine.shortWhy,
-    aboutText: aboutText || mine.aboutText,
-    categoryTag: categoryTag || mine.categoryTag,
-    pronouns: pronouns || mine.pronouns,
-    languages: languages || mine.languages,
-    primaryCta: primaryCta || mine.primaryCta,
-    city: city || mine.city,
-    hours: hours || mine.hours,
-    openNow,
-    availabilityStatus,
-    customStatus,
-    customStatusEmoji,
-    phone,
-    avatar: avatar || mine.avatar,
-    cover: cover || mine.cover,
-    links,
-    products,
-    services,
-    deals,
-  };
 
   const statusInfo = AVAILABILITY_STATUSES[availabilityStatus] || AVAILABILITY_STATUSES.available;
 

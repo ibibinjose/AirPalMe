@@ -22,7 +22,7 @@ import {
 import type { BioCatalogItem } from "@shared/bio";
 import { BUSINESS_CATEGORIES } from "@shared/business";
 import { FollowButton, LikeButton } from "@/components/social/SocialButtons";
-import { downloadVCard, shareOrDownloadVCard, upsertPerson } from "@/lib/people";
+import { shareOrDownloadVCard, upsertPerson } from "@/lib/people";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { BioHandleButton } from "@/components/bio/BioHandleButton";
 import { BioSocials } from "@/components/bio/BioSocials";
