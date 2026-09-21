@@ -445,20 +445,13 @@ export function BioPublicPage() {
                 {bio.categoryTag}
               </span>
             )}
-          </div>
 
-          <p className="mt-0.5 text-xs font-medium text-mute">
-            @{bio.handle}
-            {bio.pronouns && ` · ${bio.pronouns}`}
-          </p>
-
-          {/* WhatsApp / Availability Status Pill */}
-          <div className="mt-2.5 flex flex-wrap items-center gap-2">
+            {/* Availability / Custom Status Pill inline next to Name & Actions */}
             <button
               type="button"
               onClick={() => isOwner && setStatusModalOpen(true)}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border transition-all",
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border transition-all shadow-2xs",
                 statusInfo.badgeBg,
                 statusInfo.textColor,
                 isOwner ? "cursor-pointer hover:brightness-95 active:scale-95" : "cursor-default",
@@ -469,7 +462,7 @@ export function BioPublicPage() {
               {bio.customStatus && (
                 <>
                   <span className="opacity-40">·</span>
-                  <span className="font-normal text-ink/90 truncate max-w-[220px]">
+                  <span className="font-normal text-ink/90 truncate max-w-[300px]">
                     {bio.customStatusEmoji && `${bio.customStatusEmoji} `}
                     {bio.customStatus}
                   </span>
@@ -480,6 +473,11 @@ export function BioPublicPage() {
 
             {bio.hours && <span className="text-xs text-mute font-medium">· {bio.hours}</span>}
           </div>
+
+          <p className="mt-1 text-xs font-medium text-mute">
+            @{bio.handle}
+            {bio.pronouns && ` · ${bio.pronouns}`}
+          </p>
 
           {(bio.city || bio.category || bio.languages) && (
             <p className="mt-2 inline-flex flex-wrap items-center gap-1.5 text-xs font-medium text-mute">
