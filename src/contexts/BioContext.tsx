@@ -5,14 +5,13 @@ import { getFirebaseAuth } from "@/lib/firebase";
 import {
   liveBackendEnabled,
   checkHandleAvailableRemote,
-  createBusinessProfileRemote,
   recordBioTapRemote,
   setBioOfferRemote,
   transferHandleRemote,
-  updateBusinessProfileRemote,
 } from "@/lib/functions";
 import { useAuth } from "@/contexts/AuthContext";
-import { bumpTap, loadBios, persistBios, subscribeBios, tapCount } from "@/lib/bio-store";
+import { persistOwnedProfile } from "@/lib/bio-persist";
+import { bumpTap, hydrateOwnedBios, loadBios, persistBios, subscribeBios, tapCount } from "@/lib/bio-store";
 import { syncBioToListing } from "@/lib/identity";
 import { placeByHandle } from "@/lib/catalog";
 import { stallByHandle } from "@/lib/bio-handle";
@@ -34,6 +33,8 @@ type BioValue = {
   profiles: BioProfile[];
   mine: BioProfile | null;
   business: BioProfile | null;
+  /** False while signed-in profiles are loading from the account. */
+  biosReady: boolean;
   byHandle: (handle: string) => BioProfile | undefined;
   handleFree: (handle: string, exceptId?: string) => Promise<{ ok: boolean; reason?: string }>;
   createProfile: (input: CreateBioInput) => Promise<BioProfile>;
@@ -49,6 +50,7 @@ const BioContext = createContext<BioValue | undefined>(undefined);
 export function BioProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [profiles, setProfiles] = useState<BioProfile[]>(() => (typeof window === "undefined" ? [] : loadBios()));
+  const [biosReady, setBiosReady] = useState(!user);
 
   const refresh = useCallback(() => setProfiles(loadBios()), []);
 
@@ -56,6 +58,41 @@ export function BioProvider({ children }: { children: ReactNode }) {
     refresh();
     return subscribeBios(refresh);
   }, [refresh]);
+
+  useEffect(() => {
+    if (!user) {
+      setBiosReady(true);
+      return;
+    }
+    if (!liveBackendEnabled()) {
+      setBiosReady(true);
+      return;
+    }
+    let cancelled = false;
+    setBiosReady(false);
+    void (async () => {
+      try {
+        const { rows } = await hydrateOwnedBios(user.uid);
+        if (cancelled) return;
+        refresh();
+        const mineRows = rows.filter((row) => row.ownerUid === user.uid && row.handle);
+        for (const row of mineRows) {
+          try {
+            await persistOwnedProfile(row);
+          } catch {
+            /* stay on device; next save retries */
+          }
+        }
+        if (cancelled) return;
+        refresh();
+      } finally {
+        if (!cancelled) setBiosReady(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [refresh, user?.uid]);
 
   const owned = useMemo(() => {
     if (!user) return profiles.filter((p) => p.ownerEmail || p.ownerUid || p.id.startsWith("bio-"));
@@ -166,24 +203,7 @@ export function BioProvider({ children }: { children: ReactNode }) {
       ]);
       if (kind === "business") syncBioToListing(profile);
       refresh();
-      if (liveBackendEnabled() && getFirebaseAuth()?.currentUser) {
-        try {
-          const res = await createBusinessProfileRemote({
-            handle: h,
-            name: profile.name,
-            city: profile.city,
-            category: profile.category,
-            shortWhy: profile.shortWhy,
-            placeId: profile.placeId,
-            listingId: profile.listingId,
-          });
-          profile.id = res.profileId;
-          persistBios([profile, ...loadBios().filter((p) => p.handle !== h && p.id !== profile.id)]);
-          refresh();
-        } catch {
-          /* local profile is enough for demo */
-        }
-      }
+      await persistOwnedProfile(profile);
       return profile;
     },
     [business, mine, refresh, user],
@@ -201,31 +221,7 @@ export function BioProvider({ children }: { children: ReactNode }) {
       persistBios([next, ...loadBios().filter((p) => p.handle !== next.handle)]);
       if ((next.kind || "business") === "business") syncBioToListing(next);
       refresh();
-      if (liveBackendEnabled() && getFirebaseAuth()?.currentUser) {
-        try {
-          await updateBusinessProfileRemote({
-            handle: next.handle,
-            name: next.name,
-            shortWhy: next.shortWhy,
-            city: next.city,
-            category: next.category,
-            hours: next.hours,
-            openNow: next.openNow,
-            phone: next.phone,
-            avatar: next.avatar,
-            cover: next.cover,
-            links: next.links,
-            products: next.products,
-            services: next.services,
-            deals: next.deals,
-            mapsPlaceId: next.mapsPlaceId,
-            listingId: next.listingId,
-            placeId: next.placeId,
-          });
-        } catch {
-          /* local save already applied */
-        }
-      }
+      await persistOwnedProfile(next);
     },
     [refresh],
   );
@@ -285,6 +281,7 @@ export function BioProvider({ children }: { children: ReactNode }) {
       profiles,
       mine,
       business,
+      biosReady,
       byHandle,
       tapsToday,
       recordTap,
@@ -295,6 +292,7 @@ export function BioProvider({ children }: { children: ReactNode }) {
       transferHandle,
     }),
     [
+      biosReady,
       business,
       byHandle,
       createProfile,

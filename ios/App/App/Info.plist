@@ -73,7 +73,9 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>AirPal may save a photo you crop for your profile, plan, or listing.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>AirPal uses your location while the app is open to show places, plans, and events near you — not your home address. You can pick a city instead.</string>
+	<string>AirPal uses your location while the app is open to show places, plans, and events near you — not your home address. You can pick a city instead. AirPal does not track your location in the background.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>AirPal uses your location while the app is open to show places, plans, and events near you — not your home address. You can pick a city instead. AirPal does not track your location in the background.</string>
 	<key>NFCReaderUsageDescription</key>
 	<string>AirPal can read or write an AirPal Wave tag so a nearby AirPal can greet you. NFC is optional.</string>
 	<key>GIDClientID</key>

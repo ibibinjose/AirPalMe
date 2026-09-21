@@ -190,6 +190,7 @@ export function createBusinessProfileRemote(data: {
   shortWhy: string;
   placeId?: string;
   listingId?: string;
+  kind?: "person" | "business";
 }) {
   return callFunction<typeof data, { profileId: string; handle: string }>(CALLABLES.createBusinessProfile, data);
 }
@@ -236,6 +237,17 @@ export function updateBusinessProfileRemote(data: {
     badge?: string;
     href?: string;
   }>;
+  kind?: "person" | "business";
+  aboutText?: string;
+  pronouns?: string;
+  languages?: string;
+  categoryTag?: string;
+  primaryCta?: string;
+  availabilityStatus?: string;
+  customStatus?: string;
+  customStatusEmoji?: string;
+  geo?: { lat: number; lng: number };
+  zooHunt?: boolean;
 }) {
   return callFunction<typeof data, { ok: true }>(CALLABLES.updateBusinessProfile, data);
 }

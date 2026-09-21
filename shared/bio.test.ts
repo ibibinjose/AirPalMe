@@ -19,6 +19,7 @@ import {
   randomHexHandle,
   resolveStatusPicks,
   sanitizeBioHref,
+  sanitizeBioLinks,
   sanitizeCatalog,
   socialLinks,
   stackLinks,
@@ -132,6 +133,18 @@ describe("bio href allowlist", () => {
     expect(rows[0]?.href).toBe("https://thecut.bar");
     expect(rows[1]?.href).toBeUndefined();
     expect(sanitizeBioHref("data:text/html,x")).toBeUndefined();
+  });
+
+  it("keeps Instagram, Facebook, X, and website links", () => {
+    const rows = sanitizeBioLinks([
+      { id: "1", type: "instagram", label: "Instagram", href: "https://instagram.com/maya" },
+      { id: "2", type: "facebook", label: "Facebook", href: "https://facebook.com/maya" },
+      { id: "3", type: "x", label: "X", href: "https://x.com/maya" },
+      { id: "4", type: "website", label: "Site", href: "https://maya.example" },
+      { id: "5", type: "instagram", label: "Bad", href: "javascript:alert(1)" },
+    ]);
+    expect(rows.map((row) => row.type)).toEqual(["instagram", "facebook", "x", "website"]);
+    expect(rows).toHaveLength(4);
   });
 });
 

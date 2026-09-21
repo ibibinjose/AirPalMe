@@ -57,6 +57,34 @@ export const completeAccountSignup = onCall(CALLABLE, async (request) => {
     uid,
     updatedAt: FieldValue.serverTimestamp(),
   });
+  const existingHandle = await db.collection("handles").doc(handle).get();
+  if (!existingHandle.exists || String(existingHandle.data()?.ownerUid) === uid) {
+    const owned = await db.collection("profiles").where("ownerUid", "==", uid).get();
+    const person = owned.docs.find((row) => String(row.data()?.kind || "person") === "person");
+    const profileId = existingHandle.exists
+      ? String(existingHandle.data()?.profileId)
+      : person?.id || `bio-${uid.slice(0, 8)}`;
+    await db.collection("handles").doc(handle).set({ handle, profileId, ownerUid: uid }, { merge: true });
+    await db
+      .collection("profiles")
+      .doc(profileId)
+      .set(
+        {
+          id: profileId,
+          handle,
+          kind: "person",
+          ownerUid: uid,
+          name,
+          shortWhy: "On AirPal",
+          city: "Sydney",
+          category: "services",
+          hours: "",
+          openNow: true,
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
+  }
   return { ok: true as const, phone };
 });
 

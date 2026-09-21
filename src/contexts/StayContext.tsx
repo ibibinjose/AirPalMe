@@ -25,6 +25,7 @@ export type StaySession = {
   checkInAt?: string;
 };
 
+/** Guest Stay scan session — this browser only. Account bios live in Firestore. */
 const KEY = "airpal.stay";
 
 function readSession(): StaySession {

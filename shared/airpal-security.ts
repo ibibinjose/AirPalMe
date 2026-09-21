@@ -326,6 +326,7 @@ export type CreateBusinessProfileRequest = {
   shortWhy: string;
   placeId?: string;
   listingId?: string;
+  kind?: "person" | "business";
 };
 export type UpdateBusinessProfileRequest = {
   handle: string;
@@ -341,6 +342,17 @@ export type UpdateBusinessProfileRequest = {
   mapsPlaceId?: string;
   listingId?: string;
   placeId?: string;
+  kind?: "person" | "business";
+  aboutText?: string;
+  pronouns?: string;
+  languages?: string;
+  categoryTag?: string;
+  primaryCta?: string;
+  availabilityStatus?: string;
+  customStatus?: string;
+  customStatusEmoji?: string;
+  geo?: { lat: number; lng: number };
+  zooHunt?: boolean;
   links?: Array<{ id: string; type: string; label: string; href: string }>;
   products?: Array<{
     id: string;

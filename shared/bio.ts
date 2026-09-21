@@ -446,6 +446,33 @@ export function sanitizeBioHref(raw: unknown): string | undefined {
   return href && isSafeBioHref(href) ? href : undefined;
 }
 
+const BIO_LINK_TYPE_SET = new Set<string>(BIO_LINK_TYPES.map((t) => t.id));
+const BIO_LINKS_MAX = 24;
+
+/** Instagram, Facebook, X, websites, WhatsApp, and the rest of the bio link row. */
+export function sanitizeBioLinks(rows: unknown): BioLink[] {
+  if (!Array.isArray(rows)) return [];
+  const out: BioLink[] = [];
+  for (const row of rows) {
+    if (!row || typeof row !== "object") continue;
+    const r = row as Record<string, unknown>;
+    const type = String(r.type || "");
+    if (!BIO_LINK_TYPE_SET.has(type)) continue;
+    const href = sanitizeBioHref(r.href);
+    if (!href) continue;
+    out.push({
+      id: String(r.id || `l-${out.length}`).slice(0, 32),
+      type: type as BioLinkType,
+      label: String(r.label || type)
+        .trim()
+        .slice(0, 40),
+      href,
+    });
+    if (out.length >= BIO_LINKS_MAX) break;
+  }
+  return out;
+}
+
 export function sanitizeCatalog(kind: BioCatalogKind, rows: unknown): BioCatalogItem[] {
   if (!Array.isArray(rows)) return [];
   const out: BioCatalogItem[] = [];

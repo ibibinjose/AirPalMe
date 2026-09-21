@@ -61,7 +61,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 export function MePage() {
   const [, nav] = useLocation();
   const { user, logout, sendVerificationEmail } = useAuth();
-  const { mine, business, updateProfile } = useBio();
+  const { mine, business, biosReady, updateProfile } = useBio();
   const { savedEvents, savedStalls, getEvent, stalls, calendarEvents } = useEvents();
   const { memberByEmail } = useClub();
   const { state: zoo } = useZoo();
@@ -111,15 +111,22 @@ export function MePage() {
                 cornerBadge={mine ? <BioKindIcon kind={mine.kind} /> : undefined}
               />
               <h1 className="font-display mt-4 text-3xl font-bold tracking-tight text-ink">{user.displayName || mine?.name || "Account"}</h1>
-              <p className="mt-1 text-sm font-medium text-mute">{mine ? `@${mine.handle}` : "No @handle yet"}</p>
+              <p className="mt-1 text-sm font-medium text-mute">
+                {mine ? `@${mine.handle}` : biosReady ? "No @handle yet" : "Loading your profile…"}
+              </p>
               {mine && (
                 <div className="mt-2">
                   <BioKindBadge kind={mine.kind} />
                 </div>
               )}
               <div className="mt-4 flex flex-wrap justify-center gap-2">
-                <Button size="sm" className="rounded-full font-semibold" onClick={() => nav(mine ? "/bio/edit" : "/bio/setup")}>
-                  {mine ? "Edit profile" : "Choose @handle"}
+                <Button
+                  size="sm"
+                  className="rounded-full font-semibold"
+                  disabled={!mine && !biosReady}
+                  onClick={() => nav(mine ? "/bio/edit" : "/bio/setup")}
+                >
+                  {mine ? "Edit profile" : biosReady ? "Choose @handle" : "Loading…"}
                 </Button>
                 {mine && (
                   <Button size="sm" variant="ghost" className="rounded-full border border-line" onClick={() => nav(bioPath(mine.handle))}>
@@ -145,7 +152,7 @@ export function MePage() {
           <section className="mt-6 rounded-3xl border border-line bg-card p-5">
             <h2 className="font-display text-lg font-bold text-ink">Invite friends</h2>
             <div className="mt-3">
-              <InvitePanel handle={mine?.handle} />
+              <InvitePanel handle={mine?.handle} loading={!biosReady} />
             </div>
           </section>
         </div>

@@ -49,7 +49,10 @@ export function syncListingToBio(listing: {
   geo?: { lat: number; lng: number };
 }) {
   const bios = loadBios();
-  const bio = bios.find((row) => row.listingId === listing.id || (listing.handle && row.handle === listing.handle));
+  const bio = bios.find((row) => {
+    if (row.kind === "person") return false;
+    return row.listingId === listing.id || Boolean(listing.handle && row.handle === listing.handle);
+  });
   if (!bio) return;
   persistBios([
     {

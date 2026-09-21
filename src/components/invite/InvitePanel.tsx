@@ -8,7 +8,7 @@ import { fetchInviteOverview, inviteLinkFor, type InviteOverview } from "@/lib/a
 import { shareContent } from "@/lib/share";
 
 /** Send invites to join AirPal, and see who invited you + who joined with your code. */
-export function InvitePanel({ handle }: { handle?: string }) {
+export function InvitePanel({ handle, loading }: { handle?: string; loading?: boolean }) {
   const [, nav] = useLocation();
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
@@ -31,10 +31,14 @@ export function InvitePanel({ handle }: { handle?: string }) {
     return (
       <div className="rounded-[28px] ring-1 ring-line bg-card p-5 text-center">
         <p className="font-display text-lg font-semibold">Invite friends to AirPal</p>
-        <p className="mt-1 text-sm text-mute">Claim your @handle first — it becomes your invite code.</p>
-        <Button className="mt-4" onClick={() => nav("/bio/setup")}>
-          Claim @handle
-        </Button>
+        <p className="mt-1 text-sm text-mute">
+          {loading ? "Loading your @handle…" : "Claim your @handle first — it becomes your invite code."}
+        </p>
+        {!loading && (
+          <Button className="mt-4" onClick={() => nav("/bio/setup")}>
+            Claim @handle
+          </Button>
+        )}
       </div>
     );
   }

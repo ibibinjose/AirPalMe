@@ -115,7 +115,7 @@ export function StartPage() {
     requestPasswordReset,
     logout,
   } = useAuth();
-  const { mine, business } = useBio();
+  const { mine, business, biosReady } = useBio();
   const [pendingGo, setPendingGo] = useState(false);
 
   // Mode resolution
@@ -421,8 +421,18 @@ export function StartPage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold text-left">
               Quick Navigation
             </p>
-            <Button className="w-full justify-between" onClick={() => nav(mine ? "/bio/edit" : "/bio/setup")}>
-              <span>{mine ? `Edit profile (@${mine.handle})` : "Set up your public @handle"}</span>
+            <Button
+              className="w-full justify-between"
+              disabled={!mine && !biosReady}
+              onClick={() => nav(mine ? "/bio/edit" : "/bio/setup")}
+            >
+              <span>
+                {mine
+                  ? `Edit profile (@${mine.handle})`
+                  : biosReady
+                    ? "Set up your public @handle"
+                    : "Loading your @handle…"}
+              </span>
               <User size={16} />
             </Button>
             <Button variant="ghost" className="w-full justify-between" onClick={() => nav("/host")}>

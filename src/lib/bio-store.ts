@@ -1,9 +1,11 @@
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import {
+  AVAILABILITY_STATUSES,
   BIO_LINK_TYPES,
   isSafeBioHref,
   normalizeHandle,
   sanitizeCatalog,
+  type AvailabilityStatus,
   type BioKind,
   type BioLink,
   type BioLinkType,
@@ -128,7 +130,93 @@ export function profileFromDoc(id: string, data: Record<string, unknown>): BioPr
     registrationNumber: data.registrationNumber ? String(data.registrationNumber) : undefined,
     domain: data.domain ? String(data.domain) : undefined,
     trademark: data.trademark ? String(data.trademark) : undefined,
+    aboutText: data.aboutText ? String(data.aboutText) : undefined,
+    pronouns: data.pronouns ? String(data.pronouns) : undefined,
+    languages: data.languages ? String(data.languages) : undefined,
+    categoryTag: data.categoryTag ? String(data.categoryTag) : undefined,
+    primaryCta: data.primaryCta ? String(data.primaryCta) : undefined,
+    availabilityStatus:
+      typeof data.availabilityStatus === "string" && data.availabilityStatus in AVAILABILITY_STATUSES
+        ? (data.availabilityStatus as AvailabilityStatus)
+        : undefined,
+    customStatus: data.customStatus ? String(data.customStatus) : undefined,
+    customStatusEmoji: data.customStatusEmoji ? String(data.customStatusEmoji) : undefined,
+    zooHunt: data.zooHunt === true ? true : undefined,
   };
+}
+
+/** Remote profiles for this account are restored; unsynced local handles for the same uid are kept. */
+export function mergeOwnedBios(local: BioProfile[], remote: BioProfile[], uid: string): BioProfile[] {
+  const merged = new Map<string, BioProfile>();
+  for (const row of remote) {
+    if (!row.handle) continue;
+    merged.set(row.handle, { ...row, ownerUid: row.ownerUid || uid });
+  }
+  for (const row of local) {
+    if (!row.handle) continue;
+    const remoteRow = merged.get(row.handle);
+    if (remoteRow) {
+      if (row.ownerUid && row.ownerUid !== uid) continue;
+      merged.set(row.handle, { ...remoteRow, ...row, ownerUid: uid, id: remoteRow.id || row.id });
+      continue;
+    }
+    merged.set(row.handle, row);
+  }
+  return Array.from(merged.values());
+}
+
+export async function fetchOwnedBios(uid: string): Promise<{ rows: BioProfile[]; needsBackfill: boolean }> {
+  const db = getFirebaseDb();
+  if (!db || !uid) return { rows: [], needsBackfill: false };
+  try {
+    const snap = await getDocs(query(collection(db, "profiles"), where("ownerUid", "==", uid)));
+    if (!snap.empty) {
+      return {
+        rows: snap.docs.map((row) => profileFromDoc(row.id, row.data() as Record<string, unknown>)),
+        needsBackfill: false,
+      };
+    }
+  } catch {
+    /* query may fail without an index; fall through to users.handle */
+  }
+  const userSnap = await getDoc(doc(db, "users", uid));
+  if (!userSnap.exists()) return { rows: [], needsBackfill: false };
+  const handle = normalizeHandle(String(userSnap.data()?.handle || ""));
+  if (!handle) return { rows: [], needsBackfill: false };
+  const pub = await fetchPublicBio(handle);
+  if (pub && (!pub.ownerUid || pub.ownerUid === uid)) {
+    return { rows: [{ ...pub, ownerUid: uid, kind: pub.kind || "person" }], needsBackfill: false };
+  }
+  if (pub) return { rows: [], needsBackfill: false };
+  const name = String(userSnap.data()?.displayName || handle);
+  return {
+    rows: [
+      {
+        id: `bio-${uid.slice(0, 8)}`,
+        handle,
+        kind: "person",
+        ownerUid: uid,
+        name,
+        shortWhy: "On AirPal",
+        city: "Sydney",
+        category: "services",
+        hours: "",
+        openNow: true,
+        products: [],
+        services: [],
+        deals: [],
+        links: [],
+      },
+    ],
+    needsBackfill: true,
+  };
+}
+
+export async function hydrateOwnedBios(uid: string): Promise<{ rows: BioProfile[]; needsBackfill: boolean }> {
+  const fetched = await fetchOwnedBios(uid);
+  const merged = mergeOwnedBios(loadBios(), fetched.rows, uid);
+  persistBios(merged);
+  return { rows: merged, needsBackfill: fetched.needsBackfill };
 }
 
 export async function fetchPublicBio(handle: string): Promise<BioProfile | null> {

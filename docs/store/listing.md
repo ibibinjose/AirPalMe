@@ -5,7 +5,9 @@ Support: AirPalMe@gmail.com · Privacy: https://airpal.me/privacy · Terms: http
 
 ## App name
 
-AirPal
+App Store Connect (≤30): `AirPal.Me`  
+Play Console (≤50): `AirPal`  
+Home screen: `AirPal`
 
 ## Subtitle (App Store, ≤30 chars)
 

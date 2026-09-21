@@ -54,4 +54,36 @@ test.describe("Join & business profile", () => {
     await page.waitForLoadState("domcontentloaded");
     await expect(page.getByRole("heading", { name: /Add 3 things/i })).toBeVisible();
   });
+
+  test("personal bio edit does not import a Google listing", async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        "airpal.bios.v1",
+        JSON.stringify([
+          {
+            id: "bio-maya",
+            handle: "maya",
+            kind: "person",
+            name: "Maya",
+            shortWhy: "On AirPal",
+            city: "Sydney",
+            category: "services",
+            hours: "",
+            openNow: true,
+            products: [],
+            services: [],
+            deals: [],
+            links: [],
+          },
+        ]),
+      );
+    });
+    await page.goto("/bio/edit");
+    await page.waitForLoadState("domcontentloaded");
+    await expect(page.getByText("Personal Profile")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Import or sync the listing/i })).toHaveCount(0);
+    await expect(page.getByTestId("personal-listing-hint")).toBeVisible();
+    await expect(page.getByRole("button", { name: /Register the business/i })).toBeVisible();
+  });
 });
+

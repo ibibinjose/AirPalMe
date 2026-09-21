@@ -80,7 +80,7 @@ function Row({
 export function ProfileMenu() {
   const [, nav] = useLocation();
   const { user, isAdmin, isHost, logout } = useAuth();
-  const { mine, business } = useBio();
+  const { mine, business, biosReady } = useBio();
   const { memberByEmail } = useClub();
   const { myEvent } = useEvents();
   const [open, setOpen] = useState(false);
@@ -221,13 +221,15 @@ export function ProfileMenu() {
           hint="Your public bio — share to network"
           onClick={() => go(`/@${mine.handle}`)}
         />
-      ) : (
+      ) : biosReady ? (
         <Row
           icon={Sparkles}
           label="Claim @handle"
           hint="So your Circle can find you"
           onClick={() => go("/bio/setup")}
         />
+      ) : (
+        <Row icon={Sparkles} label="Your @handle" hint="Loading your profile…" onClick={() => go("/me")} />
       )}
       {mine && (
         <Row icon={PencilLine} label="Edit bio" hint="Profile, links, shop, share" onClick={() => go("/bio/edit")} />
@@ -252,7 +254,12 @@ export function ProfileMenu() {
       {business ? (
         <>
           <Row icon={Store} label="Your place" hint={`AirPal.Me/@${business.handle}`} onClick={() => go("/business")} />
-          <Row icon={PencilLine} label="Edit profile" hint="Logo, links, offers" onClick={() => go("/bio/edit")} />
+          <Row
+            icon={PencilLine}
+            label="Edit place"
+            hint="Listing, hours, Google import"
+            onClick={() => go("/business")}
+          />
         </>
       ) : (
         <Row

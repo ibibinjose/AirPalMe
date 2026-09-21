@@ -29,6 +29,7 @@ import {
   bioPath,
   catalogDeals,
   handleError,
+  isBusinessKind,
   isSocialLinkType,
   normalizeHandle,
   type AvailabilityStatus,
@@ -46,7 +47,7 @@ import { cn } from "@/lib/cn";
 import { PhoneField } from "@/components/forms/PhoneField";
 import { isValidPhone } from "@shared/geo-address";
 import { fieldInput } from "@/components/forms/ValidField";
-import { GooglePlaceImportCard } from "@/components/business/GooglePlaceImport";
+import { GooglePlaceImportCard, PersonalProfileListingHint } from "@/components/business/GooglePlaceImport";
 import { bioLinksFromGooglePlace, mergeBioLinks } from "@shared/google-place";
 import { Photo } from "@/components/ui/Photo";
 import { BioHandleButton } from "@/components/bio/BioHandleButton";
@@ -264,31 +265,39 @@ export function BioEditPage() {
       toast.error("Phone needs a country code (e.g. +61 400 123 456)");
       return;
     }
-    await updateProfile({
-      handle: mine!.handle,
-      name,
-      shortWhy,
-      aboutText,
-      categoryTag,
-      pronouns,
-      languages,
-      primaryCta,
-      city,
-      hours,
-      openNow,
-      availabilityStatus,
-      customStatus: customStatus.trim() || undefined,
-      customStatusEmoji: customStatusEmoji.trim() || undefined,
-      phone,
-      avatar: avatar.trim() || undefined,
-      cover: cover.trim() || undefined,
-      mapsPlaceId: mapsPlaceId.trim() || undefined,
-      zooHunt,
-    });
-    if (business && business.handle !== mine!.handle) {
-      await updateProfile({ handle: business.handle, zooHunt });
+    try {
+      await updateProfile({
+        handle: mine!.handle,
+        name,
+        shortWhy,
+        aboutText,
+        categoryTag,
+        pronouns,
+        languages,
+        primaryCta,
+        city,
+        hours,
+        openNow,
+        availabilityStatus,
+        customStatus: customStatus.trim() || undefined,
+        customStatusEmoji: customStatusEmoji.trim() || undefined,
+        phone,
+        avatar: avatar.trim() || undefined,
+        cover: cover.trim() || undefined,
+        mapsPlaceId: mapsPlaceId.trim() || undefined,
+        zooHunt,
+        links,
+        products,
+        services,
+        deals,
+      });
+      if (business && business.handle !== mine!.handle) {
+        await updateProfile({ handle: business.handle, zooHunt });
+      }
+      toast.success("Saved to your AirPal account");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save to your account. Try again.");
     }
-    toast.success("Profile saved");
   }
 
   async function onStoredPhoto(kind: "avatar" | "cover", src?: string) {
@@ -799,22 +808,29 @@ export function BioEditPage() {
                 </div>
               </div>
 
-              <GooglePlaceImportCard
-                importedPlaceId={mapsPlaceId}
-                onImport={(place) => {
-                  setName(place.name);
-                  setCity(place.city || city);
-                  setHours(place.hours || hours);
-                  setPhone(place.phone || phone);
-                  setMapsPlaceId(place.placeId);
-                  if (place.photoNames[0]) setCover(place.photoNames[0]);
-                  if (place.photoNames[1] || place.photoNames[0])
-                    setAvatar(place.photoNames[1] || place.photoNames[0] || "");
-                  if (place.shortWhy && shortWhy.length < 10) setShortWhy(place.shortWhy);
-                  setLinks((prev) => mergeBioLinks(prev, bioLinksFromGooglePlace(place)));
-                  toast.success("Imported from Google — save to keep changes");
-                }}
-              />
+              {isBusinessKind(mine.kind) ? (
+                <GooglePlaceImportCard
+                  importedPlaceId={mapsPlaceId}
+                  onImport={(place) => {
+                    setName(place.name);
+                    setCity(place.city || city);
+                    setHours(place.hours || hours);
+                    setPhone(place.phone || phone);
+                    setMapsPlaceId(place.placeId);
+                    if (place.photoNames[0]) setCover(place.photoNames[0]);
+                    if (place.photoNames[1] || place.photoNames[0])
+                      setAvatar(place.photoNames[1] || place.photoNames[0] || "");
+                    if (place.shortWhy && shortWhy.length < 10) setShortWhy(place.shortWhy);
+                    setLinks((prev) => mergeBioLinks(prev, bioLinksFromGooglePlace(place)));
+                    toast.success("Imported from Google — save to keep changes");
+                  }}
+                />
+              ) : (
+                <PersonalProfileListingHint
+                  hasBusiness={Boolean(business)}
+                  onOpenBusiness={() => nav(business ? "/business" : "/business/onboard")}
+                />
+              )}
 
               <Button type="submit" className="h-12 w-full text-base font-semibold shadow-md gap-2">
                 <Check size={18} />
@@ -896,8 +912,11 @@ export function BioEditPage() {
                       ];
                       setLinks(next);
                       setHref("");
-                      void updateProfile({ handle: mine.handle, links: next });
-                      toast.success(`Added ${selectedLabel}`);
+                      void updateProfile({ handle: mine.handle, links: next })
+                        .then(() => toast.success(`Added ${selectedLabel}`))
+                        .catch((err) =>
+                          toast.error(err instanceof Error ? err.message : "Could not save that link to your account"),
+                        );
                     }}
                   >
                     <div className="flex items-center justify-between">
@@ -978,8 +997,11 @@ export function BioEditPage() {
                               onClick={() => {
                                 const next = links.filter((x) => x.id !== l.id);
                                 setLinks(next);
-                                void updateProfile({ handle: mine.handle, links: next });
-                                toast.success("Link removed");
+                                void updateProfile({ handle: mine.handle, links: next })
+                                  .then(() => toast.success("Link removed"))
+                                  .catch((err) =>
+                                    toast.error(err instanceof Error ? err.message : "Could not update your account"),
+                                  );
                               }}
                             >
                               <Trash2 size={16} />

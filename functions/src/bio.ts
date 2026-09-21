@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
-import { HANDLE_RE, handleError, normalizeHandle, sanitizeCatalog } from "../../shared/bio";
+import { HANDLE_RE, handleError, normalizeHandle, sanitizeBioLinks, sanitizeCatalog } from "../../shared/bio";
 import type {
   AccessClaims,
   CheckHandleAvailableRequest,
@@ -35,44 +35,48 @@ export const createBusinessProfile = onCall(CALLABLE, async (request) => {
   if (err) throw new HttpsError("invalid-argument", err);
   const name = String(data.name || "").trim();
   if (!name) throw new HttpsError("invalid-argument", "Name is required.");
+  const kind = data.kind === "business" ? "business" : "person";
   const existingHandle = await db.collection("handles").doc(handle).get();
   if (existingHandle.exists && String(existingHandle.data()?.ownerUid) !== uid) {
     throw new HttpsError("already-exists", "Taken");
   }
-  const owned = await db.collection("profiles").where("ownerUid", "==", uid).limit(1).get();
-  const profileId = existingHandle.exists
-    ? String(existingHandle.data()?.profileId)
-    : owned.empty
-      ? `bio-${randomBytes(4).toString("hex")}`
-      : owned.docs[0]!.id;
+  const owned = await db.collection("profiles").where("ownerUid", "==", uid).get();
+  const sameKind = owned.docs.find((row) => String(row.data()?.kind || "") === kind);
+  const legacySolo =
+    kind === "person" && owned.size === 1 && !owned.docs[0]?.data()?.kind ? owned.docs[0] : undefined;
+  const profileId =
+    existingHandle.exists && String(existingHandle.data()?.ownerUid) === uid
+      ? String(existingHandle.data()?.profileId)
+      : sameKind?.id || legacySolo?.id || `bio-${randomBytes(4).toString("hex")}`;
   const previous = await db.collection("handles").where("ownerUid", "==", uid).get();
-  const stale = previous.docs.filter((row) => row.id !== handle);
+  const stale = previous.docs.filter(
+    (row) => row.id !== handle && String(row.data()?.profileId || "") === profileId,
+  );
   await db.collection("handles").doc(handle).set({ handle, profileId, ownerUid: uid });
   await Promise.all(stale.map((row) => row.ref.delete()));
-  await db
-    .collection("profiles")
-    .doc(profileId)
-    .set(
-      {
-        id: profileId,
-        handle,
-        ownerUid: uid,
-        name,
-        shortWhy: String(data.shortWhy || "").trim(),
-        city: String(data.city || "Sydney").trim(),
-        category: String(data.category || "eat"),
-        hours: "See bio",
-        openNow: true,
-        placeId: data.placeId ? String(data.placeId) : null,
-        listingId: data.listingId ? String(data.listingId) : null,
-        links: [],
-        products: [],
-        services: [],
-        deals: [],
-        updatedAt: FieldValue.serverTimestamp(),
-      },
-      { merge: true },
-    );
+  const previousProfile = await db.collection("profiles").doc(profileId).get();
+  const payload: Record<string, unknown> = {
+    id: profileId,
+    handle,
+    kind,
+    ownerUid: uid,
+    name,
+    shortWhy: String(data.shortWhy || "").trim(),
+    city: String(data.city || "Sydney").trim(),
+    category: String(data.category || (kind === "person" ? "services" : "eat")),
+    updatedAt: FieldValue.serverTimestamp(),
+  };
+  if (data.placeId) payload.placeId = String(data.placeId);
+  if (data.listingId) payload.listingId = String(data.listingId);
+  if (!previousProfile.exists) {
+    payload.hours = kind === "person" ? "" : "See bio";
+    payload.openNow = true;
+    payload.links = [];
+    payload.products = [];
+    payload.services = [];
+    payload.deals = [];
+  }
+  await db.collection("profiles").doc(profileId).set(payload, { merge: true });
   return { profileId, handle };
 });
 
@@ -80,8 +84,34 @@ export const updateBusinessProfile = onCall(CALLABLE, async (request) => {
   const uid = requireAccount(request);
   const data = (request.data || {}) as UpdateBusinessProfileRequest;
   const handle = normalizeHandle(String(data.handle || ""));
-  const href = await db.collection("handles").doc(handle).get();
-  if (!href.exists) throw new HttpsError("not-found", "No handle.");
+  const err = handleError(handle);
+  if (err) throw new HttpsError("invalid-argument", err);
+  const kind = data.kind === "business" ? "business" : "person";
+  let href = await db.collection("handles").doc(handle).get();
+  if (!href.exists) {
+    const owned = await db.collection("profiles").where("ownerUid", "==", uid).get();
+    const sameKind = owned.docs.find((row) => String(row.data()?.kind || "") === kind);
+    const legacySolo =
+      kind === "person" && owned.size === 1 && !owned.docs[0]?.data()?.kind ? owned.docs[0] : undefined;
+    const profileIdNew = sameKind?.id || legacySolo?.id || `bio-${randomBytes(4).toString("hex")}`;
+    await db.collection("handles").doc(handle).set({ handle, profileId: profileIdNew, ownerUid: uid });
+    await db
+      .collection("profiles")
+      .doc(profileIdNew)
+      .set(
+        {
+          id: profileIdNew,
+          handle,
+          kind,
+          ownerUid: uid,
+          name: String(data.name || handle),
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
+    href = await db.collection("handles").doc(handle).get();
+  }
+  if (!href.exists) throw new HttpsError("internal", "Could not save handle.");
   if (String(href.data()?.ownerUid) !== uid) throw new HttpsError("permission-denied", "Not yours.");
   const profileId = String(href.data()?.profileId);
   const patch: Record<string, unknown> = { updatedAt: FieldValue.serverTimestamp() };
@@ -97,11 +127,22 @@ export const updateBusinessProfile = onCall(CALLABLE, async (request) => {
     "mapsPlaceId",
     "listingId",
     "placeId",
+    "kind",
+    "aboutText",
+    "pronouns",
+    "languages",
+    "categoryTag",
+    "primaryCta",
+    "availabilityStatus",
+    "customStatus",
+    "customStatusEmoji",
   ] as const) {
     if (data[key] !== undefined) patch[key] = data[key];
   }
   if (typeof data.openNow === "boolean") patch.openNow = data.openNow;
-  if (data.links) patch.links = data.links;
+  if (typeof data.zooHunt === "boolean") patch.zooHunt = data.zooHunt;
+  if (data.geo && Number.isFinite(data.geo.lat) && Number.isFinite(data.geo.lng)) patch.geo = data.geo;
+  if (data.links) patch.links = sanitizeBioLinks(data.links);
   if (data.products) patch.products = sanitizeCatalog("product", data.products);
   if (data.services) patch.services = sanitizeCatalog("service", data.services);
   if (data.deals) {

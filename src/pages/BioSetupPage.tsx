@@ -458,7 +458,7 @@ export function BioSetupPage() {
           className="mt-5 w-full text-center text-sm text-brand"
           onClick={() => nav("/bio/setup?kind=business")}
         >
-          Host a registered business
+          Register the business — Google listings live there
         </button>
       )}
     </div>

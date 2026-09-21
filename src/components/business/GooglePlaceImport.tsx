@@ -284,3 +284,26 @@ export function GooglePlaceImportCard({
     </div>
   );
 }
+
+/** Shown on a personal @handle so Google listings are not pasted onto the person. */
+export function PersonalProfileListingHint({
+  hasBusiness,
+  onOpenBusiness,
+}: {
+  hasBusiness: boolean;
+  onOpenBusiness: () => void;
+}) {
+  return (
+    <div data-testid="personal-listing-hint" className="rounded-2xl bg-paper p-4 ring-1 ring-line">
+      <p className="text-[11px] font-bold uppercase tracking-wider text-brand">Your place</p>
+      <h3 className="font-display mt-1 text-lg font-bold">Import the listing on the business profile</h3>
+      <p className="mt-1 text-[13px] leading-relaxed text-mute">
+        This page is you. Google and directory listings belong on the business profile, so a café or shop does not
+        overwrite your personal @handle.
+      </p>
+      <Button type="button" className="mt-3 w-full" onClick={onOpenBusiness}>
+        {hasBusiness ? "Open your place" : "Register the business"}
+      </Button>
+    </div>
+  );
+}
