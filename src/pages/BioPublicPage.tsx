@@ -318,16 +318,6 @@ export function BioPublicPage() {
 
         {/* Top Right Bio Handle Badge */}
         <div className="absolute right-3.5 top-3.5 z-10 flex items-center gap-1.5">
-          {isOwner && (
-            <button
-              type="button"
-              onClick={() => setStatusModalOpen(true)}
-              className="inline-flex h-8 items-center gap-1.5 rounded-2xl bg-white/95 px-2.5 text-xs font-semibold text-ink shadow-md ring-1 ring-black/10 backdrop-blur-md hover:bg-white active:scale-95 transition"
-              title="Set WhatsApp / Availability Status"
-            >
-              <span>Status</span>
-            </button>
-          )}
           <BioHandleButton handle={bio.handle} />
         </div>
       </div>
