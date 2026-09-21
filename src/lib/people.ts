@@ -104,10 +104,17 @@ export type VCardInput = {
 };
 
 function escapeVCard(value: string): string {
-  return value.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/;/g, "\\;").replace(/,/g, "\\,");
+  // Prevent CRLF injection by replacing raw newlines with literal '\n' and escaping special chars
+  return value
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .replace(/\\/g, "\\\\")
+    .replace(/\n/g, "\\n")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,");
 }
 
-/** Minimal vCard 3.0 — opens in iOS/Android contacts with one tap. */
+/** Secure RFC 6350 vCard 3.0 — opens directly in iOS/Android Contacts. */
 export function buildVCard(input: VCardInput): string {
   const lines = ["BEGIN:VCARD", "VERSION:3.0"];
   const name = input.name.trim() || "AirPal contact";
@@ -125,18 +132,52 @@ export function buildVCard(input: VCardInput): string {
 }
 
 export function downloadVCard(input: VCardInput): void {
-  const blob = new Blob([buildVCard(input)], { type: "text/vcard" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${
+  const vcardText = buildVCard(input);
+  const fileName = `${
     input.name
       .trim()
       .replace(/[^\w\- ]+/g, "")
-      .replace(/\s+/g, "-") || "contact"
+      .replace(/\s+/g, "-") || "AirPal-Contact"
   }.vcf`;
+  const blob = new Blob([vcardText], { type: "text/vcard;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
   document.body.appendChild(a);
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+/**
+ * Triggers native iOS / Android contact share sheet if supported,
+ * otherwise triggers vCard .vcf file download.
+ */
+export async function shareOrDownloadVCard(input: VCardInput): Promise<{ shared: boolean }> {
+  const vcardText = buildVCard(input);
+  const fileName = `${
+    input.name
+      .trim()
+      .replace(/[^\w\- ]+/g, "")
+      .replace(/\s+/g, "-") || "AirPal-Contact"
+  }.vcf`;
+  const file = new File([vcardText], fileName, { type: "text/vcard" });
+
+  if (typeof navigator !== "undefined" && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({
+        title: input.name,
+        text: `Contact card for ${input.name} on AirPal`,
+        files: [file],
+      });
+      return { shared: true };
+    } catch (err) {
+      if ((err as Error)?.name === "AbortError") return { shared: false };
+    }
+  }
+
+  // Fallback to direct .vcf download
+  downloadVCard(input);
+  return { shared: true };
 }

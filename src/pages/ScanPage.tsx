@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import jsQR from "jsqr";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
-import { parseQrPayload, pathForIntent } from "@/lib/qr";
+import { Camera, Image as ImageIcon, QrCode, Sparkles, Upload } from "lucide-react";
+import { decodeQrFromImageFile, parseQrPayload, pathForIntent } from "@/lib/qr";
 import { useStay } from "@/contexts/StayContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -16,8 +17,8 @@ import { qrContextIdFromPath, qrContextIdFromStay } from "@shared/analytics";
 import { WaveListenCard } from "@/components/wave/WaveListenCard";
 
 /**
- * Quick links are live listings only — no hardcoded demo venues. Empty DB
- * means manual entry + Explore, honestly.
+ * Universal Scanner for AirPal — Scans live QR camera feed, user photo library images,
+ * room numbers, @handles, stays, plans, and events across iOS, Android & Web.
  */
 
 export function ScanPage() {
@@ -32,10 +33,12 @@ export function ScanPage() {
   );
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [live, setLive] = useState(false);
   const [denied, setDenied] = useState(false);
   const [manualCode, setManualCode] = useState("");
   const [cameraAttempt, setCameraAttempt] = useState(0);
+  const [uploading, setUploading] = useState(false);
   const running = useRef(false);
 
   const go = useCallback(
@@ -98,7 +101,7 @@ export function ScanPage() {
                   go(path);
                   return;
                 }
-                toast.message("Unknown code");
+                toast.message("Unknown code scanned");
               }
             }
           }
@@ -118,14 +121,41 @@ export function ScanPage() {
     };
   }, [go, cameraAttempt]);
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    void triggerHaptic("light");
+    try {
+      const qrData = await decodeQrFromImageFile(file);
+      if (qrData) {
+        const intent = parseQrPayload(qrData);
+        const path = pathForIntent(intent);
+        if (path) {
+          void triggerHaptic("success");
+          toast.success("QR code decoded from photo");
+          go(path);
+          return;
+        }
+        toast.error("Unrecognized QR payload in photo.");
+      } else {
+        toast.error("No clear QR code detected in this photo. Try another image.");
+      }
+    } catch {
+      toast.error("Failed to read image file.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const clean = manualCode.trim();
     if (!clean) return;
     void triggerHaptic("medium");
 
-    // Pure room numbers resolve inside the current stay only — never a
-    // hardcoded demo property.
+    // Pure room numbers resolve inside the current stay only — never a hardcoded demo property.
     if (/^\d{1,4}$/.test(clean)) {
       if (session.propertyId) {
         go(`/g/${session.propertyId}?room=${clean}`);
@@ -160,35 +190,69 @@ export function ScanPage() {
   };
 
   return (
-    <div className="mx-auto flex h-full max-w-lg flex-col px-4 pb-12">
-      <div className="relative mt-2 overflow-hidden rounded-[28px] bg-ink">
+    <div className="mx-auto flex h-full max-w-lg flex-col px-4 pb-16 pb-safe">
+      <div className="relative mt-2 overflow-hidden rounded-[28px] bg-ink shadow-lg ring-1 ring-line">
         <video ref={videoRef} className="h-64 w-full object-cover md:h-80" playsInline muted />
         <canvas ref={canvasRef} className="hidden" />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => void handleImageUpload(e)}
+        />
+
         {!live && (
           <div className="absolute inset-0 grid content-center justify-items-center gap-2 px-6 text-center text-sm text-white/70">
             <span>{denied ? t("cameraOff") : t("openingCamera")}</span>
             {denied && (
               <>
                 <p className="max-w-xs text-xs text-white/60">
-                  Allow camera access in your browser settings, or use the code box below — room numbers, @handles, and
-                  invite codes work without the camera, even offline.
+                  Allow camera access in browser settings, or upload a saved QR photo / enter code below.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDenied(false);
-                    setCameraAttempt((n) => n + 1);
-                  }}
-                  className="rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold text-white ring-1 ring-white/30 transition hover:bg-white/25"
-                >
-                  Try camera again
-                </button>
+                <div className="flex gap-2 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDenied(false);
+                      setCameraAttempt((n) => n + 1);
+                    }}
+                    className="rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/30 transition hover:bg-white/25 active:scale-95"
+                  >
+                    Try Camera
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="rounded-full bg-brand px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-95 flex items-center gap-1.5"
+                  >
+                    <Upload size={13} />
+                    <span>Upload QR Image</span>
+                  </button>
+                </div>
               </>
             )}
           </div>
         )}
+
         <div className="pointer-events-none absolute inset-0 grid place-items-center">
-          <div className="h-40 w-40 rounded-3xl border-2 border-white/80" />
+          <div className="h-40 w-40 rounded-3xl border-2 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]" />
+        </div>
+
+        {/* Floating Scanner Controls (Upload QR Image) */}
+        <div className="absolute bottom-3 inset-x-3 z-10 flex items-center justify-between px-2">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="inline-flex items-center gap-1.5 rounded-2xl bg-black/60 px-3 py-1.5 text-xs font-semibold text-white shadow-md backdrop-blur-md hover:bg-black/80 transition active:scale-95 border border-white/20"
+          >
+            <ImageIcon size={14} className="text-brand" />
+            <span>{uploading ? "Scanning Photo..." : "Scan Photo"}</span>
+          </button>
+          <span className="text-[11px] font-semibold text-white/80 backdrop-blur-xs bg-black/40 px-2.5 py-1 rounded-full">
+            AirPal Universal QR
+          </span>
         </div>
       </div>
 

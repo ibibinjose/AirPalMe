@@ -22,7 +22,7 @@ import {
 import type { BioCatalogItem } from "@shared/bio";
 import { BUSINESS_CATEGORIES } from "@shared/business";
 import { FollowButton, LikeButton } from "@/components/social/SocialButtons";
-import { downloadVCard, upsertPerson } from "@/lib/people";
+import { downloadVCard, shareOrDownloadVCard, upsertPerson } from "@/lib/people";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { BioHandleButton } from "@/components/bio/BioHandleButton";
 import { BioSocials } from "@/components/bio/BioSocials";
@@ -405,22 +405,44 @@ export function BioPublicPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 rounded-full border border-line p-0 text-ink shadow-sm hover:bg-paper"
+                  className="gap-1.5 rounded-full border border-line bg-card px-3 text-xs font-semibold text-ink shadow-sm hover:bg-paper"
                   aria-label={`Save ${bio.name} to phone contacts`}
-                  title="Save contact (.vcf)"
-                  onClick={() =>
-                    downloadVCard({
+                  title="Save contact to phone (.vcf)"
+                  onClick={() => {
+                    void shareOrDownloadVCard({
                       name: bio.name,
                       phone: bio.phone,
                       url: share,
                       note: `AirPal bio · AirPal.Me/@${bio.handle}`,
-                    })
-                  }
+                    });
+                    toast.success(`Contact card for ${bio.name} generated`);
+                  }}
                 >
-                  <ContactRound size={14} />
+                  <ContactRound size={14} className="text-brand" />
+                  <span>Save Contact</span>
                 </Button>
               </div>
-            ) : null}
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 rounded-full border border-line bg-card px-3 text-xs font-semibold text-ink shadow-sm hover:bg-paper"
+                aria-label={`Save ${bio.name} to phone contacts`}
+                title="Save contact to phone (.vcf)"
+                onClick={() => {
+                  void shareOrDownloadVCard({
+                    name: bio.name,
+                    phone: bio.phone,
+                    url: share,
+                    note: `AirPal bio · AirPal.Me/@${bio.handle}`,
+                  });
+                  toast.success(`Contact card for ${bio.name} generated`);
+                }}
+              >
+                <ContactRound size={14} className="text-brand" />
+                <span>Save Contact</span>
+              </Button>
+            )}
           </div>
         </div>
 
