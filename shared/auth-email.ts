@@ -106,8 +106,13 @@ export function authErrorMessage(err: unknown, fallback = "Failed"): string {
       return "That mobile number is already on another account.";
     case "auth/provider-already-linked":
       return "This account already has a mobile number. Change it, or remove it first.";
+    case "auth/popup-closed-by-user":
+    case "auth/cancelled-popup-request":
+      return "Sign-in was cancelled.";
+    case "auth/account-exists-with-different-credential":
+      return "That email already has an account. Sign in with email or the method you used first.";
     case "auth/operation-not-allowed":
-      return "Phone sign-in is blocked for this number or region. On localhost use a Firebase test number.";
+      return "This sign-in method is not enabled yet. Try email or mobile, or try again shortly.";
     default:
       if (err instanceof Error && err.message && !err.message.startsWith("Firebase:")) return err.message;
       return fallback;

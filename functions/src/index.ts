@@ -1,7 +1,7 @@
 // Barrel: every callable keeps its deployed name. Domain logic lives in sibling modules.
 export { recordAnalyticsBatch, aggregateAnalyticsHourly, runAnalyticsAggregation } from "./analytics";
 export { completeRegistration, ensurePlatformAdmin, setPropertyMember, backfillOwnerClaims } from "./registration";
-export { completeAccountSignup, loginWithPhonePassword } from "./account";
+export { completeAccountSignup, loginWithPhonePassword, ensureUserProfile } from "./account";
 export {
   claimDeal,
   redeemVoucher,

@@ -1,9 +1,23 @@
+/// <reference types="@capacitor-firebase/authentication" />
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "me.airpal.app",
   appName: "AirPal",
   webDir: "dist",
+  experimental: {
+    ios: {
+      spm: {
+        packageOptions: {
+          "@capacitor-firebase/authentication": { symlink: true },
+        },
+        swiftToolsVersion: "6.1",
+        packageTraits: {
+          "@capacitor-firebase/authentication": ["Google"],
+        },
+      },
+    },
+  },
   server: {
     // WebView origin must be the live domain so Firebase Auth, phone reCAPTCHA,
     // and authorized domains match https://airpal.me — not capacitor://localhost.
@@ -45,6 +59,10 @@ const config: CapacitorConfig = {
     },
     Geolocation: {
       enableHighAccuracy: true,
+    },
+    FirebaseAuthentication: {
+      skipNativeAuth: true,
+      providers: ["google.com", "apple.com"],
     },
   },
 };

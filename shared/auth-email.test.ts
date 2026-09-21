@@ -51,7 +51,8 @@ describe("auth error copy", () => {
     expect(authErrorMessage(new Error("Firebase: Error (auth/wrong-password)."))).toBe(
       "Email or password does not match",
     );
-    expect(authErrorMessage({ code: "auth/operation-not-allowed" })).toMatch(/region|test number/i);
+    expect(authErrorMessage({ code: "auth/operation-not-allowed" })).toMatch(/not enabled/i);
+    expect(authErrorMessage({ code: "auth/popup-closed-by-user" })).toMatch(/cancelled/i);
     expect(authErrorMessage(new Error("Sign-in needs Firebase."))).toBe("Sign-in needs Firebase.");
   });
 });

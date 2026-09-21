@@ -1,16 +1,16 @@
 # AirPal store submission pack
 
-App: **AirPal** · ID `me.airpal.app` · version 2.0.0 (iOS build 8, Android versionCode 3)
+App: **AirPal** · ID `me.airpal.app` · version 2.0.0 (iOS build 10, Android versionCode 5)
 Legal entity: **SarvamDaily Pty Ltd** trading as **AirPal.Me** · ABN **83 702 462 977** · Apple Team ID **26WGXSNG58**
 Web: https://airpal.me · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms · Contact: https://airpal.me/contact
 Support email: AirPalMe@gmail.com (App Store / Play contact) · hello@airpal.me (brand)
 
 ## What Apple review / Play review will check
 
-- Sign-in works without a prior account: email, phone (SMS), and anonymous QR-guest sessions. No OAuth in the app, so no external-login headaches.
+- Native iOS/Android require an account on the opening screen (Apple, Google, email, or phone). Website guests still browse without sign-in. Account deletion is in Settings.
 - Camera → QR scan. Location (when in use) → nearby places. Photos → profile/listing images. NFC/Bluetooth optional for Wave. Full table: `docs/store/permissions.md`.
 - Paid paths are real-world services only: experience bookings and stay food orders check out with Stripe card payment (live when `STRIPE_SECRET_KEY` is set, sandbox otherwise). No digital goods or in-app currency, so no in-app-purchase conflict — still, re-read both stores' payments policies before release.
-- Reviewer path (no demo account needed): open the app → continue as guest (Scan/Start works with no account). Host features need any email account; food ordering works in sandbox mode. Account deletion: Settings → Delete account (type DELETE), or hello@airpal.me. Paste `docs/store/reviewer-notes.md` into the review notes field.
+- Reviewer path: open the app → create an account on the opening screen (Apple / Google / email / phone). Paste `docs/store/reviewer-notes.md` into the review notes field. Account deletion: Settings → Delete account (type DELETE).
 - Content: user-generated venues, plans, and reviews. Safety tooling in-app: safety reports, blocks, manual claim review, admin audit log.
 
 ## Data safety (Play) / privacy labels (App Store) — fill verbatim

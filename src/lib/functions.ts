@@ -56,6 +56,10 @@ export function loginWithPhonePasswordRemote(data: LoginWithPhonePasswordRequest
   );
 }
 
+export function ensureUserProfileRemote() {
+  return callFunction<Record<string, never>, { ok: true; created: boolean }>(CALLABLES.ensureUserProfile, {});
+}
+
 export function getPropertyWifiRemote(data: GetPropertyWifiRequest) {
   return callFunction<GetPropertyWifiRequest, GetPropertyWifiResponse>(CALLABLES.getPropertyWifi, data);
 }

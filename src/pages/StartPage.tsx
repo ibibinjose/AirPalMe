@@ -32,8 +32,9 @@ import { VerifyEmailBanner } from "@/components/auth/VerifyEmailBanner";
 import { AccountContacts } from "@/components/auth/AccountContacts";
 import { PhoneLogin } from "@/components/auth/PhoneLogin";
 import { SignupFlow } from "@/components/auth/SignupFlow";
+import { SocialAuthButtons, SocialAuthDivider } from "@/components/auth/SocialAuthButtons";
 import { PhoneField } from "@/components/forms/PhoneField";
-import { triggerHaptic } from "@/lib/native";
+import { isNativeApp, triggerHaptic } from "@/lib/native";
 import { phonePasswordNeedsSms, phoneReady } from "@shared/phone-auth";
 import { MeAvatar } from "@/components/auth/MeAvatar";
 import { useAuth } from "@/contexts/AuthContext";
@@ -105,7 +106,15 @@ export function StartPage() {
   const emailParam = params.get("email") || "";
   const [, nav] = useLocation();
 
-  const { login, loginWithPhonePassword, user, sendVerificationEmail, requestPasswordReset, logout } = useAuth();
+  const {
+    login,
+    loginWithPhonePassword,
+    loginWithSocial,
+    user,
+    sendVerificationEmail,
+    requestPasswordReset,
+    logout,
+  } = useAuth();
   const { mine, business } = useBio();
   const [pendingGo, setPendingGo] = useState(false);
 
@@ -262,6 +271,7 @@ export function StartPage() {
     if (roleParam === "host") return "/host";
     if (roleParam === "business" || business) return "/business";
     if (roleParam === "event") return "/event";
+    if (isNativeApp()) return "/";
     return "/circle";
   }
 
@@ -783,8 +793,21 @@ export function StartPage() {
               </div>
             )}
 
+            <div className="mt-5">
+              <SocialAuthButtons
+                busy={busy}
+                onSocial={async (provider) => {
+                  setInlineError(null);
+                  await loginWithSocial(provider);
+                  toast.success("Signed in successfully!");
+                  setPendingGo(true);
+                }}
+              />
+              <SocialAuthDivider />
+            </div>
+
             {mode === "signup" ? (
-              <div className="mt-5">
+              <div className="mt-1">
                 <SignupFlow
                   onDone={() => {
                     setPhoneSignup(false);

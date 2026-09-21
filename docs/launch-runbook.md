@@ -10,7 +10,7 @@ Sydney time for all roster/SLA references. Never market AirPal as guaranteeing p
 - Firestore rules + indexes deployed: `npm run deploy:rules` (covers the `safety_reports` status+createdAt composite and admin block reads).
 - Secrets: `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` bound via Secret Manager (prod). `ALLOW_SANDBOX_BOOKINGS` must be unset/false in prod. Never commit `.env`.
 - Legal pages live: /privacy, /terms, /cookies, /contact, /about; `LEGAL.updated` bumped on copy change.
-- Guests can browse Stay/Explore/Scan without auth; no PII in analytics.
+- Website guests can browse Stay/Explore/Scan without auth. Native iOS/Android require sign-in on the opening screen. No PII in analytics.
 
 ## Safety SLA (human review, no autonomous closures)
 

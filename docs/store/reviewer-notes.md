@@ -1,38 +1,47 @@
 # Reviewer notes (paste into App Store Connect / Play Console)
 
-**App:** AirPal (`me.airpal.app`) 2.0.0  
+**App:** AirPal (`me.airpal.app`) 2.0.0 (iOS build 10)  
 **Seller:** SarvamDaily Pty Ltd trading as AirPal.Me · ABN 83 702 462 977  
-**Support:** AirPalMe@gmail.com · hello@airpal.me
+**Apple Team:** ZEN KAPITAL PTY LTD (`26WGXSNG58`)  
+**Support:** AirPalMe@gmail.com · hello@airpal.me  
+**Privacy:** https://airpal.me/privacy · Terms: https://airpal.me/terms
 
-## How to review without an account
+## How to review (sign-in required on iOS/Android)
 
-Open the app and stay a guest. Home, Discover, Stay/Concierge, Scan, Events, and Experiences browse without sign-in.
+The native app opens on a branded screen and requires an account. Create one in the app — no demo login is needed.
 
-## Sign-in (optional features)
+1. Open AirPal.
+2. Tap **Continue with Apple**, **Continue with Google**, or **Create a free account**.
+3. Email signup: password 8+ characters with a letter and a number. Phone SMS: use a Firebase test number if you cannot receive SMS.
+4. After sign-in you land on home (What do you need? / What’s on).
 
-Settings or Start → Create account (email + password, 8+ characters with a letter and a number) or Sign in. Phone SMS uses Firebase test numbers if you cannot receive SMS.
+Website https://airpal.me still browses without an account. Privacy and Terms are reachable from the opening screen before sign-in.
 
 ## Account deletion (Guideline 5.1.1)
 
-Signed in → Settings → Delete account → type DELETE. This removes the login immediately and records a deletion request.
+Signed in → Settings → Delete account → type DELETE. This removes the login immediately and records a deletion request. You may also email AirPalMe@gmail.com.
+
+## Sign in with Apple / Google
+
+Both are offered on the opening screen. Sign in with Apple uses the system sheet. Google uses the Google account picker.
 
 ## Payments
 
-No in-app digital goods. Bookings for real-world experiences may show as unpaid until Stripe checkout is live. Guests are not charged to browse.
+No in-app digital goods and no IAP. Bookings for real-world experiences checkout with Stripe (card). Guests are not charged to create an account.
 
-## Permissions (all optional — deny and the app still browses)
+## Permissions (all optional after sign-in)
 
-- **Camera:** Scan tab — place QR, stay key, event pass, Wave. Guest browse works without it (type a code).
-- **Location (when in use):** nearby places, plans, events. Not a home address. Deny → pick any city in the location pin.
-- **Photos:** profile, plan, or listing image you pick. Not required to browse.
-- **NFC:** optional Wave greeting. No NFC hardware required.
+- **Camera:** Scan — place QR, stay key, event pass, Wave. You can type a code instead.
+- **Location (when in use):** nearby places, plans, events. Not a home address. Deny → pick a city.
+- **Photos:** profile, plan, or listing image you pick.
+- **NFC:** optional Wave greeting.
 - **Bluetooth (Android):** optional Wave scan. iOS does not request Bluetooth.
-- Never requested: microphone, contacts, always-on location, tracking.
+- Never requested: microphone, contacts, always-on location, tracking, advertising ID.
 
 ## Content
 
-User-generated listings, plans, and reviews. Report/block is in the profile menu and match chat.
+User-generated listings, plans, and reviews. Report/block is in the profile menu and match chat. 17+ / 18+.
 
 ## Demo
 
-No demo login required. If you create an account, delete it from Settings when finished.
+No demo login. Create an account, review, then delete it from Settings when finished.

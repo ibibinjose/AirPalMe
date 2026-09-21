@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { LogIn, UserPlus, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import { SocialAuthButtons, SocialAuthDivider } from "@/components/auth/SocialAuthButtons";
 
 function currentNext(): string {
   try {
@@ -18,7 +19,7 @@ function currentNext(): string {
  * failing silently; the pending intent resumes after sign-in.
  */
 export function SignInPrompt() {
-  const { signInPrompt, dismissSignInPrompt } = useAuth();
+  const { signInPrompt, dismissSignInPrompt, loginWithSocial } = useAuth();
   const [, nav] = useLocation();
 
   useScrollLock(Boolean(signInPrompt));
@@ -61,6 +62,13 @@ export function SignInPrompt() {
         <p className="mt-1.5 text-sm leading-relaxed text-mute">{signInPrompt.reason}</p>
         <p className="mt-1 text-xs text-mute">Free account · syncs likes, follows and plans everywhere.</p>
         <div className="mt-5 space-y-2">
+          <SocialAuthButtons
+            onSocial={async (provider) => {
+              await loginWithSocial(provider);
+              dismissSignInPrompt();
+            }}
+          />
+          <SocialAuthDivider />
           <button
             type="button"
             onClick={() => go("signin")}

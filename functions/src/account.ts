@@ -60,6 +60,32 @@ export const completeAccountSignup = onCall(CALLABLE, async (request) => {
   return { ok: true as const, phone };
 });
 
+/** First Google / Apple sign-in: create the users doc (clients cannot create it). */
+export const ensureUserProfile = onCall(CALLABLE, async (request) => {
+  await noteAppCheck(request, "ensureUserProfile");
+  const uid = requireAccount(request, "Sign in first.");
+  const record = await auth.getUser(uid);
+  const email = record.email || "";
+  const displayName = record.displayName || email.split("@")[0] || "AirPal";
+  const existing = await db.collection("users").doc(uid).get();
+  const payload: Record<string, unknown> = {
+    uid,
+    email,
+    displayName,
+    emailVerified: Boolean(record.emailVerified),
+    photoURL: record.photoURL || "",
+    phone: record.phoneNumber || "",
+    phoneVerified: Boolean(record.phoneNumber),
+    updatedAt: FieldValue.serverTimestamp(),
+  };
+  if (!existing.exists) {
+    payload.role = "guest";
+    payload.createdAt = FieldValue.serverTimestamp();
+  }
+  await db.collection("users").doc(uid).set(payload, { merge: true });
+  return { ok: true as const, created: !existing.exists };
+});
+
 /**
  * Sign in with mobile + password without returning the email to the client.
  * Verifies the password through Identity Toolkit, then issues a custom token.

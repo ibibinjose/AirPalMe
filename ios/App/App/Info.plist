@@ -76,6 +76,8 @@
 	<string>AirPal uses your location while the app is open to show places, plans, and events near you — not your home address. You can pick a city instead.</string>
 	<key>NFCReaderUsageDescription</key>
 	<string>AirPal can read or write an AirPal Wave tag so a nearby AirPal can greet you. NFC is optional.</string>
+	<key>GIDClientID</key>
+	<string>265455282950-b4qn7ecibbumqo052lkf6j587so1tg5i.apps.googleusercontent.com</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -87,6 +89,16 @@
 			<array>
 				<string>airpal</string>
 				<string>me.airpal.app</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>GoogleSignIn</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.265455282950-b4qn7ecibbumqo052lkf6j587so1tg5i</string>
 			</array>
 		</dict>
 	</array>

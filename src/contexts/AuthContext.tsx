@@ -39,9 +39,11 @@ import { clearPendingIntent, savePendingIntent, type PendingIntent } from "@/lib
 import {
   completeAccountSignupRemote,
   completeRegistration,
+  ensureUserProfileRemote,
   liveBackendEnabled,
   loginWithPhonePasswordRemote,
 } from "@/lib/functions";
+import { signInWithSocial, type SocialProvider } from "@/lib/social-auth";
 import { saveCachedProperty } from "@/lib/properties";
 import { track } from "@/lib/analytics";
 
@@ -60,6 +62,7 @@ type AuthValue = {
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
   loginWithPhonePassword: (phone: string, password: string) => Promise<void>;
+  loginWithSocial: (provider: SocialProvider) => Promise<void>;
   register: (email: string, name: string, opts?: RegisterOpts) => Promise<{ propertyId?: string }>;
   sendPhoneCode: (phone: string) => Promise<void>;
   confirmPhoneCode: (code: string) => Promise<void>;
@@ -240,6 +243,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             apiKey: firebaseWebApiKey() || undefined,
           });
           await signInWithCustomToken(auth, token);
+        });
+      },
+      async loginWithSocial(provider) {
+        await withAuthUpgrade(async () => {
+          await signInWithSocial(provider);
+          if (liveBackendEnabled()) {
+            try {
+              await ensureUserProfileRemote();
+            } catch {
+              /* profile can be completed later from /bio/setup */
+            }
+          }
         });
       },
       async linkEmailPassword(email, password) {

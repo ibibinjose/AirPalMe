@@ -6,24 +6,26 @@ import { SignInPrompt } from "@/components/auth/SignInPrompt";
 import { ScrollProbe } from "@/components/debug/ScrollProbe";
 import { DebugInfoOverlay } from "@/components/debug/DebugInfoOverlay";
 import { NativeSplashTransition } from "@/components/layout/NativeSplashTransition";
+import { NativeAuthGate } from "@/components/auth/NativeAuthGate";
 import { AppProviders } from "@/app/providers";
 import { AppRoutes } from "@/app/routes";
 import { ensureAnonymousSession } from "@/lib/firebase";
-import { initNativeApp } from "@/lib/native";
+import { initNativeApp, isNativeApp } from "@/lib/native";
 import { installErrorTracking } from "@/lib/error-report";
 import { initKeyboardManager } from "@/lib/keyboard";
 import { useEffect } from "react";
 
-function Boot() {
+function NativeChrome() {
   useEffect(() => {
     installErrorTracking();
-    void ensureAnonymousSession();
+    if (!isNativeApp()) void ensureAnonymousSession();
     void initNativeApp({ deferSplashHide: true });
-    const cleanupKeyboard = initKeyboardManager();
-    return () => {
-      cleanupKeyboard();
-    };
+    return initKeyboardManager();
   }, []);
+  return null;
+}
+
+function Boot() {
   return (
     <AppShell>
       <AppRoutes />
@@ -41,7 +43,10 @@ export default function App() {
       <AppProviders>
         <Toaster position="top-center" richColors offset="calc(env(safe-area-inset-top, 0px) + 112px)" />
         <NativeSplashTransition />
-        <Boot />
+        <NativeChrome />
+        <NativeAuthGate>
+          <Boot />
+        </NativeAuthGate>
       </AppProviders>
     </ErrorBoundary>
   );

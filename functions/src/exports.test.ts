@@ -5,6 +5,7 @@ import * as api from "./index";
 // clients and deploys, so the barrel re-export list is pinned here.
 const CALLABLES = [
   "completeAccountSignup",
+  "ensureUserProfile",
   "loginWithPhonePassword",
   "completeRegistration",
   "ensurePlatformAdmin",

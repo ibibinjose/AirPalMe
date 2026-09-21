@@ -71,6 +71,7 @@ export const CALLABLES = {
   getPlanByInviteCode: "getPlanByInviteCode",
   confirmExperienceBooking: "confirmExperienceBookingRemote",
   completeAccountSignup: "completeAccountSignup",
+  ensureUserProfile: "ensureUserProfile",
   loginWithPhonePassword: "loginWithPhonePassword",
   shareHere: "shareHere",
   stopHere: "stopHere",
