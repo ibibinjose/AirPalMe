@@ -186,25 +186,28 @@ export function MatePage() {
   }, [user, reloadKey]);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">AirPal Mate</p>
-      <h1 className="font-display mt-2 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl text-ink">
-        Go with your Mate, Friends &amp; Family.
-      </h1>
-      <p className="mt-3 max-w-md text-[15px] leading-relaxed text-mute font-medium">
-        Got plans or a night out but need a companion or local guide? Go solo, bring your crew, or find an approved
-        AirPal Mate to join you.
-      </p>
-      <div className="mt-5 flex flex-wrap gap-2">
-        <Button size="lg" onClick={() => nav("/mate/request")}>
-          Find someone to go with <ArrowRight size={17} />
-        </Button>
-        <Link href="/companion">
-          <Button size="lg" variant="ghost">
-            Become a Mate
-          </Button>
-        </Link>
-      </div>
+    <div className="mx-auto max-w-5xl px-4 py-8 md:px-6">
+      <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+        {/* Left Column: Hero, Request Actions, Assigned Jobs & Request History (7 cols) */}
+        <div className="lg:col-span-7">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">AirPal Mate</p>
+          <h1 className="font-display mt-2 text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.05] tracking-tight text-ink">
+            Go with your Mate, Friends &amp; Family.
+          </h1>
+          <p className="mt-3 max-w-md text-[14px] sm:text-[15px] leading-relaxed text-mute font-medium">
+            Got plans or a night out but need a companion or local guide? Go solo, bring your crew, or find an approved
+            AirPal Mate to join you.
+          </p>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <Button size="lg" className="rounded-full bg-brand font-semibold text-white shadow-md hover:bg-brand-ink" onClick={() => nav("/mate/request")}>
+              Find someone to go with <ArrowRight size={17} />
+            </Button>
+            <Link href="/companion">
+              <Button size="lg" variant="ghost" className="rounded-full border border-line bg-card text-ink hover:bg-paper">
+                Become a Mate
+              </Button>
+            </Link>
+          </div>
 
       {user && assigned.length > 0 && (
         <section className="mt-6 rounded-2xl border border-line bg-card p-4">
@@ -474,111 +477,117 @@ export function MatePage() {
         </section>
       )}
 
-      {user && publicMates.length > 0 && (
-        <section className="mt-6 rounded-2xl border border-line bg-card p-4">
-          <h2 className="font-display text-base font-bold">Approved Mates</h2>
-          <p className="mt-1 text-[13px] text-mute">
-            People already reviewed by AirPal — reasons, not a mystery score.
-          </p>
-          <ul className="mt-3 space-y-2">
-            {publicMates.slice(0, 8).map((m) => (
-              <li key={m.uid} className="rounded-xl bg-paper p-3 ring-1 ring-line">
-                <p className="text-sm font-semibold">{m.firstName}</p>
-                <p className="mt-0.5 text-[12px] text-mute">{m.introduction || "Approved local Mate."}</p>
-                <span className="mt-1.5 flex flex-wrap gap-1">
-                  {mateDiscoverReasons(m, requests?.[0]).map((reason) => (
-                    <span
-                      key={reason}
-                      className="rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-medium text-brand"
-                    >
-                      {reason}
-                    </span>
-                  ))}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <section className="mt-8">
-        <h2 className="font-display text-xl font-bold tracking-tight">What do you want to do?</h2>
-        <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-          {MATE_USE_CASES.map((c) => (
-            <li key={c.id}>
-              <Link
-                href={`/mate/request?useCase=${c.id}`}
-                className="flex items-center gap-3 rounded-2xl border border-line bg-card p-3.5 hover:border-mute"
-              >
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand/10 text-brand">
-                  {c.id === "events" ? (
-                    <Sparkles size={18} />
-                  ) : c.id === "social" ? (
-                    <Users size={18} />
-                  ) : (
-                    <CalendarDays size={18} />
-                  )}
-                </span>
-                <span>
-                  <span className="block text-sm font-semibold">{c.label}</span>
-                  <span className="block text-xs text-mute">{c.line}</span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mt-6 rounded-2xl border border-line bg-card p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h2 className="font-display text-base font-bold">Or start from an experience</h2>
-            <p className="mt-0.5 text-[13px] text-mute">Pick something worth doing — then take a Mate along.</p>
-          </div>
-          <Link
-            href="/experiences"
-            className="shrink-0 rounded-full bg-brand px-4 py-2 text-[13px] font-semibold text-white"
-          >
-            Browse
-          </Link>
         </div>
-      </section>
 
-      <section className="mt-8 rounded-2xl bg-ink p-5 text-white">
-        <h2 className="font-display text-xl font-bold">How it works</h2>
-        <ol className="mt-3 space-y-3">
-          {STEPS.map((s, i) => (
-            <li key={s.title} className="flex gap-3">
-              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/15 text-xs font-bold">
-                {i + 1}
-              </span>
-              <span>
-                <span className="block text-sm font-semibold">{s.title}</span>
-                <span className="block text-[13px] leading-6 text-white/70">{s.body}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
-        <p className="mt-4 flex items-start gap-1.5 text-xs leading-5 text-white/70">
-          <ShieldCheck size={14} className="mt-0.5 shrink-0" />
-          Approved Mates only. Meet in public, keep chat in AirPal. Under 18s need a guardian.
-        </p>
-      </section>
+        {/* Right Column: Approved Mates Showcase, Use Cases & Host Onboarding (5 cols) */}
+        <div className="mt-6 lg:mt-0 lg:col-span-5 space-y-6">
+          {user && publicMates.length > 0 && (
+            <section className="rounded-3xl border border-line bg-card p-5 shadow-xs">
+              <h2 className="font-display text-base font-bold">Approved Mates</h2>
+              <p className="mt-1 text-[13px] text-mute">
+                People already reviewed by AirPal — reasons, not a mystery score.
+              </p>
+              <ul className="mt-3 space-y-2.5">
+                {publicMates.slice(0, 8).map((m) => (
+                  <li key={m.uid} className="rounded-2xl bg-paper p-3.5 ring-1 ring-line">
+                    <p className="text-sm font-semibold">{m.firstName}</p>
+                    <p className="mt-0.5 text-[12px] text-mute">{m.introduction || "Approved local Mate."}</p>
+                    <span className="mt-1.5 flex flex-wrap gap-1">
+                      {mateDiscoverReasons(m, requests?.[0]).map((reason) => (
+                        <span
+                          key={reason}
+                          className="rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-medium text-brand"
+                        >
+                          {reason}
+                        </span>
+                      ))}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-      <section className="mt-6 rounded-2xl border border-line bg-card p-5 text-center">
-        <p className="flex items-center justify-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
-          <BadgeCheck size={13} /> Verified locals
-        </p>
-        <p className="font-display mt-1 text-lg font-bold">Good with people? Get paid for it.</p>
-        <p className="mx-auto mt-1 max-w-sm text-[13px] leading-6 text-mute">
-          Apply once, get reviewed by a person, then earn every time someone picks you.
-        </p>
-        <Link href="/companion">
-          <Button variant="dark" className="mt-3">
-            Apply to become a Mate
-          </Button>
-        </Link>
-      </section>
+          <section>
+            <h2 className="font-display text-xl font-bold tracking-tight">What do you want to do?</h2>
+            <ul className="mt-3 grid gap-2.5 sm:grid-cols-2">
+              {MATE_USE_CASES.map((c) => (
+                <li key={c.id}>
+                  <Link
+                    href={`/mate/request?useCase=${c.id}`}
+                    className="flex items-center gap-3 rounded-2xl border border-line bg-card p-3.5 hover:border-brand/40 transition"
+                  >
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand/10 text-brand">
+                      {c.id === "events" ? (
+                        <Sparkles size={18} />
+                      ) : c.id === "social" ? (
+                        <Users size={18} />
+                      ) : (
+                        <CalendarDays size={18} />
+                      )}
+                    </span>
+                    <span>
+                      <span className="block text-sm font-semibold">{c.label}</span>
+                      <span className="block text-xs text-mute">{c.line}</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="rounded-3xl border border-line bg-card p-5 shadow-xs">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h2 className="font-display text-base font-bold">Or start from an experience</h2>
+                <p className="mt-0.5 text-[13px] text-mute">Pick something worth doing — then take a Mate along.</p>
+              </div>
+              <Link
+                href="/experiences"
+                className="shrink-0 rounded-full bg-brand px-4 py-2 text-[13px] font-semibold text-white hover:bg-brand-ink"
+              >
+                Browse
+              </Link>
+            </div>
+          </section>
+
+          <section className="rounded-3xl bg-ink p-5 text-white shadow-sm">
+            <h2 className="font-display text-xl font-bold">How it works</h2>
+            <ol className="mt-3 space-y-3">
+              {STEPS.map((s, i) => (
+                <li key={s.title} className="flex gap-3">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/15 text-xs font-bold">
+                    {i + 1}
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold">{s.title}</span>
+                    <span className="block text-[13px] leading-6 text-white/70">{s.body}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-4 flex items-start gap-1.5 text-xs leading-5 text-white/70">
+              <ShieldCheck size={14} className="mt-0.5 shrink-0" />
+              Approved Mates only. Meet in public, keep chat in AirPal. Under 18s need a guardian.
+            </p>
+          </section>
+
+          <section className="rounded-3xl border border-line bg-card p-5 text-center shadow-xs">
+            <p className="flex items-center justify-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+              <BadgeCheck size={13} /> Verified locals
+            </p>
+            <p className="font-display mt-1 text-lg font-bold">Good with people? Get paid for it.</p>
+            <p className="mx-auto mt-1 max-w-sm text-[13px] leading-6 text-mute">
+              Apply once, get reviewed by a person, then earn every time someone picks you.
+            </p>
+            <Link href="/companion">
+              <Button variant="dark" className="mt-3 rounded-full font-semibold">
+                Apply to become a Mate
+              </Button>
+            </Link>
+          </section>
+        </div>
+      </div>
     </div>
   );
 }

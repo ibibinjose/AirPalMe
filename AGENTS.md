@@ -193,3 +193,11 @@ One trusted marketplace engine, six eventual verticals. Proof: someone wants to 
 - Provider order in `src/app/providers.tsx` (LocalNow after Stay). Shared function types live in `shared/`.
 - Live Firestore reads with honest empty states; `hoursVerifiedAt`/`scheduleVerifiedAt` freshness SLAs; city-only presence; legal copy in pages + `src/lib/legal.ts` (bump `LEGAL.updated` on change); tickets via callables not localStorage; `/host` reads live property; `unknownProperty` for missing stays.
 - Env: Firebase `VITE_FIREBASE_*`, Maps key, `PLATFORM_ADMIN_EMAILS`; never commit `.env`. Deploy: hosting/functions/rules scripts. Native: Capacitor `me.airpal.app`.
+
+## 42. Modern UI Architecture & Native Builds Annex
+
+- **Design System & Layout Grid**: All core screens (`DiscoverPage`, `MatePage`, `MePage`, `ConciergePage`, `PlanHubPage`) use a liquid glass aesthetic with AirPal Blue (`#1805db`) primary accents, subtle glassmorphism cards (`bg-card ring-1 ring-line shadow-xs`), high-contrast typography, and a responsive 12-column grid (`lg:grid-cols-12`) on desktop screens while preserving touch-friendly mobile layouts (target sizes $\ge 44\text{px}$).
+- **Mobile Navigation & Safe Area**: Mobile bottom navigation is styled as a floating Apple-inspired liquid glass dock with `pb-safe` padding for iOS Home Indicators and Android navigation bars.
+- **Testing & Verification Standards**: All features must pass the automated Vitest test suite (`npm test`, 94 test files / 489 tests) and Vite production build compilation (`npx vite build` / `npm run verify`) prior to git commits or deployment.
+- **Native Capacitor Integration**: Mobile apps use `@capacitor/core` under app ID `me.airpal.app`. Run `npm run cap:sync` after production web builds to synchronize web assets with iOS and Android native containers.
+

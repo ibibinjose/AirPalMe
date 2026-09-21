@@ -270,13 +270,13 @@ export function BioPublicPage() {
   const statusInfo = AVAILABILITY_STATUSES[statusKey] || AVAILABILITY_STATUSES.available;
 
   return (
-    <div className="mx-auto max-w-md pb-12">
+    <div className="mx-auto max-w-5xl pb-16 pb-safe">
       {/* Hero Cover Header (clean & bright, no dark overlay scrim) */}
-      <div className="relative">
+      <div className="relative overflow-hidden rounded-b-3xl sm:rounded-3xl">
         {bio.cover ? (
-          <Photo src={bio.cover} className="h-44 w-full object-cover sm:h-52" />
+          <Photo src={bio.cover} className="h-44 w-full object-cover sm:h-56 lg:h-64" />
         ) : (
-          <div className="relative h-44 w-full overflow-hidden bg-gradient-to-br from-[#1b221d] via-[#222b24] to-[#121614] sm:h-52">
+          <div className="relative h-44 w-full overflow-hidden bg-gradient-to-br from-[#1b221d] via-[#222b24] to-[#121614] sm:h-56 lg:h-64">
             <div className="absolute inset-0 opacity-25 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:18px_18px]" />
           </div>
         )}
@@ -426,8 +426,19 @@ export function BioPublicPage() {
 
         {/* Profile Info Left-Aligned */}
         <div className="mt-3 text-left">
-          <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">{bio.name}</h1>
-          <p className="mt-0.5 text-sm font-medium text-mute">@{bio.handle}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">{bio.name}</h1>
+            {bio.categoryTag && (
+              <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-brand">
+                {bio.categoryTag}
+              </span>
+            )}
+          </div>
+
+          <p className="mt-0.5 text-xs font-medium text-mute">
+            @{bio.handle}
+            {bio.pronouns && ` · ${bio.pronouns}`}
+          </p>
 
           {/* WhatsApp / Availability Status Pill */}
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
@@ -458,14 +469,30 @@ export function BioPublicPage() {
             {bio.hours && <span className="text-xs text-mute font-medium">· {bio.hours}</span>}
           </div>
 
-          {(bio.city || bio.category) && (
-            <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-mute">
-              <MapPin size={12} className="text-gold shrink-0" aria-hidden />
-              {[bio.city, BUSINESS_CATEGORIES.find((c) => c.id === bio.category)?.label].filter(Boolean).join(" · ")}
+          {(bio.city || bio.category || bio.languages) && (
+            <p className="mt-2 inline-flex flex-wrap items-center gap-1.5 text-xs font-medium text-mute">
+              {bio.city && (
+                <>
+                  <MapPin size={12} className="text-gold shrink-0" aria-hidden />
+                  <span>{bio.city}</span>
+                </>
+              )}
+              {bio.category && (
+                <span>· {BUSINESS_CATEGORIES.find((c) => c.id === bio.category)?.label}</span>
+              )}
+              {bio.languages && <span>· Languages: {bio.languages}</span>}
             </p>
           )}
 
           {bio.shortWhy && <p className="mt-2 text-[14px] leading-relaxed text-ink/85 font-normal">{bio.shortWhy}</p>}
+
+          {/* Extended Bio / About Story Card */}
+          {bio.aboutText && (
+            <div className="mt-3.5 rounded-2xl bg-card p-4 border border-line/70 shadow-xs">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-gold mb-1">About Story</p>
+              <p className="text-xs leading-relaxed text-ink/80 whitespace-pre-line">{bio.aboutText}</p>
+            </div>
+          )}
         </div>
 
         <div className="mt-4 flex items-center gap-2">

@@ -191,134 +191,148 @@ export function ConciergePage() {
   ];
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-10">
-      {/* Header Banner */}
-      <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
-        {property.heroImage && <img src={property.heroImage} alt="" className="h-48 w-full object-cover" />}
-        <div className="hero-scrim absolute inset-0" />
-        <div className="absolute inset-x-0 bottom-0 p-5">
-          <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-slate-950 border border-line shadow-xs mb-1.5">
-            {roomLabel ? `Room ${roomLabel}` : property.city || property.destination || "AirPal Stay Concierge"}
-          </span>
-          <h1 className="font-display text-2xl font-extrabold text-white">{property.name || t("scanRoom")}</h1>
-          {property.tagline ? <p className="mt-1 text-xs text-white/80">{property.tagline}</p> : null}
-          {demoModeActive() && (
-            <div className="mt-2">
-              <DemoBadge />
+    <div className="mx-auto max-w-5xl px-4 pb-12 md:px-6">
+      <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
+        {/* Left Column: Header Banner, AirPal Mate Priority, Room details & Quick Action Tiles (5 cols) */}
+        <div className="lg:col-span-5 space-y-4">
+          <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
+            {property.heroImage && <img src={property.heroImage} alt="" className="h-48 w-full object-cover" />}
+            <div className="hero-scrim absolute inset-0" />
+            <div className="absolute inset-x-0 bottom-0 p-5">
+              <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-slate-950 border border-line shadow-xs mb-1.5">
+                {roomLabel ? `Room ${roomLabel}` : property.city || property.destination || "AirPal Stay Concierge"}
+              </span>
+              <h1 className="font-display text-2xl font-extrabold text-white">{property.name || t("scanRoom")}</h1>
+              {property.tagline ? <p className="mt-1 text-xs text-white/80">{property.tagline}</p> : null}
+              {demoModeActive() && (
+                <div className="mt-2">
+                  <DemoBadge />
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </div>
+          </div>
 
-      {/* AirPal Companion Integration Banner */}
-      <div className="mt-4 rounded-3xl ring-1 ring-line bg-gradient-to-r from-brand/10 via-amber-500/10 to-purple-500/10 p-4 shadow-xs flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
-            <HeartHandshake size={20} />
-          </span>
+          <div className="rounded-3xl ring-1 ring-line bg-gradient-to-r from-brand/10 via-amber-500/10 to-purple-500/10 p-4 shadow-xs flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
+                <HeartHandshake size={20} />
+              </span>
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
+                  AirPal Mate Priority
+                </p>
+                <p className="text-xs font-bold text-ink">Exploring Sydney alone?</p>
+                <p className="text-[11px] text-mute">Find a local AirPal Mate to go with you.</p>
+              </div>
+            </div>
+            <Button size="sm" className="shrink-0 font-bold gap-1 shadow-xs rounded-full" onClick={() => nav("/companion")}>
+              <span>Find Mate</span>
+              <ArrowRight size={14} />
+            </Button>
+          </div>
+
+          {roomLabel ? (
+            <YourRoomCard
+              roomNumber={roomLabel || ""}
+              roomType={roomTypeForNumber(property.roomTypes, roomLabel)}
+              checkIn={property.checkIn}
+              checkOut={property.checkOut}
+            />
+          ) : null}
+
+          {/* Quick Action Tiles */}
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
-              AirPal Mate Priority
-            </p>
-            <p className="text-xs font-bold text-ink">Exploring Sydney alone?</p>
-            <p className="text-[11px] text-mute">Find a local AirPal Mate to go with you.</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-gold mb-2">Guest Actions</p>
+            <div className="grid grid-cols-2 gap-2.5">
+              {tiles.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={t.run}
+                  className="flex touch-manipulation items-center gap-3 rounded-2xl ring-1 ring-line bg-card px-4 py-3.5 shadow-xs transition hover:bg-paper active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                >
+                  <t.icon size={18} className="shrink-0 text-brand" />
+                  <span className="truncate text-sm font-bold text-ink">{t.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-        <Button size="sm" className="shrink-0 font-bold gap-1 shadow-xs" onClick={() => nav("/companion")}>
-          <span>Find Mate</span>
-          <ArrowRight size={14} />
-        </Button>
-      </div>
 
-      {property.staffPicks && property.staffPicks.length > 0 && (
-        <section className="mt-4 rounded-3xl ring-1 ring-line bg-card p-4 shadow-xs">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-gold">Host recommends</p>
-          <ul className="mt-2 space-y-2">
-            {property.staffPicks.slice(0, 3).map((pick) => (
-              <li key={pick.id} className="flex items-start gap-2.5">
-                <Sparkles size={15} className="mt-0.5 shrink-0 text-brand" />
-                <div className="min-w-0">
-                  <p className="text-sm font-bold text-ink">{pick.title}</p>
-                  {pick.detail ? <p className="text-xs text-mute">{pick.detail}</p> : null}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {property.name ? <ArrivalGuide /> : null}
-
-      {roomLabel ? (
-        <YourRoomCard
-          roomNumber={roomLabel}
-          roomType={roomTypeForNumber(property.roomTypes, roomLabel)}
-          checkIn={property.checkIn}
-          checkOut={property.checkOut}
-        />
-      ) : null}
-
-      {/* Quick Action Tiles */}
-      <div className="mt-5 grid grid-cols-2 gap-2.5">
-        {tiles.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={t.run}
-            className="flex touch-manipulation items-center gap-3 rounded-2xl ring-1 ring-line bg-card px-4 py-3.5 shadow-xs transition hover:bg-paper active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+        {/* Right Column: Ask AirPal, Recommendations, Arrival Guide & Around You (7 cols) */}
+        <div className="mt-6 lg:mt-0 lg:col-span-7 space-y-5">
+          {/* Ask AirPal Input Form */}
+          <form
+            className="flex items-center gap-2 rounded-full ring-1 ring-line bg-card px-4 py-2.5 shadow-xs transition focus-within:ring-2 focus-within:ring-brand"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!ask.trim()) return;
+              setSheet("ask");
+              void runAsk();
+            }}
           >
-            <t.icon size={18} className="shrink-0 text-brand" />
-            <span className="truncate text-sm font-bold text-ink">{t.label}</span>
-          </button>
-        ))}
-      </div>
+            <Sparkles size={18} className="shrink-0 text-brand" />
+            <input
+              value={ask}
+              onChange={(e) => setAsk(e.target.value)}
+              placeholder={t("askAirPal")}
+              aria-label={t("askAirPal")}
+              className="h-10 w-full bg-transparent text-[15px] outline-none text-ink placeholder:text-mute font-medium"
+            />
+            <Button type="submit" size="sm" className="rounded-full px-4 font-bold shrink-0">
+              Ask
+            </Button>
+          </form>
 
-      {/* Ask AirPal Input */}
-      <form
-        className="mt-5 flex items-center gap-2 rounded-full ring-1 ring-line bg-card px-4 py-2 shadow-xs transition focus-within:ring-2 focus-within:ring-brand"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!ask.trim()) return;
-          setSheet("ask");
-          void runAsk();
-        }}
-      >
-        <Sparkles size={16} className="shrink-0 text-brand" />
-        <input
-          value={ask}
-          onChange={(e) => setAsk(e.target.value)}
-          placeholder={t("askAirPal")}
-          aria-label={t("askAirPal")}
-          className="h-10 w-full bg-transparent text-[15px] outline-none text-ink placeholder:text-mute font-medium"
-        />
-      </form>
+          {property.staffPicks && property.staffPicks.length > 0 && (
+            <section className="rounded-3xl ring-1 ring-line bg-card p-5 shadow-xs">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-gold">Host recommends</p>
+              <ul className="mt-3 space-y-2.5">
+                {property.staffPicks?.slice(0, 3).map((pick) => (
+                  <li key={pick.id} className="flex items-start gap-2.5">
+                    <Sparkles size={16} className="mt-0.5 shrink-0 text-brand" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-ink">{pick.title}</p>
+                      {pick.detail ? <p className="text-xs text-mute mt-0.5">{pick.detail}</p> : null}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-      <EmojiRate
-        target="stay"
-        propertyId={session.propertyId || property.id}
-        winbackTitle={property.winbackOffer?.title}
-        winbackDetail={property.winbackOffer?.detail}
-      />
+          {property.name ? <ArrivalGuide /> : null}
 
-      <LocalFavorites />
+          <EmojiRate
+            target="stay"
+            propertyId={session.propertyId || property.id}
+            winbackTitle={property.winbackOffer?.title}
+            winbackDetail={property.winbackOffer?.detail}
+          />
 
-      <div className="mt-8 flex items-end justify-between">
-        <h2 className="font-display text-xl font-bold text-ink">{t("aroundYou")}</h2>
-        <button className="text-xs font-bold text-mute hover:text-ink" onClick={() => nav("/")}>
-          {t("all")}
-        </button>
-      </div>
-      {nearby.length === 0 ? (
-        <p className="mt-3 rounded-2xl ring-1 ring-line bg-card px-4 py-5 text-center text-sm text-mute shadow-xs">
-          {t("aroundEmpty")}
-        </p>
-      ) : (
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          {nearby.map((p) => (
-            <PlaceCard key={p.id} place={p} walk={p.walk} />
-          ))}
+          <LocalFavorites />
+
+          <div>
+            <div className="flex items-end justify-between mb-3">
+              <h2 className="font-display text-xl font-bold text-ink">{t("aroundYou")}</h2>
+              <button type="button" className="text-xs font-bold text-mute hover:text-ink" onClick={() => nav("/")}>
+                {t("all")}
+              </button>
+            </div>
+            {nearby.length === 0 ? (
+              <p className="rounded-2xl ring-1 ring-line bg-card px-4 py-5 text-center text-sm text-mute shadow-xs">
+                {t("aroundEmpty")}
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
+                {nearby.map((p) => (
+                  <PlaceCard key={p.id} place={p} walk={p.walk} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
 
       {/* Sheets */}
       <Sheet open={sheet === "wifi"} onClose={() => setSheet(null)} title={t("wifi")}>

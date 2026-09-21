@@ -257,6 +257,16 @@ export type BioProfile = {
   registrationNumber?: string;
   domain?: string;
   trademark?: string;
+  /** Optional multi-line bio story */
+  aboutText?: string;
+  /** Pronouns for personal profiles (e.g. She/Her) */
+  pronouns?: string;
+  /** Languages spoken (e.g. English, Spanish) */
+  languages?: string;
+  /** Vibe or category tag badge */
+  categoryTag?: string;
+  /** Customized primary CTA label */
+  primaryCta?: string;
   /** Opt in to Air Zoo hunts and a collectible sticker on the shop QR. */
   zooHunt?: boolean;
 };

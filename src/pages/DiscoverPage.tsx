@@ -161,25 +161,31 @@ export function DiscoverPage() {
   return (
     <div className="relative mx-auto max-w-6xl px-4 pb-28 md:px-6">
       <header className="pt-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">{placeName}</p>
-        <h1 className="font-display mt-1 text-3xl font-semibold">What&apos;s on</h1>
-        <label className="mt-3 flex h-11 w-full max-w-md items-center gap-2 rounded-2xl bg-card px-3.5 ring-1 ring-line">
-          <Search size={15} className="shrink-0 text-mute" aria-hidden />
-          <span className="sr-only">Search places</span>
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder={t("aroundYouSearch")}
-            aria-label="Search places"
-            className="w-full bg-transparent text-sm outline-none placeholder:text-mute"
-          />
-        </label>
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">{placeName}</p>
+            <h1 className="font-display mt-1 text-3xl sm:text-4xl font-bold tracking-tight text-ink">What&apos;s on</h1>
+          </div>
+          {/* Glass Search Input */}
+          <label className="flex h-12 w-full max-w-md items-center gap-2.5 rounded-full bg-card px-4 ring-1 ring-line shadow-xs focus-within:ring-2 focus-within:ring-brand transition-all">
+            <Search size={16} className="shrink-0 text-mute" aria-hidden />
+            <span className="sr-only">Search places</span>
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={t("aroundYouSearch")}
+              aria-label="Search places"
+              className="w-full bg-transparent text-sm outline-none placeholder:text-mute font-medium text-ink"
+            />
+          </label>
+        </div>
+
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center justify-between">
           <div className="min-w-0 flex-1 overflow-hidden">
             <FilterChips value={chip} onChange={setChip} />
           </div>
           <div
-            className="flex w-fit shrink-0 rounded-full bg-card p-1 ring-1 ring-line"
+            className="flex w-fit shrink-0 rounded-full bg-card p-1 ring-1 ring-line shadow-xs"
             role="tablist"
             aria-label="Discover view"
           >
@@ -189,8 +195,8 @@ export function DiscoverPage() {
               aria-selected={view === "list"}
               onClick={() => setView("list")}
               className={cn(
-                "inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition",
-                view === "list" ? "bg-brand text-white" : "text-mute hover:text-ink",
+                "inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all active:scale-95",
+                view === "list" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
               )}
             >
               <ListIcon size={14} />
@@ -202,8 +208,8 @@ export function DiscoverPage() {
               aria-selected={view === "map"}
               onClick={() => setView("map")}
               className={cn(
-                "inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition",
-                view === "map" ? "bg-brand text-white" : "text-mute hover:text-ink",
+                "inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-all active:scale-95",
+                view === "map" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
               )}
             >
               <MapIcon size={14} />
