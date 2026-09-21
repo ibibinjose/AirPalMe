@@ -10,6 +10,7 @@ import { friendlyPromotionError, submitPromotionRemote, updatePromotionRemote } 
 import { createBroadcastRemote } from "@/lib/notifications";
 import { cn } from "@/lib/cn";
 import type { Promotion } from "@shared/promotions";
+import { PlaceAddressField } from "@/components/forms/PlaceAddressField";
 
 const EDITABLE = ["draft", "submitted", "rejected"];
 
@@ -210,7 +211,6 @@ export function BusinessPromotionDetailPage() {
           {[
             ["title", "Title"],
             ["prizeValue", "Offer / prize value"],
-            ["locationText", "Location"],
             ["eligibility", "Eligibility"],
           ].map(([k, label]) => (
             <label key={k} className="block text-xs font-semibold">
@@ -222,6 +222,12 @@ export function BusinessPromotionDetailPage() {
               />
             </label>
           ))}
+          <PlaceAddressField
+            label="Location"
+            value={draft.locationText}
+            onChange={(text) => set("locationText", text)}
+            placeholder="Search Google Maps"
+          />
           <label className="block text-xs font-semibold">
             Description
             <textarea

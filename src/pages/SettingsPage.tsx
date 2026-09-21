@@ -8,6 +8,7 @@ import { AccountContacts } from "@/components/auth/AccountContacts";
 import { VerifyEmailBanner } from "@/components/auth/VerifyEmailBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
+import { ChangeHandleForm } from "@/components/bio/ChangeHandleForm";
 
 export function SettingsPage() {
   const [, nav] = useLocation();
@@ -35,6 +36,11 @@ export function SettingsPage() {
       )}
 
       {user && <AccountContacts />}
+      {user && mine && (
+        <div className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line">
+          <ChangeHandleForm current={mine.handle} profileId={mine.id} />
+        </div>
+      )}
       {user?.email && user.emailVerified === false && (
         <VerifyEmailBanner email={user.email} onSend={sendVerificationEmail} />
       )}

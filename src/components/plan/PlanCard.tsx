@@ -11,6 +11,7 @@ import {
 } from "@shared/plan";
 import { PLAN_TYPE_ICONS } from "./planTypeIcons";
 import { cn } from "@/lib/cn";
+import { PlaceAddressLink } from "@/components/forms/PlaceAddressField";
 
 export function PlanCard({ plan, userAttendeeId }: { plan: HangoutPlan; userAttendeeId?: string }) {
   const theme = PLAN_THEMES[plan.theme] || PLAN_THEMES.gold;
@@ -163,7 +164,11 @@ export function PlanCard({ plan, userAttendeeId }: { plan: HangoutPlan; userAtte
           </div>
           <div className="flex items-center gap-2 text-xs text-mute">
             <MapPin size={13} className="shrink-0 text-gold" />
-            <span className="truncate">{plan.destination || plan.city}</span>
+            <PlaceAddressLink
+              label={plan.destination || plan.city}
+              geo={plan.geo}
+              className="truncate text-xs text-mute"
+            />
           </div>
         </div>
       </div>

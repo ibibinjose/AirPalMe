@@ -14,7 +14,7 @@ export function InvitePanel({ handle, loading }: { handle?: string; loading?: bo
   const [copied, setCopied] = useState(false);
   const [overview, setOverview] = useState<InviteOverview | null>(null);
 
-  const link = handle ? inviteLinkFor(handle, window.location.origin) : "";
+  const link = handle ? inviteLinkFor(handle) : "";
 
   useEffect(() => {
     if (!user) return;

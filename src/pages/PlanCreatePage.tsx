@@ -1,6 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useLocation, useSearch } from "wouter";
-import { ArrowLeft, CalendarDays, MapPin, Ticket, Users } from "lucide-react";
+import { ArrowLeft, CalendarDays, Ticket, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { AuthGate } from "@/components/auth/AuthGate";
@@ -16,6 +16,8 @@ import { circleHandles } from "@/lib/circle";
 import { triggerHaptic } from "@/lib/native";
 import { PLAN_TYPES, type PlanType } from "@shared/plan";
 import { cn } from "@/lib/cn";
+import { PlaceAddressField, type PickedPlace } from "@/components/forms/PlaceAddressField";
+import type { Geo } from "@shared/nearby";
 
 const KINDS: Array<{ id: PlanType; label: string }> = [
   { id: "catchup", label: "Catch up" },
@@ -60,6 +62,7 @@ export function PlanCreatePage() {
   const [date, setDate] = useState(today || toZonedDateStr(new Date()));
   const [time, setTime] = useState("18:00");
   const [place, setPlace] = useState(params.get("dest") || params.get("destination") || city || "The Rocks, Sydney");
+  const [placeGeo, setPlaceGeo] = useState<Geo | undefined>();
   const [isPublic, setIsPublic] = useState(false);
   const [hero, setHero] = useState<string | undefined>();
   const [invite, setInvite] = useState<Set<string>>(() => new Set(targetHandle ? [targetHandle] : []));
@@ -122,6 +125,7 @@ export function PlanCreatePage() {
         time,
         city: params.get("city") || city || "Sydney",
         destination: place.trim() || city || "Sydney",
+        geo: placeGeo,
         heroImage: hero,
         isPublic,
         invited: circle
@@ -235,13 +239,15 @@ export function PlanCreatePage() {
           </div>
         </div>
 
-        <label className="block">
-          <span className="text-[13px] font-semibold text-mute">Where</span>
-          <div className="relative mt-1">
-            <MapPin size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
-            <input value={place} onChange={(e) => setPlace(e.target.value)} className={`${fieldInput} pl-10`} />
-          </div>
-        </label>
+        <PlaceAddressField
+          value={place}
+          onChange={setPlace}
+          onPick={(picked: PickedPlace) => {
+            setPlace(picked.label);
+            setPlaceGeo(picked.geo);
+          }}
+          placeholder={city || "Search Google Maps"}
+        />
 
         {circle.length > 0 && (
           <div>

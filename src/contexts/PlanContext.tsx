@@ -180,7 +180,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         },
         date: input.date,
         time: input.time,
-        endTime: input.endTime,
+        ...(input.endTime ? { endTime: input.endTime } : {}),
         datetime: `${input.date}T${input.time}:00`,
         city: input.city || "",
         destination: input.destination || input.city || "",

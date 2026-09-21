@@ -145,24 +145,54 @@ export function profileFromDoc(id: string, data: Record<string, unknown>): BioPr
   };
 }
 
-/** Remote profiles for this account are restored; unsynced local handles for the same uid are kept. */
+/** Remote profiles for this account are restored. Same profile id keeps one row (server handle wins on rename). */
 export function mergeOwnedBios(local: BioProfile[], remote: BioProfile[], uid: string): BioProfile[] {
-  const merged = new Map<string, BioProfile>();
+  const byId = new Map<string, BioProfile>();
+  const byHandle = new Map<string, BioProfile>();
+
+  const remember = (row: BioProfile) => {
+    if (row.id) byId.set(row.id, row);
+    if (row.handle) byHandle.set(row.handle, row);
+  };
+
   for (const row of remote) {
     if (!row.handle) continue;
-    merged.set(row.handle, { ...row, ownerUid: row.ownerUid || uid });
+    remember({ ...row, ownerUid: row.ownerUid || uid });
   }
   for (const row of local) {
     if (!row.handle) continue;
-    const remoteRow = merged.get(row.handle);
-    if (remoteRow) {
-      if (row.ownerUid && row.ownerUid !== uid) continue;
-      merged.set(row.handle, { ...remoteRow, ...row, ownerUid: uid, id: remoteRow.id || row.id });
+    if (row.ownerUid && row.ownerUid !== uid) {
+      remember(row);
       continue;
     }
-    merged.set(row.handle, row);
+    const sameId = row.id ? byId.get(row.id) : undefined;
+    if (sameId) {
+      const merged = { ...sameId, ...row, handle: sameId.handle, id: sameId.id, ownerUid: uid };
+      if (row.handle !== sameId.handle) byHandle.delete(row.handle);
+      remember(merged);
+      continue;
+    }
+    const sameHandle = byHandle.get(row.handle);
+    if (sameHandle) {
+      remember({ ...sameHandle, ...row, ownerUid: uid, id: sameHandle.id || row.id });
+      continue;
+    }
+    remember({ ...row, ownerUid: row.ownerUid || uid });
   }
-  return Array.from(merged.values());
+
+  const seen = new Set<string>();
+  const out: BioProfile[] = [];
+  for (const row of Array.from(byId.values())) {
+    if (seen.has(row.handle)) continue;
+    out.push(row);
+    seen.add(row.handle);
+  }
+  for (const row of Array.from(byHandle.values())) {
+    if (seen.has(row.handle)) continue;
+    out.push(row);
+    seen.add(row.handle);
+  }
+  return out;
 }
 
 export async function fetchOwnedBios(uid: string): Promise<{ rows: BioProfile[]; needsBackfill: boolean }> {

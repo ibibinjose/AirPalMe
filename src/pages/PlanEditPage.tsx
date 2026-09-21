@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
-import { ArrowLeft, Calendar, Check, Clock, MapPin, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Calendar, Check, Clock, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PLAN_THEMES, PLAN_TYPES, type PlanTheme, type PlanType } from "@shared/plan";
 import { usePlans } from "@/contexts/PlanContext";
@@ -12,6 +12,8 @@ import { NotFoundPage } from "./NotFoundPage";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
+import { PlaceAddressField, type PickedPlace } from "@/components/forms/PlaceAddressField";
+import type { Geo } from "@shared/nearby";
 
 export function PlanEditPage() {
   const [, params] = useRoute("/plan/:id/edit");
@@ -30,6 +32,7 @@ export function PlanEditPage() {
   const [time, setTime] = useState(plan?.time || "18:30");
   const [endTime, setEndTime] = useState(plan?.endTime || "");
   const [destination, setDestination] = useState(plan?.destination || "");
+  const [placeGeo, setPlaceGeo] = useState<Geo | undefined>(plan?.geo);
   const [notes, setNotes] = useState(plan?.notes || "");
   const [heroImage, setHeroImage] = useState<string | undefined>(plan?.heroImage);
   const [isPublic, setIsPublic] = useState(plan?.isPublic ?? true);
@@ -44,6 +47,7 @@ export function PlanEditPage() {
       setTime(plan.time);
       setEndTime(plan.endTime || "");
       setDestination(plan.destination);
+      setPlaceGeo(plan.geo);
       setNotes(plan.notes || "");
       setHeroImage(plan.heroImage);
       setIsPublic(plan.isPublic ?? true);
@@ -95,6 +99,7 @@ export function PlanEditPage() {
       time,
       endTime: endTime.trim() || undefined,
       destination: destination.trim(),
+      geo: placeGeo,
       notes: notes.trim() || undefined,
       heroImage,
       isPublic,
@@ -264,19 +269,17 @@ export function PlanEditPage() {
             </div>
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-ink/80 block mb-1">Destination / Venue</label>
-            <div className="relative">
-              <MapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
-              <input
-                type="text"
-                required
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-                className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-line outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
-              />
-            </div>
-          </div>
+          <PlaceAddressField
+            label="Destination / Venue"
+            required
+            value={destination}
+            onChange={setDestination}
+            onPick={(picked: PickedPlace) => {
+              setDestination(picked.label);
+              setPlaceGeo(picked.geo);
+            }}
+            placeholder="Search Google Maps"
+          />
 
           <div>
             <label className="text-xs font-semibold text-ink/80 block mb-1">Host Notes</label>

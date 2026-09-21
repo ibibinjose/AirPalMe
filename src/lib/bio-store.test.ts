@@ -39,6 +39,16 @@ describe("mergeOwnedBios", () => {
     expect(merged.map((row) => row.handle).sort()).toEqual(["cafemaya", "maya"]);
   });
 
+  it("keeps one profile when the handle was renamed locally", () => {
+    const remote = [person({ id: "bio-1", handle: "oldname" })];
+    const local = [person({ id: "bio-1", handle: "newname", name: "Maya" })];
+    const merged = mergeOwnedBios(local, remote, "uid-1");
+    expect(merged).toHaveLength(1);
+    expect(merged[0]?.id).toBe("bio-1");
+    expect(merged[0]?.handle).toBe("oldname");
+    expect(merged[0]?.name).toBe("Maya");
+  });
+
   it("does not drop a second account's cached bio", () => {
     const local = [person({ ownerUid: "uid-2", handle: "other" })];
     const remote = [person({ id: "bio-remote" })];

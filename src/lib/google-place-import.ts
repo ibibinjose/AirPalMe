@@ -91,6 +91,7 @@ export async function searchGooglePlaces(
   input: string,
   sessionToken: string,
   bias?: Geo,
+  includeAddresses = false,
 ): Promise<GooglePlaceSuggestion[]> {
   const needle = input.trim();
   if (needle.length < 2) return [];
@@ -117,7 +118,8 @@ export async function searchGooglePlaces(
   return (json.suggestions || [])
     .map((row) => {
       const p = row.placePrediction;
-      if (!p?.placeId || !isGoogleBusinessPrediction(p.types)) return null;
+      if (!p?.placeId) return null;
+      if (!includeAddresses && !isGoogleBusinessPrediction(p.types)) return null;
       return {
         placeId: p.placeId,
         title: p.structuredFormat?.mainText?.text || p.text?.text || "Place",
@@ -128,8 +130,18 @@ export async function searchGooglePlaces(
 }
 
 export async function searchPlaces(input: string, sessionToken: string, bias?: Geo): Promise<GooglePlaceSuggestion[]> {
-  if (canImportGooglePlaces()) return searchGooglePlaces(input, sessionToken, bias);
+  if (canImportGooglePlaces()) return searchGooglePlaces(input, sessionToken, bias, false);
   return searchOsmPlaces(input, bias);
+}
+
+/** Venues and street addresses for plan/event “Where” fields. */
+export async function searchAddressPlaces(
+  input: string,
+  sessionToken: string,
+  bias?: Geo,
+): Promise<GooglePlaceSuggestion[]> {
+  if (canImportGooglePlaces()) return searchGooglePlaces(input, sessionToken, bias, true);
+  return searchOsmPlaces(input, bias, true);
 }
 
 export async function fetchPlace(placeId: string, sessionToken: string): Promise<GooglePlaceImport> {

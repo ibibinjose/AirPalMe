@@ -260,17 +260,15 @@ export function BioProvider({ children }: { children: ReactNode }) {
       const taken = loadBios().some((p) => p.handle === h && p.id !== current.id);
       if (taken) throw new Error("Taken");
       if (getCachedListings().some((row) => row.handle === h && row.id !== current.listingId)) throw new Error("Taken");
-      const next = { ...current, handle: h };
-      persistBios([next, ...loadBios().filter((p) => p.handle !== from && p.handle !== h)]);
+      let profileId = current.id;
+      if (liveBackendEnabled() && getFirebaseAuth()?.currentUser) {
+        const res = await transferHandleRemote({ from, to: h });
+        if (res.profileId) profileId = res.profileId;
+      }
+      const next = { ...current, handle: h, id: profileId };
+      persistBios([next, ...loadBios().filter((p) => p.handle !== from && p.handle !== h && p.id !== current.id)]);
       syncBioToListing(next);
       refresh();
-      if (liveBackendEnabled() && getFirebaseAuth()?.currentUser) {
-        try {
-          await transferHandleRemote({ from, to: h });
-        } catch {
-          /* local already moved */
-        }
-      }
       return h;
     },
     [refresh],

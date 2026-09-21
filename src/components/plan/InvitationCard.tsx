@@ -5,6 +5,7 @@ import { PLAN_TYPE_ICONS } from "./planTypeIcons";
 import { PlanQrModal } from "./PlanQrModal";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
+import { PlaceAddressLink } from "@/components/forms/PlaceAddressField";
 
 export function InvitationCard({
   plan,
@@ -191,7 +192,9 @@ export function InvitationCard({
             </div>
             <div className="min-w-0">
               <p className={cn("text-[11px] uppercase tracking-wider", theme.onThemeMutedClass)}>Where</p>
-              <p className="truncate text-sm font-semibold">{plan.destination || plan.city}</p>
+              <p className="truncate text-sm font-semibold">
+                <PlaceAddressLink label={plan.destination || plan.city} geo={plan.geo} />
+              </p>
             </div>
           </div>
         </div>

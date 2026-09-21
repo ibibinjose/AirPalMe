@@ -205,8 +205,7 @@ export function CirclePage() {
       nav("/bio/setup");
       return;
     }
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://airpal.me";
-    const url = inviteLinkFor(handle, origin);
+    const url = inviteLinkFor(handle);
     const result = await shareContent({
       title: "Join my AirPal Circle",
       text: `I’m on AirPal — join my Circle and let’s make plans in ${city}.`,

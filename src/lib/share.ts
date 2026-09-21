@@ -1,6 +1,7 @@
 import { toast } from "sonner";
 import { Share } from "@capacitor/share";
 import { isNativeApp } from "./native";
+import { publicSiteOrigin, toPublicUrl } from "./public-origin";
 
 export interface ShareOptions {
   title?: string;
@@ -27,7 +28,7 @@ export function isShareSupported(): boolean {
  * with an automatic fallback to clipboard copy + toast when unsupported.
  */
 export async function shareContent(options: ShareOptions): Promise<ShareResult> {
-  const url = options.url || (typeof window !== "undefined" ? window.location.href : "https://airpal.me");
+  const url = toPublicUrl(options.url || (typeof window !== "undefined" ? window.location.href : publicSiteOrigin()));
   const title = options.title || "AirPal";
   const text = options.text;
   const dialogTitle = options.dialogTitle || "Share via";
@@ -118,7 +119,7 @@ function isAbortOrCancel(err: unknown): boolean {
  * Share the user's current city/location and corresponding precinct guide.
  */
 export async function shareCurrentLocation(city: string, _options?: { source?: string }): Promise<ShareResult> {
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://airpal.me";
+  const origin = publicSiteOrigin();
   const targetCity = city || "Sydney";
   const url = `${origin}/guide?city=${encodeURIComponent(targetCity)}`;
   const title = `Exploring ${targetCity} · AirPal`;
@@ -137,7 +138,7 @@ export async function shareCurrentLocation(city: string, _options?: { source?: s
  * Share the curated local guide page for a city or precinct.
  */
 export async function shareCuratedGuide(city?: string): Promise<ShareResult> {
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://airpal.me";
+  const origin = publicSiteOrigin();
   const targetCity = city || "Sydney";
   const url = `${origin}/guide?city=${encodeURIComponent(targetCity)}`;
   const title = `${targetCity} Curated Local Guide · AirPal`;
@@ -161,7 +162,7 @@ export async function shareTour(tour: {
   duration?: string;
   city?: string;
 }): Promise<ShareResult> {
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://airpal.me";
+  const origin = publicSiteOrigin();
   const url = `${origin}/tour/${tour.id}`;
   const title = `${tour.title} · Curated Walk`;
   const text = `Take the "${tour.title}" walking tour (${tour.duration || "Self-guided"}) on AirPal:`;

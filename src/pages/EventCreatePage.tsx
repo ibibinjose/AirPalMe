@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { currencyForCity } from "@/lib/cities";
 import { useLocation, useSearch } from "wouter";
-import { MapPin, Ticket, Users } from "lucide-react";
+import { Ticket, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { AuthGate } from "@/components/auth/AuthGate";
@@ -14,6 +14,9 @@ import { toZonedDateStr } from "@/lib/local-time";
 import { shareContent } from "@/lib/share";
 import { planInviteCodeUrl } from "@shared/plan";
 import { cn } from "@/lib/cn";
+import { PlaceAddressField, type PickedPlace } from "@/components/forms/PlaceAddressField";
+import { toPublicUrl } from "@/lib/public-origin";
+import type { Geo } from "@shared/nearby";
 
 const KINDS = [
   { id: "event", label: "Event", hint: "A night, market, or gathering" },
@@ -35,6 +38,7 @@ export function EventCreatePage() {
   const [date, setDate] = useState(today || toZonedDateStr(new Date()));
   const [time, setTime] = useState("18:00");
   const [place, setPlace] = useState("");
+  const [placeGeo, setPlaceGeo] = useState<Geo | undefined>();
   const [paid, setPaid] = useState(true);
   const [price, setPrice] = useState("25");
   const [capacity, setCapacity] = useState("40");
@@ -94,6 +98,7 @@ export function EventCreatePage() {
         time,
         city: (place.trim() || city || "").replace(/^Choose a city$/i, "") || "Current location",
         destination: place.trim() || city || "Nearby",
+        geo: placeGeo,
         heroImage: hero,
         notes: notes.trim() || undefined,
         isPublic,
@@ -104,8 +109,7 @@ export function EventCreatePage() {
         currency: currencyForCity(place || city),
         capacity: paid ? cap : undefined,
       });
-      const origin = window.location.origin;
-      const url = planInviteCodeUrl(plan.inviteCode, origin);
+      const url = planInviteCodeUrl(plan.inviteCode, toPublicUrl("/").replace(/\/$/, ""));
       await shareContent({
         title: name,
         text: paid ? `${name} — $${priceAud} · ${date}` : `${name} — free · ${date}`,
@@ -178,18 +182,15 @@ export function EventCreatePage() {
           </label>
         </div>
 
-        <label className="block">
-          <span className="text-xs font-semibold uppercase tracking-wider text-mute">Where</span>
-          <div className="relative">
-            <MapPin size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-mute" />
-            <input
-              value={place}
-              onChange={(e) => setPlace(e.target.value)}
-              placeholder={city && city !== "Choose a city" ? city : "Neighbourhood or city"}
-              className={`${fieldInput} pl-9`}
-            />
-          </div>
-        </label>
+        <PlaceAddressField
+          value={place}
+          onChange={setPlace}
+          onPick={(picked: PickedPlace) => {
+            setPlace(picked.label);
+            setPlaceGeo(picked.geo);
+          }}
+          placeholder={city && city !== "Choose a city" ? city : "Search Google Maps"}
+        />
 
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-mute">Tickets</p>

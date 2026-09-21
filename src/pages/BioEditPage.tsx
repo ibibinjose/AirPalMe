@@ -28,10 +28,8 @@ import {
   BIO_LINK_TYPES,
   bioPath,
   catalogDeals,
-  handleError,
   isBusinessKind,
   isSocialLinkType,
-  normalizeHandle,
   type AvailabilityStatus,
   type BioCatalogItem,
   type BioCatalogKind,
@@ -43,6 +41,7 @@ import { BioCatalogEditor } from "@/components/bio/BioCatalogEditor";
 import { useBio } from "@/contexts/BioContext";
 import { ImageField } from "@/components/media/ImageField";
 import { makeQrDataUrl } from "@/lib/qr";
+import { toPublicUrl } from "@/lib/public-origin";
 import { cn } from "@/lib/cn";
 import { PhoneField } from "@/components/forms/PhoneField";
 import { isValidPhone } from "@shared/geo-address";
@@ -51,6 +50,7 @@ import { GooglePlaceImportCard, PersonalProfileListingHint } from "@/components/
 import { bioLinksFromGooglePlace, mergeBioLinks } from "@shared/google-place";
 import { Photo } from "@/components/ui/Photo";
 import { BioHandleButton } from "@/components/bio/BioHandleButton";
+import { ChangeHandleForm } from "@/components/bio/ChangeHandleForm";
 
 const CATEGORY_TAG_PRESETS = [
   { id: "Creator", label: "Creator 🎨" },
@@ -179,7 +179,7 @@ function formatFinalLinkHref(type: BioLinkType, input: string): string {
 
 export function BioEditPage() {
   const [, nav] = useLocation();
-  const { mine, business, updateProfile, tapsToday, transferHandle } = useBio();
+  const { mine, business, updateProfile, tapsToday } = useBio();
   const [tab, setTab] = useState<"profile" | "links" | "shop" | "share">("profile");
 
   // Editable Profile Form States
@@ -201,7 +201,6 @@ export function BioEditPage() {
   const [cover, setCover] = useState("");
 
   const [mapsPlaceId, setMapsPlaceId] = useState("");
-  const [nextHandle, setNextHandle] = useState("");
   const [links, setLinks] = useState<BioLink[]>([]);
   const [products, setProducts] = useState<BioCatalogItem[]>([]);
   const [services, setServices] = useState<BioCatalogItem[]>([]);
@@ -239,8 +238,7 @@ export function BioEditPage() {
     setServices(mine.services || []);
     setDeals(mine.deals?.length ? mine.deals : catalogDeals(mine));
     setZooHunt(Boolean(business?.zooHunt ?? mine.zooHunt));
-    const origin = window.location.origin;
-    void makeQrDataUrl(`${origin}${bioPath(mine.handle)}`).then(setQr);
+    void makeQrDataUrl(toPublicUrl(bioPath(mine.handle))).then(setQr);
   }, [business, mine]);
 
   if (!mine) {
@@ -257,7 +255,7 @@ export function BioEditPage() {
     );
   }
 
-  const share = `${typeof window !== "undefined" ? window.location.origin : "https://airpal.me"}${bioPath(mine.handle)}`;
+  const share = toPublicUrl(bioPath(mine.handle));
 
   async function onProfile(e: FormEvent) {
     e.preventDefault();
@@ -1099,40 +1097,8 @@ export function BioEditPage() {
                 )}
               </div>
 
-              {/* Transfer Handle Card */}
-              <div className="rounded-3xl border border-line bg-card p-6 shadow-xs space-y-3">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">Transfer / Change Handle</p>
-                <p className="text-xs text-mute">
-                  Move your current bio profile to a new available handle name.
-                </p>
-
-                <form
-                  className="space-y-3"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const err = handleError(nextHandle);
-                    if (err) {
-                      toast.error(err);
-                      return;
-                    }
-                    void transferHandle(mine.handle, nextHandle)
-                      .then((h) => {
-                        toast.success(`Handle transferred to @${h}`);
-                        setNextHandle("");
-                      })
-                      .catch((err) => toast.error(err instanceof Error ? err.message : "Failed to transfer handle"));
-                  }}
-                >
-                  <input
-                    value={nextHandle}
-                    onChange={(e) => setNextHandle(normalizeHandle(e.target.value))}
-                    placeholder="newhandle"
-                    className={fieldInput}
-                  />
-                  <Button type="submit" variant="ghost" className="w-full border border-line h-11 font-semibold" disabled={!nextHandle}>
-                    Transfer Handle
-                  </Button>
-                </form>
+              <div className="rounded-3xl border border-line bg-card p-6 shadow-xs">
+                <ChangeHandleForm current={mine.handle} profileId={mine.id} />
               </div>
             </div>
           )}

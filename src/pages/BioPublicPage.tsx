@@ -57,6 +57,7 @@ import {
 } from "@shared/bio";
 import type { PlanType } from "@shared/plan";
 import { mapsPlaceIdUrl, mapsPlaceUrl } from "@/lib/maps";
+import { toPublicUrl } from "@/lib/public-origin";
 import { NotFoundPage } from "./NotFoundPage";
 import { cn } from "@/lib/cn";
 import { useClub } from "@/contexts/ClubContext";
@@ -140,7 +141,7 @@ export function BioPublicPage() {
       title: `${profile.name} (@${profile.handle}) · AirPal.Me`,
       description: profile.shortWhy || profile.offer?.detail || "On AirPal.Me",
       image: profile.cover || profile.avatar,
-      url: `${window.location.origin}${bioPath(profile.handle)}`,
+      url: toPublicUrl(bioPath(profile.handle)),
     });
   }, [profile, recordTap]);
 
@@ -281,10 +282,7 @@ export function BioPublicPage() {
   const callLink = bio.links.find((l) => l.type === "call");
   const tel = bio.phone ? `tel:${bio.phone.replace(/\s/g, "")}` : callLink?.href;
 
-  const share =
-    typeof window !== "undefined"
-      ? `${window.location.origin}${bioPath(bio.handle)}`
-      : `https://airpal.me${bioPath(bio.handle)}`;
+  const share = toPublicUrl(bioPath(bio.handle));
   const stacked = stackLinks(bio.links).filter((l) => l.href !== websiteUrl && l.type !== "whatsapp");
   const avatar = bio.avatar && bio.avatar !== bio.cover ? bio.avatar : undefined;
 

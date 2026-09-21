@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { createPromotionRemote, friendlyPromotionError, submitPromotionRemote } from "@/lib/promotions";
 import { MECHANIC_TYPES, PROMOTION_CATEGORIES } from "@shared/promotions";
+import { PlaceAddressField } from "@/components/forms/PlaceAddressField";
 
 export function BusinessPromotionNewPage() {
   const { requireUser } = useAuth();
@@ -106,7 +107,6 @@ export function BusinessPromotionNewPage() {
           ["sponsorName", "Business name"],
           ["prizeTitle", "Offer / prize title"],
           ["prizeValue", "Value (e.g. 20% off, ₹5,000 approx.)"],
-          ["locationText", "Location"],
           ["eligibility", "Eligibility"],
         ].map(([k, label]) => (
           <label key={k} className="block text-xs font-semibold">
@@ -118,6 +118,12 @@ export function BusinessPromotionNewPage() {
             />
           </label>
         ))}
+        <PlaceAddressField
+          label="Location"
+          value={form.locationText}
+          onChange={(text) => set("locationText", text)}
+          placeholder="Search Google Maps"
+        />
         <label className="block text-xs font-semibold">
           Description
           <textarea

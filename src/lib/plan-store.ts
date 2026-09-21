@@ -12,6 +12,7 @@ import {
 } from "@shared/plan";
 import { getFirebaseDb, isFirebaseConfigured } from "./firebase";
 import { collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, deleteDoc, where } from "firebase/firestore";
+import { omitUndefinedDeep } from "./firestore-data";
 
 const STORAGE_KEY = "airpal.plans.v3";
 
@@ -164,7 +165,7 @@ export function savePlan(plan: HangoutPlan, syncRemote = true): HangoutPlan {
   if (syncRemote && isFirebaseConfigured) {
     const db = getFirebaseDb();
     if (db) {
-      setDoc(doc(db, "plans", finalPlan.id), finalPlan, { merge: true }).catch(() => {
+      setDoc(doc(db, "plans", finalPlan.id), omitUndefinedDeep(finalPlan), { merge: true }).catch(() => {
         /* stay on the device copy until sync retries */
       });
     }

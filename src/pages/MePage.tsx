@@ -19,6 +19,7 @@ import { loadHunts } from "@/lib/hunts-store";
 import { listMemories } from "@/lib/memories";
 import { listPeople } from "@/lib/people";
 import { InvitePanel } from "@/components/invite/InvitePanel";
+import { ChangeHandleForm } from "@/components/bio/ChangeHandleForm";
 import { BookingsSection } from "@/components/booking/BookingsSection";
 import { PayoutSetupCard } from "@/components/connect/PayoutSetupCard";
 import { cn } from "@/lib/cn";
@@ -142,6 +143,12 @@ export function MePage() {
               </div>
             </div>
           </div>
+
+          {mine && (
+            <div className="rounded-[28px] ring-1 ring-line bg-card p-5 shadow-xs">
+              <ChangeHandleForm current={mine.handle} profileId={mine.id} />
+            </div>
+          )}
 
           <AccountContacts compact />
 

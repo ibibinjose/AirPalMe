@@ -13,6 +13,7 @@ import { listMyCatchUpReminders, removeCatchUp, type CatchUpItem } from "@/lib/c
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { bioPath } from "@shared/bio";
 import { fieldInput } from "@/components/forms/ValidField";
+import { PlaceAddressField } from "@/components/forms/PlaceAddressField";
 
 function formatDay(iso: string): string {
   try {
@@ -221,12 +222,11 @@ export function PeoplePage() {
                 maxLength={40}
                 className={fieldInput}
               />
-              <input
+              <PlaceAddressField
+                label=""
                 value={whereMet}
-                onChange={(e) => setWhereMet(e.target.value)}
+                onChange={setWhereMet}
                 placeholder="Where you met — Bondi markets"
-                maxLength={80}
-                className={fieldInput}
               />
               <Button type="submit" className="w-full rounded-full">
                 Save person

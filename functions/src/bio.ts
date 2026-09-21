@@ -252,20 +252,42 @@ export const transferHandle = onCall(CALLABLE, async (request) => {
   const to = normalizeHandle(String(data.to || ""));
   const err = handleError(to);
   if (err) throw new HttpsError("invalid-argument", err);
-  const href = await db.collection("handles").doc(from).get();
-  if (!href.exists) throw new HttpsError("not-found", "No handle.");
-  const owner = String(href.data()?.ownerUid || "");
+  if (from === to) return { handle: to, profileId: "" };
   const admin = isPlatformAdmin((request.auth?.token || {}) as AccessClaims);
-  if (owner !== uid && !admin) throw new HttpsError("permission-denied", "Not yours.");
+  const href = await db.collection("handles").doc(from).get();
+  let profileId = "";
+  let owner = uid;
+  if (href.exists) {
+    owner = String(href.data()?.ownerUid || "");
+    if (owner !== uid && !admin) throw new HttpsError("permission-denied", "Not yours.");
+    profileId = String(href.data()?.profileId || "");
+  } else {
+    const owned = await db.collection("profiles").where("ownerUid", "==", uid).get();
+    const match =
+      owned.docs.find((row) => String(row.data()?.handle || "") === from) ||
+      owned.docs.find((row) => String(row.data()?.kind || "person") === "person");
+    if (!match) throw new HttpsError("not-found", "No handle.");
+    profileId = match.id;
+  }
+  if (!profileId) throw new HttpsError("not-found", "No handle.");
   const taken = await db.collection("handles").doc(to).get();
-  if (taken.exists) throw new HttpsError("already-exists", "Taken");
-  const profileId = String(href.data()?.profileId);
-  await db.collection("handles").doc(to).set({ handle: to, profileId, ownerUid: owner });
-  await db.collection("handles").doc(from).delete();
+  if (taken.exists && String(taken.data()?.profileId || "") !== profileId) {
+    throw new HttpsError("already-exists", "Taken");
+  }
+  const profileSnap = await db.collection("profiles").doc(profileId).get();
+  const kind = String(profileSnap.data()?.kind || "person");
+  await db.collection("handles").doc(to).set({ handle: to, profileId, ownerUid: owner || uid });
+  if (from) await db.collection("handles").doc(from).delete().catch(() => undefined);
   await db
     .collection("profiles")
     .doc(profileId)
     .set({ handle: to, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+  const userRef = db.collection("users").doc(uid);
+  const userSnap = await userRef.get();
+  const accountHandle = normalizeHandle(String(userSnap.data()?.handle || ""));
+  if (kind !== "business" || accountHandle === from || !accountHandle) {
+    await userRef.set({ handle: to, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+  }
   return { handle: to, profileId };
 });
 

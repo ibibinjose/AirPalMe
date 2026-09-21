@@ -19,6 +19,28 @@ type NominatimRow = {
   extratags?: Record<string, string>;
 };
 
+function asAddressHit(row: NominatimRow): OsmSearchHit | null {
+  const osmType = String(row.osm_type || "").toLowerCase();
+  const osmId = String(row.osm_id || "");
+  const name = String(row.name || "").trim() || String(row.display_name || "").split(",")[0]?.trim() || "";
+  const lat = Number(row.lat);
+  const lng = Number(row.lon);
+  if (!osmType || !osmId || !name) return null;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return {
+    osmType,
+    osmId,
+    name,
+    displayName: String(row.display_name || name),
+    category: String(row.category || row.class || "").toLowerCase(),
+    type: String(row.type || "").toLowerCase(),
+    lat,
+    lng,
+    address: row.address || {},
+    extra: row.extratags || {},
+  };
+}
+
 function asHit(row: NominatimRow): OsmSearchHit | null {
   const osmType = String(row.osm_type || "").toLowerCase();
   const osmId = String(row.osm_id || "");
@@ -55,6 +77,7 @@ async function nominatim(path: string): Promise<NominatimRow[]> {
 export async function searchOsmPlaces(
   input: string,
   bias?: Geo,
+  includeAddresses = false,
 ): Promise<Array<{ placeId: string; title: string; subtitle: string }>> {
   const needle = input.trim();
   if (needle.length < 2) return [];
@@ -73,7 +96,7 @@ export async function searchOsmPlaces(
   const rows = await nominatim(`/search?${params.toString()}`);
   const hits: Array<{ placeId: string; title: string; subtitle: string }> = [];
   for (const row of rows) {
-    const hit = asHit(row);
+    const hit = includeAddresses ? asAddressHit(row) || asHit(row) : asHit(row);
     if (!hit) continue;
     const place = osmHitToImport(hit);
     cache.set(place.placeId, place);

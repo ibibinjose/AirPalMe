@@ -2,6 +2,7 @@ import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase
 import { normalizeHandle } from "@shared/bio";
 import { getFirebaseDb } from "./firebase";
 import { fetchPublicBio } from "./bio-store";
+import { publicSiteOrigin, toPublicUrl } from "./public-origin";
 
 const REF_KEY = "airpal:invite-ref:v1";
 
@@ -43,10 +44,11 @@ export function normalizeInviteCode(raw: string | null | undefined): string | nu
   return handle || null;
 }
 
-/** Shareable join link for an @handle. Origin is injected so tests stay pure. */
-export function inviteLinkFor(handle: string, origin: string): string {
+/** Shareable join link for an @handle. Always https://airpal.me — never capacitor://. */
+export function inviteLinkFor(handle: string, origin?: string): string {
   const code = normalizeHandle(handle);
-  return `${origin.replace(/\/$/, "")}/start?tab=signup&ref=${encodeURIComponent(code)}`;
+  const base = toPublicUrl(`${(origin || publicSiteOrigin()).replace(/\/$/, "")}/`).replace(/\/$/, "");
+  return `${base}/start?tab=signup&ref=${encodeURIComponent(code)}`;
 }
 
 /** Resolve an invite code to the inviter (public reads only). */
