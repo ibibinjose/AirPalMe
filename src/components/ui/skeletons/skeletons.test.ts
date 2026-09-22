@@ -6,8 +6,6 @@ import {
   PlaceCardSkeletonGrid,
   CalendarEventCardSkeleton,
   CalendarEventSkeletonList,
-  PlanCardSkeleton,
-  PlanCardSkeletonGrid,
   TourCardSkeleton,
   TourCardSkeletonGrid,
   TonightEventCardSkeleton,
@@ -43,17 +41,6 @@ describe("Skeleton Loading Components", () => {
     const html = renderToStaticMarkup(createElement(CalendarEventSkeletonList, { count: 3 }));
     expect(html).toContain('role="status"');
     expect(html).toContain('aria-label="Loading calendar events"');
-  });
-
-  it("renders PlanCardSkeleton and PlanCardSkeletonGrid", () => {
-    const singleHtml = renderToStaticMarkup(createElement(PlanCardSkeleton));
-    expect(singleHtml).toContain('aria-hidden="true"');
-    expect(singleHtml).toContain("animate-shimmer");
-
-    const html = renderToStaticMarkup(createElement(PlanCardSkeletonGrid, { count: 3 }));
-    expect(html).toContain('role="status"');
-    expect(html).toContain('aria-label="Loading plans"');
-    expect(html).toContain("animate-shimmer");
   });
 
   it("renders TourCardSkeleton and TourCardSkeletonGrid", () => {
