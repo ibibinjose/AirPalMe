@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import {
   ArrowLeft,
   Calendar,
+  ChevronRight,
+  Clock,
   Coffee,
   ContactRound,
   Edit3,
@@ -11,8 +13,10 @@ import {
   HeartHandshake,
   MapPin,
   MessageCircle,
+  Navigation,
   Phone,
   QrCode,
+  Share2,
   Sparkles,
   Ticket,
   UserPlus,
@@ -61,6 +65,42 @@ import { toPublicUrl } from "@/lib/public-origin";
 import { NotFoundPage } from "./NotFoundPage";
 import { cn } from "@/lib/cn";
 import { useClub } from "@/contexts/ClubContext";
+
+/** Round Google-style action: brand icon in a ringed circle with a label. */
+function BizCircle({
+  label,
+  Icon,
+  href,
+  onClick,
+}: {
+  label: string;
+  Icon: typeof Phone;
+  href?: string;
+  onClick?: () => void;
+}) {
+  const circle =
+    "grid h-14 w-14 place-items-center rounded-full bg-card text-brand ring-1 ring-line shadow-xs transition active:scale-95";
+  const wrap = "flex min-w-[64px] touch-manipulation flex-col items-center gap-1.5";
+  const caption = "text-[12px] font-semibold text-brand";
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer" onClick={onClick} className={wrap} aria-label={label}>
+        <span className={circle}>
+          <Icon size={22} />
+        </span>
+        <span className={caption}>{label}</span>
+      </a>
+    );
+  }
+  return (
+    <button type="button" onClick={onClick} className={wrap} aria-label={label}>
+      <span className={circle}>
+        <Icon size={22} />
+      </span>
+      <span className={caption}>{label}</span>
+    </button>
+  );
+}
 
 export function BioPublicPage() {
   const [path, nav] = useLocation();
@@ -533,7 +573,7 @@ export function BioPublicPage() {
 
           {/* Extended Bio / About Story Card */}
           {bio.aboutText && (
-            <div className="mt-3.5 rounded-2xl bg-card p-4 border border-line/70 shadow-xs">
+            <div id="bio-about" className="mt-3.5 scroll-mt-24 rounded-2xl bg-card p-4 border border-line/70 shadow-xs">
               <p className="text-[10px] font-bold uppercase tracking-wider text-gold mb-1">About Story</p>
               <p className="text-xs leading-relaxed text-ink/80 whitespace-pre-line">{bio.aboutText}</p>
             </div>
@@ -608,6 +648,154 @@ export function BioPublicPage() {
             </div>
           )}
         </div>
+
+        {/* Business profile — Google-style status, sections, actions, info, follow */}
+        {bio.kind === "business" && (
+          <div className="mt-5">
+            <p className="text-[15px]">
+              <span className={cn("font-semibold", bio.openNow ? "text-emerald-700" : "text-red-600")}>
+                {bio.openNow ? "Open now" : "Closed"}
+              </span>
+              {bio.hours && <span className="text-mute"> · {bio.hours}</span>}
+            </p>
+
+            <div
+              className="mt-3 flex gap-2 overflow-x-auto pb-1 no-scrollbar"
+              role="navigation"
+              aria-label="Business sections"
+            >
+              <button
+                type="button"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                className="h-10 shrink-0 rounded-full bg-ink px-4 text-sm font-semibold text-white transition active:scale-95"
+              >
+                Overview
+              </button>
+              {liveOffer && (
+                <button
+                  type="button"
+                  onClick={() => document.getElementById("bio-offers")?.scrollIntoView({ behavior: "smooth" })}
+                  className="h-10 shrink-0 rounded-full bg-paper px-4 text-sm font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
+                >
+                  Offers
+                </button>
+              )}
+              {(bio.products || []).length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => document.getElementById("bio-products")?.scrollIntoView({ behavior: "smooth" })}
+                  className="h-10 shrink-0 rounded-full bg-paper px-4 text-sm font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
+                >
+                  Products
+                </button>
+              )}
+              {(bio.services || []).length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => document.getElementById("bio-services")?.scrollIntoView({ behavior: "smooth" })}
+                  className="h-10 shrink-0 rounded-full bg-paper px-4 text-sm font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
+                >
+                  Services
+                </button>
+              )}
+              {bio.aboutText && (
+                <button
+                  type="button"
+                  onClick={() => document.getElementById("bio-about")?.scrollIntoView({ behavior: "smooth" })}
+                  className="h-10 shrink-0 rounded-full bg-paper px-4 text-sm font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
+                >
+                  About
+                </button>
+              )}
+            </div>
+
+            <div className="mt-4 flex gap-3 overflow-x-auto pb-1 no-scrollbar" aria-label="Contact actions">
+              {tel && (
+                <BizCircle label="Call" Icon={Phone} href={tel} onClick={() => recordTap(bio.handle, "call")} />
+              )}
+              {maps && (
+                <BizCircle
+                  label="Directions"
+                  Icon={Navigation}
+                  href={maps}
+                  onClick={() => {
+                    recordTap(bio.handle, "maps");
+                    trackMapClick({ source: "bio" });
+                  }}
+                />
+              )}
+              {websiteUrl && (
+                <BizCircle
+                  label="Website"
+                  Icon={Globe}
+                  href={websiteUrl}
+                  onClick={() => recordTap(bio.handle, websiteLink?.type || "website")}
+                />
+              )}
+              <BizCircle label="Share" Icon={Share2} onClick={() => setShareModalOpen(true)} />
+              <BizCircle
+                label="Save"
+                Icon={ContactRound}
+                onClick={() => {
+                  void openVCardContact({
+                    name: bio.name,
+                    phone: bio.phone,
+                    url: share,
+                    note: `AirPal bio · AirPal.Me/@${bio.handle}`,
+                  });
+                }}
+              />
+            </div>
+
+            {(bio.city || bio.hours || bio.phone) && (
+              <ul className="mt-4 divide-y divide-line/70 rounded-[28px] bg-card ring-1 ring-line">
+                {bio.city && (
+                  <li>
+                    <a
+                      href={maps || undefined}
+                      target={maps ? "_blank" : undefined}
+                      rel="noreferrer"
+                      onClick={() => maps && recordTap(bio.handle, "maps")}
+                      className="flex items-center gap-3 p-4"
+                    >
+                      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
+                        <MapPin size={20} />
+                      </span>
+                      <span className="min-w-0 flex-1 text-[15px] font-medium text-ink">{bio.city}</span>
+                      {maps && <ChevronRight size={18} className="shrink-0 text-mute" />}
+                    </a>
+                  </li>
+                )}
+                {bio.hours && (
+                  <li className="flex items-center gap-3 p-4">
+                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
+                      <Clock size={20} />
+                    </span>
+                    <span className="min-w-0 flex-1 text-[15px] font-medium text-ink">{bio.hours}</span>
+                  </li>
+                )}
+                {bio.phone && (
+                  <li>
+                    <a href={tel || undefined} onClick={() => recordTap(bio.handle, "call")} className="flex items-center gap-3 p-4">
+                      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
+                        <Phone size={20} />
+                      </span>
+                      <span className="min-w-0 flex-1 text-[15px] font-medium text-ink">{bio.phone}</span>
+                      <ChevronRight size={18} className="shrink-0 text-mute" />
+                    </a>
+                  </li>
+                )}
+              </ul>
+            )}
+
+            <div className="mt-4 rounded-[28px] bg-card p-4 ring-1 ring-line">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
+                Follow @{bio.handle}
+              </p>
+              <BioSocials links={bio.links} onTap={(kind) => recordTap(bio.handle, kind)} />
+            </div>
+          </div>
+        )}
 
         {/* Who is interested to catch up with you (Owner Inbox & Requests) */}
         {isOwner && catchUpsList.length > 0 && (
@@ -809,7 +997,7 @@ export function BioPublicPage() {
 
         {/* Featured Live Offer Banner */}
         {liveOffer && (
-          <div className="mt-7 overflow-hidden rounded-3xl bg-gradient-to-br from-card to-paper p-5 ring-1 ring-gold/40 shadow-sm">
+          <div id="bio-offers" className="mt-7 scroll-mt-24 overflow-hidden rounded-3xl bg-gradient-to-br from-card to-paper p-5 ring-1 ring-gold/40 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
                 <Sparkles size={12} />
@@ -869,7 +1057,9 @@ export function BioPublicPage() {
           </ul>
         )}
 
-        <BioSocials links={bio.links} onTap={(kind) => recordTap(bio.handle, kind)} />
+        {bio.kind !== "business" && (
+          <BioSocials links={bio.links} onTap={(kind) => recordTap(bio.handle, kind)} />
+        )}
 
         {/* Open in Maps */}
         {maps && (

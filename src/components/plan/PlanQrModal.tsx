@@ -63,8 +63,12 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
     try {
       setIsPrinting(true);
       void triggerHaptic("medium");
-      await exportPlanItineraryPdf(plan);
-      toast.success("Itinerary PDF opened for print & save!");
+      const done = await exportPlanItineraryPdf(plan);
+      toast.success(
+        done === "shared"
+          ? "Plan link shared — open it in Safari or Chrome to print the guide."
+          : "Itinerary PDF opened for print & save!",
+      );
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to generate PDF");
     } finally {

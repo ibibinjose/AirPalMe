@@ -24,6 +24,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { toast } from "sonner";
 import { PageLoading } from "@/components/ui/PageLoading";
 import { setShareMeta } from "@/lib/share-meta";
 import { usePlans } from "@/contexts/PlanContext";
@@ -119,6 +120,20 @@ export function PlanDetailPage() {
   const arrivedViaInvite = Boolean(paramsInvite?.code);
 
   const bookedId = searchParams.get("booked") || "";
+
+  async function handlePrintGuide() {
+    if (!plan) return;
+    try {
+      const done = await exportPlanItineraryPdf(plan);
+      toast.success(
+        done === "shared"
+          ? "Plan link shared — open it in Safari or Chrome to print the guide."
+          : "Itinerary PDF opened for print & save!",
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to generate PDF");
+    }
+  }
   const ticketed = plan ? isTicketed(plan) : false;
   const soldOut = plan ? isSoldOut(plan) : false;
 
@@ -630,7 +645,7 @@ export function PlanDetailPage() {
 
           <button
             type="button"
-            onClick={() => exportPlanItineraryPdf(plan)}
+            onClick={() => void handlePrintGuide()}
             className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95 col-span-full"
           >
             <Printer size={16} className="text-amber-500" />
@@ -663,7 +678,7 @@ export function PlanDetailPage() {
             </span>
             <button
               type="button"
-              onClick={() => exportPlanItineraryPdf(plan)}
+              onClick={() => void handlePrintGuide()}
               className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 ring-line bg-paper text-mute hover:text-ink transition active:scale-95"
               title="Export Itinerary as PDF / Print Guide"
             >

@@ -7,15 +7,35 @@ import {
   EXPERIENCE_CATEGORIES,
 } from "@shared/plan";
 import { makeQrDataUrl } from "@/lib/qr";
+import { isNativeApp, shareNative } from "@/lib/native";
 
 /**
  * Generates and prints a magazine-quality, print-optimized physical PDF / trip guide
  * for the plan with full itinerary stops, arrival times, addresses, notes, inclusions,
  * and a dynamic QR code linking back to the live digital plan.
  */
-export async function exportPlanItineraryPdf(plan: HangoutPlan): Promise<void> {
+export async function exportPlanItineraryPdf(plan: HangoutPlan): Promise<"printed" | "shared"> {
   const origin = typeof window !== "undefined" ? window.location.origin : "https://airpal.me";
   const inviteUrl = planInviteUrl(plan.id, origin);
+
+  // Open synchronously inside the tap — any await before window.open hands
+  // the popup to the blocker (iOS Safari and Android Chrome are strictest).
+  const printWindow = window.open("", "_blank", "width=850,height=1100");
+  if (!printWindow) {
+    // App shells have no popup windows at all: share the live plan link so
+    // the guest can open it in Safari/Chrome and print from there.
+    if (isNativeApp()) {
+      const shared = await shareNative({
+        title: `${plan.title} — trip guide`,
+        text: `Open "${plan.title}" in Safari or Chrome to print the trip guide:`,
+        url: inviteUrl,
+      });
+      if (shared) return "shared";
+    }
+    throw new Error("Could not open print window. Please allow popups for this site.");
+  }
+  printWindow.document.write("<html><body><p>Preparing your trip guide…</p></body></html>");
+
   const qrDataUrl = await makeQrDataUrl(inviteUrl, 240);
 
   const typeInfo = PLAN_TYPES[plan.type] || PLAN_TYPES.custom;
@@ -23,11 +43,6 @@ export async function exportPlanItineraryPdf(plan: HangoutPlan): Promise<void> {
     plan.isExperience && plan.experienceCategory
       ? `${EXPERIENCE_CATEGORIES[plan.experienceCategory]?.emoji || "✨"} ${EXPERIENCE_CATEGORIES[plan.experienceCategory]?.label || "Experience"}`
       : typeInfo.label;
-
-  const printWindow = window.open("", "_blank", "width=850,height=1100");
-  if (!printWindow) {
-    throw new Error("Could not open print window. Please allow popups for this site.");
-  }
 
   const stopsHtml =
     plan.stops.length > 0
@@ -502,6 +517,7 @@ export async function exportPlanItineraryPdf(plan: HangoutPlan): Promise<void> {
   printWindow.document.open();
   printWindow.document.write(html);
   printWindow.document.close();
+  return "printed";
 }
 
 function escapeHtml(str: string): string {

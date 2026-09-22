@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useLocation } from "wouter";
 import { ImageField } from "@/components/media/ImageField";
+import { Photo } from "@/components/ui/Photo";
 import { EVENT_FLAVOUR_LABELS } from "@shared/event";
 import { hrefForStall } from "@/lib/bio-handle";
 import { bioPath } from "@shared/bio";
@@ -104,17 +105,23 @@ export function MePage() {
       <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
         {/* Left Column: Avatar Hero, Handle, Quick Links & Contacts (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="rounded-[28px] ring-1 ring-line bg-card p-6 text-center shadow-xs">
-            <div className="flex flex-col items-center">
-              <ImageField
-                kind="avatar"
-                round
-                align="center"
-                previewClassName="h-28 w-28"
-                value={mine?.avatar}
-                onChange={(src) => void onAvatar(src)}
-                cornerBadge={mine ? <BioKindIcon kind={mine.kind} /> : undefined}
-              />
+          <div className="overflow-hidden rounded-[28px] ring-1 ring-line bg-card text-center shadow-xs">
+            <div className="relative h-28">
+              <Photo src="/media/harbour.jpg" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="hero-scrim absolute inset-0" />
+            </div>
+            <div className="flex flex-col items-center px-6 pb-6">
+              <div className="-mt-14 rounded-full ring-4 ring-card">
+                <ImageField
+                  kind="avatar"
+                  round
+                  align="center"
+                  previewClassName="h-28 w-28"
+                  value={mine?.avatar}
+                  onChange={(src) => void onAvatar(src)}
+                  cornerBadge={mine ? <BioKindIcon kind={mine.kind} /> : undefined}
+                />
+              </div>
               <h1 className="font-display mt-4 text-3xl font-bold tracking-tight text-ink">{user.displayName || mine?.name || "Account"}</h1>
               <p className="mt-1 text-sm font-medium text-mute">
                 {mine ? `@${mine.handle}` : biosReady ? "No @handle yet" : "Loading your profile…"}

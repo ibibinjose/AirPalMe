@@ -106,7 +106,7 @@ export function HomePage() {
             {greeting}, {firstName}
           </p>
           <h1 className="font-display mt-1 text-[34px] font-bold leading-[1.02] tracking-tight text-white">
-            Around you
+            What&apos;s on
           </h1>
           <p className="mt-1 text-[14px] font-medium text-white/80">{city}</p>
           <div className="mt-4">
@@ -178,11 +178,11 @@ export function HomePage() {
         <CategoryTile icon={Users} label="People" href="/mate" tint="#e2f5e5" fg="#2fa866" />
       </nav>
 
-      {/* Around you */}
-      <section aria-label="Around you" className="mt-8">
+      {/* What's on near you */}
+      <section aria-label="What's on near you" className="mt-8">
         <SectionHeader title="Nearby" actionLabel="See all" actionHref="/explore" />
         <div className="mt-3">
-          <PillRow options={AROUND} value={around} onChange={setAround} label="Around you categories" />
+          <PillRow options={AROUND} value={around} onChange={setAround} label="What's on categories" />
         </div>
         {around === "community" ? (
           <CardShell href="/club" label="Open communities" className="mt-3 p-5">
@@ -196,7 +196,7 @@ export function HomePage() {
           </CardShell>
         ) : around === "events" ? (
           tonightEvents.length > 0 ? (
-            <div className="mt-3 flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+            <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-4 pb-2 no-scrollbar md:mx-0 md:px-0">
               {tonightEvents.map((e) => {
                 const day = new Date(`${e.date}T00:00:00`);
                 const dayNum = Number.isNaN(day.getTime()) ? "" : String(day.getDate());
@@ -204,7 +204,7 @@ export function HomePage() {
                   ? ""
                   : day.toLocaleString(undefined, { month: "short" });
                 return (
-                <CardShell key={e.id} href={e.gatePath || `/e/${e.id}`} label={e.title} className="w-64 shrink-0">
+                <CardShell key={e.id} href={e.gatePath || `/e/${e.id}`} label={e.title} className="w-64 shrink-0 snap-start">
                   <div className="relative aspect-square overflow-hidden bg-paper">
                     <Photo
                       src={e.heroImage || "/media/laneway.jpg"}
@@ -248,9 +248,9 @@ export function HomePage() {
             </div>
           )
         ) : places.length > 0 ? (
-          <div className="mt-3 flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+          <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-4 pb-2 no-scrollbar md:mx-0 md:px-0">
             {places.map((p) => (
-              <CardShell key={p.id} href={hrefForPlace(p)} label={p.name} className="w-64 shrink-0">
+              <CardShell key={p.id} href={hrefForPlace(p)} label={p.name} className="w-64 shrink-0 snap-start">
                 <div className="relative aspect-square overflow-hidden bg-paper">
                   <Photo
                     src={p.heroImage || p.photos?.[0] || "/media/harbour.jpg"}
