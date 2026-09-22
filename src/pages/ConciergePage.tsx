@@ -228,20 +228,30 @@ export function ConciergePage() {
             </div>
           </div>
 
-          <div className="rounded-3xl ring-1 ring-line bg-gradient-to-r from-brand/10 via-amber-500/10 to-purple-500/10 p-4 shadow-xs flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
-                <HeartHandshake size={20} />
+          <div className="relative overflow-hidden rounded-3xl ring-1 ring-white/10 bg-gradient-to-br from-brand via-[#1c08d4] to-[#0d027a] p-4 text-white shadow-md flex items-center justify-between gap-3">
+            <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-amber-400/20 blur-xl pointer-events-none" />
+            <div className="relative flex items-center gap-3 min-w-0">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white/15 text-white ring-1 ring-white/25 shadow-inner backdrop-blur-md">
+                <HeartHandshake size={22} className="text-amber-300" />
               </span>
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
+              <div className="min-w-0">
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-400 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-slate-950 shadow-xs mb-1">
+                  <Sparkles size={11} className="text-slate-950" />
                   AirPal Mate Priority
+                </span>
+                <p className="text-[13px] font-extrabold text-white leading-snug truncate">
+                  Exploring {property.city || "Sydney"} alone?
                 </p>
-                <p className="text-xs font-bold text-ink">Exploring Sydney alone?</p>
-                <p className="text-[11px] text-mute">Find a local AirPal Mate to go with you.</p>
+                <p className="text-[11px] text-white/80 font-medium truncate">
+                  Find a verified local Mate to go with you.
+                </p>
               </div>
             </div>
-            <Button size="sm" className="shrink-0 font-bold gap-1 shadow-xs rounded-full" onClick={() => nav("/companion")}>
+            <Button
+              size="sm"
+              className="relative shrink-0 font-extrabold gap-1.5 shadow-sm rounded-full bg-white text-brand hover:bg-amber-300 hover:text-slate-950 transition active:scale-95 px-3.5 h-9"
+              onClick={() => nav("/companion")}
+            >
               <span>Find Mate</span>
               <ArrowRight size={14} />
             </Button>
