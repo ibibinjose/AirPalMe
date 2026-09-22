@@ -48,42 +48,44 @@ Always report numerator, denominator, and the per-context distribution — never
 | `support_resolved`    | Host closed a ticket                                                                                                                   | Yes                                   |
 | `host_activation`     | Host listed a property / listing / event                                                                                               | No                                    |
 | `content_publish`     | Operator published content                                                                                                             | No                                    |
-| `content_update`      | Operator updated existing content                                                                                                      | No                                    |
+| `content_update`      | Operator updated published content                                                                                                     | No                                    |
+| `calendar_event_view` | Calendar event detail opened                                                                                                           | No                                    |
+| `calendar_event_share` | Share invoked from a calendar event                                                                                                   | No                                    |
+| `calendar_event_going` | Going RSVP from a calendar event                                                                                                      | No                                    |
+| `calendar_event_interested` | Interested RSVP from a calendar event                                                                                            | No                                    |
+| `calendar_event_liked` | Like toggled on a calendar event                                                                                                      | No                                    |
+| `calendar_event_directions` | Directions opened for a calendar event                                                                                         | No                                    |
+| `calendar_event_open` | Calendar event opened (source tile/link)                                                                                               | No                                    |
+| `calendar_month_navigate` | Month grid paged forward/back                                                                                                      | No                                    |
+| `calendar_jump_today` | Jumped back to today                                                                                                                   | No                                    |
+| `calendar_date_select` | Day cell selected                                                                                                                      | No                                    |
+| `calendar_view_change` | Calendar layout changed (month/agenda/…)                                                                                               | No                                    |
+| `calendar_filter_change` | Calendar filter changed                                                                                                               | No                                    |
+| `calendar_category_filter` | Calendar filtered by category                                                                                                    | No                                    |
+| `calendar_search`     | Calendar searched                                                                                                                      | No                                    |
+| `calendar_export_batch` | Batch export of calendar events                                                                                                     | No                                    |
+| `calendar_agenda_export_day` | Single agenda day exported                                                                                                      | No                                    |
+| `calendar_export_selected_day` | Selected day exported                                                                                                          | No                                    |
+| `calendar_event_reschedule` | Calendar event moved to a new date                                                                                              | No                                    |
+| `favorites_view`      | Local favorites list viewed                                                                                                            | No                                    |
+| `favorites_place_select` | Favorite place selected                                                                                                            | No                                    |
+| `favorites_filter_change` | Favorites filtered by category                                                                                                    | No                                    |
+| `companion_cta_viewed` | Mate application CTA shown                                                                                                            | No                                    |
+| `companion_application_started` | Mate application form opened                                                                                                | No                                    |
+| `companion_application_submitted` | Mate application submitted                                                                                              | No                                    |
+| `companion_application_reviewed` | Mate application reviewed (requires `status`)                                                                             | No                                    |
 | `rating_submitted`    | Guest rating stored                                                                                                                    | Yes                                   |
 | `share_created`       | Share sheet used                                                                                                                       | No                                    |
-| `calendar_event_view` | Calendar event viewed                                                                                                                  | No                                    |
-| `calendar_event_share` | Calendar event share action                                                                                                           | No                                    |
-| `calendar_event_going` | Calendar event marked as going                                                                                                        | No                                    |
-| `calendar_event_interested` | Calendar event marked as interested                                                                                              | No                                    |
-| `calendar_event_liked` | Calendar event liked                                                                                                                  | No                                    |
-| `calendar_event_directions` | Directions opened for a calendar event                                                                                           | No                                    |
-| `calendar_event_open` | Calendar event opened                                                                                                                   | No                                    |
-| `calendar_month_navigate` | Calendar month navigation                                                                                                         | No                                    |
-| `calendar_jump_today` | Calendar jump-to-today action                                                                                                           | No                                    |
-| `calendar_date_select` | Calendar date selected                                                                                                                 | No                                    |
-| `calendar_view_change` | Calendar view changed                                                                                                                  | No                                    |
-| `calendar_filter_change` | Calendar filter changed                                                                                                                | No                                    |
-| `calendar_category_filter` | Calendar category filter changed                                                                                                      | No                                    |
-| `calendar_search`    | Calendar search submitted                                                                                                               | No                                    |
-| `calendar_export_batch` | Calendar export batch action                                                                                                           | No                                    |
-| `calendar_agenda_export_day` | Calendar agenda day export action                                                                                               | No                                    |
-| `calendar_export_selected_day` | Calendar selected-day export action                                                                                              | No                                    |
-| `calendar_event_reschedule` | Calendar event rescheduled                                                                                                       | No                                    |
-| `favorites_view`     | Favorites view opened                                                                                                                   | No                                    |
-| `favorites_place_select` | Place selected from favorites                                                                                                      | No                                    |
-| `favorites_filter_change` | Favorites filter changed                                                                                                           | No                                    |
-| `companion_cta_viewed` | Companion call-to-action viewed                                                                                                      | No                                    |
-| `companion_application_started` | Companion application started                                                                                                  | No                                    |
-| `companion_application_submitted` | Companion application submitted                                                                                              | No                                    |
-| `companion_application_reviewed` | Companion application reviewed                                                                                                  | No                                    |
 | `client_error`        | Uncaught window error, unhandled rejection, or React boundary. No stack, URL, or free text — `errorClass` + `errorSource` + path only. | No                                    |
 
-### Event properties
+Not emitted until the product exists: `event_check_in`, `subscription_state`.
 
-Property names below are the allowlisted keys from `shared/analytics.ts`. Required properties must be present and non-empty; optional properties are included only when available. Values are clipped to 200 characters and sensitive keys are rejected.
+## Property contract (required / optional)
 
-| Event | Required properties | Optional properties |
-| --- | --- | --- |
+Mirrors `EVENT_PROPERTY_ALLOWLIST` in `shared/analytics.ts`. `validateAnalyticsEvent` rejects events missing a required key (`missing:<key>`), drops unlisted keys, and rejects sensitive keys. Collectors must always send every required key for the event they emit — the typed helpers in `src/lib/analytics.ts` (`trackFirstValue`, `trackContentAction`, `trackPageView`) do this by signature; raw `track()` callers must pass them by hand.
+
+| Event | Required | Optional |
+| ----- | -------- | -------- |
 | `session_started` | `entryPath`, `source` | `referrerClass`, `locale` |
 | `qr_scan` | `contextType`, `contextId` | `qrCampaignId`, `placementType`, `source` |
 | `context_view` | `contextType`, `contextId`, `loadStatus` | `loadMs`, `backendState` |
@@ -95,7 +97,7 @@ Property names below are the allowlisted keys from `shared/analytics.ts`. Requir
 | `offer_view` | `offerId`, `partnerId`, `contextId` | `placement` |
 | `offer_claim` | `offerId`, `partnerId`, `claimId`, `contextId` | `expiryBucket` |
 | `offer_redeem` | `offerId`, `partnerId`, `claimId` | `redemptionChannel` |
-| `event_save` | `eventId`, `contextId` | `stallId`, `source` |
+| `event_save` | `eventId`, `contextId` | `stallId`, `source`, `action` |
 | `event_check_in` | `eventId`, `contextId`, `checkInId` | `method` |
 | `support_request` | `contextId`, `requestId`, `category` | `priority` |
 | `support_resolved` | `contextId`, `requestId`, `resolutionStatus` | `resolutionTimeMs` |
@@ -105,38 +107,48 @@ Property names below are the allowlisted keys from `shared/analytics.ts`. Requir
 | `rating_submitted` | `targetType`, `targetId`, `contextId` | `ratingBucket` |
 | `share_created` | `shareType`, `contextId` | `contentId`, `destination` |
 | `subscription_state` | `tenantId`, `planState` | `planId` |
-| `calendar_event_view` | None | `eventId`, `slug`, `name`, `category`, `action` |
-| `calendar_event_share` | None | `eventId`, `name`, `action` |
-| `calendar_event_going` | None | `eventId`, `name`, `action` |
-| `calendar_event_interested` | None | `eventId`, `name`, `action` |
-| `calendar_event_liked` | None | `eventId`, `name`, `action` |
-| `calendar_event_directions` | None | `eventId`, `name`, `action` |
-| `calendar_event_open` | None | `eventId`, `name`, `action` |
-| `calendar_month_navigate` | None | `direction`, `year`, `month`, `action` |
-| `calendar_jump_today` | None | `action` |
-| `calendar_date_select` | None | `date`, `hasEvents`, `action` |
-| `calendar_view_change` | None | `view`, `action` |
-| `calendar_filter_change` | None | `filter`, `action` |
-| `calendar_category_filter` | None | `category`, `action` |
-| `calendar_search` | None | `query`, `queryLength`, `action` |
-| `calendar_export_batch` | None | `type`, `count`, `action` |
-| `calendar_agenda_export_day` | None | `date`, `count`, `action` |
-| `calendar_export_selected_day` | None | `date`, `count`, `action` |
-| `calendar_event_reschedule` | None | `eventId`, `fromDate`, `toDate`, `action` |
-| `favorites_view` | None | `contextId`, `lat`, `lng`, `category`, `action` |
-| `favorites_place_select` | None | `placeId`, `placeName`, `action` |
-| `favorites_filter_change` | None | `category`, `action` |
-| `companion_cta_viewed` | None | `source` |
-| `companion_application_started` | None | None |
-| `companion_application_submitted` | None | `roles` |
-| `companion_application_reviewed` | `status` | None |
+| `calendar_event_view` | — | `eventId`, `slug`, `name`, `category`, `action` |
+| `calendar_event_share` | — | `eventId`, `name`, `action` |
+| `calendar_event_going` | — | `eventId`, `name`, `action` |
+| `calendar_event_interested` | — | `eventId`, `name`, `action` |
+| `calendar_event_liked` | — | `eventId`, `name`, `action` |
+| `calendar_event_directions` | — | `eventId`, `name`, `action` |
+| `calendar_event_open` | — | `eventId`, `name`, `action` |
+| `calendar_month_navigate` | — | `direction`, `year`, `month`, `action` |
+| `calendar_jump_today` | — | `date`, `action` |
+| `calendar_date_select` | — | `date`, `hasEvents`, `action` |
+| `calendar_view_change` | — | `view`, `action` |
+| `calendar_filter_change` | — | `filter`, `action` |
+| `calendar_category_filter` | — | `category`, `action` |
+| `calendar_search` | — | `query`, `queryLength`, `action` |
+| `calendar_export_batch` | — | `type`, `count`, `action` |
+| `calendar_agenda_export_day` | — | `date`, `count`, `action` |
+| `calendar_export_selected_day` | — | `date`, `count`, `action` |
+| `calendar_event_reschedule` | — | `eventId`, `fromDate`, `toDate`, `action` |
+| `favorites_view` | — | `contextId`, `lat`, `lng`, `category`, `action` |
+| `favorites_place_select` | — | `placeId`, `placeName`, `action` |
+| `favorites_filter_change` | — | `category`, `action` |
+| `companion_cta_viewed` | — | `source` |
+| `companion_application_started` | — | — |
+| `companion_application_submitted` | — | `roles` |
+| `companion_application_reviewed` | `status` | — |
 | `client_error` | `errorClass`, `errorSource` | `path`, `name` |
 
-Not emitted until the product exists: `event_check_in`, `subscription_state`.
+Enumerated values (enforced by `isQualifiedAction`, not by the validator — unknown values validate but never count):
+
+- `valueType`: `wifi` `answer` `map` `profile` `faq` `offer` `save` `support`
+- `actionType`: `map_open` `wifi_reveal` `profile_open` `booking_intent` `place_open`
+- `answerStatus`: counts toward the north-star only when `shown`
+- `contextType`: `property` `room` `marker` `campus` `event` `business` `bio`
+- `source`: `qr` `direct` `share` `referral` `internal` `unknown`
+- `backendState`: `live` `offline_queued` `local_demo` `failed`
+- `status` (`companion_application_reviewed`): free string from the review flow; required, never omit
+
+`client_error` carries `errorClass` + `errorSource` + `path` only. Stacks, full URLs, and free-text are stripped by design to prevent PII.
 
 ## Forbidden in properties
 
-`password`, `wifiPassword`, `email`, `phone`, `question`, `note`, `details`, `token`, `roomToken`, `pin`, `staffPin`, `href`, `url`, `guestName`, and any value over 200 characters.
+`password`, `wifiPassword`, `email`, `phone`, `question`, `note`, `details`, `token`, `roomToken`, `pin`, `staffPin`, `href`, `url`, `guestName`, `code`, and any value over 200 characters.
 
 ## Retention (policy)
 
@@ -146,6 +158,16 @@ Not emitted until the product exists: `event_check_in`, `subscription_state`.
 | Rejects `analyticsEventRejects` | 90 days                            |
 | Daily aggregates                | Commercial reporting period         |
 | GA4 diagnostics                 | Provider default; optional consent |
+
+## Amplitude tracking plan (project `845386`)
+
+Status: the Amplitude project currently holds only default autocapture/system properties (`[Amplitude] *`, `[Guides-Surveys] *`). None of the custom events or properties below are planned yet. To plan them, create one event per name in the Events table above, then add the properties from the Property contract table with these types:
+
+- Number: `timeFromSessionStartMs`, `timeFromQrScanMs`, `queryLength`, `count`, `year`, `month`, `lat`, `lng`, `loadMs`, `latencyMs`, `resolutionTimeMs`
+- Boolean: `loopTargetMet`, `hasEvents`, `helpful`
+- String: everything else
+
+Mark each property required in Amplitude exactly when it is required in the Property contract table. Keep the forbidden list (§ Forbidden in properties) out of Amplitude entirely — never plan `password`, `wifiPassword`, `email`, `phone`, `question`, `note`, `details`, `token`, `roomToken`, `pin`, `staffPin`, `href`, `url`, `guestName`, or `code` as event properties.
 
 ## KPI formula (code)
 

@@ -68,9 +68,9 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
           if (entry.isIntersecting) {
             void track("calendar_event_view", {
               eventId: event.id,
-              title: event.title,
+              name: event.title,
               category: event.category,
-              source: event.source,
+              action: "view",
             });
             observer.unobserve(entry.target);
           }
@@ -85,7 +85,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
     void triggerHaptic("light");
-    void track("calendar_event_share", { eventId: event.id, method: "button" });
+    void track("calendar_event_share", { eventId: event.id, name: event.title, action: "share" });
     const url = window.location.origin + (event.gatePath || `/calendar?event=${event.id}`);
     const shared = await shareNative({
       title: event.title,
@@ -129,14 +129,14 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
 
   const openDirections = (e: React.MouseEvent) => {
     e.stopPropagation();
-    void track("calendar_event_directions", { eventId: event.id, venue: event.venue });
+    void track("calendar_event_directions", { eventId: event.id, name: event.title, action: "directions" });
     const query = encodeURIComponent(`${event.venue}, ${event.city}`);
     window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
   };
 
   const handleCardClick = () => {
     if (onSelect) {
-      void track("calendar_event_open", { eventId: event.id, source: "card_click" });
+      void track("calendar_event_open", { eventId: event.id, name: event.title, action: "card_click" });
       onSelect(event);
     }
   };

@@ -665,7 +665,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
 
         downloadMultipleIcs(targets, `airpal-sydney-itinerary-${Date.now().toString().slice(-4)}.ics`);
         toast.success(`Exported ${targets.length} events to your calendar (.ics)!`);
-        void track("calendar_export_batch", { count: targets.length, mode: filterMode });
+        void track("calendar_export_batch", { count: targets.length, type: filterMode, action: "export" });
         return true;
       },
     }),

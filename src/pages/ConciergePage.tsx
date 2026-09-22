@@ -539,7 +539,7 @@ export function ConciergePage() {
                           items,
                         });
                         setOrderQty({});
-                        trackContentAction("booking_intent", propId, { orderId: res.orderId });
+                        trackContentAction("booking_intent", propId, { contentId: res.orderId });
                         if (res.checkoutUrl) {
                           window.location.assign(res.checkoutUrl);
                         } else {

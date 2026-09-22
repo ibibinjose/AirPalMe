@@ -81,7 +81,7 @@ export function CalendarWeekView({
     const next = new Date(currentDate);
     next.setDate(next.getDate() - 7);
     onChangeDate(next);
-    void track("calendar_date_select", { date: toDateStr(next), source: "week_nav_prev" });
+    void track("calendar_date_select", { date: toDateStr(next), action: "week_nav_prev" });
   }, [currentDate, onChangeDate]);
 
   const nextWeek = useCallback(() => {
@@ -89,7 +89,7 @@ export function CalendarWeekView({
     const next = new Date(currentDate);
     next.setDate(next.getDate() + 7);
     onChangeDate(next);
-    void track("calendar_date_select", { date: toDateStr(next), source: "week_nav_next" });
+    void track("calendar_date_select", { date: toDateStr(next), action: "week_nav_next" });
   }, [currentDate, onChangeDate]);
 
   const jumpToday = useCallback(() => {

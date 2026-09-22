@@ -55,7 +55,7 @@ export function CalendarDayView({
     const prev = new Date(currentDate);
     prev.setDate(prev.getDate() - 1);
     onChangeDate(prev);
-    void track("calendar_date_select", { date: toDateStr(prev), source: "day_nav_prev" });
+    void track("calendar_date_select", { date: toDateStr(prev), action: "day_nav_prev" });
   }, [currentDate, onChangeDate]);
 
   const nextDay = useCallback(() => {
@@ -63,7 +63,7 @@ export function CalendarDayView({
     const next = new Date(currentDate);
     next.setDate(next.getDate() + 1);
     onChangeDate(next);
-    void track("calendar_date_select", { date: toDateStr(next), source: "day_nav_next" });
+    void track("calendar_date_select", { date: toDateStr(next), action: "day_nav_next" });
   }, [currentDate, onChangeDate]);
 
   const jumpToday = useCallback(() => {

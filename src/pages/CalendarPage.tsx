@@ -135,7 +135,7 @@ function CalendarPageContent() {
 
   // Track view mode changes
   useEffect(() => {
-    void track("calendar_view_change", { viewMode, source: "user_action" });
+    void track("calendar_view_change", { view: viewMode, action: "user_action" });
   }, [viewMode]);
 
   // Filter state: 'all' | 'going' | 'interested' | 'liked' | 'local' | 'weekend' | 'free'
@@ -146,7 +146,7 @@ function CalendarPageContent() {
 
   // Track filter changes
   useEffect(() => {
-    void track("calendar_filter_change", { filter, source: "user_action" });
+    void track("calendar_filter_change", { filter, action: "user_action" });
   }, [filter]);
 
   // Category filter
@@ -155,7 +155,7 @@ function CalendarPageContent() {
   // Track category changes
   useEffect(() => {
     if (category !== "all") {
-      void track("calendar_category_filter", { category, source: "user_action" });
+      void track("calendar_category_filter", { category, action: "user_action" });
     }
   }, [category]);
 
@@ -189,7 +189,12 @@ function CalendarPageContent() {
   useEffect(() => {
     if (searchQuery.trim()) {
       const timer = setTimeout(() => {
-        void track("calendar_search", { query: searchQuery, resultCount: filteredEvents.length });
+        void track("calendar_search", {
+          query: searchQuery,
+          queryLength: searchQuery.length,
+          count: filteredEvents.length,
+          action: "search",
+        });
       }, 1000);
       return () => clearTimeout(timer);
     }
