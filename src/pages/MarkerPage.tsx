@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { PlaceCard } from "@/components/discovery/PlaceCard";
 import { FilterChips } from "@/components/discovery/FilterChips";
@@ -79,6 +79,15 @@ export function MarkerPage() {
   }, [marker, chip]);
 
   const isStayMarker = marker?.kind === "room" || marker?.kind === "lobby";
+
+  // A context_view with loadStatus "ok" already fired for /q/:id — pair it
+  // with context_load_failed when the code resolves to nothing.
+  const loadFailed = useRef("");
+  useEffect(() => {
+    if (!markerChecked || marker || !markerId || loadFailed.current === markerId) return;
+    loadFailed.current = markerId;
+    void track("context_load_failed", { contextType: "marker", contextId: markerId, errorClass: "not_found" });
+  }, [markerChecked, marker, markerId]);
 
   if (!markerChecked && !marker) {
     return <PageLoading />;

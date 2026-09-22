@@ -310,6 +310,9 @@ export function demoModeActive(): boolean {
 
 export function trackContentAction(actionType: ContentActionType, contextId: string, extra?: AnalyticsProperties) {
   void track("content_action", { actionType, contextId, ...extra });
+  // first_value keeps the action subtype instead of collapsing to "faq", and
+  // receives only allowlisted keys: anything else in `extra` (destination,
+  // category, …) would be silently stripped by the validator.
   const valueType: ValueType =
     actionType === "wifi_reveal"
       ? "wifi"
@@ -317,8 +320,13 @@ export function trackContentAction(actionType: ContentActionType, contextId: str
         ? "map"
         : actionType === "profile_open"
           ? "profile"
-          : "faq";
-  trackFirstValue(valueType, contextId, extra);
+          : actionType === "booking_intent"
+            ? "booking"
+            : actionType === "place_open"
+              ? "place"
+              : "faq";
+  const contentId = typeof extra?.contentId === "string" ? extra.contentId : undefined;
+  trackFirstValue(valueType, contextId, contentId ? { contentId } : undefined);
 }
 
 export function trackPageView(path: string) {

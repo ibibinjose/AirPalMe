@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { Check, ChevronDown, Heart, Star, MapPin, Share2, Sparkles, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import { formatRelativeBadge } from "@/lib/calendar-utils";
 import { shareContent } from "@/lib/share";
 import { setShareMeta } from "@/lib/share-meta";
 import { cn } from "@/lib/cn";
+import { track } from "@/lib/analytics";
 import type { CalendarEvent } from "@shared/event";
 import type { NearbyEvent } from "@shared/nearby";
 import { ExpoDirectoryPage } from "./ExpoDirectoryPage";
@@ -27,18 +28,28 @@ export function EventPage() {
     if (id) void fetchRemoteStalls(id);
   }, [id, fetchRemoteStalls]);
 
+  const expo = getExpo(id);
+  const calEv = calendarEvents.find((e) => e.id === id);
+  // Migrated curated events live in Firestore, not in the bundle.
+  const near = remoteNearby.find((e) => e.id === id);
+
+  // A context_view with loadStatus "ok" already fired for /e/:id — pair it
+  // with context_load_failed when nothing resolves, or the miss reads as a hit.
+  const loadFailed = useRef("");
+  useEffect(() => {
+    if (!remoteLoaded || expo || calEv || near || !id || loadFailed.current === id) return;
+    loadFailed.current = id;
+    void track("context_load_failed", { contextType: "event", contextId: id, errorClass: "not_found" });
+  }, [remoteLoaded, expo, calEv, near, id]);
+
   if (!remoteLoaded) {
     return <PageLoading />;
   }
 
-  const expo = getExpo(id);
   if (expo) return <ExpoDirectoryPage event={expo} />;
 
-  const calEv = calendarEvents.find((e) => e.id === id);
   if (calEv) return <CalendarEventDetailView event={calEv} />;
 
-  // Migrated curated events live in Firestore, not in the bundle.
-  const near = remoteNearby.find((e) => e.id === id);
   if (near) return <NearbyEventDetailView event={near} />;
   return <NotFoundPage />;
 }

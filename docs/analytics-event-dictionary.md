@@ -32,12 +32,12 @@ Always report numerator, denominator, and the per-context distribution — never
 
 | Event                 | When it fires                                                                                                                          | Counts toward north-star              |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| `session_started`     | First page in a browser session                                                                                                        | No                                    |
+| `session_started`     | First page in a browser session; emitted once per session — route changes do not emit additional session events                       | No                                    |
 | `qr_scan`             | Printed QR or in-app scan landing                                                                                                      | No                                    |
-| `context_view`        | Stay / marker / campus / event / bio context loaded                                                                                    | No                                    |
+| `context_view`        | Stay / marker / campus / event / business / bio context loaded                                                                          | No                                    |
 | `context_load_failed` | Context failed to load                                                                                                                 | No                                    |
 | `first_value`         | First useful action in a session/context/day                                                                                           | Yes, max once per session/context/day |
-| `content_action`      | Map (`actionType=map_open`), Wi-Fi reveal, profile open, booking intent                                                                | Yes for allowlisted `actionType`      |
+| `content_action`      | Map (`actionType=map_open`), Wi-Fi reveal, profile open, booking intent, place open                                                    | Yes for allowlisted `actionType`      |
 | `ask_submitted`       | Guest submitted Ask AirPal                                                                                                             | No                                    |
 | `ask_answered`        | Answer shown                                                                                                                           | Yes if `answerStatus=shown`           |
 | `offer_view`          | Offer shown                                                                                                                            | No                                    |
@@ -136,7 +136,7 @@ Mirrors `EVENT_PROPERTY_ALLOWLIST` in `shared/analytics.ts`. `validateAnalyticsE
 
 Enumerated values (enforced by `isQualifiedAction`, not by the validator — unknown values validate but never count):
 
-- `valueType`: `wifi` `answer` `map` `profile` `faq` `offer` `save` `support`
+- `valueType`: `wifi` `answer` `map` `profile` `faq` `offer` `save` `support` `booking` `place`
 - `actionType`: `map_open` `wifi_reveal` `profile_open` `booking_intent` `place_open`
 - `answerStatus`: counts toward the north-star only when `shown`
 - `contextType`: `property` `room` `marker` `campus` `event` `business` `bio`
@@ -145,6 +145,14 @@ Enumerated values (enforced by `isQualifiedAction`, not by the validator — unk
 - `status` (`companion_application_reviewed`): free string from the review flow; required, never omit
 
 `client_error` carries `errorClass` + `errorSource` + `path` only. Stacks, full URLs, and free-text are stripped by design to prevent PII.
+
+## Collector notes
+
+- `trackContentAction()` derives the paired `first_value.valueType` from the action: `wifi_reveal`→`wifi`, `map_open`→`map`, `profile_open`→`profile`, `booking_intent`→`booking`, `place_open`→`place`, anything else→`faq`. The subtype is preserved, never collapsed.
+- `trackContentAction()` forwards only `contentId` to `first_value`. Any other `extra` keys (`destination`, `category`, …) belong to `content_action` and would be silently stripped from `first_value` by the validator — callers must not expect them there.
+- Map links never send the URL: `openMap()` accepts a URL for navigation but records only `destination` (e.g. `"maps"` or the caller-supplied label). `url` is forbidden — `destination` is the safe replacement.
+- `noteQrContext(id, { source })` records that value as `placementType` (the scan surface: `stay`, `marker`, `campus`, `scan`), not as traffic `source`. QR-scan events always carry `source: "qr"`.
+- `trackPageView()` emits `context_view` with `loadStatus: "ok"` for every context route. The five context pages (stay, marker, campus, event, bio) separately emit `context_load_failed` with `errorClass: "not_found"` when the id resolves to nothing — read the pair together, or misses read as hits.
 
 ## Forbidden in properties
 
@@ -161,7 +169,7 @@ Enumerated values (enforced by `isQualifiedAction`, not by the validator — unk
 
 ## Amplitude tracking plan (project `845386`)
 
-Status: the Amplitude project currently holds only default autocapture/system properties (`[Amplitude] *`, `[Guides-Surveys] *`). None of the custom events or properties below are planned yet. To plan them, create one event per name in the Events table above, then add the properties from the Property contract table with these types:
+Status: the Amplitude project currently holds only default autocapture/system properties (`[Amplitude] *`, `[Guides-Surveys] *`). None of the custom events or properties below are planned yet, so Amplitude cannot currently validate whether these custom events are being ingested — treat the contract and ledger as source of truth until the plan below is applied. To plan them, create one event per name in the Events table above, then add the properties from the Property contract table with these types:
 
 - Number: `timeFromSessionStartMs`, `timeFromQrScanMs`, `queryLength`, `count`, `year`, `month`, `lat`, `lng`, `loadMs`, `latencyMs`, `resolutionTimeMs`
 - Boolean: `loopTargetMet`, `hasEvents`, `helpful`

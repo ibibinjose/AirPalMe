@@ -131,6 +131,15 @@ export function BioPublicPage() {
   }, [claim]);
 
   const profile = remote || local;
+  const loadFailed = useRef("");
+
+  // A context_view with loadStatus "ok" already fired for /@:handle — pair it
+  // with context_load_failed when the handle resolves to nothing.
+  useEffect(() => {
+    if (!tried || profile || !handle || loadFailed.current === handle) return;
+    loadFailed.current = handle;
+    void track("context_load_failed", { contextType: "bio", contextId: handle, errorClass: "not_found" });
+  }, [tried, profile, handle]);
 
   useEffect(() => {
     if (!profile) return;

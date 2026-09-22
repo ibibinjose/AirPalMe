@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useRoute } from "wouter";
 import { useStay } from "@/contexts/StayContext";
 import { fetchCampus, loadCampus, type CampusDoc } from "@/lib/campus-store";
@@ -6,7 +6,7 @@ import { Sheet } from "@/components/ui/Sheet";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PageLoading } from "@/components/ui/PageLoading";
-import { noteQrContext, trackContentAction } from "@/lib/analytics";
+import { noteQrContext, track, trackContentAction } from "@/lib/analytics";
 
 export function CampusPage() {
   const [, nav] = useLocation();
@@ -33,6 +33,15 @@ export function CampusPage() {
       alive = false;
     };
   }, [id]);
+  // A context_view with loadStatus "ok" already fired for /c/:id — pair it
+  // with context_load_failed when the campus resolves to nothing.
+  const loadFailed = useRef("");
+  useEffect(() => {
+    if (!checked || campus || !id || loadFailed.current === id) return;
+    loadFailed.current = id;
+    void track("context_load_failed", { contextType: "campus", contextId: id, errorClass: "not_found" });
+  }, [checked, campus, id]);
+
   if (!campus) {
     if (!checked) return <PageLoading />;
     return (

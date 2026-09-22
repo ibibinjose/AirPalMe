@@ -90,7 +90,7 @@ export type AnalyticsSource = (typeof ANALYTICS_SOURCES)[number];
 export const BACKEND_STATES = ["live", "offline_queued", "local_demo", "failed"] as const;
 export type BackendState = (typeof BACKEND_STATES)[number];
 
-export const VALUE_TYPES = ["wifi", "answer", "map", "profile", "faq", "offer", "save", "support"] as const;
+export const VALUE_TYPES = ["wifi", "answer", "map", "profile", "faq", "offer", "save", "support", "booking", "place"] as const;
 export type ValueType = (typeof VALUE_TYPES)[number];
 
 export const CONTENT_ACTION_TYPES = [

@@ -123,6 +123,35 @@ describe("winnable loop (scan QR → first value in 60s)", () => {
     }
   });
 
+  it("keeps booking and place subtypes as qualified first values", () => {
+    for (const valueType of ["booking", "place"] as const) {
+      const result = validateAnalyticsEvent(
+        event({
+          eventName: "first_value",
+          contextId: "prop_live_1",
+          properties: { valueType, contextId: "prop_live_1" },
+        }),
+      );
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(isQualifiedAction(result.event)).toBe(true);
+    }
+  });
+
+  it("strips non-allowlisted extras from first_value", () => {
+    const result = validateAnalyticsEvent(
+      event({
+        eventName: "first_value",
+        contextId: "prop_live_1",
+        properties: { valueType: "booking", contextId: "prop_live_1", destination: "stripe", category: "x" },
+      }),
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.event.properties.destination).toBeUndefined();
+      expect(result.event.properties.category).toBeUndefined();
+    }
+  });
+
   it("measures loop duration from ISO timestamps", () => {
     expect(loopMs("2026-09-11T12:00:00.000Z", "2026-09-11T12:00:45.000Z")).toBe(45000);
     expect(loopMs(undefined, "2026-09-11T12:00:45.000Z")).toBeUndefined();
