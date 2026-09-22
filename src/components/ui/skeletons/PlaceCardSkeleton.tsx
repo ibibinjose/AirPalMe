@@ -1,12 +1,11 @@
 import { cn } from "@/lib/cn";
 
-export function PlaceCardSkeleton({ large = false, className }: { large?: boolean; className?: string }) {
+export function PlaceCardSkeleton({ className }: { className?: string }) {
   return (
     <div
       aria-hidden="true"
       className={cn(
-        "relative overflow-hidden rounded-3xl bg-card ring-1 ring-line/70",
-        large ? "min-h-[280px]" : "min-h-[220px]",
+        "relative aspect-square overflow-hidden rounded-3xl bg-card ring-1 ring-line/70",
         className,
       )}
     >
@@ -34,15 +33,7 @@ export function PlaceCardSkeleton({ large = false, className }: { large?: boolea
   );
 }
 
-export function PlaceCardSkeletonGrid({
-  count = 8,
-  large = false,
-  className,
-}: {
-  count?: number;
-  large?: boolean;
-  className?: string;
-}) {
+export function PlaceCardSkeletonGrid({ count = 8, className }: { count?: number; className?: string }) {
   return (
     <div
       role="status"
@@ -50,7 +41,7 @@ export function PlaceCardSkeletonGrid({
       className={cn("grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4", className)}
     >
       {Array.from({ length: count }).map((_, i) => (
-        <PlaceCardSkeleton key={i} large={large} />
+        <PlaceCardSkeleton key={i} />
       ))}
     </div>
   );

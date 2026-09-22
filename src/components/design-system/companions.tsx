@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "wouter";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/cn";
@@ -298,7 +299,10 @@ export function StickyAction({
   primary: ReactNode;
   secondary?: ReactNode;
 }) {
-  return (
+  // Portaled to body: page wrappers use transform (pull-to-refresh), which
+  // would trap `fixed` mid-page. Same pattern as Sheet.
+  if (typeof document === "undefined") return null;
+  return createPortal(
     <div className="fixed-element fixed inset-x-0 bottom-24 z-30 lg:hidden pointer-events-none">
       <div className="mx-auto max-w-lg px-4">
         <div className="pointer-events-auto flex items-center gap-2 rounded-full bg-card/95 p-2 shadow-xl ring-1 ring-line backdrop-blur-xl">
@@ -306,7 +310,8 @@ export function StickyAction({
           {secondary}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

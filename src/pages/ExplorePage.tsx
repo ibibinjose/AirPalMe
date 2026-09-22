@@ -214,7 +214,7 @@ export function ExplorePage() {
         <section aria-label="Events" className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
           {events.map((e) => (
             <CardShell key={e.id} href={e.gatePath || `/e/${e.id}`} label={e.title}>
-              <div className="relative h-44 bg-paper">
+              <div className="relative aspect-square bg-paper">
                 {e.heroImage && (
                   <Photo src={e.heroImage} className="absolute inset-0 h-full w-full object-cover" />
                 )}
@@ -263,7 +263,7 @@ export function ExplorePage() {
         <section aria-label="Experiences" className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
           {experiences.map((p) => (
             <CardShell key={p.id} href={`/plan/${p.id}`} label={p.title}>
-              <div className="relative h-44 bg-paper">
+              <div className="relative aspect-square bg-paper">
                 {p.heroImage && (
                   <Photo src={p.heroImage} className="absolute inset-0 h-full w-full object-cover" />
                 )}
@@ -292,7 +292,7 @@ export function ExplorePage() {
         <section aria-label="Places" className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
           {places.map((p) => (
             <CardShell key={p.id} href={hrefForPlace(p)} label={p.name}>
-              <div className="relative h-48 bg-paper">
+              <div className="relative aspect-square bg-paper">
                 {(p.heroImage || p.photos?.[0]) ? (
                   <Photo
                     src={p.heroImage || p.photos![0]}

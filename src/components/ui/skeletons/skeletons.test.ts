@@ -19,14 +19,9 @@ describe("Skeleton Loading Components", () => {
     const html = renderToStaticMarkup(createElement(PlaceCardSkeleton));
     expect(html).toContain('aria-hidden="true"');
     expect(html).toContain("rounded-3xl");
-    expect(html).toContain("min-h-[220px]");
+    expect(html).toContain("aspect-square");
     expect(html).toContain("animate-shimmer");
     expect(html).toContain("hero-scrim");
-  });
-
-  it("renders PlaceCardSkeleton large variant", () => {
-    const html = renderToStaticMarkup(createElement(PlaceCardSkeleton, { large: true }));
-    expect(html).toContain("min-h-[280px]");
   });
 
   it("renders PlaceCardSkeletonGrid with specified count and aria-label", () => {

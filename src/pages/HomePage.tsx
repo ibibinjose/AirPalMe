@@ -195,7 +195,7 @@ export function HomePage() {
             <div className="mt-3 flex gap-3 overflow-x-auto pb-2 no-scrollbar">
               {tonightEvents.map((e) => (
                 <CardShell key={e.id} href={e.gatePath || `/e/${e.id}`} label={e.title} className="w-64 shrink-0">
-                  <div className="relative h-36 bg-paper">
+                  <div className="relative aspect-square bg-paper">
                     {e.heroImage && (
                       <Photo src={e.heroImage} className="absolute inset-0 h-full w-full object-cover" />
                     )}
@@ -227,7 +227,7 @@ export function HomePage() {
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2 no-scrollbar">
             {places.map((p) => (
               <CardShell key={p.id} href={hrefForPlace(p)} label={p.name} className="w-64 shrink-0">
-                <div className="relative h-36 bg-paper">
+                <div className="relative aspect-square bg-paper">
                   {(p.heroImage || p.photos?.[0]) && (
                     <Photo
                       src={p.heroImage || p.photos![0]}

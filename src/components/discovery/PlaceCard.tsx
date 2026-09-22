@@ -8,7 +8,7 @@ import { useOptionalLocalNow } from "@/contexts/LocalNowContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import { cn } from "@/lib/cn";
 
-export function PlaceCard({ place, walk, large = false }: { place: NearbyPlace; walk?: string; large?: boolean }) {
+export function PlaceCard({ place, walk }: { place: NearbyPlace; walk?: string }) {
   const { t } = useLocale();
   const local = useOptionalLocalNow();
   // Harbour fallback is Sydney stock only — other cities render a clean ink
@@ -25,8 +25,7 @@ export function PlaceCard({ place, walk, large = false }: { place: NearbyPlace; 
     <Link
       href={hrefForPlace(place)}
       className={cn(
-        "group relative block overflow-hidden rounded-3xl text-left ring-1 ring-line",
-        large ? "min-h-[280px]" : "min-h-[220px]",
+        "group relative block aspect-square overflow-hidden rounded-3xl text-left ring-1 ring-line",
         onPhoto ? "bg-paper" : "bg-card",
       )}
     >

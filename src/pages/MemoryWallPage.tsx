@@ -236,7 +236,7 @@ export function MemoryWallPage() {
             aria-modal="true"
             aria-label="New memory"
           >
-            <img src={draftUrl} alt="New memory" className="aspect-[4/3] w-full rounded-2xl object-cover" />
+            <img src={draftUrl} alt="New memory" className="aspect-square w-full rounded-2xl object-cover" />
             <input
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
@@ -290,7 +290,7 @@ export function MemoryWallPage() {
             className="w-full max-w-md overflow-hidden rounded-[28px] bg-paper shadow-2xl ring-1 ring-line"
             onClick={(e) => e.stopPropagation()}
           >
-            <Photo src={lightbox.src} className="aspect-[4/3] w-full object-cover" />
+            <Photo src={lightbox.src} className="aspect-square w-full object-cover" />
             <div className="p-5">
               {lightbox.caption && <p className="font-display text-lg font-bold leading-snug">{lightbox.caption}</p>}
               <p className="mt-1 flex items-center gap-1.5 text-xs text-mute">
