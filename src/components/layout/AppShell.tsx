@@ -152,7 +152,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <TopNav path={path} enter={play} />
                 <motion.div
                   {...chrome}
-                  className="flex h-14 items-center justify-between border-b border-line/70 bg-paper/90 px-3 backdrop-blur-xl sm:px-4 lg:hidden"
+                  className="flex h-14 items-center justify-between bg-paper/80 px-3 backdrop-blur-xl sm:px-4 lg:hidden"
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <Link href="/" className="flex items-center min-w-0" aria-label="AirPal Home">

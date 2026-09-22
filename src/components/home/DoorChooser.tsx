@@ -7,19 +7,19 @@ const DOORS: Array<{ id: DoorId; title: string; line: string; icon: typeof Spark
   {
     id: "plan",
     title: "Plan with people",
-    line: "Family and friends. Create, share, show up.",
+    line: "Create it. Share it. Show up.",
     icon: CalendarDays,
   },
   {
     id: "explore",
     title: "See what’s on",
-    line: "Public nights and places near your pin.",
+    line: "Nights and places near you.",
     icon: Sparkles,
   },
   {
     id: "stay",
     title: "I’m staying here",
-    line: "Scan a room or lobby code for Wi-Fi and the desk.",
+    line: "Scan the room. Wi-Fi and the desk.",
     icon: BedDouble,
   },
 ];
@@ -35,9 +35,7 @@ export function DoorChooser({ onPick }: { onPick: (id: DoorId) => void }) {
 
   return (
     <div className="mx-auto max-w-md px-4 pb-28 pt-8">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">AirPal</p>
-      <h1 className="font-display mt-1 text-3xl font-semibold">What do you need?</h1>
-      <p className="mt-1 text-sm text-mute">Three doors. Pick one — you can switch anytime.</p>
+      <h1 className="font-display text-3xl font-semibold">What do you need?</h1>
       <div className="mt-6 grid gap-3">
         {DOORS.map((door) => {
           const Icon = door.icon;
@@ -46,7 +44,7 @@ export function DoorChooser({ onPick }: { onPick: (id: DoorId) => void }) {
               key={door.id}
               type="button"
               onClick={() => pick(door.id)}
-              className="flex items-start gap-3 rounded-3xl bg-card p-4 text-left ring-1 ring-line transition hover:ring-brand/40"
+              className="flex items-center gap-3 rounded-[28px] bg-card p-4 text-left ring-1 ring-line transition hover:ring-brand/30 active:scale-[0.99]"
             >
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
                 <Icon size={20} />

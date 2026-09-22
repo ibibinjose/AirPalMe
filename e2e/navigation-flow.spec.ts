@@ -28,7 +28,8 @@ test.describe("Global Navigation & Profile Flow", () => {
     await expect(page.getByRole("button", { name: /I’m staying here|I'm staying here/i })).toBeVisible();
     await page.getByRole("button", { name: /See what’s on|See what's on/i }).click();
     await expect(page).toHaveURL("/");
-    await expect(page.getByPlaceholder("Search places")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Around you" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Where are you going/i })).toBeVisible();
   });
 
   test("desktop top navigation links between major application hubs", async ({ page }) => {

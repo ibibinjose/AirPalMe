@@ -100,9 +100,7 @@ export function HomePage() {
         <p className="text-[13px] font-semibold text-mute">
           {greeting}, {firstName}
         </p>
-        <h1 className="font-display mt-1 text-[32px] font-bold leading-[1.05] tracking-tight">
-          What&apos;s happening around you?
-        </h1>
+        <h1 className="font-display mt-1 text-[32px] font-bold leading-[1.05] tracking-tight">Around you</h1>
         <div className="mt-4">
           <AirPalSearchField placeholder="Where are you going?" />
         </div>
@@ -157,8 +155,8 @@ export function HomePage() {
           <div className="mt-2">
             <EmptyState
               kicker="Trips"
-              title="Your next adventure starts here."
-              body="Plan a trip and AirPal will organise your itinerary, places, events and people."
+              title="No trip yet."
+              body="A plan keeps the people, the place, and the time together."
               action={() => nav("/plan/new")}
               actionLabel="Plan a Trip"
             />
@@ -176,7 +174,7 @@ export function HomePage() {
 
       {/* Around you */}
       <section aria-label="Around you" className="mt-8">
-        <SectionHeader title="Around you" actionLabel="See all" actionHref="/explore" />
+        <SectionHeader title="Nearby" actionLabel="See all" actionHref="/explore" />
         <div className="mt-3">
           <PillRow options={AROUND} value={around} onChange={setAround} label="Around you categories" />
         </div>

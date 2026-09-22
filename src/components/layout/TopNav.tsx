@@ -28,7 +28,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
   const active = tabFromPath(path);
   return (
     <motion.header
-      className="hidden border-b border-line/70 bg-paper/90 backdrop-blur-xl lg:block"
+      className="hidden bg-paper/80 backdrop-blur-xl lg:block"
       initial={enter ? { opacity: 0, y: -12 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease: enterEase, delay: 0.12 }}

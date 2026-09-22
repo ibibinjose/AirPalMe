@@ -98,7 +98,7 @@ export function ExplorePage() {
       <header className="pt-6">
         <h1 className="font-display text-[28px] font-bold tracking-tight">Explore</h1>
         <div className="mt-3">
-          <AirPalSearchField placeholder="What do you want to explore?" />
+          <AirPalSearchField placeholder="Search" />
         </div>
         <p className="mt-3 text-[15px] font-semibold">
           {city || "Sydney"} <span className="font-normal text-mute">· For you</span>
@@ -129,7 +129,7 @@ export function ExplorePage() {
 
       {/* Journeys live one level down: tapping one starts planning it */}
       <section aria-label="Journeys" className="mt-5">
-        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Journeys</p>
+        <p className="text-[15px] font-semibold">Journeys</p>
         <div className="mt-2 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
           {["Getaways", "Root Escapes", "Sacred Journeys", "Wellness", "Heritage"].map((j) => (
             <Link

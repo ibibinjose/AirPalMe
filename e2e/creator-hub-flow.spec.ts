@@ -4,7 +4,7 @@ test.describe("Join & business profile", () => {
   test("join explains personal account vs business profile", async ({ page }) => {
     await page.goto("/join");
     await page.waitForLoadState("domcontentloaded");
-    await expect(page.getByRole("heading", { name: /Join the AirPal Network — Made Easy/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Join AirPal" })).toBeVisible();
     await expect(page.getByText(/Everyone on AirPal has a personal account/i)).toBeVisible();
     await expect(page.getByRole("heading", { name: "Just use AirPal" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Partner account" })).toBeVisible();

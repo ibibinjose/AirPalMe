@@ -21,17 +21,9 @@ export function JoinPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 md:py-12">
       <header>
-        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">AirPal.me · Sydney</p>
-        <h1 className="font-display mt-2 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight text-ink">
-          Join the AirPal Network — Made Easy
-        </h1>
-        <p className="mt-4 text-base leading-relaxed text-mute">
-          Everyone on AirPal has a personal account. That&apos;s how you explore places, make plans, and join a Circle.
-        </p>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">Join AirPal</h1>
         <p className="mt-3 text-base leading-relaxed text-mute">
-          Some people stay as a user. That&apos;s enough. Others also create a{" "}
-          <strong className="font-semibold text-ink">business profile</strong> so their café, shop, stay, or studio can
-          be found in Discover — with products, services, and offers.
+          Everyone on AirPal has a personal account. A partner account is the same login, plus a place guests can find.
         </p>
       </header>
 
@@ -48,10 +40,7 @@ export function JoinPage() {
             <User size={22} />
           </span>
           <h2 className="font-display mt-4 text-xl font-bold">Just use AirPal</h2>
-          <p className="mt-2 flex-1 text-sm leading-relaxed text-mute">
-            Create a personal account if you don&apos;t have one. Find places, start a Circle, make plans. No business
-            listing required.
-          </p>
+          <p className="mt-2 flex-1 text-sm leading-relaxed text-mute">Places, plans, and a Circle.</p>
           <Button
             className="mt-5 w-full justify-between"
             variant={hasAccount ? "ghost" : "primary"}
@@ -68,8 +57,7 @@ export function JoinPage() {
           </span>
           <h2 className="font-display mt-4 text-xl font-bold">{NAMES.partnerAccount}</h2>
           <p className="mt-2 flex-1 text-sm leading-relaxed text-mute">
-            Same AirPal login. Import the place from Google, go live, then add a product, a service, and an offer.
-            Guests find it on What&apos;s on and in search.
+            Same AirPal login. Guests find the place on What&apos;s on.
           </p>
           <Button
             className="mt-5 w-full justify-between"
@@ -81,8 +69,8 @@ export function JoinPage() {
         </div>
       </div>
 
-      <section className="mt-10 rounded-3xl ring-1 ring-line bg-paper p-6">
-        <h2 className="font-display text-xl font-bold">How a business profile goes live</h2>
+      <section className="mt-8 rounded-[28px] bg-card p-6 ring-1 ring-line">
+        <h2 className="font-display text-xl font-bold">Go live</h2>
         <ol className="mt-4 space-y-3">
           {[
             {

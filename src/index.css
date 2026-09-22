@@ -26,18 +26,20 @@
   src: url("/fonts/outfit.woff2") format("woff2");
 }
 
-/* Canon freeze: docs/CANON.md §2. Do not replace this palette or fonts. */
+/* Canon freeze: docs/CANON.md §2. Brand and fonts stay. Paper is mist so cards float. */
 @theme inline {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", "DM Sans", sans-serif;
-  --color-paper: #ffffff;
+  --color-paper: #eef1f6;
   --color-ink: #121614;
   --color-mute: #6a726c;
-  --color-line: #e5e7eb;
+  --color-line: #e4e7ee;
   --color-card: #ffffff;
   --color-brand: #1805db;
   --color-brand-ink: #0e0394;
   --color-gold: #1805db;
+  --shadow-clay: 0 1px 1px rgba(255, 255, 255, 0.9) inset, 0 1px 2px rgba(18, 22, 20, 0.04),
+    0 16px 36px -18px rgba(24, 5, 219, 0.22);
 }
 
 * {
@@ -72,7 +74,9 @@ html {
 }
 body {
   margin: 0;
-  background: var(--color-paper);
+  background:
+    radial-gradient(1200px 480px at 50% -120px, rgba(24, 5, 219, 0.06), transparent 60%),
+    var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -308,6 +312,13 @@ body.keyboard-open .keyboard-hide {
 
 .hero-scrim {
   background: linear-gradient(180deg, rgba(18, 22, 20, 0.08) 0%, rgba(18, 22, 20, 0.72) 100%);
+}
+
+/* Soft clay lift for the shared card recipe. Inputs use border, not ring, so fields stay flat. */
+@layer components {
+  :where(a, button, div, section, article, li, form).bg-card.ring-1 {
+    box-shadow: var(--shadow-clay);
+  }
 }
 
 .legal-prose h2 {

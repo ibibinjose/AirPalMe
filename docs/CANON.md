@@ -46,7 +46,7 @@ Tokens live in `src/index.css` `@theme`. Do not invent a new palette.
 | `--color-brand` | `#1805db` | AirPal Blue — primary CTA, links, active |
 | `--color-brand-ink` | `#0e0394` | Pressed / dark brand |
 | `--color-gold` | `#1805db` | Eyebrow labels (same hue as brand) |
-| `--color-paper` | `#ffffff` | Page |
+| `--color-paper` | `#eef1f6` | Page mist — cards float on it |
 | `--color-card` | `#ffffff` | Cards |
 | `--color-ink` | `#121614` | Text |
 | `--color-mute` | `#6a726c` | Secondary text |
@@ -54,7 +54,7 @@ Tokens live in `src/index.css` `@theme`. Do not invent a new palette.
 
 Fonts: **DM Sans** (UI), **Outfit** (display). Self-hosted in `public/fonts/`. No Google Fonts CDN.
 
-Cards: `bg-card ring-1 ring-line shadow-xs`, generous radius, not childish. Touch targets ≥ 44px. Mobile dock: liquid glass, `pb-safe`. Desktop: `lg:grid-cols-12` where those screens already use it.
+Cards: white on mist, `bg-card ring-1 ring-line` plus `--shadow-clay`, radius about 28px. Not clay blobs, not childish. Touch targets ≥ 44px. Mobile dock: light floating pill, brand capsule on the active tab, `pb-safe`. Desktop: `lg:grid-cols-12` where those screens already use it.
 
 Reuse `Button`, `ValidField`, `Photo`, `ImageField`. Do not drop in a new component library.
 

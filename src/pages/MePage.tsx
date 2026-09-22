@@ -100,10 +100,8 @@ export function MePage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-12 md:px-6">
-      <p className="pt-4 text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Profile</p>
-
-      <div className="mt-4 lg:grid lg:grid-cols-12 lg:gap-8 items-start">
+    <div className="mx-auto max-w-5xl px-4 pb-12 pt-6 md:px-6">
+      <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
         {/* Left Column: Avatar Hero, Handle, Quick Links & Contacts (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           <div className="rounded-[28px] ring-1 ring-line bg-card p-6 text-center shadow-xs">

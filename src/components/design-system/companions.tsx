@@ -7,8 +7,7 @@ import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
 
 /**
  * AirPal companion design primitives (§24–§28, §43 of the brief).
- * One calm system: shared radius / type roles / spacing, subtle elevation
- * via borders + ring (never heavy shadows), one primary action per screen.
+ * Soft clay: white cards on mist, one brand action, short labels.
  */
 
 export function SectionHeader({
@@ -68,7 +67,7 @@ export function SegmentedControl<T extends string>({
           onClick={() => onChange(o.id)}
           className={cn(
             "h-9 flex-1 cursor-pointer touch-manipulation rounded-full px-4 text-[14px] font-semibold whitespace-nowrap transition active:scale-[0.98]",
-            value === o.id ? "bg-ink text-white" : "text-mute hover:text-ink",
+            value === o.id ? "bg-brand text-white shadow-[0_6px_14px_-8px_rgba(24,5,219,0.8)]" : "text-mute hover:text-ink",
           )}
         >
           {o.label}
@@ -123,7 +122,7 @@ export function AirPalSearchField({ placeholder = "Search AirPal" }: { placehold
     <button
       type="button"
       onClick={openGlobalSearch}
-      className="flex h-[52px] w-full cursor-pointer touch-manipulation items-center gap-2.5 rounded-full bg-card px-5 text-left shadow-[0_4px_16px_rgba(18,22,20,0.08)] ring-1 ring-line transition hover:ring-brand/40 active:scale-[0.99]"
+      className="flex h-[52px] w-full cursor-pointer touch-manipulation items-center gap-2.5 rounded-full bg-card px-5 text-left ring-1 ring-line transition hover:ring-brand/30 active:scale-[0.99]"
     >
       <Search size={18} className="shrink-0 text-mute" />
       <span className="truncate text-[15px] text-mute">{placeholder}</span>
@@ -158,7 +157,7 @@ export function CardShell({
   label?: string;
 }) {
   const cls = cn(
-    "block overflow-hidden rounded-2xl bg-card text-left ring-1 ring-line transition active:scale-[0.99]",
+    "block overflow-hidden rounded-[28px] bg-card text-left ring-1 ring-line transition active:scale-[0.99]",
     (href || onClick) && "hover:ring-brand/30",
     className,
   );
@@ -227,7 +226,7 @@ export function ArrowCta() {
   return (
     <span
       aria-hidden="true"
-      className="grid h-11 w-11 place-items-center rounded-full bg-[#f2692e] text-white shadow-lg transition group-hover:scale-105"
+      className="grid h-11 w-11 place-items-center rounded-full bg-brand text-white shadow-[0_8px_16px_-8px_rgba(24,5,219,0.8)] transition group-hover:scale-105"
     >
       <span className="text-[18px] font-bold leading-none">↗</span>
     </span>

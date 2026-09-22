@@ -15,8 +15,9 @@ export function Button({ variant = "primary", size = "md", className, loading, d
         size === "sm" && "h-9 px-3.5 text-sm",
         size === "md" && "h-11 px-5 text-[15px]",
         size === "lg" && "h-12 px-6 text-base",
-        variant === "primary" && "bg-brand text-white",
-        variant === "ghost" && "bg-card text-ink ring-1 ring-line hover:bg-paper",
+        variant === "primary" &&
+          "bg-brand text-white shadow-[0_10px_24px_-10px_rgba(24,5,219,0.75)]",
+        variant === "ghost" && "bg-card text-ink ring-1 ring-line hover:bg-white",
         variant === "dark" && "bg-brand text-white",
         variant === "gold" && "bg-gold text-white",
         variant === "light" && "bg-white text-ink hover:bg-white/90",

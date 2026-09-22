@@ -41,7 +41,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
       transition={{ duration: 0.25, ease: enterEase }}
     >
       <div className="relative mx-auto max-w-md pointer-events-auto px-4">
-        <div className="relative mb-[max(0.75rem,env(safe-area-inset-bottom,0px))] flex items-center justify-between rounded-full apple-liquid-glass-dark px-2 py-1 text-white">
+        <div className="relative mb-[max(0.75rem,env(safe-area-inset-bottom,0px))] flex items-center justify-between rounded-full bg-card/90 px-1.5 py-1.5 text-ink shadow-[var(--shadow-clay)] ring-1 ring-white/80 backdrop-blur-xl">
           {TABS.map((tab) => {
             const on = active === tab.id;
             const href = tab.id === "me" ? meHref : tab.href;
@@ -58,9 +58,15 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
                 }}
                 className={cn(
                   "relative flex h-12 min-w-0 flex-1 touch-manipulation flex-col items-center justify-center gap-0.5 transition-all duration-200 cursor-pointer active:scale-95",
-                  on ? "text-white font-bold" : "text-white/65 hover:text-white font-medium",
+                  on ? "font-bold text-white" : "font-medium text-ink/55 hover:text-ink",
                 )}
               >
+                {on ? (
+                  <span
+                    aria-hidden
+                    className="absolute inset-x-1 inset-y-0.5 rounded-full bg-brand shadow-[0_8px_16px_-8px_rgba(24,5,219,0.8)]"
+                  />
+                ) : null}
                 <span className="relative z-10 flex flex-col items-center justify-center gap-0.5">
                   {tab.id === "me" ? (
                     <span className="text-[17px] font-bold leading-none">@</span>
@@ -70,13 +76,6 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
                   <span className="max-w-full truncate px-0.5 text-[11px] font-semibold tracking-tight">
                     {tab.label}
                   </span>
-                  <span
-                    aria-hidden
-                    className={cn(
-                      "h-1 w-1 rounded-full bg-white transition-opacity",
-                      on ? "opacity-100" : "opacity-0",
-                    )}
-                  />
                 </span>
               </button>
             );
