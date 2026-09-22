@@ -2,6 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { authErrorCode, authErrorMessage } from "@shared/auth-email";
 import { cn } from "@/lib/cn";
+import { track } from "@/lib/analytics";
 import { triggerHaptic } from "@/lib/native";
 import type { SocialProvider } from "@/lib/social-auth";
 
@@ -22,6 +23,11 @@ export function SocialAuthButtons({
     try {
       await onSocial(provider);
     } catch (err) {
+      // Record the Firebase code for diagnosis (no PII — code only). The
+      // user-facing message stays generic on purpose.
+      const code = authErrorCode(err);
+      if (import.meta.env.DEV) console.error("[social-auth]", provider, code, err);
+      void track("client_error", { errorClass: code || "unknown", errorSource: `${provider}-signin` });
       // invalid-credential means Apple/Firebase rejected the token — never
       // show password copy for it.
       const msg =

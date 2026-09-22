@@ -95,14 +95,23 @@ export function HomePage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-12 md:px-6">
-      {/* Header — personal, not a dashboard */}
-      <header className="pt-6">
-        <p className="text-[13px] font-semibold text-mute">
-          {greeting}, {firstName}
-        </p>
-        <h1 className="font-display mt-1 text-[32px] font-bold leading-[1.05] tracking-tight">Around you</h1>
-        <div className="mt-4">
-          <AirPalSearchField placeholder="Where are you going?" />
+      {/* Header — Sydney harbour backdrop, personal not a dashboard */}
+      <header className="relative -mx-4 overflow-hidden rounded-b-[28px] md:-mx-6">
+        <div className="absolute inset-0" aria-hidden="true">
+          <Photo src="/media/harbour.jpg" priority className="h-full w-full object-cover" alt="" />
+          <div className="hero-scrim absolute inset-0" />
+        </div>
+        <div className="relative px-4 pb-6 pt-10 md:px-6 md:pt-14">
+          <p className="text-[13px] font-semibold text-white/85">
+            {greeting}, {firstName}
+          </p>
+          <h1 className="font-display mt-1 text-[34px] font-bold leading-[1.02] tracking-tight text-white">
+            Around you
+          </h1>
+          <p className="mt-1 text-[14px] font-medium text-white/80">{city}</p>
+          <div className="mt-4">
+            <AirPalSearchField placeholder="Where are you going?" />
+          </div>
         </div>
       </header>
 
@@ -116,14 +125,11 @@ export function HomePage() {
             className="group mt-2 rounded-[28px]"
           >
             <div className="relative min-h-[240px]">
-              {nextTrip.heroImage ? (
-                <Photo
-                  src={nextTrip.heroImage}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-              ) : (
-                <div className="absolute inset-0 bg-ink" />
-              )}
+              <Photo
+                src={nextTrip.heroImage || "/media/walk.jpg"}
+                priority
+                className="absolute inset-0 h-full w-full object-cover"
+              />
               <div className="hero-scrim absolute inset-0" />
               <div className="absolute left-4 top-4 right-4">
                 <p className="font-display text-[22px] font-bold leading-tight text-white">
@@ -191,13 +197,32 @@ export function HomePage() {
         ) : around === "events" ? (
           tonightEvents.length > 0 ? (
             <div className="mt-3 flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-              {tonightEvents.map((e) => (
+              {tonightEvents.map((e) => {
+                const day = new Date(`${e.date}T00:00:00`);
+                const dayNum = Number.isNaN(day.getTime()) ? "" : String(day.getDate());
+                const month = Number.isNaN(day.getTime())
+                  ? ""
+                  : day.toLocaleString(undefined, { month: "short" });
+                return (
                 <CardShell key={e.id} href={e.gatePath || `/e/${e.id}`} label={e.title} className="w-64 shrink-0">
-                  <div className="relative aspect-square bg-paper">
-                    {e.heroImage && (
-                      <Photo src={e.heroImage} className="absolute inset-0 h-full w-full object-cover" />
-                    )}
+                  <div className="relative aspect-square overflow-hidden bg-paper">
+                    <Photo
+                      src={e.heroImage || "/media/laneway.jpg"}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
                     <div className="hero-scrim absolute inset-0" />
+                    {dayNum && (
+                      <span className="absolute left-3 top-3 grid min-h-11 min-w-11 place-items-center rounded-2xl bg-card/95 px-2 py-1 text-center shadow-sm">
+                        <span>
+                          <span className="font-display block text-[16px] font-bold leading-none text-ink">
+                            {dayNum}
+                          </span>
+                          <span className="block text-[10px] font-bold uppercase tracking-wider text-brand">
+                            {month}
+                          </span>
+                        </span>
+                      </span>
+                    )}
                     <p className="absolute bottom-2 left-3 right-3 font-display text-[17px] font-bold leading-tight text-white">
                       {e.title}
                     </p>
@@ -209,7 +234,8 @@ export function HomePage() {
                     </p>
                   </div>
                 </CardShell>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="mt-3">
@@ -225,13 +251,11 @@ export function HomePage() {
           <div className="mt-3 flex gap-3 overflow-x-auto pb-2 no-scrollbar">
             {places.map((p) => (
               <CardShell key={p.id} href={hrefForPlace(p)} label={p.name} className="w-64 shrink-0">
-                <div className="relative aspect-square bg-paper">
-                  {(p.heroImage || p.photos?.[0]) && (
-                    <Photo
-                      src={p.heroImage || p.photos![0]}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                  )}
+                <div className="relative aspect-square overflow-hidden bg-paper">
+                  <Photo
+                    src={p.heroImage || p.photos?.[0] || "/media/harbour.jpg"}
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
                   <div className="hero-scrim absolute inset-0" />
                   <p className="absolute bottom-2 left-3 right-3 font-display text-[17px] font-bold leading-tight text-white">
                     {p.name}
@@ -264,15 +288,25 @@ export function HomePage() {
           <ul className="mt-3 space-y-2">
             {forYou.map((p) => (
               <li key={p.id}>
-                <CardShell href={`/plan/${p.id}`} label={p.title} className="p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gold">
-                    Because you&apos;re {p.city ? `near ${p.city}` : "exploring"}
-                  </p>
-                  <p className="font-display mt-0.5 text-[17px] font-semibold">{p.title}</p>
-                  <p className="mt-0.5 text-[13px] text-mute">
-                    {formatPlanDate(p.date, p.time)}
-                    {p.destination ? ` · ${p.destination}` : ""}
-                  </p>
+                <CardShell href={`/plan/${p.id}`} label={p.title} className="p-3">
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-paper">
+                      <Photo
+                        src={p.heroImage || "/media/walk.jpg"}
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gold">
+                        Because you&apos;re {p.city ? `near ${p.city}` : "exploring"}
+                      </p>
+                      <p className="font-display mt-0.5 truncate text-[17px] font-semibold">{p.title}</p>
+                      <p className="mt-0.5 truncate text-[13px] text-mute">
+                        {formatPlanDate(p.date, p.time)}
+                        {p.destination ? ` · ${p.destination}` : ""}
+                      </p>
+                    </div>
+                  </div>
                 </CardShell>
               </li>
             ))}
@@ -295,14 +329,23 @@ export function HomePage() {
       {/* Moments preview — travel/context driven, not a selfie feed */}
       <section aria-label="Moments" className="mt-8">
         <SectionHeader title="Moments" actionLabel="Open Circle" actionHref="/circle" />
-        <CardShell href="/me/memories" label="Open your moments" className="mt-3 p-5">
-          <p className="text-[14px] leading-6 text-mute">
-            Travel moments answer <span className="font-semibold text-ink">where, when, what, who</span> —
-            a café worth the detour, a weekend worth repeating.
-          </p>
-          <span className="mt-3 inline-flex items-center gap-1 text-[14px] font-semibold text-brand">
-            Share a Moment <ArrowRight size={15} />
-          </span>
+        <CardShell href="/me/memories" label="Open your moments" className="mt-3 overflow-hidden p-0">
+          <div className="relative h-32">
+            <Photo src="/media/campus.jpg" className="absolute inset-0 h-full w-full object-cover" />
+            <div className="hero-scrim absolute inset-0" />
+            <p className="absolute bottom-2.5 left-4 right-4 font-display text-[18px] font-bold leading-tight text-white">
+              Weekends worth repeating
+            </p>
+          </div>
+          <div className="p-5">
+            <p className="text-[14px] leading-6 text-mute">
+              Travel moments answer <span className="font-semibold text-ink">where, when, what, who</span> —
+              a café worth the detour, a weekend worth repeating.
+            </p>
+            <span className="mt-3 inline-flex items-center gap-1 text-[14px] font-semibold text-brand">
+              Share a Moment <ArrowRight size={15} />
+            </span>
+          </div>
         </CardShell>
       </section>
     </div>

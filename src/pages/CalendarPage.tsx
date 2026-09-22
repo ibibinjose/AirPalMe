@@ -328,14 +328,39 @@ function CalendarPageContent() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-24 pt-4 md:px-6 md:pt-6">
-      {/* Top Header / Breadcrumb */}
-      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gold">
+      {/* Image header — laneway backdrop, controls float below the title */}
+      <div className="relative mb-6 overflow-hidden rounded-[28px]">
+        <div className="absolute inset-0" aria-hidden="true">
+          <img
+            src="/media/laneway.jpg"
+            alt=""
+            className="h-full w-full object-cover"
+            loading="eager"
+            decoding="async"
+            onError={(e) => {
+              e.currentTarget.src = "/media/harbour.jpg";
+            }}
+          />
+          <div className="hero-scrim absolute inset-0" />
+        </div>
+        <div className="relative p-5 md:p-7">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/85">
             <Sparkles size={13} />
             <span>{city} · What’s On</span>
           </div>
-          <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-ink md:text-4xl">Event Calendar</h1>
+          <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-white md:text-4xl">
+            Event Calendar
+          </h1>
+          <p className="mt-1 text-[14px] font-medium text-white/80">
+            {filteredEvents.length} upcoming · {savedItineraryCount} saved to your itinerary
+          </p>
+        </div>
+      </div>
+
+      {/* Top Header / tools */}
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h2 className="font-display text-xl font-bold tracking-tight text-ink">Browse events</h2>
         </div>
 
         {/* View Switcher & Action Tools */}

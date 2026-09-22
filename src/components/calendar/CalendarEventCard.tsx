@@ -172,8 +172,8 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
         isCurrentlyDragged && "opacity-40 ring-2 ring-brand ring-dashed scale-[0.99]",
       )}
     >
-      {/* Top Banner / Image */}
-      {event.heroImage && !compact && (
+      {/* Top Banner / Image — laneway fallback when the event has no art */}
+      {!compact && (
         <div className="relative mb-3.5 aspect-square w-full overflow-hidden rounded-2xl bg-paper/60">
           {/* Loading placeholder */}
           {!imageLoaded && !imageError && (
@@ -183,7 +183,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
           {/* Actual image */}
           {!imageError && (
             <img
-              src={event.heroImage}
+              src={event.heroImage || "/media/laneway.jpg"}
               alt={`${event.title} event banner`}
               className={cn(
                 "h-full w-full object-cover transition duration-500 group-hover:scale-105",
@@ -192,7 +192,11 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
               loading="lazy"
               decoding="async"
               onLoad={() => setImageLoaded(true)}
-              onError={() => setImageError(true)}
+              onError={(e) => {
+                const el = e.currentTarget;
+                if (el.src.endsWith("/media/laneway.jpg")) setImageError(true);
+                else el.src = "/media/laneway.jpg";
+              }}
             />
           )}
 
