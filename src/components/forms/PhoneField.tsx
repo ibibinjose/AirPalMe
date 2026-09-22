@@ -166,9 +166,17 @@ export function PhoneField({
           onChange={(e) => handleNumberChange(e.target.value)}
           inputMode="tel"
           autoComplete="tel-national"
+          enterKeyHint="next"
           placeholder={placeholder}
-          className={cn(fieldInput, "flex-1")}
+          className={cn(fieldInput, "flex-1 text-[16px]")}
           aria-label="Mobile Number"
+          onFocus={(e) => {
+            try {
+              e.currentTarget.scrollIntoView({ behavior: "smooth", block: "center" });
+            } catch {
+              /* ignore */
+            }
+          }}
         />
       </div>
     </ValidField>

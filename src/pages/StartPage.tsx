@@ -35,6 +35,7 @@ import { SignupFlow } from "@/components/auth/SignupFlow";
 import { SocialAuthButtons, SocialAuthDivider } from "@/components/auth/SocialAuthButtons";
 import { PhoneField } from "@/components/forms/PhoneField";
 import { isNativeApp, triggerHaptic } from "@/lib/native";
+import { useVirtualKeyboard } from "@/lib/keyboard";
 import { phonePasswordNeedsSms, phoneReady } from "@shared/phone-auth";
 import { MeAvatar } from "@/components/auth/MeAvatar";
 import { useAuth } from "@/contexts/AuthContext";
@@ -46,6 +47,19 @@ import { cn } from "@/lib/cn";
 
 type AuthMode = "signin" | "signup" | "reset";
 type AuthMethod = "email" | "phone";
+
+/**
+ * Keyboard hygiene: 16px stops iOS auto-zoom, focusing a field pulls it
+ * above the keyboard on web + Android webviews.
+ */
+const KEYBOARD_SAFE_INPUT = "text-[16px]";
+function nudgeIntoView(e: React.FocusEvent<HTMLElement>) {
+  try {
+    e.currentTarget.scrollIntoView({ behavior: "smooth", block: "center" });
+  } catch {
+    /* ignore */
+  }
+}
 
 type RoleHeroItem = {
   icon: ComponentType<{ size?: number | string; strokeWidth?: number | string }>;
@@ -468,9 +482,13 @@ export function StartPage() {
   }
 
   const RoleIcon = roleContext.icon;
+  const { keyboardHeight } = useVirtualKeyboard();
 
   return (
-    <div className="mx-auto max-w-md px-4 py-8 md:py-12">
+    <div
+      className="mx-auto max-w-md px-4 py-8 md:py-12"
+      style={keyboardHeight > 0 ? { paddingBottom: keyboardHeight + 24 } : undefined}
+    >
       {isGuestStart && (
         <div className="mb-6 text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">Life Made Easy</p>
@@ -703,11 +721,12 @@ export function StartPage() {
                       inputMode="email"
                       autoComplete="email"
                       autoCapitalize="none"
+                      enterKeyHint="go"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      onFocus={nudgeIntoView}
                       placeholder="you@example.com"
-                      autoFocus
-                      className={cn(fieldInput, "pl-10")}
+                      className={cn(fieldInput, "pl-10", KEYBOARD_SAFE_INPUT)}
                     />
                   </div>
                 </ValidField>
@@ -875,7 +894,9 @@ export function StartPage() {
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••"
                           autoComplete="current-password"
-                          className={cn(fieldInput, "pl-10 pr-10")}
+                          enterKeyHint="go"
+                          onFocus={nudgeIntoView}
+                          className={cn(fieldInput, "pl-10 pr-10", KEYBOARD_SAFE_INPUT)}
                         />
                         <button
                           type="button"
@@ -915,11 +936,12 @@ export function StartPage() {
                       inputMode="email"
                       autoComplete="email"
                       autoCapitalize="none"
+                      enterKeyHint="next"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                      onFocus={nudgeIntoView}
                       placeholder="you@domain.com"
-                      className={cn(fieldInput, "pl-10")}
-                      autoFocus
+                      className={cn(fieldInput, "pl-10", KEYBOARD_SAFE_INPUT)}
                     />
                   </div>
                 </ValidField>
@@ -932,7 +954,9 @@ export function StartPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
                       autoComplete="current-password"
-                      className={cn(fieldInput, "pl-10 pr-10")}
+                      enterKeyHint="go"
+                      onFocus={nudgeIntoView}
+                      className={cn(fieldInput, "pl-10 pr-10", KEYBOARD_SAFE_INPUT)}
                     />
                     <button
                       type="button"
