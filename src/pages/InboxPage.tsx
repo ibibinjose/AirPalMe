@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore";
-import { Bell } from "lucide-react";
+import { Bell, MessageCircle } from "lucide-react";
+import { SegmentedControl } from "@/components/design-system/companions";
+import { usePlans } from "@/contexts/PlanContext";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
@@ -13,8 +15,19 @@ import { toast } from "sonner";
 export function InboxPage() {
   const { user, authReady } = useAuth();
   const [, nav] = useLocation();
+  const { myPlans } = usePlans();
   const [notes, setNotes] = useState<PromotionNotification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [segment, setSegment] = useState<"messages" | "activity">("messages");
+
+  const conversations = useMemo(
+    () =>
+      myPlans
+        .filter((p) => p.status !== "completed")
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .slice(0, 10),
+    [myPlans],
+  );
 
   useEffect(() => {
     const db = getFirebaseDb();
@@ -65,9 +78,105 @@ export function InboxPage() {
 
   return (
     <div className="mx-auto max-w-lg px-4 pb-12">
-      <p className="pt-6 text-[13px] font-semibold text-mute">Notifications</p>
-      <h1 className="font-display mt-1 text-[32px] font-bold tracking-tight">Inbox</h1>
-      <p className="mt-1 text-[15px] text-mute">{unread ? `${unread} new` : "You're up to date."}</p>
+      <h1 className="font-display pt-6 text-[28px] font-bold tracking-tight">Inbox</h1>
+      <p className="mt-1 text-[15px] text-mute">
+        Messages, invitations and trip collaboration — {unread ? `${unread} new` : "you're up to date."}
+      </p>
+      <div className="mt-4">
+        <SegmentedControl
+          label="Inbox sections"
+          value={segment}
+          onChange={setSegment}
+          options={[
+            { id: "messages", label: "Messages" },
+            { id: "activity", label: "Activity" },
+          ]}
+        />
+      </div>
+
+      {segment === "messages" ? (
+        <div className="mt-4">
+          {conversations.length === 0 ? (
+            <div className="mt-2 text-center rounded-[20px] bg-card ring-1 ring-line/80 px-4 py-10">
+              <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-paper text-mute">
+                <MessageCircle size={22} />
+              </span>
+              <p className="font-display mt-4 text-xl font-semibold">No conversations yet</p>
+              <p className="mx-auto mt-1 max-w-xs text-[15px] leading-6 text-mute">
+                Messages live inside trip plans and Circle threads — plan something together to start.
+              </p>
+              <div className="mt-5 flex justify-center gap-4">
+                <Link href="/plan/new" className="text-[15px] font-semibold text-brand">
+                  Plan a Trip
+                </Link>
+                <Link href="/circle" className="text-[15px] font-semibold text-brand">
+                  Open Circle
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <ul className="mt-2 overflow-hidden rounded-[20px] bg-card ring-1 ring-line/80">
+              {conversations.map((p, i) => (
+                <li key={p.id} className={cn(i > 0 && "border-t border-line/70")}>
+                  <button
+                    type="button"
+                    onClick={() => nav(`/plan/${p.id}`)}
+                    className="flex w-full gap-3 px-4 py-3.5 text-left"
+                  >
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand/10 font-display text-[15px] font-bold text-brand">
+                      {p.title.trim()[0]?.toUpperCase() || "•"}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[15px] font-semibold text-ink">{p.title}</span>
+                      <span className="mt-0.5 block truncate text-[13px] text-mute">
+                        {p.destination || p.city || "Trip chat"}
+                        {p.attendees?.length ? ` · ${p.attendees.length} going` : ""}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const code = new FormData(e.currentTarget).get("code");
+              const norm = typeof code === "string" ? code.trim() : "";
+              if (norm) nav(`/invite/${encodeURIComponent(norm)}`);
+            }}
+            className="mt-3 flex items-center gap-2 rounded-[20px] bg-card px-4 py-3 ring-1 ring-line/80"
+          >
+            <label htmlFor="invite-code" className="shrink-0 text-[13px] font-semibold text-mute">
+              Have an invite?
+            </label>
+            <input
+              id="invite-code"
+              name="code"
+              type="text"
+              autoComplete="off"
+              placeholder="Enter code"
+              aria-label="Enter trip invite code"
+              className="min-w-0 flex-1 bg-transparent text-[15px] font-medium placeholder:text-mute focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="shrink-0 cursor-pointer rounded-full bg-ink px-4 py-2 text-[13px] font-semibold text-white active:scale-95"
+            >
+              Join
+            </button>
+          </form>
+          <button
+            type="button"
+            onClick={() => setSegment("activity")}
+            className="mt-4 w-full text-center text-[14px] font-semibold text-brand"
+          >
+            See activity →
+          </button>
+        </div>
+      ) : (
+      <>
+      <p className="mt-4 text-[13px] font-semibold text-mute">Activity</p>
 
       {!pushPrefEnabled() && (
         <button
@@ -116,6 +225,8 @@ export function InboxPage() {
             </li>
           ))}
         </ul>
+      )}
+      </>
       )}
     </div>
   );

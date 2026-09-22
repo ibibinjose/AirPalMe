@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRoute, useLocation } from "wouter";
-import { Check, Heart, Star, MapPin, Share2, Sparkles, ArrowLeft } from "lucide-react";
+import { Check, ChevronDown, Heart, Star, MapPin, Share2, Sparkles, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { StickyAction } from "@/components/design-system/companions";
 import { Button } from "@/components/ui/Button";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { useEvents } from "@/contexts/EventsContext";
@@ -57,6 +58,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
 
   const { today } = useLocalNow();
   const relative = formatRelativeBadge(event.date, today);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const handleShare = async () => {
     await shareContent({
@@ -74,7 +76,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
   };
 
   return (
-    <div className="mx-auto max-w-lg pb-16">
+    <div className="mx-auto max-w-lg pb-48">
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-line/60">
         <button
@@ -150,90 +152,104 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
           )}
         </div>
 
-        <HereCheckIn placeName={event.venue} eventId={event.id} />
+        {/* Secondary status — one quiet row, never competing with the primary */}
+        <div className="mt-4 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (toggleInterested(event.id) && !event.isInterested)
+                toast.success(`Saved "${event.title}" to Interested`);
+            }}
+            className={cn(
+              "inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full text-[13px] font-semibold transition active:scale-[0.98]",
+              event.isInterested
+                ? "bg-ink text-white"
+                : "bg-card text-mute ring-1 ring-line hover:text-ink",
+            )}
+          >
+            <Star
+              size={15}
+              className={event.isInterested ? "fill-white" : ""}
+              strokeWidth={event.isInterested ? 2.5 : 2}
+            />
+            <span>{event.isInterested ? "Saved" : "Save"}</span>
+          </button>
 
-        {/* Description */}
-        <div className="mt-5">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-mute">Overview</h2>
-          <p className="mt-2 text-sm leading-relaxed text-ink whitespace-pre-line">{event.description}</p>
+          <button
+            type="button"
+            aria-pressed={event.isLiked}
+            aria-label={event.isLiked ? "Liked" : "Like this event"}
+            onClick={() => {
+              if (toggleLiked(event.id) && !event.isLiked) toast.success(`Liked "${event.title}"`);
+            }}
+            className={cn(
+              "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-95",
+              event.isLiked
+                ? "bg-ink text-white"
+                : "bg-card text-mute ring-1 ring-line hover:text-ink",
+            )}
+          >
+            <Heart size={16} className={event.isLiked ? "fill-white" : ""} strokeWidth={event.isLiked ? 2.5 : 2} />
+          </button>
         </div>
 
-        {/* Attendance Action Bar */}
-        <div className="mt-6 rounded-2xl bg-card p-3.5 ring-1 ring-line">
-          <p className="text-center text-xs font-medium text-mute mb-2.5">Your status for this event</p>
-          <div className="flex items-center justify-center gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                if (toggleGoing(event.id) && !event.isGoing) toast.success(`Marked Going to "${event.title}"`);
-              }}
-              className={cn(
-                "flex-1 inline-flex h-9 items-center justify-center gap-1.5 rounded-full text-xs font-medium transition active:scale-95",
-                event.isGoing
-                  ? "bg-emerald-600 text-white shadow-sm ring-1 ring-emerald-700"
-                  : "bg-paper text-ink hover:bg-emerald-50 ring-1 ring-line/80",
-              )}
-            >
-              <Check size={14} strokeWidth={event.isGoing ? 3 : 2} />
-              <span>Going</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                if (toggleInterested(event.id) && !event.isInterested)
-                  toast.success(`Saved "${event.title}" to Interested`);
-              }}
-              className={cn(
-                "flex-1 inline-flex h-9 items-center justify-center gap-1.5 rounded-full text-xs font-medium transition active:scale-95",
-                event.isInterested
-                  ? "bg-amber-500 text-white shadow-sm ring-1 ring-amber-600"
-                  : "bg-paper text-ink hover:bg-amber-50 ring-1 ring-line/80",
-              )}
-            >
-              <Star
-                size={14}
-                className={event.isInterested ? "fill-white" : ""}
-                strokeWidth={event.isInterested ? 2.5 : 2}
-              />
-              <span>Interested</span>
-            </button>
-
-            <button
-              type="button"
-              aria-pressed={event.isLiked}
-              aria-label={event.isLiked ? "Liked" : "Like this event"}
-              onClick={() => {
-                if (toggleLiked(event.id) && !event.isLiked) toast.success(`Liked "${event.title}"`);
-              }}
-              className={cn(
-                "inline-flex h-9 w-9 items-center justify-center rounded-full transition active:scale-95",
-                event.isLiked
-                  ? "bg-rose-500 text-white shadow-sm ring-1 ring-rose-600"
-                  : "bg-paper text-ink hover:bg-rose-50 ring-1 ring-line/80",
-              )}
-            >
-              <Heart size={15} className={event.isLiked ? "fill-white" : ""} strokeWidth={event.isLiked ? 2.5 : 2} />
-            </button>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="mt-6 flex flex-col gap-2.5">
-          {event.ticketUrl && (
-            <Button className="w-full" onClick={() => window.open(event.ticketUrl, "_blank")}>
-              Get Tickets / Official Info
-            </Button>
+        {/* Progressive disclosure — description and logistics wait one tap away */}
+        <div className="mt-4 overflow-hidden rounded-2xl bg-card ring-1 ring-line">
+          <button
+            type="button"
+            onClick={() => setDetailsOpen((o) => !o)}
+            aria-expanded={detailsOpen}
+            className="flex w-full cursor-pointer touch-manipulation items-center justify-between px-4 py-3.5 text-left"
+          >
+            <span className="text-[15px] font-semibold">More details</span>
+            <ChevronDown
+              size={17}
+              className={cn("text-mute transition-transform", detailsOpen && "rotate-180")}
+            />
+          </button>
+          {detailsOpen && (
+            <div className="border-t border-line/70 px-4 py-4">
+              <p className="text-sm leading-relaxed text-ink whitespace-pre-line">{event.description}</p>
+              <div className="mt-4">
+                <HereCheckIn placeName={event.venue} eventId={event.id} />
+              </div>
+              <div className="mt-4 flex flex-col gap-2.5">
+                {event.ticketUrl && (
+                  <Button className="w-full" onClick={() => window.open(event.ticketUrl, "_blank")}>
+                    Get Tickets / Official Info
+                  </Button>
+                )}
+                <AddToCalendarMenu
+                  event={event}
+                  className="w-full"
+                  buttonClassName="w-full bg-card hover:bg-paper ring-1 ring-line text-xs py-2.5"
+                  label="Add to Calendar (Google, Apple, Outlook, 365)"
+                />
+              </div>
+            </div>
           )}
-
-          <AddToCalendarMenu
-            event={event}
-            className="w-full"
-            buttonClassName="w-full bg-card hover:bg-paper ring-1 ring-line text-xs py-2.5"
-            label="Add to Calendar (Google, Apple, Outlook, 365)"
-          />
         </div>
       </div>
+
+      {/* One primary action, thumb-reachable: decide → act */}
+      <StickyAction
+        primary={
+          <button
+            type="button"
+            onClick={() => {
+              const applied = toggleGoing(event.id);
+              if (applied && !event.isGoing) toast.success(`You're going to "${event.title}"`);
+            }}
+            className={cn(
+              "flex h-12 w-full cursor-pointer touch-manipulation items-center justify-center gap-2 rounded-full text-[15px] font-semibold transition active:scale-[0.99]",
+              event.isGoing ? "bg-emerald-600 text-white" : "bg-brand text-white",
+            )}
+          >
+            <Check size={17} strokeWidth={event.isGoing ? 3 : 2.2} />
+            <span>{event.isGoing ? "You're going ✓" : "Add to AirPal — I'm going"}</span>
+          </button>
+        }
+      />
     </div>
   );
 }

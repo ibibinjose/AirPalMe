@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { useEvents } from "@/contexts/EventsContext";
+import { usePlans } from "@/contexts/PlanContext";
 import { useClub } from "@/contexts/ClubContext";
 import { useZoo } from "@/contexts/ZooContext";
 import { huntProgress } from "@shared/zoo";
@@ -73,6 +74,9 @@ export function MePage() {
   const interestedCount = calendarEvents.filter((e) => e.isInterested).length;
   const peopleCount = listPeople().length;
   const memoryCount = listMemories().length;
+  const { myPlans } = usePlans();
+  const tripCount = myPlans.length;
+  const savedCount = savedEvents.length + savedStalls.length;
 
   if (!user) {
     return (
@@ -141,6 +145,55 @@ export function MePage() {
                   Giveaways
                 </Button>
               </div>
+            </div>
+          </div>
+
+          {/* Travel identity — a reason to build a profile */}
+          <div className="rounded-[28px] ring-1 ring-line bg-card p-5 shadow-xs">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Travel identity</p>
+            <dl className="mt-3 grid grid-cols-4 gap-2 text-center">
+              {[
+                { v: String(tripCount), l: "Trips" },
+                { v: String(goingCount + interestedCount), l: "Events" },
+                { v: String(savedCount), l: "Saved" },
+                { v: String(peopleCount), l: "People" },
+              ].map((s) => (
+                <div key={s.l} className="rounded-2xl bg-paper px-1 py-2.5">
+                  <dt className="sr-only">{s.l}</dt>
+                  <dd className="font-display text-[19px] font-bold">{s.v}</dd>
+                  <dd className="text-[11px] font-medium text-mute">{s.l}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-3 flex flex-wrap justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => nav("/plan")}
+                className="rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold ring-1 ring-line transition hover:ring-brand/40"
+              >
+                Trips
+              </button>
+              <button
+                type="button"
+                onClick={() => nav("/me/memories")}
+                className="rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold ring-1 ring-line transition hover:ring-brand/40"
+              >
+                Moments ({memoryCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => nav("/calendar")}
+                className="rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold ring-1 ring-line transition hover:ring-brand/40"
+              >
+                Events
+              </button>
+              <button
+                type="button"
+                onClick={() => nav("/settings")}
+                className="rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold ring-1 ring-line transition hover:ring-brand/40"
+              >
+                Settings
+              </button>
             </div>
           </div>
 

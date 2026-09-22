@@ -62,16 +62,18 @@ export function BioCatalogSection({
   featured,
   onTap,
   onClaim,
+  id,
 }: {
   label: string;
   items: BioCatalogItem[];
   featured?: boolean;
   onTap: (kind: string) => void;
   onClaim?: (item: BioCatalogItem) => void;
+  id?: string;
 }) {
   if (!items.length) return null;
   return (
-    <section className="mt-6">
+    <section id={id} className="mt-6 scroll-mt-24">
       <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">{label}</p>
       <ul className="mt-2 space-y-2">
         {items.map((item) => (

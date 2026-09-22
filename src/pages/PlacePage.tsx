@@ -7,6 +7,7 @@ import { bioPath } from "@shared/bio";
 import { mapsWalkUrl, mapsPlaceUrl, mapsPlaceIdUrl } from "@/lib/maps";
 import { openMap } from "@/lib/analytics";
 import { Button } from "@/components/ui/Button";
+import { StickyAction } from "@/components/design-system/companions";
 import { HereCheckIn } from "@/components/circle/HereCheckIn";
 import { BioHandleButton } from "@/components/bio/BioHandleButton";
 import { Photo } from "@/components/ui/Photo";
@@ -51,7 +52,7 @@ export function PlacePage() {
   };
 
   return (
-    <div className="mx-auto max-w-lg pb-10">
+    <div className="mx-auto max-w-lg pb-48">
       <div className="relative">
         <Photo src={img} className="h-[360px] w-full object-cover" />
         <div className="hero-scrim absolute inset-0" />
@@ -111,26 +112,10 @@ export function PlacePage() {
       <div className="px-4 pt-5">
         <p className="text-[15px] leading-relaxed">{place.insiderTip || place.shortWhy}</p>
         {handle && (
-          <Button className="mt-6 w-full" onClick={() => nav(bioPath(handle))}>
+          <Button variant="ghost" className="mt-4 w-full" onClick={() => nav(bioPath(handle))}>
             Open @{handle}
           </Button>
         )}
-        <div className={handle ? "mt-3 flex gap-3" : "mt-6 flex gap-3"}>
-          <Button
-            className="flex-1"
-            variant={handle ? "ghost" : "primary"}
-            onClick={() => openMap(mapsWalkUrl(from, place.geo), { contentId: place.id, destination: "walk" })}
-          >
-            Walk
-          </Button>
-          <Button
-            variant="ghost"
-            className="flex-1"
-            onClick={() => openMap(maps, { contentId: place.id, destination: "maps" })}
-          >
-            Maps
-          </Button>
-        </div>
         <HereCheckIn placeName={place.name} placeId={place.id} />
         {place.bookingUrl && (
           <Button
@@ -141,10 +126,37 @@ export function PlacePage() {
             {place.bookingLabel || "Book"}
           </Button>
         )}
-        <button className="mt-4 w-full text-sm text-mute" onClick={() => nav("/")}>
-          Discover
+        <button
+          type="button"
+          className="mt-4 w-full cursor-pointer text-[14px] font-semibold text-brand"
+          onClick={() => nav("/explore")}
+        >
+          Explore more →
         </button>
       </div>
+
+      {/* One primary action, thumb-reachable: Walk there */}
+      <StickyAction
+        primary={
+          <button
+            type="button"
+            onClick={() => openMap(mapsWalkUrl(from, place.geo), { contentId: place.id, destination: "walk" })}
+            className="flex h-12 w-full cursor-pointer touch-manipulation items-center justify-center rounded-full bg-brand text-[15px] font-semibold text-white transition active:scale-[0.99]"
+          >
+            Walk there
+          </button>
+        }
+        secondary={
+          <button
+            type="button"
+            onClick={() => openMap(maps, { contentId: place.id, destination: "maps" })}
+            aria-label="Open in Maps"
+            className="grid h-12 w-12 shrink-0 cursor-pointer touch-manipulation place-items-center rounded-full bg-card text-[13px] font-semibold text-mute ring-1 ring-line transition hover:text-ink active:scale-95"
+          >
+            Maps
+          </button>
+        }
+      />
     </div>
   );
 }

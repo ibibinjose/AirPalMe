@@ -66,11 +66,11 @@ Brand: **AirPal.me** (the `.me` stays). Tagline **Life Made Easy.** Script logo 
 
 ## 3. Shipped chrome (do not replace)
 
-Bottom tabs, in this order: **What's on** (`/`) · **Plan** (`/plan`) · **Scan** (centre, `/scan`) · **Stay** (`/concierge`) · **Me** (`/me`). Circle lives under Plan (`/circle`). Mate is `/mate`, **not** a tab.
+Bottom tabs, in this order: **Home** (`/`) · **Explore** (`/explore`) · **Trips** (`/plan`) · **Inbox** (`/me/inbox`) · **Me** (`/me`). Circle + EventCreate live under Trips (`/circle`, `/event/new`). Mate is `/mate`, **not** a tab. Scan is not a tab — it lives behind the global **+ Create** action (`CreateFab`) and Home quick actions. Stay (`/concierge`) lives inside Explore/Home, not as a tab.
 
-Mapping: `src/lib/tabs.ts`, `src/components/layout/TabBar.tsx`.
+Mapping: `src/lib/tabs.ts`, `src/components/layout/TabBar.tsx`. Global create: `src/components/design-system/CreateFab.tsx` (rendered by `AppShell`).
 
-`AGENTS.md` §3 is the long-term marketplace IA. **Do not rip out the shipped five-tab dock** to match §3. Add Mate/Fashion as routes, not extra tabs, unless the human asks.
+Changed 22 September 2026 at the human's explicit request (companion redesign: Home/Explore/Trips/Inbox/Me + one + Create action, all existing routes preserved). `AGENTS.md` §3 IA now matches the shipped dock. Add Mate/Fashion as routes, not extra tabs, unless the human asks.
 
 ---
 
@@ -192,7 +192,7 @@ Do not undo these without the human naming them:
 - Website guest browse
 - Personal vs business identity; Google import on business only
 - Firestore profile persist (`persistOwnedProfile`, `hydrateOwnedBios`)
-- Five-tab dock + Scan centre button
+- Five-tab companion dock (Home / Explore / Trips / Inbox / Me) + global + Create action (Scan lives there, not as a tab)
 - Capacitor origin `airpal.me`
 - Sign in with Apple + Google on native
 - Stay scan session as device-only

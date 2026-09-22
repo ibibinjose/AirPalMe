@@ -696,7 +696,34 @@ export function BioPublicPage() {
           </div>
         )}
 
-        {!isOwner && (
+        {!isOwner && bio.kind === "business" && ((bio.products || []).length > 0 || (bio.services || []).length > 0) && (
+          <div className="mt-6 rounded-3xl bg-card p-5 shadow-[0_4px_16px_rgba(18,22,20,0.08)] ring-1 ring-line">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Book</p>
+            <h3 className="font-display mt-1.5 text-lg font-semibold text-ink">Products &amp; services</h3>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              {(bio.products || []).length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => document.getElementById("bio-products")?.scrollIntoView({ behavior: "smooth" })}
+                  className="rounded-2xl bg-brand px-2 py-3 text-center text-sm font-bold text-white shadow-[0_6px_20px_rgba(24,5,219,0.35)] transition active:scale-[0.98]"
+                >
+                  Products
+                </button>
+              )}
+              {(bio.services || []).length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => document.getElementById("bio-services")?.scrollIntoView({ behavior: "smooth" })}
+                  className="rounded-2xl bg-ink px-2 py-3 text-center text-sm font-bold text-white transition active:scale-[0.98]"
+                >
+                  Services
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {!isOwner && !(bio.kind === "business" && ((bio.products || []).length > 0 || (bio.services || []).length > 0)) && (
           <div className="mt-6 rounded-3xl bg-card p-5 ring-1 ring-line">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Meet &amp; hangout</p>
             <h3 className="font-display mt-1.5 text-lg font-semibold text-ink">Catch up or meet with {bio.name}</h3>
@@ -811,8 +838,8 @@ export function BioPublicPage() {
           onTap={(kind) => recordTap(bio.handle, kind)}
           onClaim={onClaimDeal}
         />
-        <BioCatalogSection label="Products" items={bio.products || []} onTap={(kind) => recordTap(bio.handle, kind)} />
-        <BioCatalogSection label="Services" items={bio.services || []} onTap={(kind) => recordTap(bio.handle, kind)} />
+        <BioCatalogSection label="Products" items={bio.products || []} onTap={(kind) => recordTap(bio.handle, kind)} id="bio-products" />
+        <BioCatalogSection label="Services" items={bio.services || []} onTap={(kind) => recordTap(bio.handle, kind)} id="bio-services" />
 
         {/* Outbound Link Stack */}
         {stacked.length > 0 && (

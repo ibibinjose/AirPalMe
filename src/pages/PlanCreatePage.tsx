@@ -163,8 +163,10 @@ export function PlanCreatePage() {
         </p>
       )}
 
-      <form className="mt-6 space-y-5" onSubmit={(e) => void onSubmit(e)}>
-        <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
+      <form className="mt-6 space-y-7" onSubmit={(e) => void onSubmit(e)}>
+        <section aria-label="Step 1: what">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">1 · What</p>
+          <div className="mt-2 flex gap-1.5 overflow-x-auto no-scrollbar">
           {KINDS.map((k) => (
             <button
               key={k.id}
@@ -195,18 +197,21 @@ export function PlanCreatePage() {
 
         <ImageField kind="square" folder="listings" label="Photo" value={hero} onChange={setHero} />
 
-        <label className="block">
-          <span className="text-[13px] font-semibold text-mute">What</span>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder={PLAN_TYPES[type]?.defaultTitle || "Friday drinks"}
-            className={`${fieldInput} mt-1`}
-          />
-        </label>
+          <label className="mt-3 block">
+            <span className="text-[13px] font-semibold text-mute">What</span>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={PLAN_TYPES[type]?.defaultTitle || "Friday drinks"}
+              className={`${fieldInput} mt-1`}
+            />
+          </label>
+        </section>
 
-        <div>
-          <span className="text-[13px] font-semibold text-mute">When</span>
+        <section aria-label="Step 2: when and where">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">2 · When & where</p>
+          <div className="mt-2">
+            <span className="text-[13px] font-semibold text-mute">When</span>
           <div className="mt-1.5 flex gap-1.5">
             {[
               { label: "Today", value: today },
@@ -248,10 +253,12 @@ export function PlanCreatePage() {
           }}
           placeholder={city || "Search Google Maps"}
         />
+        </section>
 
         {circle.length > 0 && (
-          <div>
-            <p className="flex items-center gap-1.5 text-[13px] font-semibold text-mute">
+          <section aria-label="Step 3: who">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">3 · Who</p>
+            <p className="mt-2 flex items-center gap-1.5 text-[13px] font-semibold text-mute">
               <Users size={14} /> Invite
             </p>
             <ul className="mt-2 max-h-36 space-y-1 overflow-y-auto">
@@ -275,7 +282,7 @@ export function PlanCreatePage() {
                 );
               })}
             </ul>
-          </div>
+          </section>
         )}
 
         <label className="flex items-center gap-3 py-1">

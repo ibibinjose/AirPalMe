@@ -8,20 +8,18 @@ import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
 import { cn } from "@/lib/cn";
 import { enterEase } from "@/lib/motion";
 import { tabFromPath } from "@/lib/tabs";
-import { saveDoor, type DoorId } from "@/lib/door";
 
-import { useLocale } from "@/contexts/LocaleContext";
 import { useAuth } from "@/contexts/AuthContext";
 
 const LINKS = [
-  { href: "/", id: "explore" as const, key: "whatsOn" },
-  { href: "/plan", id: "plan" as const, key: "plan" },
-  { href: "/concierge", id: "stay" as const, key: "stay" },
+  { href: "/", label: "Home", id: "home" as const },
+  { href: "/explore", label: "Explore", id: "explore" as const },
+  { href: "/plan", label: "Plan", id: "trips" as const },
+  { href: "/me/inbox", label: "Inbox", id: "inbox" as const },
 ];
 
 export function TopNav({ path, enter = false }: { path: string; enter?: boolean }) {
   const [, nav] = useLocation();
-  const { t } = useLocale();
   const { isHost } = useAuth();
   const active = tabFromPath(path);
   return (
@@ -39,17 +37,14 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
           {LINKS.map((link) => (
             <button
               key={link.id}
-              onClick={() => {
-                saveDoor(link.id as DoorId);
-                nav(link.href);
-              }}
+              onClick={() => nav(link.href)}
               aria-current={active === link.id ? "page" : undefined}
               className={cn(
                 "h-9 touch-manipulation rounded-full px-3 text-sm font-medium lg:h-10 lg:px-4",
                 active === link.id ? "bg-brand text-white" : "text-mute hover:text-ink",
               )}
             >
-              {t(link.key)}
+              {link.label}
             </button>
           ))}
         </nav>
@@ -71,14 +66,14 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
             onClick={() => nav("/scan")}
             className="h-9 shrink-0 rounded-full bg-brand px-3.5 text-sm font-medium text-white lg:h-10 lg:px-4"
           >
-            {t("scan")}
+            Scan
           </button>
           {isHost ? (
             <button
               onClick={() => nav("/host")}
               className="h-9 shrink-0 rounded-full bg-white px-3.5 text-sm font-medium ring-1 ring-line lg:h-10 lg:px-4"
             >
-              {t("host")}
+              Host
             </button>
           ) : (
             <button

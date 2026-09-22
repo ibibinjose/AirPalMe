@@ -8,7 +8,6 @@ import {
   Sparkles,
   Users,
   Building2,
-  Wifi,
   ArrowRight,
   X,
   Compass,
@@ -38,6 +37,36 @@ export function openGlobalSearch() {
 
 type SearchCategory = "all" | "people" | "places" | "events" | "stay" | "plan" | "experiences";
 
+const RECENT_KEY = "airpal.recentSearches.v1";
+type RecentItem = { title: string; href: string };
+
+function loadRecent(): RecentItem[] {
+  try {
+    const raw = localStorage.getItem(RECENT_KEY);
+    const parsed = raw ? (JSON.parse(raw) as RecentItem[]) : [];
+    return Array.isArray(parsed) ? parsed.slice(0, 5) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveRecent(item: RecentItem) {
+  try {
+    const next = [item, ...loadRecent().filter((r) => r.href !== item.href)].slice(0, 5);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {
+    /* ignore */
+  }
+}
+
+const EXPLORE_GROUPS = [
+  { label: "Places", href: "/explore", icon: MapPin },
+  { label: "Events", href: "/calendar", icon: CalendarDays },
+  { label: "Plans", href: "/plan", icon: Users },
+  { label: "People", href: "/mate", icon: HeartHandshake },
+  { label: "Communities", href: "/club", icon: Building2 },
+];
+
 interface SearchResultItem {
   id: string;
   category: "place" | "event" | "stay" | "plan" | "partner" | "experience" | "person";
@@ -61,6 +90,7 @@ export function GlobalSearchModal() {
   const { here, city, usingGps } = useLocalNow();
   const [liveExperiences, setLiveExperiences] = useState<Campaign[]>([]);
   const [publicMates, setPublicMates] = useState<PublicMate[]>([]);
+  const [recent, setRecent] = useState<RecentItem[]>([]);
 
   useScrollLock(open);
 
@@ -106,6 +136,7 @@ export function GlobalSearchModal() {
       void triggerHaptic("light");
       setQuery("");
       setSelectedIndex(0);
+      setRecent(loadRecent());
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [open]);
@@ -115,57 +146,8 @@ export function GlobalSearchModal() {
     const q = query.trim().toLowerCase();
     const items: SearchResultItem[] = [];
 
-    // Default Quick Actions when query is empty
-    if (!q) {
-      items.push(
-        {
-          id: "qa-mate",
-          category: "person",
-          title: "Find someone to go with you",
-          subtitle: "Request an approved AirPal Mate",
-          badge: "Mate",
-          href: "/mate",
-          icon: HeartHandshake,
-        },
-        {
-          id: "qa-plan-night",
-          category: "plan",
-          title: "Plan a Night Out with Mates",
-          subtitle: "Rooftop drinks, pubs & late-night spots with digital RSVP",
-          badge: "Mates Plan",
-          href: "/plan/new",
-          icon: Users,
-        },
-        {
-          id: "qa-wifi",
-          category: "stay",
-          title: "In-Room Wi-Fi & Password",
-          subtitle: "Instant connection details and concierge access",
-          badge: "Concierge",
-          href: "/concierge",
-          icon: Wifi,
-        },
-        {
-          id: "qa-calendar",
-          category: "event",
-          title: `${city || "Local"} events`,
-          subtitle: "What's on near your location",
-          badge: "Calendar",
-          href: "/calendar",
-          icon: CalendarDays,
-        },
-        {
-          id: "qa-host",
-          category: "partner",
-          title: "Become a Host or List a Venue",
-          subtitle: "Free QR companion kits, verified @handle and visitor deals",
-          badge: "Partner Hub",
-          href: "/join",
-          icon: Building2,
-        },
-      );
-      return items;
-    }
+    // Empty query renders the Recent + Explore panel instead of results.
+    if (!q) return items;
 
     // 1. Match Places (live listings only — empty DB means no place results)
     for (const p of placesForLocation(activePlaces(), here, city, usingGps)) {
@@ -403,8 +385,16 @@ export function GlobalSearchModal() {
 
   const selectItem = (item: SearchResultItem) => {
     void triggerHaptic("light");
+    saveRecent({ title: item.title, href: item.href });
     setOpen(false);
     nav(item.href);
+  };
+
+  const goHref = (title: string, href: string) => {
+    void triggerHaptic("light");
+    saveRecent({ title, href });
+    setOpen(false);
+    nav(href);
   };
 
   if (!open) return null;
@@ -487,7 +477,52 @@ export function GlobalSearchModal() {
 
         {/* Results List */}
         <div className="scroll-container max-h-[min(60vh,calc(var(--visual-viewport-height,100dvh)-12rem))] p-2 space-y-1">
-          {results.length > 0 ? (
+          {!query.trim() ? (
+            <div className="px-2 py-3">
+              <p className="px-1 text-[15px] font-semibold text-ink">What are you looking for?</p>
+              {recent.length > 0 && (
+                <div className="mt-3">
+                  <p className="px-1 text-[11px] font-bold uppercase tracking-[0.14em] text-mute">Recent</p>
+                  <ul className="mt-1.5 space-y-1">
+                    {recent.map((r) => (
+                      <li key={r.href}>
+                        <button
+                          type="button"
+                          onClick={() => goHref(r.title, r.href)}
+                          className="flex w-full items-center gap-3 rounded-2xl p-2.5 text-left transition hover:bg-paper"
+                        >
+                          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-paper text-mute ring-1 ring-line">
+                            <Search size={15} />
+                          </span>
+                          <span className="truncate text-[14px] font-medium text-ink">{r.title}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <div className="mt-4">
+                <p className="px-1 text-[11px] font-bold uppercase tracking-[0.14em] text-mute">Explore</p>
+                <ul className="mt-1.5 space-y-1">
+                  {EXPLORE_GROUPS.map((g) => (
+                    <li key={g.label}>
+                      <button
+                        type="button"
+                        onClick={() => goHref(g.label, g.href)}
+                        className="flex w-full items-center gap-3 rounded-2xl p-2.5 text-left transition hover:bg-paper"
+                      >
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand">
+                          <g.icon size={17} />
+                        </span>
+                        <span className="text-[14px] font-semibold text-ink">{g.label}</span>
+                        <ArrowRight size={15} className="ml-auto shrink-0 text-transparent" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ) : results.length > 0 ? (
             results.map((item, index) => {
               const Icon = item.icon;
               const isSelected = index === selectedIndex;

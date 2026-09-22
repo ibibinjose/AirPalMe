@@ -19,9 +19,9 @@ import { ProfileMenu } from "@/components/auth/ProfileMenu";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 import { TicketAlertBar } from "@/components/host/TicketAlertBar";
+import { CreateFab } from "@/components/design-system/CreateFab";
 import { NotificationPopup } from "@/components/notifications/NotificationPopup";
 import { PresencePublisher } from "@/components/layout/PresencePublisher";
-import { useLocale } from "@/contexts/LocaleContext";
 import { cn } from "@/lib/cn";
 import { enterEase, takeShellEnter } from "@/lib/motion";
 import { parseAtHandle } from "@shared/bio";
@@ -41,7 +41,7 @@ const WORKSPACE = [
   /^\/join/,
   /^\/business/,
   /^\/event/,
-  /^\/me/,
+  /^\/me\/(zoo|memories|people|giveaways)/,
   /^\/zoo/,
   /^\/settings/,
   /^\/bio/,
@@ -56,7 +56,6 @@ const WORKSPACE = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [path] = useLocation();
-  const { t } = useLocale();
   useEffect(() => {
     window.scrollTo(0, 0);
     trackPageView(path);
@@ -68,6 +67,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   // rendering the tab bar too would stack two fixed bars on mobile.
   // (/plan/new keeps the tab bar: it has no action bar of its own.)
   const isPlanDetail = (path.startsWith("/plan/") && path !== "/plan/new") || path.startsWith("/invite/");
+  // Focused detail flows own the bottom slot with their own sticky action —
+  // the global + Create stays one tap away on Home/Explore instead.
+  const isDetail = /^\/(e|p|tour|q|g|w)\//.test(path);
   const showFooter = !isNativeApp() && shouldShowFooter(path);
   const bare = Boolean(parseAtHandle(path));
   const reduce = useReducedMotion();
@@ -136,17 +138,17 @@ export function AppShell({ children }: { children: ReactNode }) {
                         path === "/" ? "bg-brand text-white" : "text-mute hover:text-ink",
                       )}
                     >
-                      {t("explore")}
+                      Home
                     </Link>
                     <Link
-                      href="/calendar"
-                      aria-current={path.startsWith("/calendar") ? "page" : undefined}
+                      href="/explore"
+                      aria-current={path.startsWith("/explore") ? "page" : undefined}
                       className={cn(
                         "hidden md:inline-flex h-9 touch-manipulation items-center rounded-full px-3 text-sm font-medium",
-                        path.startsWith("/calendar") ? "bg-brand text-white" : "text-mute hover:text-ink",
+                        path.startsWith("/explore") ? "bg-brand text-white" : "text-mute hover:text-ink",
                       )}
                     >
-                      {t("calendar")}
+                      Explore
                     </Link>
 
                     <NotificationBell />
@@ -196,6 +198,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </PullToRefreshContainer>
           </main>
           {!workspace && !isPlanDetail && <TabBar path={path} enter={play} />}
+          {!workspace && !isPlanDetail && !bare && !isDetail && <CreateFab />}
           <PresencePublisher />
           <GuestStayTools />
           <GlobalSearchModal />

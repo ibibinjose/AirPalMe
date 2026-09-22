@@ -3,9 +3,10 @@ import { Redirect, Route, Switch } from "wouter";
 import { BIO_PUBLIC_PATH } from "@shared/bio";
 
 // Eager load the landing page for instant first paint; every other route splits out.
-import { DiscoverPage } from "@/pages/DiscoverPage";
+import { HomePage } from "@/pages/HomePage";
 
 // Code-split all other pages dynamically for fast initial bundle
+const ExplorePage = lazy(() => import("@/pages/ExplorePage").then((m) => ({ default: m.ExplorePage })));
 const ConciergePage = lazy(() => import("@/pages/ConciergePage").then((m) => ({ default: m.ConciergePage })));
 const CirclePage = lazy(() => import("@/pages/CirclePage").then((m) => ({ default: m.CirclePage })));
 const CompanionPage = lazy(() => import("@/pages/CompanionPage").then((m) => ({ default: m.CompanionPage })));
@@ -111,17 +112,15 @@ export function AppRoutes() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Switch>
-        <Route path="/" component={DiscoverPage} />
+        <Route path="/" component={HomePage} />
         <Route path="/mate" component={MatePage} />
         <Route path="/mate/request" component={MateRequestPage} />
-        <Route path="/explore">
-          <Redirect to="/" />
-        </Route>
+        <Route path="/explore" component={ExplorePage} />
         <Route path="/discover">
-          <Redirect to="/" />
+          <Redirect to="/explore" />
         </Route>
         <Route path="/discovery">
-          <Redirect to="/" />
+          <Redirect to="/explore" />
         </Route>
         <Route path="/solutions/:id" component={SolutionDetailPage} />
         <Route path="/solutions" component={SolutionsPage} />
