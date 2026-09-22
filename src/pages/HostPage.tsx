@@ -8,6 +8,9 @@ import { ValidField, fieldInput } from "@/components/forms/ValidField";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { VerifyEmailBanner } from "@/components/auth/VerifyEmailBanner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useBio } from "@/contexts/BioContext";
+import { partnerAccountPath } from "@/lib/partner-account";
+import { NAMES } from "@shared/names";
 import { fetchProperty, subscribeProperty, subscribePropertyMenu, unknownProperty } from "@/lib/properties";
 import { makeQrDataUrl, stayQrPayload } from "@/lib/qr";
 import { buildMarkerUrl } from "@shared/airpal-urls";
@@ -30,6 +33,7 @@ type Tab = "today" | "rooms" | "place" | "dining" | "print";
 
 export function HostPage() {
   const { user, isHost, isAdmin, authReady, createHostProperty, sendVerificationEmail } = useAuth();
+  const { business } = useBio();
   const [, nav] = useLocation();
   const [tab, setTab] = useState<Tab>("today");
   const workspaceId = hostWorkspacePropertyId(user?.propertyIds, isAdmin);
@@ -197,8 +201,12 @@ export function HostPage() {
           </Button>
         </form>
         <div className="mt-6 space-y-2">
-          <Button variant="ghost" className="w-full" onClick={() => nav("/bio/setup?kind=business")}>
-            List a local place
+          <Button
+            variant="ghost"
+            className="w-full"
+            onClick={() => nav(partnerAccountPath({ signedIn: true, hasPlace: Boolean(business) }))}
+          >
+            {business ? NAMES.yourPlace : NAMES.partnerAccount}
           </Button>
           <Button variant="ghost" className="w-full" onClick={() => nav("/event")}>
             Create an event
@@ -250,8 +258,12 @@ export function HostPage() {
         </header>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <Button variant="ghost" className="h-8 px-3 text-xs" onClick={() => nav("/bio/setup?kind=business")}>
-            Local listing
+          <Button
+            variant="ghost"
+            className="h-8 px-3 text-xs"
+            onClick={() => nav(partnerAccountPath({ signedIn: true, hasPlace: Boolean(business) }))}
+          >
+            {business ? NAMES.yourPlace : NAMES.partnerAccount}
           </Button>
           <Button variant="ghost" className="h-8 px-3 text-xs" onClick={() => nav("/event")}>
             Event

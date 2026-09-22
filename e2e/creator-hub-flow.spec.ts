@@ -7,16 +7,18 @@ test.describe("Join & business profile", () => {
     await expect(page.getByRole("heading", { name: /Join the AirPal Network — Made Easy/i })).toBeVisible();
     await expect(page.getByText(/Everyone on AirPal has a personal account/i)).toBeVisible();
     await expect(page.getByRole("heading", { name: "Just use AirPal" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Create a business profile" })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Register the business/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Partner account" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Open a partner account/i })).toBeVisible();
+    await expect(page.getByText(/Same AirPal login/i).first()).toBeVisible();
     await expect(page.getByText("Stay Partner")).toHaveCount(0);
   });
 
-  test("register the business goes to signup then onboard", async ({ page }) => {
+  test("partner account uses the same login, then onboard", async ({ page }) => {
     await page.goto("/join");
-    await page.getByRole("button", { name: /Register the business/i }).click();
-    await expect(page).toHaveURL(/\/start/);
-    await expect(page.getByText("Your place", { exact: true }).first()).toBeVisible();
+    await page.getByRole("button", { name: /Open a partner account/i }).click();
+    await expect(page).toHaveURL(/\/start\?role=business/);
+    await expect(page.getByText("Partner account", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText(/Same login as your personal AirPal/i)).toBeVisible();
   });
 
   test("onboard is Register, You, then Google import — not Google ownership", async ({ page }) => {

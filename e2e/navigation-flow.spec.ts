@@ -40,19 +40,17 @@ test.describe("Global Navigation & Profile Flow", () => {
     const header = page.locator("header.hidden.lg\\:block");
     await expect(header).toBeVisible();
 
-    // Navigate to Stay / Concierge
-    await header.getByRole("button", { name: "Stay" }).click();
-    await expect(page).toHaveURL(/\/concierge/);
+    await header.getByRole("button", { name: "Explore" }).click();
+    await expect(page).toHaveURL(/\/explore/);
 
-    // Navigate to Plan
     await header.getByRole("button", { name: "Plan" }).click();
     await expect(page).toHaveURL(/\/plan/);
 
-    await header.getByRole("button", { name: /On|What's on|Explore/i }).click();
+    await header.getByRole("button", { name: "Home", exact: true }).click();
     await expect(page).toHaveURL("/");
 
-    await header.getByRole("button", { name: "Add your place" }).click();
-    await expect(page).toHaveURL(/\/join/);
+    await header.getByRole("button", { name: "Partner account" }).click();
+    await expect(page).toHaveURL(/\/start\?role=business/);
   });
 
   test("time and weather sit above the main nav", async ({ page }) => {
@@ -86,7 +84,7 @@ test.describe("Global Navigation & Profile Flow", () => {
     await expect(menu.getByText("Welcome to AirPal")).toBeVisible();
     await expect(menu.getByRole("menuitem", { name: /Sign in \/ Create account/i })).toBeVisible();
     await expect(menu.getByRole("menuitem", { name: /Start your Circle/i })).toBeVisible();
-    await expect(menu.getByRole("menuitem", { name: /Add your place/i })).toBeVisible();
+    await expect(menu.getByRole("menuitem", { name: /Partner account/i })).toBeVisible();
     await expect(menu.getByRole("menuitem", { name: /Become a Host/i })).toBeVisible();
     await expect(menu.getByRole("menuitem", { name: /Organise an Event/i })).toBeVisible();
 
@@ -140,6 +138,6 @@ test.describe("Global Navigation & Profile Flow", () => {
 
     // Click the result to navigate
     await result.click();
-    await expect(page).toHaveURL(/\/p\/glenmore/);
+    await expect(page).toHaveURL(/\/@glenmore|\/p\/glenmore/);
   });
 });

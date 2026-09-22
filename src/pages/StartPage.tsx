@@ -224,10 +224,10 @@ export function StartPage() {
     if (target.includes("business") || target.includes("place")) {
       return {
         icon: Store,
-        kicker: "Your place",
-        title: "Sign in to add your place",
-        signupTitle: "Add your place",
-        desc: "Import from Google, publish offers, and show up when people nearby are making plans.",
+        kicker: "Partner account",
+        title: "Sign in — same AirPal login",
+        signupTitle: "Open a partner account",
+        desc: "Same login as your personal AirPal. Add the place, then guests find it on What's on and in search.",
         color: "text-emerald-600 dark:text-emerald-400",
         bg: "bg-emerald-500/10",
       };
@@ -530,10 +530,10 @@ export function StartPage() {
 
       {isBusinessStart && (
         <RoleHero
-          kicker="Your place"
-          title={<>Add your place in one tap.</>}
-          sub="Import your Google listing — logo, address, phone, website, hours — then confirm it's yours and go live."
-          cta="Add your place below — it takes a minute ↓"
+          kicker="Partner account"
+          title={<>Same login. Add the place.</>}
+          sub="Import your Google listing — logo, address, phone, website, hours — then guests find you on What's on and in search."
+          cta="Open the partner account below — it takes a minute ↓"
           items={[
             {
               icon: Store,

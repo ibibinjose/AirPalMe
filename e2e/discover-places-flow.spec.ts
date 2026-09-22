@@ -32,7 +32,7 @@ test.describe("Discover & Places Flow", () => {
     await expect(page.getByText(/Nothing listed near/i).first()).toBeVisible({ timeout: 15_000 });
     // …with zero Rocks place cards leaking in, and a host onboarding path.
     await expect(page.locator("a[href^='/@'], a[href^='/p/']")).toHaveCount(0);
-    await expect(page.locator("#main-content").getByRole("button", { name: "Add your place" })).toBeVisible();
+    await expect(page.locator("#main-content").getByRole("button", { name: "Partner account" })).toBeVisible();
   });
 
   test("renders discovery feed with category chips and places", async ({ page }) => {

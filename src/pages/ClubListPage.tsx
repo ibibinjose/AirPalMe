@@ -5,6 +5,8 @@ import { GuestListPanel } from "@/components/club/GuestListPanel";
 import { AIRPAL_CLUB_ID } from "@/contexts/ClubContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
+import { partnerAccountPath } from "@/lib/partner-account";
+import { NAMES } from "@shared/names";
 
 export function ClubListPage() {
   const [, nav] = useLocation();
@@ -32,8 +34,8 @@ export function ClubListPage() {
         <p className="mt-2 text-sm text-mute">
           A registered business gets a guest list. AirPal Club members can be imported.
         </p>
-        <Button className="mt-6" onClick={() => nav("/bio/setup?kind=business")}>
-          Host a business
+        <Button className="mt-6" onClick={() => nav(partnerAccountPath({ signedIn: true, hasPlace: false }))}>
+          {NAMES.partnerAccount}
         </Button>
       </div>
     );

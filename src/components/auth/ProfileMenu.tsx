@@ -24,6 +24,8 @@ import { AvatarFace } from "@/components/auth/MeAvatar";
 import { BioStatusModal } from "@/components/bio/BioStatusModal";
 import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
 import { AVAILABILITY_STATUSES, bioKindLabel, type AvailabilityStatus } from "@shared/bio";
+import { NAMES } from "@shared/names";
+import { partnerAccountPath } from "@/lib/partner-account";
 import { cn } from "@/lib/cn";
 
 function Row({
@@ -264,9 +266,9 @@ export function ProfileMenu() {
       ) : (
         <Row
           icon={Store}
-          label="Add your place"
-          hint="Import from Google, then go live"
-          onClick={() => go("/business/onboard")}
+          label={NAMES.partnerAccount}
+          hint="Same login. Guests find you on What's on"
+          onClick={() => go(partnerAccountPath({ signedIn: true, hasPlace: false }))}
         />
       )}
 
@@ -329,7 +331,12 @@ export function ProfileMenu() {
         highlight
         onClick={() => go("/circle")}
       />
-      <Row icon={Store} label="Add your place" hint="Import from Google, then go live" onClick={() => go("/join")} />
+      <Row
+        icon={Store}
+        label={NAMES.partnerAccount}
+        hint="Same login. Guests find your place"
+        onClick={() => go(partnerAccountPath({ signedIn: false, hasPlace: false }))}
+      />
       <Row icon={Building2} label="Become a Host" hint="Hotel, venue, hostel, campus" onClick={() => go("/join")} />
       <Row icon={CalendarDays} label="Organise an Event" hint="Market, expo, festival" onClick={() => go("/join")} />
 

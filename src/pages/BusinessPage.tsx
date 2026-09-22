@@ -11,6 +11,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useListings } from "@/contexts/ListingsContext";
 import { useBio } from "@/contexts/BioContext";
 import { withWalk } from "@/lib/catalog";
+import { hrefForPlace } from "@/lib/bio-handle";
+import { partnerAccountPath } from "@/lib/partner-account";
 import { cn } from "@/lib/cn";
 import { GuestListPanel } from "@/components/club/GuestListPanel";
 import { AddressFields } from "@/components/forms/AddressFields";
@@ -95,15 +97,18 @@ export function BusinessPage() {
     return (
       <div className="mx-auto grid min-h-[50vh] max-w-lg place-items-center px-6 text-center">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wider text-gold">AirPal Business</p>
-          <p className="font-display mt-2 text-3xl font-bold">List your place</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-gold">{NAMES.partnerAccount}</p>
+          <p className="font-display mt-2 text-3xl font-bold">Open it on this login</p>
           <p className="mt-2 text-sm text-mute">
-            Import from Google, then add offers, products and services people nearby can find.
+            Same AirPal login. Import the place from Google and go live. Guests find it on What&apos;s on and in
+            search. Offers, bookings, and payouts stay here.
           </p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
-            <Button onClick={() => nav("/business/onboard")}>{NAMES.addPlace}</Button>
+            <Button onClick={() => nav(partnerAccountPath({ signedIn: true, hasPlace: false }))}>
+              Open a partner account
+            </Button>
             <Button variant="ghost" className="ring-1 ring-line" onClick={() => nav("/bio/setup?kind=business")}>
-              Create a profile
+              Business @handle
             </Button>
           </div>
         </div>
@@ -211,6 +216,16 @@ export function BusinessPage() {
       <div className="mt-4">
         <WaveHostCard placeName={mine.name} placeId={mine.placeId} listingId={mine.id} handle={handle} />
       </div>
+      <button
+        type="button"
+        onClick={() => nav(hrefForPlace(listingToPlace(mine)))}
+        className="mt-3 w-full rounded-2xl border border-line bg-card px-4 py-3 text-left"
+      >
+        <span className="block font-semibold">Guests find you here</span>
+        <span className="block text-[13px] text-mute">
+          What&apos;s on and search open this page. Offers, bookings, and payouts stay on this partner account.
+        </span>
+      </button>
       {!(business?.products?.length || business?.services?.length || business?.deals?.length) && (
         <button
           type="button"

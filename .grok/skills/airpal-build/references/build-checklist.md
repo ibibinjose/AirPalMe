@@ -48,7 +48,7 @@ Only `done` is checked.
 
 ## P1 — Required for usability
 
-- [ ] `partial` `p1-search` Shared search — Done when: one search across people, experiences, stays, events, businesses. Evidence: `GlobalSearchModal` includes approved Mates (`mates_public`). Gap: no businesses/fashion as first-class results.
+- [ ] `partial` `p1-search` Shared search — Done when: one search across people, experiences, stays, events, businesses. Evidence: `GlobalSearchModal` includes approved Mates and live listings (`activePlaces` → `hrefForPlace`). Gap: fashion is still not a first-class result.
 - [ ] `partial` `p1-filters` Contextual filters — Done when: location/date/category/price appear only when relevant. Evidence: `src/components/discovery/FilterChips.tsx`.
 - [ ] `partial` `p1-saved` Saved items — Done when: one saved model across verticals. Evidence: `users/{id}/savedEvents`, `savedStalls`. Gap: not generic `saved_items`.
 - [ ] `partial` `p1-cancel` Cancellation flow — Done when: customer/provider cancel with visible policy. Evidence: `canCustomerCancel` in `shared/booking.ts`. Gap: no policy copy, no fees.
@@ -89,7 +89,7 @@ Only `done` is checked.
 
 Business is a dedicated dashboard on the **same** identity, listing, booking, payment, and review engine. Do not create a second user system.
 
-- [ ] `partial` `biz-onboard` Apply / claim venue — Done when: Find venue → owner → verify claim → plan → sign-off writes a real partner record. Evidence: `src/pages/BusinessOnboardPage.tsx` Register searches Google (`GooglePlaceImportCard` field variant) and `applyGooglePlace` fills the draft; `src/pages/BusinessShowcasePage.tsx`, `shared/business-onboarding.ts`. Gap: plan prices are placeholders; Presence is a directory claim; Featured is clamped to domain/ABN proof. Stripe for Featured is not live.
+- [ ] `partial` `biz-onboard` Apply / claim venue — Done when: Find venue → owner → verify claim → plan → sign-off writes a real partner record. Evidence: `partnerAccountPath` (`src/lib/partner-account.ts`) is the same login, then `src/pages/BusinessOnboardPage.tsx` (Google import) and `src/pages/BusinessShowcasePage.tsx`. Guests open the live place from What's on and search. Gap: plan prices are placeholders; Presence is a directory claim; Featured is clamped to domain/ABN proof. Stripe for Featured is not live.
 - [ ] `partial` `biz-listing` Manage listing — Done when: owner edits place, hours, photos, deals; hours freshness SLA respected. Evidence: `src/pages/BusinessPage.tsx`, `shared/business.ts`, `listings` rules.
 - [ ] `partial` `biz-campaign` Create Experience campaign — Done when: business funds an Experience, admin reviews, guests book through shared bookings. Evidence: `src/pages/BusinessCampaignsPage.tsx`, `src/components/admin/CampaignInboxAdmin.tsx`. Gap: `paymentStatus: "deferred"`; RSVPs not `bookings`.
 - [x] `done` `biz-bookings` Business booking inbox — Done when: owner sees/confirm/completes bookings for their listings/experiences. Evidence: `src/components/booking/BusinessBookingsSection.tsx`, `src/pages/BusinessPage.tsx`, `createBookingForCampaign` in `src/components/booking/BookingsSection.tsx`, `src/pages/ExperiencesPage.tsx`.
@@ -128,4 +128,4 @@ The MVP is not complete until every row above is `done`.
 
 1. `p0-pay` — On airpal.me, sign in, book a paid Mate, pay with test card `4242`. Then Connect payouts (`p0-payout`).
 2. `biz-onboard` — venue claim still self-attested; tighten verify before paid supply.
-3. `p1-search` — businesses/fashion still not first-class search results.
+3. `p1-search` — live places are in search; fashion is still not a first-class result.

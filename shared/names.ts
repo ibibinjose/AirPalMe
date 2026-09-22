@@ -14,6 +14,8 @@ export const NAMES = {
   places: "Places",
   addPlace: "Add your place",
   yourPlace: "Your place",
+  /** Same AirPal login plus a live place. Not a second app or a second user. */
+  partnerAccount: "Partner account",
   stayHost: "Stay host",
   account: "Account",
   experience: "Experience",

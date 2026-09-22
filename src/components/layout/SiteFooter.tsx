@@ -18,8 +18,8 @@ const NAV_EXPLORE = [
 ];
 
 const NAV_HOSPITALITY = [
-  { href: "/join", label: "Register the business" },
-  { href: "/business/onboard", label: "Your place" },
+  { href: "/join", label: "Partner account" },
+  { href: "/business", label: "Your place" },
   { href: "/plan/new", label: "Create plan" },
   { href: "/event/new", label: "Create event" },
   { href: "/host", label: "Stay host" },

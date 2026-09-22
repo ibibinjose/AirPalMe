@@ -3,6 +3,8 @@ import { ArrowRight, CheckCircle2, Compass, Store, User } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
+import { partnerAccountPath } from "@/lib/partner-account";
+import { NAMES } from "@shared/names";
 
 export function JoinPage() {
   const [, nav] = useLocation();
@@ -64,20 +66,16 @@ export function JoinPage() {
           <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-700">
             <Store size={22} />
           </span>
-          <h2 className="font-display mt-4 text-xl font-bold">Create a business profile</h2>
+          <h2 className="font-display mt-4 text-xl font-bold">{NAMES.partnerAccount}</h2>
           <p className="mt-2 flex-1 text-sm leading-relaxed text-mute">
-            Same AirPal account. Register the business, import public details from Google, go live — then add a product,
-            a service, and an offer.
+            Same AirPal login. Import the place from Google, go live, then add a product, a service, and an offer.
+            Guests find it on What&apos;s on and in search.
           </p>
           <Button
             className="mt-5 w-full justify-between"
-            onClick={() => {
-              if (hasPlace) nav("/business");
-              else if (hasAccount) nav("/business/onboard");
-              else nav("/start?role=business&tab=signup&next=/business/onboard");
-            }}
+            onClick={() => nav(partnerAccountPath({ signedIn: hasAccount, hasPlace }))}
           >
-            <span>{hasPlace ? "Your place" : "Register the business"}</span>
+            <span>{hasPlace ? NAMES.yourPlace : "Open a partner account"}</span>
             <ArrowRight size={16} />
           </Button>
         </div>
@@ -89,8 +87,8 @@ export function JoinPage() {
           {[
             {
               n: "1",
-              t: "Register the business",
-              d: "Type the name. Choose what it is — café, shop, stay, and so on.",
+              t: "Open a partner account",
+              d: "Same login. Name the place and what it is — café, shop, stay, and so on.",
             },
             {
               n: "2",

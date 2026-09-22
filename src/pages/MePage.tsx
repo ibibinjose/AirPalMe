@@ -24,6 +24,8 @@ import { ChangeHandleForm } from "@/components/bio/ChangeHandleForm";
 import { BookingsSection } from "@/components/booking/BookingsSection";
 import { PayoutSetupCard } from "@/components/connect/PayoutSetupCard";
 import { cn } from "@/lib/cn";
+import { partnerAccountPath } from "@/lib/partner-account";
+import { NAMES } from "@shared/names";
 
 function Row({
   kicker,
@@ -247,10 +249,10 @@ export function MePage() {
               onClick={() => nav("/host")}
             />
             <Row
-              kicker="Business"
-              title={business ? `@${business.handle}` : "Local listing"}
+              kicker={NAMES.partnerAccount}
+              title={business ? `@${business.handle}` : "Same login. Guests find your place"}
               action={business ? "Open" : "Add"}
-              onClick={() => nav(business ? "/business" : "/bio/setup?kind=business")}
+              onClick={() => nav(partnerAccountPath({ signedIn: true, hasPlace: Boolean(business) }))}
             />
             <Row kicker="Plan" title="With family and friends" action="Create" onClick={() => nav("/plan/new")} />
             <Row

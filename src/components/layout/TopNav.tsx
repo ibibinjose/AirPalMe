@@ -10,6 +10,9 @@ import { enterEase } from "@/lib/motion";
 import { tabFromPath } from "@/lib/tabs";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { useBio } from "@/contexts/BioContext";
+import { partnerAccountPath } from "@/lib/partner-account";
+import { NAMES } from "@shared/names";
 
 const LINKS = [
   { href: "/", label: "Home", id: "home" as const },
@@ -20,7 +23,8 @@ const LINKS = [
 
 export function TopNav({ path, enter = false }: { path: string; enter?: boolean }) {
   const [, nav] = useLocation();
-  const { isHost } = useAuth();
+  const { user, isHost } = useAuth();
+  const { business } = useBio();
   const active = tabFromPath(path);
   return (
     <motion.header
@@ -77,11 +81,11 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
             </button>
           ) : (
             <button
-              onClick={() => nav("/join")}
-              aria-label="Add your place"
+              onClick={() => nav(partnerAccountPath({ signedIn: Boolean(user), hasPlace: Boolean(business) }))}
+              aria-label={NAMES.partnerAccount}
               className="h-9 shrink-0 rounded-full bg-white px-3.5 text-sm font-medium ring-1 ring-line hover:bg-paper transition lg:h-10 lg:px-4"
             >
-              Add your place
+              {NAMES.partnerAccount}
             </button>
           )}
           <NotificationBell />

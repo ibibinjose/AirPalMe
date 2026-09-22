@@ -15,6 +15,7 @@ import {
   HeartHandshake,
 } from "lucide-react";
 import { activePlaces, placesForLocation, toursForPrecinct } from "@/lib/catalog";
+import { hrefForPlace } from "@/lib/bio-handle";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { cityMatches } from "@/lib/remote-events";
 import { EVENT_NEAR_M, locatedNear } from "@/lib/location-scope";
@@ -163,7 +164,7 @@ export function GlobalSearchModal() {
           title: p.name,
           subtitle: p.shortWhy || p.address || p.category,
           badge: p.category,
-          href: `/p/${p.id}`,
+          href: hrefForPlace(p),
           icon: MapPin,
         });
       }
@@ -339,9 +340,9 @@ export function GlobalSearchModal() {
       items.push({
         id: "partner-join",
         category: "partner",
-        title: "Partner Hub",
-        subtitle: "Host, business & events",
-        badge: "Partner Hub",
+        title: "Partner account",
+        subtitle: "Same AirPal login. Guests find your place on What's on",
+        badge: "Partner",
         href: "/join",
         icon: Building2,
       });

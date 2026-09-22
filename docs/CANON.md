@@ -60,6 +60,8 @@ Reuse `Button`, `ValidField`, `Photo`, `ImageField`. Do not drop in a new compon
 
 Words: `shared/names.ts` — Place, Your place, Add your place, Stay, Stay host, Plans, Circle, Account, Scan, Explore. Do not relabel chrome to venue / hub / portal.
 
+Partner account (`NAMES.partnerAccount`, `partnerAccountPath`) is the same AirPal login plus a live place. Guests find that place on What's on and in search. It is not a second app or a second user. Personal `@handle` stays a person.
+
 Brand: **AirPal.me** (the `.me` stays). Tagline **Life Made Easy.** Script logo is accent only.
 
 ---

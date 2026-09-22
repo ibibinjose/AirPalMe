@@ -14,6 +14,10 @@ import { knownCityCenter } from "@/lib/cities";
 import { usePlans } from "@/contexts/PlanContext";
 import { cn } from "@/lib/cn";
 import { useListings } from "@/contexts/ListingsContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useBio } from "@/contexts/BioContext";
+import { partnerAccountPath } from "@/lib/partner-account";
+import { NAMES } from "@shared/names";
 import { useLocale } from "@/contexts/LocaleContext";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { EventTile } from "@/components/event/EventTile";
@@ -26,6 +30,9 @@ import { freshnessOf } from "@shared/freshness";
 
 export function DiscoverPage() {
   const [, nav] = useLocation();
+  const { user } = useAuth();
+  const { business } = useBio();
+  const openPartner = () => nav(partnerAccountPath({ signedIn: Boolean(user), hasPlace: Boolean(business) }));
   const search = useSearch();
   const { version, remoteLoaded } = useListings();
   const { t } = useLocale();
@@ -232,9 +239,9 @@ export function DiscoverPage() {
                 <button
                   type="button"
                   className="mt-2 text-[13px] font-semibold text-brand"
-                  onClick={() => nav("/business/onboard")}
+                  onClick={openPartner}
                 >
-                  Add your place
+                  {NAMES.partnerAccount}
                 </button>
               </div>
             )}
@@ -333,8 +340,8 @@ export function DiscoverPage() {
                   ? `No places listed near ${placeName} yet — they appear here when local hosts publish them.`
                   : undefined
               }
-              action={() => nav("/business/onboard")}
-              actionLabel="Add your place"
+              action={openPartner}
+              actionLabel={NAMES.partnerAccount}
               secondary={() => nav("/event/new")}
               secondaryLabel="Host a night"
             />

@@ -9,6 +9,8 @@ import { VerifyEmailBanner } from "@/components/auth/VerifyEmailBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { ChangeHandleForm } from "@/components/bio/ChangeHandleForm";
+import { partnerAccountPath } from "@/lib/partner-account";
+import { NAMES } from "@shared/names";
 
 export function SettingsPage() {
   const [, nav] = useLocation();
@@ -72,11 +74,11 @@ export function SettingsPage() {
         <button
           type="button"
           className="flex w-full items-center justify-between rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line"
-          onClick={() => nav("/business")}
+          onClick={() => nav(partnerAccountPath({ signedIn: Boolean(user), hasPlace: Boolean(business) }))}
         >
           <span>
-            <span className="block text-[12px] text-mute">Business</span>
-            <span className="font-medium">{business ? `@${business.handle}` : "Local listing"}</span>
+            <span className="block text-[12px] text-mute">{NAMES.partnerAccount}</span>
+            <span className="font-medium">{business ? `@${business.handle}` : "Same login. Guests find your place"}</span>
           </span>
           <span className="text-sm text-brand">Open</span>
         </button>

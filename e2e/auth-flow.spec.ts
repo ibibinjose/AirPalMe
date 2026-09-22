@@ -58,8 +58,8 @@ test.describe("Authentication & Security Flow", () => {
     await expect(page.getByText("Sign in to Host Tools")).toBeVisible();
 
     await page.goto("/start?role=business");
-    await expect(page.getByText("Your place", { exact: true }).first()).toBeVisible();
-    await expect(page.getByText("Sign in to add your place")).toBeVisible();
+    await expect(page.getByText("Partner account", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Sign in — same AirPal login")).toBeVisible();
   });
 
   test("renders password reset view and navigates back to Sign In", async ({ page }) => {

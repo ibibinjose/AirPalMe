@@ -275,10 +275,11 @@ export function BusinessOnboardPage() {
       <Link href="/join" className="flex items-center gap-1 text-[13px] font-medium text-mute">
         <ArrowLeft size={14} /> {NAMES.addPlace}
       </Link>
-      <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Business profile</p>
+      <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">{NAMES.partnerAccount}</p>
       <h1 className="font-display mt-1 text-3xl font-bold tracking-tight">Register the business</h1>
       <p className="mt-1 text-sm text-mute">
-        Search Google, pick the listing, go live. We copy the public details into AirPal.
+        Same AirPal login. Search Google, pick the listing, go live. Guests then find this place on What&apos;s on and
+        in search.
       </p>
 
       <div className="mt-6 grid gap-6 md:grid-cols-[200px_1fr]">
