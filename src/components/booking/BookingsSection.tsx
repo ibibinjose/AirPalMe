@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { addDoc, collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
+import { createSubmitGuard } from "@/lib/submit-guard";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { logAdminAction } from "@/lib/admin-audit";
 import { getDoc } from "firebase/firestore";
@@ -51,6 +52,10 @@ export function BookingsSection() {
   const { user, isAdmin } = useAuth();
   const [rows, setRows] = useState<Booking[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
+  // Synchronous double-tap guard per booking: `busy` only disables the button
+  // after a re-render, so a second tap on Pay could open a second Stripe
+  // checkout session for the same booking (double charge risk).
+  const guardRef = useRef(createSubmitGuard());
 
   async function reload(uid: string) {
     const db = getFirebaseDb();
@@ -82,6 +87,7 @@ export function BookingsSection() {
 
   async function pay(b: Booking) {
     if (!user) return;
+    if (!guardRef.current.tryAcquire()) return;
     setBusy(b.id);
     try {
       const res = await createBookingCheckoutSessionRemote({ bookingId: b.id });
@@ -91,12 +97,14 @@ export function BookingsSection() {
       }
       await reload(user.uid);
     } finally {
+      guardRef.current.release();
       setBusy(null);
     }
   }
 
   async function complete(b: Booking) {
     if (!user) return;
+    if (!guardRef.current.tryAcquire()) return;
     setBusy(b.id);
     try {
       await completePaidBookingRemote({ bookingId: b.id });
@@ -105,6 +113,7 @@ export function BookingsSection() {
       }
       await reload(user.uid);
     } finally {
+      guardRef.current.release();
       setBusy(null);
     }
   }
@@ -112,6 +121,7 @@ export function BookingsSection() {
   async function transition(b: Booking, status: Booking["status"], extra: Record<string, unknown> = {}) {
     const db = getFirebaseDb();
     if (!db || !user) return;
+    if (!guardRef.current.tryAcquire()) return;
     setBusy(b.id);
     try {
       const now = new Date().toISOString();
@@ -121,6 +131,7 @@ export function BookingsSection() {
       }
       await reload(user.uid);
     } finally {
+      guardRef.current.release();
       setBusy(null);
     }
   }

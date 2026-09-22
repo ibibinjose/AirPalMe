@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -6,12 +6,16 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { createPromotionRemote, friendlyPromotionError, submitPromotionRemote } from "@/lib/promotions";
 import { MECHANIC_TYPES, PROMOTION_CATEGORIES } from "@shared/promotions";
+import { createSubmitGuard } from "@/lib/submit-guard";
 import { PlaceAddressField } from "@/components/forms/PlaceAddressField";
 
 export function BusinessPromotionNewPage() {
   const { requireUser } = useAuth();
   const [, nav] = useLocation();
   const [busy, setBusy] = useState(false);
+  // Synchronous double-tap guard: `busy` only disables the buttons after a
+  // re-render, so a second tap can create a second promotion.
+  const guardRef = useRef(createSubmitGuard());
   const [form, setForm] = useState({
     kind: "promotion",
     mechanicType: "discount",
@@ -32,6 +36,7 @@ export function BusinessPromotionNewPage() {
 
   async function save(submit: boolean) {
     if (!requireUser("Sign in to create a promotion.")) return;
+    if (!guardRef.current.tryAcquire()) return;
     setBusy(true);
     try {
       const res = await createPromotionRemote({
@@ -58,6 +63,7 @@ export function BusinessPromotionNewPage() {
       }
       nav(`/business/promotions/${res.promotionId}`);
     } catch (err) {
+      guardRef.current.release();
       toast.error(friendlyPromotionError(err));
     } finally {
       setBusy(false);

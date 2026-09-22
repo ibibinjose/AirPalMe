@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { currencyForCity } from "@/lib/cities";
 import { useLocation, useSearch } from "wouter";
 import { Ticket, Users } from "lucide-react";
@@ -14,6 +14,7 @@ import { toZonedDateStr } from "@/lib/local-time";
 import { shareContent } from "@/lib/share";
 import { planInviteCodeUrl } from "@shared/plan";
 import { cn } from "@/lib/cn";
+import { createSubmitGuard } from "@/lib/submit-guard";
 import { PlaceAddressField, type PickedPlace } from "@/components/forms/PlaceAddressField";
 import { toPublicUrl } from "@/lib/public-origin";
 import type { Geo } from "@shared/nearby";
@@ -45,6 +46,9 @@ export function EventCreatePage() {
   const [notes, setNotes] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [busy, setBusy] = useState(false);
+  // Synchronous double-tap guard: state-based `busy` only disables the button
+  // after a re-render (see PlanCreatePage — same race created duplicate plans).
+  const guardRef = useRef(createSubmitGuard());
 
   useEffect(() => {
     if (city && city !== "Choose a city" && city !== "Current location") {
@@ -87,6 +91,7 @@ export function EventCreatePage() {
       toast.error("How many tickets can you sell?");
       return;
     }
+    if (!guardRef.current.tryAcquire()) return;
     setBusy(true);
     try {
       const isExperience = kind === "experience" || paid;
@@ -118,6 +123,7 @@ export function EventCreatePage() {
       });
       nav(`/plan/${plan.id}`);
     } catch (err) {
+      guardRef.current.release();
       toast.error(err instanceof Error ? err.message : "Couldn’t create it");
     } finally {
       setBusy(false);

@@ -7,7 +7,7 @@ import { Photo } from "@/components/ui/Photo";
 import { Button } from "@/components/ui/Button";
 import { PageLoading } from "@/components/ui/PageLoading";
 import { useAuth } from "@/contexts/AuthContext";
-import { downloadVCard, listPeople, removePerson, upsertPerson, type PersonMet } from "@/lib/people";
+import { listPeople, openVCardContact, removePerson, upsertPerson, type PersonMet } from "@/lib/people";
 import { listMemories, memoriesWithPerson } from "@/lib/memories";
 import { listMyCatchUpReminders, removeCatchUp, type CatchUpItem } from "@/lib/catchup";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
@@ -290,7 +290,7 @@ export function PeoplePage() {
                     <button
                       type="button"
                       onClick={() =>
-                        downloadVCard({
+                        void openVCardContact({
                           name: p.name,
                           url: p.handle ? `https://airpal.me${bioPath(p.handle)}` : undefined,
                           note: p.whereMet ? `Met at ${p.whereMet} · AirPal` : "AirPal contact",

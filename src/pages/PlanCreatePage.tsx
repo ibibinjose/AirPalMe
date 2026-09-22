@@ -3,6 +3,7 @@ import { useLocation, useSearch } from "wouter";
 import { ArrowLeft, CalendarDays, Ticket, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
+import { createSubmitGuard } from "@/lib/submit-guard";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { fieldInput } from "@/components/forms/ValidField";
 import { ImageField } from "@/components/media/ImageField";
@@ -69,7 +70,7 @@ export function PlanCreatePage() {
   const [busy, setBusy] = useState(false);
   // Synchronous double-tap guard: state-based `busy` only disables the
   // button after a re-render, so two rapid taps could create two plans.
-  const submittingRef = useRef(false);
+  const guardRef = useRef(createSubmitGuard());
 
   const circle = useMemo(() => {
     const handles = circleHandles({
@@ -112,13 +113,12 @@ export function PlanCreatePage() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (submittingRef.current) return;
+    if (!guardRef.current.tryAcquire()) return;
     const name = title.trim() || PLAN_TYPES[type]?.defaultTitle || "Hangout";
     if (!date || (today && date < today)) {
       toast.error("Pick a date from today on");
       return;
     }
-    submittingRef.current = true;
     setBusy(true);
     void triggerHaptic("success");
     try {
@@ -140,7 +140,7 @@ export function PlanCreatePage() {
       if (created?.id) nav(`/plan/${created.id}?share=true`);
       else setBusy(false);
     } catch (err) {
-      submittingRef.current = false;
+      guardRef.current.release();
       setBusy(false);
       toast.error(err instanceof Error ? err.message : "Couldn’t create the plan");
     }

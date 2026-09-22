@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CheckCircle, CreditCard, Lock, Minus, Plus, QrCode, Sparkles, Users, X } from "lucide-react";
 import { type HangoutPlan, type PlanPricingTier, formatTime12h, isSoldOut, spotsLeft } from "@shared/plan";
 import { Button } from "@/components/ui/Button";
@@ -8,6 +8,7 @@ import { createExperienceCheckoutSessionRemote } from "@/lib/functions";
 import { useAuth } from "@/contexts/AuthContext";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
+import { createSubmitGuard } from "@/lib/submit-guard";
 
 interface ExperienceBookingModalProps {
   plan: HangoutPlan;
@@ -37,6 +38,10 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
   const [confirmedBooking, setConfirmedBooking] = useState<boolean>(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [payLater, setPayLater] = useState(false);
+  // Synchronous double-tap guard: state-based `isProcessing` only disables the
+  // button after a re-render, so a second tap can fire a second Stripe
+  // checkout session (double charge risk) before the first resolves.
+  const guardRef = useRef(createSubmitGuard());
   const { user, requireUser } = useAuth();
 
   if (!isOpen) return null;
@@ -67,6 +72,7 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
       setBookingError("Sold out.");
       return;
     }
+    if (!guardRef.current.tryAcquire()) return;
     setIsProcessing(true);
     setBookingError(null);
     void triggerHaptic("medium");
@@ -93,6 +99,7 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
 
       setBookingRefId(res.bookingId);
       setPayLater(res.mode === "sandbox_simulated");
+      guardRef.current.release();
       setIsProcessing(false);
       setConfirmedBooking(true);
       void triggerHaptic("success");
@@ -107,6 +114,7 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Ticket purchase failed. Please try again.";
+      guardRef.current.release();
       setIsProcessing(false);
       setBookingError(message);
     }

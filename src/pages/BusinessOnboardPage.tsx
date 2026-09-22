@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { collection, endAt, getDocs, limit, orderBy, query, startAt } from "firebase/firestore";
 import { ArrowLeft, ArrowRight, BadgeCheck, Building2, ShieldCheck, Store } from "lucide-react";
@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { claimFreeVenuePresenceRemote, submitPartnerClaimRemote, upsertBusinessListingRemote } from "@/lib/functions";
 import { cn } from "@/lib/cn";
+import { createSubmitGuard } from "@/lib/submit-guard";
 import {
   BUSINESS_PLANS,
   ONBOARD_STEPS,
@@ -84,6 +85,9 @@ export function BusinessOnboardPage() {
   });
   const [results, setResults] = useState<DirectoryVenue[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  // Synchronous double-tap guard: `submitting` only disables the button after
+  // a re-render, so a second tap can file a second business claim.
+  const guardRef = useRef(createSubmitGuard());
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [changeListing, setChangeListing] = useState(false);
 
@@ -153,6 +157,7 @@ export function BusinessOnboardPage() {
       setSubmitError("Connect Firebase keys first — claims are filed through the live backend.");
       return;
     }
+    if (!guardRef.current.tryAcquire()) return;
     setSubmitting(true);
     const plan = resolvedPlan(draft, user?.email);
     const shortWhy = draft.shortWhy.trim() || `${draft.venue.venueName.trim()} on AirPal.`;
@@ -257,6 +262,7 @@ export function BusinessOnboardPage() {
       nav("/business/setup");
       return;
     } catch (e) {
+      guardRef.current.release();
       setSubmitError(e instanceof Error ? e.message : "Something went wrong filing your claim.");
     } finally {
       setSubmitting(false);

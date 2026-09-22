@@ -1,3 +1,5 @@
+import { isNativeApp } from "./native";
+
 export type PersonMet = {
   id: string;
   /** AirPal @handle without the @, when they have a bio. */
@@ -166,6 +168,32 @@ export function downloadVCard(input: VCardInput): void {
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+/**
+ * Opens a contact card directly in the phone's Contacts app instead of a
+ * share sheet. No browser/WebView API can prefill the native contact editor,
+ * so on mobile web we navigate to the vCard itself: iOS opens the contact
+ * preview with "Create New Contact", Android saves the .vcf so tapping it
+ * opens Contacts import. Inside the Capacitor shell the WebView cannot open
+ * a vCard, so the OS share sheet stays the handoff there; desktop keeps the
+ * file download.
+ */
+export async function openVCardContact(input: VCardInput): Promise<"contact" | "shared" | "download"> {
+  if (typeof window !== "undefined" && typeof navigator !== "undefined") {
+    const ua = navigator.userAgent || "";
+    const isMobileWeb = !isNativeApp() && /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+    if (isMobileWeb) {
+      window.location.href = `data:text/vcard;charset=utf-8,${encodeURIComponent(buildVCard(input))}`;
+      return "contact";
+    }
+    if (isNativeApp()) {
+      await shareOrDownloadVCard(input);
+      return "shared";
+    }
+  }
+  downloadVCard(input);
+  return "download";
 }
 
 /**

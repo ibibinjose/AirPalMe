@@ -22,7 +22,7 @@ import {
 import type { BioCatalogItem } from "@shared/bio";
 import { BUSINESS_CATEGORIES } from "@shared/business";
 import { FollowButton, LikeButton } from "@/components/social/SocialButtons";
-import { shareOrDownloadVCard, upsertPerson } from "@/lib/people";
+import { openVCardContact, upsertPerson } from "@/lib/people";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { BioHandleButton } from "@/components/bio/BioHandleButton";
 import { BioSocials } from "@/components/bio/BioSocials";
@@ -427,13 +427,12 @@ export function BioPublicPage() {
                   aria-label={`Save ${bio.name} to phone contacts`}
                   title="Save contact to phone (.vcf)"
                   onClick={() => {
-                    void shareOrDownloadVCard({
+                    void openVCardContact({
                       name: bio.name,
                       phone: bio.phone,
                       url: share,
                       note: `AirPal bio · AirPal.Me/@${bio.handle}`,
                     });
-                    toast.success(`Contact card for ${bio.name} generated`);
                   }}
                 >
                   <ContactRound size={14} className="text-brand" />
@@ -448,13 +447,12 @@ export function BioPublicPage() {
                 aria-label={`Save ${bio.name} to phone contacts`}
                 title="Save contact to phone (.vcf)"
                 onClick={() => {
-                  void shareOrDownloadVCard({
+                  void openVCardContact({
                     name: bio.name,
                     phone: bio.phone,
                     url: share,
                     note: `AirPal bio · AirPal.Me/@${bio.handle}`,
                   });
-                  toast.success(`Contact card for ${bio.name} generated`);
                 }}
               >
                 <ContactRound size={14} className="text-brand" />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { addDoc, collection } from "firebase/firestore";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { cn } from "@/lib/cn";
+import { createSubmitGuard } from "@/lib/submit-guard";
 import { MATE_USE_CASES, emptyMateRequest, isUseCase, mateRequestValid } from "@shared/mate-request";
 
 const inputCls =
@@ -40,6 +41,10 @@ export function MateRequestPage() {
 
   const [form, setForm] = useState(initial);
   const [sending, setSending] = useState(false);
+  // Synchronous double-tap guard: `sending` only disables the button after a
+  // re-render, so a second tap can file a second mate_request (same race that
+  // duplicated plans on PlanCreatePage).
+  const guardRef = useRef(createSubmitGuard());
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
 
@@ -52,6 +57,7 @@ export function MateRequestPage() {
       setError("Connect Firebase first — requests are filed through the live backend.");
       return;
     }
+    if (!guardRef.current.tryAcquire()) return;
     setSending(true);
     try {
       const now = new Date().toISOString();
@@ -72,6 +78,7 @@ export function MateRequestPage() {
       });
       setSent(true);
     } catch (e) {
+      guardRef.current.release();
       setError(e instanceof Error ? e.message : "Couldn't file your request. Try again.");
     } finally {
       setSending(false);
