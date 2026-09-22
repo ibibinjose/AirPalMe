@@ -18,12 +18,18 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
+import { createSubmitGuard } from "@/lib/submit-guard";
 import { useClub } from "@/contexts/ClubContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { AvatarFace } from "@/components/auth/MeAvatar";
-import { BioStatusModal } from "@/components/bio/BioStatusModal";
 import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
-import { AVAILABILITY_STATUSES, bioKindLabel, type AvailabilityStatus } from "@shared/bio";
+import {
+  AVAILABILITY_STATUSES,
+  bioKindLabel,
+  resolveStatusPicks,
+  type AvailabilityStatus,
+} from "@shared/bio";
+import { toast } from "sonner";
 import { NAMES } from "@shared/names";
 import { partnerAccountPath } from "@/lib/partner-account";
 import { cn } from "@/lib/cn";
@@ -82,11 +88,16 @@ function Row({
 export function ProfileMenu() {
   const [, nav] = useLocation();
   const { user, isAdmin, isHost, logout } = useAuth();
-  const { mine, business, biosReady } = useBio();
+  const { mine, business, biosReady, updateProfile } = useBio();
   const { memberByEmail } = useClub();
   const { myEvent } = useEvents();
   const [open, setOpen] = useState(false);
-  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  // Inline status editor lives inside the dropdown (not a separate modal).
+  const [statusEditing, setStatusEditing] = useState(false);
+  const [editStatus, setEditStatus] = useState<AvailabilityStatus>("available");
+  const [editText, setEditText] = useState("");
+  const [statusSaving, setStatusSaving] = useState(false);
+  const statusGuard = useRef(createSubmitGuard());
   const box = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -119,8 +130,42 @@ export function ProfileMenu() {
 
   function go(href: string) {
     setOpen(false);
+    setStatusEditing(false);
     triggerRef.current?.focus();
     nav(href);
+  }
+
+  function openStatusEditor() {
+    if (!mine) return;
+    const picks = resolveStatusPicks({
+      status: mine.availabilityStatus || (mine.openNow ? "available" : "offline"),
+      customStatus: mine.customStatus,
+      emoji: mine.customStatusEmoji,
+    });
+    setEditStatus(picks.status);
+    setEditText(picks.customText);
+    setStatusEditing(true);
+  }
+
+  async function saveStatus(clear = false) {
+    if (!mine || !statusGuard.current.tryAcquire()) return;
+    setStatusSaving(true);
+    try {
+      await updateProfile({
+        handle: mine.handle,
+        availabilityStatus: clear ? "available" : editStatus,
+        openNow: clear ? true : editStatus === "available",
+        customStatus: clear ? undefined : editText.trim() || undefined,
+        customStatusEmoji: clear ? undefined : mine.customStatusEmoji,
+      });
+      toast.success(clear ? "Status cleared" : "Status updated!");
+      setStatusEditing(false);
+    } catch (err) {
+      statusGuard.current.release();
+      toast.error(err instanceof Error ? err.message : "Failed to update status");
+    } finally {
+      setStatusSaving(false);
+    }
   }
 
   function onMenuKeyDown(e: ReactKeyboardEvent<HTMLDivElement>) {
@@ -167,10 +212,8 @@ export function ProfileMenu() {
           {mine ? (
             <button
               type="button"
-              onClick={() => {
-                setOpen(false);
-                setStatusModalOpen(true);
-              }}
+              aria-expanded={statusEditing}
+              onClick={() => (statusEditing ? setStatusEditing(false) : openStatusEditor())}
               className={cn(
                 "flex-1 flex items-center justify-between gap-1.5 rounded-xl border px-2.5 py-1.5 text-left transition hover:brightness-95 active:scale-[0.98]",
                 statusInfo.badgeBg,
@@ -185,7 +228,9 @@ export function ProfileMenu() {
                     : ""}
                 </span>
               </div>
-              <span className="ml-1 shrink-0 text-[10px] font-bold uppercase text-ink/60">Edit</span>
+              <span className="ml-1 shrink-0 text-[10px] font-bold uppercase text-ink/60">
+                {statusEditing ? "Done" : "Edit"}
+              </span>
             </button>
           ) : (
             <div
@@ -199,6 +244,62 @@ export function ProfileMenu() {
             </div>
           )}
         </div>
+
+        {/* Inline status editor — lives inside the menubar window, not a modal */}
+        {statusEditing && mine && (
+          <div className="mt-2 rounded-xl bg-paper/60 p-2 ring-1 ring-line" onKeyDown={(e) => e.stopPropagation()}>
+            <div className="grid grid-cols-2 gap-1.5" role="group" aria-label="Availability">
+              {(Object.keys(AVAILABILITY_STATUSES) as AvailabilityStatus[]).map((key) => {
+                const info = AVAILABILITY_STATUSES[key];
+                const selected = editStatus === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => setEditStatus(key)}
+                    className={cn(
+                      "flex h-10 items-center gap-2 rounded-xl px-2 text-left ring-1 transition active:scale-[0.98]",
+                      selected ? "bg-card font-semibold ring-brand" : "bg-card/50 ring-line",
+                    )}
+                  >
+                    <span className={cn("h-3 w-3 shrink-0 rounded-full", info.dotColor)} />
+                    <span className="truncate text-[12px]">{info.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-1.5 flex h-10 items-center gap-1.5 rounded-xl bg-card px-2.5 ring-1 ring-line">
+              <input
+                type="text"
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                placeholder="Status message…"
+                maxLength={60}
+                aria-label="Status message"
+                className="h-full flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-mute"
+              />
+            </div>
+            <div className="mt-1.5 flex gap-1.5">
+              <button
+                type="button"
+                onClick={() => void saveStatus(true)}
+                disabled={statusSaving}
+                className="h-9 flex-1 rounded-full text-[12px] font-semibold text-mute transition hover:text-ink disabled:opacity-50"
+              >
+                Clear
+              </button>
+              <button
+                type="button"
+                onClick={() => void saveStatus(false)}
+                disabled={statusSaving}
+                className="h-9 flex-1 rounded-full bg-brand text-[12px] font-semibold text-white transition hover:bg-brand-ink active:scale-[0.98] disabled:opacity-50"
+              >
+                {statusSaving ? "Saving…" : "Save"}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Language selector in the profile menu */}
         <div
@@ -385,16 +486,6 @@ export function ProfileMenu() {
         </>
       )}
 
-      {mine && (
-        <BioStatusModal
-          open={statusModalOpen}
-          onClose={() => setStatusModalOpen(false)}
-          handle={mine.handle}
-          currentStatus={mine.availabilityStatus || (mine.openNow ? "available" : "offline")}
-          currentCustomStatus={mine.customStatus}
-          currentEmoji={mine.customStatusEmoji}
-        />
-      )}
     </div>
   );
 }
