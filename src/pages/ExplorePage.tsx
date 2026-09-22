@@ -200,7 +200,7 @@ export function ExplorePage() {
           </CardShell>
         </section>
       ) : showTravel ? (
-        <section aria-label="Travel" className="mt-4 grid gap-3 sm:grid-cols-2">
+        <section aria-label="Travel" className="mt-4 grid grid-cols-2 gap-3">
           <CardShell href="/plan" label="Open plans" className="p-5">
             <p className="font-display text-[18px] font-semibold">Plans</p>
             <p className="mt-1 text-[14px] text-mute">Itineraries, maps, people — one plan at a time.</p>
@@ -211,7 +211,7 @@ export function ExplorePage() {
           </CardShell>
         </section>
       ) : showEvents ? (
-        <section aria-label="Events" className="mt-4 grid gap-4 sm:grid-cols-2">
+        <section aria-label="Events" className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
           {events.map((e) => (
             <CardShell key={e.id} href={e.gatePath || `/e/${e.id}`} label={e.title}>
               <div className="relative h-44 bg-paper">
@@ -260,7 +260,7 @@ export function ExplorePage() {
           )}
         </section>
       ) : showExperiences ? (
-        <section aria-label="Experiences" className="mt-4 grid gap-4 sm:grid-cols-2">
+        <section aria-label="Experiences" className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
           {experiences.map((p) => (
             <CardShell key={p.id} href={`/plan/${p.id}`} label={p.title}>
               <div className="relative h-44 bg-paper">
@@ -289,7 +289,7 @@ export function ExplorePage() {
           )}
         </section>
       ) : (
-        <section aria-label="Places" className="mt-4 grid gap-4 sm:grid-cols-2">
+        <section aria-label="Places" className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
           {places.map((p) => (
             <CardShell key={p.id} href={hrefForPlace(p)} label={p.name}>
               <div className="relative h-48 bg-paper">

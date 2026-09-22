@@ -48,6 +48,9 @@ import { NotFoundPage } from "./NotFoundPage";
 import { localTodayStr, shouldAutoOpenInviteRsvp } from "@/lib/plan-invite";
 import { trackContentAction } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
+import { SegmentedControl, StickyAction } from "@/components/design-system/companions";
+import { CityMap, type MapPin } from "@/components/map/CityMap";
+import { knownCityCenter } from "@/lib/cities";
 
 export function PlanDetailPage() {
   const [, paramsPlan] = useRoute("/plan/:id");
@@ -110,6 +113,8 @@ export function PlanDetailPage() {
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
+  const [detailTab, setDetailTab] = useState<"overview" | "plan" | "map" | "people">("overview");
+  const [selectedPin, setSelectedPin] = useState<MapPin | null>(null);
   const autoRsvpShown = useRef(false);
   const arrivedViaInvite = Boolean(paramsInvite?.code);
 
@@ -156,6 +161,30 @@ export function PlanDetailPage() {
     return Boolean(id && plan.subscribers.includes(id));
   }, [plan, user]);
 
+  const stopPins: MapPin[] = useMemo(
+    () =>
+      (plan?.stops || [])
+        .filter((s) => s.geo && Number.isFinite(s.geo.lat) && Number.isFinite(s.geo.lng))
+        .map((s) => ({
+          id: `stop-${s.id}`,
+          kind: "place" as const,
+          title: s.name,
+          sub: s.time || s.address,
+          lat: s.geo!.lat,
+          lng: s.geo!.lng,
+          area: false,
+        })),
+    [plan],
+  );
+
+  const mapCenter = useMemo(
+    () =>
+      (plan?.geo && Number.isFinite(plan.geo.lat) ? { lat: plan.geo.lat, lng: plan.geo.lng } : null) ||
+      knownCityCenter(plan?.city) ||
+      { lat: -33.8688, lng: 151.2093 },
+    [plan],
+  );
+
   if (loading) {
     return <PageLoading />;
   }
@@ -164,8 +193,8 @@ export function PlanDetailPage() {
     return <NotFoundPage />;
   }
 
-  const goingAttendees = plan.attendees.filter((a) => a.status === "going");
-  const maybeAttendees = plan.attendees.filter((a) => a.status === "maybe");
+  const goingAttendees = plan ? plan.attendees.filter((a) => a.status === "going") : [];
+  const maybeAttendees = plan ? plan.attendees.filter((a) => a.status === "maybe") : [];
 
   const handleDeletePlan = () => {
     if (window.confirm("Are you sure you want to delete this plan?")) {
@@ -239,12 +268,7 @@ export function PlanDetailPage() {
         </div>
       </div>
 
-      {/* WhatsApp-Style Group Header Bar */}
-      <div className="mb-6">
-        <PlanGroupHeader plan={plan} onInvite={() => setShareOpen(true)} onRsvp={() => setRsvpOpen(true)} />
-      </div>
-
-      {/* Main Luxury Digital VIP Invitation Card */}
+      {/* Hero — the invitation */}
       <InvitationCard
         plan={plan}
         userStatus={userAttendee?.status}
@@ -283,6 +307,23 @@ export function PlanDetailPage() {
         </div>
       )}
 
+      <div className="mt-6">
+        <SegmentedControl
+          label="Plan sections"
+          value={detailTab}
+          onChange={setDetailTab}
+          options={[
+            { id: "overview", label: "Overview" },
+            { id: "plan", label: "Plan" },
+            { id: "map", label: "Map" },
+            { id: "people", label: "People" },
+          ]}
+        />
+      </div>
+
+      {detailTab === "overview" && (
+        <>
+
       {/* RSVP Status Highlight Strip */}
       <div className="mt-6 rounded-3xl bg-card p-4 sm:p-5 ring-1 ring-line shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -308,9 +349,9 @@ export function PlanDetailPage() {
             <p className="text-xs text-mute font-medium">Your RSVP Status</p>
             <p className="text-sm font-semibold text-ink">
               {userAttendee?.status === "going"
-                ? "You're in — see you there! 🎉"
+                ? "You're in"
                 : userAttendee?.status === "maybe"
-                  ? "Marked as Maybe"
+                  ? "Maybe"
                   : "Not responded yet"}
             </p>
             {userAttendee?.notes && <p className="text-xs text-mute italic mt-0.5">"{userAttendee.notes}"</p>}
@@ -558,6 +599,48 @@ export function PlanDetailPage() {
         </div>
       )}
 
+      {/* Calendar Export & Sync Actions */}
+      <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+        <h2 className="font-display text-xl font-bold text-ink mt-0.5">Sync with Calendar</h2>
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => exportIcs(plan)}
+            className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
+          >
+            <CalendarPlus size={16} className="text-brand" />
+            <span>Apple / Outlook (.ics)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => openGoogleCalendar(plan)}
+            className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
+          >
+            <Calendar size={16} className="text-brand" />
+            <span>Google Calendar</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => exportPlanItineraryPdf(plan)}
+            className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95 col-span-full"
+          >
+            <Printer size={16} className="text-amber-500" />
+            <span>Print / Save Itinerary PDF Guide</span>
+          </button>
+        </div>
+      </div>
+
+      {bookedId ? <TicketPass bookingId={bookedId} /> : null}
+      {isHost && ticketed ? <TicketSalesPanel planId={plan.id} /> : null}
+
+        </>
+      )}
+
+      {detailTab === "plan" && (
+        <>
+
       {/* Co-Planning Itinerary Stops */}
       <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
         <div className="flex items-center justify-between gap-3 mb-4">
@@ -637,6 +720,41 @@ export function PlanDetailPage() {
         )}
       </div>
 
+        </>
+      )}
+
+      {detailTab === "map" && (
+        <div className="mt-8">
+          <div className="overflow-hidden rounded-[24px] ring-1 ring-line">
+            <CityMap
+              center={mapCenter}
+              pins={stopPins}
+              selectedId={selectedPin?.id}
+              onPin={setSelectedPin}
+            />
+          </div>
+          {selectedPin ? (
+            <div className="mt-3 rounded-2xl bg-card px-4 py-3 ring-1 ring-line">
+              <p className="text-[15px] font-semibold">{selectedPin.title}</p>
+              {selectedPin.sub && <p className="text-[13px] text-mute">{selectedPin.sub}</p>}
+            </div>
+          ) : (
+            <p className="mt-3 text-[13px] text-mute">
+              {stopPins.length > 0
+                ? `${stopPins.length} ${stopPins.length === 1 ? "stop" : "stops"} mapped — tap a pin.`
+                : "Stops appear here once places are added."}
+            </p>
+          )}
+        </div>
+      )}
+
+      {detailTab === "people" && (
+        <>
+
+      <div className="mt-8">
+        <PlanGroupHeader plan={plan} onInvite={() => setShareOpen(true)} onRsvp={() => setRsvpOpen(true)} />
+      </div>
+
       {/* Attendees Guest List */}
       <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
         <div className="flex items-center justify-between">
@@ -707,47 +825,8 @@ export function PlanDetailPage() {
         />
       </div>
 
-      {/* Calendar Export & Sync Actions */}
-      <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Add to Your Schedule</span>
-        <h2 className="font-display text-xl font-bold text-ink mt-0.5">Sync with Calendar</h2>
-        <p className="text-xs text-mute mt-1">
-          Export full event with all planned stops directly into Apple Calendar, Google Calendar, or Outlook.
-        </p>
-
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => exportIcs(plan)}
-            className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
-          >
-            <CalendarPlus size={16} className="text-brand" />
-            <span>Apple / Outlook (.ics)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => openGoogleCalendar(plan)}
-            className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
-          >
-            <Calendar size={16} className="text-brand" />
-            <span>Google Calendar</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => exportPlanItineraryPdf(plan)}
-            className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95 col-span-full"
-          >
-            <Printer size={16} className="text-amber-500" />
-            <span>Print / Save Itinerary PDF Guide</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Host Danger Zone (Delete) */}
-      {bookedId ? <TicketPass bookingId={bookedId} /> : null}
-      {isHost && ticketed ? <TicketSalesPanel planId={plan.id} /> : null}
+        </>
+      )}
 
       {isHost && (
         <div className="mt-8 border-t border-line/60 pt-6 flex justify-end">
@@ -762,53 +841,58 @@ export function PlanDetailPage() {
         </div>
       )}
 
-      {/* Sticky Mobile Bottom Floating Action Bar */}
-      <div className="fixed-element fixed inset-x-0 bottom-0 z-40 p-3 bg-paper/90 backdrop-blur-xl border-t border-line sm:hidden safe-bottom">
-        <div className="flex items-center gap-2 max-w-md mx-auto">
-          <Button
-            onClick={() => setShareOpen(true)}
-            variant="ghost"
-            className="flex-1 rounded-full h-11 text-xs font-semibold gap-1.5 ring-1 ring-line"
-          >
-            <Share2 size={15} />
-            <span>Share Link</span>
-          </Button>
-
-          {ticketed ? (
-            <Button
-              onClick={() => setBookingOpen(true)}
-              disabled={soldOut}
-              className="flex-1 rounded-full h-11 text-xs font-semibold gap-1.5 shadow-md bg-gradient-to-r from-amber-500 to-amber-600 text-white"
+      {/* Sticky Mobile Bottom Action — one primary, thumb-reachable */}
+      <div className="sm:hidden">
+        <StickyAction
+          primary={
+            ticketed ? (
+              <button
+                type="button"
+                onClick={() => setBookingOpen(true)}
+                disabled={soldOut}
+                className="flex h-12 w-full cursor-pointer touch-manipulation items-center justify-center gap-2 rounded-full bg-ink text-[15px] font-semibold text-white transition active:scale-[0.99] disabled:opacity-50"
+              >
+                <CreditCard size={16} />
+                <span>
+                  {soldOut
+                    ? "Sold out"
+                    : plan.pricingModel === "deposit" && plan.depositConfig
+                      ? `Reserve $${plan.depositConfig.depositAmount}`
+                      : `Buy $${plan.pricePerPerson || 0}`}
+                </span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setRsvpOpen(true)}
+                aria-label={userAttendee?.status === "going" ? "Going" : "RSVP Now"}
+                className="flex h-12 w-full cursor-pointer touch-manipulation items-center justify-center gap-2 rounded-full bg-brand text-[15px] font-semibold text-white shadow-[0_6px_20px_rgba(24,5,219,0.35)] transition active:scale-[0.99]"
+              >
+                {userAttendee?.status === "going" ? (
+                  <>
+                    <CheckCircle2 size={16} />
+                    <span>Going ✓</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={16} />
+                    <span>RSVP</span>
+                  </>
+                )}
+              </button>
+            )
+          }
+          secondary={
+            <button
+              type="button"
+              onClick={() => setShareOpen(true)}
+              aria-label="Share plan link"
+              className="grid h-12 w-12 shrink-0 cursor-pointer touch-manipulation place-items-center rounded-full bg-card text-mute ring-1 ring-line transition hover:text-ink active:scale-95"
             >
-              <CreditCard size={15} />
-              <span>
-                {soldOut
-                  ? "Sold out"
-                  : plan.pricingModel === "deposit" && plan.depositConfig
-                    ? `Reserve $${plan.depositConfig.depositAmount}`
-                    : `Buy $${plan.pricePerPerson || 0}`}
-              </span>
-            </Button>
-          ) : (
-            <Button
-              onClick={() => setRsvpOpen(true)}
-              aria-label={userAttendee?.status === "going" ? "Going" : "RSVP Now"}
-              className="flex-1 rounded-full h-11 text-xs font-semibold gap-1.5 shadow-md"
-            >
-              {userAttendee?.status === "going" ? (
-                <>
-                  <CheckCircle2 size={15} />
-                  <span>Going</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles size={15} />
-                  <span>RSVP</span>
-                </>
-              )}
-            </Button>
-          )}
-        </div>
+              <Share2 size={16} />
+            </button>
+          }
+        />
       </div>
 
       {/* Modals */}
