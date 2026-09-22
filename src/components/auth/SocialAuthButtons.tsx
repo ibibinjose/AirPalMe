@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { authErrorMessage } from "@shared/auth-email";
+import { authErrorCode, authErrorMessage } from "@shared/auth-email";
 import { cn } from "@/lib/cn";
 import { triggerHaptic } from "@/lib/native";
 import type { SocialProvider } from "@/lib/social-auth";
@@ -22,7 +22,12 @@ export function SocialAuthButtons({
     try {
       await onSocial(provider);
     } catch (err) {
-      const msg = authErrorMessage(err, provider === "apple" ? "Apple sign-in failed" : "Google sign-in failed");
+      // invalid-credential means Apple/Firebase rejected the token — never
+      // show password copy for it.
+      const msg =
+        provider === "apple" && authErrorCode(err) === "auth/invalid-credential"
+          ? "Apple could not complete sign-in. Try again."
+          : authErrorMessage(err, provider === "apple" ? "Apple sign-in failed" : "Google sign-in failed");
       toast.error(msg);
     } finally {
       setPending(null);
