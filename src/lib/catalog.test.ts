@@ -113,7 +113,7 @@ describe("catalog dynamic places", () => {
     expect(res.ok).toBe(true);
     expect(res.placesCount).toBeGreaterThan(0);
     expect(res.propertiesCount).toBeGreaterThan(0);
-    expect(getCachedProperty("harbour-hotel")?.name).toMatch(/Harbour/);
+    expect(getCachedProperty("harbour-hotel")?.name).toMatch(/(AirPal|Harbour)/);
 
     const places = activePlaces();
     expect(places.length).toBeGreaterThan(0);

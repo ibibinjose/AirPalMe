@@ -28,16 +28,17 @@ export function defaultChecklist(property: PropertyInfo, kind: StayKind, room: s
     ];
   }
 
-  const pool = property.facilities.some((f) => /pool/i.test(f.name));
-  const laundry = property.facilities.some((f) => /laundry/i.test(f.name));
-  const luggage = property.facilities.find((f) => /luggage/i.test(f.name));
+  const facilities = property.facilities || [];
+  const pool = facilities.some((f) => f && f.name && /pool/i.test(f.name));
+  const laundry = facilities.some((f) => f && f.name && /laundry/i.test(f.name));
+  const luggage = facilities.find((f) => f && f.name && /luggage/i.test(f.name));
 
   const items: ChecklistItem[] = [
     { id: "id", label: "Passport / ID", done: false },
     { id: "chargers", label: "Phone, chargers, adapters", done: false },
     { id: "meds", label: "Medications", done: false },
     { id: "keys", label: room ? `Room ${room} keys / stay QR` : "Keys / stay QR", done: false },
-    { id: "out", label: `Checkout by ${property.checkOut}`, hint: property.name, done: false },
+    { id: "out", label: `Checkout by ${property.checkOut || "10:00 AM"}`, hint: property.name || "your stay", done: false },
     { id: "bags", label: "Bags at the desk", hint: luggage?.details, done: false },
     { id: "minibar", label: "Minibar & extras settled", done: false },
   ];

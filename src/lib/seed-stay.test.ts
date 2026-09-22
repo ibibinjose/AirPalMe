@@ -6,7 +6,7 @@ describe("harbourStaySeeds", () => {
     const stays = harbourStaySeeds();
     expect(stays.map((s) => s.property.id)).toEqual(["harbour-hotel", "harbour-rocks-hotel-6cbbce"]);
     for (const stay of stays) {
-      expect(stay.property.name).toMatch(/Harbour/);
+      expect(stay.property.name).toMatch(/(AirPal|Harbour)/);
       expect(stay.property.wifi.password).toBe("");
       expect(stay.property.wifi.network).toBeTruthy();
       expect(stay.property.lobbyMarkerId).toBe("97a4e8add3a8c668");

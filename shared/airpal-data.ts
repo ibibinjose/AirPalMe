@@ -570,8 +570,8 @@ export interface ItineraryStop {
 
 export const CURRENT_PROPERTY: PropertyInfo = {
   id: "harbour-hotel",
-  name: "Harbour Hotel Sydney",
-  tagline: "Your Boutique Sanctuary by the Rocks",
+  name: "AirPal Hotel Sydney",
+  tagline: "Your Boutique Sanctuary by the Rocks · Life Made Easy",
   destination: "Sydney Harbour",
   city: "Sydney",
   country: "Australia",

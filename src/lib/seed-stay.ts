@@ -38,8 +38,8 @@ export function harbourStaySeeds(): HarbourStaySeed[] {
   const rocks: PropertyInfo = withStayMeta({
     ...CURRENT_PROPERTY,
     id: HARBOUR_ROCKS_PROPERTY_ID,
-    name: "Harbour Rocks Hotel",
-    tagline: "Heritage stay in The Rocks",
+    name: "AirPal Hotel · The Rocks",
+    tagline: "AirPal Boutique Template Stay in Sydney",
     handle: "harbour-rocks-hotel",
     slug: "harbour-rocks-hotel",
     vanityKey: "sydney/harbour-rocks-hotel",

@@ -67,8 +67,8 @@ export function ContactHostSheet() {
     }, 900);
   }
 
-  const tel = property.phone.replace(/\s/g, "");
-  const wa = property.whatsapp.replace(/[^\d]/g, "");
+  const tel = (property.phone || "").replace(/\s/g, "");
+  const wa = (property.whatsapp || "").replace(/[^\d]/g, "");
 
   return (
     <Sheet open={contactOpen} onClose={closeStayUi} title={t("contactHost")}>

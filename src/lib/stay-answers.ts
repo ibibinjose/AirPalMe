@@ -33,18 +33,20 @@ export function buildQuickAnswers(property: PropertyInfo, kind: StayKind, room: 
     };
   }
 
-  const pool = property.facilities.find((f) => /pool/i.test(f.name));
-  const laundry = property.facilities.find((f) => /laundry/i.test(f.name));
-  const luggage = property.facilities.find((f) => /luggage/i.test(f.name));
-  const bar = property.facilities.find((f) => /bar/i.test(f.name));
+  const facilities = property.facilities || [];
+  const pool = facilities.find((f) => f && f.name && /pool/i.test(f.name));
+  const laundry = facilities.find((f) => f && f.name && /laundry/i.test(f.name));
+  const luggage = facilities.find((f) => f && f.name && /luggage/i.test(f.name));
+  const bar = facilities.find((f) => f && f.name && /bar/i.test(f.name));
+  const wifi = property.wifi || { network: "Ask front desk", password: "", speed: "" };
 
   return {
-    place: property.name,
+    place: property.name || "AirPal Stay",
     room,
-    wifi: property.wifi,
+    wifi,
     checkout: [
-      { label: "Out by", value: property.checkOut },
-      { label: "In from", value: property.checkIn },
+      { label: "Out by", value: property.checkOut || "10:00 AM" },
+      { label: "In from", value: property.checkIn || "2:00 PM" },
       { label: "Bags", value: luggage?.details || "Front desk holds bags after checkout." },
       { label: "Late", value: "Ask the host before 8 PM the night before." },
       { label: "Cancel", value: property.cancellationPolicy || "See your booking." },
@@ -52,7 +54,7 @@ export function buildQuickAnswers(property: PropertyInfo, kind: StayKind, room: 
     rules: [
       {
         label: "Quiet",
-        value: bar ? `Keep it down after ${bar.hours.split("–").pop()?.trim() || "11 PM"}.` : "Quiet after 10:30 PM.",
+        value: bar ? `Keep it down after ${bar.hours?.split("–").pop()?.trim() || "11 PM"}.` : "Quiet after 10:30 PM.",
       },
       { label: "Smoke", value: "Rooms are smoke-free. Use outdoor terraces." },
       { label: "Pool", value: pool ? `${pool.hours} · ${pool.floor}` : "Ask the desk." },

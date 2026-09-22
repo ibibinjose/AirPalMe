@@ -54,7 +54,8 @@ export function ArrivalGuide() {
   const delta = checkInAt.getTime() - now.getTime();
   const origin = stayOrigin(property, marker?.geo);
   const parking = nearbyParking(origin)[0];
-  const bags = property.facilities.find((f) => /luggage/i.test(f.name));
+  const facilities = property.facilities || [];
+  const bags = facilities.find((f) => f && f.name && /luggage/i.test(f.name));
 
   const eta = delta > 0 ? countdownLabel(delta) : phase === "early" ? `Opens in ${countdownLabel(-delta)}` : null;
 

@@ -104,11 +104,13 @@ export function normalizeProperty(id: string, data: Record<string, unknown>): Pr
     ...base,
     ...data,
     id,
-    name: String(data.name || base.name),
+    name: String(data.name || base.name || ""),
+    phone: String(data.phone || base.phone || ""),
+    whatsapp: String(data.whatsapp || base.whatsapp || ""),
     wifi: {
-      network: (data.wifi as { network?: string } | undefined)?.network || base.wifi.network,
-      password: (data.wifi as { password?: string } | undefined)?.password || base.wifi.password,
-      speed: (data.wifi as { speed?: string } | undefined)?.speed || base.wifi.speed,
+      network: (data.wifi as { network?: string } | undefined)?.network || base.wifi.network || "",
+      password: (data.wifi as { password?: string } | undefined)?.password || base.wifi.password || "",
+      speed: (data.wifi as { speed?: string } | undefined)?.speed || base.wifi.speed || "",
     },
     breakfast: {
       ...base.breakfast,
@@ -117,8 +119,8 @@ export function normalizeProperty(id: string, data: Record<string, unknown>): Pr
     facilities:
       Array.isArray(data.facilities) && data.facilities.length > 0
         ? (data.facilities as PropertyInfo["facilities"])
-        : base.facilities,
-    roomTokens: (data.roomTokens as Record<string, string>) || base.roomTokens,
+        : base.facilities || [],
+    roomTokens: (data.roomTokens as Record<string, string>) || base.roomTokens || {},
     lobbyMarkerId: data.lobbyMarkerId ? String(data.lobbyMarkerId) : undefined,
     wifiUpdatedAt: isoFromUnknown(data.wifiUpdatedAt),
     hoursVerifiedAt: isoFromUnknown(data.hoursVerifiedAt),
