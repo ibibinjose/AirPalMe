@@ -1,6 +1,6 @@
 # Gemini — AirPal.me
 
-Read **`AGENTS.md`** then **`docs/CANON.md`** before any edit.
+Read **`AGENTS.md`**, then **`docs/CANON.md`**, then **`docs/AIRPAL_BRAIN.md`** before any edit. The Brain gates new product surfaces.
 
 This is a Vite SPA (not Next.js) on Firebase project `airpalme-app`, Capacitor app `me.airpal.app`.
 

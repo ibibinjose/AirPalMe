@@ -15,7 +15,7 @@ Operate this repo as one marketplace engine. Product rules live in `AGENTS.md`. 
 
 ## On every invoke
 
-1. Read `AGENTS.md` (repo root) and `docs/CANON.md` (shipped freeze — do not revert).
+1. Read `AGENTS.md` (repo root), `docs/CANON.md` (shipped freeze — do not revert), and `docs/AIRPAL_BRAIN.md` (expansion gate — pass §18 before a new surface).
 2. Read `.grok/skills/airpal-build/references/build-checklist.md` and `references/surfaces.md` before adding files.
 3. Name the next item you will touch (its checklist `id`) and the smallest change that moves it toward `done`.
 4. After shipping, update the checklist row: status, checkbox, evidence path, date. Never mark `done` without a real path a user can exercise.
@@ -37,7 +37,7 @@ Partial items stay unchecked. Only `done` gets `[x]`.
 
 Default order (AGENTS.md §32): P0 transaction → P1 usability → P2 growth → P3 expansion → P4 infrastructure.
 
-Pick the first P0 row that is `todo`, else the first P0 `partial`. Do not start a new vertical, a second booking engine, or Studio modules while a P0 `todo` remains — unless the user named that vertical in this turn (`/airpal-business` counts as naming Business).
+Pick the first P0 row that is `todo`, else the first P0 `partial`, and only if it serves the Brain loop (plan → connect → experience → complete). Do not start a new vertical, a second booking engine, paid-companion front door, or Studio modules while that loop is unproven — unless the user named that vertical in this turn (`/airpal-business` counts as naming Business). A named vertical still has to pass the Brain feature test.
 
 When the user names a surface (Mate, Business, Stay, …), stay on that surface but still reuse shared collections in `surfaces.md`.
 

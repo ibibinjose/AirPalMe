@@ -1,5 +1,5 @@
 # Cursor — AirPal.me
-Read AGENTS.md and docs/CANON.md first.
+Read AGENTS.md, docs/CANON.md, and docs/AIRPAL_BRAIN.md first. The Brain gates new product surfaces.
 Stack: Vite SPA, React, TypeScript, Tailwind, Lucide, Firebase, Capacitor me.airpal.app.
 Do not revert shipped features, style tokens, or auth rules in docs/CANON.md.
 Smallest change. npm run verify before claiming done.

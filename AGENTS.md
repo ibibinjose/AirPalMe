@@ -21,9 +21,11 @@ Core positioning: a trusted global marketplace connecting people (friends, famil
 
 Build the marketplace engine first. Do not build all verticals as fully operational marketplaces at the same time.
 
-Initial commercial wedge: AirPal Mate — Find someone to go with you. Designed for global scale across any city worldwide (initial launch market: Sydney, Australia).
+Expansion gate: **`docs/AIRPAL_BRAIN.md`**. Before adding a surface, pass its feature test (§18). Company loop: Want → Discover → Connect → Plan → Go → Experience → Remember → Repeat. North Star: completed experiences per active user.
 
-The first objective is not downloads. It is Completed AirPal experiences. Prove this loop: Intent → Request → Match → Connect → Book → Meet/Experience → Complete → Review → Repeat. Expand into other verticals only after the core loop works.
+Initial use: people new to a city (Sydney first) answer "what do you want to do?", then who with, and complete a plan. AirPal Mate means find someone to do it with. Paid companionship is later and is not the front door.
+
+The first objective is not downloads. It is Completed AirPal experiences. Expand into other verticals only after that loop works. If this file and the Brain disagree about what to build next, the Brain wins. Safety, security, privacy, payments, and `docs/CANON.md` still win over both.
 
 ## 3. App Information Architecture
 
@@ -175,7 +177,7 @@ Small logical commits (`feat:`, `fix:` …). Never commit secrets. No force-push
 
 ## 38. Agent Behaviour
 
-Read this file first. Inspect before changing architecture. Reuse components/patterns. Smallest change that solves. Preserve functionality. Test affected flows + mobile + auth/permissions + Firestore/payment implications. Report changes and tests. Conflicts resolve: Safety → Security → Correctness → Transaction integrity → UX → Performance → Growth.
+Read this file first, then `docs/CANON.md`, then `docs/AIRPAL_BRAIN.md` before adding a product surface. Inspect before changing architecture. Reuse components/patterns. Smallest change that solves. Preserve functionality. Test affected flows + mobile + auth/permissions + Firestore/payment implications. Report changes and tests. Conflicts resolve: Safety → Security → Correctness → Transaction integrity → UX → Performance → Growth.
 
 ## 39. Product Guardrails
 
