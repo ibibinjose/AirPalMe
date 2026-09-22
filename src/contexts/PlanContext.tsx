@@ -119,7 +119,7 @@ const PlanContext = createContext<PlanContextValue | undefined>(undefined);
 
 export function PlanProvider({ children }: { children: ReactNode }) {
   const [plans, setPlans] = useState<HangoutPlan[]>(() => loadPlans());
-  const { user } = useAuth();
+  const { user, requireUser } = useAuth();
   const { mine } = useBio();
 
   useEffect(() => {
@@ -288,6 +288,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
 
   const rsvpPlan = useCallback(
     (planId: string, status: "going" | "maybe" | "declined", guestName?: string, notes?: string) => {
+      if (!requireUser("Sign in to RSVP to plans.")) return undefined;
       const attendeeId =
         user?.uid || (typeof window !== "undefined" && localStorage.getItem("airpal.anon.id")) || `anon-${Date.now()}`;
 
@@ -323,7 +324,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       }
       return updated;
     },
-    [user, mine],
+    [user, mine, requireUser],
   );
 
   const addStop = useCallback(
@@ -331,6 +332,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       planId: string,
       stop: { name: string; time?: string; notes?: string; placeId?: string; icon?: string; address?: string },
     ) => {
+      if (!requireUser("Sign in to add stops to plans.")) return undefined;
       const adderName = user?.displayName || mine?.name || "Mate";
       const updated = addStopToPlan(planId, {
         name: stop.name,
@@ -351,11 +353,12 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       }
       return updated;
     },
-    [user, mine],
+    [user, mine, requireUser],
   );
 
   const updateStop = useCallback(
     (planId: string, stopId: string, patch: Partial<Omit<PlanStop, "id">>) => {
+      if (!requireUser("Sign in to edit plan stops.")) return undefined;
       const actorName = user?.displayName || mine?.name || "Mate";
       const updated = updateStopInPlan(planId, stopId, patch);
       if (updated) {
@@ -366,11 +369,12 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       }
       return updated;
     },
-    [user, mine],
+    [user, mine, requireUser],
   );
 
   const removeStop = useCallback(
     (planId: string, stopId: string) => {
+      if (!requireUser("Sign in to edit plan stops.")) return undefined;
       const actorName = user?.displayName || mine?.name || "Mate";
       const current = storeGetPlan(planId);
       const stopName = current?.stops.find((s) => s.id === stopId)?.name ?? "stop";
@@ -382,11 +386,12 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       }
       return updated;
     },
-    [user, mine],
+    [user, mine, requireUser],
   );
 
   const reorderStops = useCallback(
     (planId: string, fromIndex: number, toIndex: number) => {
+      if (!requireUser("Sign in to edit plan stops.")) return undefined;
       const actorName = user?.displayName || mine?.name || "Mate";
       const updated = reorderStopsInPlan(planId, fromIndex, toIndex);
       if (updated && fromIndex !== toIndex) {
@@ -401,6 +406,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
 
   const voteStop = useCallback(
     (planId: string, stopId: string) => {
+      if (!requireUser("Sign in to vote on stops.")) return undefined;
       const uid =
         user?.uid || (typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null) || "guest";
       const updated = voteStopInPlan(planId, stopId, uid);
@@ -409,12 +415,13 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       }
       return updated;
     },
-    [user],
+    [user, requireUser],
   );
 
   const addComment = useCallback(
     (planId: string, text: string, photoUrl?: string) => {
       if (!text.trim()) return undefined;
+      if (!requireUser("Sign in to post in crew discussions.")) return undefined;
       const authorName = user?.displayName || mine?.name || "Mate";
       const authorId =
         user?.uid || (typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null) || "guest";
@@ -436,6 +443,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
 
   const followPlan = useCallback(
     (planId: string, emailOrId?: string) => {
+      if (!requireUser("Sign in to follow plans.")) return false;
       let anonId = typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null;
       if (!anonId && typeof window !== "undefined") {
         anonId = `anon-${Date.now()}`;
@@ -454,7 +462,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       }
       return false;
     },
-    [user],
+    [user, requireUser],
   );
 
   const exportIcs = useCallback((plan: HangoutPlan) => {

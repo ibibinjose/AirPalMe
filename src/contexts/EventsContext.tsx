@@ -85,7 +85,7 @@ function uidNow() {
 }
 
 export function EventsProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, requireUser } = useAuth();
   const sync = useOptionalSync();
   const [events, setEvents] = useState<EventRecord[]>([]);
   const [stalls, setStalls] = useState<StallRecord[]>([]);
@@ -303,20 +303,22 @@ export function EventsProvider({ children }: { children: ReactNode }) {
 
   const toggleGoing = useCallback(
     (eventId: string) => {
+      if (!requireUser("Sign in to mark yourself Going.", { kind: "going-event", id: eventId })) return false;
       const current = userStates[eventId]?.status;
       void setEventStatus(eventId, current === "going" ? null : "going");
       return true;
     },
-    [setEventStatus, userStates],
+    [setEventStatus, userStates, requireUser],
   );
 
   const toggleInterested = useCallback(
     (eventId: string) => {
+      if (!requireUser("Sign in to save events.", { kind: "interested-event", id: eventId })) return false;
       const current = userStates[eventId]?.status;
       void setEventStatus(eventId, current === "interested" ? null : "interested");
       return true;
     },
-    [setEventStatus, userStates],
+    [setEventStatus, userStates, requireUser],
   );
 
   const setLiked = useCallback(
@@ -350,11 +352,12 @@ export function EventsProvider({ children }: { children: ReactNode }) {
 
   const toggleLiked = useCallback(
     (eventId: string) => {
+      if (!requireUser("Sign in to like events.", { kind: "like-event", id: eventId })) return false;
       const nextLiked = !userStates[eventId]?.liked;
       void setLiked(eventId, nextLiked);
       return true;
     },
-    [setLiked, userStates],
+    [setLiked, userStates, requireUser],
   );
 
   const rescheduleEvent = useCallback(

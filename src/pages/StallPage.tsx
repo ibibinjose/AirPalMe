@@ -15,7 +15,7 @@ import { NotFoundPage } from "./NotFoundPage";
 export function StallPage() {
   const [, params] = useRoute("/e/:eventId/s/:stallId");
   const [, nav] = useLocation();
-  const { user } = useAuth();
+  const { requireUser } = useAuth();
   const { getEvent, stallsFor, saveStall, unsaveStall, isSaved, fetchRemoteStalls } = useEvents();
   const eventId = params?.eventId || "";
   const [stallsReady, setStallsReady] = useState(false);
@@ -78,17 +78,13 @@ export function StallPage() {
             toast.message("Removed");
             return;
           }
+          if (!requireUser("Sign in to save stalls.")) return;
           void saveStall(stall, event);
-          toast.success(user ? "Saved" : "Saved on this device");
+          toast.success("Saved");
         }}
       >
         {saved ? "Saved" : "Save stall"}
       </Button>
-      {!user && (
-        <button type="button" className="mt-3 w-full text-center text-sm text-brand" onClick={() => nav("/me")}>
-          Sign in to keep it on your account
-        </button>
-      )}
       <EmojiRate target="stall" eventId={event.id} stallId={stall.id} stallName={stall.name} />
     </div>
   );
