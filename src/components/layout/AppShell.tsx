@@ -21,6 +21,7 @@ import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { TicketAlertBar } from "@/components/host/TicketAlertBar";
 import { NotificationPopup } from "@/components/notifications/NotificationPopup";
 import { PresencePublisher } from "@/components/layout/PresencePublisher";
+import { DeviceMirror } from "@/components/layout/DeviceMirror";
 import { cn } from "@/lib/cn";
 import { enterEase, takeShellEnter } from "@/lib/motion";
 import { parseAtHandle } from "@shared/bio";
@@ -187,6 +188,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </main>
           {!workspace && !isPlanDetail && <TabBar path={path} enter={play} />}
           <PresencePublisher />
+          <DeviceMirror />
           <GuestStayTools />
           <GlobalSearchModal />
           <NetworkStatusToast />

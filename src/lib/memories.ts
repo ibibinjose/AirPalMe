@@ -48,12 +48,20 @@ export function listMemories(): Memory[] {
   }
 }
 
+let persistHook: (() => void) | null = null;
+
+/** Called after every local write (used to mirror to Firebase when signed in). */
+export function setMemoriesPersistHook(fn: (() => void) | null): void {
+  persistHook = fn;
+}
+
 function persist(memories: Memory[]): void {
   try {
     storage()?.setItem(KEY, JSON.stringify(memories));
   } catch {
     /* private mode or quota: metadata is best-effort, blobs live in IndexedDB */
   }
+  persistHook?.();
 }
 
 export function newMemoryId(): string {
@@ -90,6 +98,16 @@ export function updateMemory(id: string, patch: Partial<Pick<Memory, "caption" |
   memories[idx] = next;
   persist(memories);
   return next;
+}
+
+/** Replace the whole list (used when merging the Firebase mirror on login). */
+export function replaceMemories(rows: Memory[]): void {
+  persist(
+    rows
+      .map(clean)
+      .filter((r): r is Memory => r !== null)
+      .filter((r, i, all) => all.findIndex((o) => o.id === r.id) === i),
+  );
 }
 
 export function removeMemory(id: string): void {

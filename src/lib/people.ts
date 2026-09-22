@@ -45,12 +45,20 @@ export function listPeople(): PersonMet[] {
   }
 }
 
+let persistHook: (() => void) | null = null;
+
+/** Called after every local write (used to mirror to Firebase when signed in). */
+export function setPeoplePersistHook(fn: (() => void) | null): void {
+  persistHook = fn;
+}
+
 function persist(people: PersonMet[]): void {
   try {
     storage()?.setItem(KEY, JSON.stringify(people));
   } catch {
     /* private mode: best-effort */
   }
+  persistHook?.();
 }
 
 export function newPersonId(): string {
@@ -88,6 +96,16 @@ export function upsertPerson(input: Omit<PersonMet, "id" | "metAt"> & { id?: str
   };
   persist([row, ...people]);
   return row;
+}
+
+/** Replace the whole list (used when merging the Firebase mirror on login). */
+export function replacePeople(rows: PersonMet[]): void {
+  persist(
+    rows
+      .map(clean)
+      .filter((r): r is PersonMet => r !== null)
+      .filter((r, i, all) => all.findIndex((o) => o.id === r.id) === i),
+  );
 }
 
 export function removePerson(id: string): void {

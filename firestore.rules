@@ -111,6 +111,10 @@ service cloud.firestore {
         allow read, write: if signedIn() && request.auth.uid == userId;
       }
 
+      match /device/{docId} {
+        allow read, write: if signedIn() && request.auth.uid == userId;
+      }
+
       match /follows/{handle} {
         allow read, write: if signedIn() && request.auth.uid == userId;
       }
