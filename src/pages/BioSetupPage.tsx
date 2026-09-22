@@ -21,6 +21,7 @@ import { AuthGate } from "@/components/auth/AuthGate";
 import { ValidField, fieldInput } from "@/components/forms/ValidField";
 import { AddressFields } from "@/components/forms/AddressFields";
 import { PhoneField } from "@/components/forms/PhoneField";
+import { TradingHoursField } from "@/components/forms/TradingHoursField";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { useListings } from "@/contexts/ListingsContext";
@@ -406,9 +407,7 @@ export function BioSetupPage() {
               </button>
             ))}
           </div>
-          <ValidField label="Hours">
-            <input value={hours} onChange={(e) => setHours(e.target.value)} className={fieldInput} />
-          </ValidField>
+          <TradingHoursField value={hours} onChange={setHours} inputClassName={fieldInput} />
           <ValidField label="Short why" ok={shortWhy.trim().length >= 4}>
             <input
               value={shortWhy}

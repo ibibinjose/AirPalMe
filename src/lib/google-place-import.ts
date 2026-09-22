@@ -144,6 +144,64 @@ export async function searchAddressPlaces(
   return searchOsmPlaces(input, bias, true);
 }
 
+/** Localities, suburbs, cities and regions for "City / Suburb & Region" fields. */
+export async function searchCityRegions(
+  input: string,
+  sessionToken: string,
+  bias?: Geo,
+): Promise<GooglePlaceSuggestion[]> {
+  const needle = input.trim();
+  if (needle.length < 2) return [];
+  if (!canImportGooglePlaces()) {
+    return searchOsmPlaces(needle, bias, true);
+  }
+  const center = bias && Number.isFinite(bias.lat) && Number.isFinite(bias.lng) ? bias : SYDNEY;
+  try {
+    const res = await placesFetch(
+      "places:autocomplete",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          input: needle,
+          languageCode: "en",
+          includedPrimaryTypes: [
+            "locality",
+            "sublocality",
+            "sublocality_level_1",
+            "administrative_area_level_1",
+            "administrative_area_level_2",
+            "postal_code",
+            "neighborhood",
+          ],
+          includedRegionCodes: ["au", "in", "ae", "gb", "us", "ca", "fr", "de", "es", "it", "nl", "ie", "nz", "sg", "my", "th", "ph", "id", "jp", "kr", "vn"],
+          sessionToken,
+          locationBias: {
+            circle: { center: { latitude: center.lat, longitude: center.lng }, radius: 50000 },
+          },
+        }),
+      },
+      "suggestions.placePrediction.placeId,suggestions.placePrediction.text,suggestions.placePrediction.structuredFormat,suggestions.placePrediction.types",
+    );
+    const json = (await res.json()) as AutocompleteJson;
+    if (res.ok && json.suggestions && json.suggestions.length > 0) {
+      return json.suggestions
+        .map((row) => {
+          const p = row.placePrediction;
+          if (!p?.placeId) return null;
+          return {
+            placeId: p.placeId,
+            title: p.structuredFormat?.mainText?.text || p.text?.text || "Place",
+            subtitle: p.structuredFormat?.secondaryText?.text || "",
+          } satisfies GooglePlaceSuggestion;
+        })
+        .filter((row): row is GooglePlaceSuggestion => Boolean(row));
+    }
+  } catch {
+    // Fallback if specific types are not accepted
+  }
+  return searchGooglePlaces(needle, sessionToken, bias, true);
+}
+
 export async function fetchPlace(placeId: string, sessionToken: string): Promise<GooglePlaceImport> {
   if (parseOsmPlaceId(placeId)) return fetchOsmPlace(placeId);
   return fetchGooglePlace(placeId, sessionToken);

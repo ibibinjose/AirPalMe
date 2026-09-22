@@ -5,7 +5,6 @@ import {
   ArrowLeft,
   Calendar,
   ChevronRight,
-  Clock,
   Coffee,
   ContactRound,
   Edit3,
@@ -43,6 +42,7 @@ import { useBio } from "@/contexts/BioContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { fetchPublicBio } from "@/lib/bio-store";
+import { TradingHoursScheduleView } from "@/components/discovery/TradingHoursScheduleView";
 import { resolvePublicBio } from "@/lib/bio-handle";
 import { claimCode, loadClaim, saveClaim } from "@/lib/bio-claims";
 import { liveBackendEnabled, claimBioOfferRemote } from "@/lib/functions";
@@ -767,11 +767,12 @@ export function BioPublicPage() {
                   </li>
                 )}
                 {bio.hours && (
-                  <li className="flex items-center gap-3 p-4">
-                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
-                      <Clock size={20} />
-                    </span>
-                    <span className="min-w-0 flex-1 text-[15px] font-medium text-ink">{bio.hours}</span>
+                  <li>
+                    <TradingHoursScheduleView
+                      hours={bio.hours}
+                      placeName={bio.name || bio.handle}
+                      variant="row"
+                    />
                   </li>
                 )}
                 {bio.phone && (

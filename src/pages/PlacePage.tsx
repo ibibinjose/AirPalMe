@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useRoute, useLocation } from "wouter";
-import { ArrowLeft, Share2 } from "lucide-react";
+import { ArrowLeft, Plus, Share2 } from "lucide-react";
 import { getPlace, withWalk } from "@/lib/catalog";
 import { shareContent } from "@/lib/share";
 import { handleOfPlace } from "@/lib/bio-handle";
@@ -8,6 +9,7 @@ import { mapsWalkUrl, mapsPlaceUrl, mapsPlaceIdUrl } from "@/lib/maps";
 import { openMap } from "@/lib/analytics";
 import { Button } from "@/components/ui/Button";
 import { StickyAction } from "@/components/design-system/companions";
+import { AddToTripSheet } from "@/components/plan/AddToTripSheet";
 import { HereCheckIn } from "@/components/circle/HereCheckIn";
 import { BioHandleButton } from "@/components/bio/BioHandleButton";
 import { Photo } from "@/components/ui/Photo";
@@ -19,6 +21,7 @@ import { freshnessOf } from "@shared/freshness";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { useLocale } from "@/contexts/LocaleContext";
 import { PageLoading } from "@/components/ui/PageLoading";
+import { TradingHoursScheduleView } from "@/components/discovery/TradingHoursScheduleView";
 import { NotFoundPage } from "./NotFoundPage";
 
 export function PlacePage() {
@@ -28,6 +31,7 @@ export function PlacePage() {
   const { remoteLoaded } = useListings();
   const { now, timeZone, here } = useLocalNow();
   const { t } = useLocale();
+  const [tripOpen, setTripOpen] = useState(false);
   const place = getPlace(params?.id || "");
   if (!place && !remoteLoaded) {
     return <PageLoading />;
@@ -111,6 +115,14 @@ export function PlacePage() {
       </div>
       <div className="px-4 pt-5">
         <p className="text-[15px] leading-relaxed">{place.insiderTip || place.shortWhy}</p>
+        {place.hours && (
+          <TradingHoursScheduleView
+            hours={place.hours}
+            placeName={place.name}
+            variant="inline"
+            className="mt-4"
+          />
+        )}
         {handle && (
           <Button variant="ghost" className="mt-4 w-full" onClick={() => nav(bioPath(handle))}>
             Open @{handle}
@@ -126,6 +138,14 @@ export function PlacePage() {
             {place.bookingLabel || "Book"}
           </Button>
         )}
+        <button
+          type="button"
+          onClick={() => setTripOpen(true)}
+          className="mt-3 hidden h-12 w-full touch-manipulation items-center justify-center gap-1.5 rounded-full bg-brand/10 text-[15px] font-semibold text-brand transition hover:bg-brand/15 active:scale-[0.99] lg:flex"
+        >
+          <Plus size={17} />
+          <span>Add to Trip</span>
+        </button>
         <button
           type="button"
           className="mt-4 w-full cursor-pointer text-[14px] font-semibold text-brand"
@@ -147,15 +167,30 @@ export function PlacePage() {
           </button>
         }
         secondary={
-          <button
-            type="button"
-            onClick={() => openMap(maps, { contentId: place.id, destination: "maps" })}
-            aria-label="Open in Maps"
-            className="grid h-12 w-12 shrink-0 cursor-pointer touch-manipulation place-items-center rounded-full bg-card text-[13px] font-semibold text-mute ring-1 ring-line transition hover:text-ink active:scale-95"
-          >
-            Maps
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setTripOpen(true)}
+              className="inline-flex h-12 cursor-pointer touch-manipulation items-center gap-1.5 rounded-full bg-brand/10 px-4 text-[14px] font-semibold text-brand transition hover:bg-brand/15 active:scale-95"
+            >
+              <Plus size={16} />
+              <span>Add to Trip</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => openMap(maps, { contentId: place.id, destination: "maps" })}
+              aria-label="Open in Maps"
+              className="grid h-12 w-12 shrink-0 cursor-pointer touch-manipulation place-items-center rounded-full bg-card text-[13px] font-semibold text-mute ring-1 ring-line transition hover:text-ink active:scale-95"
+            >
+              Maps
+            </button>
+          </div>
         }
+      />
+      <AddToTripSheet
+        open={tripOpen}
+        onClose={() => setTripOpen(false)}
+        stop={{ name: place.name, placeId: place.id, notes: place.shortWhy }}
       />
     </div>
   );

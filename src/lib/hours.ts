@@ -1,4 +1,5 @@
 import { minutesOfDay, zonedWeekdayIndex } from "./local-time";
+import { parseHoursTo7DaySchedule, WEEKDAY_INDEX_TO_KEY } from "./trading-hours";
 
 export type HoursWindow = {
   start: number;
@@ -47,7 +48,7 @@ export function parseHoursWindow(hours: string): HoursWindow | "always" | "unkno
   const s = hours.trim();
   if (!s) return "unknown";
   const lower = s.toLowerCase();
-  if (/24\s*hours|always open|^open$/.test(lower)) return "always";
+  if (/24\s*hours|always open|^open$|^24\/7$/.test(lower)) return "always";
 
   const days = daysFromText(lower);
   const clocks = Array.from(s.matchAll(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/gi))
@@ -76,7 +77,47 @@ export function parseHoursWindow(hours: string): HoursWindow | "always" | "unkno
  * Returns null when hours cannot be interpreted (do not guess).
  */
 export function isOpenAt(hours: string | undefined, now: Date, timeZone: string): boolean | null {
-  if (!hours) return null;
+  if (!hours || !hours.trim()) return null;
+  const s = hours.trim();
+  const lower = s.toLowerCase();
+
+  // If unknown free-text without time or known open keywords, do not guess
+  const hasTimesOrKeywords =
+    /24\s*hours|always open|^open$|^24\/7$|closed|\d{1,2}(?::\d{2})?\s*(?:am|pm)?|\d{1,2}:\d{2}|dinner|lunch|afternoon/i.test(
+      lower,
+    );
+  if (!hasTimesOrKeywords) return null;
+
+  // Multi-day schedule evaluation
+  if (
+    s.includes(";") ||
+    s.includes(",") ||
+    /mon|tue|wed|thu|fri|sat|sun|daily|everyday/i.test(lower)
+  ) {
+    const dayIdx = zonedWeekdayIndex(now, timeZone);
+    const dayKey = WEEKDAY_INDEX_TO_KEY[dayIdx];
+    const sched = parseHoursTo7DaySchedule(s);
+    const todaySched = sched[dayKey];
+    if (!todaySched) return null;
+
+    if (todaySched.status === "closed") return false;
+    if (todaySched.status === "24hours") return true;
+
+    const startMins = parseClock(todaySched.openTime);
+    let endMins = parseClock(todaySched.closeTime);
+    if (startMins == null) return null;
+    if (todaySched.isLate || endMins == null) {
+      endMins = 24 * 60 + 30;
+    }
+
+    const mins = minutesOfDay(now, timeZone);
+    if (endMins <= startMins) {
+      // Overnight (e.g. 16:00 to 02:00)
+      return mins >= startMins || mins < endMins;
+    }
+    return mins >= startMins && mins < endMins;
+  }
+
   const window = parseHoursWindow(hours);
   if (window === "always") return true;
   if (window === "unknown") return null;

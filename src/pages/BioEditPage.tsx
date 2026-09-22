@@ -5,7 +5,6 @@ import { nanoid } from "nanoid";
 import {
   ArrowLeft,
   Check,
-  Clock,
   Copy,
   Download,
   Edit3,
@@ -42,6 +41,8 @@ import { useBio } from "@/contexts/BioContext";
 import { ImageField } from "@/components/media/ImageField";
 import { makeQrDataUrl } from "@/lib/qr";
 import { toPublicUrl } from "@/lib/public-origin";
+import { TradingHoursField } from "@/components/forms/TradingHoursField";
+import { CitySuburbRegionField } from "@/components/forms/CitySuburbRegionField";
 import { cn } from "@/lib/cn";
 import { PhoneField } from "@/components/forms/PhoneField";
 import { isValidPhone } from "@shared/geo-address";
@@ -725,32 +726,18 @@ export function BioEditPage() {
                 <p className="text-xs font-bold uppercase tracking-wider text-gold">Location & Hours</p>
 
                 {/* City / Location */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-mute">
-                    <MapPin size={13} className="text-gold" />
-                    <span>City / Suburb & Region</span>
-                  </div>
-                  <input
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="e.g. Sydney, NSW or Bondi Beach, NSW"
-                    className={fieldInput}
-                  />
-                </div>
+                <CitySuburbRegionField
+                  value={city}
+                  onChange={setCity}
+                  inputClassName={fieldInput}
+                />
 
                 {/* Trading / Opening Hours */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-mute">
-                    <Clock size={13} className="text-gold" />
-                    <span>Trading / Opening Hours</span>
-                  </div>
-                  <input
-                    value={hours}
-                    onChange={(e) => setHours(e.target.value)}
-                    placeholder="e.g. Mon–Fri 7:00 AM – 4:00 PM, Sat 8:00 AM – 2:00 PM"
-                    className={fieldInput}
-                  />
-                </div>
+                <TradingHoursField
+                  value={hours}
+                  onChange={setHours}
+                  inputClassName={fieldInput}
+                />
 
                 {/* Live Availability Status Picker */}
                 <div className="space-y-2 pt-2 border-t border-line/60">

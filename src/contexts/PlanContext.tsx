@@ -104,6 +104,7 @@ interface PlanContextValue {
       addedByName?: string;
       addedByUid?: string;
     },
+    opts?: { silent?: boolean },
   ) => HangoutPlan | undefined;
   updateStop: (planId: string, stopId: string, patch: Partial<Omit<PlanStop, "id">>) => HangoutPlan | undefined;
   removeStop: (planId: string, stopId: string) => HangoutPlan | undefined;
@@ -331,6 +332,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     (
       planId: string,
       stop: { name: string; time?: string; notes?: string; placeId?: string; icon?: string; address?: string },
+      opts?: { silent?: boolean },
     ) => {
       if (!requireUser("Sign in to add stops to plans.")) return undefined;
       const adderName = user?.displayName || mine?.name || "Mate";
@@ -347,9 +349,11 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       if (updated) {
         const notif = notifyStopChange(planId, "added", { stopName: stop.name, actorName: adderName });
         const count = notif?.recipientIds.length ?? 0;
-        toast.success(
-          `Added "${stop.name}" to the plan!${count > 0 ? ` Notified ${count} mate${count === 1 ? "" : "s"}.` : ""}`,
-        );
+        if (!opts?.silent) {
+          toast.success(
+            `Added "${stop.name}" to the plan!${count > 0 ? ` Notified ${count} mate${count === 1 ? "" : "s"}.` : ""}`,
+          );
+        }
       }
       return updated;
     },

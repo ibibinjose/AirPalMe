@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useRoute, useLocation } from "wouter";
-import { Check, ChevronDown, Heart, Star, MapPin, Share2, Sparkles, ArrowLeft } from "lucide-react";
+import { Check, ChevronDown, Heart, MapPin, Plus, Share2, Sparkles, Star, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { StickyAction } from "@/components/design-system/companions";
 import { Button } from "@/components/ui/Button";
@@ -11,6 +11,7 @@ import { shareContent } from "@/lib/share";
 import { setShareMeta } from "@/lib/share-meta";
 import { cn } from "@/lib/cn";
 import { track } from "@/lib/analytics";
+import { AddToTripSheet } from "@/components/plan/AddToTripSheet";
 import type { CalendarEvent } from "@shared/event";
 import type { NearbyEvent } from "@shared/nearby";
 import { ExpoDirectoryPage } from "./ExpoDirectoryPage";
@@ -70,6 +71,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
   const { today } = useLocalNow();
   const relative = formatRelativeBadge(event.date, today);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [tripOpen, setTripOpen] = useState(false);
 
   const handleShare = async () => {
     await shareContent({
@@ -203,6 +205,24 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
             <Heart size={16} className={event.isLiked ? "fill-white" : ""} strokeWidth={event.isLiked ? 2.5 : 2} />
           </button>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setTripOpen(true)}
+          className="mt-2.5 flex h-11 w-full touch-manipulation items-center justify-center gap-1.5 rounded-full bg-brand/10 text-sm font-semibold text-brand transition hover:bg-brand/15 active:scale-[0.99]"
+        >
+          <Plus size={16} />
+          <span>Add to Trip</span>
+        </button>
+        <AddToTripSheet
+          open={tripOpen}
+          onClose={() => setTripOpen(false)}
+          stop={{
+            name: event.title,
+            address: `${event.venue}, ${event.city}`,
+            notes: `${event.date} · ${event.timeLabel}`,
+          }}
+        />
 
         {/* Progressive disclosure — description and logistics wait one tap away */}
         <div className="mt-4 overflow-hidden rounded-2xl bg-card ring-1 ring-line">

@@ -17,6 +17,7 @@ import { cn } from "@/lib/cn";
 import { GuestListPanel } from "@/components/club/GuestListPanel";
 import { AddressFields } from "@/components/forms/AddressFields";
 import { PhoneField } from "@/components/forms/PhoneField";
+import { TradingHoursField } from "@/components/forms/TradingHoursField";
 import {
   addressOk,
   countryByCode,
@@ -362,7 +363,7 @@ export function BusinessPage() {
             {locating ? "Locating…" : geo ? `Pinned ${formatGps(geo.lat, geo.lng)} · update` : "Use current location"}
           </Button>
           <AddressFields value={address} onChange={setAddress} />
-          <input value={hours} onChange={(e) => setHours(e.target.value)} placeholder="Hours" className={fieldInput} />
+          <TradingHoursField value={hours} onChange={setHours} inputClassName={fieldInput} />
           <HostFreshnessBanner
             kind="hours"
             at={mine.hoursVerifiedAt || mine.updatedAt}

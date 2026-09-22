@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type KeyboardEvent } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { Loader2, MapPin, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { fieldInput } from "@/components/forms/ValidField";
@@ -64,17 +64,41 @@ export function PlaceAddressField({
 }) {
   const { here } = useLocalNow();
   const listId = useId();
+  const containerRef = useRef<HTMLLabelElement>(null);
+  const selectedRef = useRef(false);
+
   const [session, setSession] = useState(() => newPlacesSessionToken());
   const [hits, setHits] = useState<GooglePlaceSuggestion[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
   const [active, setActive] = useState(0);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pickedId, setPickedId] = useState<string | null>(null);
 
+  // Close dropdown on click outside
   useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+        setHits([]);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (selectedRef.current) {
+      selectedRef.current = false;
+      setHits([]);
+      setIsOpen(false);
+      return;
+    }
+
     const needle = value.trim();
     if (needle.length < 2) {
       setHits([]);
+      setIsOpen(false);
       return;
     }
     const t = window.setTimeout(() => {
@@ -82,8 +106,11 @@ export function PlaceAddressField({
       setError(null);
       void searchAddressPlaces(needle, session, here)
         .then((rows) => {
-          setHits(rows);
-          setActive(0);
+          if (!selectedRef.current) {
+            setHits(rows);
+            setIsOpen(rows.length > 0);
+            setActive(0);
+          }
         })
         .catch((e) => setError(googleSearchErrorMessage(e)))
         .finally(() => setSearching(false));
@@ -92,11 +119,14 @@ export function PlaceAddressField({
   }, [value, session, here.lat, here.lng]);
 
   async function choose(hit: GooglePlaceSuggestion) {
+    selectedRef.current = true;
     setHits([]);
+    setIsOpen(false);
     setSearching(true);
     try {
       const place = await fetchPlace(hit.placeId, session);
       const label = formatPickedPlace(place);
+      selectedRef.current = true;
       onChange(label);
       onPick?.({
         label,
@@ -110,16 +140,19 @@ export function PlaceAddressField({
       setSession(newPlacesSessionToken());
     } catch (e) {
       const label = [hit.title, hit.subtitle].filter(Boolean).join(", ");
+      selectedRef.current = true;
       onChange(label);
       onPick?.({ label, name: hit.title, address: hit.subtitle, placeId: hit.placeId });
       setError(googleSearchErrorMessage(e));
     } finally {
       setSearching(false);
+      setHits([]);
+      setIsOpen(false);
     }
   }
 
   function onKey(e: KeyboardEvent<HTMLInputElement>) {
-    if (!hits.length) return;
+    if (!hits.length || !isOpen) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setActive((i) => Math.min(i + 1, hits.length - 1));
@@ -133,12 +166,13 @@ export function PlaceAddressField({
         void choose(hit);
       }
     } else if (e.key === "Escape") {
+      setIsOpen(false);
       setHits([]);
     }
   }
 
   return (
-    <label className="block">
+    <label ref={containerRef} className="block relative">
       {label && <span className="text-[13px] font-semibold text-mute">{label}</span>}
       <div className={cn("relative", label && "mt-1")}>
         <MapPin size={16} className="pointer-events-none absolute left-3.5 top-1/2 z-[1] -translate-y-1/2 text-mute" />
@@ -147,11 +181,15 @@ export function PlaceAddressField({
           required={required}
           autoComplete="off"
           role="combobox"
-          aria-expanded={hits.length > 0}
+          aria-expanded={isOpen && hits.length > 0}
           aria-controls={listId}
           aria-autocomplete="list"
           placeholder={placeholder}
+          onFocus={() => {
+            if (hits.length > 0) setIsOpen(true);
+          }}
           onChange={(e) => {
+            selectedRef.current = false;
             setPickedId(null);
             onChange(e.target.value);
           }}
@@ -166,7 +204,9 @@ export function PlaceAddressField({
             aria-label="Clear place"
             className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full text-mute"
             onClick={() => {
+              selectedRef.current = true;
               setHits([]);
+              setIsOpen(false);
               setPickedId(null);
               onChange("");
               onPick?.({ label: "", name: "", address: "" });
@@ -175,7 +215,7 @@ export function PlaceAddressField({
             <X size={14} />
           </button>
         ) : null}
-        {hits.length > 0 && (
+        {isOpen && hits.length > 0 && (
           <ul
             id={listId}
             role="listbox"
@@ -189,8 +229,10 @@ export function PlaceAddressField({
                     "flex w-full flex-col px-3 py-2.5 text-left",
                     i === active ? "bg-brand/10" : "hover:bg-paper",
                   )}
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => void choose(hit)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    void choose(hit);
+                  }}
                 >
                   <span className="text-sm font-semibold text-ink">{hit.title}</span>
                   {hit.subtitle && <span className="text-[12px] text-mute">{hit.subtitle}</span>}

@@ -1,20 +1,32 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Mates Social Planning & Digital Invitations Flow", () => {
-  test("create plan is a short family-and-friends form", async ({ page }) => {
+  test("create plan is a stepped template flow", async ({ page }) => {
     await page.goto("/plan/new");
     await page.waitForLoadState("domcontentloaded");
-    await expect(page.getByRole("heading", { name: /Create a Plan|Plan with family/i })).toBeVisible();
-    const form = page.getByRole("heading", { name: "Create a Plan" });
-    if (await form.isVisible()) {
-      await expect(page.getByRole("button", { name: "Catch up" })).toBeVisible();
-      await expect(page.getByRole("button", { name: "Night out" })).toBeVisible();
-      await expect(page.getByText(/^Photo$/i)).toBeVisible();
-      await expect(page.getByText(/PNG, JPG, or WEBP/i)).toBeVisible();
-      await page.getByPlaceholder(/Friday drinks|Lunch|Hangout/i).fill("Harbour walk");
-      await page.getByRole("button", { name: "Create plan" }).click();
-      await expect(page).toHaveURL(/\/plan\//);
+    const gate = page.getByRole("heading", { name: /Plan with family/i });
+    const stepped = page.getByRole("heading", { name: /What are you planning/i });
+    await expect(gate.or(stepped)).toBeVisible();
+    if (await gate.isVisible().catch(() => false)) {
+      // Unauthenticated: sign-in gate holds the route.
+      await expect(page.getByText(/Sign in/i).first()).toBeVisible();
+      return;
     }
+
+    // Step 0: template cards
+    await expect(page.getByRole("button", { name: /Catch up/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Hangout/i })).toBeVisible();
+    await page.getByRole("button", { name: /Catch up/i }).click();
+
+    // Step 1: details
+    await expect(page.getByRole("heading", { name: /Where & when/i })).toBeVisible();
+    await page.getByPlaceholder(/Friday drinks|Lunch|Hangout/i).fill("Harbour walk");
+    await page.getByRole("button", { name: "Continue" }).click();
+
+    // Step 2: who (skippable) → create
+    await expect(page.getByRole("heading", { name: /Who's in/i })).toBeVisible();
+    await page.getByRole("button", { name: "Create plan" }).click();
+    await expect(page).toHaveURL(/\/plan\//);
   });
 
   test("allows anonymous mates to RSVP and updates guest list", async ({ page }) => {

@@ -28,7 +28,7 @@ test.describe("Global Navigation & Profile Flow", () => {
     await expect(page.getByRole("button", { name: /I’m staying here|I'm staying here/i })).toBeVisible();
     await page.getByRole("button", { name: /See what’s on|See what's on/i }).click();
     await expect(page).toHaveURL("/");
-    await expect(page.getByRole("heading", { level: 1, name: "Around you" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "What's on" })).toBeVisible();
     await expect(page.getByRole("button", { name: /Where are you going/i })).toBeVisible();
   });
 
@@ -103,21 +103,20 @@ test.describe("Global Navigation & Profile Flow", () => {
     const tabNav = page.locator("nav.lg\\:hidden");
     await expect(tabNav).toBeVisible();
 
-    // Navigate to Plan via bottom tab
+    // Shipped companion dock: Home / Explore / Plan / Inbox / Me.
+    await tabNav.getByRole("button", { name: "Explore" }).click();
+    await expect(page).toHaveURL(/\/explore/);
+
     await tabNav.getByRole("button", { name: "Plan" }).click();
     await expect(page).toHaveURL(/\/plan/);
 
-    // Navigate to Stay via bottom tab
-    await tabNav.getByRole("button", { name: "Stay" }).click();
-    await expect(page).toHaveURL(/\/concierge/);
-
-    await tabNav.getByRole("button", { name: /On|What's on|Explore/i }).click();
+    await tabNav.getByRole("button", { name: "Home" }).click();
     await expect(page).toHaveURL("/");
 
-    await tabNav.getByRole("button", { name: /Scan QR|Scan/i }).click();
-    await expect(page).toHaveURL(/\/scan/);
+    await tabNav.getByRole("button", { name: "Inbox" }).click();
+    await expect(page).toHaveURL(/\/me\/inbox/);
 
-    await tabNav.getByRole("button", { name: /My bio/i }).click();
+    await tabNav.getByRole("button", { name: "My bio" }).click();
     await expect(page).toHaveURL(/\/start|\/bio\/setup|\/@|\/me/);
   });
 
