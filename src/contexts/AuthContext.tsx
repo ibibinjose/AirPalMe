@@ -36,6 +36,7 @@ import {
   withAuthUpgrade,
 } from "@/lib/firebase";
 import { clearPendingIntent, savePendingIntent, type PendingIntent } from "@/lib/pending-intent";
+import { clearDeviceCache } from "@/lib/device-cache";
 import {
   completeAccountSignupRemote,
   completeRegistration,
@@ -439,7 +440,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         resetPhoneLogin();
         const auth = getFirebaseAuth();
         if (auth) await signOut(auth);
+        // Never leak the previous account: wipe device user data, then reload
+        // to a truly fresh page (no stale name, avatar, or lists in memory).
+        clearDeviceCache();
         setUser(null);
+        if (typeof window !== "undefined") window.location.assign("/");
       },
       async deleteAccount() {
         const auth = getFirebaseAuth();
@@ -465,7 +470,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           throw err;
         }
         resetPhoneLogin();
+        clearDeviceCache();
         setUser(null);
+        if (typeof window !== "undefined") window.location.assign("/");
       },
       async sendVerificationEmail() {
         await sendAccountVerificationEmail();
