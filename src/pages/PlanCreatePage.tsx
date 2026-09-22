@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 import { useLocation, useSearch } from "wouter";
 import { ArrowLeft, CalendarDays, Ticket, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -67,6 +67,9 @@ export function PlanCreatePage() {
   const [hero, setHero] = useState<string | undefined>();
   const [invite, setInvite] = useState<Set<string>>(() => new Set(targetHandle ? [targetHandle] : []));
   const [busy, setBusy] = useState(false);
+  // Synchronous double-tap guard: state-based `busy` only disables the
+  // button after a re-render, so two rapid taps could create two plans.
+  const submittingRef = useRef(false);
 
   const circle = useMemo(() => {
     const handles = circleHandles({
@@ -109,11 +112,13 @@ export function PlanCreatePage() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (submittingRef.current) return;
     const name = title.trim() || PLAN_TYPES[type]?.defaultTitle || "Hangout";
     if (!date || (today && date < today)) {
       toast.error("Pick a date from today on");
       return;
     }
+    submittingRef.current = true;
     setBusy(true);
     void triggerHaptic("success");
     try {
@@ -135,6 +140,7 @@ export function PlanCreatePage() {
       if (created?.id) nav(`/plan/${created.id}?share=true`);
       else setBusy(false);
     } catch (err) {
+      submittingRef.current = false;
       setBusy(false);
       toast.error(err instanceof Error ? err.message : "Couldn’t create the plan");
     }
