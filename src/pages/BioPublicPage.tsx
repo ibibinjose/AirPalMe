@@ -357,7 +357,7 @@ export function BioPublicPage() {
             <div
               className={cn(
                 "-mt-12 sm:-mt-14 relative z-10 h-24 w-24 sm:h-28 sm:w-28 overflow-hidden rounded-full bg-paper ring-4 transition-all duration-300 shadow-md",
-                statusInfo.ringClass,
+                statusKey === "available" ? "ring-brand" : statusInfo.ringClass,
               )}
             >
               {avatar ? (

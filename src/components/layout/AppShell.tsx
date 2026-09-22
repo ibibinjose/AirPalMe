@@ -19,7 +19,6 @@ import { ProfileMenu } from "@/components/auth/ProfileMenu";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 import { TicketAlertBar } from "@/components/host/TicketAlertBar";
-import { CreateFab } from "@/components/design-system/CreateFab";
 import { NotificationPopup } from "@/components/notifications/NotificationPopup";
 import { PresencePublisher } from "@/components/layout/PresencePublisher";
 import { cn } from "@/lib/cn";
@@ -31,7 +30,7 @@ import { SiteFooter } from "./SiteFooter";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useDataReload } from "@/hooks/useDataReload";
 import { PullToRefreshContainer } from "./PullToRefreshContainer";
-import { useLocalNow } from "@/hooks/useLocalNow";
+
 
 const WORKSPACE = [
   /^\/host/,
@@ -67,9 +66,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   // rendering the tab bar too would stack two fixed bars on mobile.
   // (/plan/new keeps the tab bar: it has no action bar of its own.)
   const isPlanDetail = (path.startsWith("/plan/") && path !== "/plan/new") || path.startsWith("/invite/");
-  // Focused detail flows own the bottom slot with their own sticky action —
-  // the global + Create stays one tap away on Home/Explore instead.
-  const isDetail = /^\/(e|p|tour|q|g|w)\//.test(path);
   const showFooter = !isNativeApp() && shouldShowFooter(path);
   const bare = Boolean(parseAtHandle(path));
   const reduce = useReducedMotion();
@@ -89,8 +85,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         transition: { duration: 0.55, ease: enterEase, delay: 0.12 },
       }
     : {};
-
-  const { day } = useLocalNow();
 
   return (
     <div className="flex min-h-[var(--visual-viewport-height,100dvh)] flex-col bg-paper">
@@ -116,9 +110,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                     <Link href="/" className="flex items-center min-w-0">
                       <BrandMark compact={false} />
                     </Link>
-                    <span className="text-[12px] font-semibold text-mute font-display">
-                      {day}
-                    </span>
                   </div>
                   <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <button
@@ -167,9 +158,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                     <Link href="/" className="flex items-center min-w-0" aria-label="AirPal Home">
                       <BrandMark compact={false} />
                     </Link>
-                    <span className="text-[12px] font-semibold text-mute font-display">
-                      {day}
-                    </span>
                   </div>
                   <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <button
@@ -198,7 +186,6 @@ export function AppShell({ children }: { children: ReactNode }) {
             </PullToRefreshContainer>
           </main>
           {!workspace && !isPlanDetail && <TabBar path={path} enter={play} />}
-          {!workspace && !isPlanDetail && !bare && !isDetail && <CreateFab />}
           <PresencePublisher />
           <GuestStayTools />
           <GlobalSearchModal />

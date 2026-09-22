@@ -48,7 +48,7 @@ import { NotFoundPage } from "./NotFoundPage";
 import { localTodayStr, shouldAutoOpenInviteRsvp } from "@/lib/plan-invite";
 import { trackContentAction } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
-import { SegmentedControl, StickyAction } from "@/components/design-system/companions";
+import { SegmentedControl } from "@/components/design-system/companions";
 import { CityMap, type MapPin } from "@/components/map/CityMap";
 import { knownCityCenter } from "@/lib/cities";
 
@@ -274,6 +274,7 @@ export function PlanDetailPage() {
         userStatus={userAttendee?.status}
         onOpenRsvp={() => setRsvpOpen(true)}
         onOpenQr={() => setQrModalOpen(true)}
+        onOpenBooking={() => setBookingOpen(true)}
       />
 
       {/* Host Controls: Privacy toggle */}
@@ -324,6 +325,9 @@ export function PlanDetailPage() {
       {detailTab === "overview" && (
         <>
 
+      {/* RSVP Status — hidden for ticketed experiences: booking IS the RSVP */}
+      {!ticketed && (
+      <>
       {/* RSVP Status Highlight Strip */}
       <div className="mt-6 rounded-3xl bg-card p-4 sm:p-5 ring-1 ring-line shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -403,6 +407,9 @@ export function PlanDetailPage() {
           )}
         </div>
       </div>
+
+      </>
+      )}
 
       <HereCheckIn placeName={plan.destination} planId={plan.id} />
 
@@ -840,60 +847,6 @@ export function PlanDetailPage() {
           </button>
         </div>
       )}
-
-      {/* Sticky Mobile Bottom Action — one primary, thumb-reachable */}
-      <div className="sm:hidden">
-        <StickyAction
-          primary={
-            ticketed ? (
-              <button
-                type="button"
-                onClick={() => setBookingOpen(true)}
-                disabled={soldOut}
-                className="flex h-12 w-full cursor-pointer touch-manipulation items-center justify-center gap-2 rounded-full bg-ink text-[15px] font-semibold text-white transition active:scale-[0.99] disabled:opacity-50"
-              >
-                <CreditCard size={16} />
-                <span>
-                  {soldOut
-                    ? "Sold out"
-                    : plan.pricingModel === "deposit" && plan.depositConfig
-                      ? `Reserve $${plan.depositConfig.depositAmount}`
-                      : `Buy $${plan.pricePerPerson || 0}`}
-                </span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setRsvpOpen(true)}
-                aria-label={userAttendee?.status === "going" ? "Going" : "RSVP Now"}
-                className="flex h-12 w-full cursor-pointer touch-manipulation items-center justify-center gap-2 rounded-full bg-brand text-[15px] font-semibold text-white shadow-[0_6px_20px_rgba(24,5,219,0.35)] transition active:scale-[0.99]"
-              >
-                {userAttendee?.status === "going" ? (
-                  <>
-                    <CheckCircle2 size={16} />
-                    <span>Going ✓</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles size={16} />
-                    <span>RSVP</span>
-                  </>
-                )}
-              </button>
-            )
-          }
-          secondary={
-            <button
-              type="button"
-              onClick={() => setShareOpen(true)}
-              aria-label="Share plan link"
-              className="grid h-12 w-12 shrink-0 cursor-pointer touch-manipulation place-items-center rounded-full bg-card text-mute ring-1 ring-line transition hover:text-ink active:scale-95"
-            >
-              <Share2 size={16} />
-            </button>
-          }
-        />
-      </div>
 
       {/* Modals */}
       <PlanShareModal plan={plan} open={shareOpen} onClose={() => setShareOpen(false)} />

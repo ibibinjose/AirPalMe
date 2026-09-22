@@ -25,7 +25,7 @@ export function SettingsPage() {
 
       {user ? (
         <div className="mt-5 flex items-center gap-3 rounded-2xl bg-card px-4 py-3 ring-1 ring-line">
-          <MeAvatar faceClassName="h-14 w-14 text-lg" statusClass="h-3 w-3" />
+          <MeAvatar faceClassName="h-14 w-14 text-lg" />
           <div className="min-w-0">
             <p className="truncate font-medium">{user.displayName || "Account"}</p>
             <p className="truncate text-sm text-mute">{user.displayName ? "Signed in" : "Account"}</p>

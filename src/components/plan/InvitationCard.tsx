@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { Calendar, MapPin, Sparkles, CheckCircle2, QrCode } from "lucide-react";
-import { type HangoutPlan, PLAN_THEMES, PLAN_TYPES, formatPlanDate } from "@shared/plan";
+import { Calendar, CreditCard, MapPin, Sparkles, CheckCircle2, QrCode } from "lucide-react";
+import { type HangoutPlan, PLAN_THEMES, PLAN_TYPES, formatPlanDate, isTicketed, isSoldOut } from "@shared/plan";
 import { PLAN_TYPE_ICONS } from "./planTypeIcons";
 import { PlanQrModal } from "./PlanQrModal";
 import { triggerHaptic } from "@/lib/native";
@@ -12,11 +12,13 @@ export function InvitationCard({
   userStatus,
   onOpenRsvp,
   onOpenQr,
+  onOpenBooking,
 }: {
   plan: HangoutPlan;
   userStatus?: "going" | "maybe" | "declined" | null;
   onOpenRsvp?: () => void;
   onOpenQr?: () => void;
+  onOpenBooking?: () => void;
 }) {
   const theme = PLAN_THEMES[plan.theme] || PLAN_THEMES.gold;
   const typeInfo = PLAN_TYPES[plan.type] || PLAN_TYPES.custom;
@@ -80,7 +82,7 @@ export function InvitationCard({
 
         {/* Header Cover Photo if set */}
         {plan.heroImage ? (
-          <div className="relative -mx-6 -mt-6 md:-mx-8 md:-mt-8 mb-5 h-44 sm:h-52 w-[calc(100%+3rem)] md:w-[calc(100%+4rem)] overflow-hidden">
+          <div className="relative -mx-6 -mt-6 md:-mx-8 md:-mt-8 mb-5 aspect-square max-h-[560px] w-[calc(100%+3rem)] md:w-[calc(100%+4rem)] overflow-hidden">
             <img src={plan.heroImage} alt={plan.title} className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-black/40 to-transparent" />
             <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2">
@@ -279,9 +281,26 @@ export function InvitationCard({
                 ) : (
                   <>
                     <Sparkles size={14} />
-                    <span>RSVP to this Plan</span>
+                    <span>RSVP</span>
                   </>
                 )}
+              </button>
+            )}
+            {onOpenBooking && isTicketed(plan) && (
+              <button
+                type="button"
+                onClick={onOpenBooking}
+                disabled={isSoldOut(plan)}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-2.5 text-xs font-semibold text-white shadow-md transition active:scale-95 disabled:opacity-50"
+              >
+                <CreditCard size={14} />
+                <span>
+                  {isSoldOut(plan)
+                    ? "Sold out"
+                    : plan.pricingModel === "deposit" && plan.depositConfig
+                      ? `Reserve $${plan.depositConfig.depositAmount}`
+                      : `Buy $${plan.pricePerPerson || 0}`}
+                </span>
               </button>
             )}
           </div>

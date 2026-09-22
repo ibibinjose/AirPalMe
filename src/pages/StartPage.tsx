@@ -387,7 +387,7 @@ export function StartPage() {
       <div className="mx-auto max-w-md px-4 py-10">
         <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-sm text-center">
           <div className="mx-auto flex justify-center">
-            <MeAvatar faceClassName="h-16 w-16 text-xl" statusClass="h-4 w-4" />
+            <MeAvatar faceClassName="h-16 w-16 text-xl" />
           </div>
           <h1 className="font-display mt-4 text-2xl font-semibold">{user.displayName || "Your Account"}</h1>
           <p className="text-sm text-mute">{user.email || user.phone || "Signed in"}</p>

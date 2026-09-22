@@ -145,8 +145,8 @@ export function ProfileMenu() {
     <>
       <div className="px-2.5 pb-2 pt-1.5">
         <div className="flex items-center gap-3">
-          <span className={cn("rounded-full ring-2 ring-offset-2 ring-offset-card shadow-none", statusInfo.ringClass)}>
-            <AvatarFace className="h-11 w-11 shrink-0 text-base" showStatusDot={false} />
+          <span className="rounded-full ring-2 ring-brand ring-offset-2 ring-offset-card shadow-none">
+            <AvatarFace className="h-11 w-11 shrink-0 text-base" />
           </span>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold">{user.displayName || mine?.name || "Account"}</p>
@@ -357,7 +357,7 @@ export function ProfileMenu() {
           !open && !user && "ring-1 ring-line hover:ring-brand/50",
         )}
       >
-        <AvatarFace className="h-9 w-9 text-xs sm:h-10 sm:w-10" showStatusDot={false} />
+        <AvatarFace className="h-9 w-9 text-xs sm:h-10 sm:w-10" />
       </button>
       {open && (
         <>

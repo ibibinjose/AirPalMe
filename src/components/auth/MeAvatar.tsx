@@ -9,16 +9,7 @@ import { AVAILABILITY_STATUSES, type AvailabilityStatus } from "@shared/bio";
 /** Nav buttons are h-9 / lg:h-10 — keep the avatar on that same height. */
 export const NAV_AVATAR = "h-10 w-10 text-sm lg:text-base";
 
-export function AvatarFace({
-  className,
-  statusClass,
-  showStatusDot = true,
-}: {
-  className?: string;
-  statusClass?: string;
-  /** Corner status pip. Hide on the nav trigger — the ring carries status there. */
-  showStatusDot?: boolean;
-}) {
+export function AvatarFace({ className }: { className?: string }) {
   const { user } = useAuth();
   const { mine } = useBio();
   const raw = mine?.avatar || user?.photoURL;
@@ -27,11 +18,23 @@ export function AvatarFace({
 
   const statusKey: AvailabilityStatus =
     mine?.availabilityStatus || (mine?.openNow ? "available" : user ? "available" : "offline");
-  const statusInfo = AVAILABILITY_STATUSES[statusKey];
+  // Status lives in the AirPal ring only — no corner dots. Available carries
+  // the AirPal Blue ring; busy/dnd keep their red rings; offline is neutral.
+  const ring =
+    statusKey === "available"
+      ? "ring-2 ring-brand"
+      : statusKey === "offline"
+        ? "ring-1 ring-line"
+        : AVAILABILITY_STATUSES[statusKey]?.ringClass || "ring-1 ring-line";
 
   return (
     <span className={cn("relative inline-grid shrink-0 overflow-visible", className || NAV_AVATAR)}>
-      <span className="absolute inset-0 grid place-items-center overflow-hidden rounded-full bg-ink font-semibold leading-none text-white ring-1 ring-line">
+      <span
+        className={cn(
+          "absolute inset-0 grid place-items-center overflow-hidden rounded-full bg-ink font-semibold leading-none text-white",
+          ring,
+        )}
+      >
         {src ? (
           <img src={src} alt="" className="h-full w-full object-cover" />
         ) : user ? (
@@ -40,16 +43,6 @@ export function AvatarFace({
           <UserRound className="h-[48%] w-[48%]" strokeWidth={1.8} />
         )}
       </span>
-      {showStatusDot && (
-        <span
-          aria-hidden
-          className={cn(
-            "pointer-events-none absolute right-0 bottom-0 z-10 translate-x-1/2 translate-y-1/2 rounded-full ring-2 ring-paper shadow-xs",
-            statusInfo?.dotColor || (user ? "bg-emerald-500" : "bg-mute"),
-            statusClass || "h-2.5 w-2.5",
-          )}
-        />
-      )}
     </span>
   );
 }
@@ -57,12 +50,10 @@ export function AvatarFace({
 export function MeAvatar({
   className,
   faceClassName,
-  statusClass,
   labeled = false,
 }: {
   className?: string;
   faceClassName?: string;
-  statusClass?: string;
   labeled?: boolean;
 }) {
   const { user } = useAuth();
@@ -72,7 +63,7 @@ export function MeAvatar({
       className={cn("inline-flex items-center gap-2", className)}
       title={user ? user.displayName || user.email : "Sign in"}
     >
-      <AvatarFace className={faceClassName} statusClass={statusClass} />
+      <AvatarFace className={faceClassName} />
       {labeled && <span className="text-sm font-medium">{label}</span>}
     </span>
   );
