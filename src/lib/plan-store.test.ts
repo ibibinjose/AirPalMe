@@ -6,6 +6,7 @@ import {
   deletePlan,
   getPlan,
   listStopNotifications,
+  loadPlans,
   notifyStopChange,
   removeStopFromPlan,
   reorderStopsInPlan,
@@ -44,6 +45,14 @@ describe("plan store", () => {
     expect(getPlan(plan.id)?.id).toBe(plan.id);
     expect(getPlan(plan.inviteCode)?.id).toBe(plan.id);
     expect(getPlan("nope")).toBeUndefined();
+  });
+
+  it("saving the same plan twice does not duplicate it", () => {
+    const base = fixture();
+    const before = loadPlans().length;
+    savePlan({ ...base, title: "Same plan again" });
+    expect(loadPlans().length).toBe(before);
+    expect(getPlan(base.id)?.title).toBe("Same plan again");
   });
 
   it("upserts an RSVP instead of duplicating the mate", () => {
