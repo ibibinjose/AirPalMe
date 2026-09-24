@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "wouter";
 import { Calendar, CreditCard, MapPin, Sparkles, CheckCircle2, QrCode } from "lucide-react";
 import { type HangoutPlan, PLAN_THEMES, PLAN_TYPES, formatPlanDate, isTicketed, isSoldOut } from "@shared/plan";
 import { PLAN_TYPE_ICONS } from "./planTypeIcons";
@@ -151,24 +152,34 @@ export function InvitationCard({
 
         {/* Title & Host */}
         <div className="mt-5">
-          <p
+          <div
             className={cn(
               "flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-[0.16em]",
               theme.onThemeMutedClass,
             )}
           >
-            <span>
-              Invitation from {plan.creator.name}
-              {plan.creator.handle ? ` (@${plan.creator.handle})` : ""}
-            </span>
+            <span>Invitation from</span>
+            {plan.creator.handle ? (
+              <Link
+                href={`/@${plan.creator.handle}`}
+                className={cn(
+                  "font-bold underline decoration-white/30 underline-offset-2 hover:decoration-white transition",
+                  theme.onThemeClass,
+                )}
+              >
+                {plan.creator.name} (@{plan.creator.handle})
+              </Link>
+            ) : (
+              <strong className={cn("font-bold", theme.onThemeClass)}>{plan.creator.name}</strong>
+            )}
             {theme.id === "holographic" && (
               <span className="inline-flex items-center gap-1 rounded-full bg-black/40 px-2.5 py-0.5 text-[10px] font-bold tracking-[0.2em] text-white ring-1 ring-white/40">
                 <Sparkles size={11} />
                 VIP
               </span>
             )}
-          </p>
-          <h1 className="font-display mt-1 text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">{plan.title}</h1>
+          </div>
+          <h1 className="font-display mt-1.5 text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">{plan.title}</h1>
           {plan.notes && (
             <p className={cn("mt-2.5 text-xs sm:text-sm leading-relaxed max-w-xl", theme.onThemeMutedClass)}>
               {plan.notes}

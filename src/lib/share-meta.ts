@@ -118,9 +118,20 @@ export function applyRouteMeta(pathname: string) {
   setShareMeta({ ...meta, url: toPublicUrl(meta.path) });
 }
 
-export function setShareMeta(input: { title: string; description: string; image?: string; url?: string }) {
+export function setShareMeta(input: {
+  title: string;
+  description: string;
+  image?: string;
+  url?: string;
+  type?: "website" | "profile" | "event" | "article";
+  imageWidth?: number;
+  imageHeight?: number;
+  imageAlt?: string;
+  jsonLd?: Record<string, unknown>;
+}) {
   if (typeof document === "undefined") return;
   document.title = input.title;
+
   const set = (key: string, value: string, prop = "property") => {
     let tag = document.head.querySelector(`meta[${prop}="${key}"]`);
     if (!tag) {
@@ -130,17 +141,34 @@ export function setShareMeta(input: { title: string; description: string; image?
     }
     tag.setAttribute("content", value);
   };
+
+  set("og:site_name", "AirPal.Me");
+  set("og:locale", "en_AU");
+  set("og:type", input.type || "website");
   set("og:title", input.title);
   set("og:description", input.description);
   set("description", input.description, "name");
+
   set("twitter:card", "summary_large_image", "name");
+  set("twitter:site", "@airpalme", "name");
+  set("twitter:creator", "@airpalme", "name");
   set("twitter:title", input.title, "name");
   set("twitter:description", input.description, "name");
+
   if (input.image) {
-    const image = input.image.startsWith("http") ? input.image : toPublicUrl(input.image);
-    set("og:image", image);
-    set("twitter:image", image, "name");
+    const rawImage = input.image.startsWith("idb:") ? undefined : input.image;
+    if (rawImage) {
+      const image = rawImage.startsWith("http") ? rawImage : toPublicUrl(rawImage);
+      set("og:image", image);
+      set("og:image:secure_url", image);
+      set("og:image:width", String(input.imageWidth || 1200));
+      set("og:image:height", String(input.imageHeight || 630));
+      set("og:image:alt", input.imageAlt || input.title);
+      set("twitter:image", image, "name");
+      set("twitter:image:alt", input.imageAlt || input.title, "name");
+    }
   }
+
   if (input.url) {
     const canonicalUrl = toPublicUrl(input.url);
     set("og:url", canonicalUrl);
@@ -151,5 +179,16 @@ export function setShareMeta(input: { title: string; description: string; image?
       document.head.appendChild(canonical);
     }
     canonical.setAttribute("href", canonicalUrl);
+  }
+
+  if (input.jsonLd) {
+    let script = document.head.querySelector('script[id="dynamic-page-jsonld"]');
+    if (!script) {
+      script = document.createElement("script");
+      script.setAttribute("type", "application/ld+json");
+      script.setAttribute("id", "dynamic-page-jsonld");
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(input.jsonLd);
   }
 }

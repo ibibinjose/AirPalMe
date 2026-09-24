@@ -56,6 +56,7 @@ import { SegmentedControl } from "@/components/design-system/companions";
 import { CityMap, type MapPin } from "@/components/map/CityMap";
 import { knownCityCenter } from "@/lib/cities";
 import { evaluatePlanHealth } from "@/lib/brain";
+import { triggerHaptic } from "@/lib/native";
 
 export function PlanDetailPage() {
   const [, paramsPlan] = useRoute("/plan/:id");
@@ -105,12 +106,42 @@ export function PlanDetailPage() {
   useEffect(() => {
     if (!plan) return;
     const where = plan.destination || plan.city || "Sydney";
+    let shareImg = plan.heroImage;
+    if (shareImg && shareImg.startsWith("idb:")) {
+      shareImg = undefined;
+    }
+    if (!shareImg) {
+      shareImg = "https://airpal.me/brand/og-share.jpg";
+    }
+    const whenStr = plan.date ? ` on ${plan.date}${plan.time ? ` at ${plan.time}` : ""}` : "";
+    const description =
+      `${plan.title} in ${where}${whenStr} — ${plan.notes || "Join the hangout on AirPal.Me. Life Made Easy."}`.slice(0, 160);
+
     setShareMeta({
-      title: `${plan.title} · AirPal`,
-      description:
-        `${plan.title} in ${where}${plan.date ? ` on ${plan.date}` : ""} — join the plan on AirPal.Me.`.slice(0, 160),
-      image: plan.heroImage || undefined,
+      title: `${plan.title} · AirPal.Me`,
+      description,
+      image: shareImg,
       url: toPublicUrl(`/plan/${plan.id}`),
+      type: "event",
+      imageAlt: `${plan.title} on AirPal.Me`,
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "Event",
+        name: plan.title,
+        description: plan.notes || description,
+        startDate: plan.date ? `${plan.date}T${plan.time || "12:00"}:00` : undefined,
+        location: {
+          "@type": "Place",
+          name: where,
+          address: plan.destination || where,
+        },
+        image: shareImg ? (shareImg.startsWith("http") ? shareImg : toPublicUrl(shareImg)) : undefined,
+        organizer: {
+          "@type": "Person",
+          name: plan.creator.name,
+          url: plan.creator.handle ? toPublicUrl(`/@${plan.creator.handle}`) : undefined,
+        },
+      },
     });
   }, [plan]);
 
@@ -401,12 +432,15 @@ export function PlanDetailPage() {
         <SegmentedControl
           label="Plan sections"
           value={detailTab}
-          onChange={setDetailTab}
+          onChange={(tab) => {
+            void triggerHaptic("light");
+            setDetailTab(tab);
+          }}
           options={[
             { id: "overview", label: "Overview" },
-            { id: "plan", label: "Plan" },
-            { id: "map", label: "Map" },
-            { id: "people", label: "People" },
+            { id: "plan", label: `Plan (${plan.stops.length})` },
+            { id: "map", label: `Map (${stopPins.length})` },
+            { id: "people", label: `People (${goingAttendees.length})` },
           ]}
         />
       </div>
@@ -418,40 +452,104 @@ export function PlanDetailPage() {
       {!ticketed && (
       <>
       {/* RSVP Status Highlight Strip */}
-      <div className="mt-6 rounded-3xl bg-card p-4 sm:p-5 ring-1 ring-line shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+      <div className="mt-6 rounded-3xl bg-card p-4 sm:p-5 ring-1 ring-line shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
           <span
             className={cn(
-              "grid h-11 w-11 place-items-center rounded-2xl",
+              "grid h-12 w-12 shrink-0 place-items-center rounded-2xl shadow-2xs",
               userAttendee?.status === "going"
-                ? "bg-emerald-500/10 text-emerald-600"
+                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30"
                 : userAttendee?.status === "maybe"
-                  ? "bg-amber-500/10 text-amber-600"
-                  : "bg-paper text-mute",
+                  ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 ring-1 ring-amber-500/30"
+                  : "bg-paper text-mute ring-1 ring-line",
             )}
           >
             {userAttendee?.status === "going" ? (
-              <CheckCircle2 size={22} />
+              <CheckCircle2 size={24} />
             ) : userAttendee?.status === "maybe" ? (
-              <HelpCircle size={22} />
+              <HelpCircle size={24} />
             ) : (
-              <Mail size={22} />
+              <Mail size={24} />
             )}
           </span>
           <div>
-            <p className="text-xs text-mute font-medium">Your RSVP Status</p>
-            <p className="text-sm font-semibold text-ink">
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-mute font-bold uppercase tracking-wider">Your RSVP</p>
+              <span
+                className={cn(
+                  "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+                  userAttendee?.status === "going"
+                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                    : userAttendee?.status === "maybe"
+                      ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
+                      : "bg-paper text-mute ring-1 ring-line",
+                )}
+              >
+                {userAttendee?.status === "going"
+                  ? "Attending"
+                  : userAttendee?.status === "maybe"
+                    ? "Tentative"
+                    : "Not Responded"}
+              </span>
+            </div>
+            <p className="text-sm sm:text-base font-bold text-ink mt-0.5">
               {userAttendee?.status === "going"
-                ? "You're in"
+                ? "You're in for this hangout!"
                 : userAttendee?.status === "maybe"
-                  ? "Maybe"
-                  : "Not responded yet"}
+                  ? "You marked yourself as maybe."
+                  : "Are you coming along?"}
             </p>
             {userAttendee?.notes && <p className="text-xs text-mute italic mt-0.5">"{userAttendee.notes}"</p>}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* 1-Tap Quick RSVP Actions */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => {
+              void triggerHaptic("success");
+              rsvpPlan(plan.id, "going", user?.displayName || "You");
+              toast.success("You're in! RSVP set to Going 🎉");
+            }}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
+              userAttendee?.status === "going"
+                ? "bg-emerald-500 text-white shadow-xs"
+                : "bg-paper text-ink/80 hover:bg-emerald-500/10 hover:text-emerald-600 ring-1 ring-line",
+            )}
+          >
+            <CheckCircle2 size={14} />
+            <span>Going</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              void triggerHaptic("light");
+              rsvpPlan(plan.id, "maybe", user?.displayName || "You");
+              toast.success("RSVP updated to Maybe");
+            }}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
+              userAttendee?.status === "maybe"
+                ? "bg-amber-500 text-white shadow-xs"
+                : "bg-paper text-ink/80 hover:bg-amber-500/10 hover:text-amber-600 ring-1 ring-line",
+            )}
+          >
+            <HelpCircle size={14} />
+            <span>Maybe</span>
+          </button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setRsvpOpen(true)}
+            className="rounded-full h-8 px-3 text-xs font-semibold ring-1 ring-line text-mute hover:text-ink"
+          >
+            Add Note
+          </Button>
+
           <AddToCalendarMenu
             event={{
               id: plan.id,
@@ -465,35 +563,6 @@ export function PlanDetailPage() {
             size="sm"
             label="Sync Calendar"
           />
-
-          {ticketed && (
-            <Button
-              size="sm"
-              disabled={soldOut}
-              onClick={() => setBookingOpen(true)}
-              className="rounded-full shrink-0 gap-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md hover:from-amber-600 hover:to-amber-700"
-            >
-              <CreditCard size={14} />
-              <span>
-                {soldOut
-                  ? "Sold out"
-                  : plan.pricingModel === "deposit" && plan.depositConfig
-                    ? `Reserve • $${plan.depositConfig.depositAmount}`
-                    : `Buy ticket • $${plan.pricePerPerson || 0}`}
-              </span>
-            </Button>
-          )}
-
-          {!ticketed && (
-            <Button
-              variant={userAttendee ? "ghost" : "primary"}
-              size="sm"
-              onClick={() => setRsvpOpen(true)}
-              className="rounded-full shrink-0"
-            >
-              {userAttendee ? "Change RSVP" : "RSVP (Free)"}
-            </Button>
-          )}
         </div>
       </div>
 

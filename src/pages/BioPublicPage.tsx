@@ -208,11 +208,40 @@ export function BioPublicPage() {
     if (viewed.current === profile.handle) return;
     viewed.current = profile.handle;
     recordTap(profile.handle, "view");
+
+    let shareImg = profile.cover || profile.avatar;
+    if (shareImg && shareImg.startsWith("idb:")) {
+      shareImg = undefined;
+    }
+    if (!shareImg) {
+      shareImg = "https://airpal.me/brand/og-share.jpg";
+    }
+
+    const bioDescription =
+      profile.shortWhy ||
+      profile.offer?.detail ||
+      profile.customStatus ||
+      `Connect with ${profile.name} (@${profile.handle}) on AirPal.Me — Life Made Easy.`;
+
     setShareMeta({
       title: `${profile.name} (@${profile.handle}) · AirPal.Me`,
-      description: profile.shortWhy || profile.offer?.detail || "On AirPal.Me",
-      image: profile.cover || profile.avatar,
+      description: bioDescription.slice(0, 160),
+      image: shareImg,
       url: toPublicUrl(bioPath(profile.handle)),
+      type: "profile",
+      imageAlt: `${profile.name} on AirPal.Me`,
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        mainEntity: {
+          "@type": "Person",
+          name: profile.name,
+          alternateName: `@${profile.handle}`,
+          description: bioDescription,
+          image: shareImg ? (shareImg.startsWith("http") ? shareImg : toPublicUrl(shareImg)) : undefined,
+          url: toPublicUrl(bioPath(profile.handle)),
+        },
+      },
     });
   }, [profile, recordTap]);
 

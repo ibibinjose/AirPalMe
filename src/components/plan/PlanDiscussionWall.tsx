@@ -1,8 +1,12 @@
-import { useMemo, useState } from "react";
-import { Car, MapPin, MessageSquare, Send, Sparkles, Ticket, Camera, Image as ImageIcon } from "lucide-react";
+import { useMemo, useState, useRef } from "react";
+import { Car, MapPin, MessageSquare, Send, Sparkles, Ticket, Camera, Image as ImageIcon, Link2, Loader2, X } from "lucide-react";
 import type { HangoutPlan } from "@shared/plan";
 import { Button } from "@/components/ui/Button";
+import { Photo } from "@/components/ui/Photo";
 import { useAuth } from "@/contexts/AuthContext";
+import { readFileAsImage, storeMedia } from "@/lib/image-store";
+import { triggerHaptic } from "@/lib/native";
+import { toast } from "sonner";
 import { cn } from "@/lib/cn";
 
 const TOPICS = [
@@ -27,8 +31,10 @@ export function PlanDiscussionWall({
   const { user } = useAuth();
   const [text, setText] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
-  const [showPhotoInput, setShowPhotoInput] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [filter, setFilter] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const comments = plan.comments || [];
   const visible = useMemo(
@@ -43,14 +49,58 @@ export function PlanDiscussionWall({
     });
   }
 
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPhoto(true);
+    void triggerHaptic("light");
+    try {
+      const { image, url } = await readFileAsImage(file);
+      const canvas = document.createElement("canvas");
+      const maxEdge = 1200;
+      let { width, height } = image;
+      if (width > maxEdge || height > maxEdge) {
+        if (width > height) {
+          height = Math.round((height * maxEdge) / width);
+          width = maxEdge;
+        } else {
+          width = Math.round((width * maxEdge) / height);
+          height = maxEdge;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Could not process image");
+      ctx.drawImage(image, 0, 0, width, height);
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob(
+          (b) => (b ? resolve(b) : reject(new Error("Could not encode image"))),
+          "image/jpeg",
+          0.88,
+        );
+      });
+      const src = await storeMedia(blob, { folder: "memories", kind: "comment" });
+      setPhotoUrl(src);
+      URL.revokeObjectURL(url);
+      void triggerHaptic("success");
+      toast.success("Photo attached to message!");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload photo");
+    } finally {
+      setUploadingPhoto(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim()) return;
-    // addComment toasts on success and returns undefined when login-gated.
     if (!onPostComment(text.trim(), photoUrl.trim() || undefined)) return;
+    void triggerHaptic("success");
     setText("");
     setPhotoUrl("");
-    setShowPhotoInput(false);
+    setShowUrlInput(false);
   };
 
   return (
@@ -79,6 +129,7 @@ export function PlanDiscussionWall({
               key={t.id}
               type="button"
               onClick={() => {
+                void triggerHaptic("light");
                 setFilter(on ? null : t.id);
                 if (!on) pickTopic(t.id);
               }}
@@ -154,8 +205,8 @@ export function PlanDiscussionWall({
                     {comment.text}
                   </p>
                   {comment.photoUrl && (
-                    <div className="mt-2.5 aspect-square w-full max-w-[240px] overflow-hidden rounded-2xl ring-1 ring-line">
-                      <img
+                    <div className="mt-2.5 aspect-video w-full max-w-[280px] overflow-hidden rounded-2xl ring-1 ring-line shadow-xs">
+                      <Photo
                         src={comment.photoUrl}
                         alt="Drop from crew"
                         className="h-full w-full object-cover"
@@ -171,25 +222,67 @@ export function PlanDiscussionWall({
 
       {/* Post Message Input Form */}
       <form onSubmit={handleSubmit} className="mt-5 border-t border-line/60 pt-4 space-y-2.5">
-        {showPhotoInput && (
-          <div className="flex items-center gap-2 rounded-2xl bg-paper px-3 py-1.5 ring-1 ring-line">
-            <ImageIcon size={14} className="text-mute shrink-0" />
+        {/* Hidden direct file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          aria-label="Upload photo from device"
+          className="hidden"
+          onChange={(e) => void handleFileSelect(e)}
+        />
+
+        {/* Photo Attachment Thumbnail Preview */}
+        {(photoUrl || uploadingPhoto) && (
+          <div className="flex items-center gap-3 rounded-2xl bg-paper p-2.5 ring-1 ring-line">
+            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl ring-1 ring-line bg-card">
+              {uploadingPhoto ? (
+                <div className="flex h-full w-full items-center justify-center text-brand">
+                  <Loader2 size={18} className="animate-spin" />
+                </div>
+              ) : (
+                <Photo src={photoUrl} alt="Attached preview" className="h-full w-full object-cover" />
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold text-ink truncate">
+                {uploadingPhoto ? "Optimizing & attaching photo..." : "Photo attached"}
+              </p>
+              <p className="text-[11px] text-mute">Will be shared with your message</p>
+            </div>
+            {!uploadingPhoto && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPhotoUrl("");
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
+                className="grid h-7 w-7 place-items-center rounded-full bg-card ring-1 ring-line text-mute hover:text-red-500 transition cursor-pointer"
+                title="Remove photo"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Optional URL input fallback */}
+        {showUrlInput && (
+          <div className="flex items-center gap-2 rounded-2xl bg-paper px-3 py-2 ring-1 ring-line">
+            <Link2 size={14} className="text-mute shrink-0" />
             <input
               type="url"
               value={photoUrl}
               onChange={(e) => setPhotoUrl(e.target.value)}
-              placeholder="Paste image URL (https://...)"
+              placeholder="Or paste web image link (https://...)"
               className="w-full bg-transparent text-xs text-ink outline-none"
             />
             <button
               type="button"
-              onClick={() => {
-                setPhotoUrl("");
-                setShowPhotoInput(false);
-              }}
-              className="text-[11px] text-mute hover:text-red-500"
+              onClick={() => setShowUrlInput(false)}
+              className="text-[11px] font-medium text-mute hover:text-red-500"
             >
-              Cancel
+              Close
             </button>
           </div>
         )}
@@ -203,18 +296,40 @@ export function PlanDiscussionWall({
             placeholder="Post a message, meeting spot update, or photo..."
             className="h-11 flex-1 rounded-2xl bg-paper px-4 text-xs sm:text-sm border border-line outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
           />
+
+          {/* Direct File Picker Button */}
           <button
             type="button"
-            onClick={() => setShowPhotoInput((v) => !v)}
-            title="Attach photo"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploadingPhoto}
+            title="Upload photo from device or take picture"
             className={cn(
-              "grid h-11 w-11 shrink-0 place-items-center rounded-2xl transition ring-1",
-              showPhotoInput ? "bg-brand text-white ring-brand" : "bg-paper text-mute ring-line hover:text-ink",
+              "grid h-11 w-11 shrink-0 place-items-center rounded-2xl transition ring-1 cursor-pointer",
+              photoUrl ? "bg-emerald-500/15 text-emerald-600 ring-emerald-500/30" : "bg-paper text-mute ring-line hover:text-ink",
+            )}
+          >
+            {uploadingPhoto ? <Loader2 size={17} className="animate-spin text-brand" /> : <Camera size={17} />}
+          </button>
+
+          {/* Optional Paste URL Toggle */}
+          <button
+            type="button"
+            onClick={() => setShowUrlInput((v) => !v)}
+            title="Paste image URL"
+            className={cn(
+              "hidden sm:grid h-11 w-11 shrink-0 place-items-center rounded-2xl transition ring-1 cursor-pointer",
+              showUrlInput ? "bg-brand text-white ring-brand" : "bg-paper text-mute ring-line hover:text-ink",
             )}
           >
             <ImageIcon size={17} />
           </button>
-          <Button type="submit" size="sm" className="h-11 rounded-2xl px-4 shrink-0 gap-1.5 shadow-[0_6px_20px_rgba(24,5,219,0.35)]">
+
+          <Button
+            type="submit"
+            size="sm"
+            disabled={uploadingPhoto}
+            className="h-11 rounded-2xl px-4 shrink-0 gap-1.5 shadow-[0_6px_20px_rgba(24,5,219,0.35)]"
+          >
             <Send size={15} />
             <span className="hidden sm:inline">Send</span>
           </Button>
