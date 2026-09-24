@@ -1,9 +1,10 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { useLocation } from "wouter";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { nanoid } from "nanoid";
 import {
   ArrowLeft,
+  Building2,
   Check,
   Copy,
   Download,
@@ -16,10 +17,15 @@ import {
   MessageCircle,
   Package,
   Phone,
+  Plus,
   QrCode,
   Share2,
   Sparkles,
+  Store,
   Trash2,
+  User,
+  UserCheck,
+  UserRound,
   X,
 } from "lucide-react";
 import {
@@ -34,6 +40,7 @@ import {
   type BioCatalogKind,
   type BioLink,
   type BioLinkType,
+  type BioProfile,
 } from "@shared/bio";
 import { Button } from "@/components/ui/Button";
 import { BioCatalogEditor } from "@/components/bio/BioCatalogEditor";
@@ -51,26 +58,51 @@ import { GooglePlaceImportCard, PersonalProfileListingHint } from "@/components/
 import { bioLinksFromGooglePlace, mergeBioLinks } from "@shared/google-place";
 import { Photo } from "@/components/ui/Photo";
 import { BioHandleButton } from "@/components/bio/BioHandleButton";
+import { BioKindBadge, BioKindIcon } from "@/components/bio/BioKindBadge";
 import { ChangeHandleForm } from "@/components/bio/ChangeHandleForm";
 
-const CATEGORY_TAG_PRESETS = [
-  { id: "Creator", label: "Creator 🎨" },
+// Personal Profile Category / Vibe Presets
+const PERSONAL_CATEGORY_PRESETS = [
   { id: "AirPal Mate", label: "AirPal Mate 🤝" },
-  { id: "Local Business", label: "Local Business 🏪" },
-  { id: "Food & Drink", label: "Food & Drink ☕" },
-  { id: "Stay Host", label: "Stay Host 🏡" },
+  { id: "Travel Companion", label: "Travel Companion ✈️" },
+  { id: "Creator & Artist", label: "Creator & Artist 🎨" },
+  { id: "Food & Coffee Lover", label: "Food & Coffee Lover ☕" },
   { id: "Fashion & Style", label: "Fashion & Style 👗" },
-  { id: "Community", label: "Community 🌟" },
-  { id: "Music & Events", label: "Music & Events 🎵" },
+  { id: "Fitness & Wellness", label: "Fitness & Wellness 🏃" },
+  { id: "Student & Explorer", label: "Student & Explorer 🎒" },
+  { id: "Community Host", label: "Community Host 🌟" },
 ] as const;
 
-const PRIMARY_CTA_PRESETS = [
+// Business Profile Category Presets
+const BUSINESS_CATEGORY_PRESETS = [
+  { id: "Local Business", label: "Local Business 🏪" },
+  { id: "Food & Drink", label: "Food & Drink ☕" },
+  { id: "Restaurant & Bar", label: "Restaurant & Bar 🍽️" },
+  { id: "Stay & Accommodation", label: "Stay Host 🏡" },
+  { id: "Boutique & Retail", label: "Boutique & Retail 🛍️" },
+  { id: "Beauty & Wellness", label: "Beauty & Wellness 💈" },
+  { id: "Music & Venue", label: "Events & Venue 🎭" },
+  { id: "Services & Trades", label: "Services & Trades 🛠️" },
+] as const;
+
+// Personal Action Button Presets
+const PERSONAL_CTA_PRESETS = [
   "Catch Up",
+  "Say Hello",
   "Book Mate",
-  "Order Online",
   "Message WhatsApp",
+  "Connect",
+  "Follow Me",
+] as const;
+
+// Business Action Button Presets
+const BUSINESS_CTA_PRESETS = [
+  "Order Online",
+  "Book Table",
   "View Menu",
-  "Contact Me",
+  "Get Directions",
+  "Message WhatsApp",
+  "Contact Business",
 ] as const;
 
 const SOCIAL_CONFIG: Partial<
@@ -89,35 +121,35 @@ const SOCIAL_CONFIG: Partial<
     prefix: "https://instagram.com/",
     cleanPrefix: "instagram.com/",
     placeholder: "username",
-    example: "e.g. cafe_sydney",
+    example: "e.g. alex_sydney",
     domainRegex: /^(?:https?:\/\/)?(?:www\.)?instagram\.com\/(?:@)?/i,
   },
   facebook: {
     prefix: "https://facebook.com/",
     cleanPrefix: "facebook.com/",
     placeholder: "page or username",
-    example: "e.g. cafe.sydney",
+    example: "e.g. alex.sydney",
     domainRegex: /^(?:https?:\/\/)?(?:www\.)?facebook\.com\//i,
   },
   tiktok: {
     prefix: "https://tiktok.com/@",
     cleanPrefix: "tiktok.com/@",
     placeholder: "username",
-    example: "e.g. cafesydney",
+    example: "e.g. alexsydney",
     domainRegex: /^(?:https?:\/\/)?(?:www\.)?tiktok\.com\/(?:@)?/i,
   },
   x: {
     prefix: "https://x.com/",
     cleanPrefix: "x.com/",
     placeholder: "username",
-    example: "e.g. cafesydney",
+    example: "e.g. alexsydney",
     domainRegex: /^(?:https?:\/\/)?(?:www\.)?(?:twitter\.com|x\.com)\/(?:@)?/i,
   },
   youtube: {
     prefix: "https://youtube.com/@",
     cleanPrefix: "youtube.com/@",
     placeholder: "channel name",
-    example: "e.g. cafesydney",
+    example: "e.g. alexsydney",
     domainRegex: /^(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:@|c\/|channel\/)?/i,
   },
   linkedin: {
@@ -131,21 +163,21 @@ const SOCIAL_CONFIG: Partial<
     prefix: "https://threads.net/@",
     cleanPrefix: "threads.net/@",
     placeholder: "username",
-    example: "e.g. cafesydney",
+    example: "e.g. alexsydney",
     domainRegex: /^(?:https?:\/\/)?(?:www\.)?threads\.net\/(?:@)?/i,
   },
   snapchat: {
     prefix: "https://snapchat.com/add/",
     cleanPrefix: "snapchat.com/add/",
     placeholder: "username",
-    example: "e.g. cafesydney",
+    example: "e.g. alexsydney",
     domainRegex: /^(?:https?:\/\/)?(?:www\.)?snapchat\.com\/(?:add\/)?/i,
   },
   pinterest: {
     prefix: "https://pinterest.com/",
     cleanPrefix: "pinterest.com/",
     placeholder: "username",
-    example: "e.g. cafesydney",
+    example: "e.g. alexsydney",
     domainRegex: /^(?:https?:\/\/)?(?:www\.)?pinterest\.com\//i,
   },
   whatsapp: {
@@ -180,7 +212,26 @@ function formatFinalLinkHref(type: BioLinkType, input: string): string {
 
 export function BioEditPage() {
   const [, nav] = useLocation();
-  const { mine, business, updateProfile, tapsToday } = useBio();
+  const searchStr = useSearch();
+  const params = useMemo(() => new URLSearchParams(searchStr), [searchStr]);
+  const queryKind = params.get("kind");
+  const queryHandle = params.get("handle");
+
+  const { mine, business, profiles, updateProfile, tapsToday } = useBio();
+
+  // Active target profile resolution: personal (mine) or business or selected handle
+  const activeProfile: BioProfile | null = useMemo(() => {
+    if (queryHandle) {
+      const hit = profiles.find((p) => p.handle === queryHandle);
+      if (hit) return hit;
+    }
+    if (queryKind === "business" && business) return business;
+    if (queryKind === "person" && mine) return mine;
+    return mine || business || profiles[0] || null;
+  }, [business, mine, profiles, queryHandle, queryKind]);
+
+  const isBusiness = isBusinessKind(activeProfile?.kind);
+
   const [tab, setTab] = useState<"profile" | "links" | "shop" | "share">("profile");
 
   // Editable Profile Form States
@@ -215,48 +266,72 @@ export function BioEditPage() {
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
+  // Synchronize form states when active target profile changes
   useEffect(() => {
-    if (!mine) return;
-    setName(mine.name);
-    setShortWhy(mine.shortWhy || "");
-    setAboutText(mine.aboutText || "");
-    setCategoryTag(mine.categoryTag || (mine.kind === "business" ? "Local Business" : "AirPal Mate"));
-    setPronouns(mine.pronouns || "");
-    setLanguages(mine.languages || "");
-    setPrimaryCta(mine.primaryCta || "Catch Up");
-    setCity(mine.city || "");
-    setHours(mine.hours || "");
-    setOpenNow(mine.openNow ?? true);
-    setAvailabilityStatus(mine.availabilityStatus || "available");
-    setCustomStatus(mine.customStatus || "");
-    setCustomStatusEmoji(mine.customStatusEmoji || "☕");
-    setPhone(mine.phone || "");
-    setAvatar(mine.avatar || "");
-    setCover(mine.cover || "");
-    setMapsPlaceId(mine.mapsPlaceId || "");
-    setLinks(mine.links || []);
-    setProducts(mine.products || []);
-    setServices(mine.services || []);
-    setDeals(mine.deals?.length ? mine.deals : catalogDeals(mine));
-    setZooHunt(Boolean(business?.zooHunt ?? mine.zooHunt));
-    void makeQrDataUrl(toPublicUrl(bioPath(mine.handle))).then(setQr);
-  }, [business, mine]);
+    if (!activeProfile) return;
+    setName(activeProfile.name);
+    setShortWhy(activeProfile.shortWhy || "");
+    setAboutText(activeProfile.aboutText || "");
+    setCategoryTag(
+      activeProfile.categoryTag || (isBusinessKind(activeProfile.kind) ? "Local Business" : "AirPal Mate"),
+    );
+    setPronouns(activeProfile.pronouns || "");
+    setLanguages(activeProfile.languages || "");
+    setPrimaryCta(
+      activeProfile.primaryCta || (isBusinessKind(activeProfile.kind) ? "Order Online" : "Catch Up"),
+    );
+    setCity(activeProfile.city || "");
+    setHours(activeProfile.hours || "");
+    setOpenNow(activeProfile.openNow ?? true);
+    setAvailabilityStatus(activeProfile.availabilityStatus || "available");
+    setCustomStatus(activeProfile.customStatus || "");
+    setCustomStatusEmoji(activeProfile.customStatusEmoji || "☕");
+    setPhone(activeProfile.phone || "");
+    setAvatar(activeProfile.avatar || "");
+    setCover(activeProfile.cover || "");
+    setMapsPlaceId(activeProfile.mapsPlaceId || "");
+    setLinks(activeProfile.links || []);
+    setProducts(activeProfile.products || []);
+    setServices(activeProfile.services || []);
+    setDeals(activeProfile.deals?.length ? activeProfile.deals : catalogDeals(activeProfile));
+    setZooHunt(Boolean(activeProfile.zooHunt));
+    void makeQrDataUrl(toPublicUrl(bioPath(activeProfile.handle))).then(setQr);
+  }, [activeProfile]);
 
-  if (!mine) {
+  if (!activeProfile) {
     return (
       <div className="grid min-h-[50vh] place-items-center px-6 text-center">
-        <div className="rounded-3xl bg-card p-8 shadow-sm ring-1 ring-line max-w-sm w-full">
+        <div className="rounded-[28px] bg-card p-8 shadow-clay ring-1 ring-line max-w-sm w-full">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand mb-4">
+            <UserRound size={28} />
+          </div>
           <p className="font-display text-2xl font-bold text-ink">No @ handle yet</p>
-          <p className="mt-2 text-sm text-mute">Set up your AirPal profile or business handle to get started.</p>
-          <Button className="mt-5 w-full h-11 text-base font-semibold shadow-md" onClick={() => nav("/bio/setup")}>
-            Set Up Handle
-          </Button>
+          <p className="mt-2 text-sm text-mute leading-relaxed">
+            Set up your personal AirPal profile or business place handle to get started.
+          </p>
+          <div className="mt-6 space-y-2">
+            <Button
+              className="w-full h-11 text-sm font-semibold shadow-md gap-2"
+              onClick={() => nav("/bio/setup")}
+            >
+              <User size={16} />
+              Set Up Personal Bio
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full h-11 text-sm font-semibold border border-line gap-2"
+              onClick={() => nav("/bio/setup?kind=business")}
+            >
+              <Store size={16} />
+              Add Business Place
+            </Button>
+          </div>
         </div>
       </div>
     );
   }
 
-  const share = toPublicUrl(bioPath(mine.handle));
+  const share = toPublicUrl(bioPath(activeProfile.handle));
 
   async function onProfile(e: FormEvent) {
     e.preventDefault();
@@ -266,7 +341,7 @@ export function BioEditPage() {
     }
     try {
       await updateProfile({
-        handle: mine!.handle,
+        handle: activeProfile!.handle,
         name,
         shortWhy,
         aboutText,
@@ -290,20 +365,19 @@ export function BioEditPage() {
         services,
         deals,
       });
-      if (business && business.handle !== mine!.handle) {
-        await updateProfile({ handle: business.handle, zooHunt });
-      }
-      toast.success("Saved to your AirPal account");
+      toast.success(
+        isBusiness ? "Saved business place profile" : "Saved personal AirPal profile",
+      );
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not save to your account. Try again.");
+      toast.error(err instanceof Error ? err.message : "Could not save profile changes. Try again.");
     }
   }
 
   async function onStoredPhoto(kind: "avatar" | "cover", src?: string) {
-    if (!mine) return;
+    if (!activeProfile) return;
     if (kind === "avatar") setAvatar(src || "");
     else setCover(src || "");
-    await updateProfile({ handle: mine.handle, [kind]: src || "" });
+    await updateProfile({ handle: activeProfile.handle, [kind]: src || "" });
   }
 
   async function saveCatalog(kind: BioCatalogKind, rows: BioCatalogItem[]) {
@@ -313,28 +387,58 @@ export function BioEditPage() {
     if (kind === "product") setProducts(rows);
     if (kind === "service") setServices(rows);
     if (kind === "deal") setDeals(rows);
-    await updateProfile({ handle: mine!.handle, products: nextProducts, services: nextServices, deals: nextDeals });
-    toast.success("Catalog saved");
+    await updateProfile({
+      handle: activeProfile!.handle,
+      products: nextProducts,
+      services: nextServices,
+      deals: nextDeals,
+    });
+    toast.success("Catalog updated");
   }
 
   const statusInfo = AVAILABILITY_STATUSES[availabilityStatus] || AVAILABILITY_STATUSES.available;
 
-  // Render the Live Interactive Profile Preview Card
+  // Render the Live Interactive Profile Preview Card with sharp distinction
   const renderLivePreviewCard = () => (
-    <div className="overflow-hidden rounded-3xl bg-card shadow-xl ring-1 ring-line/80">
+    <div className="overflow-hidden rounded-[28px] bg-card shadow-clay ring-1 ring-line">
+      {/* Distinction Header Banner */}
+      <div
+        className={cn(
+          "flex items-center justify-between px-4 py-2 border-b text-[11px] font-bold uppercase tracking-wider",
+          isBusiness
+            ? "bg-amber-500/10 text-amber-900 dark:text-amber-300 border-amber-500/20"
+            : "bg-brand/10 text-brand border-brand/20",
+        )}
+      >
+        <span className="flex items-center gap-1.5">
+          {isBusiness ? <Store size={14} /> : <UserCheck size={14} />}
+          {isBusiness ? "Business Profile" : "Personal AirPal Bio"}
+        </span>
+        <span className="inline-flex items-center gap-1 font-mono text-[10px] lowercase text-ink/70">
+          @{activeProfile.handle}
+        </span>
+      </div>
+
       {/* Cover Header */}
       <div className="relative">
         {cover ? (
           <Photo src={cover} className="h-40 w-full object-cover sm:h-44" />
         ) : (
-          <div className="relative h-40 w-full overflow-hidden bg-gradient-to-br from-[#1b221d] via-[#222b24] to-[#121614] sm:h-44">
-            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:16px_16px]" />
+          <div
+            className={cn(
+              "relative h-40 w-full overflow-hidden sm:h-44",
+              isBusiness
+                ? "bg-gradient-to-br from-[#1d1e22] via-[#2a2c33] to-[#121316]"
+                : "bg-gradient-to-br from-[#121829] via-[#1c2438] to-[#0f1424]",
+            )}
+          >
+            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#1805db_1.5px,transparent_1.5px)] [background-size:18px_18px]" />
           </div>
         )}
 
         {/* Live Badge Top Right */}
         <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5">
-          <span className="inline-flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-md">
+          <span className="inline-flex items-center gap-1 rounded-full bg-black/65 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-md shadow-xs">
             <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
             LIVE PREVIEW
           </span>
@@ -359,26 +463,36 @@ export function BioEditPage() {
                 </span>
               )}
             </div>
+
+            {/* Profile Kind Floating Icon */}
+            <div className="absolute -bottom-1 -right-1 z-20">
+              <BioKindIcon kind={activeProfile.kind} className="shadow-md ring-2 ring-card" />
+            </div>
           </div>
 
           <div className="mb-1">
-            <BioHandleButton handle={mine.handle} />
+            <BioHandleButton handle={activeProfile.handle} />
           </div>
         </div>
 
         {/* Info */}
         <div className="mt-3 text-left">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <h2 className="font-display text-2xl font-bold tracking-tight text-ink">{name || "Your Name"}</h2>
             {categoryTag && (
-              <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand">
+              <span
+                className={cn(
+                  "rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+                  isBusiness ? "bg-amber-500/15 text-amber-800 dark:text-amber-300" : "bg-brand/10 text-brand",
+                )}
+              >
                 {categoryTag}
               </span>
             )}
           </div>
 
           <p className="text-xs font-medium text-mute mt-0.5">
-            @{mine.handle}
+            @{activeProfile.handle}
             {pronouns && ` · ${pronouns}`}
           </p>
 
@@ -424,7 +538,9 @@ export function BioEditPage() {
           {/* Extended Bio */}
           {aboutText && (
             <div className="mt-3 rounded-2xl bg-paper p-3 text-xs leading-relaxed text-ink/80 border border-line/60">
-              <p className="font-semibold text-[10px] uppercase tracking-wider text-mute mb-1">About</p>
+              <p className="font-semibold text-[10px] uppercase tracking-wider text-mute mb-1">
+                {isBusiness ? "About This Place" : "About Story"}
+              </p>
               <p className="whitespace-pre-line">{aboutText}</p>
             </div>
           )}
@@ -436,8 +552,8 @@ export function BioEditPage() {
             type="button"
             className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-brand text-xs font-bold uppercase tracking-wider text-white shadow-md transition hover:bg-brand-ink active:scale-[0.98]"
           >
-            <HeartHandshake size={15} />
-            <span>{primaryCta || "Catch Up"}</span>
+            {isBusiness ? <Building2 size={15} /> : <HeartHandshake size={15} />}
+            <span>{primaryCta || (isBusiness ? "Order Online" : "Catch Up")}</span>
           </button>
         </div>
 
@@ -462,7 +578,7 @@ export function BioEditPage() {
           <div className="mt-4 rounded-2xl bg-gradient-to-br from-paper to-card p-3 border border-gold/30">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold uppercase tracking-wider text-gold flex items-center gap-1">
-                <Sparkles size={11} /> Featured Deal
+                <Sparkles size={11} /> Featured Offer
               </span>
               <span className="text-[10px] text-mute">{deals[0].badge || "Offer"}</span>
             </div>
@@ -474,7 +590,9 @@ export function BioEditPage() {
         {/* Links stack */}
         {links.length > 0 && (
           <div className="mt-4 space-y-1.5">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-mute">Links ({links.length})</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-mute">
+              {isBusiness ? "Place Links" : "Bio Links"} ({links.length})
+            </p>
             {links.slice(0, 3).map((l) => (
               <div
                 key={l.id}
@@ -500,7 +618,7 @@ export function BioEditPage() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => nav(bioPath(mine.handle))}
+            onClick={() => nav(bioPath(activeProfile.handle))}
             className="flex h-10 w-10 items-center justify-center rounded-2xl bg-card border border-line text-ink transition hover:bg-paper active:scale-95 shadow-xs"
             aria-label="Back to public bio"
             title="Back to public bio"
@@ -509,13 +627,11 @@ export function BioEditPage() {
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">@{mine.handle}</p>
-              <span className="rounded-full bg-paper px-2 py-0.5 text-[10px] font-semibold uppercase text-mute border border-line">
-                {mine.kind === "business" ? "Business Profile" : "Personal Profile"}
-              </span>
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">@{activeProfile.handle}</p>
+              <BioKindBadge kind={activeProfile.kind} />
             </div>
             <h1 className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
-              {mine.kind === "business" ? "Edit Business Profile" : "Edit AirPal Bio"}
+              {isBusiness ? "Edit Business Place Profile" : "Edit Personal AirPal Bio"}
             </h1>
           </div>
         </div>
@@ -526,7 +642,7 @@ export function BioEditPage() {
             variant="ghost"
             size="sm"
             className="gap-1.5 rounded-full border border-line bg-card px-4 font-semibold text-ink shadow-xs hover:bg-paper"
-            onClick={() => nav(bioPath(mine.handle))}
+            onClick={() => nav(bioPath(activeProfile.handle))}
           >
             <ExternalLink size={14} className="text-brand" />
             <span>View Public Profile</span>
@@ -545,6 +661,100 @@ export function BioEditPage() {
         </div>
       </div>
 
+      {/* Distinction & Profile Switcher Banner */}
+      <div className="mt-4 rounded-3xl bg-card p-4 sm:p-5 ring-1 ring-line shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          {/* Identity Explainer */}
+          <div className="flex items-start gap-3">
+            <div
+              className={cn(
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl shadow-xs",
+                isBusiness ? "bg-amber-500/15 text-amber-800 dark:text-amber-300" : "bg-brand/10 text-brand",
+              )}
+            >
+              {isBusiness ? <Store size={20} /> : <UserRound size={20} />}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-ink">
+                  {isBusiness ? "Business / Place Profile" : "Personal AirPal Bio"}
+                </span>
+                <span
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase",
+                    isBusiness ? "bg-amber-500/10 text-amber-800 dark:text-amber-300" : "bg-brand/10 text-brand",
+                  )}
+                >
+                  Active Editor
+                </span>
+              </div>
+              <p className="text-xs text-mute mt-0.5 leading-relaxed">
+                {isBusiness
+                  ? "Your place profile displays trading hours, Google Place sync, menus, and customer orders."
+                  : "Your personal @handle is your human identity for Mate catch-ups, travel companions, and social links."}
+              </p>
+            </div>
+          </div>
+
+          {/* Profile Switcher & New Profile CTAs */}
+          <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-line/60">
+            {/* If user has both personal and business, show fast toggle */}
+            {mine && business && (
+              <div className="inline-flex rounded-full bg-paper p-1 ring-1 ring-line">
+                <button
+                  type="button"
+                  onClick={() => nav("/bio/edit?kind=person")}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition active:scale-95",
+                    !isBusiness ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
+                  )}
+                >
+                  <UserRound size={13} />
+                  <span>@{mine.handle}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => nav("/bio/edit?kind=business")}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition active:scale-95",
+                    isBusiness ? "bg-amber-600 text-white shadow-xs" : "text-mute hover:text-ink",
+                  )}
+                >
+                  <Store size={13} />
+                  <span>@{business.handle}</span>
+                </button>
+              </div>
+            )}
+
+            {/* If only personal exists, offer button to add place */}
+            {mine && !business && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 rounded-full border border-line bg-paper text-xs font-semibold text-ink hover:bg-card shadow-xs"
+                onClick={() => nav("/bio/setup?kind=business")}
+              >
+                <Plus size={13} className="text-brand" />
+                <span>Add Business Place</span>
+              </Button>
+            )}
+
+            {/* If only business exists, offer button to set up personal bio */}
+            {!mine && business && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 rounded-full border border-line bg-paper text-xs font-semibold text-ink hover:bg-card shadow-xs"
+                onClick={() => nav("/bio/setup")}
+              >
+                <Plus size={13} className="text-brand" />
+                <span>Claim Personal @handle</span>
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Main Grid: Left Editor Column (7 cols on desktop) + Right Live Preview (5 cols on desktop) */}
       <div className="mt-6 lg:grid lg:grid-cols-12 lg:gap-8">
         {/* Left Column: Segmented Tabs & Editors */}
@@ -553,10 +763,15 @@ export function BioEditPage() {
           <div className="flex rounded-2xl bg-paper p-1.5 ring-1 ring-line shadow-xs">
             {(
               [
-                { id: "profile", label: "Profile", icon: Edit3 },
-                { id: "links", label: "Links", icon: Globe },
-                { id: "shop", label: "Shop", icon: Package },
-                { id: "share", label: "Share & QR", icon: QrCode },
+                { id: "profile", label: "Profile", icon: Edit3, count: undefined },
+                { id: "links", label: "Links", icon: Globe, count: links.length },
+                {
+                  id: "shop",
+                  label: isBusiness ? "Catalog & Menu" : "Shop & Deals",
+                  icon: Package,
+                  count: products.length + services.length + deals.length,
+                },
+                { id: "share", label: "Share & QR", icon: QrCode, count: undefined },
               ] as const
             ).map((item) => (
               <button
@@ -566,12 +781,24 @@ export function BioEditPage() {
                 className={cn(
                   "flex flex-1 items-center justify-center gap-1.5 h-10 rounded-xl text-xs sm:text-sm font-semibold transition active:scale-95",
                   tab === item.id
-                    ? "bg-brand text-white shadow-sm"
+                    ? isBusiness
+                      ? "bg-amber-600 text-white shadow-xs"
+                      : "bg-brand text-white shadow-xs"
                     : "text-mute hover:text-ink hover:bg-white/50",
                 )}
               >
                 <item.icon size={15} />
-                <span>{item.label}</span>
+                <span className="truncate">{item.label}</span>
+                {typeof item.count === "number" && item.count > 0 && (
+                  <span
+                    className={cn(
+                      "ml-0.5 rounded-full px-1.5 py-0.2 text-[10px] font-bold",
+                      tab === item.id ? "bg-white/25 text-white" : "bg-card text-mute ring-1 ring-line",
+                    )}
+                  >
+                    {item.count}
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -581,18 +808,34 @@ export function BioEditPage() {
             <form className="mt-6 space-y-6" onSubmit={onProfile}>
               {/* Media Section: Cover & Avatar */}
               <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">Media & Images</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-bold uppercase tracking-wider text-gold">Media & Photos</p>
+                  <span className="text-[11px] text-mute">
+                    {isBusiness ? "Storefront & Logo" : "Cover & Avatar"}
+                  </span>
+                </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="text-xs font-semibold text-ink mb-1 block">Cover Header Photo</label>
+                    <label className="text-xs font-semibold text-ink mb-1 block">
+                      {isBusiness ? "Place Banner / Header Photo" : "Cover Header Photo"}
+                    </label>
                     <ImageField kind="cover" value={cover} onChange={(src) => void onStoredPhoto("cover", src)} />
-                    <p className="mt-1 text-[11px] text-mute">Recommended ratio: 16:9 banner photo for top header.</p>
+                    <p className="mt-1 text-[11px] text-mute">Recommended ratio: 16:9 widescreen photo for top hero.</p>
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-ink mb-1 block">Profile Avatar Photo</label>
-                    <ImageField kind="avatar" round value={avatar} onChange={(src) => void onStoredPhoto("avatar", src)} />
-                    <p className="mt-1 text-[11px] text-mute">Square or portrait face/logo photo.</p>
+                    <label className="text-xs font-semibold text-ink mb-1 block">
+                      {isBusiness ? "Business Logo / Mark" : "Profile Avatar Photo"}
+                    </label>
+                    <ImageField
+                      kind="avatar"
+                      round
+                      value={avatar}
+                      onChange={(src) => void onStoredPhoto("avatar", src)}
+                    />
+                    <p className="mt-1 text-[11px] text-mute">
+                      {isBusiness ? "Square business logo or storefront badge." : "Square or portrait face photo."}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -603,22 +846,30 @@ export function BioEditPage() {
 
                 {/* Display Name */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute">Display Name</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-mute">
+                    {isBusiness ? "Business / Place Name" : "Your Display Name"}
+                  </label>
                   <input
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Harbour Brew Cafe or Alex Morgan"
+                    placeholder={isBusiness ? "e.g. Harbour Brew Cafe" : "e.g. Alex Morgan"}
                     required
                     className={fieldInput}
                   />
-                  <p className="text-[11px] text-mute">The primary name shown on your public profile card.</p>
+                  <p className="text-[11px] text-mute">
+                    {isBusiness
+                      ? "The public trading name shown on your place card and in search."
+                      : "The primary name shown on your personal profile card."}
+                  </p>
                 </div>
 
                 {/* Category / Vibe Badge Selector */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute">Profile Category / Vibe</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-mute">
+                    {isBusiness ? "Business Category" : "Profile Category / Vibe"}
+                  </label>
                   <div className="flex flex-wrap gap-2 pt-1">
-                    {CATEGORY_TAG_PRESETS.map((cat) => (
+                    {(isBusiness ? BUSINESS_CATEGORY_PRESETS : PERSONAL_CATEGORY_PRESETS).map((cat) => (
                       <button
                         key={cat.id}
                         type="button"
@@ -626,7 +877,9 @@ export function BioEditPage() {
                         className={cn(
                           "h-8 rounded-full px-3 text-xs font-medium transition active:scale-95",
                           categoryTag === cat.id
-                            ? "bg-brand text-white shadow-xs"
+                            ? isBusiness
+                              ? "bg-amber-600 text-white shadow-xs"
+                              : "bg-brand text-white shadow-xs"
                             : "bg-paper border border-line text-ink hover:border-brand/40",
                         )}
                       >
@@ -639,23 +892,31 @@ export function BioEditPage() {
                 {/* Tagline / Short Bio */}
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-mute">Tagline (1 Line)</label>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute">
+                      Tagline (1 Line Headline)
+                    </label>
                     <span className="text-[10px] text-mute">{shortWhy.length}/100</span>
                   </div>
                   <input
                     value={shortWhy}
                     maxLength={100}
                     onChange={(e) => setShortWhy(e.target.value)}
-                    placeholder="e.g. Specialty coffee, artisanal roasts & harbour views"
+                    placeholder={
+                      isBusiness
+                        ? "e.g. Specialty coffee, artisanal roasts & harbour views"
+                        : "e.g. Sydney local, coffee enthusiast & travel companion"
+                    }
                     className={fieldInput}
                   />
-                  <p className="text-[11px] text-mute">A short 1-line description displayed right below your name.</p>
+                  <p className="text-[11px] text-mute">A punchy 1-line description displayed right below your name.</p>
                 </div>
 
                 {/* Extended Bio / About Story */}
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-mute">About Story / Extended Bio</label>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute">
+                      {isBusiness ? "About Your Place / Story" : "About Story / Extended Bio"}
+                    </label>
                     <span className="text-[10px] text-mute">{aboutText.length}/280</span>
                   </div>
                   <textarea
@@ -663,45 +924,59 @@ export function BioEditPage() {
                     maxLength={280}
                     rows={3}
                     onChange={(e) => setAboutText(e.target.value)}
-                    placeholder="Share a longer description about who you are, your background, services offered, or what makes your spot unique..."
+                    placeholder={
+                      isBusiness
+                        ? "Tell customers what makes your venue, menu, or services special..."
+                        : "Share who you are, your background, hobbies, or what you love exploring..."
+                    }
                     className="w-full rounded-2xl border border-line bg-paper p-3 text-sm outline-none transition focus:border-ink placeholder:text-mute/60 resize-none"
                   />
                 </div>
               </div>
 
-              {/* Personalization & Mate Details */}
+              {/* Personal Preferences OR Business Actions */}
               <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">Connections & Preferences</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-gold">
+                  {isBusiness ? "Customer Action & Engagement" : "Connections & Preferences"}
+                </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Pronouns */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-mute">Pronouns (Optional)</label>
-                    <input
-                      value={pronouns}
-                      onChange={(e) => setPronouns(e.target.value)}
-                      placeholder="e.g. She/Her, They/Them"
-                      className={fieldInput}
-                    />
-                  </div>
+                {!isBusiness && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Pronouns */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute">
+                        Pronouns (Optional)
+                      </label>
+                      <input
+                        value={pronouns}
+                        onChange={(e) => setPronouns(e.target.value)}
+                        placeholder="e.g. She/Her, They/Them"
+                        className={fieldInput}
+                      />
+                    </div>
 
-                  {/* Languages Spoken */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-mute">Languages Spoken</label>
-                    <input
-                      value={languages}
-                      onChange={(e) => setLanguages(e.target.value)}
-                      placeholder="e.g. English, Spanish, Japanese"
-                      className={fieldInput}
-                    />
+                    {/* Languages Spoken */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute">
+                        Languages Spoken
+                      </label>
+                      <input
+                        value={languages}
+                        onChange={(e) => setLanguages(e.target.value)}
+                        placeholder="e.g. English, Spanish, Japanese"
+                        className={fieldInput}
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Primary Action Button Picker */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute">Primary Action Button</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-mute">
+                    Primary Action Button
+                  </label>
                   <div className="flex flex-wrap gap-2 pt-1">
-                    {PRIMARY_CTA_PRESETS.map((cta) => (
+                    {(isBusiness ? BUSINESS_CTA_PRESETS : PERSONAL_CTA_PRESETS).map((cta) => (
                       <button
                         key={cta}
                         type="button"
@@ -709,7 +984,9 @@ export function BioEditPage() {
                         className={cn(
                           "h-8 rounded-full px-3 text-xs font-medium transition active:scale-95",
                           primaryCta === cta
-                            ? "bg-brand text-white shadow-xs"
+                            ? isBusiness
+                              ? "bg-amber-600 text-white shadow-xs"
+                              : "bg-brand text-white shadow-xs"
                             : "bg-paper border border-line text-ink hover:border-brand/40",
                         )}
                       >
@@ -721,27 +998,21 @@ export function BioEditPage() {
                 </div>
               </div>
 
-              {/* Location & Schedule Section */}
+              {/* Location & Hours Section */}
               <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-gold">Location & Hours</p>
 
                 {/* City / Location */}
-                <CitySuburbRegionField
-                  value={city}
-                  onChange={setCity}
-                  inputClassName={fieldInput}
-                />
+                <CitySuburbRegionField value={city} onChange={setCity} inputClassName={fieldInput} />
 
                 {/* Trading / Opening Hours */}
-                <TradingHoursField
-                  value={hours}
-                  onChange={setHours}
-                  inputClassName={fieldInput}
-                />
+                <TradingHoursField value={hours} onChange={setHours} inputClassName={fieldInput} />
 
                 {/* Live Availability Status Picker */}
                 <div className="space-y-2 pt-2 border-t border-line/60">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute">Live Availability & WhatsApp Status</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-mute">
+                    Live Status & Availability
+                  </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {(Object.keys(AVAILABILITY_STATUSES) as AvailabilityStatus[]).map((stKey) => {
                       const st = AVAILABILITY_STATUSES[stKey];
@@ -779,7 +1050,7 @@ export function BioEditPage() {
                     <input
                       value={customStatus}
                       onChange={(e) => setCustomStatus(e.target.value)}
-                      placeholder="e.g. Coffee at Rocks Cafe"
+                      placeholder={isBusiness ? "e.g. Fresh pastries today" : "e.g. Coffee at Rocks Cafe"}
                       className={`col-span-3 ${fieldInput}`}
                     />
                   </div>
@@ -787,13 +1058,16 @@ export function BioEditPage() {
 
                 {/* Contact Phone */}
                 <div className="space-y-1.5 pt-2 border-t border-line/60">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute">Contact Phone (Optional)</label>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-mute">
+                    Contact Phone (Optional)
+                  </label>
                   <PhoneField value={phone} onChange={setPhone} />
                   <p className="text-[11px] text-mute">Include country code for direct WhatsApp & calling.</p>
                 </div>
               </div>
 
-              {isBusinessKind(mine.kind) ? (
+              {/* Business-Only Google Place Import Card vs Personal Hint */}
+              {isBusiness ? (
                 <GooglePlaceImportCard
                   importedPlaceId={mapsPlaceId}
                   onImport={(place) => {
@@ -813,11 +1087,17 @@ export function BioEditPage() {
               ) : (
                 <PersonalProfileListingHint
                   hasBusiness={Boolean(business)}
-                  onOpenBusiness={() => nav(business ? "/business" : "/business/onboard")}
+                  onOpenBusiness={() => nav(business ? "/bio/edit?kind=business" : "/bio/setup?kind=business")}
                 />
               )}
 
-              <Button type="submit" className="h-12 w-full text-base font-semibold shadow-md gap-2">
+              <Button
+                type="submit"
+                className={cn(
+                  "h-12 w-full text-base font-semibold shadow-md gap-2",
+                  isBusiness && "bg-amber-600 hover:bg-amber-700 text-white",
+                )}
+              >
                 <Check size={18} />
                 Save All Profile Changes
               </Button>
@@ -834,7 +1114,9 @@ export function BioEditPage() {
                   {/* Category Buttons */}
                   <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-4">
                     <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Actions & Preset Links</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+                        Actions & Preset Links
+                      </p>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {BIO_LINK_TYPES.filter((t) => !isSocialLinkType(t.id)).map((t) => (
                           <button
@@ -846,7 +1128,11 @@ export function BioEditPage() {
                             }}
                             className={cn(
                               "h-9 rounded-full px-3.5 text-xs font-semibold transition active:scale-95",
-                              type === t.id ? "bg-brand text-white shadow-xs" : "bg-paper border border-line text-ink hover:bg-card",
+                              type === t.id
+                                ? isBusiness
+                                  ? "bg-amber-600 text-white shadow-xs"
+                                  : "bg-brand text-white shadow-xs"
+                                : "bg-paper border border-line text-ink hover:bg-card",
                             )}
                           >
                             {t.label}
@@ -856,7 +1142,9 @@ export function BioEditPage() {
                     </div>
 
                     <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Social Media Networks</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+                        Social Media Networks
+                      </p>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {BIO_LINK_TYPES.filter((t) => isSocialLinkType(t.id)).map((t) => (
                           <button
@@ -868,7 +1156,11 @@ export function BioEditPage() {
                             }}
                             className={cn(
                               "h-9 rounded-full px-3.5 text-xs font-semibold transition active:scale-95",
-                              type === t.id ? "bg-brand text-white shadow-xs" : "bg-paper border border-line text-ink hover:bg-card",
+                              type === t.id
+                                ? isBusiness
+                                  ? "bg-amber-600 text-white shadow-xs"
+                                  : "bg-brand text-white shadow-xs"
+                                : "bg-paper border border-line text-ink hover:bg-card",
                             )}
                           >
                             {t.label}
@@ -897,7 +1189,7 @@ export function BioEditPage() {
                       ];
                       setLinks(next);
                       setHref("");
-                      void updateProfile({ handle: mine.handle, links: next })
+                      void updateProfile({ handle: activeProfile.handle, links: next })
                         .then(() => toast.success(`Added ${selectedLabel}`))
                         .catch((err) =>
                           toast.error(err instanceof Error ? err.message : "Could not save that link to your account"),
@@ -905,7 +1197,9 @@ export function BioEditPage() {
                     }}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-mute">Add {selectedLabel} Link</span>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-mute">
+                        Add {selectedLabel} Link
+                      </span>
                       {social && <span className="text-[11px] text-mute">{social.example}</span>}
                     </div>
 
@@ -982,7 +1276,7 @@ export function BioEditPage() {
                               onClick={() => {
                                 const next = links.filter((x) => x.id !== l.id);
                                 setLinks(next);
-                                void updateProfile({ handle: mine.handle, links: next })
+                                void updateProfile({ handle: activeProfile.handle, links: next })
                                   .then(() => toast.success("Link removed"))
                                   .catch((err) =>
                                     toast.error(err instanceof Error ? err.message : "Could not update your account"),
@@ -1002,7 +1296,17 @@ export function BioEditPage() {
 
           {/* TAB 3: SHOP / CATALOG */}
           {tab === "shop" && (
-            <div className="rounded-3xl border border-line bg-card p-5 shadow-xs">
+            <div className="mt-6 rounded-3xl border border-line bg-card p-5 shadow-xs">
+              <div className="mb-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-gold">
+                  {isBusiness ? "Business Menu, Deals & Products" : "Personal Shop & Recommendations"}
+                </p>
+                <p className="text-xs text-mute mt-0.5">
+                  {isBusiness
+                    ? "Add your specials, signature dishes, or bookable services."
+                    : "Add deals, recommended items, or personal services you provide."}
+                </p>
+              </div>
               <BioCatalogEditor products={products} services={services} deals={deals} onChange={saveCatalog} />
             </div>
           )}
@@ -1011,17 +1315,19 @@ export function BioEditPage() {
           {tab === "share" && (
             <div className="mt-6 space-y-6">
               <div className="rounded-3xl border border-line bg-card p-6 text-center shadow-xs space-y-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">Your Profile QR & Share Link</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-gold">
+                  {isBusiness ? "Place QR Code & Share Link" : "Personal Profile QR & Share Link"}
+                </p>
 
                 {qr && (
                   <div className="relative inline-block rounded-3xl bg-white p-4 ring-1 ring-line shadow-md">
-                    <img src={qr} alt={`QR code for @${mine.handle}`} className="mx-auto h-52 w-52" />
+                    <img src={qr} alt={`QR code for @${activeProfile.handle}`} className="mx-auto h-52 w-52" />
                   </div>
                 )}
 
                 <div>
-                  <p className="font-display text-xl font-bold text-ink">airpal.me/@{mine.handle}</p>
-                  <p className="text-xs text-mute mt-0.5">{tapsToday(mine.handle)} profile taps today</p>
+                  <p className="font-display text-xl font-bold text-ink">airpal.me/@{activeProfile.handle}</p>
+                  <p className="text-xs text-mute mt-0.5">{tapsToday(activeProfile.handle)} profile taps today</p>
                 </div>
 
                 {/* Australian Air Zoo Hunt Toggle */}
@@ -1037,13 +1343,16 @@ export function BioEditPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
                   <Button
-                    className="h-11 font-semibold gap-2 shadow-sm"
+                    className={cn(
+                      "h-11 font-semibold gap-2 shadow-sm",
+                      isBusiness && "bg-amber-600 hover:bg-amber-700 text-white",
+                    )}
                     onClick={() => {
                       if (navigator.share) {
                         navigator
                           .share({
-                            title: `${mine.name} (@${mine.handle})`,
-                            text: mine.shortWhy || "Connect on AirPal",
+                            title: `${activeProfile.name} (@${activeProfile.handle})`,
+                            text: activeProfile.shortWhy || "Connect on AirPal",
                             url: share,
                           })
                           .catch(() => {});
@@ -1075,7 +1384,7 @@ export function BioEditPage() {
                 {qr && (
                   <a
                     href={qr}
-                    download={`airpal-${mine.handle}-qr.png`}
+                    download={`airpal-${activeProfile.handle}-qr.png`}
                     className="inline-flex h-10 items-center justify-center gap-2 rounded-full px-4 text-xs font-semibold text-brand hover:underline"
                   >
                     <Download size={14} />
@@ -1085,7 +1394,7 @@ export function BioEditPage() {
               </div>
 
               <div className="rounded-3xl border border-line bg-card p-6 shadow-xs">
-                <ChangeHandleForm current={mine.handle} profileId={mine.id} />
+                <ChangeHandleForm current={activeProfile.handle} profileId={activeProfile.id} />
               </div>
             </div>
           )}
