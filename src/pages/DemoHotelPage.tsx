@@ -7,6 +7,7 @@ import {
   DEMO_HOTEL_ROOM_TOKEN,
   harbourStaySeeds,
 } from "@/lib/seed-stay";
+import { DemoBanner } from "@/components/demo/DemoBanner";
 import { ConciergePage } from "./ConciergePage";
 
 /**
@@ -31,5 +32,10 @@ export function DemoHotelPage() {
     });
   }, [setSession]);
 
-  return <ConciergePage />;
+  return (
+    <>
+      <DemoBanner />
+      <ConciergePage />
+    </>
+  );
 }
