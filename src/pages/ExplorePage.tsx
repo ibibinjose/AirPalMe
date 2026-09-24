@@ -7,6 +7,14 @@ import { toast } from "sonner";
 import { useLocalNow } from "@/contexts/LocalNowContext";
 import { useListings } from "@/contexts/ListingsContext";
 import { discoverPlaces } from "@/lib/catalog";
+import {
+  EXPLORE_PRICE_OPTIONS,
+  EXPLORE_WHEN_OPTIONS,
+  filterEventsByWhen,
+  filterPlacesByPrice,
+  type ExplorePrice,
+  type ExploreWhen,
+} from "@/lib/explore-filters";
 import { hrefForPlace } from "@/lib/bio-handle";
 import { knownCityCenter } from "@/lib/cities";
 import { formatPlanDate } from "@shared/plan";
@@ -45,19 +53,24 @@ export function ExplorePage() {
   const [view, setView] = useState<"list" | "map">("list");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
+  const [when, setWhen] = useState<ExploreWhen>("any");
+  const [price, setPrice] = useState<ExplorePrice>("any");
 
   const places = useMemo(
-    () => discoverPlaces(here, city, "city").slice(0, 20),
-    [here, city, version],
+    () => filterPlacesByPrice(discoverPlaces(here, city, "city"), price).slice(0, 20),
+    [here, city, version, price],
   );
 
   const events = useMemo(
     () =>
-      calendarEvents
-        .filter((e) => e.date >= today)
+      filterEventsByWhen(
+        calendarEvents.filter((e) => e.date >= today),
+        when,
+        today,
+      )
         .sort((a, b) => a.date.localeCompare(b.date))
         .slice(0, 12),
-    [calendarEvents, today],
+    [calendarEvents, today, when],
   );
 
   const experiences = useMemo(
@@ -330,26 +343,55 @@ export function ExplorePage() {
         <div className="space-y-5 pb-2">
           <div>
             <p className="text-[13px] font-semibold">When</p>
-            <div className="mt-2 flex gap-2">
-              {["Today", "This weekend", "Next week"].map((w) => (
-                <span key={w} className="rounded-full bg-paper px-4 py-2 text-[13px] font-medium ring-1 ring-line">
-                  {w}
-                </span>
+            <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Filter by when">
+              {EXPLORE_WHEN_OPTIONS.map((w) => (
+                <button
+                  key={w.id}
+                  type="button"
+                  onClick={() => setWhen(w.id)}
+                  aria-pressed={when === w.id}
+                  className={`min-h-[44px] rounded-full px-4 py-2 text-[13px] font-medium ring-1 transition active:scale-95 ${
+                    when === w.id ? "bg-ink text-white ring-ink" : "bg-paper ring-line"
+                  }`}
+                >
+                  {w.label}
+                </button>
               ))}
             </div>
           </div>
           <div>
             <p className="text-[13px] font-semibold">Price</p>
-            <div className="mt-2 flex gap-2">
-              {["Any", "Free", "$", "$$", "$$$"].map((w) => (
-                <span key={w} className="rounded-full bg-paper px-4 py-2 text-[13px] font-medium ring-1 ring-line">
-                  {w}
-                </span>
+            <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Filter by price">
+              {EXPLORE_PRICE_OPTIONS.map((w) => (
+                <button
+                  key={w.id}
+                  type="button"
+                  onClick={() => setPrice(w.id)}
+                  aria-pressed={price === w.id}
+                  className={`min-h-[44px] rounded-full px-4 py-2 text-[13px] font-medium ring-1 transition active:scale-95 ${
+                    price === w.id ? "bg-ink text-white ring-ink" : "bg-paper ring-line"
+                  }`}
+                >
+                  {w.label}
+                </button>
               ))}
             </div>
           </div>
+          {(when !== "any" || price !== "any") && (
+            <button
+              type="button"
+              onClick={() => {
+                setWhen("any");
+                setPrice("any");
+              }}
+              className="min-h-[44px] rounded-full bg-card px-4 py-2 text-[13px] font-semibold ring-1 ring-line active:scale-95"
+            >
+              Clear filters
+            </button>
+          )}
           <p className="text-[13px] text-mute">
-            Full filtering lives on each category surface — this sheet stays light by design.
+            Price applies where a place lists one — unlisted places show under Any. Full filtering lives on each
+            category surface.
           </p>
         </div>
       </Sheet>

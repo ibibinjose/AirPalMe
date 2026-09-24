@@ -4,9 +4,11 @@ import { toast } from "sonner";
 import {
   ArrowLeft,
   Calendar,
+  Check,
   ChevronRight,
   Coffee,
   ContactRound,
+  Copy,
   Edit3,
   Globe,
   HeartHandshake,
@@ -33,6 +35,7 @@ import { BioCatalogSection } from "@/components/bio/BioCatalog";
 import { BioShareModal } from "@/components/bio/BioShareModal";
 import { BioCatchUpModal } from "@/components/bio/BioCatchUpModal";
 import { BioStatusModal } from "@/components/bio/BioStatusModal";
+import { BioKindIcon } from "@/components/bio/BioKindBadge";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { listCatchUpsForHandle, subscribeCatchUpsForOwner, updateCatchUpStatus, type CatchUpItem } from "@/lib/catchup";
 import { toZonedDateStr } from "@/lib/local-time";
@@ -67,7 +70,7 @@ import { cn } from "@/lib/cn";
 import { useClub } from "@/contexts/ClubContext";
 import { PingButton } from "@/components/social/PingButton";
 
-/** Round Google-style action: brand icon in a ringed circle with a label. */
+/** Round action circle button with brand icon and subtitle */
 function BizCircle({
   label,
   Icon,
@@ -80,14 +83,15 @@ function BizCircle({
   onClick?: () => void;
 }) {
   const circle =
-    "grid h-14 w-14 place-items-center rounded-full bg-card text-brand ring-1 ring-line shadow-xs transition active:scale-95";
-  const wrap = "flex min-w-[64px] touch-manipulation flex-col items-center gap-1.5";
-  const caption = "text-[12px] font-semibold text-brand";
+    "grid h-12 w-12 sm:h-14 sm:w-14 place-items-center rounded-2xl sm:rounded-full bg-card text-brand ring-1 ring-line/80 shadow-xs transition-transform duration-150 hover:scale-105 active:scale-95";
+  const wrap = "flex min-w-[56px] sm:min-w-[64px] touch-manipulation flex-col items-center gap-1.5 group";
+  const caption = "text-[11px] sm:text-xs font-semibold text-ink/90 group-hover:text-brand transition-colors";
+
   if (href) {
     return (
       <a href={href} target="_blank" rel="noreferrer" onClick={onClick} className={wrap} aria-label={label}>
         <span className={circle}>
-          <Icon size={22} />
+          <Icon size={20} className="sm:w-[22px] sm:h-[22px]" />
         </span>
         <span className={caption}>{label}</span>
       </a>
@@ -96,7 +100,7 @@ function BizCircle({
   return (
     <button type="button" onClick={onClick} className={wrap} aria-label={label}>
       <span className={circle}>
-        <Icon size={22} />
+        <Icon size={20} className="sm:w-[22px] sm:h-[22px]" />
       </span>
       <span className={caption}>{label}</span>
     </button>
@@ -117,6 +121,7 @@ export function BioPublicPage() {
   const [catchUpModalOpen, setCatchUpModalOpen] = useState(false);
   const [catchUpInitialType, setCatchUpInitialType] = useState<PlanType>("catchup");
   const [catchUpsList, setCatchUpsList] = useState<CatchUpItem[]>([]);
+  const [copiedLink, setCopiedLink] = useState(false);
   const { stalls, getEvent } = useEvents();
   const local = resolvePublicBio(handle, byHandle);
   const [remote, setRemote] = useState<typeof local>();
@@ -174,8 +179,6 @@ export function BioPublicPage() {
   const profile = remote || local;
   const loadFailed = useRef("");
 
-  // A context_view with loadStatus "ok" already fired for /@:handle — pair it
-  // with context_load_failed when the handle resolves to nothing.
   useEffect(() => {
     if (!tried || profile || !handle || loadFailed.current === handle) return;
     loadFailed.current = handle;
@@ -197,53 +200,57 @@ export function BioPublicPage() {
 
   if (!profile && !tried) {
     return (
-      <div className="mx-auto max-w-md pb-12" aria-label="Loading profile" role="status">
-        <div className="h-44 w-full animate-pulse bg-card sm:h-52" />
-        <div className="px-4">
-          <div className="flex items-end justify-between">
-            <div className="-mt-12 sm:-mt-14 h-24 w-24 sm:h-28 sm:w-28 animate-pulse rounded-full bg-card ring-4 ring-paper shadow-md" />
-            <div className="mb-1 h-8 w-24 animate-pulse rounded-full bg-card" />
-          </div>
-          <div className="mt-3 space-y-2">
-            <div className="h-6 w-48 animate-pulse rounded-md bg-card" />
-            <div className="h-3.5 w-24 animate-pulse rounded-md bg-card" />
-            <div className="h-4 w-64 animate-pulse rounded-md bg-card" />
-          </div>
-          <div className="mt-4 flex gap-2">
-            <div className="h-10 flex-1 animate-pulse rounded-full bg-card" />
-            <div className="h-10 flex-1 animate-pulse rounded-full bg-card" />
-            <div className="h-10 w-16 animate-pulse rounded-full bg-card" />
-          </div>
-          <div className="mt-2.5 grid grid-cols-3 gap-2">
-            <div className="h-10 animate-pulse rounded-full bg-card" />
-            <div className="h-10 animate-pulse rounded-full bg-card" />
-            <div className="h-10 animate-pulse rounded-full bg-card" />
+      <div className="mx-auto max-w-lg px-4 py-8" aria-label="Loading profile" role="status">
+        <div className="overflow-hidden rounded-3xl bg-card ring-1 ring-line/70 shadow-xs">
+          <div className="h-44 w-full animate-pulse bg-paper sm:h-52" />
+          <div className="p-5">
+            <div className="flex items-end justify-between">
+              <div className="-mt-14 h-24 w-24 sm:h-28 sm:w-28 animate-pulse rounded-full bg-paper ring-4 ring-card shadow-md" />
+              <div className="mb-1 h-8 w-24 animate-pulse rounded-full bg-paper" />
+            </div>
+            <div className="mt-4 space-y-2.5">
+              <div className="h-7 w-48 animate-pulse rounded-lg bg-paper" />
+              <div className="h-4 w-24 animate-pulse rounded-md bg-paper" />
+              <div className="h-4 w-full animate-pulse rounded-md bg-paper" />
+              <div className="h-4 w-3/4 animate-pulse rounded-md bg-paper" />
+            </div>
+            <div className="mt-5 flex gap-2">
+              <div className="h-10 flex-1 animate-pulse rounded-full bg-paper" />
+              <div className="h-10 flex-1 animate-pulse rounded-full bg-paper" />
+              <div className="h-10 w-16 animate-pulse rounded-full bg-paper" />
+            </div>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              <div className="h-12 animate-pulse rounded-2xl bg-paper" />
+              <div className="h-12 animate-pulse rounded-2xl bg-paper" />
+              <div className="h-12 animate-pulse rounded-2xl bg-paper" />
+            </div>
           </div>
         </div>
       </div>
     );
   }
+
   if (!profile && tried) {
     if (handle) {
       return (
         <div className="mx-auto max-w-md px-4 py-16 text-center">
-          <div className="rounded-3xl border border-line bg-card p-6 shadow-sm">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-              <Sparkles size={28} />
+          <div className="rounded-[32px] border border-line bg-card p-6 sm:p-8 shadow-clay">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-brand/10 text-brand shadow-inner">
+              <Sparkles size={32} />
             </div>
-            <h1 className="font-display mt-4 text-2xl font-bold text-ink">@{handle} is available!</h1>
-            <p className="mt-2 text-sm text-mute">
-              This AirPal handle hasn’t been set up yet. Be the first to claim <strong>@{handle}</strong> and create your public bio page.
+            <h1 className="font-display mt-5 text-2xl sm:text-3xl font-bold text-ink">@{handle} is available!</h1>
+            <p className="mt-2.5 text-sm text-mute leading-relaxed">
+              This AirPal handle hasn’t been set up yet. Be the first to claim <strong>@{handle}</strong> and launch your public bio page.
             </p>
-            <div className="mt-6 flex flex-col gap-2">
+            <div className="mt-6 flex flex-col gap-2.5">
               <Button
                 size="lg"
-                className="w-full gap-2 rounded-2xl bg-brand font-semibold text-white shadow-md hover:brightness-110"
+                className="w-full gap-2 rounded-full bg-brand font-semibold text-white shadow-md hover:brightness-110"
                 onClick={() => nav(`/bio/setup?handle=${handle}`)}
               >
                 Claim @{handle}
               </Button>
-              <Button variant="ghost" className="w-full rounded-2xl" onClick={() => nav("/")}>
+              <Button variant="ghost" className="w-full rounded-full" onClick={() => nav("/")}>
                 Explore AirPal
               </Button>
             </div>
@@ -253,6 +260,7 @@ export function BioPublicPage() {
     }
     return <NotFoundPage />;
   }
+
   if (!profile) return <NotFoundPage />;
   const bio = profile;
 
@@ -347,136 +355,209 @@ export function BioPublicPage() {
     bio.availabilityStatus || (bio.openNow === true ? "available" : bio.openNow === false ? "offline" : "available");
   const statusInfo = AVAILABILITY_STATUSES[statusKey] || AVAILABILITY_STATUSES.available;
 
+  const handleQuickCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(share);
+      setCopiedLink(true);
+      toast.success("Profile link copied to clipboard!");
+      setTimeout(() => setCopiedLink(false), 2000);
+    } catch {
+      toast.message(share);
+    }
+  };
+
   return (
-    <div className="mx-auto max-w-5xl pb-16 pb-safe">
-      {/* Hero Cover Header (clean & bright, no dark overlay scrim) */}
-      <div className="relative overflow-hidden rounded-b-3xl sm:rounded-3xl">
-        {bio.cover ? (
-          <Photo src={bio.cover} className="h-44 w-full object-cover sm:h-56 lg:h-64" />
-        ) : (
-          <div className="relative h-44 w-full overflow-hidden bg-gradient-to-br from-[#1b221d] via-[#222b24] to-[#121614] sm:h-56 lg:h-64">
-            <div className="absolute inset-0 opacity-25 bg-[radial-gradient(#d4af37_1px,transparent_1px)] [background-size:18px_18px]" />
-          </div>
-        )}
+    <div className="mx-auto max-w-2xl pb-20 pb-safe sm:py-6">
+      {/* Main Glass Card Wrapper */}
+      <div className="overflow-hidden bg-card/95 sm:rounded-[36px] sm:ring-1 sm:ring-line/80 sm:shadow-clay backdrop-blur-xl">
+        {/* Cover Hero Header */}
+        <div className="relative overflow-hidden">
+          {bio.cover ? (
+            <Photo src={bio.cover} className="h-48 w-full object-cover sm:h-60" />
+          ) : (
+            <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-[#121829] via-[#1c2438] to-[#0f1424] sm:h-60">
+              <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#1805db_1.5px,transparent_1.5px)] [background-size:20px_20px]" />
+              <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand/20 blur-3xl pointer-events-none" />
+              <div className="absolute -left-16 -bottom-16 h-48 w-48 rounded-full bg-amber-500/15 blur-3xl pointer-events-none" />
+            </div>
+          )}
 
-        {/* Top Floating Controls */}
-        <div className="absolute left-3.5 top-3.5 z-10 inline-flex items-center rounded-2xl bg-white/95 p-1 shadow-md ring-1 ring-black/10 backdrop-blur-md">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (window.history.length > 1) {
-                window.history.back();
-              } else {
-                nav("/");
-              }
-            }}
-            className="flex h-8 w-8 items-center justify-center rounded-xl text-ink/75 transition hover:bg-black/5 hover:text-ink active:scale-95"
-            aria-label="Go back"
-            title="Go back"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <span className="mx-0.5 h-4 w-[1px] bg-line/80" />
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              nav("/");
-            }}
-            className="flex h-8 items-center rounded-xl px-1.5 transition hover:bg-black/5 active:scale-95"
-            aria-label="AirPal Home"
-            title="AirPal Home"
-          >
-            <BrandMark compact />
-          </button>
-        </div>
+          {/* Top Floating Glass Navigation Dock */}
+          <div className="absolute inset-x-3.5 top-3.5 z-10 flex items-center justify-between">
+            {/* Left Pill: Back & AirPal Logo */}
+            <div className="inline-flex items-center rounded-full bg-white/90 p-1 shadow-sm ring-1 ring-black/10 backdrop-blur-md">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (window.history.length > 1) {
+                    window.history.back();
+                  } else {
+                    nav("/");
+                  }
+                }}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-ink/75 transition hover:bg-black/5 hover:text-ink active:scale-95"
+                aria-label="Go back"
+                title="Go back"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+              <span className="mx-0.5 h-3.5 w-[1px] bg-line" />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  nav("/");
+                }}
+                className="flex h-8 items-center rounded-full px-2 transition hover:bg-black/5 active:scale-95"
+                aria-label="AirPal Home"
+                title="AirPal Home"
+              >
+                <BrandMark compact />
+              </button>
+            </div>
 
-        {/* Top Right Bio Handle Badge */}
-        <div className="absolute right-3.5 top-3.5 z-10 flex items-center gap-1.5">
-          <BioHandleButton handle={bio.handle} />
-        </div>
-      </div>
-
-      <div className="px-4">
-        {/* Profile Header: Left-aligned Half-Overlapping Avatar with Availability Ring */}
-        <div className="flex items-end justify-between">
-          <div className="relative">
-            <div
-              className={cn(
-                "-mt-12 sm:-mt-14 relative z-10 h-24 w-24 sm:h-28 sm:w-28 overflow-hidden rounded-full bg-paper ring-4 transition-all duration-300 shadow-md",
-                statusKey === "available" ? "ring-brand" : statusInfo.ringClass,
-              )}
-            >
-              {avatar ? (
-                <Photo src={avatar} className="h-full w-full object-cover" />
-              ) : (
-                <span className="grid h-full w-full place-items-center bg-ink font-display text-3xl font-bold text-white">
-                  {bio.name[0]}
-                </span>
-              )}
+            {/* Right Controls: Quick Copy Link & Handle Badge */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={handleQuickCopy}
+                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-white/90 px-3 text-xs font-semibold text-ink shadow-sm ring-1 ring-black/10 backdrop-blur-md transition hover:bg-white active:scale-95"
+                title="Copy profile link"
+                aria-label="Copy profile link"
+              >
+                {copiedLink ? (
+                  <>
+                    <Check size={13} className="text-emerald-600" />
+                    <span className="text-emerald-600 font-bold">Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy size={13} className="text-mute" />
+                    <span className="hidden xs:inline">Share</span>
+                  </>
+                )}
+              </button>
+              <BioHandleButton handle={bio.handle} className="shadow-sm" />
             </div>
           </div>
+        </div>
 
-          {/* Right Action (Edit profile / Claim / Connect) */}
-          <div className="mb-1 flex items-center gap-2">
-            {isOwner ? (
-              <div className="flex items-center gap-1.5">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-1.5 rounded-full border border-line bg-card px-3 text-xs font-semibold text-ink shadow-sm hover:bg-paper"
-                  onClick={() => setStatusModalOpen(true)}
-                >
-                  <Sparkles size={12} className="text-gold" />
-                  Status
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-1.5 rounded-full border border-line bg-card px-3.5 text-xs font-semibold text-ink shadow-sm hover:bg-paper"
-                  onClick={() => nav("/bio/edit")}
-                >
-                  <Edit3 size={13} />
-                  Edit
-                </Button>
-              </div>
-            ) : unclaimed ? (
-              <Button
-                size="sm"
-                className="rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-sm hover:brightness-110"
-                onClick={() => nav(`/bio/setup?handle=${bio.handle}`)}
-              >
-                Claim @{bio.handle}
-              </Button>
-            ) : bio.kind === "person" ? (
-              <div className="flex items-center gap-1.5">
-                <Button
-                  size="sm"
-                  className="gap-1.5 rounded-full bg-brand px-3.5 text-xs font-semibold text-white shadow-sm hover:brightness-110"
-                  onClick={() => {
-                    if (!requireUser("Sign in to keep the people you meet in one place.")) return;
-                    upsertPerson({
-                      handle: bio.handle,
-                      name: bio.name,
-                      photo: avatar,
-                      whereMet: bio.city || undefined,
-                    });
-                    toast.success(`${bio.name} saved to people you met`);
-                  }}
-                >
-                  <UserPlus size={14} />
-                  Connect
-                </Button>
-                {bio.ownerUid && (!user || bio.ownerUid !== user.uid) && (
-                  <PingButton toUid={bio.ownerUid} toHandle={bio.handle} toName={bio.name} />
+        {/* Profile Content Body */}
+        <div className="px-5 pb-8 sm:px-8">
+          {/* Avatar & Action Button Row */}
+          <div className="flex items-end justify-between">
+            {/* Avatar with Status Glow Ring & Kind Icon */}
+            <div className="relative">
+              <div
+                className={cn(
+                  "-mt-14 sm:-mt-16 relative z-10 h-24 w-24 sm:h-28 sm:w-28 overflow-hidden rounded-full bg-paper ring-4 ring-card transition-all duration-300 shadow-md",
+                  statusKey === "available" ? "ring-offset-2 ring-offset-emerald-500/30" : "",
                 )}
+              >
+                {avatar ? (
+                  <Photo src={avatar} className="h-full w-full object-cover" />
+                ) : (
+                  <span className="grid h-full w-full place-items-center bg-gradient-to-br from-ink to-ink/80 font-display text-3xl font-bold text-white">
+                    {bio.name[0]}
+                  </span>
+                )}
+              </div>
+
+              {/* Status Pulse Indicator */}
+              <span
+                className={cn(
+                  "absolute bottom-0 right-0 z-20 h-5 w-5 rounded-full ring-2 ring-card shadow-sm grid place-items-center",
+                  statusKey === "available" ? "bg-emerald-500" : statusKey === "busy" ? "bg-amber-500" : "bg-zinc-400",
+                )}
+                title={statusInfo.label}
+              >
+                {statusKey === "available" && (
+                  <span className="absolute h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+                )}
+                <BioKindIcon kind={bio.kind} className="h-5 w-5 ring-0" />
+              </span>
+            </div>
+
+            {/* Profile Action Pill (Edit, Status, Claim, Connect) */}
+            <div className="mb-1 flex items-center gap-2">
+              {isOwner ? (
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 rounded-full border border-line bg-paper/80 px-3 text-xs font-semibold text-ink shadow-2xs hover:bg-paper active:scale-95"
+                    onClick={() => setStatusModalOpen(true)}
+                  >
+                    <Sparkles size={13} className="text-gold" />
+                    Status
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 rounded-full border border-line bg-paper/80 px-3.5 text-xs font-semibold text-ink shadow-2xs hover:bg-paper active:scale-95"
+                    onClick={() => nav("/bio/edit")}
+                  >
+                    <Edit3 size={13} />
+                    Edit
+                  </Button>
+                </div>
+              ) : unclaimed ? (
+                <Button
+                  size="sm"
+                  className="rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-sm hover:brightness-110 active:scale-95"
+                  onClick={() => nav(`/bio/setup?handle=${bio.handle}`)}
+                >
+                  Claim @{bio.handle}
+                </Button>
+              ) : bio.kind === "person" ? (
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    size="sm"
+                    className="gap-1.5 rounded-full bg-brand px-3.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 active:scale-95"
+                    onClick={() => {
+                      if (!requireUser("Sign in to keep the people you meet in one place.")) return;
+                      upsertPerson({
+                        handle: bio.handle,
+                        name: bio.name,
+                        photo: avatar,
+                        whereMet: bio.city || undefined,
+                      });
+                      toast.success(`${bio.name} saved to people you met`);
+                    }}
+                  >
+                    <UserPlus size={14} />
+                    Connect
+                  </Button>
+                  {bio.ownerUid && (!user || bio.ownerUid !== user.uid) && (
+                    <PingButton toUid={bio.ownerUid} toHandle={bio.handle} toName={bio.name} />
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 rounded-full border border-line bg-paper/80 px-3 text-xs font-semibold text-ink shadow-2xs hover:bg-paper active:scale-95"
+                    aria-label={`Save ${bio.name} to phone contacts`}
+                    title="Save contact to phone (.vcf)"
+                    onClick={() => {
+                      void openVCardContact({
+                        name: bio.name,
+                        phone: bio.phone,
+                        url: share,
+                        note: `AirPal bio · AirPal.Me/@${bio.handle}`,
+                      });
+                    }}
+                  >
+                    <ContactRound size={14} className="text-brand" />
+                    <span className="hidden sm:inline">Save Contact</span>
+                  </Button>
+                </div>
+              ) : (
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="gap-1.5 rounded-full border border-line bg-card px-3 text-xs font-semibold text-ink shadow-sm hover:bg-paper"
+                  className="gap-1.5 rounded-full border border-line bg-paper/80 px-3 text-xs font-semibold text-ink shadow-2xs hover:bg-paper active:scale-95"
                   aria-label={`Save ${bio.name} to phone contacts`}
                   title="Save contact to phone (.vcf)"
                   onClick={() => {
@@ -491,688 +572,688 @@ export function BioPublicPage() {
                   <ContactRound size={14} className="text-brand" />
                   <span>Save Contact</span>
                 </Button>
-              </div>
-            ) : (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="gap-1.5 rounded-full border border-line bg-card px-3 text-xs font-semibold text-ink shadow-sm hover:bg-paper"
-                aria-label={`Save ${bio.name} to phone contacts`}
-                title="Save contact to phone (.vcf)"
-                onClick={() => {
-                  void openVCardContact({
-                    name: bio.name,
-                    phone: bio.phone,
-                    url: share,
-                    note: `AirPal bio · AirPal.Me/@${bio.handle}`,
-                  });
-                }}
-              >
-                <ContactRound size={14} className="text-brand" />
-                <span>Save Contact</span>
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* Profile Info Left-Aligned */}
-        <div className="mt-3 text-left">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">{bio.name}</h1>
-            {bio.categoryTag && (
-              <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-brand">
-                {bio.categoryTag}
-              </span>
-            )}
-
-            {/* Availability / Custom Status Pill inline next to Name & Actions */}
-            <button
-              type="button"
-              onClick={() => isOwner && setStatusModalOpen(true)}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border transition-all shadow-2xs",
-                statusInfo.badgeBg,
-                statusInfo.textColor,
-                isOwner ? "cursor-pointer hover:brightness-95 active:scale-95" : "cursor-default",
               )}
-              title={isOwner ? "Click to change availability status" : statusInfo.description}
-            >
-              <span>{statusInfo.label}</span>
-              {bio.customStatus && (
-                <>
-                  <span className="opacity-40">·</span>
-                  <span className="font-normal text-ink/90 truncate max-w-[300px]">
-                    {bio.customStatusEmoji && `${bio.customStatusEmoji} `}
-                    {bio.customStatus}
-                  </span>
-                </>
-              )}
-              {isOwner && <Edit3 size={11} className="opacity-60 ml-0.5" />}
-            </button>
-
-            {bio.hours && <span className="text-xs text-mute font-medium">· {bio.hours}</span>}
+            </div>
           </div>
 
-          <p className="mt-1 text-xs font-medium text-mute">
-            @{bio.handle}
-            {bio.pronouns && ` · ${bio.pronouns}`}
-          </p>
+          {/* Profile Name & Primary Identity */}
+          <div className="mt-3.5 text-left">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+                {bio.name}
+              </h1>
+              {bio.categoryTag && (
+                <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-brand">
+                  {bio.categoryTag}
+                </span>
+              )}
+            </div>
 
-          {(bio.city || bio.category || bio.languages) && (
-            <p className="mt-2 inline-flex flex-wrap items-center gap-1.5 text-xs font-medium text-mute">
+            {/* Handle & Subtitle */}
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs font-medium text-mute">
+              <span className="font-semibold text-ink/75">@{bio.handle}</span>
+              {bio.pronouns && <span>· {bio.pronouns}</span>}
               {bio.city && (
-                <>
+                <span className="inline-flex items-center gap-1">
                   <MapPin size={12} className="text-gold shrink-0" aria-hidden />
-                  <span>{bio.city}</span>
-                </>
+                  {bio.city}
+                </span>
               )}
               {bio.category && (
                 <span>· {BUSINESS_CATEGORIES.find((c) => c.id === bio.category)?.label}</span>
               )}
-              {bio.languages && <span>· Languages: {bio.languages}</span>}
-            </p>
-          )}
-
-          {bio.shortWhy && <p className="mt-2 text-[14px] leading-relaxed text-ink/85 font-normal">{bio.shortWhy}</p>}
-
-          {/* Extended Bio / About Story Card */}
-          {bio.aboutText && (
-            <div id="bio-about" className="mt-3.5 scroll-mt-24 rounded-2xl bg-card p-4 border border-line/70 shadow-xs">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-gold mb-1">About Story</p>
-              <p className="text-xs leading-relaxed text-ink/80 whitespace-pre-line">{bio.aboutText}</p>
+              {bio.languages && <span>· {bio.languages}</span>}
             </div>
-          )}
-        </div>
 
-        <div className="mt-4 flex items-center gap-2">
-          <FollowButton handle={bio.handle} name={bio.name} className="flex-1 h-10 text-xs font-semibold" />
-          <LikeButton handle={bio.handle} name={bio.name} className="flex-1 h-10 text-xs font-semibold" />
-          <button
-            type="button"
-            onClick={() => setShareModalOpen(true)}
-            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink shadow-sm ring-1 ring-line transition hover:bg-paper active:scale-95 shrink-0"
-            title="Share & QR"
-          >
-            <QrCode size={15} className="text-gold" />
-            <span>QR</span>
-          </button>
-        </div>
-
-        {/* Primary Action Row 2: [Website], [WhatsApp], [Call] in one line */}
-        <div className="mt-2.5 grid grid-cols-3 gap-2">
-          {websiteUrl ? (
-            <a
-              href={websiteUrl}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => recordTap(bio.handle, websiteLink?.type || "website")}
-              className="flex h-10 items-center justify-center gap-1.5 rounded-full bg-card px-2 text-xs font-semibold text-ink shadow-sm ring-1 ring-line transition hover:bg-paper hover:ring-sky-500/40 active:scale-95"
-            >
-              <Globe size={14} className="text-sky-600 shrink-0" />
-              <span className="truncate">Website</span>
-            </a>
-          ) : (
-            <div className="flex h-10 items-center justify-center gap-1.5 rounded-full bg-card/40 px-2 text-xs font-medium text-mute/50 ring-1 ring-line/40 cursor-not-allowed">
-              <Globe size={14} className="opacity-40 shrink-0" />
-              <span className="truncate">Website</span>
-            </div>
-          )}
-
-          {whatsappUrl ? (
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => recordTap(bio.handle, "whatsapp")}
-              className="flex h-10 items-center justify-center gap-1.5 rounded-full bg-card px-2 text-xs font-semibold text-ink shadow-sm ring-1 ring-line transition hover:bg-paper hover:ring-emerald-500/40 active:scale-95"
-            >
-              <MessageCircle size={14} className="text-emerald-600 shrink-0" />
-              <span className="truncate">WhatsApp</span>
-            </a>
-          ) : (
-            <div className="flex h-10 items-center justify-center gap-1.5 rounded-full bg-card/40 px-2 text-xs font-medium text-mute/50 ring-1 ring-line/40 cursor-not-allowed">
-              <MessageCircle size={14} className="opacity-40 shrink-0" />
-              <span className="truncate">WhatsApp</span>
-            </div>
-          )}
-
-          {tel ? (
-            <a
-              href={tel}
-              onClick={() => recordTap(bio.handle, "call")}
-              className="flex h-10 items-center justify-center gap-1.5 rounded-full bg-card px-2 text-xs font-semibold text-ink shadow-sm ring-1 ring-line transition hover:bg-paper hover:ring-amber-500/40 active:scale-95"
-            >
-              <Phone size={14} className="text-amber-600 shrink-0" />
-              <span className="truncate">Call</span>
-            </a>
-          ) : (
-            <div className="flex h-10 items-center justify-center gap-1.5 rounded-full bg-card/40 px-2 text-xs font-medium text-mute/50 ring-1 ring-line/40 cursor-not-allowed">
-              <Phone size={14} className="opacity-40 shrink-0" />
-              <span className="truncate">Call</span>
-            </div>
-          )}
-        </div>
-
-        {/* Business profile — Google-style status, sections, actions, info, follow */}
-        {bio.kind === "business" && (
-          <div className="mt-5">
-            <p className="text-[15px]">
-              <span className={cn("font-semibold", bio.openNow ? "text-emerald-700" : "text-red-600")}>
-                {bio.openNow ? "Open now" : "Closed"}
-              </span>
-              {bio.hours && <span className="text-mute"> · {bio.hours}</span>}
-            </p>
-
-            <div
-              className="mt-3 flex gap-2 overflow-x-auto pb-1 no-scrollbar"
-              role="navigation"
-              aria-label="Business sections"
-            >
+            {/* Interactive Availability / Custom Status Pill */}
+            <div className="mt-2.5">
               <button
                 type="button"
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                className="h-10 shrink-0 rounded-full bg-ink px-4 text-sm font-semibold text-white transition active:scale-95"
+                onClick={() => isOwner && setStatusModalOpen(true)}
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold border transition-all duration-200 shadow-2xs",
+                  statusInfo.badgeBg,
+                  statusInfo.textColor,
+                  isOwner ? "cursor-pointer hover:brightness-95 active:scale-95" : "cursor-default",
+                )}
+                title={isOwner ? "Click to change status" : statusInfo.description}
               >
-                Overview
+                <span className="h-2 w-2 rounded-full bg-current shrink-0" />
+                <span>{statusInfo.label}</span>
+                {bio.customStatus && (
+                  <>
+                    <span className="opacity-40">·</span>
+                    <span className="font-normal text-ink/90 truncate max-w-[280px]">
+                      {bio.customStatusEmoji && `${bio.customStatusEmoji} `}
+                      {bio.customStatus}
+                    </span>
+                  </>
+                )}
+                {isOwner && <Edit3 size={11} className="opacity-60 ml-0.5" />}
               </button>
-              {liveOffer && (
-                <button
-                  type="button"
-                  onClick={() => document.getElementById("bio-offers")?.scrollIntoView({ behavior: "smooth" })}
-                  className="h-10 shrink-0 rounded-full bg-paper px-4 text-sm font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
-                >
-                  Offers
-                </button>
-              )}
-              {(bio.products || []).length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => document.getElementById("bio-products")?.scrollIntoView({ behavior: "smooth" })}
-                  className="h-10 shrink-0 rounded-full bg-paper px-4 text-sm font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
-                >
-                  Products
-                </button>
-              )}
-              {(bio.services || []).length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => document.getElementById("bio-services")?.scrollIntoView({ behavior: "smooth" })}
-                  className="h-10 shrink-0 rounded-full bg-paper px-4 text-sm font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
-                >
-                  Services
-                </button>
-              )}
-              {bio.aboutText && (
-                <button
-                  type="button"
-                  onClick={() => document.getElementById("bio-about")?.scrollIntoView({ behavior: "smooth" })}
-                  className="h-10 shrink-0 rounded-full bg-paper px-4 text-sm font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
-                >
-                  About
-                </button>
-              )}
             </div>
 
-            <div className="mt-4 flex gap-3 overflow-x-auto pb-1 no-scrollbar" aria-label="Contact actions">
-              {tel && (
-                <BizCircle label="Call" Icon={Phone} href={tel} onClick={() => recordTap(bio.handle, "call")} />
-              )}
-              {maps && (
+            {/* Elevator Pitch / Short Why */}
+            {bio.shortWhy && (
+              <p className="mt-3 text-[14px] sm:text-[15px] leading-relaxed text-ink/85 font-normal">
+                {bio.shortWhy}
+              </p>
+            )}
+
+            {/* Extended About Story Card */}
+            {bio.aboutText && (
+              <div id="bio-about" className="mt-4 scroll-mt-24 rounded-3xl bg-paper/60 p-4 sm:p-5 border border-line/80 shadow-2xs">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-gold mb-1.5">
+                  About Story
+                </p>
+                <p className="text-xs sm:text-sm leading-relaxed text-ink/80 whitespace-pre-line">
+                  {bio.aboutText}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Social Engagement Deck (Follow, Like, QR Share) */}
+          <div className="mt-5 flex items-center gap-2">
+            <FollowButton handle={bio.handle} name={bio.name} className="flex-1 h-10 text-xs font-semibold" />
+            <LikeButton handle={bio.handle} name={bio.name} className="flex-1 h-10 text-xs font-semibold" />
+            <button
+              type="button"
+              onClick={() => setShareModalOpen(true)}
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-paper px-4 text-xs font-semibold text-ink shadow-2xs ring-1 ring-line/80 transition hover:bg-paper/80 active:scale-95 shrink-0"
+              title="Share & QR Code"
+            >
+              <QrCode size={15} className="text-gold" />
+              <span>QR</span>
+            </button>
+          </div>
+
+          {/* 1-Tap Quick Action Deck: [Website], [WhatsApp], [Call] */}
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {websiteUrl ? (
+              <a
+                href={websiteUrl}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => recordTap(bio.handle, websiteLink?.type || "website")}
+                className="group flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-paper/70 px-2 text-xs font-semibold text-ink ring-1 ring-line/80 transition-all duration-200 hover:bg-paper hover:ring-sky-500/40 active:scale-95 shadow-2xs"
+              >
+                <Globe size={15} className="text-sky-600 shrink-0 group-hover:scale-110 transition-transform" />
+                <span className="truncate">Website</span>
+              </a>
+            ) : (
+              <div className="flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-paper/30 px-2 text-xs font-medium text-mute/50 ring-1 ring-line/40 cursor-not-allowed">
+                <Globe size={15} className="opacity-40 shrink-0" />
+                <span className="truncate">Website</span>
+              </div>
+            )}
+
+            {whatsappUrl ? (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => recordTap(bio.handle, "whatsapp")}
+                className="group flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-paper/70 px-2 text-xs font-semibold text-ink ring-1 ring-line/80 transition-all duration-200 hover:bg-paper hover:ring-emerald-500/40 active:scale-95 shadow-2xs"
+              >
+                <MessageCircle size={15} className="text-emerald-600 shrink-0 group-hover:scale-110 transition-transform" />
+                <span className="truncate">WhatsApp</span>
+              </a>
+            ) : (
+              <div className="flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-paper/30 px-2 text-xs font-medium text-mute/50 ring-1 ring-line/40 cursor-not-allowed">
+                <MessageCircle size={15} className="opacity-40 shrink-0" />
+                <span className="truncate">WhatsApp</span>
+              </div>
+            )}
+
+            {tel ? (
+              <a
+                href={tel}
+                onClick={() => recordTap(bio.handle, "call")}
+                className="group flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-paper/70 px-2 text-xs font-semibold text-ink ring-1 ring-line/80 transition-all duration-200 hover:bg-paper hover:ring-amber-500/40 active:scale-95 shadow-2xs"
+              >
+                <Phone size={15} className="text-amber-600 shrink-0 group-hover:scale-110 transition-transform" />
+                <span className="truncate">Call</span>
+              </a>
+            ) : (
+              <div className="flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-paper/30 px-2 text-xs font-medium text-mute/50 ring-1 ring-line/40 cursor-not-allowed">
+                <Phone size={15} className="opacity-40 shrink-0" />
+                <span className="truncate">Call</span>
+              </div>
+            )}
+          </div>
+
+          {/* Business profile specific overview & actions */}
+          {bio.kind === "business" && (
+            <div className="mt-6">
+              <div className="flex items-center justify-between">
+                <p className="text-[14px] font-semibold">
+                  <span className={cn(bio.openNow ? "text-emerald-600" : "text-red-500")}>
+                    ● {bio.openNow ? "Open now" : "Closed"}
+                  </span>
+                  {bio.hours && <span className="text-mute font-normal"> · {bio.hours}</span>}
+                </p>
+              </div>
+
+              {/* Section Tabs */}
+              <div
+                className="mt-3.5 flex gap-2 overflow-x-auto pb-1 no-scrollbar"
+                role="navigation"
+                aria-label="Business sections"
+              >
+                <button
+                  type="button"
+                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                  className="h-9 shrink-0 rounded-full bg-ink px-4 text-xs font-semibold text-white transition active:scale-95"
+                >
+                  Overview
+                </button>
+                {liveOffer && (
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("bio-offers")?.scrollIntoView({ behavior: "smooth" })}
+                    className="h-9 shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
+                  >
+                    Offers
+                  </button>
+                )}
+                {(bio.products || []).length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("bio-products")?.scrollIntoView({ behavior: "smooth" })}
+                    className="h-9 shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
+                  >
+                    Products
+                  </button>
+                )}
+                {(bio.services || []).length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("bio-services")?.scrollIntoView({ behavior: "smooth" })}
+                    className="h-9 shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
+                  >
+                    Services
+                  </button>
+                )}
+                {bio.aboutText && (
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("bio-about")?.scrollIntoView({ behavior: "smooth" })}
+                    className="h-9 shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
+                  >
+                    About
+                  </button>
+                )}
+              </div>
+
+              {/* Action Circles */}
+              <div className="mt-4 flex gap-3 overflow-x-auto pb-1 no-scrollbar" aria-label="Contact actions">
+                {tel && (
+                  <BizCircle label="Call" Icon={Phone} href={tel} onClick={() => recordTap(bio.handle, "call")} />
+                )}
+                {maps && (
+                  <BizCircle
+                    label="Directions"
+                    Icon={Navigation}
+                    href={maps}
+                    onClick={() => {
+                      recordTap(bio.handle, "maps");
+                      trackMapClick({ source: "bio" });
+                    }}
+                  />
+                )}
+                {websiteUrl && (
+                  <BizCircle
+                    label="Website"
+                    Icon={Globe}
+                    href={websiteUrl}
+                    onClick={() => recordTap(bio.handle, websiteLink?.type || "website")}
+                  />
+                )}
+                <BizCircle label="Share" Icon={Share2} onClick={() => setShareModalOpen(true)} />
                 <BizCircle
-                  label="Directions"
-                  Icon={Navigation}
-                  href={maps}
+                  label="Save"
+                  Icon={ContactRound}
                   onClick={() => {
-                    recordTap(bio.handle, "maps");
-                    trackMapClick({ source: "bio" });
+                    void openVCardContact({
+                      name: bio.name,
+                      phone: bio.phone,
+                      url: share,
+                      note: `AirPal bio · AirPal.Me/@${bio.handle}`,
+                    });
                   }}
                 />
-              )}
-              {websiteUrl && (
-                <BizCircle
-                  label="Website"
-                  Icon={Globe}
-                  href={websiteUrl}
-                  onClick={() => recordTap(bio.handle, websiteLink?.type || "website")}
-                />
-              )}
-              <BizCircle label="Share" Icon={Share2} onClick={() => setShareModalOpen(true)} />
-              <BizCircle
-                label="Save"
-                Icon={ContactRound}
-                onClick={() => {
-                  void openVCardContact({
-                    name: bio.name,
-                    phone: bio.phone,
-                    url: share,
-                    note: `AirPal bio · AirPal.Me/@${bio.handle}`,
-                  });
-                }}
-              />
-            </div>
+              </div>
 
-            {(bio.city || bio.hours || bio.phone) && (
-              <ul className="mt-4 divide-y divide-line/70 rounded-[28px] bg-card ring-1 ring-line">
-                {bio.city && (
-                  <li>
+              {/* Business Location & Trading Hours Schedule Card */}
+              {(bio.city || bio.hours || bio.phone) && (
+                <div className="mt-5 divide-y divide-line/70 rounded-3xl bg-paper/60 ring-1 ring-line/80 overflow-hidden shadow-2xs">
+                  {bio.city && (
                     <a
                       href={maps || undefined}
                       target={maps ? "_blank" : undefined}
                       rel="noreferrer"
                       onClick={() => maps && recordTap(bio.handle, "maps")}
-                      className="flex items-center gap-3 p-4"
+                      className="flex items-center gap-3 p-4 transition hover:bg-paper"
                     >
-                      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
-                        <MapPin size={20} />
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
+                        <MapPin size={18} />
                       </span>
-                      <span className="min-w-0 flex-1 text-[15px] font-medium text-ink">{bio.city}</span>
+                      <span className="min-w-0 flex-1 text-sm font-medium text-ink">{bio.city}</span>
                       {maps && <ChevronRight size={18} className="shrink-0 text-mute" />}
                     </a>
-                  </li>
-                )}
-                {bio.hours && (
-                  <li>
-                    <TradingHoursScheduleView
-                      hours={bio.hours}
-                      placeName={bio.name || bio.handle}
-                      variant="row"
-                    />
-                  </li>
-                )}
-                {bio.phone && (
-                  <li>
-                    <a href={tel || undefined} onClick={() => recordTap(bio.handle, "call")} className="flex items-center gap-3 p-4">
-                      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
-                        <Phone size={20} />
+                  )}
+                  {bio.hours && (
+                    <div className="p-1">
+                      <TradingHoursScheduleView
+                        hours={bio.hours}
+                        placeName={bio.name || bio.handle}
+                        variant="row"
+                      />
+                    </div>
+                  )}
+                  {bio.phone && (
+                    <a
+                      href={tel || undefined}
+                      onClick={() => recordTap(bio.handle, "call")}
+                      className="flex items-center gap-3 p-4 transition hover:bg-paper"
+                    >
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
+                        <Phone size={18} />
                       </span>
-                      <span className="min-w-0 flex-1 text-[15px] font-medium text-ink">{bio.phone}</span>
+                      <span className="min-w-0 flex-1 text-sm font-medium text-ink">{bio.phone}</span>
                       <ChevronRight size={18} className="shrink-0 text-mute" />
                     </a>
-                  </li>
-                )}
-              </ul>
-            )}
-
-            <div className="mt-4 rounded-[28px] bg-card p-4 ring-1 ring-line">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
-                Follow @{bio.handle}
-              </p>
-              <BioSocials links={bio.links} onTap={(kind) => recordTap(bio.handle, kind)} />
+                  )}
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Who is interested to catch up with you (Owner Inbox & Requests) */}
-        {isOwner && catchUpsList.length > 0 && (
-          <div className="mt-5 rounded-3xl bg-gradient-to-br from-amber-500/10 via-paper to-card p-5 ring-1 ring-amber-500/30 shadow-xs">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-amber-700">
-                <HeartHandshake size={14} className="text-amber-600" />
-                <span>Interested in Catching Up ({catchUpsList.length})</span>
+          {/* Owner Catch-up Proposals & Requests Inbox */}
+          {isOwner && catchUpsList.length > 0 && (
+            <div className="mt-6 rounded-3xl bg-gradient-to-br from-amber-500/10 via-paper to-card p-5 ring-1 ring-amber-500/30 shadow-xs">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-amber-700">
+                  <HeartHandshake size={14} className="text-amber-600" />
+                  <span>Interested in Catching Up ({catchUpsList.length})</span>
+                </div>
+                <span className="text-[10px] font-bold rounded-full bg-amber-500/20 px-2.5 py-0.5 text-amber-800">
+                  Inbox
+                </span>
               </div>
-              <span className="text-[10px] font-bold rounded-full bg-amber-500/20 px-2 py-0.5 text-amber-800">
-                Inbox
-              </span>
-            </div>
 
-            <p className="mt-1 text-xs text-mute">People who want to meet, grab coffee or sync up with you.</p>
+              <p className="mt-1 text-xs text-mute leading-relaxed">
+                People who want to meet, grab coffee, or collaborate with you.
+              </p>
 
-            <div className="mt-3 space-y-2.5">
-              {catchUpsList.map((item) => {
-                const eventPayload = {
-                  title: `${item.type === "meeting" ? "Meeting" : item.type === "nightout" ? "Hangout" : "Catch Up"}: ${item.requesterName}`,
-                  description: `${item.notes || `AirPal with ${item.requesterName}`}\nVenue: ${item.venue || "TBD"}\nhttps://airpal.me/@${bio.handle}`,
-                  startsAt: `${item.date || toZonedDateStr(new Date())}T${item.time || "14:00"}:00`,
-                  venue: item.venue,
-                  city: bio.city,
-                };
+              <div className="mt-3.5 space-y-2.5">
+                {catchUpsList.map((item) => {
+                  const eventPayload = {
+                    title: `${item.type === "meeting" ? "Meeting" : item.type === "nightout" ? "Hangout" : "Catch Up"}: ${item.requesterName}`,
+                    description: `${item.notes || `AirPal with ${item.requesterName}`}\nVenue: ${item.venue || "TBD"}\nhttps://airpal.me/@${bio.handle}`,
+                    startsAt: `${item.date || toZonedDateStr(new Date())}T${item.time || "14:00"}:00`,
+                    venue: item.venue,
+                    city: bio.city,
+                  };
 
-                return (
-                  <div
-                    key={item.id}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl bg-card p-3.5 ring-1 ring-line shadow-xs"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="h-10 w-10 overflow-hidden rounded-full ring-1 ring-line bg-paper shrink-0">
-                        {item.requesterPhoto ? (
-                          <Photo src={item.requesterPhoto} className="h-full w-full object-cover" />
-                        ) : (
-                          <span className="grid h-full w-full place-items-center bg-ink font-bold text-sm text-white">
-                            {item.requesterName[0]}
-                          </span>
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <p className="font-semibold text-xs text-ink truncate">{item.requesterName}</p>
-                          {item.requesterHandle && (
-                            <Link
-                              href={`/@${item.requesterHandle}`}
-                              className="text-[11px] text-mute hover:text-brand truncate"
-                            >
-                              @{item.requesterHandle}
-                            </Link>
+                  return (
+                    <div
+                      key={item.id}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl bg-card p-3.5 ring-1 ring-line/80 shadow-2xs"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="h-10 w-10 overflow-hidden rounded-full ring-1 ring-line bg-paper shrink-0">
+                          {item.requesterPhoto ? (
+                            <Photo src={item.requesterPhoto} className="h-full w-full object-cover" />
+                          ) : (
+                            <span className="grid h-full w-full place-items-center bg-ink font-bold text-sm text-white">
+                              {item.requesterName[0]}
+                            </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-mute truncate mt-0.5">
-                          {item.type === "meeting"
-                            ? "📅 Meeting"
-                            : item.type === "nightout"
-                              ? "👥 Hangout"
-                              : "☕ Catch Up"}
-                          {item.date && ` · ${item.date}`}
-                          {item.time && ` @ ${item.time}`}
-                          {item.venue && ` · ${item.venue}`}
-                        </p>
-                        {item.notes && <p className="text-[11px] text-ink/80 italic mt-0.5 truncate">"{item.notes}"</p>}
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <p className="font-semibold text-xs text-ink truncate">{item.requesterName}</p>
+                            {item.requesterHandle && (
+                              <Link
+                                href={`/@${item.requesterHandle}`}
+                                className="text-[11px] text-mute hover:text-brand truncate"
+                              >
+                                @{item.requesterHandle}
+                              </Link>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-mute truncate mt-0.5">
+                            {item.type === "meeting"
+                              ? "📅 Meeting"
+                              : item.type === "nightout"
+                                ? "👥 Hangout"
+                                : "☕ Catch Up"}
+                            {item.date && ` · ${item.date}`}
+                            {item.time && ` @ ${item.time}`}
+                            {item.venue && ` · ${item.venue}`}
+                          </p>
+                          {item.notes && <p className="text-[11px] text-ink/80 italic mt-0.5 truncate">"{item.notes}"</p>}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                        <AddToCalendarMenu
+                          event={eventPayload}
+                          size="sm"
+                          variant="ghost"
+                          label="Sync"
+                          buttonClassName="h-8 px-2.5 text-[11px] rounded-full border border-line"
+                        />
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0 rounded-full text-mute hover:text-ink hover:bg-black/5"
+                          onClick={() => {
+                            updateCatchUpStatus(item.id, "dismissed");
+                            setCatchUpsList((prev) => prev.filter((i) => i.id !== item.id));
+                            toast.info("Request dismissed");
+                          }}
+                        >
+                          <X size={14} />
+                        </Button>
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
-                      <AddToCalendarMenu
-                        event={eventPayload}
-                        size="sm"
-                        variant="ghost"
-                        label="Sync Calendar"
-                        buttonClassName="h-7 px-2 text-[11px] rounded-lg"
-                      />
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 px-2 text-[11px] rounded-lg text-mute hover:text-ink"
-                        onClick={() => {
-                          updateCatchUpStatus(item.id, "dismissed");
-                          setCatchUpsList((prev) => prev.filter((i) => i.id !== item.id));
-                          toast.info("Request dismissed");
-                        }}
-                      >
-                        <X size={12} />
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {!isOwner && bio.kind === "business" && ((bio.products || []).length > 0 || (bio.services || []).length > 0) && (
-          <div className="mt-6 rounded-3xl bg-card p-5 shadow-[0_4px_16px_rgba(18,22,20,0.08)] ring-1 ring-line">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Book</p>
-            <h3 className="font-display mt-1.5 text-lg font-semibold text-ink">Products &amp; services</h3>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              {(bio.products || []).length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => document.getElementById("bio-products")?.scrollIntoView({ behavior: "smooth" })}
-                  className="rounded-2xl bg-brand px-2 py-3 text-center text-sm font-bold text-white shadow-[0_6px_20px_rgba(24,5,219,0.35)] transition active:scale-[0.98]"
-                >
-                  Products
-                </button>
-              )}
-              {(bio.services || []).length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => document.getElementById("bio-services")?.scrollIntoView({ behavior: "smooth" })}
-                  className="rounded-2xl bg-ink px-2 py-3 text-center text-sm font-bold text-white transition active:scale-[0.98]"
-                >
-                  Services
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+          {/* Catch Up & Hangout Deck for Personal / Mate Profiles */}
+          {!isOwner && !(bio.kind === "business" && ((bio.products || []).length > 0 || (bio.services || []).length > 0)) && (
+            <div className="mt-6 rounded-3xl bg-gradient-to-br from-paper/90 via-card to-paper/60 p-5 ring-1 ring-line/80 shadow-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
+                  Meet &amp; Hangout
+                </span>
+                <span className="text-[10px] font-medium text-mute uppercase tracking-wider">
+                  AirPal Connect
+                </span>
+              </div>
+              <h3 className="font-display mt-1.5 text-lg font-bold text-ink">
+                Catch up with {bio.name}
+              </h3>
+              <p className="mt-1 text-xs leading-relaxed text-mute">
+                Propose a 1-on-1 coffee, schedule a sync meeting, or create a group hangout plan.
+              </p>
 
-        {!isOwner && !(bio.kind === "business" && ((bio.products || []).length > 0 || (bio.services || []).length > 0)) && (
-          <div className="mt-6 rounded-3xl bg-card p-5 ring-1 ring-line">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Meet &amp; hangout</p>
-            <h3 className="font-display mt-1.5 text-lg font-semibold text-ink">Catch up or meet with {bio.name}</h3>
-            <p className="mt-1 text-[13px] leading-relaxed text-mute">
-              Propose a 1-on-1 coffee, schedule a sync meeting, or create a group hangout plan.
-            </p>
-            <div className="mt-4 grid grid-cols-3 gap-2">
-              {(
-                [
-                  {
-                    type: "catchup" as const,
-                    label: "Catch Up",
-                    sub: "1-on-1 coffee",
-                    Icon: Coffee,
-                    tint: "bg-amber-500/15 text-amber-700",
-                  },
-                  {
-                    type: "meeting" as const,
-                    label: "Meeting",
-                    sub: "1-on-1 sync",
-                    Icon: Calendar,
-                    tint: "bg-sky-500/15 text-sky-700",
-                  },
-                  {
-                    type: "nightout" as const,
-                    label: "Hangout",
-                    sub: "Group plan",
-                    Icon: Users,
-                    tint: "bg-violet-500/15 text-violet-700",
-                  },
-                ] as const
-              ).map((opt) => (
-                <button
-                  key={opt.type}
-                  type="button"
-                  onClick={() => {
-                    setCatchUpInitialType(opt.type);
-                    setCatchUpModalOpen(true);
-                  }}
-                  className="flex flex-col items-center rounded-2xl bg-paper px-2 py-3 text-center ring-1 ring-line transition hover:ring-brand/40 active:scale-[0.98]"
-                >
-                  <span className={cn("mb-1.5 grid h-10 w-10 place-items-center rounded-2xl", opt.tint)}>
-                    <opt.Icon size={18} />
-                  </span>
-                  <span className="text-xs font-bold text-ink">{opt.label}</span>
-                  <span className="mt-0.5 text-[10px] text-mute">{opt.sub}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* What's On — Appearing at Events */}
-        {appearing.length > 0 && (
-          <div className="mt-7">
-            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">What’s On</p>
-            <div className="mt-2 space-y-2">
-              {appearing.map((s) => {
-                const event = getEvent(s.eventId);
-                return (
+              <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+                {(
+                  [
+                    {
+                      type: "catchup" as const,
+                      label: "Catch Up",
+                      sub: "1-on-1 coffee",
+                      Icon: Coffee,
+                      tint: "bg-amber-500/15 text-amber-700",
+                    },
+                    {
+                      type: "meeting" as const,
+                      label: "Meeting",
+                      sub: "1-on-1 sync",
+                      Icon: Calendar,
+                      tint: "bg-sky-500/15 text-sky-700",
+                    },
+                    {
+                      type: "nightout" as const,
+                      label: "Hangout",
+                      sub: "Group plan",
+                      Icon: Users,
+                      tint: "bg-violet-500/15 text-violet-700",
+                    },
+                  ] as const
+                ).map((opt) => (
                   <button
-                    key={s.id}
+                    key={opt.type}
                     type="button"
-                    onClick={() => nav(`/e/${s.eventId}`)}
-                    className="w-full rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line transition hover:bg-card/80"
+                    onClick={() => {
+                      setCatchUpInitialType(opt.type);
+                      setCatchUpModalOpen(true);
+                    }}
+                    className="flex flex-col items-center rounded-2xl bg-card p-3 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98]"
                   >
-                    <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-gold">Appearing at</p>
-                    <p className="font-medium">{event?.name || "Event / Market"}</p>
-                    {s.booth && <p className="text-sm text-mute">Booth {s.booth}</p>}
+                    <span className={cn("mb-2 grid h-10 w-10 place-items-center rounded-2xl", opt.tint)}>
+                      <opt.Icon size={18} />
+                    </span>
+                    <span className="text-xs font-bold text-ink">{opt.label}</span>
+                    <span className="mt-0.5 text-[10px] text-mute">{opt.sub}</span>
                   </button>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Featured Live Offer Banner */}
-        {liveOffer && (
-          <div id="bio-offers" className="mt-7 scroll-mt-24 overflow-hidden rounded-3xl bg-gradient-to-br from-card to-paper p-5 ring-1 ring-gold/40 shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
-                <Sparkles size={12} />
-                {liveOffer.badge}
-              </span>
-              <span className="text-[11px] font-medium text-mute uppercase tracking-wider">AirPal Offer</span>
+          {/* What's On / Appearing at Events */}
+          {appearing.length > 0 && (
+            <div className="mt-7">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">What’s On</p>
+              <div className="mt-2.5 space-y-2">
+                {appearing.map((s) => {
+                  const event = getEvent(s.eventId);
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => nav(`/e/${s.eventId}`)}
+                      className="w-full flex items-center justify-between rounded-3xl bg-card p-4 text-left ring-1 ring-line/80 transition hover:bg-paper shadow-2xs active:scale-[0.99]"
+                    >
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold">Appearing at</p>
+                        <p className="font-display text-sm font-bold text-ink mt-0.5">{event?.name || "Event / Market"}</p>
+                        {s.booth && <p className="text-xs text-mute mt-0.5">Booth {s.booth}</p>}
+                      </div>
+                      <ChevronRight size={18} className="text-mute shrink-0" />
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <h3 className="font-display mt-2.5 text-xl font-bold leading-snug text-ink">{liveOffer.title}</h3>
-            <p className="mt-1 text-sm leading-relaxed text-mute">{liveOffer.detail}</p>
-            <Button
-              className="mt-4 w-full gap-2 bg-brand text-white hover:bg-brand-ink"
-              onClick={() =>
-                onClaimDeal({
-                  id: "live-offer",
-                  kind: "deal",
-                  title: liveOffer.title,
-                  detail: liveOffer.detail,
-                  badge: liveOffer.badge,
-                })
-              }
-            >
-              <Ticket size={16} className="text-gold" />
-              Claim Live Offer
-            </Button>
+          )}
+
+          {/* Featured Live Offer Banner */}
+          {liveOffer && (
+            <div id="bio-offers" className="mt-7 scroll-mt-24 overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card to-paper p-5 ring-1 ring-gold/40 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">
+                  <Sparkles size={11} />
+                  {liveOffer.badge}
+                </span>
+                <span className="text-[10px] font-medium text-mute uppercase tracking-wider">AirPal Offer</span>
+              </div>
+              <h3 className="font-display mt-2.5 text-lg sm:text-xl font-bold leading-snug text-ink">{liveOffer.title}</h3>
+              <p className="mt-1 text-xs sm:text-sm leading-relaxed text-mute">{liveOffer.detail}</p>
+              <Button
+                className="mt-4 w-full gap-2 rounded-full bg-brand text-white shadow-sm hover:brightness-110 active:scale-[0.98]"
+                onClick={() =>
+                  onClaimDeal({
+                    id: "live-offer",
+                    kind: "deal",
+                    title: liveOffer.title,
+                    detail: liveOffer.detail,
+                    badge: liveOffer.badge,
+                  })
+                }
+              >
+                <Ticket size={15} className="text-gold" />
+                Claim Live Offer
+              </Button>
+            </div>
+          )}
+
+          {/* Secondary Deals, Products & Services Catalog */}
+          <BioCatalogSection
+            label={liveOffer ? "More Deals & Offers" : "Deals & Offers"}
+            items={deals}
+            featured={!liveOffer}
+            onTap={(kind) => recordTap(bio.handle, kind)}
+            onClaim={onClaimDeal}
+          />
+          <BioCatalogSection
+            label="Products"
+            items={bio.products || []}
+            onTap={(kind) => recordTap(bio.handle, kind)}
+            id="bio-products"
+          />
+          <BioCatalogSection
+            label="Services"
+            items={bio.services || []}
+            onTap={(kind) => recordTap(bio.handle, kind)}
+            id="bio-services"
+          />
+
+          {/* Custom Outbound Links Stack */}
+          {stacked.length > 0 && (
+            <div className="mt-7">
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold mb-2.5">
+                Featured Links
+              </h3>
+              <ul className="space-y-2.5">
+                {stacked
+                  .filter((link) => isSafeBioHref(link.href))
+                  .map((link) => (
+                    <li key={link.id}>
+                      <a
+                        href={link.href}
+                        target={link.href.startsWith("http") ? "_blank" : undefined}
+                        rel="noreferrer"
+                        onClick={() => recordTap(bio.handle, link.type)}
+                        className="group flex h-13 sm:h-14 items-center justify-between rounded-full bg-brand px-6 text-sm sm:text-[15px] font-bold text-white shadow-xs transition-all duration-200 hover:bg-brand-ink hover:shadow-md active:scale-[0.99]"
+                      >
+                        <span className="truncate">{link.label || link.type}</span>
+                        <ChevronRight size={18} className="shrink-0 transition-transform group-hover:translate-x-1" />
+                      </a>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Social Icons Dock */}
+          <div className="mt-7 pt-4 border-t border-line/60">
+            <p className="text-center text-[10px] font-bold uppercase tracking-[0.16em] text-gold">
+              Follow @{bio.handle}
+            </p>
+            <BioSocials links={bio.links} onTap={(kind) => recordTap(bio.handle, kind)} />
           </div>
-        )}
 
-        {/* Secondary Deals & Catalog */}
-        <BioCatalogSection
-          label={liveOffer ? "More Deals & Offers" : "Deals & Offers"}
-          items={deals}
-          featured={!liveOffer}
-          onTap={(kind) => recordTap(bio.handle, kind)}
-          onClaim={onClaimDeal}
-        />
-        <BioCatalogSection label="Products" items={bio.products || []} onTap={(kind) => recordTap(bio.handle, kind)} id="bio-products" />
-        <BioCatalogSection label="Services" items={bio.services || []} onTap={(kind) => recordTap(bio.handle, kind)} id="bio-services" />
+          {/* Open in Maps Button */}
+          {maps && (
+            <div className="mt-5">
+              <a
+                href={maps}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => {
+                  recordTap(bio.handle, "maps");
+                  trackMapClick({ source: "bio" });
+                }}
+                className="flex h-11 items-center justify-center gap-2 rounded-full bg-paper text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:bg-paper/80 shadow-2xs active:scale-95"
+              >
+                <MapPin size={15} className="text-gold" />
+                <span>Open in Maps</span>
+              </a>
+            </div>
+          )}
 
-        {/* Outbound Link Stack */}
-        {stacked.length > 0 && (
-          <ul className="mt-5 space-y-2">
-            {stacked
-              .filter((link) => isSafeBioHref(link.href))
-              .map((link) => (
-                <li key={link.id}>
-                  <a
-                    href={link.href}
-                    target={link.href.startsWith("http") ? "_blank" : undefined}
-                    rel="noreferrer"
-                    onClick={() => recordTap(bio.handle, link.type)}
-                    className="flex h-14 items-center justify-center rounded-full bg-brand text-[15px] font-semibold text-white transition hover:bg-brand-ink active:scale-[0.99]"
-                  >
-                    {link.label || link.type}
-                  </a>
-                </li>
-              ))}
-          </ul>
-        )}
-
-        {bio.kind !== "business" && (
-          <BioSocials links={bio.links} onTap={(kind) => recordTap(bio.handle, kind)} />
-        )}
-
-        {/* Open in Maps */}
-        {maps && (
-          <div className="mt-4">
-            <a
-              href={maps}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => {
-                recordTap(bio.handle, "maps");
-                trackMapClick({ source: "bio" });
+          {/* Guest list sign up */}
+          {(bio.kind === "business" || ["bar", "club", "events", "eat"].includes(bio.category)) && (
+            <form
+              className="mt-8 rounded-3xl bg-paper/60 p-5 ring-1 ring-line/80 shadow-2xs space-y-2.5"
+              onSubmit={(e) => {
+                e.preventDefault();
+                try {
+                  addGuest(bio.handle, { email: listEmail, name: listName, source: "bio" });
+                  joinClub({ email: listEmail, name: listName || bio.name, city: bio.city, invites: true, offers: true });
+                  toast.success("On the guest list · AirPal Club");
+                  setListEmail("");
+                  setListName("");
+                } catch (err) {
+                  toast.error(err instanceof Error ? err.message : "Failed");
+                }
               }}
-              className="flex h-12 items-center justify-center gap-2 rounded-full bg-card text-sm font-semibold text-ink ring-1 ring-line transition hover:bg-card/80 shadow-sm"
             >
-              <MapPin size={16} className="text-gold" />
-              <span>Open in Maps</span>
-            </a>
-          </div>
-        )}
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold">VIP Guest List</p>
+                <h4 className="font-display text-base font-bold text-ink mt-0.5">Get invites &amp; secret drops</h4>
+              </div>
+              <input
+                value={listName}
+                onChange={(e) => setListName(e.target.value)}
+                placeholder="Your Name"
+                className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus:border-brand shadow-2xs"
+              />
+              <input
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                autoCapitalize="none"
+                required
+                value={listEmail}
+                onChange={(e) => setListEmail(e.target.value)}
+                placeholder="Your Email"
+                className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus:border-brand shadow-2xs"
+              />
+              <button
+                type="submit"
+                className="h-11 w-full rounded-full bg-brand text-xs font-bold text-white transition hover:bg-brand-ink active:scale-95 shadow-xs"
+              >
+                Join VIP List
+              </button>
+              <p className="text-center text-[11px] text-mute">Includes AirPal Club perks and priority invites.</p>
+            </form>
+          )}
 
-        {/* Guest list sign up */}
-        {(bio.kind === "business" || ["bar", "club", "events", "eat"].includes(bio.category)) && (
-          <form
-            className="mt-8 space-y-2"
-            onSubmit={(e) => {
-              e.preventDefault();
-              try {
-                addGuest(bio.handle, { email: listEmail, name: listName, source: "bio" });
-                joinClub({ email: listEmail, name: listName || bio.name, city: bio.city, invites: true, offers: true });
-                toast.success("On the guest list · AirPal Club");
-                setListEmail("");
-                setListName("");
-              } catch (err) {
-                toast.error(err instanceof Error ? err.message : "Failed");
-              }
-            }}
-          >
-            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Guest list</p>
-            <input
-              value={listName}
-              onChange={(e) => setListName(e.target.value)}
-              placeholder="Name"
-              className="h-12 w-full rounded-full bg-card px-4 border border-line outline-none focus:border-brand"
-            />
-            <input
-              type="email"
-              inputMode="email"
-              autoComplete="email"
-              autoCapitalize="none"
-              required
-              value={listEmail}
-              onChange={(e) => setListEmail(e.target.value)}
-              placeholder="Email"
-              className="h-12 w-full rounded-full bg-card px-4 border border-line outline-none focus:border-brand"
-            />
-            <button
-              type="submit"
-              className="h-12 w-full rounded-full bg-brand text-sm font-medium text-white transition hover:bg-brand-ink"
-            >
-              Join the list
-            </button>
-            <p className="text-center text-[12px] text-mute">Also joins AirPal Club for invites and offers.</p>
-          </form>
-        )}
-
-        {/* Footer Brand & Handle Link */}
-        <footer className="mt-12 flex flex-col items-center justify-center gap-2 border-t border-line/60 pt-8 text-center">
-          <Link href="/" className="inline-flex items-center gap-2 transition hover:opacity-80">
-            <BrandMark compact />
-            <span className="font-display text-base font-bold tracking-tight">
-              AirPal<span className="text-brand">.me</span>
-            </span>
-          </Link>
-          <p className="text-xs text-mute">
-            AirPal bio for people, venues & creators ·{" "}
-            <Link href="/bio/setup" className="font-semibold text-ink underline hover:text-brand">
-              Claim your free @handle
+          {/* Brand Footer & Viral @handle CTA */}
+          <footer className="mt-10 flex flex-col items-center justify-center gap-2 border-t border-line/60 pt-6 text-center">
+            <Link href="/" className="inline-flex items-center gap-2 transition hover:opacity-80">
+              <BrandMark compact />
+              <span className="font-display text-base font-bold tracking-tight">
+                AirPal<span className="text-brand">.me</span>
+              </span>
             </Link>
-          </p>
-          <button
-            type="button"
-            className="mt-2 text-xs text-mute/80 hover:text-ink"
-            onClick={() => setShareModalOpen(true)}
-          >
-            Share · airpal.me/@{bio.handle}
-          </button>
-        </footer>
+            <p className="text-xs text-mute">
+              AirPal bio for people, venues &amp; creators ·{" "}
+              <Link href="/bio/setup" className="font-semibold text-ink underline hover:text-brand">
+                Claim your free @handle
+              </Link>
+            </p>
+            <button
+              type="button"
+              className="mt-1 text-xs text-mute/80 hover:text-ink font-mono"
+              onClick={() => setShareModalOpen(true)}
+            >
+              airpal.me/@{bio.handle}
+            </button>
+          </footer>
+        </div>
       </div>
 
       {/* Claim Redemption Modal */}
       {claim && (
         <div
-          className="fixed inset-0 z-50 grid place-items-center bg-ink/60 px-6 backdrop-blur-sm"
+          className="fixed inset-0 z-50 grid place-items-center bg-ink/60 px-6 backdrop-blur-sm animate-in fade-in duration-200"
           onClick={() => setClaim(null)}
         >
           <div
-            className="w-full max-w-sm rounded-[32px] bg-paper p-6 text-center shadow-2xl ring-1 ring-line"
+            className="w-full max-w-sm rounded-[32px] bg-card p-6 text-center shadow-2xl ring-1 ring-line animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">{claim.badge}</p>
             <p className="font-mono mt-3 text-4xl font-bold tracking-widest text-ink">{claim.code}</p>
-            <p className="mt-2 text-sm font-medium text-mute leading-relaxed">{claim.detail}</p>
-            <div className="mt-4 rounded-2xl bg-gold/10 p-3 text-xs text-gold-dark">
+            <p className="mt-2 text-xs font-medium text-mute leading-relaxed">{claim.detail}</p>
+            <div className="mt-4 rounded-2xl bg-gold/10 p-3 text-xs text-gold-dark font-medium">
               Active offer · Show this code to your server or at the till.
             </div>
             <button
               type="button"
-              className="mt-5 w-full rounded-full bg-brand py-3 text-sm font-semibold text-white transition hover:bg-brand-ink"
+              className="mt-5 w-full rounded-full bg-brand py-3 text-xs font-bold text-white transition hover:bg-brand-ink active:scale-95"
               onClick={() => setClaim(null)}
             >
               Done
@@ -1202,7 +1283,7 @@ export function BioPublicPage() {
         initialType={catchUpInitialType}
       />
 
-      {/* WhatsApp / Availability Status Modal */}
+      {/* Availability Status Modal */}
       <BioStatusModal
         open={statusModalOpen}
         onClose={() => setStatusModalOpen(false)}
@@ -1228,3 +1309,4 @@ export function BioPublicPage() {
     </div>
   );
 }
+

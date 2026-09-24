@@ -11,6 +11,7 @@ import {
   type CreateBroadcastRequest,
   type ReviewBroadcastRequest,
 } from "../../shared/notifications";
+import { EVERYONE_BROADCAST_CAP } from "../../shared/notifications";
 import type { AccessClaims } from "../../shared/airpal-security";
 import type { NotificationKind, Promotion } from "../../shared/promotions";
 import { enforceRateLimit, isAnonymousAuth, noteAppCheck } from "./abuse";
@@ -201,7 +202,7 @@ export const reviewBroadcast = onCall(CALLABLE, async (request) => {
   let uids: string[] = [];
   const promotionId = String(bc.promotionId || "");
   if (bc.audience === "everyone") {
-    const users = await db.collection("users").limit(1000).get();
+    const users = await db.collection("users").limit(EVERYONE_BROADCAST_CAP).get();
     uids = users.docs.map((d) => d.id);
   } else {
     const entries = await db.collection("promotion_entries").where("promotionId", "==", promotionId).get();

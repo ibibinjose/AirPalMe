@@ -163,6 +163,17 @@ describe("plan store", () => {
     expect(comments[0]?.text).toBe("See everyone at 7!");
   });
 
+  it("rejects empty or oversized crew comments", () => {
+    const plan = fixture();
+    expect(
+      addCommentToPlan(plan.id, { authorId: "user-1", authorName: "Alex", text: "   " }),
+    ).toBeUndefined();
+    expect(
+      addCommentToPlan(plan.id, { authorId: "user-1", authorName: "Alex", text: "x".repeat(501) }),
+    ).toBeUndefined();
+    expect(getPlan(plan.id)?.comments ?? []).toHaveLength(0);
+  });
+
   it("deletes a plan", () => {
     const plan = fixture();
     expect(getPlan(plan.id)).toBeDefined();

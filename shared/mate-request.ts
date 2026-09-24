@@ -99,6 +99,23 @@ export function matchAssignmentValid(mateUid: string, mateName: string): boolean
   return mateUid.trim().length > 0 && mateName.trim().length >= 2;
 }
 
+/**
+ * Client-side precheck before claiming an open request. Firestore rules stay
+ * the authority — this only explains the refusal early (B2 double-accept).
+ * Returns null when the claim may proceed, otherwise a human-readable reason.
+ */
+export function canAcceptRequest(
+  request: Pick<MateRequest, "status" | "ownerUid">,
+  mateUid: string,
+  isApprovedMate: boolean,
+): string | null {
+  if (!mateUid) return "Sign in as an approved Mate to accept.";
+  if (!isApprovedMate) return "Only approved Mates can accept requests.";
+  if (request.ownerUid === mateUid) return "You can't accept your own request.";
+  if (request.status !== "open") return "This request is no longer open.";
+  return null;
+}
+
 /** Understandable match reasons — never a mystery score (AGENTS.md §5). */
 export function matchReasons(req: Pick<MateRequest, "suburb" | "date" | "time" | "mateKind" | "useCase">): string[] {
   const out: string[] = [];

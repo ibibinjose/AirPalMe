@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  canAcceptRequest,
   canLeaveReview,
   emptyMateRequest,
   isRequestStatus,
@@ -84,5 +85,21 @@ describe("mate requests", () => {
     expect(canLeaveReview("completed")).toBe(true);
     expect(canLeaveReview("matched")).toBe(false);
     expect(canLeaveReview("open")).toBe(false);
+  });
+
+  it("guards the accept claim before the transaction", () => {
+    expect(canAcceptRequest({ status: "open", ownerUid: "owner-1" }, "mate-1", true)).toBe(null);
+    expect(canAcceptRequest({ status: "matched", ownerUid: "owner-1" }, "mate-1", true)).toBe(
+      "This request is no longer open.",
+    );
+    expect(canAcceptRequest({ status: "open", ownerUid: "mate-1" }, "mate-1", true)).toBe(
+      "You can't accept your own request.",
+    );
+    expect(canAcceptRequest({ status: "open", ownerUid: "owner-1" }, "mate-1", false)).toBe(
+      "Only approved Mates can accept requests.",
+    );
+    expect(canAcceptRequest({ status: "open", ownerUid: "owner-1" }, "", true)).toBe(
+      "Sign in as an approved Mate to accept.",
+    );
   });
 });

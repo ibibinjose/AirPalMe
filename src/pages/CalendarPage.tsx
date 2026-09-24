@@ -29,6 +29,9 @@ import {
   type CalendarViewMode,
 } from "@/lib/calendar-utils";
 import { downloadMultipleIcs } from "@/lib/calendar-export";
+import { usePlans } from "@/contexts/PlanContext";
+import { downloadPlanIcs } from "@/lib/plan-store";
+import { formatPlanDate } from "@shared/plan";
 import { CalendarAgendaView } from "@/components/calendar/CalendarAgendaView";
 import { CalendarMonthGrid } from "@/components/calendar/CalendarMonthGrid";
 import { CalendarWeekView } from "@/components/calendar/CalendarWeekView";
@@ -101,7 +104,16 @@ function CalendarPageContent() {
   const [, nav] = useLocation();
   const searchStr = useSearch();
   const { calendarEvents, exportItinerary } = useEvents();
+  const { myPlans } = usePlans();
   const { today, city, usingGps, chooseLocation } = useLocalNow();
+  const upcomingPlans = useMemo(
+    () =>
+      [...myPlans]
+        .filter((p) => !p.date || p.date >= today)
+        .sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`))
+        .slice(0, 6),
+    [myPlans, today],
+  );
   const { reschedulingEvent, setReschedulingEvent } = useCalendarDrag();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -799,6 +811,60 @@ function CalendarPageContent() {
               onSelectTag={(tag) => setSearchQuery(tag.startsWith("#") ? tag : `#${tag}`)}
             />
           )}
+
+          {/* My plans — the repeat loop lives here, same chrome as events */}
+          <section aria-label="My plans" className="rounded-3xl bg-card p-4 ring-1 ring-line/80 shadow-sm md:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 className="font-display text-xl font-bold text-ink">My plans</h3>
+                <p className="mt-0.5 text-xs text-mute">
+                  Your upcoming plans — open one to coordinate, or save it to your calendar.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => nav("/plan/new")}
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white transition active:scale-95"
+              >
+                <PlusCircle size={13} />
+                <span>New plan</span>
+              </button>
+            </div>
+            {upcomingPlans.length === 0 ? (
+              <p className="mt-4 rounded-2xl bg-paper px-4 py-3 text-[13px] text-mute ring-1 ring-line/60">
+                No upcoming plans yet. Create one, invite your crew, and it will show up here.
+              </p>
+            ) : (
+              <ul className="mt-4 space-y-2">
+                {upcomingPlans.map((p) => (
+                  <li
+                    key={p.id}
+                    className="flex items-center gap-3 rounded-2xl bg-paper px-3 py-2.5 ring-1 ring-line/60"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => nav(`/plan/${p.id}`)}
+                      className="min-w-0 flex-1 cursor-pointer text-left"
+                    >
+                      <span className="block truncate text-[14px] font-semibold text-ink">{p.title}</span>
+                      <span className="block text-[12px] text-mute">
+                        {formatPlanDate(p.date, p.time)}
+                        {p.destination ? ` · ${p.destination}` : ""}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => downloadPlanIcs(p)}
+                      aria-label={`Save ${p.title} to calendar`}
+                      className="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full bg-card ring-1 ring-line transition hover:ring-brand/40 active:scale-90"
+                    >
+                      <Download size={15} className="text-mute" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
         </div>
       </div>
 

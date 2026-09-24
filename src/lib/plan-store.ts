@@ -330,15 +330,25 @@ export function voteStopInPlan(planId: string, stopId: string, userId: string): 
   return savePlan(updatedPlan);
 }
 
+export const PLAN_COMMENT_MAX = 500;
+
+/** Crew discussion stays on the plan doc (`comments`) so rules §plans stay the single gate. */
+export function commentValid(text: string): boolean {
+  const t = text.trim();
+  return t.length >= 1 && t.length <= PLAN_COMMENT_MAX;
+}
+
 export function addCommentToPlan(
   planId: string,
   comment: Omit<PlanComment, "id" | "createdAt">,
 ): HangoutPlan | undefined {
   const plan = getPlan(planId);
   if (!plan) return undefined;
+  if (!commentValid(comment.text)) return undefined;
 
   const newComment: PlanComment = {
     ...comment,
+    text: comment.text.trim(),
     id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     createdAt: new Date().toISOString(),
   };

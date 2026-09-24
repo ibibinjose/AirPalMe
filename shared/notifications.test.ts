@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { broadcastNeedsReview, isMarketingKind, isPriorityKind, validateBroadcast } from "./notifications";
+import {
+  broadcastNeedsReview,
+  CIRCLE_BROADCAST_CAP,
+  EVERYONE_BROADCAST_CAP,
+  isMarketingKind,
+  isPriorityKind,
+  validateBroadcast,
+} from "./notifications";
 
 describe("broadcast validation", () => {
   it("requires a short title and body", () => {
@@ -26,5 +33,10 @@ describe("notification routing", () => {
     expect(isMarketingKind("entry_confirmed")).toBe(false);
     expect(isPriorityKind("winner_selected")).toBe(true);
     expect(isPriorityKind("announcement")).toBe(false);
+  });
+
+  it("keeps broadcast audiences bounded", () => {
+    expect(CIRCLE_BROADCAST_CAP).toBe(250);
+    expect(EVERYONE_BROADCAST_CAP).toBe(1000);
   });
 });

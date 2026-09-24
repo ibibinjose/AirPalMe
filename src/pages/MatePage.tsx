@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
-import { collection, doc, getDoc, getDocs, limit, orderBy, query, updateDoc, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, limit, orderBy, query, runTransaction, updateDoc, where } from "firebase/firestore";
 import { ArrowRight, BadgeCheck, CalendarDays, ShieldCheck, Sparkles, Star, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,6 +12,7 @@ import { createBookingCheckoutSessionRemote } from "@/lib/functions";
 import { TicketPass } from "@/components/plan/TicketPass";
 import { PayoutSetupCard } from "@/components/connect/PayoutSetupCard";
 import {
+  canAcceptRequest,
   canLeaveReview,
   MATE_USE_CASES,
   matchReasons,
@@ -112,21 +113,35 @@ export function MatePage() {
     if (!user) return;
     const db = getFirebaseDb();
     if (!db) return;
+    const blocked = canAcceptRequest(r, user.uid, isApprovedMate);
+    if (blocked) {
+      toast.error(blocked);
+      return;
+    }
     setAcceptBusy(r.id);
     try {
-      const now = new Date().toISOString();
       const name = user.displayName?.trim().split(/\s+/)[0] || "Mate";
-      await updateDoc(doc(db, "mate_requests", r.id), {
-        status: "matched",
-        matchedMateUid: user.uid,
-        matchedMateName: name,
-        updatedAt: now,
+      const claimed = await runTransaction(db, async (tx) => {
+        const ref = doc(db, "mate_requests", r.id);
+        const snap = await tx.get(ref);
+        if (!snap.exists()) throw new Error("This request is gone.");
+        const current = snap.data() as Omit<MateRequest, "id">;
+        if (current.ownerUid === user.uid) throw new Error("You can't accept your own request.");
+        if (current.status !== "open") throw new Error("Someone just claimed it — pick another open request.");
+        const now = new Date().toISOString();
+        tx.update(ref, {
+          status: "matched",
+          matchedMateUid: user.uid,
+          matchedMateName: name,
+          updatedAt: now,
+        });
+        return { ...r, ...current, id: r.id, status: "matched" as const, matchedMateUid: user.uid, matchedMateName: name, updatedAt: now };
       });
       setOpenJobs((list) => list.filter((x) => x.id !== r.id));
-      setAssigned((list) => [
-        { ...r, status: "matched", matchedMateUid: user.uid, matchedMateName: name, updatedAt: now },
-        ...list,
-      ]);
+      setAssigned((list) => [claimed, ...list]);
+      toast.success("Matched — say hello in the chat.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't accept this request.");
     } finally {
       setAcceptBusy(null);
     }

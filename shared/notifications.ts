@@ -13,6 +13,8 @@ export const BROADCAST_AUDIENCES = ["circle", "promotion_entrants", "everyone"] 
 export type BroadcastAudience = (typeof BROADCAST_AUDIENCES)[number];
 
 export const CIRCLE_BROADCAST_CAP = 250;
+/** `everyone` blasts stay bounded and admin-only (functions reviewBroadcast). */
+export const EVERYONE_BROADCAST_CAP = 1000;
 
 export function broadcastNeedsReview(audience: string): boolean {
   return audience === "everyone" || audience === "promotion_entrants";
