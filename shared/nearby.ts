@@ -36,7 +36,15 @@ export const PLACE_CATEGORY_LABELS: Record<PlaceCategory, string> = {
 
 export type Geo = { lat: number; lng: number };
 
-export type PropertyTradeKind = "hotel" | "hostel" | "campus" | "venue";
+/** D3 commercial stay kinds; residential stays stay out until legal compliance lands. */
+export type PropertyTradeKind =
+  | "hotel"
+  | "motel"
+  | "serviced-apartment"
+  | "hostel"
+  | "boutique"
+  | "campus"
+  | "venue";
 
 export type MarkerDoc = {
   id: string;
@@ -369,7 +377,16 @@ export function guessPrecinctIdFromCityText(text?: string): string | undefined {
 }
 
 export function parsePropertyTradeKind(value: string | undefined): PropertyTradeKind | undefined {
-  if (value === "hotel" || value === "hostel" || value === "campus" || value === "venue") return value;
+  if (
+    value === "hotel" ||
+    value === "motel" ||
+    value === "serviced-apartment" ||
+    value === "hostel" ||
+    value === "boutique" ||
+    value === "campus" ||
+    value === "venue"
+  )
+    return value;
   return undefined;
 }
 
@@ -377,7 +394,14 @@ export function parsePropertyTradeKind(value: string | undefined): PropertyTrade
 export function venueTradeOf(input: MarkerCompetitorInput): PlaceCategory | undefined {
   if (input.venueCategory && isPlaceCategory(input.venueCategory)) return input.venueCategory;
   if (input.kind === "street" || input.kind === "precinct" || input.kind === "event") return undefined;
-  if (input.propertyKind === "hotel" || input.propertyKind === "hostel" || input.propertyKind === "campus")
+  if (
+    input.propertyKind === "hotel" ||
+    input.propertyKind === "motel" ||
+    input.propertyKind === "serviced-apartment" ||
+    input.propertyKind === "hostel" ||
+    input.propertyKind === "boutique" ||
+    input.propertyKind === "campus"
+  )
     return "stay";
   if (input.propertyKind === "venue" || input.kind === "venue") return "eat";
   if (input.kind === "lobby" || input.kind === "room" || input.kind === "meeting") return "stay";

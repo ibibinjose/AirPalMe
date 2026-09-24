@@ -19,6 +19,7 @@ import { LocalFavorites } from "@/components/stay/LocalFavorites";
 import { EmojiRate } from "@/components/feedback/EmojiRate";
 import { ArrivalGuide } from "@/components/stay/ArrivalGuide";
 import { YourRoomCard } from "@/components/stay/YourRoomCard";
+import { StayBookCard } from "@/components/stay/StayBookCard";
 import { roomTypeForNumber } from "@/lib/host-rooms";
 import { useStay } from "@/contexts/StayContext";
 import { useStayUi } from "@/contexts/StayUiContext";
@@ -265,6 +266,8 @@ export function ConciergePage() {
               checkOut={property.checkOut}
             />
           ) : null}
+
+          {!roomLabel && property.id && property.id !== "unknown" ? <StayBookCard property={property} /> : null}
 
           {/* Quick Action Tiles */}
           <div>

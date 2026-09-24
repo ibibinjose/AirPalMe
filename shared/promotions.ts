@@ -369,23 +369,42 @@ export function currentWeekId(now = new Date()): string {
   return `${year}-W${String(week).padStart(2, "0")}`;
 }
 
+/** Offer target kinds. Every offer lands on a transaction surface — never an ad link. */
+export const OFFER_TARGET_TYPES = ["stay", "event", "place", "mate", "experience", "fashion"] as const;
+export type OfferTargetType = (typeof OFFER_TARGET_TYPES)[number];
+
+/** Target kinds that name a specific venue/doc and need a targetId. */
+const VENUE_TARGET_TYPES: ReadonlySet<string> = new Set(["stay", "event", "place"]);
+
+export function isOfferTargetType(t: string): t is OfferTargetType {
+  return (OFFER_TARGET_TYPES as readonly string[]).includes(t);
+}
+
+/** Target is well-formed: known kind, and venue kinds name their venue. */
+export function offerTargetValid(targetType: string, targetId: string): boolean {
+  if (!isOfferTargetType(targetType.trim())) return false;
+  if (VENUE_TARGET_TYPES.has(targetType.trim())) return targetId.trim().length > 0;
+  return true;
+}
+
 /** Deep link for a campaign's marketplace target. Empty when unmapped. */
 export function targetHref(targetType: string, targetId: string): string {
-  if (!targetId) return "";
-  switch (targetType) {
+  if (!offerTargetValid(targetType, targetId)) return "";
+  switch (targetType.trim()) {
     case "stay":
-      return `/g/${targetId}`;
+      return `/g/${targetId.trim()}`;
     case "event":
-      return `/e/${targetId}`;
+      return `/e/${targetId.trim()}`;
     case "place":
-      return `/p/${targetId}`;
+      return `/p/${targetId.trim()}`;
     case "mate":
       return "/mate";
     case "experience":
       return "/experiences";
     case "fashion":
+      return "/fashion";
     default:
-      return "/discover";
+      return "";
   }
 }
 

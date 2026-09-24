@@ -1,17 +1,39 @@
 import type { PropertyInfo, PropertyMemberRole } from "./airpal-data";
 import { generatePropertyId, slugifyCity, slugifyHandle } from "./airpal-urls";
 
-export type HostPropertyKind = "hotel" | "hostel" | "campus" | "venue";
+/** D3 — commercial stay kinds only. No residential/STRA kinds until legal compliance lands. */
+export type HostPropertyKind =
+  | "hotel"
+  | "motel"
+  | "serviced-apartment"
+  | "hostel"
+  | "boutique"
+  | "campus"
+  | "venue";
 
 export function parseHostPropertyKind(value?: string | null): HostPropertyKind {
-  if (value === "hostel" || value === "campus" || value === "venue") return value;
+  if (
+    value === "motel" ||
+    value === "serviced-apartment" ||
+    value === "hostel" ||
+    value === "boutique" ||
+    value === "campus" ||
+    value === "venue"
+  )
+    return value;
   return "hotel";
 }
 
 export function propertyKindLabel(kind?: string): string {
   switch (kind) {
+    case "motel":
+      return "Motel";
+    case "serviced-apartment":
+      return "Serviced apartment";
     case "hostel":
       return "Hostel";
+    case "boutique":
+      return "Boutique stay";
     case "campus":
       return "Campus";
     case "venue":

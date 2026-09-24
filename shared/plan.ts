@@ -753,6 +753,23 @@ export function formatTime12h(timeStr?: string): string {
 }
 
 /** Reorder stops by moving the stop at `fromIndex` to `toIndex`. Out-of-range indices return the list unchanged. */
+/**
+ * D4 — trip itinerary days in order. Drops malformed entries, sorts by
+ * dayNumber, and renumbers sequentially so trip views never show day gaps.
+ */
+export function scheduleDays(schedule: readonly PlanMultiDaySchedule[] | undefined): PlanMultiDaySchedule[] {
+  if (!schedule) return [];
+  return schedule
+    .filter((d) => d && Number.isFinite(d.dayNumber) && d.dayNumber >= 1 && d.title.trim())
+    .sort((a, b) => a.dayNumber - b.dayNumber)
+    .map((d, i) => ({ ...d, dayNumber: i + 1 }));
+}
+
+/** D4 — a plan carries a trip itinerary worth rendering as day views. */
+export function hasTripItinerary(plan: Pick<HangoutPlan, "type" | "multiDaySchedule">): boolean {
+  return (plan.type === "trip" || plan.type === "escape") && scheduleDays(plan.multiDaySchedule).length > 0;
+}
+
 export function reorderStops<T>(stops: readonly T[], fromIndex: number, toIndex: number): T[] {
   const next = [...stops];
   if (fromIndex < 0 || fromIndex >= next.length || toIndex < 0 || toIndex >= next.length) return next;

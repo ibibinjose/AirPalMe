@@ -16,6 +16,13 @@ import {
   type FeeConfig,
   type PayoutStatus,
 } from "../../shared/booking";
+import {
+  isStayDay,
+  nightsBetween,
+  quoteStayNights,
+  stayDateList,
+  stayRangesOverlap,
+} from "../../shared/stay-booking";
 import { CALLABLE, db, isPlatformAdmin, requireAuth } from "./admin";
 import { enforceRateLimit, isAnonymousAuth, noteAppCheck } from "./abuse";
 import type { AccessClaims } from "../../shared/airpal-security";
@@ -715,6 +722,166 @@ export const payBookingBalance = onCall(STRIPE_CALLABLE, async (request) => {
     });
 
   return { ok: true, mode: "live_stripe", bookingId: childId, sessionId: session.id, checkoutUrl: session.url };
+});
+
+export interface CreateStayCheckoutRequest {
+  propertyId?: string;
+  roomTypeId?: string;
+  checkIn?: string;
+  checkOut?: string;
+  guests?: number;
+}
+
+/**
+ * D3 — book reservable room-nights on the one bookings engine. Commercial
+ * properties only (residential kinds are rejected). Every number recomputes
+ * server-side from the property doc + block ledger + live fee config.
+ */
+export const createStayCheckoutSession = onCall(STRIPE_CALLABLE, async (request) => {
+  await noteAppCheck(request, "createStayCheckoutSession");
+  const uid = requireAuth(request.auth?.uid);
+  await enforceRateLimit(uid, "pay", isAnonymousAuth(request));
+  const data = (request.data || {}) as CreateStayCheckoutRequest;
+  const propertyId = String(data.propertyId || "").trim();
+  const roomTypeId = String(data.roomTypeId || "").trim();
+  const checkIn = String(data.checkIn || "").trim();
+  const checkOut = String(data.checkOut || "").trim();
+  if (!propertyId || !roomTypeId) throw new HttpsError("invalid-argument", "Property and room type are required.");
+  if (nightsBetween(checkIn, checkOut) <= 0) {
+    throw new HttpsError("invalid-argument", "Check-out must be after check-in.");
+  }
+
+  const propSnap = await db.collection("properties").doc(propertyId).get();
+  if (!propSnap.exists) throw new HttpsError("not-found", "Stay not found.");
+  const prop = propSnap.data() as {
+    name?: string;
+    city?: string;
+    destination?: string;
+    ownerId?: string;
+    kind?: string;
+    roomTypes?: Array<{ id?: string; name?: string; capacity?: number; startingPrice?: number }>;
+  };
+  if (prop.kind === "campus" || prop.kind === "venue") {
+    throw new HttpsError("failed-precondition", "This place does not take overnight bookings.");
+  }
+  const room = (prop.roomTypes || []).find((r) => r.id === roomTypeId);
+  if (!room) throw new HttpsError("not-found", "Room type not found.");
+  const quote = quoteStayNights({
+    checkIn,
+    checkOut,
+    nightlyDollars: Number(room.startingPrice || 0),
+    guests: Number(data.guests || 1),
+    capacity: Number(room.capacity || 1),
+  });
+  if (typeof quote === "string") throw new HttpsError("invalid-argument", quote);
+
+  const dates = stayDateList(checkIn, checkOut);
+  // Host-blocked nights (chunked: Firestore `in` takes 10).
+  for (let i = 0; i < dates.length; i += 10) {
+    const chunk = dates.slice(i, i + 10);
+    const blocked = await db
+      .collection("stay_blocks")
+      .where("propertyId", "==", propertyId)
+      .where("date", "in", chunk)
+      .limit(1)
+      .get();
+    if (!blocked.empty) {
+      throw new HttpsError("failed-precondition", "Those nights are no longer available.");
+    }
+  }
+  // Overlapping holds on the same engine.
+  const held = await db
+    .collection("bookings")
+    .where("propertyId", "==", propertyId)
+    .where("status", "in", ["pending", "confirmed", "in_progress", "completed", "disputed"])
+    .get();
+  const clash = held.docs.some((d) => {
+    const b = d.data() as Booking;
+    return (
+      b.paymentStatus !== "refunded" &&
+      isStayDay(String(b.stayCheckIn || "")) &&
+      isStayDay(String(b.stayCheckOut || "")) &&
+      stayRangesOverlap(checkIn, checkOut, String(b.stayCheckIn), String(b.stayCheckOut))
+    );
+  });
+  if (clash) throw new HttpsError("failed-precondition", "Those nights just booked. Pick other dates.");
+
+  if (!stripeLiveConfigured()) {
+    throw new HttpsError("failed-precondition", "Card payments are not configured for this stay yet.");
+  }
+
+  const fees = quoteFees(quote.totalCents, await loadFeeConfig());
+  const now = new Date().toISOString();
+  const origin = headerOrigin(request);
+  const bookingId = `bk-${Date.now().toString(36)}-${randomBytes(4).toString("hex")}`;
+  const stripe = makeStripe();
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    // Marketplace Connect is unsupported by Stripe Managed Payments.
+    managed_payments: { enabled: false },
+    client_reference_id: uid,
+    customer_email: request.auth?.token?.email || undefined,
+    submit_type: "book",
+    integration_identifier: integrationId("stay"),
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency: "aud",
+          unit_amount: quote.totalCents,
+          product_data: {
+            name: `${prop.name || "Stay"} · ${room.name || "Room"} · ${quote.nights}n`,
+          },
+        },
+      },
+    ],
+    success_url: `${origin}/stay?booked=${bookingId}`,
+    cancel_url: `${origin}/stay?canceled=true`,
+    metadata: {
+      bookingId,
+      propertyId,
+      providerUid: String(prop.ownerId || ""),
+      providerKind: "host",
+      stayCheckIn: checkIn,
+      stayCheckOut: checkOut,
+    },
+    payment_intent_data: {
+      metadata: { bookingId, propertyId, providerUid: String(prop.ownerId || "") },
+    },
+  });
+
+  await db
+    .collection("bookings")
+    .doc(bookingId)
+    .set({
+      id: bookingId,
+      requestId: "",
+      planId: "",
+      customerUid: uid,
+      providerUid: String(prop.ownerId || ""),
+      providerKind: "host",
+      providerName: String(prop.name || "Host"),
+      title: `${prop.name || "Stay"} · ${quote.nights} night${quote.nights === 1 ? "" : "s"}`,
+      suburb: String(prop.city || prop.destination || "Sydney"),
+      date: checkIn,
+      time: "",
+      priceCents: fees.priceCents,
+      feeCents: fees.feeCents,
+      paymentStatus: "unpaid",
+      payoutStatus: "unpaid",
+      status: "pending",
+      cancelReason: "",
+      propertyId,
+      stayCheckIn: checkIn,
+      stayCheckOut: checkOut,
+      stayGuests: quote.guests,
+      stayRoomTypeId: roomTypeId,
+      stripeCheckoutSessionId: session.id,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+  return { ok: true, mode: "live_stripe", bookingId, sessionId: session.id, checkoutUrl: session.url };
 });
 
 export const confirmExperienceBookingRemote = onCall(STRIPE_CALLABLE, async (request) => {

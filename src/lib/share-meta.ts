@@ -65,7 +65,7 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
   {
     match: /^\/fashion(\/|$)/,
     title: "Fashion · AirPal.Me",
-    description: "Share, rent, swap and discover fashion with AirPal.Me.",
+    description: "Brand fashion campaigns and drops on AirPal.Me. Rentals open with partner brands first.",
   },
   {
     match: /^\/scan(\/|$)/,

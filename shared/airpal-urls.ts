@@ -176,7 +176,7 @@ export function defaultHotelRoomNumbers(count = 1): string[] {
 }
 
 export function buildDefaultRoomTokens(
-  kind: "hotel" | "hostel" | "campus" | "venue",
+  kind: "hotel" | "motel" | "serviced-apartment" | "hostel" | "boutique" | "campus" | "venue",
   roomsCount?: number,
 ): { roomTokens: RoomTokenMap; defaultRoomNumber: string; defaultRoomToken: string } {
   let numbers: string[];

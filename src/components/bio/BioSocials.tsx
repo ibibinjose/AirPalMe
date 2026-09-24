@@ -1,25 +1,150 @@
-import { Facebook, Globe, Instagram, Linkedin, Music2, Twitter, Youtube } from "lucide-react";
-import { isSafeBioHref, socialLinks, type BioLink, type BioLinkType } from "@shared/bio";
+import {
+  AtSign,
+  ChevronRight,
+  Facebook,
+  Ghost,
+  Globe,
+  Instagram,
+  Linkedin,
+  Music2,
+  Pin,
+  Twitter,
+  Youtube,
+} from "lucide-react";
+import { isSafeBioHref, socialLinks, type BioLink } from "@shared/bio";
 import { cn } from "@/lib/cn";
 
-const ICONS: Partial<Record<BioLinkType, typeof Instagram>> = {
-  instagram: Instagram,
-  facebook: Facebook,
-  tiktok: Music2,
-  x: Twitter,
-  youtube: Youtube,
-  linkedin: Linkedin,
-  website: Globe,
+interface PlatformConfig {
+  name: string;
+  action: string;
+  defaultSubtitle: string;
+  icon: typeof Instagram;
+  iconBg: string;
+  iconColor: string;
+  hoverBorder: string;
+  badgeBg: string;
+  badgeText: string;
+}
+
+const PLATFORM_CONFIGS: Record<string, PlatformConfig> = {
+  instagram: {
+    name: "Instagram",
+    action: "Follow",
+    defaultSubtitle: "Photos, stories & reels",
+    icon: Instagram,
+    iconBg: "bg-gradient-to-tr from-[#f09433] via-[#e6683c] to-[#bc1888] shadow-sm shadow-rose-500/20",
+    iconColor: "text-white",
+    hoverBorder: "hover:border-rose-400/50 hover:bg-rose-500/[0.02]",
+    badgeBg: "bg-rose-500/10",
+    badgeText: "text-rose-700",
+  },
+  tiktok: {
+    name: "TikTok",
+    action: "Watch",
+    defaultSubtitle: "Shorts & trending videos",
+    icon: Music2,
+    iconBg: "bg-black text-white shadow-sm shadow-black/20 dark:bg-zinc-800",
+    iconColor: "text-white",
+    hoverBorder: "hover:border-zinc-500/50 hover:bg-black/[0.02]",
+    badgeBg: "bg-zinc-500/10",
+    badgeText: "text-zinc-800 dark:text-zinc-200",
+  },
+  youtube: {
+    name: "YouTube",
+    action: "Subscribe",
+    defaultSubtitle: "Videos, shorts & podcasts",
+    icon: Youtube,
+    iconBg: "bg-[#ff0000] text-white shadow-sm shadow-red-600/20",
+    iconColor: "text-white",
+    hoverBorder: "hover:border-red-500/50 hover:bg-red-500/[0.02]",
+    badgeBg: "bg-red-500/10",
+    badgeText: "text-red-700",
+  },
+  linkedin: {
+    name: "LinkedIn",
+    action: "Connect",
+    defaultSubtitle: "Professional career & articles",
+    icon: Linkedin,
+    iconBg: "bg-[#0a66c2] text-white shadow-sm shadow-blue-600/20",
+    iconColor: "text-white",
+    hoverBorder: "hover:border-blue-500/50 hover:bg-blue-500/[0.02]",
+    badgeBg: "bg-blue-500/10",
+    badgeText: "text-blue-700",
+  },
+  x: {
+    name: "X (Twitter)",
+    action: "Follow",
+    defaultSubtitle: "Live thoughts, news & updates",
+    icon: Twitter,
+    iconBg: "bg-black text-white shadow-sm shadow-black/20 dark:bg-zinc-800",
+    iconColor: "text-white",
+    hoverBorder: "hover:border-zinc-500/50 hover:bg-black/[0.02]",
+    badgeBg: "bg-zinc-500/10",
+    badgeText: "text-zinc-800 dark:text-zinc-200",
+  },
+  facebook: {
+    name: "Facebook",
+    action: "Follow",
+    defaultSubtitle: "Community, posts & events",
+    icon: Facebook,
+    iconBg: "bg-[#1877f2] text-white shadow-sm shadow-blue-600/20",
+    iconColor: "text-white",
+    hoverBorder: "hover:border-blue-600/50 hover:bg-blue-600/[0.02]",
+    badgeBg: "bg-blue-600/10",
+    badgeText: "text-blue-800",
+  },
+  threads: {
+    name: "Threads",
+    action: "Follow",
+    defaultSubtitle: "Discussions & conversations",
+    icon: AtSign,
+    iconBg: "bg-black text-white shadow-sm shadow-black/20 dark:bg-zinc-800",
+    iconColor: "text-white",
+    hoverBorder: "hover:border-zinc-500/50 hover:bg-black/[0.02]",
+    badgeBg: "bg-zinc-500/10",
+    badgeText: "text-zinc-800 dark:text-zinc-200",
+  },
+  snapchat: {
+    name: "Snapchat",
+    action: "Add",
+    defaultSubtitle: "Behind the scenes & snaps",
+    icon: Ghost,
+    iconBg: "bg-[#fffc00] text-black shadow-sm shadow-yellow-400/20",
+    iconColor: "text-black",
+    hoverBorder: "hover:border-yellow-400/60 hover:bg-yellow-400/[0.03]",
+    badgeBg: "bg-yellow-500/15",
+    badgeText: "text-yellow-900",
+  },
+  pinterest: {
+    name: "Pinterest",
+    action: "Follow",
+    defaultSubtitle: "Inspiration boards & ideas",
+    icon: Pin,
+    iconBg: "bg-[#e60023] text-white shadow-sm shadow-red-600/20",
+    iconColor: "text-white",
+    hoverBorder: "hover:border-red-600/50 hover:bg-red-600/[0.02]",
+    badgeBg: "bg-red-600/10",
+    badgeText: "text-red-700",
+  },
 };
 
-const BRAND_STYLES: Partial<Record<BioLinkType, { color: string; hover: string }>> = {
-  instagram: { color: "text-pink-600", hover: "hover:border-pink-500/40 hover:bg-pink-500/5" },
-  tiktok: { color: "text-ink", hover: "hover:border-ink/40 hover:bg-black/5" },
-  youtube: { color: "text-red-600", hover: "hover:border-red-500/40 hover:bg-red-500/5" },
-  linkedin: { color: "text-blue-600", hover: "hover:border-blue-500/40 hover:bg-blue-500/5" },
-  facebook: { color: "text-blue-700", hover: "hover:border-blue-600/40 hover:bg-blue-600/5" },
-  x: { color: "text-ink", hover: "hover:border-ink/40 hover:bg-black/5" },
-};
+function extractSubtitle(link: BioLink, cfg: PlatformConfig): string {
+  if (!link.href) return cfg.defaultSubtitle;
+  try {
+    const url = new URL(link.href.startsWith("http") ? link.href : `https://${link.href}`);
+    const pathname = url.pathname.replace(/^\/+|\/+$/g, "");
+    if (pathname && !["channel", "c", "user", "in", "profile", "feed"].includes(pathname.toLowerCase())) {
+      const parts = pathname.split("/");
+      const last = parts[parts.length - 1];
+      if (last && last.length <= 25 && !last.includes("?") && !last.includes("=")) {
+        return `@${last.replace(/^@/, "")}`;
+      }
+    }
+  } catch {
+    /* fallback */
+  }
+  return cfg.defaultSubtitle;
+}
 
 export function BioSocials({
   links,
@@ -34,10 +159,24 @@ export function BioSocials({
   if (!rows.length) return null;
 
   return (
-    <div className={cn("mt-4 flex flex-wrap items-center justify-center gap-2", className)}>
+    <div className={cn("space-y-2.5", className)}>
       {rows.map((link) => {
-        const Icon = ICONS[link.type] || Globe;
-        const brandStyle = BRAND_STYLES[link.type];
+        const cfg = PLATFORM_CONFIGS[link.type] || {
+          name: link.label || link.type,
+          action: "Open",
+          defaultSubtitle: "Official social link",
+          icon: Globe,
+          iconBg: "bg-brand text-white shadow-sm shadow-brand/20",
+          iconColor: "text-white",
+          hoverBorder: "hover:border-brand/40 hover:bg-brand/[0.02]",
+          badgeBg: "bg-brand/10",
+          badgeText: "text-brand",
+        };
+
+        const Icon = cfg.icon;
+        const title = link.label && link.label.toLowerCase() !== link.type ? link.label : cfg.name;
+        const subtitle = extractSubtitle(link, cfg);
+
         return (
           <a
             key={link.id}
@@ -45,18 +184,52 @@ export function BioSocials({
             target="_blank"
             rel="noreferrer"
             onClick={() => onTap(link.type)}
-            aria-label={link.label || link.type}
+            aria-label={`${title} (${cfg.action})`}
             className={cn(
-              "group inline-flex h-10 items-center gap-2 rounded-full bg-card px-3.5 text-xs font-semibold text-ink shadow-xs ring-1 ring-line/80 transition-all duration-200 active:scale-95",
-              brandStyle?.hover || "hover:border-brand/40 hover:bg-brand/5",
+              "group flex w-full items-center justify-between rounded-2xl sm:rounded-[22px] bg-card p-3.5 sm:p-4 text-left ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:shadow-xs active:scale-[0.99]",
+              cfg.hoverBorder,
             )}
           >
-            <Icon size={15} className={cn("shrink-0 transition-transform group-hover:scale-110", brandStyle?.color)} />
-            <span className="capitalize">{link.label || link.type}</span>
+            {/* Left: Brand Icon & Platform Info */}
+            <div className="flex items-center gap-3.5 min-w-0">
+              <span
+                className={cn(
+                  "grid h-11 w-11 sm:h-12 sm:w-12 shrink-0 place-items-center rounded-xl sm:rounded-2xl transition-transform duration-200 group-hover:scale-105",
+                  cfg.iconBg,
+                  cfg.iconColor,
+                )}
+              >
+                <Icon size={20} className="sm:w-[22px] sm:h-[22px]" />
+              </span>
+
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-display text-sm sm:text-[15px] font-bold text-ink truncate group-hover:text-brand transition-colors">
+                    {title}
+                  </h4>
+                  <span
+                    className={cn(
+                      "hidden xs:inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+                      cfg.badgeBg,
+                      cfg.badgeText,
+                    )}
+                  >
+                    {cfg.action}
+                  </span>
+                </div>
+                <p className="text-xs text-mute truncate mt-0.5">{subtitle}</p>
+              </div>
+            </div>
+
+            {/* Right: Action Chevron */}
+            <div className="flex items-center gap-1 shrink-0 ml-2">
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-paper/80 text-mute transition-all duration-200 group-hover:bg-brand group-hover:text-white group-hover:translate-x-0.5 shadow-2xs">
+                <ChevronRight size={15} />
+              </span>
+            </div>
           </a>
         );
       })}
     </div>
   );
 }
-

@@ -211,6 +211,11 @@ export function featuredPlaces(from: Geo = originFor(), city?: string, scope: "c
     .slice(0, 8);
 }
 
+/** D2 — deals chip: only places with a live offer. Never invents a deal. */
+export function placesWithDeals<T extends { deal?: unknown }>(rows: T[]): T[] {
+  return rows.filter((p) => Boolean(p.deal));
+}
+
 export function placesForLocation<T extends { geo?: { lat: number; lng: number }; precinctId?: string }>(
   rows: T[],
   from: Geo,

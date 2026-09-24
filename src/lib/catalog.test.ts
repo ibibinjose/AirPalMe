@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { activePlaces, getPlace, getTour, placeByHandle } from "./catalog";
+import { activePlaces, getPlace, getTour, placeByHandle, placesWithDeals } from "./catalog";
 import { upsertCachedListing, listingDefaults } from "./listings";
 import { cachePlaces, parsePlaceDoc } from "./places-store";
 import { getCachedProperty } from "./properties";
@@ -149,5 +149,17 @@ describe("parsePlaceDoc", () => {
 describe("getTour", () => {
   it("returns undefined for an unknown id instead of the first tour", () => {
     expect(getTour("no-such-tour")).toBeUndefined();
+  });
+});
+
+describe("placesWithDeals", () => {
+  it("keeps only places carrying a live offer", () => {
+    const rows = [
+      { id: "a", deal: { badge: "10% off", detail: "Show key" } },
+      { id: "b" },
+      { id: "c", deal: null },
+    ];
+    expect(placesWithDeals(rows).map((p) => p.id)).toEqual(["a"]);
+    expect(placesWithDeals([])).toEqual([]);
   });
 });

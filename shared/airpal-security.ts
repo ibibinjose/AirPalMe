@@ -47,6 +47,7 @@ export const CALLABLES = {
   confirmExperienceBookingRemote: "confirmExperienceBookingRemote",
   createBookingCheckoutSession: "createBookingCheckoutSession",
   payBookingBalance: "payBookingBalance",
+  createStayCheckoutSession: "createStayCheckoutSession",
   createConnectAccountLink: "createConnectAccountLink",
   refreshConnectAccount: "refreshConnectAccount",
   createConnectLoginLink: "createConnectLoginLink",
@@ -127,7 +128,7 @@ export type CompleteRegistrationRequest = {
   displayName: string;
   role: "host_admin" | "guest";
   propertyName?: string;
-  kind?: "hotel" | "hostel" | "campus" | "venue";
+  kind?: "hotel" | "motel" | "serviced-apartment" | "hostel" | "boutique" | "campus" | "venue";
   city?: string;
   country?: string;
   countryCode?: string;

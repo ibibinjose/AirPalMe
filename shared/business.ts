@@ -11,7 +11,7 @@ export const BUSINESS_CATEGORIES = [
   { id: "things", place: "things", label: "See", line: "Parks, museums, walks" },
   { id: "events", place: "events", label: "Events", line: "Nights & tickets" },
   { id: "wellness", place: "services", label: "Wellness", line: "Spa, gym, massage" },
-  { id: "services", place: "services", label: "Help", line: "Laundry, pharmacy, money" },
+  { id: "services", place: "services", label: "Services", line: "Laundry, pharmacy, money" },
   { id: "parking", place: "parking", label: "Park", line: "Garages & bays" },
   { id: "stay", place: "stay", label: "Stay", line: "Rooms & inns" },
 ] as const;

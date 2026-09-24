@@ -378,6 +378,25 @@ export function createBookingCheckoutSessionRemote(data: { bookingId: string }) 
   >(CALLABLES.createBookingCheckoutSession, data);
 }
 
+export function createStayCheckoutSessionRemote(data: {
+  propertyId: string;
+  roomTypeId: string;
+  checkIn: string;
+  checkOut: string;
+  guests?: number;
+}) {
+  return callFunction<
+    typeof data,
+    {
+      ok: boolean;
+      mode?: string;
+      bookingId?: string;
+      sessionId?: string;
+      checkoutUrl?: string | null;
+    }
+  >(CALLABLES.createStayCheckoutSession, data);
+}
+
 export function payBookingBalanceRemote(data: { planBookingId: string }) {
   return callFunction<
     typeof data,

@@ -60,6 +60,7 @@ import {
   isSafeBioHref,
   normalizeHandle,
   parseAtHandle,
+  socialLinks,
   stackLinks,
 } from "@shared/bio";
 import type { PlanType } from "@shared/plan";
@@ -599,7 +600,7 @@ export function BioPublicPage() {
                   {bio.city}
                 </span>
               )}
-              {bio.category && (
+              {bio.kind === "business" && bio.category && (
                 <span>· {BUSINESS_CATEGORIES.find((c) => c.id === bio.category)?.label}</span>
               )}
               {bio.languages && <span>· {bio.languages}</span>}
@@ -1135,13 +1136,20 @@ export function BioPublicPage() {
             </div>
           )}
 
-          {/* Social Icons Dock */}
-          <div className="mt-7 pt-4 border-t border-line/60">
-            <p className="text-center text-[10px] font-bold uppercase tracking-[0.16em] text-gold">
-              Follow @{bio.handle}
-            </p>
-            <BioSocials links={bio.links} onTap={(kind) => recordTap(bio.handle, kind)} />
-          </div>
+          {/* Social Links Long Strip Section */}
+          {bio.links && socialLinks(bio.links).some((l) => isSafeBioHref(l.href)) && (
+            <div className="mt-8 pt-5 border-t border-line/60">
+              <div className="flex items-center justify-between mb-3 px-0.5">
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
+                  Follow &amp; Connect
+                </p>
+                <span className="text-[10px] font-medium text-mute uppercase tracking-wider">
+                  Social Channels
+                </span>
+              </div>
+              <BioSocials links={bio.links} onTap={(kind) => recordTap(bio.handle, kind)} />
+            </div>
+          )}
 
           {/* Open in Maps Button */}
           {maps && (

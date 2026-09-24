@@ -2,7 +2,8 @@ export interface PropertyInfo {
   id: string;
   name: string;
   tagline: string;
-  kind?: "hotel" | "hostel" | "campus" | "venue";
+  /** D3 commercial kinds; residential stays stay out until legal compliance lands. */
+  kind?: "hotel" | "motel" | "serviced-apartment" | "hostel" | "boutique" | "campus" | "venue";
   destination: string;
   city: string;
   /** ISO 3166-1 alpha-2, e.g. AU, IN. */

@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  hasTripItinerary,
   interestOverlap,
   isSoldOut,
   isTicketed,
   myInterestProfile,
+  scheduleDays,
   PLAN_TYPES,
   PLAN_COVER_PRESETS,
   PLAN_THEMES,
@@ -136,5 +138,26 @@ describe("ticketed events", () => {
     expect(isSoldOut({ capacity: 10, spotsBooked: 10 })).toBe(true);
     expect(isSoldOut({ capacity: 10, spotsBooked: 3 })).toBe(false);
     expect(spotsLeft({ capacity: 0, spotsBooked: 2 })).toBe(null);
+  });
+});
+
+describe("trip itinerary", () => {
+  const day = (dayNumber: number, title: string) => ({ dayNumber, title, description: "", stops: [] });
+  it("orders days and renumbers without gaps", () => {
+    expect(scheduleDays(undefined)).toEqual([]);
+    expect(
+      scheduleDays([day(3, "Coast"), day(1, "City"), { dayNumber: 0, title: "Nowhere", description: "", stops: [] }, day(2, "  ")]).map(
+        (d) => [d.dayNumber, d.title],
+      ),
+    ).toEqual([
+      [1, "City"],
+      [2, "Coast"],
+    ]);
+  });
+  it("renders only for trip/escape plans with a schedule", () => {
+    expect(hasTripItinerary({ type: "trip", multiDaySchedule: [day(1, "City")] })).toBe(true);
+    expect(hasTripItinerary({ type: "escape", multiDaySchedule: [day(1, "Coast")] })).toBe(true);
+    expect(hasTripItinerary({ type: "trip", multiDaySchedule: [] })).toBe(false);
+    expect(hasTripItinerary({ type: "nightout", multiDaySchedule: [day(1, "City")] })).toBe(false);
   });
 });

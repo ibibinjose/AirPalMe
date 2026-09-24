@@ -69,6 +69,12 @@ export interface Booking {
   spots?: number;
   /** Balance payment: points at the original deposit booking on the same plan. */
   parentBookingId?: string;
+  /** D3 stay nights: property + range on the same bookings engine. */
+  propertyId?: string;
+  stayCheckIn?: string;
+  stayCheckOut?: string;
+  stayGuests?: number;
+  stayRoomTypeId?: string;
 }
 
 export interface BookingInput {

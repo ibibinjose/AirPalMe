@@ -4,6 +4,7 @@ import {
   canPublish,
   currentWeekId,
   legalGateSatisfied,
+  offerTargetValid,
   ownerCanTransition,
   targetHref,
   validatePromotionDraft,
@@ -63,7 +64,19 @@ describe("marketplace targets and weekly", () => {
     expect(targetHref("event", "abc")).toBe("/e/abc");
     expect(targetHref("place", "abc")).toBe("/p/abc");
     expect(targetHref("mate", "abc")).toBe("/mate");
+    expect(targetHref("mate", "")).toBe("/mate");
+    expect(targetHref("experience", "")).toBe("/experiences");
+    expect(targetHref("fashion", "")).toBe("/fashion");
     expect(targetHref("", "")).toBe("");
+  });
+
+  it("rejects unknown kinds and venue targets without a venue", () => {
+    expect(offerTargetValid("banner-ad", "abc")).toBe(false);
+    expect(offerTargetValid("place", "")).toBe(false);
+    expect(offerTargetValid("stay", "  ")).toBe(false);
+    expect(offerTargetValid("mate", "")).toBe(true);
+    expect(targetHref("banner-ad", "abc")).toBe("");
+    expect(targetHref("place", "")).toBe("");
   });
 
   it("builds a stable week id", () => {

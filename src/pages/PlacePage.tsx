@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRoute, useLocation } from "wouter";
+import { Link, useRoute, useLocation } from "wouter";
 import { ArrowLeft, Plus, Share2 } from "lucide-react";
 import { getPlace, withWalk } from "@/lib/catalog";
 import { shareContent } from "@/lib/share";
@@ -115,6 +115,31 @@ export function PlacePage() {
       </div>
       <div className="px-4 pt-5">
         <p className="text-[15px] leading-relaxed">{place.insiderTip || place.shortWhy}</p>
+        {place.deal && (
+          <div className="mt-4 rounded-2xl bg-paper p-4 ring-1 ring-line/60" aria-label="Place deal">
+            <p className="text-[13px] font-bold">{place.deal.badge}</p>
+            {place.deal.detail && <p className="mt-1 text-[14px] text-mute">{place.deal.detail}</p>}
+            {(place.deal.claimHint || place.deal.expiry) && (
+              <p className="mt-1 text-[12px] text-mute">
+                {[place.deal.claimHint, place.deal.expiry ? `Ends ${place.deal.expiry}` : ""].filter(Boolean).join(" · ")}
+              </p>
+            )}
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link
+                href={`/plan/new?title=${encodeURIComponent(place.name)}&dest=${encodeURIComponent(place.name)}`}
+                className="inline-flex min-h-[44px] items-center rounded-full bg-ink px-5 py-2 text-[14px] font-semibold text-white transition active:scale-95"
+              >
+                Plan it here
+              </Link>
+              <Link
+                href="/mate"
+                className="inline-flex min-h-[44px] items-center rounded-full bg-card px-5 py-2 text-[14px] font-semibold ring-1 ring-line transition active:scale-95"
+              >
+                Find someone to go with
+              </Link>
+            </div>
+          </div>
+        )}
         {place.hours && (
           <TradingHoursScheduleView
             hours={place.hours}

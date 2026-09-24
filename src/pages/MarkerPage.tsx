@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { PageLoading } from "@/components/ui/PageLoading";
 import { useStay } from "@/contexts/StayContext";
 import { askLocal } from "@/lib/ask";
-import { getMarker, nearbyForMarker, PRECINCT } from "@/lib/catalog";
+import { getMarker, nearbyForMarker, placesWithDeals, PRECINCT } from "@/lib/catalog";
 import { fetchMarker } from "@/lib/markers-store";
 import type { MarkerDoc } from "@shared/nearby";
 import { eventsTonight } from "@/lib/local-events";
@@ -74,7 +74,8 @@ export function MarkerPage() {
 
   const places = useMemo(() => {
     let rows = nearbyForMarker(marker);
-    if (chip !== "all" && chip !== "tonight") rows = rows.filter((p) => p.category === chip);
+    if (chip === "deals") rows = placesWithDeals(rows);
+    else if (chip !== "all" && chip !== "tonight") rows = rows.filter((p) => p.category === chip);
     return rows;
   }, [marker, chip]);
 

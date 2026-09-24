@@ -45,6 +45,7 @@ export {
   confirmExperienceBookingRemote,
   createBookingCheckoutSession,
   payBookingBalance,
+  createStayCheckoutSession,
   createConnectAccountLink,
   refreshConnectAccount,
   createConnectLoginLink,

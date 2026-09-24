@@ -21,6 +21,7 @@ import { track } from "@/lib/analytics";
 import { HostActivationChecklist } from "@/components/host/HostActivationChecklist";
 import { HostPlaceForm } from "@/components/host/HostPlaceForm";
 import { HostRoomsPanel } from "@/components/host/HostRoomsPanel";
+import { StayBlocksPanel } from "@/components/host/StayBlocksPanel";
 import { HostDiningPanel } from "@/components/host/HostDiningPanel";
 import { HostPrintPanel } from "@/components/host/HostPrintPanel";
 import { openTicketCount, resolveStaffTicket, subscribePropertyTickets } from "@/lib/tickets-store";
@@ -479,7 +480,12 @@ export function HostPage() {
           </>
         )}
 
-        {tab === "rooms" && <HostRoomsPanel property={property} onSaved={setProperty} />}
+        {tab === "rooms" && (
+          <>
+            <HostRoomsPanel property={property} onSaved={setProperty} />
+            <StayBlocksPanel propertyId={property.id} />
+          </>
+        )}
         {tab === "place" && <HostPlaceForm property={property} onSaved={setProperty} />}
         {tab === "dining" && <HostDiningPanel propertyId={property.id} menu={menu} />}
         {tab === "print" && <HostPrintPanel property={property} />}

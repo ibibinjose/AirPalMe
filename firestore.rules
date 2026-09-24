@@ -312,6 +312,17 @@ match /dining_orders/{orderId} {
       }
     }
 
+    // D3 host-blocked nights: public to read (quoting needs them), host-managed writes.
+    match /stay_blocks/{blockId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.propertyId is string
+        && request.resource.data.date is string
+        && request.resource.data.keys().hasOnly(['propertyId', 'date', 'reason', 'createdAt', 'updatedAt'])
+        && manages(request.resource.data.propertyId);
+      allow update, delete: if signedIn() && manages(resource.data.propertyId);
+    }
+
     match /businessDeals/{dealId} {
       allow read: if true;
       allow write: if false;

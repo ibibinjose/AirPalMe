@@ -5,6 +5,7 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import {
   adminCanTransition,
   canPublish,
+  offerTargetValid,
   ownerCanTransition,
   validatePromotionDraft,
   entryReferenceFor,
@@ -100,6 +101,31 @@ async function grantPoints(uid: string, delta: number, reason: string, refId: st
   });
 }
 
+/** D1 — venue-owner check: listings by ownerUid, properties by ownerId/members. */
+export async function ownsOfferVenue(uid: string, targetType: string, targetId: string): Promise<boolean> {
+  try {
+    if (targetType === "place") {
+      const byId = await db.collection("listings").doc(targetId).get();
+      if (byId.exists && String(byId.data()?.ownerUid || "") === uid) return true;
+      const byPlace = await db.collection("listings").where("ownerUid", "==", uid).limit(20).get();
+      return byPlace.docs.some(
+        (d) => d.id === targetId || String((d.data() as { placeId?: unknown }).placeId || "") === targetId,
+      );
+    }
+    if (targetType === "stay") {
+      const snap = await db.collection("properties").doc(targetId).get();
+      if (!snap.exists) return false;
+      const row = snap.data() as { ownerId?: unknown; members?: Record<string, unknown> };
+      if (String(row.ownerId || "") === uid) return true;
+      const role = row.members?.[uid];
+      return role === "host_admin" || role === "staff";
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 export const createPromotion = onCall(CALLABLE, async (request) => {
   const uid = requireAccount(request);
   await noteAppCheck(request, "createPromotion");
@@ -108,6 +134,18 @@ export const createPromotion = onCall(CALLABLE, async (request) => {
   if (errors.length) throw new HttpsError("invalid-argument", errors.join(" "));
   if (data.kind !== "giveaway" && data.kind !== "promotion") {
     throw new HttpsError("invalid-argument", "kind must be giveaway or promotion.");
+  }
+  // D1 — offers land on transaction surfaces only, and venue offers belong
+  // to the venue's owner. No external ad links, no other owner's venue promos.
+  const targetType = String(data.targetType || "").trim();
+  const targetId = String(data.targetId || "").trim();
+  if (targetType || targetId) {
+    if (!offerTargetValid(targetType, targetId)) {
+      throw new HttpsError("invalid-argument", "Offer target must be a stay, event, place, mate, experience, or fashion surface.");
+    }
+    if ((targetType === "place" || targetType === "stay") && !(await ownsOfferVenue(uid, targetType, targetId))) {
+      throw new HttpsError("permission-denied", "Offers for a place or stay must come from its owner.");
+    }
   }
 
   const now = new Date().toISOString();
@@ -197,6 +235,19 @@ export const updatePromotion = onCall(CALLABLE, async (request) => {
     delete patch[k];
   }
   if (!Object.keys(patch).length) throw new HttpsError("invalid-argument", "Nothing to update.");
+  // D1 — same target discipline on edits as on creation.
+  if ("targetType" in patch || "targetId" in patch) {
+    const nextType = String(patch.targetType ?? promo.targetType ?? "").trim();
+    const nextId = String(patch.targetId ?? promo.targetId ?? "").trim();
+    if ((nextType || nextId) && !offerTargetValid(nextType, nextId)) {
+      throw new HttpsError("invalid-argument", "Offer target must be a stay, event, place, mate, experience, or fashion surface.");
+    }
+    if ((nextType === "place" || nextType === "stay") && !admin && !(await ownsOfferVenue(uid, nextType, nextId))) {
+      throw new HttpsError("permission-denied", "Offers for a place or stay must come from its owner.");
+    }
+    patch.targetType = nextType;
+    patch.targetId = nextId;
+  }
   await ref.update({ ...patch, updatedAt: new Date().toISOString() });
   await writePromotionAudit({
     promotionId,

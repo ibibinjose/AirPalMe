@@ -88,8 +88,8 @@ const VERTICALS = [
   },
   {
     title: "AirPal Fashion",
-    badge: "Rent, Swap & Style",
-    description: "Access curated fashion collections, rentals, and exclusive brand drops anywhere.",
+    badge: "Brand campaigns first",
+    description: "Brand campaigns and exclusive drops. Rentals open with partner brands — no peer-to-peer store until trust proves out.",
     icon: Shirt,
     color: "bg-purple-500/10 text-purple-600 border-purple-500/20",
   },
