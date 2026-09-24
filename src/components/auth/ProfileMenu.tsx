@@ -1,19 +1,25 @@
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
 import { useLocation } from "wouter";
 import {
+  Activity,
   Building2,
   CalendarDays,
   Cat,
   ChevronRight,
+  Compass,
+  HeartHandshake,
   Images,
+  Info,
   Languages,
   LogIn,
   LogOut,
   PencilLine,
+  QrCode,
   Settings,
   ShieldCheck,
   Sparkles,
   Store,
+  Ticket,
   UserRound,
   Users,
   X,
@@ -34,6 +40,7 @@ import {
 import { toast } from "sonner";
 import { NAMES } from "@shared/names";
 import { partnerAccountPath } from "@/lib/partner-account";
+import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
 const EMOJI_SHORTCUTS = ["☕", "💻", "🍸", "🚶", "⚡", "✈️", "🎧", "🌴"];
@@ -45,6 +52,7 @@ function Row({
   highlight = false,
   danger = false,
   badge,
+  badgeColor,
   onClick,
 }: {
   icon: typeof UserRound;
@@ -53,15 +61,19 @@ function Row({
   highlight?: boolean;
   danger?: boolean;
   badge?: string;
+  badgeColor?: string;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       role="menuitem"
-      onClick={onClick}
+      onClick={() => {
+        void triggerHaptic("light");
+        onClick();
+      }}
       className={cn(
-        "group flex min-h-[44px] w-full touch-manipulation items-center gap-3 rounded-2xl px-3 py-2 text-left transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-[0.98]",
+        "group flex min-h-[46px] w-full touch-manipulation items-center gap-3 rounded-2xl px-3 py-2 text-left transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-[0.98]",
         highlight
           ? "bg-brand/10 text-brand hover:bg-brand/15 font-semibold"
           : danger
@@ -71,7 +83,7 @@ function Row({
     >
       <span
         className={cn(
-          "grid h-8 w-8 shrink-0 place-items-center rounded-xl transition-transform duration-150 group-hover:scale-105 ring-1",
+          "grid h-8.5 w-8.5 shrink-0 place-items-center rounded-xl transition-transform duration-150 group-hover:scale-105 ring-1",
           highlight
             ? "bg-brand text-white ring-brand/30 shadow-2xs"
             : danger
@@ -88,7 +100,12 @@ function Row({
             {label}
           </span>
           {badge && (
-            <span className="rounded-full bg-brand/10 px-2 py-0.2 text-[10px] font-bold text-brand uppercase tracking-wider">
+            <span
+              className={cn(
+                "rounded-full px-2 py-0.2 text-[10px] font-bold uppercase tracking-wider",
+                badgeColor || "bg-brand/10 text-brand",
+              )}
+            >
               {badge}
             </span>
           )}
@@ -99,7 +116,7 @@ function Row({
       <ChevronRight
         size={14}
         className={cn(
-          "shrink-0 opacity-0 transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-0.5",
+          "shrink-0 opacity-40 transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-0.5",
           highlight ? "text-brand" : danger ? "text-red-500" : "text-mute",
         )}
       />
@@ -114,7 +131,7 @@ export function ProfileMenu() {
   const { memberByEmail } = useClub();
   const { myEvent } = useEvents();
   const [open, setOpen] = useState(false);
-  // Inline status editor lives inside the dropdown (not a separate modal).
+  // Inline status editor lives inside the dropdown / drawer.
   const [statusEditing, setStatusEditing] = useState(false);
   const [editStatus, setEditStatus] = useState<AvailabilityStatus>("available");
   const [editText, setEditText] = useState("");
@@ -123,6 +140,7 @@ export function ProfileMenu() {
   const statusGuard = useRef(createSubmitGuard());
   const box = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const clubMember = user?.email ? Boolean(memberByEmail(user.email)) : false;
 
@@ -133,7 +151,12 @@ export function ProfileMenu() {
   useEffect(() => {
     if (!open) return;
     function onDoc(e: MouseEvent) {
-      if (!box.current?.contains(e.target as Node)) setOpen(false);
+      if (
+        !box.current?.contains(e.target as Node) &&
+        !drawerRef.current?.contains(e.target as Node)
+      ) {
+        setOpen(false);
+      }
     }
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
@@ -143,8 +166,6 @@ export function ProfileMenu() {
     }
     document.addEventListener("mousedown", onDoc);
     document.addEventListener("keydown", onKey);
-    // Move focus into the menu for keyboard users.
-    menuRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
     return () => {
       document.removeEventListener("mousedown", onDoc);
       document.removeEventListener("keydown", onKey);
@@ -193,7 +214,8 @@ export function ProfileMenu() {
   }
 
   function onMenuKeyDown(e: ReactKeyboardEvent<HTMLDivElement>) {
-    const items = Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>("button") || []);
+    const activeRef = menuRef.current || drawerRef.current;
+    const items = Array.from(activeRef?.querySelectorAll<HTMLButtonElement>("button") || []);
     if (items.length === 0) return;
     const active = document.activeElement as HTMLElement | null;
     const idx = items.findIndex((el) => el === active);
@@ -324,9 +346,10 @@ export function ProfileMenu() {
               <button
                 type="button"
                 onClick={() => setStatusEditing(false)}
-                className="text-mute hover:text-ink text-xs"
+                className="text-mute hover:text-ink text-xs p-1"
+                aria-label="Close status editor"
               >
-                <X size={13} />
+                <X size={14} />
               </button>
             </div>
 
@@ -416,22 +439,31 @@ export function ProfileMenu() {
         </div>
       </div>
 
-      {/* Everyday / Social Section */}
+      {/* Social & Discovery Hubs */}
       <div className="mt-2 space-y-0.5">
-        <Row icon={Users} label="Circle" hint="Family, friends, people nearby" highlight onClick={() => go("/circle")} />
-        <Row icon={CalendarDays} label="Plans" hint="Make a plan with your people" onClick={() => go("/plan")} />
+        <Row
+          icon={HeartHandshake}
+          label="AirPal Mate"
+          hint="Find someone to do things with"
+          badge="People"
+          highlight
+          onClick={() => go("/mate")}
+        />
+        <Row icon={Users} label="Circle" hint="Family, friends & people nearby" onClick={() => go("/circle")} />
+        <Row icon={CalendarDays} label="Plans & Invites" hint="Group plans, RSVPs & meetups" onClick={() => go("/plan")} />
+        <Row icon={Compass} label="Explore & Discovery" hint="Sydney, places, stays & eats" onClick={() => go("/explore")} />
         {mine ? (
           <Row
             icon={Sparkles}
             label={`@${mine.handle}`}
-            hint="Your public bio — share to network"
+            hint="Your public bio link"
             onClick={() => go(`/@${mine.handle}`)}
           />
         ) : biosReady ? (
           <Row
             icon={Sparkles}
             label="Claim @handle"
-            hint="So your Circle can find you"
+            hint="Reserve your unique AirPal handle"
             highlight
             onClick={() => go("/bio/setup")}
           />
@@ -439,35 +471,36 @@ export function ProfileMenu() {
           <Row icon={Sparkles} label="Your @handle" hint="Loading your profile…" onClick={() => go("/me")} />
         )}
         {mine && (
-          <Row icon={PencilLine} label="Edit bio" hint="Profile, links, shop, share" onClick={() => go("/bio/edit")} />
+          <Row icon={PencilLine} label="Edit Bio" hint="Profile, links, shop & share" onClick={() => go("/bio/edit")} />
         )}
-        <Row
-          icon={UserRound}
-          label="Me"
-          hint={mine ? `@${mine.handle}` : "Dashboard, zoo, workspaces"}
-          onClick={() => go("/me")}
-        />
-        {mine && <Row icon={Cat} label="Air Zoo" hint="Stickers, shops, hunts" onClick={() => go("/me/zoo")} />}
-        <Row icon={Images} label="Memory Wall" hint="Keepsakes & moments" onClick={() => go("/me/memories")} />
       </div>
 
-      {/* Workspaces Section */}
+      {/* Workspaces & Pulse Hub */}
       <div className="my-1.5 h-px bg-line/80" />
-      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-gold">Workspaces</p>
+      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-gold">Workspaces & Business</p>
       <div className="mt-1 space-y-0.5">
+        <Row
+          icon={Activity}
+          label="AirPal Pulse"
+          hint="Instant venue feedback & QR codes"
+          badge="NEW"
+          badgeColor="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+          onClick={() => go("/pulse")}
+        />
+
         {isHost ? (
           <Row icon={Building2} label="Host Workspace" hint="Hotel, venue, campus" onClick={() => go("/host")} />
         ) : (
-          <Row icon={Building2} label="Stay host" hint="Hotel, hostel, or room concierge" onClick={() => go("/join")} />
+          <Row icon={Building2} label="Stay Host" hint="Hotel, hostel, or room concierge" onClick={() => go("/join")} />
         )}
 
         {business ? (
           <>
-            <Row icon={Store} label="Your place" hint={`AirPal.Me/@${business.handle}`} onClick={() => go("/business")} />
+            <Row icon={Store} label="Your Place" hint={`AirPal.Me/@${business.handle}`} onClick={() => go("/business")} />
             <Row
               icon={PencilLine}
-              label="Edit place"
-              hint="Listing, hours, Google import"
+              label="Edit Place"
+              hint="Listing, hours & promotions"
               onClick={() => go("/business")}
             />
           </>
@@ -475,7 +508,7 @@ export function ProfileMenu() {
           <Row
             icon={Store}
             label={NAMES.partnerAccount}
-            hint="Same login. Guests find you on What's on"
+            hint="Listing, promotions & guest discovery"
             onClick={() => go(partnerAccountPath({ signedIn: true, hasPlace: false }))}
           />
         )}
@@ -489,11 +522,28 @@ export function ProfileMenu() {
         {clubMember && <Row icon={Users} label="AirPal Club" hint="Guest list & perks" onClick={() => go("/club")} />}
       </div>
 
+      {/* Personal & Tools */}
+      <div className="my-1.5 h-px bg-line/80" />
+      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-gold">Personal & Tools</p>
+      <div className="mt-1 space-y-0.5">
+        <Row
+          icon={UserRound}
+          label="Me Dashboard"
+          hint={mine ? `@${mine.handle}` : "Profile, zoo, stats"}
+          onClick={() => go("/me")}
+        />
+        <Row icon={Ticket} label="My Tickets" hint="Passes & reservations" onClick={() => go("/me/tickets")} />
+        {mine && <Row icon={Cat} label="Air Zoo" hint="Stickers, shops & hunts" onClick={() => go("/me/zoo")} />}
+        <Row icon={Images} label="Memory Wall" hint="Keepsakes & moments" onClick={() => go("/me/memories")} />
+        <Row icon={QrCode} label="Scan QR & Wave" hint="Scan marks & interact" onClick={() => go("/scan")} />
+      </div>
+
       {/* Settings & Admin */}
       <div className="my-1.5 h-px bg-line/80" />
       <div className="space-y-0.5">
-        <Row icon={Settings} label="Settings" hint="Account & preferences" onClick={() => go("/settings")} />
-        {isAdmin && <Row icon={ShieldCheck} label="Admin" hint="Platform controls" onClick={() => go("/admin")} />}
+        <Row icon={Settings} label="Settings" hint="Account, notifications & privacy" onClick={() => go("/settings")} />
+        <Row icon={Info} label="About AirPal" hint="Life Made Easy" onClick={() => go("/about")} />
+        {isAdmin && <Row icon={ShieldCheck} label="Admin Portal" hint="Platform controls" onClick={() => go("/admin")} />}
         <Row
           icon={LogOut}
           label="Sign out"
@@ -511,7 +561,7 @@ export function ProfileMenu() {
       <div className="rounded-2xl bg-paper/70 p-3.5 ring-1 ring-line/80 shadow-2xs">
         <p className="font-display text-sm font-bold text-ink">Welcome to AirPal</p>
         <p className="mt-0.5 text-xs text-mute leading-relaxed">
-          Sign in to start a Circle, make plans, and discover places.
+          Sign in to start a Circle, find a Mate, make plans, and discover places.
         </p>
 
         {/* Language selector under welcome header */}
@@ -541,11 +591,31 @@ export function ProfileMenu() {
       <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-gold">Get started</p>
       <div className="mt-1 space-y-0.5">
         <Row
+          icon={HeartHandshake}
+          label="AirPal Mate"
+          hint="Find someone to do things with"
+          highlight
+          onClick={() => go("/mate")}
+        />
+        <Row
+          icon={Compass}
+          label="Explore Sydney & Stays"
+          hint="Find places, experiences & stays"
+          onClick={() => go("/explore")}
+        />
+        <Row
           icon={Users}
           label="Start your Circle"
-          hint="Family, friends, people nearby"
-          highlight
+          hint="Family, friends & people nearby"
           onClick={() => go("/circle")}
+        />
+        <Row
+          icon={Activity}
+          label="AirPal Pulse"
+          hint="Fast real-time guest/customer feedback"
+          badge="NEW"
+          badgeColor="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+          onClick={() => go("/pulse")}
         />
         <Row
           icon={Store}
@@ -555,10 +625,12 @@ export function ProfileMenu() {
         />
         <Row icon={Building2} label="Become a Host" hint="Hotel, venue, hostel, campus" onClick={() => go("/join")} />
         <Row icon={CalendarDays} label="Organise an Event" hint="Market, expo, festival" onClick={() => go("/join")} />
+        <Row icon={QrCode} label="Scan QR & Wave" hint="Scan marks & interact" onClick={() => go("/scan")} />
       </div>
 
       <div className="my-1.5 h-px bg-line/80" />
       <Row icon={Settings} label="Settings" onClick={() => go("/settings")} />
+      <Row icon={Info} label="About AirPal" onClick={() => go("/about")} />
     </>
   );
 
@@ -571,8 +643,11 @@ export function ProfileMenu() {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={user ? `Account menu, ${statusInfo.label}` : "Menu and sign in"}
-        title={user ? `${statusInfo.label}${mine?.customStatus ? ` · ${mine.customStatus}` : ""}` : "Sign in"}
-        onClick={() => setOpen((v) => !v)}
+        title={user ? `${statusInfo.label}${mine?.customStatus ? ` · ${mine.customStatus}` : ""}` : "Sign in / Menu"}
+        onClick={() => {
+          void triggerHaptic("light");
+          setOpen((v) => !v);
+        }}
         className={cn(
           "relative grid h-9 w-9 shrink-0 touch-manipulation place-items-center overflow-visible rounded-full bg-paper transition-all duration-200 sm:h-10 sm:w-10",
           "hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-paper active:scale-95",
@@ -594,17 +669,61 @@ export function ProfileMenu() {
 
       {open && (
         <>
-          <div
-            onClick={() => setOpen(false)}
-            className="fixed inset-0 z-40 bg-ink/20 backdrop-blur-xs lg:hidden animate-in fade-in duration-150"
-            aria-hidden="true"
-          />
+          {/* Mobile / iOS / Android Bottom Sheet Drawer (< lg) */}
+          <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end">
+            <div
+              onClick={() => {
+                void triggerHaptic("light");
+                setOpen(false);
+              }}
+              className="fixed inset-0 bg-ink/40 backdrop-blur-xs animate-in fade-in duration-200"
+              aria-hidden="true"
+            />
+            <div
+              ref={drawerRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label={user ? "Account & Navigation menu" : "Menu & Sign in"}
+              onKeyDown={onMenuKeyDown}
+              className="relative z-50 flex max-h-[88dvh] w-full flex-col rounded-t-[32px] bg-card/98 ring-1 ring-line shadow-2xl backdrop-blur-2xl animate-in slide-in-from-bottom duration-250 ease-out"
+            >
+              {/* Drag Pill Handle */}
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="h-1.5 w-12 rounded-full bg-line/80" />
+              </div>
+
+              {/* Mobile Drawer Top Bar */}
+              <div className="flex items-center justify-between px-4 py-2 border-b border-line/60">
+                <span className="font-display text-sm font-bold text-ink">
+                  {user ? (mine ? `@${mine.handle}` : "Account & Navigation") : "Menu & Sign In"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void triggerHaptic("light");
+                    setOpen(false);
+                  }}
+                  className="grid h-8 w-8 touch-manipulation place-items-center rounded-full text-mute hover:bg-paper hover:text-ink ring-1 ring-line/70 transition active:scale-95"
+                  aria-label="Close menu"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Scrollable Drawer Content */}
+              <div className="flex-1 overflow-y-auto overscroll-contain p-3.5 space-y-1 pb-[max(2.5rem,env(safe-area-inset-bottom,16px))] no-scrollbar">
+                {items}
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Dropdown Menu (lg:block) */}
           <div
             ref={menuRef}
             role="menu"
             aria-label={user ? "Account menu" : "Sign in menu"}
             onKeyDown={onMenuKeyDown}
-            className="animate-menu-pop absolute right-0 z-50 mt-2.5 w-[min(20rem,calc(100vw-1.5rem))] max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain rounded-[28px] bg-card/95 p-2 sm:p-2.5 shadow-clay ring-1 ring-line/90 backdrop-blur-2xl no-scrollbar"
+            className="animate-menu-pop absolute right-0 z-50 mt-2.5 hidden lg:block w-84 max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain rounded-[28px] bg-card/95 p-3 shadow-clay ring-1 ring-line/90 backdrop-blur-2xl no-scrollbar"
           >
             {items}
           </div>
@@ -613,4 +732,3 @@ export function ProfileMenu() {
     </div>
   );
 }
-

@@ -41,6 +41,7 @@ const WORKSPACE = [
   /^\/join/,
   /^\/business/,
   /^\/event/,
+  /^\/pulse/,
   /^\/me\/(zoo|memories|people|giveaways)/,
   /^\/zoo/,
   /^\/settings/,

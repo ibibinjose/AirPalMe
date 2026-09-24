@@ -9,8 +9,10 @@ import { cn } from "@/lib/cn";
 
 const NAV_EXPLORE = [
   { href: "/", label: "Discover" },
+  { href: "/mate", label: "AirPal Mate" },
   { href: "/circle", label: "Circle" },
   { href: "/plan", label: "Plans" },
+  { href: "/pulse", label: "AirPal Pulse" },
   { href: "/experiences", label: "Experiences" },
   { href: "/calendar", label: "Events" },
   { href: "/guide", label: "Tours" },
@@ -19,6 +21,7 @@ const NAV_EXPLORE = [
 ];
 
 const NAV_HOSPITALITY = [
+  { href: "/pulse", label: "Create a Pulse" },
   { href: "/join", label: "Partner account" },
   { href: "/business", label: "Your place" },
   { href: "/plan/new", label: "Create plan" },
