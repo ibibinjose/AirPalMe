@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "ghost" | "dark" | "gold" | "light" | "onDark";
+  variant?: "primary" | "ghost" | "dark" | "gold" | "light" | "onDark" | "tonal" | "elevated" | "outlined";
   size?: "md" | "lg" | "sm";
   loading?: boolean;
 };
@@ -22,6 +22,9 @@ export function Button({ variant = "primary", size = "md", className, loading, d
         variant === "gold" && "bg-gold text-white",
         variant === "light" && "bg-white text-ink hover:bg-white/90",
         variant === "onDark" && "bg-ink/80 text-white ring-1 ring-white/55 hover:bg-ink",
+        variant === "tonal" && "bg-brand/10 text-brand font-semibold hover:bg-brand/15 active:bg-brand/20",
+        variant === "elevated" && "bg-card text-ink shadow-[var(--shadow-m3-1)] ring-1 ring-line hover:shadow-[var(--shadow-m3-2)]",
+        variant === "outlined" && "bg-transparent text-ink border border-line hover:bg-black/[0.04]",
         className,
       )}
       disabled={disabled || loading}

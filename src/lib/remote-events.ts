@@ -166,6 +166,23 @@ export function docToEventRecord(doc: Record<string, unknown>, id: string): Even
     flavour: flavourRaw,
     city,
     venue: str(doc.venue) || undefined,
+    address: str(doc.address) || undefined,
+    description: str(doc.description) || undefined,
+    shortWhy: str(doc.shortWhy) || undefined,
+    mapsPlaceId: str(doc.mapsPlaceId) || undefined,
+    geo:
+      doc.geo && typeof doc.geo === "object" && "lat" in doc.geo && "lng" in doc.geo
+        ? (doc.geo as { lat: number; lng: number })
+        : undefined,
+    coverImage: str(doc.coverImage) || undefined,
+    hostName: str(doc.hostName) || undefined,
+    hostHandle: str(doc.hostHandle) || undefined,
+    hostType: doc.hostType === "business" || doc.hostType === "individual" ? doc.hostType : undefined,
+    businessName: str(doc.businessName) || undefined,
+    businessHandle: str(doc.businessHandle) || undefined,
+    collaboratorHandles: Array.isArray(doc.collaboratorHandles)
+      ? doc.collaboratorHandles.filter((h): h is string => typeof h === "string")
+      : undefined,
     startsAt,
     endsAt: str(doc.endsAt) || startsAt,
     status: doc.status === "ended" ? "ended" : "live",

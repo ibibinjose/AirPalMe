@@ -40,6 +40,22 @@
   --color-gold: #1805db;
   --shadow-clay: 0 1px 1px rgba(255, 255, 255, 0.9) inset, 0 1px 2px rgba(18, 22, 20, 0.04),
     0 16px 36px -18px rgba(24, 5, 219, 0.22);
+
+  /* Material Design 3 (M3) Elevation & Surface Hierarchy */
+  --shadow-m3-0: none;
+  --shadow-m3-1: 0 1px 3px 1px rgba(18, 22, 20, 0.06), 0 1px 2px 0 rgba(18, 22, 20, 0.10);
+  --shadow-m3-2: 0 2px 6px 2px rgba(18, 22, 20, 0.08), 0 1px 2px 0 rgba(18, 22, 20, 0.12);
+  --shadow-m3-3: 0 4px 12px 3px rgba(18, 22, 20, 0.10), 0 1px 3px 0 rgba(18, 22, 20, 0.12);
+  --shadow-m3-4: 0 6px 16px 4px rgba(18, 22, 20, 0.12), 0 2px 4px 0 rgba(18, 22, 20, 0.14);
+  --shadow-m3-5: 0 8px 24px 6px rgba(18, 22, 20, 0.14), 0 4px 8px 0 rgba(18, 22, 20, 0.16);
+
+  --color-surface-lowest: #ffffff;
+  --color-surface-low: #f7f9fd;
+  --color-surface: #eef1f6;
+  --color-surface-high: #e5ebf4;
+  --color-surface-highest: #dde3ed;
+  --color-primary-container: rgba(24, 5, 219, 0.08);
+  --color-on-primary-container: #0e0394;
 }
 
 * {
@@ -489,4 +505,92 @@ body.keyboard-open .keyboard-hide {
   pointer-events: none;
   border-radius: inherit;
 }
+
+/* ==========================================================================
+   Material Design 3 (M3) Component Utilities
+   ========================================================================== */
+.md3-card {
+  background: var(--color-card);
+  border-radius: 28px;
+  box-shadow: var(--shadow-m3-1);
+  border: 1px solid var(--color-line);
+  transition: box-shadow 0.25s cubic-bezier(0.2, 0, 0, 1), transform 0.25s cubic-bezier(0.2, 0, 0, 1);
+}
+.md3-card:hover {
+  box-shadow: var(--shadow-m3-2);
+}
+
+.md3-card-elevated {
+  background: var(--color-card);
+  border-radius: 28px;
+  box-shadow: var(--shadow-m3-2);
+  transition: box-shadow 0.25s cubic-bezier(0.2, 0, 0, 1);
+}
+.md3-card-elevated:hover {
+  box-shadow: var(--shadow-m3-3);
+}
+
+.md3-card-filled {
+  background: var(--color-surface-high);
+  border-radius: 28px;
+  border: 1px solid rgba(228, 231, 238, 0.8);
+}
+
+.md3-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--color-card);
+  color: var(--color-ink);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-m3-1);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  cursor: pointer;
+  user-select: none;
+}
+.md3-chip:hover {
+  background: var(--color-surface-low);
+  box-shadow: var(--shadow-m3-2);
+}
+.md3-chip:active {
+  transform: scale(0.97);
+}
+
+.md3-chip-selected {
+  background: rgba(24, 5, 219, 0.12) !important;
+  color: var(--color-brand) !important;
+  border-color: var(--color-brand) !important;
+  font-weight: 600 !important;
+  box-shadow: var(--shadow-m3-1);
+}
+
+.md3-fab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 56px;
+  padding: 0 20px;
+  border-radius: 18px;
+  background: var(--color-brand);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: var(--shadow-m3-3);
+  transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+  cursor: pointer;
+}
+.md3-fab:hover {
+  box-shadow: var(--shadow-m3-4);
+  transform: translateY(-1px);
+}
+.md3-fab:active {
+  transform: translateY(0) scale(0.98);
+}
+
 

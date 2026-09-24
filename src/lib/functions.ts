@@ -155,6 +155,18 @@ export function upsertEventRemote(data: {
   flavour: string;
   city?: string;
   venue?: string;
+  address?: string;
+  description?: string;
+  shortWhy?: string;
+  mapsPlaceId?: string;
+  geo?: { lat: number; lng: number };
+  coverImage?: string;
+  hostName?: string;
+  hostHandle?: string;
+  hostType?: "business" | "individual";
+  businessName?: string;
+  businessHandle?: string;
+  collaboratorHandles?: string[];
   startsAt?: string;
   endsAt?: string;
   status?: string;
