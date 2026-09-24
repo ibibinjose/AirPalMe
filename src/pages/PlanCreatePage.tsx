@@ -7,6 +7,7 @@ import {
   ChevronRight,
   Coffee,
   Footprints,
+  Sparkles,
   Ticket,
   Users,
   UtensilsCrossed,
@@ -29,6 +30,7 @@ import { PLAN_TYPES, type PlanType } from "@shared/plan";
 import { cn } from "@/lib/cn";
 import { PlaceAddressField, type PickedPlace } from "@/components/forms/PlaceAddressField";
 import type { Geo } from "@shared/nearby";
+import { solveAirPalIntent } from "@/lib/brain";
 
 const KINDS: Array<{ id: PlanType; label: string }> = [
   { id: "catchup", label: "Catch up" },
@@ -56,6 +58,31 @@ function addDays(base: string, days: number) {
   return toZonedDateStr(dt);
 }
 
+function mapCategoryToPlanType(cat: string, timeSlot: string): PlanType {
+  if (cat === "coffee") return "catchup";
+  if (cat === "food") return timeSlot === "morning" || timeSlot === "midday" ? "lunch" : "nightout";
+  if (cat === "fitness" || cat === "nature") return "walk";
+  if (cat === "nightlife") return "nightout";
+  return "catchup";
+}
+
+function timeForSlot(slot: string): string {
+  switch (slot) {
+    case "morning":
+      return "09:30";
+    case "midday":
+      return "12:30";
+    case "afternoon":
+      return "15:30";
+    case "evening":
+      return "18:30";
+    case "night":
+      return "20:30";
+    default:
+      return "18:00";
+  }
+}
+
 export function PlanCreatePage() {
   const [, nav] = useLocation();
   const params = new URLSearchParams(useSearch());
@@ -65,15 +92,29 @@ export function PlanCreatePage() {
   const { followedHandles, followerHandles, likedHandles, likedByHandles } = useSocial();
   const people = listPeople();
 
+  const rawIntent = params.get("intent") || params.get("prompt") || "";
+  const solvedIntent = useMemo(() => {
+    if (!rawIntent) return null;
+    return solveAirPalIntent(rawIntent, { userLocationSuburb: city });
+  }, [rawIntent, city]);
+
   const targetHandle = (params.get("with") || "").replace(/^@/, "") || undefined;
   const targetName = params.get("name") || undefined;
   const paramType = params.get("type") as PlanType | null;
+
   const initialType: PlanType =
-    paramType && KINDS.some((k) => k.id === paramType) ? paramType : targetHandle ? "catchup" : "nightout";
+    paramType && KINDS.some((k) => k.id === paramType)
+      ? paramType
+      : solvedIntent
+        ? mapCategoryToPlanType(solvedIntent.category, solvedIntent.timeSlot)
+        : targetHandle
+          ? "catchup"
+          : "nightout";
 
   const [type, setType] = useState<PlanType>(initialType);
   const [title, setTitle] = useState(() => {
     if (params.get("title")) return params.get("title")!;
+    if (solvedIntent?.title) return solvedIntent.title;
     if (targetHandle) {
       if (paramType === "meeting") return `Sync with ${targetName || `@${targetHandle}`}`;
       if (paramType === "nightout") return `Hangout with ${targetName || `@${targetHandle}`}`;
@@ -82,18 +123,17 @@ export function PlanCreatePage() {
     return "";
   });
   const [date, setDate] = useState(today || toZonedDateStr(new Date()));
-  const [time, setTime] = useState("18:00");
-  const [place, setPlace] = useState(params.get("dest") || params.get("destination") || city || "The Rocks, Sydney");
+  const [time, setTime] = useState(() => (solvedIntent ? timeForSlot(solvedIntent.timeSlot) : "18:00"));
+  const [place, setPlace] = useState(
+    params.get("dest") || params.get("destination") || solvedIntent?.suburb || city || "The Rocks, Sydney",
+  );
   const [placeGeo, setPlaceGeo] = useState<Geo | undefined>();
   const [isPublic, setIsPublic] = useState(false);
   const [hero, setHero] = useState<string | undefined>();
   const [invite, setInvite] = useState<Set<string>>(() => new Set(targetHandle ? [targetHandle] : []));
   const [busy, setBusy] = useState(false);
-  // Stepped Podz-style flow: template → details → who. A prefilled invite
-  // (?with=) skips straight to details.
-  const [step, setStep] = useState<0 | 1 | 2>(targetHandle ? 1 : 0);
-  // Synchronous double-tap guard: state-based `busy` only disables the
-  // button after a re-render, so two rapid taps could create two plans.
+  // Stepped flow: template → details → who. A prefilled invite or intent skips straight to details.
+  const [step, setStep] = useState<0 | 1 | 2>(targetHandle || solvedIntent ? 1 : 0);
   const guardRef = useRef(createSubmitGuard());
 
   const circle = useMemo(() => {
@@ -263,6 +303,30 @@ export function PlanCreatePage() {
           >
             <Ticket size={14} /> Ticketed public event
           </button>
+        </div>
+      )}
+
+      {solvedIntent && (
+        <div className="mt-4 rounded-2xl bg-gradient-to-br from-brand/10 via-brand/5 to-transparent p-4 ring-1 ring-brand/20 shadow-xs">
+          <div className="flex items-center gap-2 text-brand">
+            <Sparkles size={16} className="shrink-0 animate-pulse" />
+            <span className="text-xs font-bold uppercase tracking-wider">AirPal Brain Plan</span>
+          </div>
+          <p className="mt-1 text-sm font-semibold text-ink">
+            Tailored for {solvedIntent.suburb} ({solvedIntent.timeSlot})
+          </p>
+          <div className="mt-2 space-y-1.5">
+            {solvedIntent.stops.map((stop, i) => (
+              <div key={stop.id} className="flex items-start gap-2 text-xs text-mute">
+                <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">
+                  {i + 1}
+                </span>
+                <span>
+                  <strong className="text-ink">{stop.title}</strong> ({stop.suggestedDurationMins}m) — {stop.reason}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

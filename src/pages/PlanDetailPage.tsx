@@ -53,6 +53,7 @@ import { cn } from "@/lib/cn";
 import { SegmentedControl } from "@/components/design-system/companions";
 import { CityMap, type MapPin } from "@/components/map/CityMap";
 import { knownCityCenter } from "@/lib/cities";
+import { evaluatePlanHealth } from "@/lib/brain";
 
 export function PlanDetailPage() {
   const [, paramsPlan] = useRoute("/plan/:id");
@@ -213,6 +214,18 @@ export function PlanDetailPage() {
   const goingAttendees = plan ? plan.attendees.filter((a) => a.status === "going") : [];
   const maybeAttendees = plan ? plan.attendees.filter((a) => a.status === "maybe") : [];
 
+  const brainHealth = useMemo(() => {
+    if (!plan) return null;
+    return evaluatePlanHealth({
+      title: plan.title,
+      location: plan.destination,
+      date: plan.date,
+      time: plan.time,
+      attendeesCount: (plan.attendees || []).filter((a) => a.status === "going").length,
+      isCompleted: plan.status === "completed",
+    });
+  }, [plan]);
+
   const handleDeletePlan = () => {
     if (window.confirm("Are you sure you want to delete this plan?")) {
       deletePlan(plan.id);
@@ -360,6 +373,31 @@ export function PlanDetailPage() {
         <div className="mt-4 flex items-center gap-2 rounded-2xl bg-emerald-500/10 px-4 py-3 text-[13px] font-medium text-emerald-800 ring-1 ring-emerald-500/20 dark:text-emerald-200">
           <CheckCircle2 size={16} className="shrink-0" />
           Experience completed
+        </div>
+      )}
+
+      {brainHealth && plan.status !== "completed" && plan.status !== "cancelled" && (
+        <div className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 text-xs font-bold text-brand uppercase tracking-wider">
+              <Sparkles size={14} className="animate-pulse" />
+              AirPal Brain · Experience Readiness
+            </span>
+            <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-bold text-brand">
+              {brainHealth.healthScore}%
+            </span>
+          </div>
+          <div className="mt-2.5 flex items-center gap-2 text-xs text-mute">
+            <span
+              className={cn(
+                "h-2.5 w-2.5 rounded-full shrink-0",
+                brainHealth.readyToExperience ? "bg-emerald-500" : "bg-amber-500",
+              )}
+            />
+            <span>
+              Next: <strong className="text-ink">{brainHealth.nextBestAction}</strong>
+            </span>
+          </div>
         </div>
       )}
 
