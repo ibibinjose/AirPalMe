@@ -30,7 +30,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
 
   return (
     <motion.header
-      className="sticky top-0 z-30 hidden border-b border-line/60 bg-paper/75 backdrop-blur-2xl lg:block transition-colors duration-300"
+      className="hidden border-b border-line/60 bg-paper/75 backdrop-blur-2xl lg:block transition-colors duration-300"
       initial={enter ? { opacity: 0, y: -12 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease: enterEase, delay: 0.12 }}

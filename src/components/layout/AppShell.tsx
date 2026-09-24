@@ -102,7 +102,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             Skip to content
           </a>
-          <div className="fixed-element sticky top-0 z-30 bg-paper/95 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
+          <div className="fixed-element sticky top-0 z-40 bg-paper/95 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
             <TicketAlertBar />
             <LocalNowBar />
             {workspace ? (

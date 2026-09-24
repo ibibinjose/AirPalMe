@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useLocation } from "wouter";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import {
   Activity,
   Building2,
@@ -143,6 +145,8 @@ export function ProfileMenu() {
   const drawerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const clubMember = user?.email ? Boolean(memberByEmail(user.email)) : false;
+
+  useScrollLock(open);
 
   const currentStatusKey: AvailabilityStatus =
     mine?.availabilityStatus || (mine?.openNow ? "available" : user ? "available" : "offline");
@@ -673,53 +677,57 @@ export function ProfileMenu() {
 
       {open && (
         <>
-          {/* Mobile / iOS / Android Bottom Sheet Drawer (< lg) */}
-          <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end">
-            <div
-              onClick={() => {
-                void triggerHaptic("light");
-                setOpen(false);
-              }}
-              className="fixed inset-0 bg-ink/40 backdrop-blur-xs animate-in fade-in duration-200"
-              aria-hidden="true"
-            />
-            <div
-              ref={drawerRef}
-              role="dialog"
-              aria-modal="true"
-              aria-label={user ? "Account & Navigation menu" : "Menu & Sign in"}
-              onKeyDown={onMenuKeyDown}
-              className="relative z-50 flex max-h-[88dvh] w-full flex-col rounded-t-[32px] bg-card/98 ring-1 ring-line shadow-2xl backdrop-blur-2xl animate-in slide-in-from-bottom duration-250 ease-out"
-            >
-              {/* Drag Pill Handle */}
-              <div className="flex justify-center pt-3 pb-1">
-                <div className="h-1.5 w-12 rounded-full bg-line/80" />
-              </div>
-
-              {/* Mobile Drawer Top Bar */}
-              <div className="flex items-center justify-between px-4 py-2 border-b border-line/60">
-                <span className="font-display text-sm font-bold text-ink">
-                  {user ? (mine ? `@${mine.handle}` : "Account & Navigation") : "Menu & Sign In"}
-                </span>
-                <button
-                  type="button"
+          {/* Mobile / iOS / Android Bottom Sheet Drawer (< lg) using portal */}
+          {typeof document !== "undefined" &&
+            createPortal(
+              <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end">
+                <div
                   onClick={() => {
                     void triggerHaptic("light");
                     setOpen(false);
                   }}
-                  className="grid h-8 w-8 touch-manipulation place-items-center rounded-full text-mute hover:bg-paper hover:text-ink ring-1 ring-line/70 transition active:scale-95"
-                  aria-label="Close menu"
+                  className="fixed inset-0 bg-ink/40 backdrop-blur-xs animate-in fade-in duration-200"
+                  aria-hidden="true"
+                />
+                <div
+                  ref={drawerRef}
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label={user ? "Account & Navigation menu" : "Menu & Sign in"}
+                  onKeyDown={onMenuKeyDown}
+                  className="relative z-50 flex max-h-[88dvh] w-full flex-col rounded-t-[32px] bg-card/98 ring-1 ring-line shadow-2xl backdrop-blur-2xl animate-in slide-in-from-bottom duration-250 ease-out"
                 >
-                  <X size={16} />
-                </button>
-              </div>
+                  {/* Drag Pill Handle */}
+                  <div className="flex justify-center pt-3 pb-1">
+                    <div className="h-1.5 w-12 rounded-full bg-line/80" />
+                  </div>
 
-              {/* Scrollable Drawer Content */}
-              <div className="flex-1 overflow-y-auto overscroll-contain p-3.5 space-y-1 pb-[max(2.5rem,env(safe-area-inset-bottom,16px))] no-scrollbar">
-                {items}
-              </div>
-            </div>
-          </div>
+                  {/* Mobile Drawer Top Bar */}
+                  <div className="flex items-center justify-between px-4 py-2 border-b border-line/60">
+                    <span className="font-display text-sm font-bold text-ink">
+                      {user ? (mine ? `@${mine.handle}` : "Account & Navigation") : "Menu & Sign In"}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void triggerHaptic("light");
+                        setOpen(false);
+                      }}
+                      className="grid h-8 w-8 touch-manipulation place-items-center rounded-full text-mute hover:bg-paper hover:text-ink ring-1 ring-line/70 transition active:scale-95"
+                      aria-label="Close menu"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  {/* Scrollable Drawer Content */}
+                  <div className="flex-1 overflow-y-auto overscroll-contain p-3.5 space-y-1 pb-[max(2.5rem,env(safe-area-inset-bottom,16px))] no-scrollbar">
+                    {items}
+                  </div>
+                </div>
+              </div>,
+              document.body,
+            )}
 
           {/* Desktop Dropdown Menu (lg:block) */}
           <div

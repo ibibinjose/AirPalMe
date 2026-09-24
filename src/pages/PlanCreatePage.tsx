@@ -296,13 +296,39 @@ export function PlanCreatePage() {
               <ChevronRight size={18} className="shrink-0 text-mute" />
             </button>
           ))}
-          <button
-            type="button"
-            className="flex w-full items-center justify-center gap-1.5 pt-2 text-[15px] font-medium text-mute"
-            onClick={() => nav("/event/new")}
-          >
-            <Ticket size={14} /> Ticketed public event
-          </button>
+          {/* Highlighted Ticketed Public Event Card */}
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                void triggerHaptic("medium");
+                nav("/event/new");
+              }}
+              className="group relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-[26px] border border-brand/30 bg-gradient-to-r from-brand/10 via-brand/5 to-gold/15 p-4 text-left shadow-xs transition-all duration-200 hover:border-brand hover:shadow-md hover:brightness-105 active:scale-[0.99]"
+            >
+              <div className="flex items-center gap-3.5 min-w-0">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-sm ring-2 ring-brand/30 transition group-hover:scale-105">
+                  <Ticket size={22} className="rotate-[-10deg]" />
+                </span>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[15px] font-bold text-ink group-hover:text-brand transition-colors">
+                      Ticketed Public Event
+                    </span>
+                    <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-2xs">
+                      Sell Tickets
+                    </span>
+                  </div>
+                  <p className="truncate text-xs text-mute group-hover:text-ink/80 transition-colors">
+                    Host a show, party, festival, or ticketed community gathering
+                  </p>
+                </div>
+              </div>
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-card ring-1 ring-line text-brand transition-transform group-hover:translate-x-0.5">
+                <ChevronRight size={16} />
+              </span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -444,13 +470,19 @@ export function PlanCreatePage() {
         <Button className="h-12 w-full" disabled={busy} loading={busy} onClick={() => void create()}>
           <CalendarDays size={16} /> Create plan
         </Button>
-        <button
-          type="button"
-          className="flex w-full items-center justify-center gap-1.5 text-[15px] font-medium text-mute"
-          onClick={() => nav("/event/new")}
-        >
-          <Ticket size={14} /> Ticketed public event
-        </button>
+        <div className="pt-1">
+          <button
+            type="button"
+            className="group flex w-full items-center justify-center gap-2 rounded-2xl border border-brand/25 bg-gradient-to-r from-brand/10 to-gold/10 py-3 text-xs font-bold text-brand shadow-2xs transition-all hover:bg-brand/15 hover:border-brand/40 active:scale-[0.99]"
+            onClick={() => {
+              void triggerHaptic("medium");
+              nav("/event/new");
+            }}
+          >
+            <Ticket size={16} className="rotate-[-10deg] text-brand" />
+            <span>Organising a public event or selling tickets? Create Event →</span>
+          </button>
+        </div>
         </div>
       )}
     </div>
