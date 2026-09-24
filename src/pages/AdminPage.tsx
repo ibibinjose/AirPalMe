@@ -17,6 +17,7 @@ import { MateRequestsAdmin } from "@/components/admin/MateRequestsAdmin";
 import { StudioInboxAdmin } from "@/components/admin/StudioInboxAdmin";
 import { SafetyInboxAdmin } from "@/components/admin/SafetyInboxAdmin";
 import { CampaignInboxAdmin } from "@/components/admin/CampaignInboxAdmin";
+import { FestivalAdmin } from "@/components/admin/FestivalAdmin";
 import { AuditTrailAdmin } from "@/components/admin/AuditTrailAdmin";
 import { ADMIN_TABS, AdminOverview, type AdminTab } from "@/components/admin/AdminOverview";
 
@@ -218,7 +219,12 @@ export function AdminPage() {
       {tab === "marketplace" && <MateRequestsAdmin />}
       {tab === "studio" && <StudioInboxAdmin />}
       {tab === "safety" && <SafetyInboxAdmin />}
-      {tab === "experiences" && <CampaignInboxAdmin />}
+      {tab === "experiences" && (
+        <>
+          <CampaignInboxAdmin />
+          <FestivalAdmin />
+        </>
+      )}
       {tab === "audit" && <AuditTrailAdmin />}
       <Button className="mt-6" variant="ghost" onClick={() => nav("/")}>
         Home

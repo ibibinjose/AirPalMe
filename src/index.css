@@ -594,3 +594,20 @@ body.keyboard-open .keyboard-hide {
 }
 
 
+
+/* AirPal ticket printing — Save as PDF from any ticket pass. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body.printing-ticket nav,
+  body.printing-ticket header {
+    display: none !important;
+  }
+  body.printing-ticket .ticket-pass {
+    box-shadow: none;
+    break-inside: avoid;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

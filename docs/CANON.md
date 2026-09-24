@@ -109,7 +109,8 @@ Reuse these. Do not add a parallel page for the same job.
 | Stay concierge | `/concierge`, `/stay`, `/g/:id` |
 | Demo Hotel stay QR showcase | `/DemoHotel` |
 | Marker / campus | `/q/:id`, `/c/:id` |
-| Calendar / events | `/calendar`, `/e/:id`, `/event/new` |
+| Calendar / events | `/calendar`, `/e/:id`, `/event` (single organizer door; `/event/new` redirects there; ticketed + free) |
+| Festival program | `/f/:slug` (sessions are `events` with `festivalSlug`; attend/calendar reuse the events engine) |
 | Places / experiences | `/p/:id`, `/experiences` |
 | Public bio | `/@handle` |
 | Join | `/join` |
@@ -127,6 +128,8 @@ Reuse these. Do not add a parallel page for the same job.
 | Inbox / settings | `/me/inbox`, `/settings` |
 | Zoo / memories / people | `/me/zoo`, `/me/memories`, `/me/people` |
 | Start / auth | `/start` |
+| AirPal Wallet (tickets) | `/me/tickets` (every booking as a branded pass; save-as-PDF + share) |
+| Create festival | `/f/new` (organizer draft → live; manage panel on `/f/:slug`; admin list under Experiences) |
 
 ### Business
 

@@ -71,6 +71,17 @@ describe("booking engine", () => {
         listingId: "list1",
       }),
     ).toBe(true);
+    expect(
+      bookingValid({
+        ...good,
+        requestId: "",
+        planId: "",
+        providerKind: "business",
+        providerName: "Spark Foundation",
+        eventId: "spark26-001",
+      }),
+    ).toBe(true);
+    expect(bookingValid({ ...good, requestId: "", planId: "" })).toBe(false);
   });
 
   it("accepts host plan bookings without a mate request", () => {

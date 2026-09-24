@@ -22,8 +22,9 @@ import { toast } from "sonner";
 
 export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
   const [, nav] = useLocation();
-  const { stallsFor } = useEvents();
+  const { stallsFor, savedStalls, isSaved } = useEvents();
   const stalls = stallsFor(event.id);
+  const visitList = savedStalls.filter((s) => s.eventId === event.id);
   const chips = useMemo(() => {
     const present = new Set(stalls.map((s) => s.category));
     return STALL_CATEGORIES.filter((c) => present.has(c.id) || event.categoryChips.includes(c.id));
@@ -39,6 +40,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
     return (
       s.name.toLowerCase().includes(n) ||
       s.booth.toLowerCase().includes(n) ||
+      (s.location || "").toLowerCase().includes(n) ||
       s.shortWhy.toLowerCase().includes(n) ||
       (s.handle || "").toLowerCase().includes(n.replace(/^@/, ""))
     );
@@ -242,6 +244,34 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
         ))}
       </div>
 
+      {/* My visit list — saved stalls for this event */}
+      {visitList.length > 0 && (
+        <div className="mt-4 rounded-2xl bg-brand/[0.04] p-3 ring-1 ring-brand/20">
+          <p className="px-1 text-[11px] font-bold uppercase tracking-wider text-brand">
+            My visit list · {visitList.length}
+          </p>
+          <ul className="mt-2 space-y-1.5">
+            {visitList.map((s) => (
+              <li key={s.stallId}>
+                <button
+                  type="button"
+                  onClick={() => nav(`/e/${event.id}/s/${s.stallId}`)}
+                  className="flex w-full items-center justify-between gap-2 rounded-xl bg-card px-3 py-2 text-left ring-1 ring-line"
+                >
+                  <span className="min-w-0 text-[13px]">
+                    <span className="font-semibold text-ink">{s.name}</span>
+                    <span className="block truncate text-[11px] text-mute">
+                      {[s.booth ? `Stall ${s.booth}` : "", s.location].filter(Boolean).join(" · ")}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-[11px] font-semibold text-brand">Visit →</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Stalls List */}
       <ul className="mt-5 space-y-2">
         {rows.map((s) => (
@@ -256,6 +286,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
                   {stallUnitDisplay(event.flavour, s.booth)}
                   {" · "}
                   {STALL_CATEGORIES.find((c) => c.id === s.category)?.label || s.category}
+                  {s.location ? ` · ${s.location}` : ""}
                 </span>
                 <span className="font-semibold text-sm text-ink group-hover:text-brand transition-colors">
                   {s.name}
@@ -263,7 +294,8 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
                 {s.shortWhy && <span className="mt-0.5 block text-xs text-mute">{s.shortWhy}</span>}
                 {s.offer && <span className="mt-0.5 block text-xs font-semibold text-gold">🏷️ {s.offer}</span>}
               </span>
-              <span className="shrink-0 text-xs font-medium text-mute group-hover:text-ink">
+              <span className="shrink-0 text-right text-xs font-medium text-mute group-hover:text-ink">
+                {isSaved(s.id) && <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-brand">Saved</span>}
                 {s.handle ? `@${s.handle}` : "View"}
               </span>
             </button>

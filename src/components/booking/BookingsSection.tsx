@@ -493,3 +493,58 @@ export async function createBookingForCampaign(args: {
   });
   return ref.id;
 }
+
+/** Ticketed events book through the same engine as campaigns: one pending row, fees quoted, Stripe collects. */
+export async function createBookingForEvent(args: {
+  eventId: string;
+  providerUid: string;
+  providerName: string;
+  title: string;
+  suburb: string;
+  date: string;
+  time: string;
+  priceCents: number;
+  customerUid: string;
+}): Promise<string> {
+  const db = getFirebaseDb();
+  if (!db || !isFirebaseConfigured) throw new Error("Connect Firebase first.");
+  const priceCents = Math.max(0, Math.round(args.priceCents || 0));
+  const input = {
+    requestId: args.eventId,
+    planId: "",
+    providerUid: args.providerUid,
+    providerKind: "business" as const,
+    providerName: args.providerName,
+    title: args.title,
+    suburb: args.suburb,
+    date: args.date,
+    time: args.time,
+    priceCents,
+    eventId: args.eventId,
+  };
+  if (!bookingValid(input)) throw new Error("Booking details are incomplete.");
+  const fees = quoteFees(priceCents, await loadFeeConfig());
+  const now = new Date().toISOString();
+  const ref = await addDoc(collection(db, "bookings"), {
+    requestId: args.eventId,
+    customerUid: args.customerUid,
+    providerUid: input.providerUid,
+    providerKind: input.providerKind,
+    providerName: input.providerName,
+    title: input.title,
+    suburb: input.suburb,
+    date: input.date,
+    time: input.time,
+    priceCents,
+    feeCents: fees.feeCents,
+    paymentStatus: paymentStatusForPrice(priceCents),
+    payoutStatus: payoutStatusForPrice(priceCents),
+    status: "pending",
+    cancelReason: "",
+    eventId: args.eventId,
+    spots: 1,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return ref.id;
+}

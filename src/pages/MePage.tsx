@@ -237,9 +237,9 @@ export function MePage() {
             />
             <Row
               kicker="Tickets"
-              title="Events and experiences you’ve bought or hosted"
+              title="Your AirPal Wallet — every ticket in one place"
               action="Open"
-              onClick={() => nav("/experiences")}
+              onClick={() => nav("/me/tickets")}
             />
           </Section>
 
@@ -376,7 +376,7 @@ export function MePage() {
                     className="w-full rounded-2xl ring-1 ring-line bg-card px-4 py-3 text-left transition hover:ring-brand/40 active:scale-[0.99]"
                   >
                     <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">
-                      {s.booth || "—"} · {getEvent(s.eventId)?.name || s.eventId}
+                      {[s.booth || "—", s.location].filter(Boolean).join(" · ")} · {getEvent(s.eventId)?.name || s.eventId}
                     </p>
                     <p className="font-medium text-ink">{s.name}</p>
                     {s.offer && <p className="text-[13px] text-gold">{s.offer}</p>}

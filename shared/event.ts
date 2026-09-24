@@ -7,7 +7,7 @@ export type EventFlavour = (typeof EVENT_FLAVOURS)[number];
 export const EVENT_FLAVOUR_LABELS: Record<EventFlavour, string> = {
   expo: "Expo",
   market: "Weekend market",
-  event_space: "Event space",
+  event_space: "Event",
 };
 
 export const STALL_CATEGORIES = [
@@ -22,12 +22,29 @@ export const STALL_CATEGORIES = [
 
 export type StallCategoryId = (typeof STALL_CATEGORIES)[number]["id"];
 
+/**
+ * A program speaker or panel member. External guests carry just a name;
+ * AirPal members link their @handle so the program shows their live
+ * profile photo and links to their public bio.
+ */
+export type Speaker = {
+  name: string;
+  role?: string;
+  handle?: string;
+};
+
+export function normalizeSpeakerHandle(raw: string): string {
+  return raw.trim().replace(/^@+/, "").toLowerCase().slice(0, 30);
+}
+
 export type EventRecord = {
   id: string;
   name: string;
   flavour: EventFlavour;
   city: string;
   venue?: string;
+  /** Room, hall, or stage inside the venue — festivals run concurrent rooms. */
+  room?: string;
   address?: string;
   description?: string;
   shortWhy?: string;
@@ -43,7 +60,19 @@ export type EventRecord = {
   startsAt: string;
   endsAt: string;
   status: "draft" | "live" | "ended";
+  /** Ticket price in cents (0/undefined = free). Paid nights sell via Stripe bookings. */
+  ticketPriceCents?: number;
+  /** Total tickets available. Undefined = unlimited free entry. */
+  capacity?: number;
   gatePath: string;
+  /** Festival program this session belongs to (festivals/{slug}). */
+  festivalSlug?: string;
+  /** Program track within the festival, e.g. "Hackathon", "Main stage". */
+  track?: string;
+  /** Off-platform booking link (Humanitix, Eventbrite). Attend on AirPal stays primary. */
+  registrationUrl?: string;
+  registrationNote?: string;
+  speakers?: Speaker[];
   organiserUid?: string;
   organiserEmail?: string;
   categoryChips: StallCategoryId[];
@@ -62,12 +91,36 @@ export type StallRecord = {
   eventId: string;
   name: string;
   category: StallCategoryId;
+  /** Stall/exhibitor number, e.g. "12", "B7". */
   booth: string;
+  /** Where to find it on the floor, e.g. "Aisle C · Bay 12". */
+  location?: string;
   shortWhy: string;
   offer?: string;
   handle?: string;
   status: "active" | "inactive";
 };
+
+/** Trimmed floor location, max 120 chars. Undefined when blank. */
+export function cleanStallLocation(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim().slice(0, 120);
+  return trimmed || undefined;
+}
+
+/** Non-negative integer cents, or undefined when absent/invalid. Never trusts client math. */
+export function cleanTicketCents(value: unknown): number | undefined {
+  const n = typeof value === "string" ? Number(value) : typeof value === "number" ? value : NaN;
+  if (!Number.isFinite(n) || n < 0) return undefined;
+  return Math.floor(n);
+}
+
+/** Positive integer capacity (max 2000), or undefined when absent/invalid. */
+export function cleanCapacity(value: unknown): number | undefined {
+  const n = typeof value === "string" ? Number(value) : typeof value === "number" ? value : NaN;
+  if (!Number.isInteger(n) || n < 1 || n > 2000) return undefined;
+  return n;
+}
 
 export type SavedEvent = {
   eventId: string;
@@ -82,6 +135,7 @@ export type SavedStall = {
   name: string;
   category: StallCategoryId;
   booth: string;
+  location?: string;
   offer?: string;
   handle?: string;
   savedAt: string;
@@ -111,6 +165,7 @@ export type CalendarEvent = {
   timeLabel: string;
   city: string;
   venue: string;
+  room?: string;
   category: CalendarEventCategory;
   categoryLabel: string;
   heroImage?: string;
@@ -126,6 +181,10 @@ export type CalendarEvent = {
   originalDate?: string;
   tags?: string[];
   scheduleVerifiedAt?: string;
+  speakers?: Speaker[];
+  ticketPriceCents?: number;
+  capacity?: number;
+  organiserUid?: string;
 };
 
 export function isEventFlavour(value: string): value is EventFlavour {
@@ -196,10 +255,10 @@ export function stallUnitDisplay(flavour: EventFlavour, booth?: string) {
 export function stallCsvTemplate(flavour: EventFlavour) {
   const l = stallFieldLabels(flavour);
   return [
-    `business name,${l.unit.toLowerCase()},handle,category,about,offer`,
-    "Salted Caramel Co,A12,saltedcaramel,eat,Handmade caramels,2 for $10",
-    "Harbour Linen,B04,harbourlinen,shops,Washed linen from Katoomba,Tote with $40+",
-    "Laneway Pour,C01,lanewaypour,coffee,Single origin takeaway,Second shot free",
+    `business name,${l.unit.toLowerCase()},handle,category,about,offer,location`,
+    "Salted Caramel Co,A12,saltedcaramel,eat,Handmade caramels,2 for $10,Aisle C Bay 12",
+    "Harbour Linen,B04,harbourlinen,shops,Washed linen from Katoomba,Tote with $40+,",
+    "Laneway Pour,C01,lanewaypour,coffee,Single origin takeaway,Second shot free,",
   ].join("\n");
 }
 
@@ -235,6 +294,7 @@ export type ParsedStall = {
   name: string;
   category: StallCategoryId;
   booth: string;
+  location?: string;
   shortWhy: string;
   offer?: string;
   handle?: string;
@@ -254,6 +314,7 @@ export function parseStallCsv(text: string): ParsedStall[] {
   const whyI = col(["shortwhy", "why", "about"]);
   const offerI = col(["offer", "deal", "perk"]);
   const handleI = col(["handle", "@", "username", "@handle"]);
+  const locationI = col(["location", "where", "aisle", "zone", "area"]);
   if (nameI < 0) return [];
   const rows: ParsedStall[] = [];
   for (const line of lines.slice(1)) {
@@ -267,6 +328,7 @@ export function parseStallCsv(text: string): ParsedStall[] {
       name,
       category,
       booth: (boothI >= 0 ? cells[boothI] : "") || "",
+      location: cleanStallLocation(locationI >= 0 ? cells[locationI] : ""),
       shortWhy: (whyI >= 0 ? cells[whyI] : "") || "",
       offer: offerI >= 0 ? cells[offerI] || undefined : undefined,
       handle: rawHandle

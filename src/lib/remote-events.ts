@@ -1,5 +1,12 @@
-import type { CalendarEvent, CalendarEventCategory, EventRecord } from "@shared/event";
-import { eventGatePath, isEventFlavour, isStallCategory } from "@shared/event";
+import type { CalendarEvent, CalendarEventCategory, EventRecord, Speaker } from "@shared/event";
+import {
+  cleanCapacity,
+  cleanTicketCents,
+  eventGatePath,
+  isEventFlavour,
+  isStallCategory,
+  normalizeSpeakerHandle,
+} from "@shared/event";
 import type { NearbyEvent } from "@shared/nearby";
 import { formatEventTimeRange, toDateStr } from "./calendar-utils";
 import { toZonedDateStr } from "./local-time";
@@ -67,6 +74,30 @@ export function toNearbyEvent(doc: Record<string, unknown>, id: string): NearbyE
   };
 }
 
+/**
+ * Clean a raw speakers array from Firestore or user input. Drops nameless
+ * entries, trims lengths, normalizes @handles. Never invents a speaker.
+ */
+
+export function cleanSpeakers(value: unknown): Speaker[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const cleaned = value
+    .filter(
+      (s): s is { name: unknown; role?: unknown; handle?: unknown } =>
+        !!s && typeof s === "object" && typeof (s as { name?: unknown }).name === "string",
+    )
+    .map((s) => {
+      const name = String(s.name).trim().slice(0, 80);
+      const role = typeof s.role === "string" && s.role.trim() ? s.role.trim().slice(0, 120) : undefined;
+      const handle =
+        typeof s.handle === "string" && s.handle.trim() ? normalizeSpeakerHandle(s.handle) : undefined;
+      return { name, ...(role ? { role } : {}), ...(handle ? { handle } : {}) };
+    })
+    .filter((s) => s.name.length > 0)
+    .slice(0, 24);
+  return cleaned.length ? cleaned : undefined;
+}
+
 /** Shared base mapper: EventRecord (organiser-created, local or remote) → CalendarEvent fields. */
 export function recordToCalendarBase(e: EventRecord): Omit<CalendarEvent, "isGoing" | "isInterested" | "isLiked"> {
   const originalDate = e.startsAt ? toDateStr(new Date(e.startsAt)) : toDateStr(new Date());
@@ -86,12 +117,17 @@ export function recordToCalendarBase(e: EventRecord): Omit<CalendarEvent, "isGoi
     timeLabel: formatEventTimeRange(e.startsAt, e.endsAt),
     city: e.city,
     venue: e.venue || e.city,
+    room: e.room,
+    ticketPriceCents: e.ticketPriceCents,
+    capacity: e.capacity,
+    organiserUid: e.organiserUid,
     category,
     categoryLabel: e.flavour === "market" ? "Market" : e.flavour === "expo" ? "Expo" : "Event",
     gatePath: e.gatePath,
     source: "community",
     isLocal: true,
     scheduleVerifiedAt: e.scheduleVerifiedAt || e.updatedAt,
+    speakers: e.speakers,
     tags: [
       e.flavour === "market" ? "Market" : e.flavour === "expo" ? "Expo" : "Community",
       e.city,
@@ -117,6 +153,10 @@ export function docToCalendarBase(
       endsAt: typeof doc.endsAt === "string" ? doc.endsAt : doc.startsAt,
       stallCount: typeof doc.stallCount === "number" ? doc.stallCount : 0,
       gatePath: typeof doc.gatePath === "string" ? doc.gatePath : undefined,
+      speakers: cleanSpeakers(doc.speakers),
+      ticketPriceCents: cleanTicketCents(doc.ticketPriceCents),
+      capacity: cleanCapacity(doc.capacity),
+      organiserUid: str(doc.organiserUid) || undefined,
     } as EventRecord;
     if (!rec.name.trim() || !rec.city.trim()) return null;
     return recordToCalendarBase(rec);
@@ -134,6 +174,7 @@ export function docToCalendarBase(
       timeLabel: str(doc.timeLabel),
       city: str(doc.city),
       venue: str(doc.venue || doc.city),
+      room: str(doc.room) || undefined,
       category: asCategory(doc.category),
       categoryLabel: str(doc.categoryLabel) || "Event",
       heroImage: typeof doc.heroImage === "string" ? doc.heroImage : undefined,
@@ -143,6 +184,10 @@ export function docToCalendarBase(
       source: doc.source === "partner" || doc.source === "user" ? doc.source : "local",
       isLocal: true,
       tags: Array.isArray(doc.tags) ? doc.tags.filter((t): t is string => typeof t === "string") : [],
+      speakers: cleanSpeakers(doc.speakers),
+      ticketPriceCents: cleanTicketCents(doc.ticketPriceCents),
+      capacity: cleanCapacity(doc.capacity),
+      organiserUid: str(doc.organiserUid) || undefined,
     };
   }
   return null;
@@ -152,6 +197,30 @@ export function docToCalendarBase(
  * Map a Firestore doc to a full EventRecord (expo directory pages), or null.
  * Accepts organiser-created docs; curated NearbyEvent docs are NOT records.
  */
+/**
+ * Best Google Maps link for a session: exact Place ID first, then GPS pin,
+ * then a text search of venue + room + area. Never fabricates a place.
+ */
+export function eventMapsUrl(session: {
+  venue?: string;
+  room?: string;
+  address?: string;
+  city?: string;
+  geo?: { lat: number; lng: number };
+  mapsPlaceId?: string;
+}): string | null {
+  if (session.mapsPlaceId) {
+    return `https://www.google.com/maps/search/?api=1&query_place_id=${encodeURIComponent(session.mapsPlaceId)}`;
+  }
+  if (session.geo && Number.isFinite(session.geo.lat) && Number.isFinite(session.geo.lng)) {
+    const q = [session.venue, session.room, `${session.geo.lat},${session.geo.lng}`].filter(Boolean).join(" ");
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+  }
+  const q = [session.venue, session.room, session.address, session.city].filter(Boolean).join(", ");
+  if (!q) return null;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+}
+
 export function docToEventRecord(doc: Record<string, unknown>, id: string): EventRecord | null {
   const name = str(doc.name).trim();
   const startsAt = str(doc.startsAt);
@@ -166,6 +235,7 @@ export function docToEventRecord(doc: Record<string, unknown>, id: string): Even
     flavour: flavourRaw,
     city,
     venue: str(doc.venue) || undefined,
+    room: str(doc.room) || undefined,
     address: str(doc.address) || undefined,
     description: str(doc.description) || undefined,
     shortWhy: str(doc.shortWhy) || undefined,
@@ -187,6 +257,13 @@ export function docToEventRecord(doc: Record<string, unknown>, id: string): Even
     endsAt: str(doc.endsAt) || startsAt,
     status: doc.status === "ended" ? "ended" : "live",
     gatePath: str(doc.gatePath) || eventGatePath(id),
+    ticketPriceCents: cleanTicketCents(doc.ticketPriceCents),
+    capacity: cleanCapacity(doc.capacity),
+    festivalSlug: str(doc.festivalSlug) || undefined,
+    track: str(doc.track) || undefined,
+    registrationUrl: str(doc.registrationUrl) || undefined,
+    registrationNote: str(doc.registrationNote) || undefined,
+    speakers: cleanSpeakers(doc.speakers),
     organiserUid: str(doc.organiserUid) || undefined,
     categoryChips: Array.isArray(doc.categoryChips)
       ? doc.categoryChips.filter(isStallCategory)

@@ -155,6 +155,7 @@ export function upsertEventRemote(data: {
   flavour: string;
   city?: string;
   venue?: string;
+  room?: string;
   address?: string;
   description?: string;
   shortWhy?: string;
@@ -171,6 +172,13 @@ export function upsertEventRemote(data: {
   endsAt?: string;
   status?: string;
   categoryChips?: string[];
+  ticketPriceCents?: number;
+  capacity?: number;
+  festivalSlug?: string;
+  track?: string;
+  registrationUrl?: string;
+  registrationNote?: string;
+  speakers?: { name: string; role?: string }[];
 }) {
   return callFunction<typeof data, { eventId: string }>(CALLABLES.upsertEvent, data);
 }
@@ -181,6 +189,7 @@ export function upsertEventStallRemote(data: {
   name: string;
   category: string;
   booth?: string;
+  location?: string;
   shortWhy?: string;
   offer?: string;
   handle?: string;

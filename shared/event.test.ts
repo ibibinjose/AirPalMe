@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { isExpoEventId, parseStallCsv, stallCsvTemplate, stallFieldLabels, stallUnitDisplay } from "./event";
+import {
+  cleanCapacity,
+  cleanStallLocation,
+  cleanTicketCents,
+  isExpoEventId,
+  parseStallCsv,
+  stallCsvTemplate,
+  stallFieldLabels,
+  stallUnitDisplay,
+} from "./event";
 
 describe("event csv", () => {
   it("parses a stall sheet", () => {
@@ -40,5 +49,33 @@ describe("stall field labels", () => {
     expect(stallUnitDisplay("market", "A12")).toBe("Stall A12");
     expect(stallCsvTemplate("market")).toContain("business name");
     expect(stallCsvTemplate("expo")).toContain("stand number");
+    expect(stallCsvTemplate("market")).toContain("location");
+  });
+
+  it("parses floor locations from csv", () => {
+    const rows = parseStallCsv(`name,booth,location,category
+Salted Caramel Co,A12,Aisle C Bay 12,eat
+Harbour Linen,B04,,shops
+`);
+    expect(rows[0]).toMatchObject({ booth: "A12", location: "Aisle C Bay 12" });
+    expect(rows[1]?.location).toBeUndefined();
+  });
+
+  it("cleans floor locations", () => {
+    expect(cleanStallLocation("  Aisle C · Bay 12  ")).toBe("Aisle C · Bay 12");
+    expect(cleanStallLocation("   ")).toBeUndefined();
+    expect(cleanStallLocation(undefined)).toBeUndefined();
+    expect(cleanStallLocation("x".repeat(200))?.length).toBe(120);
+  });
+
+  it("cleans ticket cents and capacity", () => {
+    expect(cleanTicketCents(2500)).toBe(2500);
+    expect(cleanTicketCents("25.99")).toBe(25);
+    expect(cleanTicketCents(-5)).toBeUndefined();
+    expect(cleanTicketCents("free")).toBeUndefined();
+    expect(cleanCapacity(40)).toBe(40);
+    expect(cleanCapacity(0)).toBeUndefined();
+    expect(cleanCapacity(2001)).toBeUndefined();
+    expect(cleanCapacity(2.5)).toBeUndefined();
   });
 });

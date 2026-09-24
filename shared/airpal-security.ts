@@ -314,6 +314,15 @@ export type UpsertEventRequest = {
   status?: string;
   categoryChips?: string[];
   scheduleVerifiedAt?: string;
+  room?: string;
+  ticketPriceCents?: number;
+  capacity?: number;
+  /** Festival program slug (festivals/{slug}) this session belongs to. */
+  festivalSlug?: string;
+  track?: string;
+  registrationUrl?: string;
+  registrationNote?: string;
+  speakers?: { name: string; role?: string; handle?: string }[];
 };
 
 export type UpsertEventStallRequest = {
@@ -322,6 +331,7 @@ export type UpsertEventStallRequest = {
   name: string;
   category: string;
   booth?: string;
+  location?: string;
   shortWhy?: string;
   offer?: string;
   handle?: string;

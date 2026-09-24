@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   cityMatches,
+  cleanSpeakers,
   docToCalendarBase,
   docToEventRecord,
+  eventMapsUrl,
   liveCalendarEvents,
   tonightCalendarEvents,
   toNearbyEvent,
@@ -119,5 +121,40 @@ describe("tonight/live calendar selectors", () => {
       cal({ id: "c", city: "Melbourne" }),
     ];
     expect(liveCalendarEvents(rows, now, tz, "Sydney").map((e) => e.id)).toEqual(["a"]);
+  });
+});
+
+describe("cleanSpeakers", () => {
+  it("cleans names, roles, and @handles, drops nameless entries", () => {
+    expect(
+      cleanSpeakers([
+        { name: "  Sarah J  ", role: " CEO ", handle: "@Sarah_J " },
+        { name: "Roy Green" },
+        { name: "   " },
+        { name: "X", handle: "  " },
+        "not-an-object",
+      ]),
+    ).toEqual([
+      { name: "Sarah J", role: "CEO", handle: "sarah_j" },
+      { name: "Roy Green" },
+      { name: "X" },
+    ]);
+  });
+
+  it("returns undefined for empty input", () => {
+    expect(cleanSpeakers(undefined)).toBe(undefined);
+    expect(cleanSpeakers([])).toBe(undefined);
+  });
+});
+
+describe("eventMapsUrl", () => {
+  it("prefers place id, then gps, then text search", () => {
+    expect(eventMapsUrl({ mapsPlaceId: "ChIJ123", venue: "Hall" })).toContain("query_place_id=ChIJ123");
+    expect(eventMapsUrl({ venue: "UTS Great Hall", room: "Building 1", geo: { lat: -33.88, lng: 151.19 } })).toContain(
+      "query=",
+    );
+    const text = eventMapsUrl({ venue: "Stone & Chalk", room: "Boardroom 5+6", city: "Sydney" });
+    expect(text).toContain(encodeURIComponent("Stone & Chalk, Boardroom 5+6, Sydney").slice(0, 20));
+    expect(eventMapsUrl({})).toBe(null);
   });
 });

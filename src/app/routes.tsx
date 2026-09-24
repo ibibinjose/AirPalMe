@@ -25,8 +25,9 @@ const StallPage = lazy(() => import("@/pages/StallPage").then((m) => ({ default:
 const OrganiserEventPage = lazy(() =>
   import("@/pages/OrganiserEventPage").then((m) => ({ default: m.OrganiserEventPage })),
 );
-const EventCreatePage = lazy(() => import("@/pages/EventCreatePage").then((m) => ({ default: m.EventCreatePage })));
+
 const MePage = lazy(() => import("@/pages/MePage").then((m) => ({ default: m.MePage })));
+const MyTicketsPage = lazy(() => import("@/pages/MyTicketsPage").then((m) => ({ default: m.MyTicketsPage })));
 const InboxPage = lazy(() => import("@/pages/InboxPage").then((m) => ({ default: m.InboxPage })));
 const ZooPage = lazy(() => import("@/pages/ZooPage").then((m) => ({ default: m.ZooPage })));
 const MemoryWallPage = lazy(() => import("@/pages/MemoryWallPage").then((m) => ({ default: m.MemoryWallPage })));
@@ -97,6 +98,10 @@ const BusinessCampaignsPage = lazy(() =>
 );
 const ExperiencesPage = lazy(() => import("@/pages/ExperiencesPage").then((m) => ({ default: m.ExperiencesPage })));
 const FashionPage = lazy(() => import("@/pages/FashionPage").then((m) => ({ default: m.FashionPage })));
+const FestivalPage = lazy(() => import("@/pages/FestivalPage").then((m) => ({ default: m.FestivalPage })));
+const FestivalCreatePage = lazy(() =>
+  import("@/pages/FestivalCreatePage").then((m) => ({ default: m.FestivalCreatePage })),
+);
 const PlanHubPage = lazy(() => import("@/pages/PlanHubPage").then((m) => ({ default: m.PlanHubPage })));
 const PlanCreatePage = lazy(() => import("@/pages/PlanCreatePage").then((m) => ({ default: m.PlanCreatePage })));
 const PlanDetailPage = lazy(() => import("@/pages/PlanDetailPage").then((m) => ({ default: m.PlanDetailPage })));
@@ -149,6 +154,8 @@ export function AppRoutes() {
         <Route path="/p/:id" component={PlacePage} />
         <Route path="/e/:eventId/s/:stallId" component={StallPage} />
         <Route path="/e/:id" component={EventPage} />
+        <Route path="/f/new" component={FestivalCreatePage} />
+        <Route path="/f/:slug" component={FestivalPage} />
         <Route path="/calendar" component={CalendarPage} />
         <Route path="/events">
           <Redirect to="/calendar" />
@@ -161,12 +168,15 @@ export function AppRoutes() {
         <Route path="/plan/:id" component={PlanDetailPage} />
         <Route path="/plan" component={PlanHubPage} />
         <Route path="/invite/:code" component={PlanDetailPage} />
-        <Route path="/event/new" component={EventCreatePage} />
+        <Route path="/event/new">
+          <Redirect to="/event" />
+        </Route>
         <Route path="/event" component={OrganiserEventPage} />
         <Route path="/me/zoo" component={ZooPage} />
         <Route path="/me/memories" component={MemoryWallPage} />
         <Route path="/me/people" component={PeoplePage} />
         <Route path="/me/inbox" component={InboxPage} />
+        <Route path="/me/tickets" component={MyTicketsPage} />
         <Route path="/circle" component={CirclePage} />
         <Route path="/me" component={MePage} />
         <Route path="/settings" component={SettingsPage} />

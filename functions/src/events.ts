@@ -1,7 +1,17 @@
 import { randomBytes } from "node:crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
-import { eventGatePath, isEventFlavour, isStallCategory } from "../../shared/event";
+import {
+  cleanCapacity,
+  cleanStallLocation,
+  cleanTicketCents,
+  eventGatePath,
+  isEventFlavour,
+  isStallCategory,
+} from "../../shared/event";
+import { checkSessionAttach, isValidFestivalSlug } from "../../shared/festival";
+import { normalizeSpeakerHandle } from "../../shared/event";
+import type { AccessClaims } from "../../shared/airpal-security";
 import { stampContentMeta } from "../../shared/content-meta";
 import { ratingDocId, ratingTargetKey } from "../../shared/abuse";
 import { normalizeHandle } from "../../shared/bio";
@@ -13,7 +23,7 @@ import type {
 } from "../../shared/airpal-security";
 import { enforceRateLimit, isAnonymousAuth, noteAppCheck, writeAudit } from "./abuse";
 import { writeAuthoritativeEvent } from "./analytics";
-import { CALLABLE, auth, db, requireAccount, requireAuth } from "./admin";
+import { CALLABLE, auth, db, isPlatformAdmin, requireAccount, requireAuth } from "./admin";
 
 export const upsertEvent = onCall(CALLABLE, async (request) => {
   await noteAppCheck(request, "upsertEvent");
@@ -34,6 +44,43 @@ export const upsertEvent = onCall(CALLABLE, async (request) => {
       throw new HttpsError("permission-denied", "Not your event.");
     }
   }
+  // Festival attach: the slug must be real, and only the festival organiser
+  // (or an admin) may pull an event into the program.
+  const festivalSlug = String(data.festivalSlug || "").trim().toLowerCase();
+  let festivalTrack = "";
+  let festivalRegistrationUrl = "";
+  let festivalRegistrationNote = "";
+  let festivalSpeakers: { name: string; role?: string }[] | undefined;
+  if (festivalSlug) {
+    if (!isValidFestivalSlug(festivalSlug)) throw new HttpsError("invalid-argument", "Unknown festival.");
+    const festivalSnap = await db.collection("festivals").doc(festivalSlug).get();
+    const festivalData = festivalSnap.exists
+      ? { slug: festivalSnap.id, ...(festivalSnap.data() as { createdByUid?: string }) }
+      : null;
+    const refusal = checkSessionAttach(
+      festivalData,
+      uid,
+      isPlatformAdmin(request.auth?.token as AccessClaims | undefined),
+    );
+    if (refusal) throw new HttpsError("permission-denied", refusal);
+    festivalTrack = String(data.track || "").trim().slice(0, 60);
+    festivalRegistrationUrl = String(data.registrationUrl || "").trim().slice(0, 500);
+    festivalRegistrationNote = String(data.registrationNote || "").trim().slice(0, 120);
+    if (Array.isArray(data.speakers)) {
+      const cleaned = data.speakers
+        .filter((s) => s && typeof s.name === "string" && s.name.trim())
+        .map((s) => {
+          const handle = typeof s.handle === "string" ? normalizeSpeakerHandle(s.handle) : "";
+          return {
+            name: s.name.trim().slice(0, 80),
+            ...(typeof s.role === "string" && s.role.trim() ? { role: s.role.trim().slice(0, 120) } : {}),
+            ...(handle ? { handle } : {}),
+          };
+        })
+        .slice(0, 24);
+      if (cleaned.length) festivalSpeakers = cleaned;
+    }
+  }
   const authUser = await auth.getUser(uid);
   const existingEvent = await db.collection("events").doc(eventId).get();
   const meta = stampContentMeta(
@@ -48,12 +95,27 @@ export const upsertEvent = onCall(CALLABLE, async (request) => {
       reviewStatus: "approved",
     },
   );
+  const festivalFields = !("festivalSlug" in data)
+    ? {}
+    : festivalSlug
+      ? {
+          festivalSlug,
+          track: festivalTrack || null,
+          registrationUrl: festivalRegistrationUrl || null,
+          registrationNote: festivalRegistrationNote || null,
+          speakers: festivalSpeakers || null,
+        }
+      : { festivalSlug: null, track: null, registrationUrl: null, registrationNote: null, speakers: null };
   const record = {
     id: eventId,
     name,
     flavour,
     city: String(data.city || "Sydney").trim(),
     venue: String(data.venue || "").trim(),
+    room: String(data.room || "").trim() || null,
+    ticketPriceCents: cleanTicketCents(data.ticketPriceCents) || null,
+    capacity: cleanCapacity(data.capacity) || null,
+    ...festivalFields,
     startsAt: String(data.startsAt || new Date().toISOString()),
     endsAt: String(data.endsAt || ""),
     status: data.status === "draft" || data.status === "ended" ? data.status : "live",
@@ -108,6 +170,7 @@ export const upsertEventStall = onCall(CALLABLE, async (request) => {
     name,
     category: isStallCategory(category) ? category : "shops",
     booth: String(data.booth || "").trim(),
+    location: cleanStallLocation(data.location) || null,
     shortWhy: String(data.shortWhy || "").trim(),
     offer: String(data.offer || "").trim() || null,
     handle: data.handle ? normalizeHandle(String(data.handle)) : null,

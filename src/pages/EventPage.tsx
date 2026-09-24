@@ -5,6 +5,11 @@ import { toast } from "sonner";
 import { StickyAction } from "@/components/design-system/companions";
 import { Button } from "@/components/ui/Button";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
+import { SpeakerRow } from "@/components/event/SpeakerRow";
+import { createBookingForEvent } from "@/components/booking/BookingsSection";
+import { createBookingCheckoutSessionRemote } from "@/lib/functions";
+import { useAuth } from "@/contexts/AuthContext";
+import { toZonedDateStr } from "@/lib/local-time";
 import { useEvents } from "@/contexts/EventsContext";
 import { formatRelativeBadge } from "@/lib/calendar-utils";
 import { setShareMeta } from "@/lib/share-meta";
@@ -58,7 +63,57 @@ export function EventPage() {
 
 function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
   const [, nav] = useLocation();
-  const { toggleGoing, toggleInterested, toggleLiked } = useEvents();
+  const { user, requireUser } = useAuth();
+  const { toggleGoing, toggleInterested, toggleLiked, getEvent } = useEvents();
+  const [buying, setBuying] = useState(false);
+
+  const paidCents = event.ticketPriceCents || 0;
+  const isPaid = paidCents > 0;
+
+  async function buyTicket() {
+    if (!requireUser("Sign in to get tickets.")) return;
+    if (!user) return;
+    const record = getEvent(event.id);
+    const providerUid =
+      event.organiserUid || (record && "organiserUid" in record ? record.organiserUid : undefined) || "";
+    if (!providerUid) {
+      toast.error("Tickets aren't on sale for this event yet.");
+      return;
+    }
+    const providerName =
+      (record && "hostName" in record && record.hostName) ||
+      (record && "businessName" in record && record.businessName) ||
+      "Event organiser";
+    const at = new Date(event.startsAt);
+    const date = Number.isNaN(at.getTime()) ? event.date : toZonedDateStr(at);
+    const time = Number.isNaN(at.getTime())
+      ? ""
+      : `${String(at.getHours()).padStart(2, "0")}:${String(at.getMinutes()).padStart(2, "0")}`;
+    setBuying(true);
+    try {
+      const bookingId = await createBookingForEvent({
+        eventId: event.id,
+        providerUid,
+        providerName: String(providerName),
+        title: event.title,
+        suburb: event.city,
+        date,
+        time,
+        priceCents: paidCents,
+        customerUid: user.uid,
+      });
+      const res = await createBookingCheckoutSessionRemote({ bookingId });
+      if (res.checkoutUrl) {
+        window.location.href = res.checkoutUrl;
+        return;
+      }
+      toast.success("Ticket reserved — see your bookings");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't start checkout.");
+    } finally {
+      setBuying(false);
+    }
+  }
 
   useEffect(() => {
     setShareMeta({
@@ -157,12 +212,23 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
           >
             <MapPin size={15} className="shrink-0 text-gold" />
             <span>
-              {event.venue}, {event.city}
+              {[event.venue, event.room].filter(Boolean).join(" · ")}, {event.city}
             </span>
           </button>
+          {event.speakers && event.speakers.length > 0 && (
+            <div className="border-t border-line/60 pt-2">
+              <SpeakerRow speakers={event.speakers} />
+            </div>
+          )}
           {event.ticketPrice && (
             <p className="text-xs font-medium text-mute">
               Admission: <strong className="text-gold">{event.ticketPrice}</strong>
+            </p>
+          )}
+          {isPaid && (
+            <p className="text-sm font-semibold text-ink">
+              ${(paidCents / 100).toFixed(2)} AUD
+              {event.capacity ? <span className="ml-2 text-xs font-medium text-mute">{event.capacity} tickets</span> : null}
             </p>
           )}
         </div>
@@ -267,20 +333,31 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
       {/* One primary action, thumb-reachable: decide → act */}
       <StickyAction
         primary={
-          <button
-            type="button"
-            onClick={() => {
-              const applied = toggleGoing(event.id);
-              if (applied && !event.isGoing) toast.success(`You're going to "${event.title}"`);
-            }}
-            className={cn(
-              "flex h-12 w-full cursor-pointer touch-manipulation items-center justify-center gap-2 rounded-full text-[15px] font-semibold transition active:scale-[0.99]",
-              event.isGoing ? "bg-emerald-600 text-white" : "bg-brand text-white",
-            )}
-          >
-            <Check size={17} strokeWidth={event.isGoing ? 3 : 2.2} />
-            <span>{event.isGoing ? "You're going ✓" : "Add to AirPal — I'm going"}</span>
-          </button>
+          isPaid && !event.isGoing ? (
+            <button
+              type="button"
+              onClick={() => void buyTicket()}
+              disabled={buying}
+              className="flex h-12 w-full cursor-pointer touch-manipulation items-center justify-center gap-2 rounded-full bg-brand text-[15px] font-semibold text-white transition active:scale-[0.99] disabled:opacity-60"
+            >
+              <span>{buying ? "Starting checkout…" : `Get ticket · $${(paidCents / 100).toFixed(2)}`}</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                const applied = toggleGoing(event.id);
+                if (applied && !event.isGoing) toast.success(`You're going to "${event.title}"`);
+              }}
+              className={cn(
+                "flex h-12 w-full cursor-pointer touch-manipulation items-center justify-center gap-2 rounded-full text-[15px] font-semibold transition active:scale-[0.99]",
+                event.isGoing ? "bg-emerald-600 text-white" : "bg-brand text-white",
+              )}
+            >
+              <Check size={17} strokeWidth={event.isGoing ? 3 : 2.2} />
+              <span>{event.isGoing ? "You're going ✓" : "Add to AirPal — I'm going"}</span>
+            </button>
+          )
         }
       />
     </div>

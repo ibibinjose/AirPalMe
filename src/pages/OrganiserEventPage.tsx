@@ -47,6 +47,9 @@ import { ratingsForEvent } from "@/lib/ratings";
 import { CITY_OPTIONS } from "@/lib/cities";
 import { cn } from "@/lib/cn";
 import { HostFreshnessBanner } from "@/components/host/HostFreshnessBanner";
+import { EventFestivalFields, type FestivalFieldValues } from "@/components/event/EventFestivalFields";
+import { EventTicketFields, ticketValuesToCents, validateTickets, type TicketFieldValues } from "@/components/event/EventTicketFields";
+import { StallHandleField } from "@/components/event/StallHandleField";
 import { landing, landingItem } from "@/lib/motion";
 import { PlaceAddressField, type PickedPlace } from "@/components/forms/PlaceAddressField";
 import { ImageField } from "@/components/media/ImageField";
@@ -116,6 +119,7 @@ export function OrganiserEventPage() {
   const [flavour, setFlavour] = useState<EventFlavour>("market");
   const [city, setCity] = useState("Sydney");
   const [venue, setVenue] = useState("");
+  const [room, setRoom] = useState("");
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
   const [shortWhy, setShortWhy] = useState("");
@@ -135,9 +139,22 @@ export function OrganiserEventPage() {
   const [collaboratorHandles, setCollaboratorHandles] = useState<string[]>([]);
   const [collaboratorInput, setCollaboratorInput] = useState("");
 
+  // Festival program state
+  const [festivalFields, setFestivalFields] = useState<FestivalFieldValues>({
+    festivalSlug: "",
+    track: "",
+    registrationUrl: "",
+    registrationNote: "",
+    speakers: [],
+  });
+
+  // Ticket state
+  const [ticketFields, setTicketFields] = useState<TicketFieldValues>({ paid: false, price: "25", capacity: "40" });
+
   // Stall creation & editing form states
   const [stallName, setStallName] = useState("");
   const [booth, setBooth] = useState("");
+  const [stallLocation, setStallLocation] = useState("");
   const [stallHandle, setStallHandle] = useState("");
   const [stallOffer, setStallOffer] = useState("");
   const [stallWhy, setStallWhy] = useState("");
@@ -168,6 +185,7 @@ export function OrganiserEventPage() {
     setFlavour(myEvent.flavour);
     setCity(myEvent.city || "Sydney");
     setVenue(myEvent.venue || "");
+    setRoom(myEvent.room || "");
     setAddress(myEvent.address || "");
     setDescription(myEvent.description || "");
     setShortWhy(myEvent.shortWhy || "");
@@ -178,9 +196,21 @@ export function OrganiserEventPage() {
     setHostName(myEvent.hostName || myEvent.businessName || "");
     setHostHandle(myEvent.hostHandle || myEvent.businessHandle || "");
     setCollaboratorHandles(myEvent.collaboratorHandles || []);
+    setFestivalFields({
+      festivalSlug: myEvent.festivalSlug || "",
+      track: myEvent.track || "",
+      registrationUrl: myEvent.registrationUrl || "",
+      registrationNote: myEvent.registrationNote || "",
+      speakers: myEvent.speakers || [],
+    });
     setStartsLocal(toLocalInput(myEvent.startsAt));
     setEndsLocal(toLocalInput(myEvent.endsAt));
     setStatus(myEvent.status);
+    setTicketFields({
+      paid: (myEvent.ticketPriceCents || 0) > 0,
+      price: String(((myEvent.ticketPriceCents || 2500) / 100).toFixed(2)),
+      capacity: String(myEvent.capacity || 40),
+    });
     const origin = publicSiteOrigin();
     void makeQrDataUrl(`${origin}${myEvent.gatePath}`).then(setQr);
   }, [myEvent, business, mine]);
@@ -218,6 +248,11 @@ export function OrganiserEventPage() {
       toast.error("End time needs to be after start");
       return;
     }
+    const ticketError = validateTickets(ticketFields);
+    if (ticketError) {
+      toast.error(ticketError);
+      return;
+    }
     setCreating(true);
     try {
       const cleanHostHandle = hostHandle.trim().replace(/^@+/, "").toLowerCase() || undefined;
@@ -226,6 +261,7 @@ export function OrganiserEventPage() {
         flavour,
         city: city.trim() || "Sydney",
         venue: venue.trim(),
+        room: room.trim() || undefined,
         address: address.trim() || undefined,
         description: description.trim() || undefined,
         shortWhy: shortWhy.trim() || undefined,
@@ -241,6 +277,12 @@ export function OrganiserEventPage() {
         startsAt: startsAt || new Date().toISOString(),
         endsAt: endsAt || undefined,
         status,
+        ...ticketValuesToCents(ticketFields),
+        festivalSlug: festivalFields.festivalSlug.trim(),
+        track: festivalFields.track.trim() || undefined,
+        registrationUrl: festivalFields.registrationUrl.trim() || undefined,
+        registrationNote: festivalFields.registrationNote.trim() || undefined,
+        speakers: festivalFields.speakers.length > 0 ? festivalFields.speakers : undefined,
       });
       toast.success("Event created and live — add your stalls/exhibitors next");
       setTab("stalls");
@@ -263,6 +305,7 @@ export function OrganiserEventPage() {
     setEditingStallId(null);
     setStallName("");
     setBooth("");
+    setStallLocation("");
     setStallHandle("");
     setStallOffer("");
     setStallWhy("");
@@ -273,6 +316,7 @@ export function OrganiserEventPage() {
     setEditingStallId(s.id);
     setStallName(s.name);
     setBooth(s.booth || "");
+    setStallLocation(s.location || "");
     setStallHandle(s.handle || "");
     setStallOffer(s.offer || "");
     setStallWhy(s.shortWhy || "");
@@ -292,6 +336,7 @@ export function OrganiserEventPage() {
       name: stallName.trim(),
       category: stallCategory,
       booth: booth.trim(),
+      location: stallLocation.trim() || undefined,
       shortWhy: stallWhy.trim(),
       offer: stallOffer.trim() || undefined,
       handle: stallHandle.trim().replace(/^@+/, "").toLowerCase() || undefined,
@@ -310,6 +355,11 @@ export function OrganiserEventPage() {
     }
     const startsAt = fromLocalInput(startsLocal);
     const endsAt = fromLocalInput(endsLocal);
+    const ticketError = validateTickets(ticketFields);
+    if (ticketError) {
+      toast.error(ticketError);
+      return;
+    }
     setSaving(true);
     try {
       const cleanHostHandle = hostHandle.trim().replace(/^@+/, "").toLowerCase() || undefined;
@@ -319,6 +369,7 @@ export function OrganiserEventPage() {
         flavour,
         city: city.trim() || "Sydney",
         venue: venue.trim(),
+        room: room.trim() || undefined,
         address: address.trim() || undefined,
         description: description.trim() || undefined,
         shortWhy: shortWhy.trim() || undefined,
@@ -334,6 +385,12 @@ export function OrganiserEventPage() {
         startsAt: startsAt || myEvent.startsAt,
         endsAt: endsAt || myEvent.endsAt,
         status,
+        ...ticketValuesToCents(ticketFields),
+        festivalSlug: festivalFields.festivalSlug.trim(),
+        track: festivalFields.track.trim() || undefined,
+        registrationUrl: festivalFields.registrationUrl.trim() || undefined,
+        registrationNote: festivalFields.registrationNote.trim() || undefined,
+        speakers: festivalFields.speakers.length > 0 ? festivalFields.speakers : [],
       });
       toast.success("Event details and Google place saved");
     } catch (err) {
@@ -395,7 +452,7 @@ export function OrganiserEventPage() {
             {/* Flavour Card Selector */}
             <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-3">
               <p className="text-xs font-bold uppercase tracking-wider text-gold">1. What kind of event?</p>
-              <div className="grid gap-2.5 sm:grid-cols-3">
+              <div className="grid gap-2.5 sm:grid-cols-2">
                 {EVENT_FLAVOURS.map((id) => {
                   const meta = FLAVOUR_META[id];
                   const Icon = meta.icon;
@@ -428,6 +485,19 @@ export function OrganiserEventPage() {
                     </button>
                   );
                 })}
+                <button
+                  type="button"
+                  onClick={() => nav("/f/new")}
+                  className="rounded-2xl p-4 text-left ring-1 transition duration-200 active:scale-[0.98] bg-paper ring-line hover:ring-brand/30 hover:bg-card"
+                >
+                  <span className="grid h-10 w-10 place-items-center rounded-xl ring-1 bg-brand/10 text-brand ring-brand/20">
+                    <CalendarDays size={18} />
+                  </span>
+                  <span className="mt-3 block text-sm font-bold">Festival week</span>
+                  <span className="mt-1 block text-[11px] leading-snug text-mute">
+                    A multi-day program of sessions. Builds at /f/new →
+                  </span>
+                </button>
               </div>
             </div>
 
@@ -528,6 +598,17 @@ export function OrganiserEventPage() {
                     className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
                   />
                 </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                  Room / Hall / Stage (Optional)
+                </label>
+                <input
+                  value={room}
+                  onChange={(e) => setRoom(e.target.value)}
+                  placeholder="e.g. Boardroom 5+6, Great Hall, Main stage"
+                  className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                />
               </div>
 
               {geo && (
@@ -812,6 +893,10 @@ export function OrganiserEventPage() {
               </div>
             </div>
 
+            <EventFestivalFields values={festivalFields} onChange={setFestivalFields} />
+
+            <EventTicketFields values={ticketFields} onChange={setTicketFields} />
+
             <Button type="submit" size="lg" className="w-full h-12 text-base font-semibold shadow-md gap-2" disabled={creating}>
               <span>{creating ? "Creating Event…" : status === "draft" ? "Save Draft" : "Create Event & Open Gate"}</span>
               <ArrowRight size={18} />
@@ -1091,17 +1176,29 @@ export function OrganiserEventPage() {
                           className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
                         />
                       </div>
-                      <div>
-                        <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                          AirPal @handle (Optional)
-                        </label>
-                        <input
-                          value={stallHandle}
-                          onChange={(e) => setStallHandle(e.target.value)}
-                          placeholder={labels.handlePlaceholder}
-                          className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                        />
-                      </div>
+                      <StallHandleField
+                        value={stallHandle}
+                        onChange={setStallHandle}
+                        onAutofillName={(name) => {
+                          if (!stallName.trim()) {
+                            setStallName(name);
+                            toast.success("Filled stall name from profile");
+                          }
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                        Floor location (Optional)
+                      </label>
+                      <input
+                        value={stallLocation}
+                        onChange={(e) => setStallLocation(e.target.value)}
+                        placeholder="e.g. Aisle C · Bay 12, near Gate B"
+                        maxLength={120}
+                        className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20 placeholder:text-mute/60"
+                      />
                     </div>
 
                     <div>
@@ -1408,6 +1505,17 @@ export function OrganiserEventPage() {
                   />
                 </div>
               </div>
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                  Room / Hall / Stage (Optional)
+                </label>
+                <input
+                  value={room}
+                  onChange={(e) => setRoom(e.target.value)}
+                  placeholder="e.g. Boardroom 5+6, Great Hall, Main stage"
+                  className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                />
+              </div>
 
               {geo && (
                 <div className="flex items-center justify-between rounded-2xl bg-paper px-3 py-2 text-xs text-mute border border-line/70">
@@ -1681,6 +1789,10 @@ export function OrganiserEventPage() {
                 })}
               </div>
             </div>
+
+            <EventFestivalFields values={festivalFields} onChange={setFestivalFields} />
+
+            <EventTicketFields values={ticketFields} onChange={setTicketFields} />
 
             <Button type="submit" className="w-full h-12 text-base font-semibold shadow-md" disabled={saving}>
               {saving ? "Saving Changes…" : "Save All Event Details"}

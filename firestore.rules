@@ -185,6 +185,28 @@ service cloud.firestore {
       }
     }
 
+    // Festival week programs: sessions stay on `events` (festivalSlug).
+    // Public to read once live; the organiser publishes, admins can intervene.
+    match /festivals/{slug} {
+      allow get, list: if resource.data.status in ['live', 'ended']
+        || (signedIn() && resource.data.createdByUid == request.auth.uid)
+        || platformAdmin();
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.slug == slug
+        && request.resource.data.createdByUid == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.city is string
+        && request.resource.data.startDate is string
+        && request.resource.data.endDate is string
+        && request.resource.data.status in ['draft', 'live'];
+      allow update: if signedIn()
+        && (resource.data.createdByUid == request.auth.uid || platformAdmin())
+        && request.resource.data.slug == slug
+        && request.resource.data.createdByUid == resource.data.createdByUid;
+      allow delete: if signedIn() && platformAdmin();
+    }
+
     match /properties/{propertyId} {
       // Public property docs must not contain wifi.password — see private/hostSecrets.
       allow read: if true;

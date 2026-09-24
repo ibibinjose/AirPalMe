@@ -4,6 +4,7 @@ import { useRoute, useLocation } from "wouter";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { BioHandleButton } from "@/components/bio/BioHandleButton";
+import { FollowButton } from "@/components/social/SocialButtons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { bioPath, handleFromPlaceId } from "@shared/bio";
@@ -55,6 +56,7 @@ export function StallPage() {
       </div>
       <p className="mt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">
         {stallUnitDisplay(event.flavour, stall.booth)} · {stall.category}
+        {stall.location ? ` · ${stall.location}` : ""}
       </p>
       <h1 className="font-display mt-1 text-3xl font-semibold">{stall.name}</h1>
       {stall.shortWhy && <p className="mt-3 text-[15px] leading-relaxed">{stall.shortWhy}</p>}
@@ -65,9 +67,12 @@ export function StallPage() {
         </p>
       )}
       {handle && (
-        <Button className="mt-6 w-full" variant="ghost" onClick={() => nav(bioPath(handle))}>
-          Open @{handle}
-        </Button>
+        <div className="mt-6 flex gap-2">
+          <Button className="flex-1" variant="ghost" onClick={() => nav(bioPath(handle))}>
+            Open @{handle}
+          </Button>
+          <FollowButton handle={handle} name={stall.name} />
+        </div>
       )}
       <Button
         className={handle ? "mt-3 w-full" : "mt-6 w-full"}

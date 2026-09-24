@@ -59,6 +59,8 @@ export interface Booking {
   listingId?: string;
   /** Optional Experience campaign this booking is for. */
   campaignId?: string;
+  /** Optional ticketed event this booking is for. */
+  eventId?: string;
   payoutStatus?: PayoutStatus;
   stripeCheckoutSessionId?: string;
   stripePaymentIntentId?: string;
@@ -90,6 +92,7 @@ export interface BookingInput {
   priceCents: number;
   listingId?: string;
   campaignId?: string;
+  eventId?: string;
 }
 
 /** @deprecated Use DEFAULT_FEE_CONFIG.platformFeeBps — kept so existing imports compile. */
@@ -208,6 +211,7 @@ export function bookingValid(input: BookingInput): boolean {
     Boolean(input.requestId?.trim()) ||
     Boolean(input.planId?.trim()) ||
     Boolean(input.campaignId?.trim()) ||
+    Boolean(input.eventId?.trim()) ||
     Boolean(input.listingId?.trim());
   return (
     hasTarget &&
