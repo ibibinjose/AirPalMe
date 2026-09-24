@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { HangoutPlan, PlanStop, PlanType, PlanTheme } from "@shared/plan";
 import type { Geo } from "@shared/nearby";
-import {
+import { completePlan as storeCompletePlan,
   loadPlans,
   subscribePlans,
   savePlan,
@@ -85,6 +85,7 @@ interface PlanContextValue {
   fetchPlan: (idOrCode: string) => Promise<HangoutPlan | undefined>;
   createPlan: (input: CreatePlanInput) => HangoutPlan;
   updatePlan: (planId: string, patch: Partial<HangoutPlan>) => HangoutPlan | undefined;
+  completePlan: (planId: string) => HangoutPlan | undefined;
   deletePlan: (planId: string) => boolean;
   rsvpPlan: (
     planId: string,
@@ -275,6 +276,14 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     });
     setPlans([...loadPlans()]);
     toast.success("Plan updated successfully");
+    return updated;
+  }, []);
+
+  const completePlan = useCallback((planId: string) => {
+    const updated = storeCompletePlan(planId);
+    if (!updated) return undefined;
+    setPlans([...loadPlans()]);
+    toast.success(`Marked "${updated.title}" completed`);
     return updated;
   }, []);
 
@@ -489,6 +498,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         fetchPlan,
         createPlan,
         updatePlan,
+        completePlan,
         deletePlan,
         rsvpPlan,
         addStop,

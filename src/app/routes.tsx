@@ -34,6 +34,7 @@ const PeoplePage = lazy(() => import("@/pages/PeoplePage").then((m) => ({ defaul
 const SettingsPage = lazy(() => import("@/pages/SettingsPage").then((m) => ({ default: m.SettingsPage })));
 const MarkerPage = lazy(() => import("@/pages/MarkerPage").then((m) => ({ default: m.MarkerPage })));
 const StayPage = lazy(() => import("@/pages/StayPage").then((m) => ({ default: m.StayPage })));
+const DemoHotelPage = lazy(() => import("@/pages/DemoHotelPage").then((m) => ({ default: m.DemoHotelPage })));
 const HostPage = lazy(() => import("@/pages/HostPage").then((m) => ({ default: m.HostPage })));
 const StartPage = lazy(() => import("@/pages/StartPage").then((m) => ({ default: m.StartPage })));
 const AuthActionPage = lazy(() => import("@/pages/AuthActionPage").then((m) => ({ default: m.AuthActionPage })));
@@ -134,6 +135,10 @@ export function AppRoutes() {
         </Route>
         <Route path="/companion" component={CompanionPage} />
         <Route path="/g/:id" component={StayPage} />
+        <Route path="/DemoHotel" component={DemoHotelPage} />
+        <Route path="/demohotel">
+          <Redirect to="/DemoHotel" />
+        </Route>
         <Route path="/q/:city/:handle" component={MarkerPage} />
         <Route path="/q/:a" component={MarkerPage} />
         <Route path="/q">
@@ -145,6 +150,9 @@ export function AppRoutes() {
         <Route path="/calendar" component={CalendarPage} />
         <Route path="/events">
           <Redirect to="/calendar" />
+        </Route>
+        <Route path="/plans">
+          <Redirect to="/plan" />
         </Route>
         <Route path="/plan/new" component={PlanCreatePage} />
         <Route path="/plan/:id/edit" component={PlanEditPage} />

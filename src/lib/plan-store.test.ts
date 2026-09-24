@@ -14,6 +14,7 @@ import {
   savePlan,
   updateStopInPlan,
   voteStopInPlan,
+  completePlan,
 } from "./plan-store";
 import type { HangoutPlan } from "@shared/plan";
 
@@ -207,5 +208,16 @@ describe("stop change notifications", () => {
 
   it("returns undefined for unknown plans", () => {
     expect(notifyStopChange("no-such-plan", "added", { stopName: "X" })).toBeUndefined();
+  });
+});
+
+
+describe("completePlan", () => {
+  it("marks an open plan completed and is idempotent", () => {
+    const plan = fixture();
+    expect(plan.status).not.toBe("completed");
+    const done = completePlan(plan.id);
+    expect(done?.status).toBe("completed");
+    expect(completePlan(plan.id)?.status).toBe("completed");
   });
 });

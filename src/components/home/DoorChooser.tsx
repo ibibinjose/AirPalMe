@@ -6,8 +6,8 @@ import { triggerHaptic } from "@/lib/native";
 const DOORS: Array<{ id: DoorId; title: string; line: string; icon: typeof Sparkles }> = [
   {
     id: "plan",
-    title: "Plan with people",
-    line: "Create it. Share it. Show up.",
+    title: "Make a plan",
+    line: "What, when, where, who — then show up.",
     icon: CalendarDays,
   },
   {
@@ -35,7 +35,7 @@ export function DoorChooser({ onPick }: { onPick: (id: DoorId) => void }) {
 
   return (
     <div className="mx-auto max-w-md px-4 pb-28 pt-8">
-      <h1 className="font-display text-3xl font-semibold">What do you need?</h1>
+      <h1 className="font-display text-3xl font-semibold">What do you want to do?</h1>
       <div className="mt-6 grid gap-3">
         {DOORS.map((door) => {
           const Icon = door.icon;

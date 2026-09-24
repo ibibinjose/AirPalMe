@@ -75,6 +75,7 @@ export function PlanDetailPage() {
     exportIcs,
     openGoogleCalendar,
     updatePlan,
+    completePlan,
     deletePlan,
   } = usePlans();
   const { user } = useAuth();
@@ -320,6 +321,44 @@ export function PlanDetailPage() {
               )}
             />
           </button>
+        </div>
+      )}
+
+      {/* Close the loop — Brain north star is completed experiences */}
+      {(isHost || userAttendee?.status === "going") &&
+        plan.status !== "completed" &&
+        plan.status !== "cancelled" &&
+        plan.date <= localTodayStr() && (
+          <div className="mt-4 flex flex-col gap-3 rounded-2xl bg-brand/5 px-4 py-4 ring-1 ring-brand/20 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="font-display text-[16px] font-semibold text-ink">Did you go?</p>
+              <p className="mt-0.5 text-[13px] text-mute">
+                Mark this complete so AirPal counts a real experience — not just an RSVP.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              className="h-11 shrink-0 gap-1.5 rounded-full px-5"
+              onClick={() => {
+                const updated = completePlan(plan.id);
+                if (updated) {
+                  trackContentAction("experience_completed", plan.id, {
+                    contentId: plan.id,
+                    category: plan.isExperience ? "experience" : "plan",
+                  });
+                }
+              }}
+            >
+              <CheckCircle2 size={16} />
+              We went
+            </Button>
+          </div>
+        )}
+
+      {plan.status === "completed" && (
+        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-emerald-500/10 px-4 py-3 text-[13px] font-medium text-emerald-800 ring-1 ring-emerald-500/20 dark:text-emerald-200">
+          <CheckCircle2 size={16} className="shrink-0" />
+          Experience completed
         </div>
       )}
 

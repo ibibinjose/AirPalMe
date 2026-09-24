@@ -20,7 +20,7 @@ export const SOLUTIONS: Solution[] = [
     title: "Stay",
     line: "Room QR. Wi-Fi. Help.",
     action: "Open stay",
-    href: "/g/harbour-hotel?room=101",
+    href: "/DemoHotel",
     image: "/media/room.jpg",
     steps: ["Print a room card", "Guest scans", "Wi-Fi, dining, staff"],
   },

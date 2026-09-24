@@ -99,6 +99,7 @@ export const CONTENT_ACTION_TYPES = [
   "profile_open",
   "booking_intent",
   "place_open",
+  "experience_completed",
 ] as const;
 export type ContentActionType = (typeof CONTENT_ACTION_TYPES)[number];
 

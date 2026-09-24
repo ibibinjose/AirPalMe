@@ -1,7 +1,7 @@
 # AirPal.me — Canon (do not revert)
 
 **Every coding agent (Grok, Claude, Gemini, Muse, Cursor, Copilot) must read this file and `AGENTS.md` before editing.**  
-If a later prompt conflicts with this file, **this file wins** unless the human explicitly says to change the canon.
+If a later prompt conflicts with this file on shipped chrome, auth, or identity, **this file wins** unless the human explicitly says to change the canon. For *what to build next*, follow `docs/BRAIN.md` (Brain does not override this freeze).
 
 Last sealed: 21 September 2026. Product: AirPal.me — Life Made Easy. One marketplace engine, six eventual verticals.
 
@@ -11,9 +11,10 @@ Last sealed: 21 September 2026. Product: AirPal.me — Life Made Easy. One marke
 
 1. Read `AGENTS.md` (product rules).
 2. Read this file (shipped freeze).
-3. For marketplace work, read `.grok/skills/airpal-build/references/build-checklist.md` and `references/surfaces.md`.
-4. For store/native, read `docs/store/README.md` and `docs/store/app-information.md`.
-5. Smallest change that solves the request. Do not rewrite the stack, restyle the app, or delete a shipped surface.
+3. Read `docs/BRAIN.md` before proposing expansion, a new vertical, Studio, or a second app (binding on what to build next).
+4. For marketplace work, read `.grok/skills/airpal-build/references/build-checklist.md` and `references/surfaces.md`.
+5. For store/native, read `docs/store/README.md` and `docs/store/app-information.md`.
+6. Smallest change that solves the request. Do not rewrite the stack, restyle the app, or delete a shipped surface.
 
 Mobile keyboard: Capacitor `Keyboard.resize` is `none`. `src/lib/keyboard.ts` locks `#root` to the visual viewport and scrolls the focused field above the keyboard. Do not switch back to `resize: body` without re-testing iOS/Android forms.
 
@@ -106,6 +107,7 @@ Reuse these. Do not add a parallel page for the same job.
 | Create / view / edit plan | `/plan/new`, `/plan/:id`, `/plan/:id/edit`, `/invite/:code` |
 | Scan QR | `/scan` |
 | Stay concierge | `/concierge`, `/stay`, `/g/:id` |
+| Demo Hotel stay QR showcase | `/DemoHotel` |
 | Marker / campus | `/q/:id`, `/c/:id` |
 | Calendar / events | `/calendar`, `/e/:id`, `/event/new` |
 | Places / experiences | `/p/:id`, `/experiences` |

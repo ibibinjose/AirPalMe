@@ -45,6 +45,19 @@ describe("properties store", () => {
     expect(getCachedProperty("harbour-college")).toBeUndefined();
   });
 
+  it("falls back to known Harbour demo seeds only — not arbitrary fakes", async () => {
+    const p = await fetchProperty("harbour-hotel");
+    expect(p.id).toBe("harbour-hotel");
+    expect(p.name).toMatch(/Harbour/);
+    expect(p.wifi.password).toBe("");
+    expect(p.roomTokens?.["tok-101-demo"]).toBe("101");
+    expect(getCachedProperty("harbour-hotel")?.id).toBe("harbour-hotel");
+
+    const unknown = await fetchProperty("made-up-hotel-xyz");
+    expect(unknown.name).toBe("");
+    expect(getCachedProperty("made-up-hotel-xyz")).toBeUndefined();
+  });
+
   it("unknownProperty carries no venue facts", () => {
     const p = unknownProperty("xyz");
     expect(p.id).toBe("xyz");

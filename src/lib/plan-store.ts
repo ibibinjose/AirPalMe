@@ -174,6 +174,20 @@ export function savePlan(plan: HangoutPlan, syncRemote = true): HangoutPlan {
   return finalPlan;
 }
 
+
+/** Close the AirPal loop: plan → show up → completed experience. */
+export function completePlan(planId: string): HangoutPlan | undefined {
+  const current = getPlan(planId);
+  if (!current) return undefined;
+  if (current.status === "cancelled") return current;
+  if (current.status === "completed") return current;
+  return savePlan({
+    ...current,
+    status: "completed",
+    updatedAt: new Date().toISOString(),
+  });
+}
+
 export function deletePlan(planId: string): boolean {
   const all = loadPlans();
   const next = all.filter((p) => p.id !== planId);

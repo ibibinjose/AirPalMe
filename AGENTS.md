@@ -211,3 +211,11 @@ Pointer files so other tools load the same rules: `CLAUDE.md`, `GEMINI.md`, `.cu
 
 To change the freeze, the human must ask; update `docs/CANON.md` in the same change as the code.
 
+## 44. AirPal Brain (binding on product expansion)
+
+What to build next is gated by **`docs/BRAIN.md`** (established 22 September 2026). North star: Completed AirPal Experiences per active user. Optimize for completed experiences, not downloads. New surfaces must pass the §18 feature test before they are built.
+
+Conflict order when documents disagree: (1) safety, security, privacy, and payment integrity in this file; (2) shipped freeze in `docs/CANON.md`; (3) Brain on expansion; (4) older vertical plans in this file that pull the product into another layer. Never start P3/P4 (Studio second app, Travel/Fashion as products, etc.) while P0 — Plan → connect → experience → complete in Sydney — is unproven.
+
+To change Brain, the human asks in plain language; update `docs/BRAIN.md` in the same change as any product rule that contradicts it.
+

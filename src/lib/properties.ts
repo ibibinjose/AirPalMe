@@ -4,6 +4,7 @@ import { buildHostProperty, parseHostPropertyKind } from "@shared/host-property"
 import { isoFromUnknown } from "@shared/freshness";
 import { getFirebaseDb } from "./firebase";
 import { liveBackendEnabled, updatePropertyProfileRemote, updatePropertyWifiRemote } from "./functions";
+import { harbourStaySeeds } from "./seed-stay";
 
 const CACHE_KEY = "airpal.properties.v1";
 
@@ -172,6 +173,13 @@ export async function fetchProperty(id: string): Promise<PropertyInfo> {
         /* unknown stay below */
       }
     }
+  }
+
+  // Known Harbour demo seeds only — not arbitrary fakes.
+  const harbourSeed = harbourStaySeeds().find((s) => s.property.id === id);
+  if (harbourSeed) {
+    saveCachedProperty(harbourSeed.property);
+    return harbourSeed.property;
   }
 
   // Unknown stay: generic placeholder, never a fake venue.

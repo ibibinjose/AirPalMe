@@ -95,7 +95,7 @@ export function HomePage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-12 md:px-6">
-      {/* Header — Sydney harbour backdrop, personal not a dashboard */}
+      {/* Header — Sydney harbour backdrop + Want CTAs (Brain P0) */}
       <header className="relative -mx-4 overflow-hidden rounded-b-[28px] md:-mx-6">
         <div className="absolute inset-0" aria-hidden="true">
           <Photo src="/media/harbour.jpg" priority className="h-full w-full object-cover" alt="" />
@@ -106,11 +106,28 @@ export function HomePage() {
             {greeting}, {firstName}
           </p>
           <h1 className="font-display mt-1 text-[34px] font-bold leading-[1.02] tracking-tight text-white">
-            What&apos;s on
+            What do you want to do?
           </h1>
           <p className="mt-1 text-[14px] font-medium text-white/80">{city}</p>
           <div className="mt-4">
-            <AirPalSearchField placeholder="Where are you going?" />
+            <AirPalSearchField placeholder="Coffee, beach, hike, dinner…" />
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              onClick={() => nav("/plan/new")}
+              className="h-11 rounded-full px-5 shadow-[0_6px_20px_rgba(24,5,219,0.28)]"
+            >
+              Make a plan
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => nav("/mate")}
+              className="h-11 rounded-full px-5 bg-white/15 text-white ring-1 ring-white/30 hover:bg-white/25"
+            >
+              Find a Mate
+            </Button>
           </div>
         </div>
       </header>
@@ -317,9 +334,12 @@ export function HomePage() {
             <p className="mt-1 text-[14px] text-mute">
               As you plan and save, AirPal will surface things worth your time here.
             </p>
-            <div className="mt-4">
-              <Button size="sm" onClick={() => nav("/explore")}>
-                Review suggestions
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button size="sm" onClick={() => nav("/plan/new")}>
+                Make a plan
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => nav("/mate")} className="ring-1 ring-line">
+                Find a Mate
               </Button>
             </div>
           </CardShell>

@@ -37,7 +37,7 @@ Always report numerator, denominator, and the per-context distribution — never
 | `context_view`        | Stay / marker / campus / event / business / bio context loaded                                                                          | No                                    |
 | `context_load_failed` | Context failed to load                                                                                                                 | No                                    |
 | `first_value`         | First useful action in a session/context/day                                                                                           | Yes, max once per session/context/day |
-| `content_action`      | Map (`actionType=map_open`), Wi-Fi reveal, profile open, booking intent, place open                                                    | Yes for allowlisted `actionType`      |
+| `content_action`      | Map (`actionType=map_open`), Wi-Fi reveal, profile open, booking intent, place open, experience completed (`experience_completed`)     | Yes for allowlisted `actionType`      |
 | `ask_submitted`       | Guest submitted Ask AirPal                                                                                                             | No                                    |
 | `ask_answered`        | Answer shown                                                                                                                           | Yes if `answerStatus=shown`           |
 | `offer_view`          | Offer shown                                                                                                                            | No                                    |
