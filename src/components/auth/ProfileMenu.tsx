@@ -314,10 +314,14 @@ export function ProfileMenu() {
               <div className="flex min-w-0 items-center gap-1.5 truncate text-xs font-semibold">
                 <span className="h-2 w-2 rounded-full bg-current shrink-0" />
                 <span className="truncate">
-                  {statusInfo.label}
-                  {mine.customStatus
-                    ? ` · ${mine.customStatusEmoji ? `${mine.customStatusEmoji} ` : ""}${mine.customStatus}`
-                    : ""}
+                  {mine.customStatus ? (
+                    <span className="font-bold text-ink">
+                      {mine.customStatusEmoji && `${mine.customStatusEmoji} `}
+                      {mine.customStatus}
+                    </span>
+                  ) : (
+                    <span>{statusInfo.label}</span>
+                  )}
                 </span>
               </div>
               <span className="ml-1 shrink-0 text-[10px] font-bold uppercase text-ink/70">

@@ -1,6 +1,23 @@
 import { useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Heart, List as ListIcon, Map as MapIcon, MapPin, SlidersHorizontal } from "lucide-react";
+import {
+  Heart,
+  List as ListIcon,
+  Map as MapIcon,
+  MapPin,
+  SlidersHorizontal,
+  Search,
+  X,
+  Sparkles,
+  ArrowRight,
+  Compass,
+  Calendar,
+  Utensils,
+  Coffee,
+  Ticket,
+  Users,
+  Footprints,
+} from "lucide-react";
 import { usePlans } from "@/contexts/PlanContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { toast } from "sonner";
@@ -17,79 +34,157 @@ import {
 } from "@/lib/explore-filters";
 import { hrefForPlace } from "@/lib/bio-handle";
 import { knownCityCenter } from "@/lib/cities";
+import { weatherLabel } from "@/lib/weather";
 import { formatPlanDate } from "@shared/plan";
 import { Photo } from "@/components/ui/Photo";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { Sheet } from "@/components/ui/Sheet";
 import { CityMap, type MapPin as Pin } from "@/components/map/CityMap";
-import {
-  AirPalSearchField,
-  CardShell,
-  PillRow,
-  RatingBadge,
-} from "@/components/design-system/companions";
+import { RatingBadge } from "@/components/design-system/companions";
+import { triggerHaptic } from "@/lib/native";
+import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/cn";
 
+type ExploreFilter = "all" | "nearby" | "events" | "places" | "food" | "experiences" | "communities" | "travel" | "people";
 
-type ExploreFilter = "nearby" | "events" | "places" | "food" | "experiences" | "communities" | "travel" | "people";
+const FILTERS: { id: ExploreFilter; label: string; icon?: typeof Compass }[] = [
+  { id: "all", label: "All" },
+  { id: "nearby", label: "Nearby" },
+  { id: "events", label: "Events" },
+  { id: "places", label: "Places" },
+  { id: "food", label: "Food & Drinks" },
+  { id: "experiences", label: "Experiences" },
+  { id: "communities", label: "Communities" },
+  { id: "travel", label: "Travel & Stays" },
+  { id: "people", label: "Mates" },
+];
 
-const FILTERS: { id: ExploreFilter; label: string; color: string }[] = [
-  { id: "nearby", label: "Nearby", color: "#121614" },
-  { id: "events", label: "Events", color: "#e86a33" },
-  { id: "places", label: "Places", color: "#2b7cd3" },
-  { id: "food", label: "Food", color: "#d99a17" },
-  { id: "experiences", label: "Experiences", color: "#0e9f8a" },
-  { id: "communities", label: "Communities", color: "#2fa866" },
-  { id: "travel", label: "Travel", color: "#b3541e" },
-  { id: "people", label: "People", color: "#e86a33" },
+const CURATED_JOURNEYS = [
+  {
+    title: "Hidden Getaways",
+    subtitle: "Coastal trails & scenic spots",
+    emoji: "🌴",
+    color: "from-blue-500/15 to-cyan-500/10 text-blue-700 dark:text-blue-300",
+  },
+  {
+    title: "Specialty Coffee Crawl",
+    subtitle: "Artisan roasters & cafes",
+    emoji: "☕",
+    color: "from-amber-500/15 to-amber-700/10 text-amber-700 dark:text-amber-300",
+  },
+  {
+    title: "Wine & Dine",
+    subtitle: "Top rated restaurants & bars",
+    emoji: "🍷",
+    color: "from-rose-500/15 to-pink-500/10 text-rose-700 dark:text-rose-300",
+  },
+  {
+    title: "Heritage & Culture",
+    subtitle: "Historic streets & galleries",
+    emoji: "🏛️",
+    color: "from-emerald-500/15 to-teal-500/10 text-emerald-700 dark:text-emerald-300",
+  },
+  {
+    title: "Wellness & Nature",
+    subtitle: "Parks, yoga & tranquil escapes",
+    emoji: "🌿",
+    color: "from-violet-500/15 to-purple-500/10 text-violet-700 dark:text-violet-300",
+  },
 ];
 
 export function ExplorePage() {
   const [, nav] = useLocation();
   const { publicPlans } = usePlans();
   const { calendarEvents, toggleInterested } = useEvents();
-  const { city, here, today } = useLocalNow();
+  const { city, here, today, weather } = useLocalNow();
   const { version } = useListings();
-  const [filter, setFilter] = useState<ExploreFilter>("nearby");
+
+  const [filter, setFilter] = useState<ExploreFilter>("all");
   const [view, setView] = useState<"list" | "map">("list");
+  const [searchQuery, setSearchQuery] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
   const [when, setWhen] = useState<ExploreWhen>("any");
   const [price, setPrice] = useState<ExplorePrice>("any");
 
-  const places = useMemo(
-    () => filterPlacesByPrice(discoverPlaces(here, city, "city"), price).slice(0, 20),
+  const effectiveCity = city && city !== "Choose a city" && city !== "Current location" ? city : "Sydney";
+
+  const rawPlaces = useMemo(
+    () => filterPlacesByPrice(discoverPlaces(here, city, "city"), price),
     [here, city, version, price],
   );
 
-  const events = useMemo(
+  const places = useMemo(() => {
+    let list = rawPlaces;
+    if (filter === "food") {
+      list = list.filter((p) => p.category === "eat" || p.category === "coffee");
+    }
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.shortWhy?.toLowerCase().includes(q) ||
+          p.category?.toLowerCase().includes(q),
+      );
+    }
+    return list.slice(0, 30);
+  }, [rawPlaces, filter, searchQuery]);
+
+  const rawEvents = useMemo(
     () =>
       filterEventsByWhen(
         calendarEvents.filter((e) => e.date >= today),
         when,
         today,
-      )
-        .sort((a, b) => a.date.localeCompare(b.date))
-        .slice(0, 12),
+      ).sort((a, b) => a.date.localeCompare(b.date)),
     [calendarEvents, today, when],
   );
 
-  const experiences = useMemo(
-    () => publicPlans.filter((p) => p.isExperience).slice(0, 8),
+  const events = useMemo(() => {
+    let list = rawEvents;
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
+      list = list.filter(
+        (e) =>
+          e.title.toLowerCase().includes(q) ||
+          e.venue?.toLowerCase().includes(q) ||
+          e.city?.toLowerCase().includes(q),
+      );
+    }
+    return list.slice(0, 16);
+  }, [rawEvents, searchQuery]);
+
+  const rawExperiences = useMemo(
+    () => publicPlans.filter((p) => p.isExperience),
     [publicPlans],
   );
+
+  const experiences = useMemo(() => {
+    let list = rawExperiences;
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
+      list = list.filter(
+        (p) =>
+          p.title.toLowerCase().includes(q) ||
+          p.destination?.toLowerCase().includes(q) ||
+          p.city?.toLowerCase().includes(q),
+      );
+    }
+    return list.slice(0, 12);
+  }, [rawExperiences, searchQuery]);
 
   const pins = useMemo<Pin[]>(
     () =>
       places
         .filter((p) => p.geo && Number.isFinite(p.geo.lat) && Number.isFinite(p.geo.lng))
-        .slice(0, 30)
+        .slice(0, 40)
         .map((p) => ({
           id: `place-${p.id}`,
           kind: "place" as const,
           title: p.name,
           sub: p.shortWhy,
-          lat: p.geo.lat,
-          lng: p.geo.lng,
+          lat: p.geo!.lat,
+          lng: p.geo!.lng,
           area: false,
         })),
     [places],
@@ -100,65 +195,187 @@ export function ExplorePage() {
     [city],
   );
 
-  const showEvents = filter === "events";
-  const showExperiences = filter === "experiences";
+  const activeFiltersCount = (when !== "any" ? 1 : 0) + (price !== "any" ? 1 : 0);
+
+  const showAll = filter === "all" || filter === "nearby";
+  const showEvents = filter === "events" || (showAll && events.length > 0 && !searchQuery);
+  const showExperiences = filter === "experiences" || (showAll && experiences.length > 0 && !searchQuery);
+  const showPlaces = filter === "places" || filter === "food" || showAll;
   const showPeople = filter === "people";
   const showCommunities = filter === "communities";
   const showTravel = filter === "travel";
 
+  const selectedPlace = useMemo(() => {
+    if (!selectedPin) return null;
+    const placeId = selectedPin.id.replace(/^place-/, "");
+    return places.find((p) => String(p.id) === placeId) || null;
+  }, [selectedPin, places]);
+
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-12 md:px-6">
-      <header className="pt-6">
-        <h1 className="font-display text-[28px] font-bold tracking-tight">Explore</h1>
-        <div className="mt-3">
-          <AirPalSearchField placeholder="Search" />
+    <div className="mx-auto max-w-6xl px-4 py-6 md:py-10 pb-28">
+      {/* Header Banner */}
+      <header className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
+              <MapPin size={12} className="shrink-0" />
+              <span>{effectiveCity}</span>
+            </span>
+            {weather && (
+              <span className="text-xs text-mute font-medium">
+                {weather.temp}°C · {weatherLabel(weather.code, weather.isDay)}
+              </span>
+            )}
+          </div>
+          <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-ink md:text-4xl">
+            Explore {effectiveCity}
+          </h1>
+          <p className="mt-1 text-sm text-mute">
+            Discover local places, upcoming events, and curated experiences.
+          </p>
         </div>
-        <p className="mt-3 text-[15px] font-semibold">
-          {city || "Sydney"} <span className="font-normal text-mute">· For you</span>
-        </p>
+
+        {/* View Switcher and Filter Toggle */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              void triggerHaptic("light");
+              setFiltersOpen(true);
+            }}
+            aria-label="Open filters"
+            className={cn(
+              "flex h-11 items-center gap-1.5 rounded-full bg-card px-4 text-xs font-semibold ring-1 transition-all active:scale-95 shadow-xs",
+              activeFiltersCount > 0
+                ? "ring-brand text-brand bg-brand/10"
+                : "ring-line text-mute hover:text-ink hover:bg-paper",
+            )}
+          >
+            <SlidersHorizontal size={15} />
+            <span>Filters</span>
+            {activeFiltersCount > 0 && (
+              <span className="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-white">
+                {activeFiltersCount}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              void triggerHaptic("light");
+              setView((v) => (v === "list" ? "map" : "list"));
+            }}
+            aria-label={view === "list" ? "Show map" : "Show list"}
+            className="flex h-11 items-center gap-1.5 rounded-full bg-card px-4 text-xs font-semibold ring-1 ring-line text-ink transition-all hover:bg-paper active:scale-95 shadow-xs"
+          >
+            {view === "list" ? (
+              <>
+                <MapIcon size={15} className="text-brand" />
+                <span>Map View</span>
+              </>
+            ) : (
+              <>
+                <ListIcon size={15} className="text-brand" />
+                <span>List View</span>
+              </>
+            )}
+          </button>
+        </div>
       </header>
 
-      <div className="mt-3 flex items-center gap-2">
-        <div className="min-w-0 flex-1">
-          <PillRow options={FILTERS} value={filter} onChange={setFilter} label="Explore categories" />
-        </div>
-        <button
-          type="button"
-          onClick={() => setFiltersOpen(true)}
-          aria-label="Open filters"
-          className="grid h-9 w-9 shrink-0 cursor-pointer touch-manipulation place-items-center rounded-full bg-card ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
-        >
-          <SlidersHorizontal size={16} className="text-mute" />
-        </button>
-        <button
-          type="button"
-          onClick={() => setView((v) => (v === "list" ? "map" : "list"))}
-          aria-label={view === "list" ? "Show map" : "Show list"}
-          className="grid h-9 w-9 shrink-0 cursor-pointer touch-manipulation place-items-center rounded-full bg-card ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
-        >
-          {view === "list" ? <MapIcon size={16} className="text-mute" /> : <ListIcon size={16} className="text-mute" />}
-        </button>
+      {/* Search Field */}
+      <div className="relative mt-5">
+        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand" />
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder={`Search places, events, or experiences in ${effectiveCity}…`}
+          aria-label="Search explore"
+          className="h-12 w-full rounded-2xl bg-card pl-11 pr-10 text-sm text-ink ring-1 ring-line outline-none placeholder:text-mute focus:ring-2 focus:ring-brand/30 shadow-xs"
+        />
+        {searchQuery && (
+          <button
+            type="button"
+            onClick={() => setSearchQuery("")}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-mute hover:text-ink"
+            aria-label="Clear search"
+          >
+            <X size={16} />
+          </button>
+        )}
       </div>
 
-      {/* Journeys live one level down: tapping one starts planning it */}
-      <section aria-label="Journeys" className="mt-5">
-        <p className="text-[15px] font-semibold">Journeys</p>
-        <div className="mt-2 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-          {["Getaways", "Root Escapes", "Sacred Journeys", "Wellness", "Heritage"].map((j) => (
-            <Link
-              key={j}
-              href={`/plan/new?title=${encodeURIComponent(j)}`}
-              className="shrink-0 touch-manipulation rounded-full bg-card px-4 py-2 text-[13px] font-semibold ring-1 ring-line transition hover:ring-brand/40 active:scale-[0.97]"
+      {/* Categories Pill Scroller */}
+      <div className="no-scrollbar mt-4 flex items-center gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+        {FILTERS.map((f) => {
+          const active = filter === f.id;
+          return (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => {
+                void triggerHaptic("light");
+                setFilter(f.id);
+              }}
+              aria-pressed={active}
+              className={cn(
+                "flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs font-bold transition-all active:scale-95",
+                active
+                  ? "bg-brand text-white shadow-xs"
+                  : "bg-card text-mute hover:text-ink ring-1 ring-line/80 hover:bg-paper",
+              )}
             >
-              {j}
-            </Link>
-          ))}
-        </div>
-      </section>
+              <span>{f.label}</span>
+            </button>
+          );
+        })}
+      </div>
 
+      {/* Curated Journeys Carousel */}
+      {!searchQuery && view === "list" && (
+        <section aria-label="Curated Journeys" className="mt-7">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-mute flex items-center gap-1.5">
+              <Sparkles size={13} className="text-brand" />
+              Curated Journeys
+            </h2>
+            <span className="text-xs text-mute">Tap to plan</span>
+          </div>
+
+          <div className="no-scrollbar mt-3 flex items-center gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+            {CURATED_JOURNEYS.map((j) => (
+              <Link
+                key={j.title}
+                href={`/plan/new?title=${encodeURIComponent(j.title)}&dest=${encodeURIComponent(effectiveCity)}`}
+                onClick={() => void triggerHaptic("light")}
+                className="group flex w-52 shrink-0 flex-col justify-between rounded-2xl bg-card p-4 text-left ring-1 ring-line transition-all duration-200 hover:-translate-y-0.5 hover:ring-brand/30 hover:shadow-xs active:scale-95"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl">{j.emoji}</span>
+                  <span className={cn("flex h-7 w-7 items-center justify-center rounded-xl bg-linear-to-br transition group-hover:scale-110", j.color)}>
+                    <Compass size={15} />
+                  </span>
+                </div>
+                <div className="mt-3">
+                  <span className="block truncate text-sm font-bold text-ink">
+                    {j.title}
+                  </span>
+                  <span className="block truncate text-[11px] text-mute">
+                    {j.subtitle}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* View Mode: Map View */}
       {view === "map" ? (
-        <section aria-label="Map" className="mt-4">
-          <div className="overflow-hidden rounded-3xl ring-1 ring-line">
+        <section aria-label="Map View" className="mt-6">
+          <div className="overflow-hidden rounded-3xl ring-1 ring-line shadow-xs">
             <CityMap
               center={center}
               pins={pins}
@@ -166,235 +383,447 @@ export function ExplorePage() {
               onPin={setSelectedPin}
             />
           </div>
-          <p className="mt-3 text-[14px] font-semibold">
-            {pins.length} places near you
-          </p>
-          <div className="mt-2 flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-            {places.slice(0, 8).map((p) => (
-              <CardShell key={p.id} href={hrefForPlace(p)} label={p.name} className="w-60 shrink-0">
-                <div className="p-3">
-                  <p className="font-display text-[15px] font-semibold leading-tight">{p.name}</p>
-                  <p className="mt-0.5 flex items-center gap-1 truncate text-[12px] text-mute">
-                    <MapPin size={12} /> {p.shortWhy || "Nearby"}
-                  </p>
-                </div>
-              </CardShell>
-            ))}
+
+          <div className="mt-4 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-ink">
+              {pins.length} places mapped in {effectiveCity}
+            </h2>
+            <span className="text-xs text-mute">Tap a pin for details</span>
           </div>
-        </section>
-      ) : showPeople ? (
-        <section aria-label="People" className="mt-4">
-          <CardShell href="/mate" label="Find people to go with" className="p-5">
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gold">
-              People travelling nearby
-            </p>
-            <p className="font-display mt-1 text-[20px] font-semibold">
-              Find someone to go with you.
-            </p>
-            <p className="mt-1 text-[14px] text-mute">
-              Travel together · Find companions · Meet locals · Join a group. Intent first —
-              never a dating feed.
-            </p>
-            <span className="mt-3 inline-block rounded-full bg-ink px-5 py-2.5 text-[14px] font-semibold text-white">
-              Find People
-            </span>
-          </CardShell>
-        </section>
-      ) : showCommunities ? (
-        <section aria-label="Communities" className="mt-4">
-          <CardShell href="/club" label="Open communities" className="p-5">
-            <p className="font-display text-[20px] font-semibold">Communities around movement</p>
-            <p className="mt-1 text-[14px] text-mute">
-              Foodies, travellers and locals — built around plans and experiences, not endless posts.
-            </p>
-            <span className="mt-3 inline-block rounded-full bg-ink px-5 py-2.5 text-[14px] font-semibold text-white">
-              Explore communities
-            </span>
-          </CardShell>
-        </section>
-      ) : showTravel ? (
-        <section aria-label="Travel" className="mt-4 grid grid-cols-2 gap-3">
-          <CardShell href="/plan" label="Open plans" className="p-5">
-            <p className="font-display text-[18px] font-semibold">Plans</p>
-            <p className="mt-1 text-[14px] text-mute">Itineraries, maps, people — one plan at a time.</p>
-          </CardShell>
-          <CardShell href="/concierge" label="Open stays" className="p-5">
-            <p className="font-display text-[18px] font-semibold">Stays</p>
-            <p className="mt-1 text-[14px] text-mute">Hotels, motels, serviced apartments, hostels.</p>
-          </CardShell>
-        </section>
-      ) : showEvents ? (
-        <section aria-label="Events" className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {events.map((e) => (
-            <CardShell key={e.id} href={e.gatePath || `/e/${e.id}`} label={e.title}>
-              <div className="relative aspect-square bg-paper">
-                {e.heroImage && (
-                  <Photo src={e.heroImage} className="absolute inset-0 h-full w-full object-cover" />
-                )}
-                <div className="hero-scrim absolute inset-0" />
-                <button
-                  type="button"
-                  onClick={(ev) => {
-                    ev.preventDefault();
-                    if (toggleInterested(e.id) && !e.isInterested)
-                      toast.success(`Saved "${e.title}" to Interested`);
-                  }}
-                  aria-label={e.isInterested ? "Unsave event" : "Save event"}
-                  aria-pressed={e.isInterested}
-                  className="absolute right-3 top-3 grid h-10 w-10 cursor-pointer place-items-center rounded-full bg-white/85 transition active:scale-90"
-                >
-                  <Heart size={17} className={e.isInterested ? "fill-brand text-brand" : "text-ink"} />
-                </button>
-                <p className="absolute bottom-2 left-3 right-3 font-display text-[19px] font-bold leading-tight text-white">
-                  {e.title}
-                </p>
+
+          {selectedPlace ? (
+            <div className="mt-3 rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs flex items-center justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-ink truncate">{selectedPlace.name}</span>
+                  {typeof selectedPlace.rating === "number" && (
+                    <RatingBadge value={selectedPlace.rating} />
+                  )}
+                </div>
+                <p className="text-xs text-mute truncate mt-0.5">{selectedPlace.shortWhy || "Nearby place"}</p>
               </div>
-              <div className="flex items-center justify-between gap-2 p-3">
-                <p className="text-[13px] font-medium text-mute">
-                  {e.timeLabel}
-                  {e.venue ? ` · ${e.venue}` : e.city ? ` · ${e.city}` : ""}
-                </p>
+              <Button
+                onClick={() => nav(hrefForPlace(selectedPlace))}
+                className="h-9 shrink-0 rounded-full px-4 text-xs font-bold"
+              >
+                <span>View</span>
+                <ArrowRight size={13} />
+              </Button>
+            </div>
+          ) : (
+            <div className="no-scrollbar mt-3 flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+              {places.slice(0, 10).map((p) => (
                 <Link
-                  href={e.gatePath || `/e/${e.id}`}
-                  className="shrink-0 rounded-full bg-ink px-4 py-2 text-[13px] font-semibold text-white"
+                  key={p.id}
+                  href={hrefForPlace(p)}
+                  className="w-56 shrink-0 rounded-2xl bg-card p-3 ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
                 >
-                  Join
+                  <p className="truncate text-sm font-bold text-ink">{p.name}</p>
+                  <p className="mt-0.5 truncate text-xs text-mute flex items-center gap-1">
+                    <MapPin size={11} className="text-emerald-500" />
+                    {p.shortWhy || "Nearby"}
+                  </p>
                 </Link>
-              </div>
-            </CardShell>
-          ))}
-          {events.length === 0 && (
-            <EmptyState
-              title="No events right now."
-              body="New events land here as organisers publish them."
-              action={() => nav("/calendar")}
-              actionLabel="Open calendar"
-            />
-          )}
-        </section>
-      ) : showExperiences ? (
-        <section aria-label="Experiences" className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {experiences.map((p) => (
-            <CardShell key={p.id} href={`/plan/${p.id}`} label={p.title}>
-              <div className="relative aspect-square bg-paper">
-                {p.heroImage && (
-                  <Photo src={p.heroImage} className="absolute inset-0 h-full w-full object-cover" />
-                )}
-                <div className="hero-scrim absolute inset-0" />
-                <p className="absolute bottom-2 left-3 right-3 font-display text-[19px] font-bold leading-tight text-white">
-                  {p.title}
-                </p>
-              </div>
-              <div className="p-3">
-                <p className="text-[13px] font-medium text-mute">
-                  Experience · {formatPlanDate(p.date, p.time)}
-                </p>
-              </div>
-            </CardShell>
-          ))}
-          {experiences.length === 0 && (
-            <EmptyState
-              title="No experiences yet."
-              body="Experiences from providers appear here once published."
-              action={() => nav("/experiences")}
-              actionLabel="Browse experiences"
-            />
+              ))}
+            </div>
           )}
         </section>
       ) : (
-        <section aria-label="Places" className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {places.map((p) => (
-            <CardShell key={p.id} href={hrefForPlace(p)} label={p.name}>
-              <div className="relative aspect-square bg-paper">
-                {(p.heroImage || p.photos?.[0]) ? (
-                  <Photo
-                    src={p.heroImage || p.photos![0]}
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                ) : null}
-                <div className="hero-scrim absolute inset-0" />
-                {typeof p.rating === "number" && (
-                  <span className="absolute left-3 top-3">
-                    <RatingBadge value={p.rating} />
-                  </span>
-                )}
-                <p className="absolute bottom-2 left-3 right-3 font-display text-[19px] font-bold leading-tight text-white">
-                  {p.name}
+        /* View Mode: List / Grid Bento */
+        <div className="mt-6 space-y-8">
+          {/* People / Mate Banner */}
+          {showPeople && (
+            <div className="overflow-hidden rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs md:p-8">
+              <div className="max-w-xl">
+                <span className="text-xs font-bold uppercase tracking-wider text-brand">
+                  AirPal Mate · Companionship
+                </span>
+                <h2 className="mt-1 font-display text-2xl font-bold text-ink md:text-3xl">
+                  Find someone to go with you
+                </h2>
+                <p className="mt-2 text-sm text-mute">
+                  Connect with verified local mates for dining, concerts, road trips, and adventures in {effectiveCity}.
                 </p>
+                <div className="mt-5">
+                  <Button
+                    onClick={() => {
+                      void triggerHaptic("medium");
+                      nav("/mate");
+                    }}
+                    className="h-11 rounded-full px-6 font-bold shadow-xs"
+                  >
+                    <Users size={16} />
+                    <span>Find Mates in {effectiveCity}</span>
+                  </Button>
+                </div>
               </div>
-              <div className="p-3">
-                <p className="flex min-w-0 items-center gap-1 truncate text-[13px] text-mute">
-                  <MapPin size={12} /> {p.shortWhy || "Nearby"}
-                </p>
-              </div>
-            </CardShell>
-          ))}
-          {places.length === 0 && (
-            <EmptyState
-              title="Nothing here yet."
-              body="Try another category or check back soon."
-            />
+            </div>
           )}
-        </section>
+
+          {/* Communities Banner */}
+          {showCommunities && (
+            <div className="overflow-hidden rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs md:p-8">
+              <div className="max-w-xl">
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">
+                  AirPal Social · Circles
+                </span>
+                <h2 className="mt-1 font-display text-2xl font-bold text-ink md:text-3xl">
+                  Communities around shared movement
+                </h2>
+                <p className="mt-2 text-sm text-mute">
+                  Foodies, hikers, creatives, and travellers — built around real-world hangouts, not endless feeds.
+                </p>
+                <div className="mt-5">
+                  <Button
+                    onClick={() => {
+                      void triggerHaptic("medium");
+                      nav("/pulse");
+                    }}
+                    className="h-11 rounded-full px-6 font-bold shadow-xs"
+                  >
+                    <span>Explore Pulse & Circles</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Travel / Stays Split */}
+          {showTravel && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs flex flex-col justify-between">
+                <div>
+                  <h3 className="font-display text-xl font-bold text-ink">Trip Itineraries & Plans</h3>
+                  <p className="mt-1 text-xs text-mute">
+                    Craft multi-stop itineraries, vote on stops, and share invites with friends.
+                  </p>
+                </div>
+                <div className="mt-4">
+                  <Button onClick={() => nav("/plan")} className="h-10 rounded-full px-5 text-xs font-bold">
+                    <span>Open Plans</span>
+                    <ArrowRight size={13} />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs flex flex-col justify-between">
+                <div>
+                  <h3 className="font-display text-xl font-bold text-ink">Verified Stays & Hotels</h3>
+                  <p className="mt-1 text-xs text-mute">
+                    Boutique accommodation, serviced apartments, and partner stays in {effectiveCity}.
+                  </p>
+                </div>
+                <div className="mt-4">
+                  <Button onClick={() => nav("/concierge")} className="h-10 rounded-full px-5 text-xs font-bold">
+                    <span>Explore Stays</span>
+                    <ArrowRight size={13} />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Events Section */}
+          {showEvents && (
+            <section aria-label="Upcoming Events">
+              <div className="flex items-center justify-between pb-3">
+                <h2 className="font-display text-xl font-bold text-ink flex items-center gap-2">
+                  <Calendar size={18} className="text-brand" />
+                  <span>Upcoming Events</span>
+                  <span className="text-xs font-semibold text-mute">({events.length})</span>
+                </h2>
+                <Link href="/calendar" className="text-xs font-bold text-brand hover:underline">
+                  View Calendar →
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+                {events.map((e) => (
+                  <div
+                    key={e.id}
+                    className="group relative flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-line transition-all duration-200 hover:-translate-y-0.5 hover:ring-brand/30 hover:shadow-xs"
+                  >
+                    <div className="relative aspect-square overflow-hidden bg-paper">
+                      {e.heroImage ? (
+                        <Photo
+                          src={e.heroImage}
+                          alt={e.title}
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-brand/10 text-brand">
+                          <Calendar size={32} />
+                        </div>
+                      )}
+                      <div className="hero-scrim absolute inset-0 opacity-80" />
+
+                      <button
+                        type="button"
+                        onClick={(ev) => {
+                          ev.preventDefault();
+                          ev.stopPropagation();
+                          void triggerHaptic("light");
+                          if (toggleInterested(e.id) && !e.isInterested) {
+                            toast.success(`Saved "${e.title}" to Interested`);
+                          }
+                        }}
+                        aria-label={e.isInterested ? "Unsave event" : "Save event"}
+                        aria-pressed={e.isInterested}
+                        className="absolute right-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-full bg-white/90 backdrop-blur-xs transition active:scale-90 shadow-xs"
+                      >
+                        <Heart
+                          size={15}
+                          className={e.isInterested ? "fill-brand text-brand" : "text-ink"}
+                        />
+                      </button>
+
+                      <div className="absolute bottom-2.5 left-2.5 right-2.5">
+                        <span className="inline-block rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-xs">
+                          {e.timeLabel}
+                        </span>
+                        <p className="mt-1 line-clamp-2 font-display text-sm font-bold leading-tight text-white">
+                          {e.title}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2 p-3">
+                      <p className="truncate text-xs text-mute flex items-center gap-1">
+                        <MapPin size={11} className="shrink-0 text-emerald-500" />
+                        <span className="truncate">{e.venue || e.city || effectiveCity}</span>
+                      </p>
+                      <Link
+                        href={e.gatePath || `/e/${e.id}`}
+                        className="shrink-0 rounded-full bg-ink px-3 py-1 text-xs font-semibold text-white transition hover:bg-brand active:scale-95"
+                      >
+                        Join
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Experiences Section */}
+          {showExperiences && (
+            <section aria-label="Bookable Experiences">
+              <div className="flex items-center justify-between pb-3">
+                <h2 className="font-display text-xl font-bold text-ink flex items-center gap-2">
+                  <Ticket size={18} className="text-amber-500" />
+                  <span>Bookable Experiences</span>
+                  <span className="text-xs font-semibold text-mute">({experiences.length})</span>
+                </h2>
+                <Link href="/experiences" className="text-xs font-bold text-brand hover:underline">
+                  All Experiences →
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+                {experiences.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/plan/${p.id}`}
+                    className="group relative flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-line transition-all duration-200 hover:-translate-y-0.5 hover:ring-brand/30 hover:shadow-xs"
+                  >
+                    <div className="relative aspect-square overflow-hidden bg-paper">
+                      {p.heroImage ? (
+                        <Photo
+                          src={p.heroImage}
+                          alt={p.title}
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-amber-500/10 text-amber-600">
+                          <Ticket size={32} />
+                        </div>
+                      )}
+                      <div className="hero-scrim absolute inset-0 opacity-80" />
+
+                      <span className="absolute left-2.5 top-2.5 rounded-full bg-amber-400 px-2 py-0.5 text-[11px] font-bold text-slate-950 shadow-xs">
+                        {p.pricePerPerson ? `$${p.pricePerPerson}` : "Tickets"}
+                      </span>
+
+                      <div className="absolute bottom-2.5 left-2.5 right-2.5">
+                        <p className="line-clamp-2 font-display text-sm font-bold leading-tight text-white">
+                          {p.title}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3">
+                      <p className="truncate text-xs text-mute">
+                        {formatPlanDate(p.date, p.time)}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Places Section */}
+          {showPlaces && (
+            <section aria-label="Places & Venues">
+              <div className="flex items-center justify-between pb-3">
+                <h2 className="font-display text-xl font-bold text-ink flex items-center gap-2">
+                  <MapPin size={18} className="text-emerald-500" />
+                  <span>Places & Venues in {effectiveCity}</span>
+                  <span className="text-xs font-semibold text-mute">({places.length})</span>
+                </h2>
+              </div>
+
+              {places.length === 0 ? (
+                <div className="rounded-3xl bg-card p-8 md:p-12 text-center ring-1 ring-line shadow-xs">
+                  <div className="mx-auto mb-3.5 grid h-12 w-12 place-items-center rounded-2xl bg-brand/10 text-brand">
+                    <Compass size={24} />
+                  </div>
+                  <h3 className="font-display text-lg font-bold text-ink">
+                    {searchQuery ? `No places found for "${searchQuery}"` : "No places available right now"}
+                  </h3>
+                  <p className="mt-1 text-xs text-mute max-w-xs mx-auto">
+                    {searchQuery
+                      ? "Try searching for a different venue or category."
+                      : "Check back soon as new verified venues are onboarded."}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+                  {places.map((p) => (
+                    <Link
+                      key={p.id}
+                      href={hrefForPlace(p)}
+                      className="group relative flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-line transition-all duration-200 hover:-translate-y-0.5 hover:ring-brand/30 hover:shadow-xs"
+                    >
+                      <div className="relative aspect-square overflow-hidden bg-paper">
+                        {(p.heroImage || p.photos?.[0]) ? (
+                          <Photo
+                            src={p.heroImage || p.photos![0]}
+                            alt={p.name}
+                            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-paper text-mute">
+                            {p.category === "coffee" ? (
+                              <Coffee size={32} />
+                            ) : p.category === "eat" ? (
+                              <Utensils size={32} />
+                            ) : (
+                              <Footprints size={32} />
+                            )}
+                          </div>
+                        )}
+                        <div className="hero-scrim absolute inset-0 opacity-80" />
+
+                        {typeof p.rating === "number" && (
+                          <span className="absolute left-2.5 top-2.5">
+                            <RatingBadge value={p.rating} />
+                          </span>
+                        )}
+
+                        <div className="absolute bottom-2.5 left-2.5 right-2.5">
+                          <p className="line-clamp-2 font-display text-sm font-bold leading-tight text-white">
+                            {p.name}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="p-3">
+                        <p className="flex items-center gap-1 truncate text-xs text-mute">
+                          <MapPin size={11} className="shrink-0 text-emerald-500" />
+                          <span className="truncate">{p.shortWhy || "Nearby place"}</span>
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
+        </div>
       )}
 
-      {/* Filters live in a bottom sheet — never a giant filter page */}
-      <Sheet open={filtersOpen} onClose={() => setFiltersOpen(false)} title="Filter">
-        <div className="space-y-5 pb-2">
+      {/* Filter Bottom Sheet */}
+      <Sheet open={filtersOpen} onClose={() => setFiltersOpen(false)} title="Filter Explore">
+        <div className="space-y-5 pb-4">
           <div>
-            <p className="text-[13px] font-semibold">When</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-mute">When</p>
             <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Filter by when">
               {EXPLORE_WHEN_OPTIONS.map((w) => (
                 <button
                   key={w.id}
                   type="button"
-                  onClick={() => setWhen(w.id)}
+                  onClick={() => {
+                    void triggerHaptic("light");
+                    setWhen(w.id);
+                  }}
                   aria-pressed={when === w.id}
-                  className={`min-h-[44px] rounded-full px-4 py-2 text-[13px] font-medium ring-1 transition active:scale-95 ${
-                    when === w.id ? "bg-ink text-white ring-ink" : "bg-paper ring-line"
-                  }`}
+                  className={cn(
+                    "min-h-[44px] rounded-full px-4 py-2 text-xs font-semibold ring-1 transition-all active:scale-95",
+                    when === w.id
+                      ? "bg-brand text-white ring-transparent shadow-xs"
+                      : "bg-paper text-mute ring-line hover:text-ink",
+                  )}
                 >
                   {w.label}
                 </button>
               ))}
             </div>
           </div>
+
           <div>
-            <p className="text-[13px] font-semibold">Price</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-mute">Price</p>
             <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Filter by price">
-              {EXPLORE_PRICE_OPTIONS.map((w) => (
+              {EXPLORE_PRICE_OPTIONS.map((pr) => (
                 <button
-                  key={w.id}
+                  key={pr.id}
                   type="button"
-                  onClick={() => setPrice(w.id)}
-                  aria-pressed={price === w.id}
-                  className={`min-h-[44px] rounded-full px-4 py-2 text-[13px] font-medium ring-1 transition active:scale-95 ${
-                    price === w.id ? "bg-ink text-white ring-ink" : "bg-paper ring-line"
-                  }`}
+                  onClick={() => {
+                    void triggerHaptic("light");
+                    setPrice(pr.id);
+                  }}
+                  aria-pressed={price === pr.id}
+                  className={cn(
+                    "min-h-[44px] rounded-full px-4 py-2 text-xs font-semibold ring-1 transition-all active:scale-95",
+                    price === pr.id
+                      ? "bg-brand text-white ring-transparent shadow-xs"
+                      : "bg-paper text-mute ring-line hover:text-ink",
+                  )}
                 >
-                  {w.label}
+                  {pr.label}
                 </button>
               ))}
             </div>
           </div>
-          {(when !== "any" || price !== "any") && (
-            <button
-              type="button"
+
+          <div className="flex items-center gap-3 pt-3 border-t border-line">
+            {(when !== "any" || price !== "any") && (
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  void triggerHaptic("light");
+                  setWhen("any");
+                  setPrice("any");
+                }}
+                className="h-11 flex-1 rounded-full text-xs font-semibold"
+              >
+                <span>Reset</span>
+              </Button>
+            )}
+
+            <Button
               onClick={() => {
-                setWhen("any");
-                setPrice("any");
+                void triggerHaptic("light");
+                setFiltersOpen(false);
               }}
-              className="min-h-[44px] rounded-full bg-card px-4 py-2 text-[13px] font-semibold ring-1 ring-line active:scale-95"
+              className="h-11 flex-1 rounded-full text-xs font-bold shadow-xs"
             >
-              Clear filters
-            </button>
-          )}
-          <p className="text-[13px] text-mute">
-            Price applies where a place lists one — unlisted places show under Any. Full filtering lives on each
-            category surface.
-          </p>
+              <span>Done</span>
+            </Button>
+          </div>
         </div>
       </Sheet>
     </div>
   );
 }
+

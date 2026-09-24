@@ -19,12 +19,13 @@ interface BioStatusModalProps {
 const EMOJI_PRESETS = ["☕", "💻", "🍸", "🚶", "✈️", "⚡", "🎉", "🎧", "🌴", "📚", "🍕", "🧘"];
 
 const QUICK_STATUS_PRESETS = [
+  { emoji: "✨", text: "Building a Better Tomorrow for Humanity." },
   { emoji: "☕", text: "Available for coffee & catch up" },
+  { emoji: "⚡", text: "Open to meet & collaborate" },
   { emoji: "💻", text: "Deep work / In a focus session" },
   { emoji: "🚶", text: "Out exploring the precinct" },
   { emoji: "🍸", text: "Down for drinks & hangout" },
   { emoji: "✈️", text: "Travelling / Out of town" },
-  { emoji: "⚡", text: "Open to meet & collaborate" },
 ];
 
 export function BioStatusModal({

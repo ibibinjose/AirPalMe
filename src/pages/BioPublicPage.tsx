@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useRoute, Link } from "wouter";
 import { toast } from "sonner";
 import {
@@ -44,6 +44,7 @@ import { Button } from "@/components/ui/Button";
 import { useBio } from "@/contexts/BioContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEvents } from "@/contexts/EventsContext";
+import { usePlans } from "@/contexts/PlanContext";
 import { fetchPublicBio } from "@/lib/bio-store";
 import { TradingHoursScheduleView } from "@/components/discovery/TradingHoursScheduleView";
 import { resolvePublicBio } from "@/lib/bio-handle";
@@ -63,13 +64,15 @@ import {
   socialLinks,
   stackLinks,
 } from "@shared/bio";
-import type { PlanType } from "@shared/plan";
+import type { PlanType, HangoutPlan } from "@shared/plan";
 import { mapsPlaceIdUrl, mapsPlaceUrl } from "@/lib/maps";
 import { toPublicUrl } from "@/lib/public-origin";
 import { NotFoundPage } from "./NotFoundPage";
 import { cn } from "@/lib/cn";
 import { useClub } from "@/contexts/ClubContext";
 import { PingButton } from "@/components/social/PingButton";
+import { PlanGridCard } from "@/components/airpal/PlanGridCard";
+import { triggerHaptic } from "@/lib/native";
 
 /** Round action circle button with brand icon and subtitle */
 function BizCircle({
@@ -113,6 +116,7 @@ export function BioPublicPage() {
   const [, params] = useRoute(BIO_PUBLIC_PATH);
   const handle = normalizeHandle(params?.handle || params?.[0] || parseAtHandle(path) || "");
   const { user, requireUser } = useAuth();
+  const { plans } = usePlans();
   const { byHandle, recordTap, mine } = useBio();
   const { addGuest, joinClub } = useClub();
   const [listEmail, setListEmail] = useState("");
@@ -129,6 +133,19 @@ export function BioPublicPage() {
   const [tried, setTried] = useState(!handle);
   const [claim, setClaim] = useState<{ code: string; badge: string; detail: string } | null>(null);
   const viewed = useRef("");
+
+  const userPlans: HangoutPlan[] = useMemo(() => {
+    const target = remote || local;
+    if (!target) return [];
+    const h = target.handle.toLowerCase();
+    return plans.filter(
+      (p) =>
+        p.isPublic &&
+        p.status !== "cancelled" &&
+        ((p.creator?.handle && p.creator.handle.toLowerCase() === h) ||
+          (target.ownerUid && p.creator?.uid === target.ownerUid)),
+    );
+  }, [plans, remote, local]);
 
   useEffect(() => {
     const p = remote || local;
@@ -357,6 +374,7 @@ export function BioPublicPage() {
   const statusInfo = AVAILABILITY_STATUSES[statusKey] || AVAILABILITY_STATUSES.available;
 
   const handleQuickCopy = async () => {
+    void triggerHaptic("light");
     try {
       await navigator.clipboard.writeText(share);
       setCopiedLink(true);
@@ -482,19 +500,10 @@ export function BioPublicPage() {
               </span>
             </div>
 
-            {/* Profile Action Pill (Edit, Status, Claim, Connect) */}
+            {/* Profile Action Pill (Edit, Claim, Connect) */}
             <div className="mb-1 flex items-center gap-2">
               {isOwner ? (
                 <div className="flex items-center gap-1.5">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="gap-1.5 rounded-full border border-line bg-paper/80 px-3 text-xs font-semibold text-ink shadow-2xs hover:bg-paper active:scale-95"
-                    onClick={() => setStatusModalOpen(true)}
-                  >
-                    <Sparkles size={13} className="text-gold" />
-                    Status
-                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -502,7 +511,7 @@ export function BioPublicPage() {
                     onClick={() => nav("/bio/edit")}
                   >
                     <Edit3 size={13} />
-                    Edit
+                    Edit Profile
                   </Button>
                 </div>
               ) : unclaimed ? (
@@ -620,26 +629,27 @@ export function BioPublicPage() {
                 title={isOwner ? "Click to change status" : statusInfo.description}
               >
                 <span className="h-2 w-2 rounded-full bg-current shrink-0" />
-                <span>{statusInfo.label}</span>
-                {bio.customStatus && (
-                  <>
-                    <span className="opacity-40">·</span>
-                    <span className="font-normal text-ink/90 truncate max-w-[280px]">
-                      {bio.customStatusEmoji && `${bio.customStatusEmoji} `}
-                      {bio.customStatus}
-                    </span>
-                  </>
+                {bio.customStatus ? (
+                  <span className="font-bold text-ink truncate max-w-[320px] sm:max-w-md">
+                    {bio.customStatusEmoji && `${bio.customStatusEmoji} `}
+                    {bio.customStatus}
+                  </span>
+                ) : (
+                  <span className="font-bold">{statusInfo.label}</span>
                 )}
                 {isOwner && <Edit3 size={11} className="opacity-60 ml-0.5" />}
               </button>
             </div>
 
             {/* Elevator Pitch / Short Why */}
-            {bio.shortWhy && (
-              <p className="mt-3 text-[14px] sm:text-[15px] leading-relaxed text-ink/85 font-normal">
-                {bio.shortWhy}
-              </p>
-            )}
+            {bio.shortWhy &&
+              bio.shortWhy.trim().toLowerCase() !== bio.customStatus?.trim().toLowerCase() &&
+              bio.shortWhy.trim().toLowerCase() !==
+                `${bio.customStatusEmoji || ""} ${bio.customStatus || ""}`.trim().toLowerCase() && (
+                <p className="mt-3 text-[14px] sm:text-[15px] leading-relaxed text-ink/85 font-normal">
+                  {bio.shortWhy}
+                </p>
+              )}
 
             {/* Extended About Story Card */}
             {bio.aboutText && (
@@ -1026,6 +1036,27 @@ export function BioPublicPage() {
                     <span className="text-xs font-bold text-ink">{opt.label}</span>
                     <span className="mt-0.5 text-[10px] text-mute">{opt.sub}</span>
                   </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Public Plans & Hangouts created by this creator */}
+          {userPlans.length > 0 && (
+            <div className="mt-7">
+              <div className="flex items-center justify-between mb-3 px-0.5">
+                <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand flex items-center gap-1.5">
+                  <Sparkles size={13} className="text-brand" />
+                  <span>Plans & Hangouts</span>
+                </h3>
+                <span className="text-[10px] font-bold text-mute uppercase tracking-wider">
+                  {userPlans.length} {userPlans.length === 1 ? "Plan" : "Plans"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                {userPlans.map((plan) => (
+                  <PlanGridCard key={plan.id} plan={plan} />
                 ))}
               </div>
             </div>

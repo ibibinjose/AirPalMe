@@ -1,41 +1,115 @@
 import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
-import { Compass, Plus, Search } from "lucide-react";
+import {
+  Compass,
+  Plus,
+  Search,
+  Sparkles,
+  MapPin,
+  Calendar,
+  Clock,
+  Share2,
+  ArrowRight,
+  X,
+  Coffee,
+  Utensils,
+  Wine,
+  Footprints,
+  Car,
+  PartyPopper,
+  Heart,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { usePlans } from "@/contexts/PlanContext";
 import { useEvents } from "@/contexts/EventsContext";
-
 import { PlanGridCard } from "@/components/airpal/PlanGridCard";
-import { PillRow } from "@/components/design-system/companions";
-import { PLAN_TYPES } from "@shared/plan";
+import { PLAN_TYPES, formatPlanDate } from "@shared/plan";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { EVENT_NEAR_M, locatedNear } from "@/lib/location-scope";
+import { triggerHaptic, shareNative } from "@/lib/native";
+import { Photo } from "@/components/ui/Photo";
+import { cn } from "@/lib/cn";
+import { toast } from "sonner";
 
 type HubTab = "my" | "public" | "past" | "saved";
 type Category = "all" | "experience" | "milestone" | "social";
 
-const TABS: { id: HubTab; label: string; color: string }[] = [
-  { id: "my", label: "Upcoming", color: "#121614" },
-  { id: "public", label: "Discover", color: "#e86a33" },
-  { id: "past", label: "Past", color: "#6a726c" },
-  { id: "saved", label: "Saved", color: "#2fa866" },
+const TABS: { id: HubTab; label: string }[] = [
+  { id: "my", label: "Upcoming" },
+  { id: "public", label: "Discover" },
+  { id: "past", label: "Past" },
+  { id: "saved", label: "Saved" },
 ];
 
-const CATEGORIES: { id: Category; label: string; color: string }[] = [
-  { id: "all", label: "All", color: "#1805db" },
-  { id: "experience", label: "Experiences", color: "#e86a33" },
-  { id: "milestone", label: "Milestones", color: "#2b7cd3" },
-  { id: "social", label: "Social", color: "#2fa866" },
+const CATEGORIES: { id: Category; label: string }[] = [
+  { id: "all", label: "All Types" },
+  { id: "experience", label: "Experiences" },
+  { id: "milestone", label: "Milestones" },
+  { id: "social", label: "Social" },
 ];
 
-function templateSuggestions(city: string) {
-  const dest = city && city !== "Current location" && city !== "Choose a city" ? city : "Nearby";
-  return [
-    { label: "👨‍👩‍👧 Family brunch", destination: dest, type: "lunch" as const },
-    { label: "☕ Coffee with friends", destination: dest, type: "catchup" as const },
-    { label: "🌃 Night out nearby", destination: dest, type: "nightout" as const },
-    { label: "🚶 Walk nearby", destination: dest, type: "walk" as const },
-  ];
+const QUICK_STARTERS = [
+  {
+    icon: Coffee,
+    emoji: "☕",
+    label: "Coffee Catchup",
+    desc: "Quick coffee & chat",
+    type: "catchup" as const,
+    color: "from-amber-500/15 to-amber-700/10 text-amber-700 dark:text-amber-300",
+  },
+  {
+    icon: Utensils,
+    emoji: "🍽️",
+    label: "Family Brunch",
+    desc: "Weekend feast together",
+    type: "lunch" as const,
+    color: "from-orange-500/15 to-orange-700/10 text-orange-700 dark:text-orange-300",
+  },
+  {
+    icon: Wine,
+    emoji: "🍸",
+    label: "Night Out",
+    desc: "Drinks, music & vibes",
+    type: "nightout" as const,
+    color: "from-purple-500/15 to-purple-700/10 text-purple-700 dark:text-purple-300",
+  },
+  {
+    icon: Footprints,
+    emoji: "🏃",
+    label: "Walk & Talk",
+    desc: "Scenic trail or park walk",
+    type: "walk" as const,
+    color: "from-emerald-500/15 to-emerald-700/10 text-emerald-700 dark:text-emerald-300",
+  },
+  {
+    icon: Car,
+    emoji: "🚗",
+    label: "Road Trip",
+    desc: "Weekend getaway drive",
+    type: "trip" as const,
+    color: "from-blue-500/15 to-blue-700/10 text-blue-700 dark:text-blue-300",
+  },
+  {
+    icon: PartyPopper,
+    emoji: "🎉",
+    label: "Celebration",
+    desc: "Birthday or milestone",
+    type: "birthday" as const,
+    color: "from-rose-500/15 to-rose-700/10 text-rose-700 dark:text-rose-300",
+  },
+];
+
+function getCountdownBadge(date: string, time: string): string {
+  try {
+    const target = new Date(`${date}T${time || "12:00"}:00`);
+    if (Number.isNaN(target.getTime())) return "";
+    const diffDays = Math.ceil((target.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    if (diffDays <= 0) return "Today";
+    if (diffDays === 1) return "Tomorrow";
+    return `In ${diffDays} days`;
+  } catch {
+    return "";
+  }
 }
 
 export function PlanHubPage() {
@@ -48,6 +122,8 @@ export function PlanHubPage() {
   const [tab, setTab] = useState<HubTab>("my");
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState<Category>("all");
+
+  const effectiveCity = city && city !== "Choose a city" && city !== "Current location" ? city : "Sydney";
 
   const pastPlans = useMemo(() => {
     return plans.filter((p) => p.date < today || p.status === "completed").sort((a, b) => b.date.localeCompare(a.date));
@@ -65,6 +141,8 @@ export function PlanHubPage() {
       .filter((p) => locatedNear({ geo: p.geo, city: p.city || p.destination }, here, city, usingGps, EVENT_NEAR_M))
       .sort((a, b) => a.date.localeCompare(b.date));
   }, [publicPlans, today, here, city, usingGps]);
+
+  const nextUpcomingPlan = activeMyPlans[0] || null;
 
   const displayedPlans = useMemo(() => {
     let list = tab === "my" ? activeMyPlans : tab === "public" ? activePublicPlans : pastPlans;
@@ -112,136 +190,417 @@ export function PlanHubPage() {
     return rows;
   }, [savedEvents, calendarEvents]);
 
+  const handleSharePlan = async (e: React.MouseEvent, planId: string, planTitle: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    void triggerHaptic("medium");
+    const shareUrl = `${window.location.origin}/plan/${planId}`;
+    const shared = await shareNative({
+      title: planTitle,
+      text: `Join my plan "${planTitle}" on AirPal:`,
+      url: shareUrl,
+      dialogTitle: `Invite to ${planTitle}`,
+    });
+    if (!shared) {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("Invite link copied to clipboard!");
+      } catch {
+        toast.message("Share link ready: " + shareUrl);
+      }
+    }
+  };
+
+  const handleStarterClick = (starter: (typeof QUICK_STARTERS)[number]) => {
+    void triggerHaptic("light");
+    nav(
+      `/plan/new?title=${encodeURIComponent(starter.label)}&dest=${encodeURIComponent(effectiveCity)}&type=${starter.type}`,
+    );
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:py-10 pb-28">
-      {/* Header — Plans: one screen, one primary action */}
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="font-display text-[28px] md:text-4xl font-bold tracking-tight text-ink">Plans</h1>
+      {/* Header — Plans: Liquid Glass Title & Action */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
+              <MapPin size={12} className="shrink-0" />
+              <span>{effectiveCity}</span>
+            </span>
+            {activeMyPlans.length > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                {activeMyPlans.length} upcoming
+              </span>
+            )}
+          </div>
+          <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-ink md:text-4xl">
+            Plans & Invites
+          </h1>
+          <p className="mt-1 text-sm text-mute">
+            Coordinate hangouts, invite mates, and explore shared itineraries.
+          </p>
+        </div>
+
         <Button
-          onClick={() => nav("/plan/new")}
-          className="h-12 shrink-0 gap-1.5 rounded-full px-5 shadow-[0_6px_20px_rgba(24,5,219,0.35)]"
+          onClick={() => {
+            void triggerHaptic("medium");
+            nav("/plan/new");
+          }}
+          className="h-12 shrink-0 gap-2 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(24,5,219,0.28)] transition-transform active:scale-95"
         >
           <Plus size={18} strokeWidth={2.5} />
           <span>New Plan</span>
         </Button>
       </div>
 
-      <div className="mt-5">
-        <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1">
-          {templateSuggestions(city).map((item) => (
+      {/* Featured Spotlight: Next Upcoming Plan */}
+      {tab === "my" && nextUpcomingPlan && (
+        <div className="mt-6 overflow-hidden rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs transition-all hover:shadow-md md:p-6">
+          <div className="flex items-center justify-between gap-3 pb-3 border-b border-line/60">
+            <div className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand/15 text-brand">
+                <Sparkles size={13} />
+              </span>
+              <span className="text-xs font-bold uppercase tracking-wider text-brand">
+                Spotlight · Your Next Plan
+              </span>
+            </div>
+            {getCountdownBadge(nextUpcomingPlan.date, nextUpcomingPlan.time) && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-brand px-3 py-1 text-xs font-bold text-white shadow-xs">
+                <Clock size={12} />
+                {getCountdownBadge(nextUpcomingPlan.date, nextUpcomingPlan.time)}
+              </span>
+            )}
+          </div>
+
+          <div className="mt-4 grid gap-5 md:grid-cols-12 md:items-center">
+            {nextUpcomingPlan.heroImage && (
+              <div className="relative aspect-video md:aspect-4/3 md:col-span-4 overflow-hidden rounded-2xl ring-1 ring-line/40">
+                <Photo
+                  src={nextUpcomingPlan.heroImage}
+                  alt={nextUpcomingPlan.title}
+                  className="h-full w-full object-cover transition duration-500 hover:scale-105"
+                />
+              </div>
+            )}
+
+            <div className={cn("flex flex-col justify-between", nextUpcomingPlan.heroImage ? "md:col-span-8" : "md:col-span-12")}>
+              <div>
+                <h2 className="font-display text-xl font-bold text-ink md:text-2xl">
+                  {nextUpcomingPlan.title}
+                </h2>
+
+                <div className="mt-2.5 flex flex-wrap items-center gap-y-2 gap-x-4 text-xs font-medium text-mute md:text-sm">
+                  <span className="inline-flex items-center gap-1.5">
+                    <Calendar size={14} className="text-brand" />
+                    {formatPlanDate(nextUpcomingPlan.date, nextUpcomingPlan.time)}
+                  </span>
+                  {(nextUpcomingPlan.destination || nextUpcomingPlan.city) && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <MapPin size={14} className="text-emerald-500" />
+                      {nextUpcomingPlan.destination || nextUpcomingPlan.city}
+                    </span>
+                  )}
+                  {nextUpcomingPlan.stops.length > 0 && (
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 rounded-full bg-mute/60" />
+                      {nextUpcomingPlan.stops.length} stop{nextUpcomingPlan.stops.length === 1 ? "" : "s"}
+                    </span>
+                  )}
+                </div>
+
+                {nextUpcomingPlan.notes && (
+                  <p className="mt-2 line-clamp-2 text-xs text-mute/90 md:text-sm">
+                    {nextUpcomingPlan.notes}
+                  </p>
+                )}
+
+                {nextUpcomingPlan.attendees && nextUpcomingPlan.attendees.length > 0 && (
+                  <div className="mt-3.5 flex items-center gap-2">
+                    <div className="flex -space-x-2 overflow-hidden">
+                      {nextUpcomingPlan.attendees.slice(0, 5).map((att, idx) => (
+                        <div
+                          key={att.id || idx}
+                          className="inline-grid h-7 w-7 place-items-center rounded-full bg-paper font-semibold text-[11px] text-ink ring-2 ring-card shadow-xs"
+                          title={att.name}
+                        >
+                          {att.name.trim()[0]?.toUpperCase() || "•"}
+                        </div>
+                      ))}
+                    </div>
+                    <span className="text-xs font-semibold text-mute">
+                      {nextUpcomingPlan.attendees.filter((a) => a.status === "going").length} going
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <Button
+                  onClick={() => {
+                    void triggerHaptic("light");
+                    nav(`/plan/${nextUpcomingPlan.id}`);
+                  }}
+                  className="h-10 rounded-full px-5 font-bold shadow-xs text-sm"
+                >
+                  <span>View Itinerary</span>
+                  <ArrowRight size={15} />
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  onClick={(e) => handleSharePlan(e, nextUpcomingPlan.id, nextUpcomingPlan.title)}
+                  className="h-10 rounded-full px-4 text-xs font-semibold text-ink ring-1 ring-line hover:bg-mute/5"
+                >
+                  <Share2 size={14} className="mr-1.5" />
+                  <span>Share Invite</span>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Starter Templates */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-mute">
+            Quick Starters
+          </h2>
+          <span className="text-xs text-mute">1-tap to start</span>
+        </div>
+
+        <div className="no-scrollbar mt-3 flex items-center gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+          {QUICK_STARTERS.map((starter) => (
             <button
-              key={item.label}
+              key={starter.label}
               type="button"
-              onClick={() =>
-                nav(
-                  `/plan/new?title=${encodeURIComponent(item.label.slice(2).trim())}&dest=${encodeURIComponent(item.destination)}&type=${item.type}`,
-                )
-              }
-              className="shrink-0 rounded-full bg-brand/10 px-4 py-2 text-[13px] font-semibold text-brand transition active:scale-[0.97]"
+              onClick={() => handleStarterClick(starter)}
+              className="group flex w-44 shrink-0 flex-col justify-between rounded-2xl bg-card p-3.5 text-left ring-1 ring-line transition-all duration-200 hover:-translate-y-0.5 hover:ring-brand/30 hover:shadow-sm active:scale-95"
             >
-              {item.label}
+              <div className="flex items-center justify-between">
+                <span className="text-2xl">{starter.emoji}</span>
+                <span
+                  className={cn(
+                    "flex h-7 w-7 items-center justify-center rounded-xl bg-linear-to-br transition group-hover:scale-110",
+                    starter.color,
+                  )}
+                >
+                  <starter.icon size={15} />
+                </span>
+              </div>
+              <div className="mt-3">
+                <span className="block truncate text-sm font-bold text-ink">
+                  {starter.label}
+                </span>
+                <span className="block truncate text-[11px] text-mute">
+                  {starter.desc}
+                </span>
+              </div>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Tabs and Search Bar */}
-      <div className="mt-5">
-        <PillRow options={TABS} value={tab} onChange={setTab} label="Plan sections" />
-        <div className="relative mt-3">
-          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-mute" />
-          <input
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search plans…"
-            aria-label="Search plans"
-            className="h-12 w-full rounded-full bg-card pl-11 pr-4 text-[15px] text-ink shadow-[0_4px_16px_rgba(18,22,20,0.08)] ring-1 ring-line outline-none placeholder:text-mute focus:ring-2 focus:ring-brand/20"
-          />
+      {/* Tab Navigation & Search */}
+      <div className="mt-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            {TABS.map((t) => {
+              const active = tab === t.id;
+              const count =
+                t.id === "my"
+                  ? activeMyPlans.length
+                  : t.id === "public"
+                  ? activePublicPlans.length
+                  : t.id === "past"
+                  ? pastPlans.length
+                  : savedDetailed.length;
+
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => {
+                    void triggerHaptic("light");
+                    setTab(t.id);
+                  }}
+                  className={cn(
+                    "flex h-10 items-center gap-2 rounded-full px-4 text-xs font-bold transition-all active:scale-95",
+                    active
+                      ? "bg-brand text-white shadow-xs"
+                      : "bg-card text-mute hover:text-ink ring-1 ring-line/80 hover:bg-paper",
+                  )}
+                >
+                  <span>{t.label}</span>
+                  {count > 0 && (
+                    <span
+                      className={cn(
+                        "inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-extrabold",
+                        active ? "bg-white/20 text-white" : "bg-mute/15 text-mute",
+                      )}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Search and Category Filters */}
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-mute" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search plans by title, city, or stops…"
+              aria-label="Search plans"
+              className="h-11 w-full rounded-2xl bg-card pl-11 pr-9 text-sm text-ink ring-1 ring-line outline-none placeholder:text-mute focus:ring-2 focus:ring-brand/30"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-mute hover:text-ink p-1"
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1">
+            {CATEGORIES.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => {
+                  void triggerHaptic("light");
+                  setCategory(c.id);
+                }}
+                className={cn(
+                  "h-9 shrink-0 rounded-xl px-3 text-xs font-semibold ring-1 transition-all active:scale-95",
+                  category === c.id
+                    ? "bg-ink text-white ring-transparent shadow-xs"
+                    : "bg-card text-mute ring-line hover:text-ink hover:bg-paper",
+                )}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Category Filters */}
-      <div className="no-scrollbar mt-3 flex items-center gap-2 overflow-x-auto pb-1">
-        {CATEGORIES.map((c) => (
-          <button
-            key={c.id}
-            type="button"
-            onClick={() => setCategory(c.id)}
-            aria-pressed={category === c.id}
-            className="h-10 shrink-0 cursor-pointer touch-manipulation rounded-full px-4 text-[14px] font-semibold shadow-sm transition active:scale-[0.96] ring-1 ring-line"
-            style={
-              category === c.id
-                ? { backgroundColor: c.color, color: "#fff", borderColor: "transparent" }
-                : { backgroundColor: `${c.color}14`, color: c.color }
-            }
-          >
-            {c.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Plans List */}
-      <div className="mt-5">
+      {/* Main Content Area: Plans / Saved List */}
+      <div className="mt-6">
         {tab === "saved" ? (
           savedDetailed.length === 0 ? (
-            <div className="rounded-3xl ring-1 ring-line bg-card p-8 md:p-12 text-center shadow-xs">
+            <div className="rounded-3xl bg-card p-8 md:p-12 text-center ring-1 ring-line shadow-xs">
+              <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-600">
+                <Heart size={24} />
+              </div>
               <h2 className="font-display text-xl font-bold text-ink">Nothing saved yet</h2>
-              <p className="text-sm text-mute mt-1.5 max-w-md mx-auto">
-                Tap the heart on any place or event and it waits for you here.
+              <p className="mt-1.5 text-sm text-mute max-w-sm mx-auto">
+                Tap the heart on any event or experience in {effectiveCity} to save it here for upcoming hangouts.
               </p>
               <div className="mt-6">
-                <Button onClick={() => nav("/explore")} className="h-11 rounded-full px-6 shadow-xs font-bold">
-                  <span>Explore</span>
+                <Button
+                  onClick={() => {
+                    void triggerHaptic("light");
+                    nav("/explore");
+                  }}
+                  className="h-11 rounded-full px-6 font-bold shadow-xs"
+                >
+                  <span>Explore Events & Stays</span>
                 </Button>
               </div>
             </div>
           ) : (
-            <ul className="space-y-2">
+            <ul className="grid gap-3 sm:grid-cols-2">
               {savedDetailed.map(({ key, eventId, name, event }) => (
                 <li key={key}>
                   <button
                     type="button"
-                    onClick={() => nav(`/calendar?event=${eventId}`)}
-                    className="flex w-full cursor-pointer touch-manipulation items-center gap-3 rounded-2xl bg-card px-4 py-3.5 text-left ring-1 ring-line transition hover:ring-brand/30 active:scale-[0.99]"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      nav(`/calendar?event=${eventId}`);
+                    }}
+                    className="flex w-full cursor-pointer touch-manipulation items-center gap-3.5 rounded-2xl bg-card p-4 text-left ring-1 ring-line transition hover:ring-brand/30 hover:shadow-xs active:scale-[0.99]"
                   >
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 font-bold">
+                      <Calendar size={18} />
+                    </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[15px] font-semibold">
+                      <span className="block truncate text-sm font-bold text-ink">
                         {event?.title || name}
                       </span>
-                      <span className="mt-0.5 block truncate text-[13px] text-mute">
+                      <span className="mt-0.5 block truncate text-xs text-mute">
                         {event ? `${event.timeLabel}${event.venue ? ` · ${event.venue}` : ""}` : "Saved event"}
                       </span>
                     </span>
-                    <span className="shrink-0 text-[14px] font-semibold text-brand">Open →</span>
+                    <span className="shrink-0 text-xs font-bold text-brand flex items-center gap-1">
+                      View <ArrowRight size={13} />
+                    </span>
                   </button>
                 </li>
               ))}
             </ul>
           )
         ) : displayedPlans.length === 0 ? (
-          <div className="rounded-[24px] bg-card p-8 text-center shadow-[0_4px_16px_rgba(18,22,20,0.08)] ring-1 ring-line">
-            <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-[18px] bg-brand/10 text-brand">
+          <div className="rounded-3xl bg-card p-8 md:p-12 text-center ring-1 ring-line shadow-xs">
+            <div className="mx-auto mb-3.5 grid h-14 w-14 place-items-center rounded-2xl bg-brand/10 text-brand">
               <Compass size={28} />
             </div>
             <h2 className="font-display text-xl font-bold text-ink">
-              {searchQuery ? "No matches" : tab === "my" ? "No upcoming plans" : "Nothing here"}
+              {searchQuery
+                ? `No plans matched "${searchQuery}"`
+                : tab === "my"
+                ? "No upcoming plans scheduled"
+                : tab === "public"
+                ? "No public plans nearby"
+                : "No past plans recorded"}
             </h2>
-            <p className="text-sm text-mute mt-1 max-w-xs mx-auto">
-              {tab === "my" ? "Make a plan, share a link, go together." : "Check back soon."}
+            <p className="mt-1.5 text-sm text-mute max-w-sm mx-auto">
+              {searchQuery
+                ? "Try searching for a different destination, activity, or keyword."
+                : tab === "my"
+                ? "Create a hangout, invite friends with a shareable link, and experience it together."
+                : tab === "public"
+                ? "Be the first to host a public plan or experience in your city."
+                : "Your completed hangouts and experiences will appear here as memories."}
             </p>
-            <div className="mt-5">
-              <Button
-                onClick={() => nav("/plan/new")}
-                className="h-12 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(24,5,219,0.35)]"
-              >
-                <Plus size={16} />
-                <span>New Plan</span>
-              </Button>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              {searchQuery ? (
+                <Button
+                  variant="outlined"
+                  onClick={() => setSearchQuery("")}
+                  className="h-11 rounded-full px-5 text-xs font-semibold ring-1 ring-line"
+                >
+                  <span>Clear Search</span>
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => {
+                    void triggerHaptic("medium");
+                    nav("/plan/new");
+                  }}
+                  className="h-11 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(24,5,219,0.25)]"
+                >
+                  <Plus size={16} strokeWidth={2.5} />
+                  <span>Create a Plan</span>
+                </Button>
+              )}
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-x-3 gap-y-5 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
             {displayedPlans.map((plan) => (
               <PlanGridCard key={plan.id} plan={plan} dimmed={tab === "past"} />
             ))}
@@ -251,3 +610,4 @@ export function PlanHubPage() {
     </div>
   );
 }
+
