@@ -5,6 +5,7 @@ import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
 import { Share } from "@capacitor/share";
 import { App } from "@capacitor/app";
 import { registerNativePush } from "./notifications";
+import { toPublicUrl } from "./public-origin";
 
 /**
  * Modal back handler registry for Android hardware back button.
@@ -92,8 +93,11 @@ export async function triggerHaptic(
 }
 
 /**
+import { toPublicUrl } from "./public-origin";
+
+/**
  * Universal share function. Uses native iOS/Android system share sheet on native,
- * and navigator.share or clipboard fallback on web.
+ * and navigator.share or clipboard fallback on web. Always normalizes URL to https://airpal.me/...
  */
 export async function shareNative(options: {
   title?: string;
@@ -101,12 +105,13 @@ export async function shareNative(options: {
   url?: string;
   dialogTitle?: string;
 }): Promise<boolean> {
+  const url = toPublicUrl(options.url);
   if (isNativeApp()) {
     try {
       await Share.share({
         title: options.title,
         text: options.text,
-        url: options.url,
+        url,
         dialogTitle: options.dialogTitle || "Share via",
       });
       return true;
@@ -120,7 +125,7 @@ export async function shareNative(options: {
       await navigator.share({
         title: options.title,
         text: options.text,
-        url: options.url,
+        url,
       });
       return true;
     } catch {
@@ -147,7 +152,7 @@ export async function hideNativeSplash(options: { fadeOutDuration?: number } = {
 
 /**
  * Initialize native device features upon app launch.
- * Sets status bar overlays, brand background, hides splash, and registers back button handlers.
+ * Sets status bar overlays, brand background, hides splash, registers back button and deep link handlers.
  */
 export async function initNativeApp(
   options: {
@@ -176,6 +181,26 @@ export async function initNativeApp(
     } catch {
       /* inbox still works */
     }
+
+    // Handle incoming Universal Links & Deep Links (e.g. https://airpal.me/plan/plan-xyz or me.airpal.app://...)
+    App.addListener("appUrlOpen", (data: { url: string }) => {
+      if (!data?.url) return;
+      try {
+        const u = new URL(data.url);
+        const targetPath = `${u.pathname}${u.search}${u.hash}`;
+        if (targetPath && targetPath !== "/") {
+          window.history.pushState(null, "", targetPath);
+          window.dispatchEvent(new Event("popstate"));
+        }
+      } catch {
+        const match = data.url.match(/^(?:https?:\/\/[^/]+|[a-z0-9.-]+:\/\/)(.*)$/i);
+        if (match && match[1]) {
+          const target = match[1].startsWith("/") ? match[1] : `/${match[1]}`;
+          window.history.pushState(null, "", target);
+          window.dispatchEvent(new Event("popstate"));
+        }
+      }
+    });
 
     // Handle Android hardware back button with modal support
     App.addListener("backButton", ({ canGoBack }) => {

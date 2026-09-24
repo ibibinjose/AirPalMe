@@ -28,6 +28,7 @@ import {
 } from "@shared/event";
 import { Button } from "@/components/ui/Button";
 import { AuthGate } from "@/components/auth/AuthGate";
+import { publicSiteOrigin } from "@/lib/public-origin";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { makeQrDataUrl } from "@/lib/qr";
@@ -125,7 +126,7 @@ export function OrganiserEventPage() {
     setStartsLocal(toLocalInput(myEvent.startsAt));
     setEndsLocal(toLocalInput(myEvent.endsAt));
     setStatus(myEvent.status);
-    const origin = window.location.origin;
+    const origin = publicSiteOrigin();
     void makeQrDataUrl(`${origin}${myEvent.gatePath}`).then(setQr);
   }, [myEvent]);
 
@@ -746,7 +747,7 @@ export function OrganiserEventPage() {
                 variant="ghost"
                 className="flex-1"
                 onClick={() => {
-                  void navigator.clipboard.writeText(`${window.location.origin}${myEvent.gatePath}`).then(
+                  void navigator.clipboard.writeText(`${publicSiteOrigin()}${myEvent.gatePath}`).then(
                     () => toast.success("Link copied"),
                     () => toast.error("Couldn’t copy"),
                   );

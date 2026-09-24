@@ -1,6 +1,7 @@
 import QRCode from "qrcode";
 import jsQR from "jsqr";
 import { buildStayUrl, parseVanityOrMarkerPath, type StayUrlOptions } from "@shared/airpal-urls";
+import { publicSiteOrigin } from "./public-origin";
 
 export type QrIntent =
   | { kind: "stay"; propertyId: string; room?: string; roomToken?: string; type?: string }
@@ -11,7 +12,7 @@ export type QrIntent =
   | { kind: "unknown"; raw: string };
 
 export function stayQrPayload(propertyId: string, roomOrOptions: string | StayUrlOptions = "101") {
-  const origin = typeof window === "undefined" ? "https://airpal.me" : window.location.origin;
+  const origin = publicSiteOrigin();
   if (typeof roomOrOptions === "string") {
     return buildStayUrl(propertyId, { room: roomOrOptions, type: "room", origin });
   }

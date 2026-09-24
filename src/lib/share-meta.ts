@@ -1,3 +1,5 @@
+import { toPublicUrl } from "./public-origin";
+
 const DEFAULT_TITLE = "AirPal.Me · Life Made Easy.";
 const DEFAULT_DESCRIPTION = "Life Made Easy. People, places, things and experiences — made easier.";
 
@@ -113,7 +115,7 @@ export function applyRouteMeta(pathname: string) {
   if (typeof document === "undefined") return;
   const meta = routeMetaFor(pathname);
   if (!meta) return;
-  setShareMeta({ ...meta, url: `${window.location.origin}${meta.path}` });
+  setShareMeta({ ...meta, url: toPublicUrl(meta.path) });
 }
 
 export function setShareMeta(input: { title: string; description: string; image?: string; url?: string }) {
@@ -135,18 +137,19 @@ export function setShareMeta(input: { title: string; description: string; image?
   set("twitter:title", input.title, "name");
   set("twitter:description", input.description, "name");
   if (input.image) {
-    const image = input.image.startsWith("http") ? input.image : `${window.location.origin}${input.image}`;
+    const image = input.image.startsWith("http") ? input.image : toPublicUrl(input.image);
     set("og:image", image);
     set("twitter:image", image, "name");
   }
   if (input.url) {
-    set("og:url", input.url);
+    const canonicalUrl = toPublicUrl(input.url);
+    set("og:url", canonicalUrl);
     let canonical = document.head.querySelector('link[rel="canonical"]');
     if (!canonical) {
       canonical = document.createElement("link");
       canonical.setAttribute("rel", "canonical");
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute("href", input.url);
+    canonical.setAttribute("href", canonicalUrl);
   }
 }

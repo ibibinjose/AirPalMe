@@ -17,6 +17,7 @@ import { useLocation } from "wouter";
 import { toast } from "sonner";
 import type { CalendarEvent } from "@shared/event";
 import { useEvents } from "@/contexts/EventsContext";
+import { toPublicUrl } from "@/lib/public-origin";
 import { useCalendarDrag } from "./CalendarDragContext";
 import { AddToCalendarMenu } from "./AddToCalendarMenu";
 import {
@@ -63,7 +64,7 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
   const categoryTheme = CATEGORY_THEMES[event.category] || CATEGORY_THEMES.market;
 
   const handleShare = async () => {
-    const url = window.location.origin + (event.gatePath || `/calendar?event=${event.id}`);
+    const url = toPublicUrl(event.gatePath || `/calendar?event=${event.id}`);
     if (navigator.share) {
       try {
         await navigator.share({

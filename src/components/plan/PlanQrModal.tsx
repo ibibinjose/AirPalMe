@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { triggerHaptic, shareNative } from "@/lib/native";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { exportPlanItineraryPdf } from "@/lib/plan-pdf";
+import { publicSiteOrigin, toPublicUrl } from "@/lib/public-origin";
 
 interface PlanQrModalProps {
   plan: HangoutPlan;
@@ -21,8 +22,8 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
   const [copied, setCopied] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
 
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://airpal.me";
-  const inviteUrl = planInviteUrl(plan.id, origin);
+  const origin = publicSiteOrigin();
+  const inviteUrl = toPublicUrl(planInviteUrl(plan.id, origin));
 
   const typeInfo = PLAN_TYPES[plan.type] || PLAN_TYPES.custom;
   const occasionBadge =

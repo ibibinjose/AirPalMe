@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { shareNative, triggerHaptic } from "@/lib/native";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import { publicSiteOrigin, toPublicUrl } from "@/lib/public-origin";
 
 export function PlanShareModal({ plan, open, onClose }: { plan: HangoutPlan; open: boolean; onClose: () => void }) {
   useScrollLock(open);
@@ -13,8 +14,8 @@ export function PlanShareModal({ plan, open, onClose }: { plan: HangoutPlan; ope
   const [copied, setCopied] = useState(false);
   const [qrUrl, setQrUrl] = useState<string>("");
 
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://airpal.me";
-  const inviteUrl = planInviteUrl(plan.id, origin);
+  const origin = publicSiteOrigin();
+  const inviteUrl = toPublicUrl(planInviteUrl(plan.id, origin));
 
   const shareText = `Hey mates! Join our plan: "${plan.title}" on ${formatPlanDate(plan.date, plan.time)}. Check out the stops and RSVP here: ${inviteUrl}`;
 

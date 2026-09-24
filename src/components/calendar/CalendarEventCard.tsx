@@ -35,6 +35,7 @@ import {
 import { cn } from "@/lib/cn";
 import { track } from "@/lib/analytics";
 import { triggerHaptic, shareNative } from "@/lib/native";
+import { toPublicUrl } from "@/lib/public-origin";
 
 interface CalendarEventCardProps {
   event: CalendarEvent;
@@ -86,7 +87,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
     e.stopPropagation();
     void triggerHaptic("light");
     void track("calendar_event_share", { eventId: event.id, name: event.title, action: "share" });
-    const url = window.location.origin + (event.gatePath || `/calendar?event=${event.id}`);
+    const url = toPublicUrl(event.gatePath || `/calendar?event=${event.id}`);
     const shared = await shareNative({
       title: event.title,
       text: `${event.title} in ${event.city} on ${event.timeLabel}`,

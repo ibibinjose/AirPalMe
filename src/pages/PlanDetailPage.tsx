@@ -33,6 +33,7 @@ import { InvitationCard } from "@/components/plan/InvitationCard";
 import { ItineraryPreview } from "@/components/plan/ItineraryPreview";
 import { PlanShareModal } from "@/components/plan/PlanShareModal";
 import { PlanQrModal } from "@/components/plan/PlanQrModal";
+import { toPublicUrl } from "@/lib/public-origin";
 import { PlanRsvpSheet } from "@/components/plan/PlanRsvpSheet";
 import { PlanGroupHeader } from "@/components/plan/PlanGroupHeader";
 import { PlanDiscussionWall } from "@/components/plan/PlanDiscussionWall";
@@ -106,7 +107,7 @@ export function PlanDetailPage() {
       description:
         `${plan.title} in ${where}${plan.date ? ` on ${plan.date}` : ""} — join the plan on AirPal.Me.`.slice(0, 160),
       image: plan.heroImage || undefined,
-      url: `${window.location.origin}/plan/${plan.id}`,
+      url: toPublicUrl(`/plan/${plan.id}`),
     });
   }, [plan]);
 

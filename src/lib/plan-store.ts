@@ -10,9 +10,20 @@ import {
   reorderStops,
   stopChangeRecipients,
 } from "@shared/plan";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  onSnapshot,
+  setDoc,
+  deleteDoc,
+} from "firebase/firestore";
 import { getFirebaseDb, isFirebaseConfigured } from "./firebase";
-import { collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, deleteDoc, where } from "firebase/firestore";
 import { omitUndefinedDeep } from "./firestore-data";
+import { publicSiteOrigin } from "./public-origin";
 
 const STORAGE_KEY = "airpal.plans.v3";
 
@@ -448,7 +459,7 @@ export function generatePlanIcs(plan: HangoutPlan): string {
   const formatIcsTime = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 
   const stopsSummary = plan.stops.map((s, i) => `${i + 1}. ${s.name}${s.time ? ` (${s.time})` : ""}`).join("\\n");
-  const fullDesc = `${plan.notes || ""}\\n\\nItinerary:\\n${stopsSummary}\\n\\nCreated on AirPal.Me: ${planInviteUrl(plan.id, typeof window !== "undefined" ? window.location.origin : "https://airpal.me")}`;
+  const fullDesc = `${plan.notes || ""}\\n\\nItinerary:\\n${stopsSummary}\\n\\nCreated on AirPal.Me: ${planInviteUrl(plan.id, publicSiteOrigin())}`;
 
   return [
     "BEGIN:VCALENDAR",
@@ -490,7 +501,7 @@ export function getPlanGoogleCalendarUrl(plan: HangoutPlan): string {
   const formatIsoUtc = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
 
   const stopsSummary = plan.stops.map((s, i) => `${i + 1}. ${s.name}${s.time ? ` (${s.time})` : ""}`).join("\n");
-  const details = `${plan.notes || ""}\n\nItinerary:\n${stopsSummary}\n\nAirPal Invite: ${planInviteUrl(plan.id, typeof window !== "undefined" ? window.location.origin : "https://airpal.me")}`;
+  const details = `${plan.notes || ""}\n\nItinerary:\n${stopsSummary}\n\nAirPal Invite: ${planInviteUrl(plan.id, publicSiteOrigin())}`;
 
   const params = new URLSearchParams({
     action: "TEMPLATE",

@@ -16,6 +16,7 @@ import {
   redeemPointsRemote,
 } from "@/lib/promotions";
 import { targetHref, type Promotion } from "@shared/promotions";
+import { toPublicUrl } from "@/lib/public-origin";
 
 export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }) {
   const { id } = useParams<{ id: string }>();
@@ -119,7 +120,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
   }
 
   async function share() {
-    const url = `${window.location.origin}${window.location.pathname}${user ? `?ref=${user.uid}` : ""}`;
+    const url = toPublicUrl(`${window.location.pathname}${user ? `?ref=${user.uid}` : ""}`);
     try {
       if (navigator.share) {
         await navigator.share({ title: promo?.title || "AirPal.Me", text: "Discover. Experience. Win.", url });

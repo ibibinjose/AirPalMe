@@ -106,9 +106,20 @@ export type StayUrlOptions = {
   origin?: string;
 };
 
+function safeOrigin(customOrigin?: string): string {
+  if (customOrigin) return customOrigin.replace(/\/$/, "");
+  if (typeof window !== "undefined" && window.location?.origin) {
+    const o = window.location.origin;
+    if (!o.startsWith("capacitor:") && !o.startsWith("ionic:") && !o.startsWith("file:")) {
+      return o;
+    }
+  }
+  return "https://airpal.me";
+}
+
 /** Build guest stay URL. Prefer opaque ?r=; fall back to ?room= for legacy. */
 export function buildStayUrl(propertyId: string, options: StayUrlOptions = {}): string {
-  const origin = options.origin ?? (typeof window !== "undefined" ? window.location.origin : "https://airpal.me");
+  const origin = safeOrigin(options.origin);
   const params = new URLSearchParams();
   if (options.roomToken) {
     params.set("r", options.roomToken);
@@ -124,12 +135,12 @@ export function buildStayUrl(propertyId: string, options: StayUrlOptions = {}): 
 }
 
 export function buildMarkerUrl(markerId: string, origin?: string): string {
-  const base = origin ?? (typeof window !== "undefined" ? window.location.origin : "https://airpal.me");
+  const base = safeOrigin(origin);
   return `${base}/q/${encodeURIComponent(markerId)}`;
 }
 
 export function buildVanityUrl(city: string, handle: string, origin?: string): string {
-  const base = origin ?? (typeof window !== "undefined" ? window.location.origin : "https://airpal.me");
+  const base = safeOrigin(origin);
   return `${base}/q/${encodeURIComponent(slugifyCity(city))}/${encodeURIComponent(slugifyHandle(handle))}`;
 }
 

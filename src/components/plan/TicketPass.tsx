@@ -3,6 +3,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { Ticket } from "lucide-react";
 import { getFirebaseDb } from "@/lib/firebase";
 import { makeQrDataUrl } from "@/lib/qr";
+import { publicSiteOrigin } from "@/lib/public-origin";
 import type { Booking } from "@shared/booking";
 
 export function TicketPass({ bookingId }: { bookingId: string }) {
@@ -16,7 +17,7 @@ export function TicketPass({ bookingId }: { bookingId: string }) {
       if (!snap.exists()) return;
       const row = { id: snap.id, ...(snap.data() as Omit<Booking, "id">) };
       setBooking(row);
-      const origin = typeof window !== "undefined" ? window.location.origin : "https://airpal.me";
+      const origin = publicSiteOrigin();
       const href = row.planId
         ? `${origin}/plan/${row.planId}?ticket=${row.id}`
         : `${origin}/experiences?ticket=${row.id}`;

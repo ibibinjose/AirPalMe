@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/Button";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { useEvents } from "@/contexts/EventsContext";
 import { formatRelativeBadge } from "@/lib/calendar-utils";
-import { shareContent } from "@/lib/share";
 import { setShareMeta } from "@/lib/share-meta";
+import { toPublicUrl } from "@/lib/public-origin";
 import { cn } from "@/lib/cn";
 import { track } from "@/lib/analytics";
+import { shareNative } from "@/lib/native";
 import { AddToTripSheet } from "@/components/plan/AddToTripSheet";
 import type { CalendarEvent } from "@shared/event";
 import type { NearbyEvent } from "@shared/nearby";
@@ -64,7 +65,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
       title: `${event.title} · AirPal`,
       description: `${event.title} in ${event.city} on ${event.timeLabel} — find it on AirPal.Me.`.slice(0, 160),
       image: event.heroImage || undefined,
-      url: `${window.location.origin}/e/${event.id}`,
+      url: toPublicUrl(`/e/${event.id}`),
     });
   }, [event.id, event.title, event.city, event.timeLabel, event.heroImage]);
 
@@ -74,13 +75,14 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
   const [tripOpen, setTripOpen] = useState(false);
 
   const handleShare = async () => {
-    await shareContent({
+    const shared = await shareNative({
       title: event.title,
       text: `${event.title} in ${event.city} on ${event.timeLabel}`,
-      url: window.location.href,
-      dialogTitle: `Share ${event.title}`,
-      copiedMessage: "Event link copied to clipboard",
+      url: toPublicUrl(`/e/${event.id}`),
     });
+    if (!shared) {
+      toast.success("Event link copied to clipboard");
+    }
   };
 
   const openDirections = () => {
@@ -292,7 +294,7 @@ function NearbyEventDetailView({ event: ev }: { event: NearbyEvent }) {
       title: `${ev.title} · AirPal`,
       description: `${ev.title} — ${ev.insiderTip || ev.detail || "find it on AirPal.Me."}`.slice(0, 160),
       image: ev.heroImage || undefined,
-      url: `${window.location.origin}/e/${ev.id}`,
+      url: toPublicUrl(`/e/${ev.id}`),
     });
   }, [ev.id, ev.title, ev.insiderTip, ev.detail, ev.heroImage]);
   return (
