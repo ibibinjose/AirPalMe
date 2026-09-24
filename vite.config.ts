@@ -77,11 +77,12 @@ export default defineConfig({
   },
   envDir: path.resolve(import.meta.dirname),
   publicDir: path.resolve(import.meta.dirname, "public"),
-  build: {
+    build: {
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
     // Don't fail the build when a dep ships without source maps.
     sourcemap: true,
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -97,7 +98,17 @@ export default defineConfig({
           ) {
             return "vendor-firebase-lazy";
           }
-          if (id.includes("firebase")) return "vendor-firebase";
+          if (id.includes("firebase/firestore") || id.includes("@firebase/firestore")) {
+            return "vendor-firebase-firestore";
+          }
+          if (
+            id.includes("firebase/auth") ||
+            id.includes("@firebase/auth") ||
+            id.includes("@capacitor-firebase/authentication")
+          ) {
+            return "vendor-firebase-auth";
+          }
+          if (id.includes("firebase")) return "vendor-firebase-core";
           if (id.includes("/react/") || id.includes("/react-dom/") || id.includes("/scheduler/")) return "vendor-react";
           if (id.includes("leaflet")) return "vendor-maps";
           if (id.includes("qrcode") || id.includes("jsqr")) return "vendor-qr";

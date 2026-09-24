@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "wouter";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
-import { ArrowLeft, Megaphone, Plus } from "lucide-react";
+import { addDoc, collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
+import { ArrowLeft, Crown, Megaphone, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PayoutSetupCard } from "@/components/connect/PayoutSetupCard";
 import { completePaidBookingRemote } from "@/lib/functions";
 import type { Booking } from "@shared/booking";
+import { isSubscriptionActive, type BusinessSubscription } from "@shared/subscription";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { cn } from "@/lib/cn";
@@ -47,6 +48,21 @@ export function BusinessCampaignsPage() {
   const [error, setError] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const [roster, setRoster] = useState<Record<string, BookingRow[]>>({});
+  const [partner, setPartner] = useState(false);
+
+  // C4 — campaigns are the Partner tool; rows stay visible, creation gates.
+  useEffect(() => {
+    const db = getFirebaseDb();
+    if (!db || !isFirebaseConfigured || !user) {
+      setPartner(false);
+      return;
+    }
+    void getDoc(doc(db, "business_subscriptions", user.uid))
+      .then((snap) => {
+        setPartner(snap.exists() && isSubscriptionActive(snap.data() as BusinessSubscription));
+      })
+      .catch(() => setPartner(false));
+  }, [user]);
 
   const reload = useCallback(async () => {
     const db = getFirebaseDb();
@@ -160,11 +176,26 @@ export function BusinessCampaignsPage() {
       </p>
       <PayoutSetupCard />
 
-      <Button className="mt-4" onClick={() => setShowForm(!showForm)}>
-        <Plus size={16} /> {showForm ? "Close brief" : "New campaign"}
-      </Button>
+      {partner ? (
+        <Button className="mt-4" onClick={() => setShowForm(!showForm)}>
+          <Plus size={16} /> {showForm ? "Close brief" : "New campaign"}
+        </Button>
+      ) : (
+        <div className="mt-4 rounded-2xl border border-line bg-card p-4">
+          <p className="flex items-center gap-1.5 text-[13px] font-semibold">
+            <Crown size={14} className="text-gold" /> Campaigns are a Partner tool
+          </p>
+          <p className="mt-1 text-[13px] text-mute">
+            Your place, offers, and bookings stay free. Become a Partner on your business page to file campaigns
+            that fill seats.
+          </p>
+          <Link href="/business" className="mt-3 inline-block rounded-full bg-ink px-5 py-2.5 text-[14px] font-semibold text-white">
+            Open Partner on /business
+          </Link>
+        </div>
+      )}
 
-      {showForm && (
+      {showForm && partner && (
         <div className="mt-3 space-y-3 rounded-2xl border border-line bg-card p-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block">

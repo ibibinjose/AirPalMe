@@ -1,18 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { addDoc, collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { Star } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { createSubmitGuard } from "@/lib/submit-guard";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { logAdminAction } from "@/lib/admin-audit";
 import { getDoc } from "firebase/firestore";
-import { completePaidBookingRemote, createBookingCheckoutSessionRemote } from "@/lib/functions";
+import { completePaidBookingRemote, createBookingCheckoutSessionRemote, payBookingBalanceRemote, refundPaidBookingRemote } from "@/lib/functions";
 import {
+  balanceDueCents,
   bookingValid,
   canCustomerCancel,
   canProviderComplete,
   canProviderConfirm,
+  canRefundPaid,
   canRetryPayout,
+  experienceReviewValid,
   DEFAULT_FEE_CONFIG,
   paymentStatusForPrice,
   payoutStatusForPrice,
@@ -57,13 +61,16 @@ export function BookingsSection() {
   // checkout session for the same booking (double charge risk).
   const guardRef = useRef(createSubmitGuard());
 
+  const [balances, setBalances] = useState<Record<string, number>>({});
+
   async function reload(uid: string) {
     const db = getFirebaseDb();
     if (!db) return;
     try {
-      const [asCustomer, asProvider] = await Promise.all([
+      const [asCustomer, asProvider, ledger] = await Promise.all([
         getDocs(query(collection(db, "bookings"), where("customerUid", "==", uid))),
         getDocs(query(collection(db, "bookings"), where("providerUid", "==", uid))),
+        getDocs(query(collection(db, "plan_bookings"), where("guestUid", "==", uid))),
       ]);
       const seen = new Map<string, Booking>();
       for (const d of [...asCustomer.docs, ...asProvider.docs]) {
@@ -72,14 +79,25 @@ export function BookingsSection() {
       const list = Array.from(seen.values());
       list.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
       setRows(list);
+      // C2 — remaining balance per deposit ledger, computed from server totals.
+      const due: Record<string, number> = {};
+      for (const d of ledger.docs) {
+        const row = d.data() as { totalAmount?: number; amountPaidCents?: number; status?: string };
+        if (row.status !== "confirmed") continue;
+        const left = balanceDueCents(Math.round(Number(row.totalAmount || 0) * 100), Number(row.amountPaidCents || 0));
+        if (left > 0) due[d.id] = left;
+      }
+      setBalances(due);
     } catch {
       setRows([]);
+      setBalances({});
     }
   }
 
   useEffect(() => {
     if (!user) {
       setRows([]);
+      setBalances({});
       return;
     }
     void reload(user.uid);
@@ -95,6 +113,74 @@ export function BookingsSection() {
         window.location.href = res.checkoutUrl;
         return;
       }
+      await reload(user.uid);
+    } finally {
+      guardRef.current.release();
+      setBusy(null);
+    }
+  }
+
+  async function payBalance(planBookingId: string) {
+    if (!user) return;
+    if (!guardRef.current.tryAcquire()) return;
+    setBusy(planBookingId);
+    try {
+      const res = await payBookingBalanceRemote({ planBookingId });
+      if (res.checkoutUrl) {
+        window.location.href = res.checkoutUrl;
+        return;
+      }
+      await reload(user.uid);
+    } finally {
+      guardRef.current.release();
+      setBusy(null);
+    }
+  }
+
+  const [reviewFor, setReviewFor] = useState<string | null>(null);
+  const [stars, setStars] = useState(5);
+  const [reviewText, setReviewText] = useState("");
+  const [savingReview, setSavingReview] = useState(false);
+
+  // C5 — one review per completed paid experience booking (doc id = booking id).
+  async function submitReview(b: Booking) {
+    const db = getFirebaseDb();
+    if (!db || !user || !experienceReviewValid(stars, reviewText)) return;
+    if (!guardRef.current.tryAcquire()) return;
+    setSavingReview(true);
+    try {
+      const existing = await getDoc(doc(db, "experience_reviews", b.id));
+      if (existing.exists()) {
+        setReviewFor(null);
+        return;
+      }
+      const now = new Date().toISOString();
+      const guestName = user.displayName?.trim().split(/\s+/)[0]?.slice(0, 40) || "Guest";
+      await setDoc(doc(db, "experience_reviews", b.id), {
+        guestUid: user.uid,
+        planId: b.planId,
+        bookingId: b.id,
+        rating: stars,
+        reviewText: reviewText.trim(),
+        guestName,
+        createdAt: now,
+        updatedAt: now,
+      });
+      setReviewFor(null);
+      setReviewText("");
+      setStars(5);
+    } finally {
+      guardRef.current.release();
+      setSavingReview(false);
+    }
+  }
+
+  async function refund(b: Booking) {
+    if (!user) return;
+    if (!guardRef.current.tryAcquire()) return;
+    setBusy(b.id);
+    try {
+      await refundPaidBookingRemote({ bookingId: b.id });
       await reload(user.uid);
     } finally {
       guardRef.current.release();
@@ -174,6 +260,16 @@ export function BookingsSection() {
                     Pay now
                   </Button>
                 )}
+                {mine && balances[b.id] !== undefined && balances[b.id]! > 0 && (
+                  <Button
+                    size="sm"
+                    disabled={busy === b.id}
+                    loading={busy === b.id}
+                    onClick={() => void payBalance(b.id)}
+                  >
+                    Pay balance ${(balances[b.id]! / 100).toFixed(0)}
+                  </Button>
+                )}
                 {mine && canCustomerCancel(b.status) && (
                   <Button
                     size="sm"
@@ -204,7 +300,69 @@ export function BookingsSection() {
                     Get paid
                   </Button>
                 )}
+                {!mine && canRefundPaid(b, user.uid, isAdmin) === null && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={busy === b.id}
+                    loading={busy === b.id}
+                    onClick={() => void refund(b)}
+                  >
+                    Refund guest
+                  </Button>
+                )}
+                {mine &&
+                  b.status === "completed" &&
+                  b.paymentStatus === "paid" &&
+                  b.providerKind === "host" &&
+                  b.planId && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        setReviewFor(reviewFor === b.id ? null : b.id);
+                        setStars(5);
+                        setReviewText("");
+                      }}
+                    >
+                      Review experience
+                    </Button>
+                  )}
               </span>
+              {reviewFor === b.id && (
+                <span className="mt-2 block rounded-2xl bg-paper p-3 ring-1 ring-line/60">
+                  <span className="flex items-center gap-1" role="group" aria-label="Your rating">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setStars(s)}
+                        aria-label={`${s} star${s === 1 ? "" : "s"}`}
+                        aria-pressed={stars === s}
+                        className="cursor-pointer touch-manipulation p-1"
+                      >
+                        <Star size={20} className={s <= stars ? "fill-gold text-gold" : "text-mute"} />
+                      </button>
+                    ))}
+                  </span>
+                  <textarea
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
+                    rows={2}
+                    maxLength={500}
+                    placeholder="How was it? (optional)"
+                    className="mt-2 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
+                  />
+                  <span className="mt-2 flex gap-1.5">
+                    <Button size="sm" disabled={savingReview} loading={savingReview} onClick={() => void submitReview(b)}>
+                      Submit review
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setReviewFor(null)}>
+                      Cancel
+                    </Button>
+                  </span>
+                </span>
+              )}
             </li>
           );
         })}

@@ -1,18 +1,24 @@
 import { describe, expect, it } from "vitest";
 import {
+  balanceDueCents,
+  bookingFeesMatch,
   bookingValid,
+  canRefundPaid,
+  experienceReviewValid,
   canCustomerCancel,
   canProviderComplete,
   canProviderConfirm,
   canReleasePayout,
   canRetryPayout,
   checkoutPaymentCollected,
+  DEFAULT_FEE_CONFIG,
   isBookingStatus,
   paymentStatusForPrice,
   payoutStatusAfterGuestPaid,
   payoutStatusForPrice,
   isBusinessProviderBooking,
   isOpenProviderBooking,
+  providerShareCents,
   quoteFees,
 } from "./booking";
 
@@ -130,6 +136,55 @@ describe("booking engine", () => {
         priceCents: 8000,
       }),
     ).toBe(false);
+  });
+
+  it("matches stored fees against the admin config quote", () => {
+    const admin = { platformFeeBps: 2000, minimumPlatformFeeCents: 100 };
+    const quoted = quoteFees(8000, admin);
+    expect(bookingFeesMatch({ priceCents: 8000, feeCents: quoted.feeCents }, admin)).toBe(true);
+    // Stale client fee from an older config no longer matches.
+    const stale = quoteFees(8000, DEFAULT_FEE_CONFIG);
+    expect(stale.feeCents).not.toBe(quoted.feeCents);
+    expect(bookingFeesMatch({ priceCents: 8000, feeCents: stale.feeCents }, admin)).toBe(false);
+  });
+
+  it("computes the remaining balance without going negative", () => {
+    expect(balanceDueCents(8000, 2000)).toBe(6000);
+    expect(balanceDueCents(8000, 8000)).toBe(0);
+    expect(balanceDueCents(8000, 9000)).toBe(0);
+    expect(balanceDueCents(NaN, 100)).toBe(0);
+    expect(balanceDueCents(8000, NaN)).toBe(8000);
+  });
+
+  it("validates experience reviews", () => {
+    expect(experienceReviewValid(5, "Sold out show, great host.")).toBe(true);
+    expect(experienceReviewValid(4, "")).toBe(true);
+    expect(experienceReviewValid(0, "No show.")).toBe(false);
+    expect(experienceReviewValid(6, "ok")).toBe(false);
+    expect(experienceReviewValid(4.5, "ok")).toBe(false);
+    expect(experienceReviewValid(3, "x".repeat(501))).toBe(false);
+  });
+
+  it("guards paid refunds before any money moves", () => {
+    const held = { paymentStatus: "paid" as const, payoutStatus: "held" as const, providerUid: "host-1", status: "confirmed" as const };
+    expect(canRefundPaid(held, "host-1", false)).toBe(null);
+    expect(canRefundPaid(held, "admin-1", true)).toBe(null);
+    expect(canRefundPaid(held, "stranger", false)).toBe("Only the provider can refund this booking.");
+    expect(
+      canRefundPaid({ ...held, paymentStatus: "unpaid" }, "host-1", false),
+    ).toBe("There is no completed payment to refund.");
+    expect(
+      canRefundPaid({ ...held, payoutStatus: "transferred" }, "host-1", false),
+    ).toBe("Already paid out — contact support.");
+    expect(canRefundPaid({ ...held, status: "refunded" }, "host-1", false)).toBe("Already refunded.");
+  });
+
+  it("pays the provider from the server-stamped fee", () => {
+    expect(providerShareCents({ priceCents: 8000, feeCents: 1200 })).toBe(6800);
+    // Legacy rows without a stamped fee fall back to the config quote.
+    expect(providerShareCents({ priceCents: 8000, feeCents: NaN })).toBe(
+      quoteFees(8000).providerCents,
+    );
   });
 
   it("scopes business inbox to the owning provider", () => {

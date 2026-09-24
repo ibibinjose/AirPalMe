@@ -6,6 +6,7 @@ import type { HangoutPlan, PlanAttendee } from "../../shared/plan";
 import { isSoldOut, spotsLeft } from "../../shared/plan";
 import {
   DEFAULT_FEE_CONFIG,
+  balanceDueCents,
   canProviderComplete,
   checkoutPaymentCollected,
   canReleasePayout,
@@ -525,6 +526,14 @@ export const createBookingCheckoutSession = onCall(STRIPE_CALLABLE, async (reque
     return { ok: true, mode: "free", bookingId };
   }
 
+  // C1 — the server is the fee authority: restamp from live admin config so a
+  // stale or tampered client fee can never reach the ledger or the payout.
+  const liveFees = quoteFees(booking.priceCents, await loadFeeConfig());
+  if (booking.feeCents !== liveFees.feeCents) {
+    await ref.update({ feeCents: liveFees.feeCents, updatedAt: new Date().toISOString() });
+    booking.feeCents = liveFees.feeCents;
+  }
+
   if (!stripeLiveConfigured()) {
     throw new HttpsError(
       "failed-precondition",
@@ -586,6 +595,128 @@ export const createBookingCheckoutSession = onCall(STRIPE_CALLABLE, async (reque
   return { ok: true, mode: "live_stripe", bookingId, sessionId: session.id, checkoutUrl: session.url };
 });
 
+/**
+ * C2 — collect the remaining balance on a deposit booking via a second
+ * Checkout session. The server recomputes the remainder from the ledger
+ * (`plan_bookings.amountPaidCents`), never from client input. The balance is
+ * its own `bookings` row (parentBookingId) so fees, payout holds, and refunds
+ * stay per-payment on the one engine.
+ */
+export const payBookingBalance = onCall(STRIPE_CALLABLE, async (request) => {
+  await noteAppCheck(request, "payBookingBalance");
+  const uid = requireAuth(request.auth?.uid);
+  await enforceRateLimit(uid, "pay", isAnonymousAuth(request));
+  const planBookingId = String(
+    (request.data as { planBookingId?: string } | undefined)?.planBookingId || "",
+  ).trim();
+  if (!planBookingId) throw new HttpsError("invalid-argument", "planBookingId is required.");
+
+  const ledgerRef = db.collection("plan_bookings").doc(planBookingId);
+  const ledgerSnap = await ledgerRef.get();
+  if (!ledgerSnap.exists) throw new HttpsError("not-found", "Booking record not found.");
+  const ledger = ledgerSnap.data() as {
+    guestUid?: string;
+    planId?: string;
+    status?: string;
+    totalAmount?: number;
+    amountPaidCents?: number;
+    spots?: number;
+    currency?: string;
+  };
+  if (ledger.guestUid !== uid) {
+    throw new HttpsError("permission-denied", "Only the guest who booked can pay the balance.");
+  }
+  if (ledger.status !== "confirmed") {
+    throw new HttpsError("failed-precondition", "The deposit payment is not confirmed yet.");
+  }
+  const remaining = balanceDueCents(
+    Math.round(Number(ledger.totalAmount || 0) * 100),
+    Number(ledger.amountPaidCents || 0),
+  );
+  if (remaining <= 0) return { ok: true, mode: "already_paid", planBookingId };
+
+  const planId = String(ledger.planId || "").trim();
+  const planSnap = planId ? await db.collection("plans").doc(planId).get() : null;
+  const plan = (planSnap?.exists ? (planSnap.data() as HangoutPlan) : null) as HangoutPlan | null;
+
+  if (!stripeLiveConfigured()) {
+    throw new HttpsError(
+      "failed-precondition",
+      "Card payments are not configured yet. Ask the host about paying the balance.",
+    );
+  }
+
+  const currency = String(ledger.currency || plan?.currency || "AUD").toLowerCase();
+  const spots = Math.max(1, Math.min(20, Math.floor(Number(ledger.spots || 1))));
+  const fees = quoteFees(remaining, await loadFeeConfig());
+  const now = new Date().toISOString();
+  const origin = headerOrigin(request);
+  const childId = `bk-${Date.now().toString(36)}-${randomBytes(4).toString("hex")}`;
+  const stripe = makeStripe();
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    // Marketplace Connect is unsupported by Stripe Managed Payments.
+    managed_payments: { enabled: false },
+    client_reference_id: uid,
+    customer_email: request.auth?.token?.email || undefined,
+    submit_type: "pay",
+    integration_identifier: integrationId("balance"),
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency,
+          unit_amount: remaining,
+          product_data: { name: `Balance · ${plan?.title || "Experience booking"}` },
+        },
+      },
+    ],
+    success_url: `${origin}/plan/${planId}?booked=${childId}`,
+    cancel_url: `${origin}/plan/${planId}?canceled=true`,
+    metadata: {
+      bookingId: childId,
+      planBookingId,
+      planId,
+      isBalance: "true",
+      spots: String(spots),
+      providerUid: plan?.creator?.uid || "",
+    },
+    payment_intent_data: {
+      metadata: { bookingId: childId, planBookingId, providerUid: plan?.creator?.uid || "" },
+    },
+  });
+
+  await db
+    .collection("bookings")
+    .doc(childId)
+    .set({
+      id: childId,
+      requestId: "",
+      planId,
+      customerUid: uid,
+      providerUid: plan?.creator?.uid || "",
+      providerKind: "host",
+      providerName: plan?.creator?.name || "Host",
+      title: plan?.title || "Experience booking",
+      suburb: plan?.city || plan?.destination || "Sydney",
+      date: plan?.date || now.slice(0, 10),
+      time: plan?.time || "",
+      priceCents: fees.priceCents,
+      feeCents: fees.feeCents,
+      paymentStatus: "unpaid",
+      payoutStatus: "unpaid",
+      status: "pending",
+      cancelReason: "",
+      spots,
+      parentBookingId: planBookingId,
+      stripeCheckoutSessionId: session.id,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+  return { ok: true, mode: "live_stripe", bookingId: childId, sessionId: session.id, checkoutUrl: session.url };
+});
+
 export const confirmExperienceBookingRemote = onCall(STRIPE_CALLABLE, async (request) => {
   await noteAppCheck(request, "confirmExperienceBookingRemote");
   const uid = requireAuth(request.auth?.uid);
@@ -643,6 +774,138 @@ export const confirmExperienceBookingRemote = onCall(STRIPE_CALLABLE, async (req
   return { ok: true, status: "confirmed", bookingId };
 });
 export const confirmExperienceBooking = confirmExperienceBookingRemote;
+
+export interface BillingConfig {
+  businessPriceId: string;
+  businessPriceLabel: string;
+}
+
+export const DEFAULT_BILLING_CONFIG: BillingConfig = { businessPriceId: "", businessPriceLabel: "" };
+
+/** Admin-set Partner price from `platform_settings/marketplace`. Empty until configured. */
+export async function loadBillingConfig(): Promise<BillingConfig> {
+  try {
+    const snap = await db.collection("platform_settings").doc("marketplace").get();
+    if (!snap.exists) return DEFAULT_BILLING_CONFIG;
+    const row = snap.data() as Partial<BillingConfig>;
+    return {
+      businessPriceId: String(row.businessPriceId || "").trim(),
+      businessPriceLabel: String(row.businessPriceLabel || "").trim(),
+    };
+  } catch {
+    return DEFAULT_BILLING_CONFIG;
+  }
+}
+
+/** C4 — Partner sits behind a live place: same login must own a listing. */
+export async function hasLivePlace(uid: string): Promise<boolean> {
+  try {
+    const snap = await db.collection("listings").where("ownerUid", "==", uid).limit(1).get();
+    return !snap.empty;
+  } catch {
+    return false;
+  }
+}
+
+/** Upsert from a Stripe subscription object. Idempotent — keyed by subscription id. */
+export async function recordSubscriptionEvent(sub: {
+  id?: string;
+  status?: string;
+  customer?: string | { id?: string } | null;
+  metadata?: Record<string, string | undefined> | null;
+  current_period_end?: unknown;
+  currentPeriodEnd?: unknown;
+  items?: { data?: Array<{ price?: { id?: string } }> };
+}): Promise<boolean> {
+  const subscriptionId = String(sub.id || "").trim();
+  if (!subscriptionId) return false;
+  const customerId =
+    typeof sub.customer === "string" ? sub.customer : String(sub.customer?.id || "").trim();
+  let uid = String(sub.metadata?.subscriptionUid || "").trim();
+  if (!uid && customerId) {
+    const prior = await db.collection("business_subscriptions").where("stripeCustomerId", "==", customerId).limit(1).get();
+    if (!prior.empty) uid = prior.docs[0]!.id;
+  }
+  if (!uid) return false;
+  const priceId = String(sub.items?.data?.[0]?.price?.id || "").trim();
+  const periodRaw = sub.current_period_end ?? sub.currentPeriodEnd;
+  const periodEnd = Number(periodRaw);
+  const now = new Date().toISOString();
+  await db
+    .collection("business_subscriptions")
+    .doc(uid)
+    .set(
+      {
+        uid,
+        status: String(sub.status || "unknown"),
+        priceId,
+        stripeCustomerId: customerId,
+        stripeSubscriptionId: subscriptionId,
+        ...(Number.isFinite(periodEnd) ? { currentPeriodEnd: Math.floor(periodEnd) } : {}),
+        updatedAt: now,
+      },
+      { merge: true },
+    );
+  return true;
+}
+
+/**
+ * C4 — start a Partner subscription. Same login, live place required, base
+ * tools stay free. Price comes from admin settings, never the client.
+ */
+export const createSubscriptionCheckout = onCall(STRIPE_CALLABLE, async (request) => {
+  await noteAppCheck(request, "createSubscriptionCheckout");
+  const uid = requireAuth(request.auth?.uid);
+  await enforceRateLimit(uid, "pay", isAnonymousAuth(request));
+
+  if (!(await hasLivePlace(uid))) {
+    throw new HttpsError("failed-precondition", "Open a partner place on this login first.");
+  }
+  const billing = await loadBillingConfig();
+  if (!billing.businessPriceId) {
+    throw new HttpsError("failed-precondition", "Partner billing is not configured yet.");
+  }
+  if (!stripeLiveConfigured()) {
+    throw new HttpsError("failed-precondition", "Card payments are not configured yet.");
+  }
+
+  const existing = await db.collection("business_subscriptions").doc(uid).get();
+  const customerId = existing.exists ? String(existing.data()?.stripeCustomerId || "") : "";
+  const origin = headerOrigin(request);
+  const stripe = makeStripe();
+  const session = await stripe.checkout.sessions.create({
+    mode: "subscription",
+    // Marketplace Connect is unsupported by Stripe Managed Payments.
+    managed_payments: { enabled: false },
+    client_reference_id: uid,
+    ...(customerId ? { customer: customerId } : { customer_email: request.auth?.token?.email || undefined }),
+    line_items: [{ price: billing.businessPriceId, quantity: 1 }],
+    success_url: `${origin}/business?subscribed=1`,
+    cancel_url: `${origin}/business?canceled=1`,
+    metadata: { subscriptionUid: uid },
+    subscription_data: { metadata: { subscriptionUid: uid } },
+  });
+  return { ok: true, sessionId: session.id, checkoutUrl: session.url };
+});
+
+/** C4 — manage/cancel an existing Partner subscription via the Stripe portal. */
+export const createSubscriptionPortal = onCall(STRIPE_CALLABLE, async (request) => {
+  await noteAppCheck(request, "createSubscriptionPortal");
+  const uid = requireAuth(request.auth?.uid);
+  await enforceRateLimit(uid, "pay", isAnonymousAuth(request));
+
+  const snap = await db.collection("business_subscriptions").doc(uid).get();
+  const customerId = snap.exists ? String(snap.data()?.stripeCustomerId || "") : "";
+  if (!customerId || !stripeLiveConfigured()) {
+    throw new HttpsError("failed-precondition", "No Partner subscription on this account yet.");
+  }
+  const origin = headerOrigin(request);
+  const portal = await makeStripe().billingPortal.sessions.create({
+    customer: customerId,
+    return_url: `${origin}/business`,
+  });
+  return { ok: true, portalUrl: portal.url };
+});
 
 export const createConnectAccountLink = onCall(STRIPE_CALLABLE, async (request) => {
   await noteAppCheck(request, "createConnectAccountLink");
@@ -831,6 +1094,57 @@ export const completePaidBooking = onCall(STRIPE_CALLABLE, async (request) => {
   };
 });
 
+/**
+ * C3 — refund a paid booking that has NOT been paid out yet. Provider or
+ * admin only (guests cancel unpaid bookings client-side). Transferred
+ * payouts are refused — unwinding those needs human review, never an
+ * automatic reversal of someone else's money.
+ */
+export const refundPaidBooking = onCall(STRIPE_CALLABLE, async (request) => {
+  await noteAppCheck(request, "refundPaidBooking");
+  const uid = requireAuth(request.auth?.uid);
+  await enforceRateLimit(uid, "pay", isAnonymousAuth(request));
+  const bookingId = String((request.data as { bookingId?: string } | undefined)?.bookingId || "").trim();
+  if (!bookingId) throw new HttpsError("invalid-argument", "bookingId is required.");
+
+  const ref = db.collection("bookings").doc(bookingId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Booking not found.");
+  const booking = { id: snap.id, ...(snap.data() as Omit<Booking, "id">) };
+  const claims = request.auth?.token as AccessClaims | undefined;
+  const admin = isPlatformAdmin(claims);
+  if (booking.providerUid !== uid && !admin) {
+    throw new HttpsError("permission-denied", "Only the provider can refund this booking.");
+  }
+  if (booking.paymentStatus !== "paid") {
+    throw new HttpsError("failed-precondition", "There is no completed payment to refund — cancel instead.");
+  }
+  if (booking.payoutStatus === "transferred") {
+    throw new HttpsError(
+      "failed-precondition",
+      "This share was already paid out. Contact support for a manual review.",
+    );
+  }
+  if (booking.status === "refunded") return { ok: true, status: "refunded", bookingId };
+
+  const now = new Date().toISOString();
+  if (stripeLiveConfigured() && (booking.stripeChargeId || booking.stripePaymentIntentId)) {
+    const stripe = makeStripe();
+    await stripe.refunds.create({
+      ...(booking.stripeChargeId ? { charge: booking.stripeChargeId } : { payment_intent: booking.stripePaymentIntentId as string }),
+      metadata: { bookingId, providerUid: booking.providerUid },
+    });
+  }
+  await ref.update({
+    paymentStatus: "refunded",
+    payoutStatus: "reversed",
+    status: "refunded",
+    cancelReason: "Refunded by provider",
+    updatedAt: now,
+  });
+  return { ok: true, status: "refunded", bookingId };
+});
+
 async function reverseTransferForDispute(chargeId: string): Promise<void> {
   const bookings = await db.collection("bookings").where("stripeChargeId", "==", chargeId).limit(1).get();
   if (bookings.empty) return;
@@ -1007,6 +1321,27 @@ export const stripeWebhook = onRequest(
           res.json({ received: true, dining: true });
           return;
         }
+        // C4 — Partner subscription checkout carries no booking.
+        const subUid = String(session.metadata?.subscriptionUid || "").trim();
+        const sessionSubId =
+          typeof session.subscription === "string"
+            ? session.subscription
+            : String(session.subscription?.id || "").trim();
+        if (subUid && sessionSubId && !String(session.metadata?.bookingId || "").trim()) {
+          if (stripeLiveConfigured()) {
+            try {
+              const sub = await makeStripe().subscriptions.retrieve(sessionSubId);
+              await recordSubscriptionEvent({
+                ...(sub as unknown as Record<string, unknown>),
+                metadata: { ...(sub.metadata || {}), subscriptionUid: subUid },
+              });
+            } catch {
+              /* subscription.* events still deliver the state */
+            }
+          }
+          res.json({ received: true, subscription: true });
+          return;
+        }
         if (!checkoutPaymentCollected(session.payment_status)) {
           res.json({ received: true, skipped: "unpaid" });
           return;
@@ -1033,27 +1368,47 @@ export const stripeWebhook = onRequest(
             }
           }
           const planBookingId = String(session.metadata?.planBookingId || bookingId);
+          const isBalance = String(session.metadata?.isBalance || "") === "true";
           const planRef = db.collection("plan_bookings").doc(planBookingId);
           const planSnap = await planRef.get();
-          if (planSnap.exists) {
+          // C2 — Stripe may redeliver: accumulate the ledger once per session.
+          const payRef = db.collection("payments").doc(session.id);
+          const paySnap = await payRef.get();
+          if (planSnap.exists && !paySnap.exists) {
+            const prev = planSnap.data() as { amountPaidCents?: unknown };
+            const paid = Math.max(0, Math.floor(Number(prev.amountPaidCents || 0)));
+            await planRef.update({
+              status: "confirmed",
+              paymentIntentId: paymentIntentId || "stripe_verified",
+              confirmedAt: new Date().toISOString(),
+              amountPaidCents: paid + (session.amount_total || 0),
+            });
+          } else if (planSnap.exists) {
             await planRef.update({
               status: "confirmed",
               paymentIntentId: paymentIntentId || "stripe_verified",
               confirmedAt: new Date().toISOString(),
             });
           }
-          await db
-            .collection("payments")
-            .doc(session.id)
-            .set({
-              id: session.id,
-              bookingId,
-              amountTotal: session.amount_total || 0,
-              currency: session.currency || "aud",
-              paymentIntentId,
-              chargeId,
-              createdAt: new Date().toISOString(),
-            });
+          if (!isBalance && newlyPaid) {
+            const bookingSnap = await db.collection("bookings").doc(bookingId).get();
+            if (bookingSnap.exists) {
+              const booking = { id: bookingSnap.id, ...(bookingSnap.data() as Omit<Booking, "id">) };
+              const spots = Math.max(1, Number(session.metadata?.spots || booking.spots || 1));
+              const guestName = String(session.customer_details?.name || session.metadata?.guestName || "Guest");
+              await applyPaidTicketToPlan(booking, spots, guestName);
+            }
+          }
+          await payRef.set({
+            id: session.id,
+            bookingId,
+            amountTotal: session.amount_total || 0,
+            currency: session.currency || "aud",
+            paymentIntentId,
+            chargeId,
+            isBalance,
+            createdAt: new Date().toISOString(),
+          });
         }
       } else if (event.type === "checkout.session.async_payment_failed") {
         const session = event.data.object as Stripe.Checkout.Session;
@@ -1067,6 +1422,14 @@ export const stripeWebhook = onRequest(
               { merge: true },
             );
         }
+      } else if (
+        event.type === "customer.subscription.created" ||
+        event.type === "customer.subscription.updated" ||
+        event.type === "customer.subscription.deleted"
+      ) {
+        await recordSubscriptionEvent(event.data.object as unknown as Parameters<typeof recordSubscriptionEvent>[0]);
+        res.json({ received: true, subscription: true });
+        return;
       } else if (event.type === "charge.dispute.created") {
         const dispute = event.data.object as Stripe.Dispute;
         const chargeId = typeof dispute.charge === "string" ? dispute.charge : dispute.charge?.id || "";

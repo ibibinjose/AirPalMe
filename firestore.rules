@@ -401,6 +401,12 @@ match /dining_orders/{orderId} {
     // B2B engine: campaigns are public once live; bookings tracked per campaign.
     // Money movement is deferred until Stripe lands (paymentStatus == 'deferred').
     match /campaigns/{campaignId} {
+      // C4 — campaigns are the Partner tool: same login needs an active
+      // subscription row (written by Stripe webhooks, never the client).
+      function partnerActive() {
+        return exists(/databases/$(database)/documents/business_subscriptions/$(request.auth.uid))
+          && get(/databases/$(database)/documents/business_subscriptions/$(request.auth.uid)).data.status in ['active', 'trialing'];
+      }
       allow get, list: if resource.data.status == 'live'
         || (signedIn() && resource.data.ownerUid == request.auth.uid)
         || platformAdmin();
@@ -408,7 +414,8 @@ match /dining_orders/{orderId} {
         && !isAnonymous()
         && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.status == 'pending'
-        && request.resource.data.keys().hasAny(['updatedAt']);
+        && request.resource.data.keys().hasAny(['updatedAt'])
+        && (partnerActive() || platformAdmin());
       allow update: if signedIn() && (
         platformAdmin() ||
         (resource.data.ownerUid == request.auth.uid
@@ -606,6 +613,50 @@ match /dining_orders/{orderId} {
         platformAdmin() || resource.data.providerUid == request.auth.uid
       );
       allow write: if false;
+    }
+
+    // C2 deposit ledger: guest + host read their own rows; money moves via Functions only.
+    match /plan_bookings/{bookingId} {
+      allow read: if signedIn() && (
+        platformAdmin()
+        || resource.data.guestUid == request.auth.uid
+        || resource.data.hostUid == request.auth.uid
+      );
+      allow write: if false;
+    }
+
+    // C4 Partner subscriptions: owner + admin read; Stripe webhooks own the writes.
+    match /business_subscriptions/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || platformAdmin());
+      allow write: if false;
+    }
+
+    // C5 experience reviews: one per completed paid booking (doc id = booking
+    // id, so create fails on a second review). Public to read — trust content.
+    match /experience_reviews/{bookingId} {
+      function reviewedBooking() {
+        return get(/databases/$(database)/documents/bookings/$(bookingId)).data;
+      }
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.guestUid == request.auth.uid
+        && request.resource.data.planId is string
+        && request.resource.data.bookingId == bookingId
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.reviewText is string
+        && request.resource.data.reviewText.size() <= 500
+        && request.resource.data.guestName is string
+        && request.resource.data.guestName.size() >= 1
+        && request.resource.data.guestName.size() <= 40
+        && request.resource.data.keys().hasOnly(['guestUid', 'planId', 'bookingId', 'rating', 'reviewText', 'guestName', 'createdAt', 'updatedAt'])
+        && reviewedBooking().customerUid == request.auth.uid
+        && reviewedBooking().planId == request.resource.data.planId
+        && reviewedBooking().status == 'completed'
+        && reviewedBooking().paymentStatus == 'paid';
+      allow get, list: if true;
+      allow update, delete: if signedIn() && platformAdmin();
     }
 
     // §8 messaging: one chat per matched request, parties only (+ admins for moderation).

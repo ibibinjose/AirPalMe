@@ -36,6 +36,7 @@ import { fieldInput, fieldTextarea } from "@/components/forms/ValidField";
 import { BusinessBookingsSection } from "@/components/booking/BusinessBookingsSection";
 import { PayoutSetupCard } from "@/components/connect/PayoutSetupCard";
 import { BusinessNavHub } from "@/components/business/BusinessNavHub";
+import { BusinessSubscriptionCard } from "@/components/business/BusinessSubscriptionCard";
 import { GooglePlaceImportCard } from "@/components/business/GooglePlaceImport";
 import { bioLinksFromGooglePlace, mergeBioLinks } from "@shared/google-place";
 import { NAMES } from "@shared/names";
@@ -248,6 +249,10 @@ export function BusinessPage() {
           bookingCount={stats.rsvps}
           businessName={mine.name}
         />
+      </div>
+
+      <div className="mt-4">
+        <BusinessSubscriptionCard />
       </div>
 
       {tab === "place" && (

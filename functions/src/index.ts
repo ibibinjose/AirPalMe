@@ -44,11 +44,15 @@ export {
   confirmExperienceBooking,
   confirmExperienceBookingRemote,
   createBookingCheckoutSession,
+  payBookingBalance,
   createConnectAccountLink,
   refreshConnectAccount,
   createConnectLoginLink,
   releaseHeldPayouts,
   completePaidBooking,
+  refundPaidBooking,
+  createSubscriptionCheckout,
+  createSubscriptionPortal,
   stripeWebhook,
 } from "./stripe";
 export { createStaffTicket, resolveStaffTicket, onStaffTicketCreated } from "./tickets";

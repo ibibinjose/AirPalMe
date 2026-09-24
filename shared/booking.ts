@@ -67,6 +67,8 @@ export interface Booking {
   stripeAccountId?: string;
   /** Ticket quantity for events/experiences. Mate bookings are 1. */
   spots?: number;
+  /** Balance payment: points at the original deposit booking on the same plan. */
+  parentBookingId?: string;
 }
 
 export interface BookingInput {
@@ -104,6 +106,47 @@ export function quoteFees(
 
 export function paymentStatusForPrice(priceCents: number): PaymentStatus {
   return priceCents <= 0 ? "paid" : "unpaid";
+}
+
+/**
+ * C1 — the stored fee must equal the admin config quote. The server stamps
+ * `feeCents` at checkout; this guard lets tests and the client verify the
+ * ledger matches the live config instead of trusting either side blindly.
+ */
+export function bookingFeesMatch(
+  booking: Pick<Booking, "priceCents" | "feeCents">,
+  config: FeeConfig = DEFAULT_FEE_CONFIG,
+): boolean {
+  return booking.feeCents === quoteFees(booking.priceCents, config).feeCents;
+}
+
+/**
+ * C5 — guest review of a completed experience. Stars required, words
+ * optional (mirrors mate reviewValid). Tied to one paid + completed
+ * booking; the doc id IS the booking id so double reviews cannot exist.
+ */
+export function experienceReviewValid(rating: number, text: string): boolean {
+  return Number.isInteger(rating) && rating >= 1 && rating <= 5 && text.trim().length <= 500;
+}
+
+/**
+ * C2 — remaining balance on a deposit ledger. Both args are cents; anything
+ * already paid (or overpaid) yields zero, never a negative charge.
+ */
+export function balanceDueCents(totalCents: number, paidCents: number): number {
+  const total = Number.isFinite(totalCents) ? Math.max(0, Math.floor(totalCents)) : 0;
+  const paid = Number.isFinite(paidCents) ? Math.max(0, Math.floor(paidCents)) : 0;
+  return Math.max(0, total - paid);
+}
+
+/** Provider share prefers the server-stamped fee; defaults only fill legacy rows. */
+export function providerShareCents(
+  booking: Pick<Booking, "priceCents" | "feeCents">,
+  config: FeeConfig = DEFAULT_FEE_CONFIG,
+): number {
+  if (!Number.isFinite(booking.feeCents)) return quoteFees(booking.priceCents, config).providerCents;
+  const fee = Math.max(0, Math.floor(booking.feeCents));
+  return Math.max(0, Math.floor(booking.priceCents) - fee);
 }
 
 export function payoutStatusForPrice(priceCents: number): PayoutStatus {
@@ -176,6 +219,23 @@ export function bookingValid(input: BookingInput): boolean {
 /** Customer may cancel while nothing has been delivered. */
 export function canCustomerCancel(status: BookingStatus): boolean {
   return status === "pending" || status === "confirmed";
+}
+
+/**
+ * C3 — refund guard: paid, share still held on the platform, provider/admin
+ * only. Transferred payouts never auto-refund; those need human review.
+ * Returns null when the refund may proceed, otherwise the reason it cannot.
+ */
+export function canRefundPaid(
+  booking: Pick<Booking, "paymentStatus" | "payoutStatus" | "providerUid" | "status">,
+  callerUid: string,
+  isAdmin: boolean,
+): string | null {
+  if (booking.providerUid !== callerUid && !isAdmin) return "Only the provider can refund this booking.";
+  if (booking.paymentStatus !== "paid") return "There is no completed payment to refund.";
+  if (booking.payoutStatus === "transferred") return "Already paid out — contact support.";
+  if (booking.status === "refunded") return "Already refunded.";
+  return null;
 }
 
 /** Provider confirms the booking, then completes it after delivery. */

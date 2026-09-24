@@ -146,6 +146,8 @@ export function MateRequestsAdmin() {
 
   const [feeBps, setFeeBps] = useState(String(DEFAULT_FEE_CONFIG.platformFeeBps));
   const [minFee, setMinFee] = useState(String(DEFAULT_FEE_CONFIG.minimumPlatformFeeCents));
+  const [priceId, setPriceId] = useState("");
+  const [priceLabel, setPriceLabel] = useState("");
   const [feeBusy, setFeeBusy] = useState(false);
 
   useEffect(() => {
@@ -153,9 +155,16 @@ export function MateRequestsAdmin() {
     if (!db || !isAdmin) return;
     void getDoc(doc(db, "platform_settings", "marketplace")).then((snap) => {
       if (!snap.exists()) return;
-      const row = snap.data() as { platformFeeBps?: number; minimumPlatformFeeCents?: number };
+      const row = snap.data() as {
+        platformFeeBps?: number;
+        minimumPlatformFeeCents?: number;
+        businessPriceId?: string;
+        businessPriceLabel?: string;
+      };
       if (row.platformFeeBps != null) setFeeBps(String(row.platformFeeBps));
       if (row.minimumPlatformFeeCents != null) setMinFee(String(row.minimumPlatformFeeCents));
+      if (row.businessPriceId != null) setPriceId(String(row.businessPriceId));
+      if (row.businessPriceLabel != null) setPriceLabel(String(row.businessPriceLabel));
     });
   }, [isAdmin]);
 
@@ -176,16 +185,26 @@ export function MateRequestsAdmin() {
           if (!db || !user) return;
           const platformFeeBps = Math.max(0, Math.min(5000, Math.floor(Number(feeBps) || 0)));
           const minimumPlatformFeeCents = Math.max(0, Math.floor(Number(minFee) || 0));
+          const businessPriceId = priceId.trim();
+          const businessPriceLabel = priceLabel.trim();
           setFeeBusy(true);
-          void setDoc(doc(db, "platform_settings", "marketplace"), {
-            platformFeeBps,
-            minimumPlatformFeeCents,
-            updatedAt: new Date().toISOString(),
-            updatedBy: user.uid,
-          })
+          void setDoc(
+            doc(db, "platform_settings", "marketplace"),
+            {
+              platformFeeBps,
+              minimumPlatformFeeCents,
+              businessPriceId,
+              businessPriceLabel,
+              updatedAt: new Date().toISOString(),
+              updatedBy: user.uid,
+            },
+            { merge: true },
+          )
             .then(() => {
               setFeeBps(String(platformFeeBps));
               setMinFee(String(minimumPlatformFeeCents));
+              setPriceId(businessPriceId);
+              setPriceLabel(businessPriceLabel);
               void logAdminAction(
                 user.uid,
                 "fees.update",
@@ -213,6 +232,24 @@ export function MateRequestsAdmin() {
             value={minFee}
             onChange={(e) => setMinFee(e.target.value)}
             inputMode="numeric"
+            className="mt-1 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm text-ink focus:border-brand"
+          />
+        </label>
+        <label className="text-[12px] font-medium text-mute">
+          Partner price ID (Stripe)
+          <input
+            value={priceId}
+            onChange={(e) => setPriceId(e.target.value)}
+            placeholder="price_…"
+            className="mt-1 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm text-ink focus:border-brand"
+          />
+        </label>
+        <label className="text-[12px] font-medium text-mute">
+          Partner price label
+          <input
+            value={priceLabel}
+            onChange={(e) => setPriceLabel(e.target.value)}
+            placeholder="$29/mo"
             className="mt-1 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm text-ink focus:border-brand"
           />
         </label>

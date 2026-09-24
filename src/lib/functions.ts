@@ -378,6 +378,20 @@ export function createBookingCheckoutSessionRemote(data: { bookingId: string }) 
   >(CALLABLES.createBookingCheckoutSession, data);
 }
 
+export function payBookingBalanceRemote(data: { planBookingId: string }) {
+  return callFunction<
+    typeof data,
+    {
+      ok: boolean;
+      mode?: string;
+      bookingId?: string;
+      planBookingId?: string;
+      sessionId?: string;
+      checkoutUrl?: string | null;
+    }
+  >(CALLABLES.payBookingBalance, data);
+}
+
 export function createManagedProductRemote(data: {
   name: string;
   description?: string;
@@ -469,6 +483,27 @@ export function releaseHeldPayoutsRemote() {
       amountCents: number;
     }
   >(CALLABLES.releaseHeldPayouts, {});
+}
+
+export function refundPaidBookingRemote(data: { bookingId: string }) {
+  return callFunction<typeof data, { ok: boolean; status: string; bookingId: string }>(
+    CALLABLES.refundPaidBooking,
+    data,
+  );
+}
+
+export function createSubscriptionCheckoutRemote() {
+  return callFunction<Record<string, never>, { ok: boolean; sessionId?: string; checkoutUrl?: string | null }>(
+    CALLABLES.createSubscriptionCheckout,
+    {},
+  );
+}
+
+export function createSubscriptionPortalRemote() {
+  return callFunction<Record<string, never>, { ok: boolean; portalUrl?: string | null }>(
+    CALLABLES.createSubscriptionPortal,
+    {},
+  );
 }
 
 export function completePaidBookingRemote(data: { bookingId: string }) {

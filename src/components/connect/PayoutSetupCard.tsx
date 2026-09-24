@@ -11,7 +11,7 @@ import {
   refreshConnectAccountRemote,
   releaseHeldPayoutsRemote,
 } from "@/lib/functions";
-import { quoteFees, type Booking } from "@shared/booking";
+import { providerShareCents, type Booking } from "@shared/booking";
 
 /** Stripe Connect payouts: onboard, send held shares, open Express dashboard. */
 export function PayoutSetupCard() {
@@ -43,7 +43,7 @@ export function PayoutSetupCard() {
     for (const d of books.docs) {
       const b = d.data() as Booking;
       if (b.paymentStatus !== "paid" || b.priceCents <= 0) continue;
-      const share = quoteFees(b.priceCents).providerCents;
+      const share = providerShareCents(b);
       if (b.payoutStatus === "transferred") paid += share;
       else if (b.status === "completed") {
         held += share;

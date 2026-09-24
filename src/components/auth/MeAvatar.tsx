@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { UserRound } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
@@ -9,41 +10,58 @@ import { AVAILABILITY_STATUSES, type AvailabilityStatus } from "@shared/bio";
 /** Nav buttons are h-9 / lg:h-10 — keep the avatar on that same height. */
 export const NAV_AVATAR = "h-10 w-10 text-sm lg:text-base";
 
-export function AvatarFace({ className }: { className?: string }) {
+export function AvatarFace({
+  className,
+  customSrc,
+  showRing = false,
+}: {
+  className?: string;
+  customSrc?: string;
+  showRing?: boolean;
+}) {
   const { user } = useAuth();
   const { mine } = useBio();
-  const raw = mine?.avatar || user?.photoURL;
+  const [imgError, setImgError] = useState(false);
+  const raw = customSrc || mine?.avatar || user?.photoURL;
   const src = useMediaSrc(raw) || (raw && !raw.startsWith("idb:") ? raw : undefined);
   const letter = (mine?.name || user?.displayName || user?.email || "M").trim().charAt(0).toUpperCase();
 
   const statusKey: AvailabilityStatus =
     mine?.availabilityStatus || (mine?.openNow ? "available" : user ? "available" : "offline");
-  // Status lives in the AirPal ring only — no corner dots. Available carries
-  // the AirPal Blue ring; busy/dnd keep their red rings; offline is neutral.
-  const ring =
-    statusKey === "available"
-      ? "ring-2 ring-brand"
+
+  const ring = showRing
+    ? statusKey === "available"
+      ? "ring-2 ring-brand ring-offset-2 ring-offset-card"
       : statusKey === "offline"
-        ? "ring-1 ring-line"
-        : AVAILABILITY_STATUSES[statusKey]?.ringClass || "ring-1 ring-line";
+        ? "ring-1 ring-line ring-offset-1 ring-offset-card"
+        : cn(AVAILABILITY_STATUSES[statusKey]?.ringClass || "ring-1 ring-line", "ring-2 ring-offset-2 ring-offset-card")
+    : "";
 
   return (
-    <span className={cn("relative inline-grid shrink-0 overflow-visible", className || NAV_AVATAR)}>
-      <span
-        className={cn(
-          "absolute inset-0 grid place-items-center overflow-hidden rounded-full bg-ink font-semibold leading-none text-white",
-          ring,
-        )}
-      >
-        {src ? (
-          <img src={src} alt="" className="h-full w-full object-cover" />
-        ) : user ? (
-          letter
-        ) : (
-          <UserRound className="h-[48%] w-[48%]" strokeWidth={1.8} />
-        )}
-      </span>
-    </span>
+    <div
+      className={cn(
+        "relative grid place-items-center shrink-0 overflow-hidden rounded-full select-none font-display font-bold leading-none transition-transform duration-200",
+        className || NAV_AVATAR,
+        user
+          ? "bg-gradient-to-br from-[#1805db] via-[#2815ee] to-[#0e0394] text-white shadow-xs"
+          : "bg-paper text-mute ring-1 ring-line/80",
+        ring,
+      )}
+    >
+      {src && !imgError ? (
+        <img
+          src={src}
+          alt=""
+          onError={() => setImgError(true)}
+          referrerPolicy="no-referrer"
+          className="h-full w-full object-cover select-none"
+        />
+      ) : user ? (
+        <span className="text-white drop-shadow-xs">{letter}</span>
+      ) : (
+        <UserRound className="h-1/2 w-1/2 text-mute" strokeWidth={2} />
+      )}
+    </div>
   );
 }
 

@@ -43,6 +43,7 @@ import { ExperienceBookingModal } from "@/components/plan/ExperienceBookingModal
 import { HereCheckIn } from "@/components/circle/HereCheckIn";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { EXPERIENCE_CATEGORIES, isSoldOut, isTicketed, type HangoutPlan } from "@shared/plan";
+import { ExperienceReviews } from "@/components/plan/ExperienceReviews";
 import { TicketPass } from "@/components/plan/TicketPass";
 import { TicketSalesPanel } from "@/components/plan/TicketSalesPanel";
 import { exportPlanItineraryPdf } from "@/lib/plan-pdf";
@@ -734,6 +735,7 @@ export function PlanDetailPage() {
 
       {bookedId ? <TicketPass bookingId={bookedId} /> : null}
       {isHost && ticketed ? <TicketSalesPanel planId={plan.id} /> : null}
+      {plan.isExperience ? <ExperienceReviews planId={plan.id} /> : null}
 
         </>
       )}
