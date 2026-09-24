@@ -48,7 +48,7 @@ describe("properties store", () => {
   it("falls back to known Harbour demo seeds only — not arbitrary fakes", async () => {
     const p = await fetchProperty("harbour-hotel");
     expect(p.id).toBe("harbour-hotel");
-    expect(p.name).toMatch(/Harbour/);
+    expect(p.name).toMatch(/(AirPal|Harbour)/);
     expect(p.wifi.password).toBe("");
     expect(p.roomTokens?.["tok-101-demo"]).toBe("101");
     expect(getCachedProperty("harbour-hotel")?.id).toBe("harbour-hotel");

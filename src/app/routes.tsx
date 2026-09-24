@@ -38,6 +38,7 @@ const StayPage = lazy(() => import("@/pages/StayPage").then((m) => ({ default: m
 const DemoHotelPage = lazy(() => import("@/pages/DemoHotelPage").then((m) => ({ default: m.DemoHotelPage })));
 const HostPage = lazy(() => import("@/pages/HostPage").then((m) => ({ default: m.HostPage })));
 const HostPulsePage = lazy(() => import("@/pages/HostPulsePage").then((m) => ({ default: m.HostPulsePage })));
+const PulseHubPage = lazy(() => import("@/pages/PulseHubPage").then((m) => ({ default: m.PulseHubPage })));
 const PulsePublicPage = lazy(() => import("@/pages/PulsePublicPage").then((m) => ({ default: m.PulsePublicPage })));
 const StartPage = lazy(() => import("@/pages/StartPage").then((m) => ({ default: m.StartPage })));
 const AuthActionPage = lazy(() => import("@/pages/AuthActionPage").then((m) => ({ default: m.AuthActionPage })));
@@ -186,6 +187,7 @@ export function AppRoutes() {
         </Route>
         <Route path="/host/pulse" component={HostPulsePage} />
         <Route path="/host" component={HostPage} />
+        <Route path="/pulse" component={PulseHubPage} />
         <Route path="/pulse/:publicToken" component={PulsePublicPage} />
         <Route path="/start" component={StartPage} />
         <Route path="/reset">

@@ -3,11 +3,13 @@ import {
   buildPulsePublicPath,
   categoryFromPulseAnswers,
   createPublicToken,
+  createPulseTemplate,
   evaluateLogic,
   isNegativeRating,
   isPulsePublicToken,
   isValidClientKey,
   issueSummaryFromAnswers,
+  PULSE_TEMPLATES,
   primaryScoreFromAnswers,
   pulseResponsesToCsv,
   resolvePulseStatusTransition,
@@ -332,4 +334,41 @@ describe("stress-testing validation rules & edge cases", () => {
     ).toBe(false);
   });
 });
+
+describe("all business and individual pulse templates", () => {
+  it("supports all template types in PULSE_TEMPLATES", () => {
+    expect(PULSE_TEMPLATES).toContain("stay_during");
+    expect(PULSE_TEMPLATES).toContain("dining_cafe");
+    expect(PULSE_TEMPLATES).toContain("event_experience");
+    expect(PULSE_TEMPLATES).toContain("service_retail");
+    expect(PULSE_TEMPLATES).toContain("general_csat");
+  });
+
+  it("creates valid questions & logic for dining_cafe", () => {
+    const tmpl = createPulseTemplate("dining_cafe", "prop_cafe_123", "usr_owner", "Surry Hills Cafe");
+    expect(tmpl.template).toBe("dining_cafe");
+    expect(tmpl.name).toBe("Surry Hills Cafe");
+    expect(tmpl.questions.some((q) => q.id === "q_dining")).toBe(true);
+    expect(tmpl.logic.some((l) => l.action === "create_issue")).toBe(true);
+  });
+
+  it("creates valid questions & logic for event_experience", () => {
+    const tmpl = createPulseTemplate("event_experience", "prop_event_123", "usr_owner", "DJ Night");
+    expect(tmpl.template).toBe("event_experience");
+    expect(tmpl.questions.some((q) => q.id === "q_event")).toBe(true);
+  });
+
+  it("creates valid questions & logic for service_retail", () => {
+    const tmpl = createPulseTemplate("service_retail", "prop_salon_123", "usr_owner", "Barber Shop");
+    expect(tmpl.template).toBe("service_retail");
+    expect(tmpl.questions.some((q) => q.id === "q_service")).toBe(true);
+  });
+
+  it("creates valid questions & logic for general_csat", () => {
+    const tmpl = createPulseTemplate("general_csat", "prop_gen_123", "usr_owner", "Creator Feedback");
+    expect(tmpl.template).toBe("general_csat");
+    expect(tmpl.questions.some((q) => q.id === "q_general")).toBe(true);
+  });
+});
+
 

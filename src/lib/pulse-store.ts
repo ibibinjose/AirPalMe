@@ -1,5 +1,5 @@
 import { collection, onSnapshot, type Timestamp } from "firebase/firestore";
-import type { PulseIssue, PulseResponse } from "@shared/pulse";
+import type { PulseIssue, PulseResponse, PulseTemplate } from "@shared/pulse";
 import { getFirebaseDb } from "./firebase";
 import {
   acknowledgePulseIssueRemote,
@@ -88,14 +88,28 @@ export async function submitPulse(input: Parameters<typeof submitPulseResponseRe
   return submitPulseResponseRemote(input);
 }
 
-export async function createDuringStayPulse(propertyId: string, name?: string) {
+export async function createPulse(
+  propertyId: string,
+  template: PulseTemplate = "general_csat",
+  name?: string,
+  title?: string,
+) {
   if (!liveBackendEnabled()) throw new Error("Pulse needs a live connection.");
-  return createPulseRemote({ propertyId, template: "stay_during", name });
+  return createPulseRemote({ propertyId, template, name, title });
 }
 
-export async function publishPulse(propertyId: string, pulseId: string) {
+export async function createDuringStayPulse(propertyId: string, name?: string) {
+  return createPulse(propertyId, "stay_during", name);
+}
+
+export async function publishPulse(
+  propertyId: string,
+  pulseId: string,
+  placement: "room" | "lobby" | "other" = "other",
+  label = "Feedback card",
+) {
   if (!liveBackendEnabled()) throw new Error("Pulse needs a live connection.");
-  return publishPulseRemote({ propertyId, pulseId, placement: "room", label: "Room card" });
+  return publishPulseRemote({ propertyId, pulseId, placement, label });
 }
 
 export async function acknowledgePulseIssue(propertyId: string, issueId: string) {

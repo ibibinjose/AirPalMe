@@ -7,12 +7,13 @@ import {
   buildPulsePublicPath,
   categoryFromPulseAnswers,
   createPublicToken,
+  createPulseTemplate,
   isPulsePublicToken,
   isValidClientKey,
   issueSummaryFromAnswers,
+  PULSE_TEMPLATES,
   resolvePulseStatusTransition,
   scoreBucket,
-  stayDuringStayTemplate,
   validatePulseFollowup,
   validatePulseSubmitPayload,
   type Pulse,
@@ -21,6 +22,7 @@ import {
   type PulsePublicDto,
   type PulseResponse,
   type PulseStatus,
+  type PulseTemplate,
 } from "../../shared/pulse";
 import { enforceRateLimit, isAnonymousAuth, noteAppCheck } from "./abuse";
 import { CALLABLE, db, isPlatformAdmin, requireAuth } from "./admin";
@@ -45,14 +47,29 @@ function callerFlags(
   const uid = request.auth?.uid || "";
   const caller = (request.auth?.token || {}) as AccessClaims;
   const role = caller.properties?.[propertyId];
-  const isHostAdmin = isPlatformAdmin(caller) || prop.ownerId === uid || role === "host_admin";
+  const isPersonalWorkspace = propertyId === uid || propertyId === `usr_${uid}` || propertyId === `prop_${uid}`;
+  const isHostAdmin = isPlatformAdmin(caller) || prop.ownerId === uid || role === "host_admin" || isPersonalWorkspace;
   const isStaff = isHostAdmin || role === "staff";
   return { uid, isHostAdmin, isStaff };
 }
 
-async function loadProperty(propertyId: string) {
+async function loadProperty(propertyId: string, callerUid?: string): Promise<Record<string, unknown>> {
   const snap = await db.collection("properties").doc(propertyId).get();
-  if (!snap.exists) throw new HttpsError("not-found", "Property not found.");
+  if (!snap.exists) {
+    // If this is a personal/business workspace for a signed-in user, auto-initialize
+    if (callerUid && (propertyId === callerUid || propertyId === `usr_${callerUid}` || propertyId === `prop_${callerUid}`)) {
+      const initial: Record<string, unknown> = {
+        id: propertyId,
+        ownerId: callerUid,
+        name: "My Pulse",
+        status: "active",
+        createdAt: FieldValue.serverTimestamp(),
+      };
+      await db.collection("properties").doc(propertyId).set(initial, { merge: true });
+      return initial;
+    }
+    throw new HttpsError("not-found", "Property not found.");
+  }
   return snap.data() || {};
 }
 
@@ -293,27 +310,32 @@ export const submitPulseResponse = onCall(CALLABLE, async (request) => {
   return { responseId, issueId: issueId || null, createIssue: Boolean(issueId) };
 });
 
-/** host_admin — create Stay during-stay Pulse (draft). */
+/** host_admin / business / creator — create Pulse (draft). */
 export const createPulse = onCall(CALLABLE, async (request) => {
   await noteAppCheck(request, "createPulse");
   const uid = requireAuth(request.auth?.uid);
-  if (isAnonymousAuth(request)) throw new HttpsError("failed-precondition", "Sign in with a host account.");
+  if (isAnonymousAuth(request)) throw new HttpsError("failed-precondition", "Sign in to create a Pulse.");
 
   const data = (request.data || {}) as Record<string, unknown>;
-  const propertyId = String(data.propertyId || "").trim();
+  const propertyId = String(data.propertyId || `usr_${uid}`).trim();
   if (!propertyId) throw new HttpsError("invalid-argument", "propertyId is required.");
 
-  const prop = await loadProperty(propertyId);
+  const prop = await loadProperty(propertyId, uid);
   const { isHostAdmin } = callerFlags(request, propertyId, prop);
-  if (!isHostAdmin) throw new HttpsError("permission-denied", "Only a host admin can create a Pulse.");
+  if (!isHostAdmin) throw new HttpsError("permission-denied", "You do not have permission to manage this Pulse.");
 
-  const template = String(data.template || "stay_during");
-  if (template !== "stay_during") throw new HttpsError("invalid-argument", "Unsupported template.");
+  const template = String(data.template || "general_csat") as PulseTemplate;
+  if (!PULSE_TEMPLATES.includes(template)) {
+    throw new HttpsError("invalid-argument", `Unsupported template: ${template}`);
+  }
 
   const nowIso = new Date().toISOString();
   const pulseId = `pulse_${Date.now().toString(36)}_${createPublicToken().slice(-6)}`;
-  const draft = stayDuringStayTemplate(propertyId, uid);
-  if (typeof data.name === "string" && data.name.trim()) draft.name = data.name.trim().slice(0, 80);
+  const draftName = typeof data.name === "string" && data.name.trim() ? data.name.trim().slice(0, 80) : undefined;
+  const draft = createPulseTemplate(template, propertyId, uid, draftName);
+  if (typeof data.title === "string" && data.title.trim()) {
+    draft.branding = { title: data.title.trim().slice(0, 80) };
+  }
 
   await db
     .collection("properties")
@@ -332,20 +354,20 @@ export const createPulse = onCall(CALLABLE, async (request) => {
   return { pulseId, status: "draft" as const };
 });
 
-/** host_admin — publish Pulse + create deployment token. */
+/** host_admin / business / creator — publish Pulse + create deployment token. */
 export const publishPulse = onCall(CALLABLE, async (request) => {
   await noteAppCheck(request, "publishPulse");
   const uid = requireAuth(request.auth?.uid);
-  if (isAnonymousAuth(request)) throw new HttpsError("failed-precondition", "Sign in with a host account.");
+  if (isAnonymousAuth(request)) throw new HttpsError("failed-precondition", "Sign in to publish a Pulse.");
 
   const data = (request.data || {}) as Record<string, unknown>;
-  const propertyId = String(data.propertyId || "").trim();
+  const propertyId = String(data.propertyId || `usr_${uid}`).trim();
   const pulseId = String(data.pulseId || "").trim();
   if (!propertyId || !pulseId) throw new HttpsError("invalid-argument", "propertyId and pulseId are required.");
 
-  const prop = await loadProperty(propertyId);
+  const prop = await loadProperty(propertyId, uid);
   const { isHostAdmin } = callerFlags(request, propertyId, prop);
-  if (!isHostAdmin) throw new HttpsError("permission-denied", "Only a host admin can publish a Pulse.");
+  if (!isHostAdmin) throw new HttpsError("permission-denied", "You do not have permission to publish this Pulse.");
 
   const pulseRef = db.collection("properties").doc(propertyId).collection("pulses").doc(pulseId);
   const pulseSnap = await pulseRef.get();
@@ -416,7 +438,7 @@ export const acknowledgePulseIssue = onCall(CALLABLE, async (request) => {
   const issueId = String(data.issueId || "").trim();
   if (!propertyId || !issueId) throw new HttpsError("invalid-argument", "propertyId and issueId are required.");
 
-  const prop = await loadProperty(propertyId);
+  const prop = await loadProperty(propertyId, uid);
   const { isStaff } = callerFlags(request, propertyId, prop);
   if (!isStaff) throw new HttpsError("permission-denied", "Only host staff can acknowledge issues.");
 
@@ -475,7 +497,7 @@ export const resolvePulseIssue = onCall(CALLABLE, async (request) => {
   const resolutionNote = String(data.resolutionNote || "").trim().slice(0, 500);
   if (!propertyId || !issueId) throw new HttpsError("invalid-argument", "propertyId and issueId are required.");
 
-  const prop = await loadProperty(propertyId);
+  const prop = await loadProperty(propertyId, uid);
   const { isStaff } = callerFlags(request, propertyId, prop);
   if (!isStaff) throw new HttpsError("permission-denied", "Only host staff can resolve issues.");
 
@@ -531,7 +553,7 @@ export const setPulseStatus = onCall(CALLABLE, async (request) => {
     throw new HttpsError("invalid-argument", "status must be live, paused, or archived.");
   }
 
-  const prop = await loadProperty(propertyId);
+  const prop = await loadProperty(propertyId, uid);
   const { isHostAdmin } = callerFlags(request, propertyId, prop);
   if (!isHostAdmin) throw new HttpsError("permission-denied", "Only a host admin can change Pulse status.");
 
@@ -607,7 +629,7 @@ export const recordPulseFollowup = onCall(CALLABLE, async (request) => {
   const checked = validatePulseFollowup(data.score, data.note);
   if (!checked.ok) throw new HttpsError("invalid-argument", `Invalid follow-up (${checked.reason}).`);
 
-  const prop = await loadProperty(propertyId);
+  const prop = await loadProperty(propertyId, uid);
   const { isStaff } = callerFlags(request, propertyId, prop);
   if (!isStaff) throw new HttpsError("permission-denied", "Only host staff can record a follow-up.");
 
