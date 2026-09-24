@@ -73,6 +73,8 @@ export const CALLABLES = {
   votePlanStopRemote: "votePlanStopRemote",
   postPlanComment: "postPlanCommentRemote",
   postPlanCommentRemote: "postPlanCommentRemote",
+  completePlan: "completePlanRemote",
+  completePlanRemote: "completePlanRemote",
   getPlanByInviteCode: "getPlanByInviteCode",
   confirmExperienceBooking: "confirmExperienceBookingRemote",
   completeAccountSignup: "completeAccountSignup",

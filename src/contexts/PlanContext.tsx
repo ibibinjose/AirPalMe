@@ -22,6 +22,9 @@ import { completePlan as storeCompletePlan,
   getPlanGoogleCalendarUrl,
 } from "@/lib/plan-store";
 import { useAuth } from "./AuthContext";
+import { completePlanRemoteCall } from "@/lib/functions";
+import { trackContentAction } from "@/lib/analytics";
+import { isFirebaseConfigured } from "@/lib/firebase";
 import { currencyForCity } from "@/lib/cities";
 import { useBio } from "./BioContext";
 import { toast } from "sonner";
@@ -85,7 +88,7 @@ interface PlanContextValue {
   fetchPlan: (idOrCode: string) => Promise<HangoutPlan | undefined>;
   createPlan: (input: CreatePlanInput) => HangoutPlan;
   updatePlan: (planId: string, patch: Partial<HangoutPlan>) => HangoutPlan | undefined;
-  completePlan: (planId: string) => HangoutPlan | undefined;
+  completePlan: (planId: string) => Promise<HangoutPlan | undefined>;
   deletePlan: (planId: string) => boolean;
   rsvpPlan: (
     planId: string,
@@ -279,13 +282,37 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     return updated;
   }, []);
 
-  const completePlan = useCallback((planId: string) => {
-    const updated = storeCompletePlan(planId);
-    if (!updated) return undefined;
-    setPlans([...loadPlans()]);
-    toast.success(`Marked "${updated.title}" completed`);
-    return updated;
-  }, []);
+  const completePlan = useCallback(
+    async (planId: string) => {
+      if (!requireUser("Sign in to complete plans.")) return undefined;
+      // Server first: authoritative status, audit record, and North Star event.
+      if (user && isFirebaseConfigured) {
+        try {
+          const res = await completePlanRemoteCall({ planId });
+          if (res?.ok) {
+            const updated = storeCompletePlan(planId);
+            if (updated) {
+              setPlans([...loadPlans()]);
+              toast.success(`Marked "${updated.title}" completed`);
+            }
+            return updated;
+          }
+        } catch {
+          // Fall through to the device copy; the server stays authoritative on retry.
+        }
+      }
+      const updated = storeCompletePlan(planId);
+      if (!updated) return undefined;
+      setPlans([...loadPlans()]);
+      trackContentAction("experience_completed", planId, {
+        contentId: planId,
+        category: storeGetPlan(planId)?.isExperience ? "experience" : "plan",
+      });
+      toast.success(`Marked "${updated.title}" completed`);
+      return updated;
+    },
+    [user, requireUser],
+  );
 
   const deletePlan = useCallback((planId: string) => {
     const success = storeDeletePlan(planId);

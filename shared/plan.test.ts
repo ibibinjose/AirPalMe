@@ -10,6 +10,7 @@ import {
   PLAN_COVER_PRESETS,
   PLAN_THEMES,
   buildStopChangeMessage,
+  canCompletePlanStatus,
   formatTime12h,
   reorderStops,
   spotsLeft,
@@ -159,5 +160,15 @@ describe("trip itinerary", () => {
     expect(hasTripItinerary({ type: "escape", multiDaySchedule: [day(1, "Coast")] })).toBe(true);
     expect(hasTripItinerary({ type: "trip", multiDaySchedule: [] })).toBe(false);
     expect(hasTripItinerary({ type: "nightout", multiDaySchedule: [day(1, "City")] })).toBe(false);
+  });
+});
+
+describe("plan completion guard", () => {
+  it("allows only live plans to close the loop", () => {
+    expect(canCompletePlanStatus("open")).toBe(true);
+    expect(canCompletePlanStatus("confirmed")).toBe(true);
+    expect(canCompletePlanStatus("draft")).toBe(false);
+    expect(canCompletePlanStatus("completed")).toBe(false);
+    expect(canCompletePlanStatus("cancelled")).toBe(false);
   });
 });

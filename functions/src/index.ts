@@ -35,6 +35,8 @@ export {
   votePlanStopRemote,
   postPlanComment,
   postPlanCommentRemote,
+  completePlan,
+  completePlanRemote,
   getPlanByInviteCode,
 } from "./plans";
 export { createManagedProduct, createManagedCheckoutSession } from "./managed-payments";

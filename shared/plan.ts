@@ -231,6 +231,9 @@ export interface HangoutPlan {
   /** Interest tags used for nearby matching. */
   interests?: string[];
   status: PlanStatus;
+  /** Server-stamped when status flips to completed via completePlanRemote. */
+  completedAt?: string;
+  completedByUid?: string;
 
   // Experience Marketplace & Monetization Fields (Optional for full backward compatibility)
   isExperience?: boolean;
@@ -1573,6 +1576,24 @@ export interface PostPlanCommentRequest {
 export interface PostPlanCommentResponse {
   ok: true;
   comment: PlanComment;
+}
+
+export interface CompletePlanRequest {
+  planId: string;
+}
+
+export interface CompletePlanResponse {
+  ok: true;
+  planId: string;
+  status: "completed";
+  completedAt: string;
+}
+
+/** Only a live plan can close the loop — drafts, cancelled, and already-completed plans cannot. */
+export const COMPLETABLE_PLAN_STATUSES: readonly PlanStatus[] = ["open", "confirmed"];
+
+export function canCompletePlanStatus(status: PlanStatus): boolean {
+  return COMPLETABLE_PLAN_STATUSES.includes(status);
 }
 
 export interface GetPlanByInviteCodeRequest {

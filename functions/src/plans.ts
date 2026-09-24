@@ -11,6 +11,8 @@ import type {
   VotePlanStopResponse,
   PostPlanCommentRequest,
   PostPlanCommentResponse,
+  CompletePlanRequest,
+  CompletePlanResponse,
   GetPlanByInviteCodeRequest,
   GetPlanByInviteCodeResponse,
   HangoutPlan,
@@ -18,9 +20,11 @@ import type {
   PlanComment,
   PlanStop,
 } from "../../shared/plan";
-import { randomInviteCode } from "../../shared/plan";
-import { CALLABLE, db, requireAuth } from "./admin";
+import { canCompletePlanStatus, randomInviteCode } from "../../shared/plan";
+import { CALLABLE, db, isPlatformAdmin, requireAuth } from "./admin";
 import { enforceRateLimit, isAnonymousAuth, noteAppCheck } from "./abuse";
+import type { AccessClaims } from "../../shared/airpal-security";
+import { writeAuthoritativeEvent } from "./analytics";
 
 export type {
   CreatePlanRequest,
@@ -33,6 +37,8 @@ export type {
   VotePlanStopResponse,
   PostPlanCommentRequest,
   PostPlanCommentResponse,
+  CompletePlanRequest,
+  CompletePlanResponse,
   GetPlanByInviteCodeRequest,
   GetPlanByInviteCodeResponse,
 };
@@ -296,6 +302,74 @@ export const postPlanCommentRemote = onCall(CALLABLE, async (request) => {
   return { ok: true, comment };
 });
 
+/**
+ * P0 — close the AirPal loop with server authority. The creator, a going
+ * attendee (someone who showed up), or a platform admin flips a live plan to
+ * completed. The server stamps completedAt, writes an audit record, and logs
+ * the authoritative experience_completed event for the North Star count.
+ */
+export const completePlanRemote = onCall(CALLABLE, async (request) => {
+  await noteAppCheck(request, "completePlanRemote");
+  const uid = requireAuth(request.auth?.uid);
+  await enforceRateLimit(uid, "planWrite", isAnonymousAuth(request));
+
+  const data = (request.data || {}) as CompletePlanRequest;
+  const planId = String(data.planId || "").trim();
+  if (!planId) throw new HttpsError("invalid-argument", "planId is required.");
+
+  const planRef = db.collection("plans").doc(planId);
+  const planSnap = await planRef.get();
+  if (!planSnap.exists) throw new HttpsError("not-found", "Plan not found.");
+  const plan = planSnap.data() as HangoutPlan;
+
+  const claims = request.auth?.token as AccessClaims | undefined;
+  const admin = isPlatformAdmin(claims);
+  const isCreator = plan.creator?.uid === uid;
+  const wentAlong = (plan.attendees || []).some((a) => a.id === uid && a.status === "going");
+  if (!isCreator && !wentAlong && !admin) {
+    throw new HttpsError("permission-denied", "Only the host, someone who went, or an admin can complete this plan.");
+  }
+  if (plan.status === "completed") {
+    return { ok: true, planId, status: "completed", completedAt: plan.completedAt || plan.updatedAt } as CompletePlanResponse;
+  }
+  if (!canCompletePlanStatus(plan.status)) {
+    throw new HttpsError("failed-precondition", "Only a live plan can be marked completed.");
+  }
+
+  const now = new Date().toISOString();
+  await planRef.update({
+    status: "completed",
+    completedAt: now,
+    completedByUid: uid,
+    updatedAt: now,
+  });
+
+  await db.collection("admin_audits").add({
+    actorUid: uid,
+    action: "plan.status",
+    collection: "plans",
+    docId: planId,
+    from: plan.status,
+    to: "completed",
+    note: "",
+    createdAt: now,
+  });
+
+  await writeAuthoritativeEvent({
+    uid,
+    eventName: "content_action",
+    contextId: planId,
+    source: "internal",
+    properties: {
+      actionType: "experience_completed",
+      contextId: planId,
+      contentId: planId,
+    },
+  });
+
+  return { ok: true, planId, status: "completed", completedAt: now } as CompletePlanResponse;
+});
+
 export const getPlanByInviteCode = onCall(CALLABLE, async (request) => {
   await noteAppCheck(request, "getPlanByInviteCode");
   const data = (request.data || {}) as GetPlanByInviteCodeRequest;
@@ -318,3 +392,4 @@ export const rsvpPlan = rsvpPlanRemote;
 export const addPlanStop = addPlanStopRemote;
 export const votePlanStop = votePlanStopRemote;
 export const postPlanComment = postPlanCommentRemote;
+export const completePlan = completePlanRemote;

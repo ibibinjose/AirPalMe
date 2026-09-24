@@ -23,6 +23,8 @@ import type {
   VotePlanStopResponse,
   PostPlanCommentRequest,
   PostPlanCommentResponse,
+  CompletePlanRequest,
+  CompletePlanResponse,
   GetPlanByInviteCodeRequest,
   GetPlanByInviteCodeResponse,
 } from "@shared/plan";
@@ -326,6 +328,11 @@ export function postPlanCommentRemote(data: PostPlanCommentRequest) {
   return callFunction<PostPlanCommentRequest, PostPlanCommentResponse>(CALLABLES.postPlanComment, data);
 }
 export const postPlanCommentRemoteCall = postPlanCommentRemote;
+
+export function completePlanRemoteCall(data: CompletePlanRequest) {
+  return callFunction<CompletePlanRequest, CompletePlanResponse>(CALLABLES.completePlan, data);
+}
+export const completePlanRemote = completePlanRemoteCall;
 
 export function getPlanByInviteCodeRemote(data: GetPlanByInviteCodeRequest) {
   return callFunction<GetPlanByInviteCodeRequest, GetPlanByInviteCodeResponse>(CALLABLES.getPlanByInviteCode, data);

@@ -356,13 +356,7 @@ export function PlanDetailPage() {
               size="sm"
               className="h-11 shrink-0 gap-1.5 rounded-full px-5"
               onClick={() => {
-                const updated = completePlan(plan.id);
-                if (updated) {
-                  trackContentAction("experience_completed", plan.id, {
-                    contentId: plan.id,
-                    category: plan.isExperience ? "experience" : "plan",
-                  });
-                }
+                void completePlan(plan.id);
               }}
             >
               <CheckCircle2 size={16} />
