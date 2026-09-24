@@ -7,7 +7,9 @@ import {
   getPulseByTokenRemote,
   liveBackendEnabled,
   publishPulseRemote,
+  recordPulseFollowupRemote,
   resolvePulseIssueRemote,
+  setPulseStatusRemote,
   submitPulseResponseRemote,
 } from "./functions";
 
@@ -69,6 +71,8 @@ export function pulseIssueFromDoc(id: string, data: Record<string, unknown>): Pu
     resolutionNote: typeof data.resolutionNote === "string" ? data.resolutionNote : undefined,
     followupScore: typeof data.followupScore === "number" ? data.followupScore : undefined,
     followupAt: asIso(data.followupAt) || undefined,
+    followupNote: typeof data.followupNote === "string" ? data.followupNote : undefined,
+    followupBy: typeof data.followupBy === "string" ? data.followupBy : undefined,
     staffTicketId: typeof data.staffTicketId === "string" ? data.staffTicketId : undefined,
     createdAt: asIso(data.createdAtIso) || asIso(data.createdAt) || new Date().toISOString(),
   };
@@ -100,6 +104,72 @@ export async function acknowledgePulseIssue(propertyId: string, issueId: string)
 
 export async function resolvePulseIssue(propertyId: string, issueId: string, resolutionNote?: string) {
   return resolvePulseIssueRemote({ propertyId, issueId, resolutionNote });
+}
+
+export async function setPulseStatus(
+  propertyId: string,
+  pulseId: string,
+  status: "live" | "paused" | "archived",
+) {
+  if (!liveBackendEnabled()) throw new Error("Pulse needs a live connection.");
+  return setPulseStatusRemote({ propertyId, pulseId, status });
+}
+
+export async function recordPulseFollowup(
+  propertyId: string,
+  issueId: string,
+  score: number,
+  note?: string,
+) {
+  return recordPulseFollowupRemote({ propertyId, issueId, score, note });
+}
+
+export type PropertyPulse = {
+  id: string;
+  name: string;
+  status: "draft" | "live" | "paused" | "archived";
+  activePublicToken?: string;
+  updatedAt?: string;
+};
+
+export function pulseFromDoc(id: string, data: Record<string, unknown>): PropertyPulse | null {
+  const status = String(data.status || "draft");
+  if (status !== "draft" && status !== "live" && status !== "paused" && status !== "archived") return null;
+  return {
+    id,
+    name: typeof data.name === "string" && data.name ? data.name : "Pulse",
+    status,
+    activePublicToken: typeof data.activePublicToken === "string" ? data.activePublicToken : undefined,
+    updatedAt: asIso(data.updatedAtIso) || asIso(data.updatedAt) || undefined,
+  };
+}
+
+export function subscribePropertyPulses(
+  propertyId: string,
+  onChange: (rows: PropertyPulse[]) => void,
+): () => void {
+  if (!propertyId || propertyId === "unknown" || !liveBackendEnabled()) {
+    onChange([]);
+    return () => undefined;
+  }
+  const db = getFirebaseDb();
+  if (!db) {
+    onChange([]);
+    return () => undefined;
+  }
+  return onSnapshot(
+    collection(db, "properties", propertyId, "pulses"),
+    (snap) => {
+      const rows: PropertyPulse[] = [];
+      for (const doc of snap.docs) {
+        const row = pulseFromDoc(doc.id, doc.data() as Record<string, unknown>);
+        if (row) rows.push(row);
+      }
+      rows.sort((a, b) => (b.updatedAt || "").localeCompare(a.updatedAt || ""));
+      onChange(rows);
+    },
+    () => onChange([]),
+  );
 }
 
 export function subscribePropertyPulseResponses(

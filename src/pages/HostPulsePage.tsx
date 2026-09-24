@@ -14,9 +14,13 @@ import {
   createDuringStayPulse,
   openPulseIssueCount,
   publishPulse,
+  recordPulseFollowup,
   resolvePulseIssue,
+  setPulseStatus,
   subscribePropertyPulseIssues,
   subscribePropertyPulseResponses,
+  subscribePropertyPulses,
+  type PropertyPulse,
 } from "@/lib/pulse-store";
 import { buildPulsePublicUrl, pulseResponsesToCsv, type PulseIssue, type PulseResponse } from "@shared/pulse";
 import { liveBackendEnabled } from "@/lib/functions";
@@ -27,18 +31,23 @@ export function HostPulsePage() {
   const workspaceId = hostWorkspacePropertyId(user?.propertyIds, isAdmin);
   const [responses, setResponses] = useState<PulseResponse[]>([]);
   const [issues, setIssues] = useState<PulseIssue[]>([]);
+  const [pulses, setPulses] = useState<PropertyPulse[]>([]);
   const [busy, setBusy] = useState(false);
   const [publicToken, setPublicToken] = useState<string | null>(null);
   const [qr, setQr] = useState<string | null>(null);
   const [noteByIssue, setNoteByIssue] = useState<Record<string, string>>({});
+  const [followupScoreByIssue, setFollowupScoreByIssue] = useState<Record<string, string>>({});
+  const [followupNoteByIssue, setFollowupNoteByIssue] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!workspaceId) return;
     const a = subscribePropertyPulseResponses(workspaceId, setResponses);
     const b = subscribePropertyPulseIssues(workspaceId, setIssues);
+    const c = subscribePropertyPulses(workspaceId, setPulses);
     return () => {
       a();
       b();
+      c();
     };
   }, [workspaceId]);
 
@@ -52,6 +61,39 @@ export function HostPulsePage() {
 
   const avg = useMemo(() => averagePrimaryScore(responses), [responses]);
   const openIssues = useMemo(() => issues.filter((i) => i.status !== "resolved"), [issues]);
+  const resolvedIssues = useMemo(() => issues.filter((i) => i.status === "resolved").slice(0, 10), [issues]);
+  const activePulse = useMemo(
+    () => pulses.find((p) => p.status === "live" || p.status === "paused") || pulses[0],
+    [pulses],
+  );
+
+  async function onSetStatus(pulseId: string, status: "live" | "paused" | "archived") {
+    if (!workspaceId) return;
+    setBusy(true);
+    try {
+      await setPulseStatus(workspaceId, pulseId, status);
+      toast.success(status === "live" ? "Pulse is live again" : status === "paused" ? "Pulse paused" : "Pulse archived");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not change status");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function onRecordFollowup(issueId: string) {
+    if (!workspaceId) return;
+    const score = Number(followupScoreByIssue[issueId]);
+    if (!Number.isInteger(score) || score < 1 || score > 5) {
+      toast.error("Pick a follow-up score from 1 to 5");
+      return;
+    }
+    void recordPulseFollowup(workspaceId, issueId, score, followupNoteByIssue[issueId]?.trim() || undefined)
+      .then(() => {
+        void track("pulse_followup_completed", { contextId: workspaceId, issueId });
+        toast.success("Follow-up recorded");
+      })
+      .catch((err) => toast.error(err instanceof Error ? err.message : "Failed"));
+  }
 
   async function onCreateAndPublish() {
     if (!workspaceId || workspaceId === "unknown") {
@@ -161,6 +203,42 @@ export function HostPulsePage() {
         )}
       </section>
 
+      {activePulse && (
+        <section className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[22px] bg-card p-4 ring-1 ring-line">
+          <div>
+            <p className="text-sm font-semibold">
+              {activePulse.name} · <span className="capitalize text-mute">{activePulse.status}</span>
+            </p>
+            <p className="text-xs text-mute">
+              {activePulse.status === "live"
+                ? "Accepting responses."
+                : activePulse.status === "paused"
+                  ? "Paused — the QR link is temporarily dead."
+                  : activePulse.status === "archived"
+                    ? "Archived — the QR link stays dead."
+                    : "Draft — publish to go live."}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {activePulse.status === "live" && (
+              <Button variant="ghost" loading={busy} onClick={() => void onSetStatus(activePulse.id, "paused")}>
+                Pause
+              </Button>
+            )}
+            {activePulse.status === "paused" && (
+              <Button variant="ghost" loading={busy} onClick={() => void onSetStatus(activePulse.id, "live")}>
+                Resume
+              </Button>
+            )}
+            {(activePulse.status === "live" || activePulse.status === "paused") && (
+              <Button variant="ghost" loading={busy} onClick={() => void onSetStatus(activePulse.id, "archived")}>
+                Archive
+              </Button>
+            )}
+          </div>
+        </section>
+      )}
+
       <div className="mt-4 grid grid-cols-3 gap-2">
         {[
           { n: responses.length, l: "Responses" },
@@ -244,6 +322,56 @@ export function HostPulsePage() {
           ))
         )}
       </ul>
+
+      {resolvedIssues.length > 0 && (
+        <>
+          <div className="mt-8 mb-2 flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold text-mute">Resolved · record a follow-up</h2>
+          </div>
+          <ul className="space-y-2">
+            {resolvedIssues.map((issue) => (
+              <li key={issue.id} className="rounded-[22px] bg-card p-4 ring-1 ring-line">
+                <p className="text-[12px] text-mute">
+                  {issue.category}
+                  {issue.roomNumber ? ` · Room ${issue.roomNumber}` : ""}
+                  {issue.followupScore != null ? ` · follow-up ${issue.followupScore}/5` : ""}
+                </p>
+                <p className="mt-0.5 font-medium">{issue.summary}</p>
+                {issue.followupScore != null ? (
+                  <p className="mt-1 text-xs text-mute">
+                    Follow-up {issue.followupScore}/5{issue.followupNote ? ` — ${issue.followupNote}` : ""}
+                  </p>
+                ) : (
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <select
+                      aria-label="Follow-up score"
+                      className="h-9 rounded-full border border-line bg-paper px-3 text-sm outline-none focus:border-brand"
+                      value={followupScoreByIssue[issue.id] || ""}
+                      onChange={(e) => setFollowupScoreByIssue((m) => ({ ...m, [issue.id]: e.target.value }))}
+                    >
+                      <option value="">Score…</option>
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <option key={n} value={n}>
+                          {n}/5
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      className="h-9 min-w-[160px] flex-1 rounded-full border border-line bg-paper px-3 text-sm outline-none focus:border-brand"
+                      placeholder="Follow-up note (optional)"
+                      value={followupNoteByIssue[issue.id] || ""}
+                      onChange={(e) => setFollowupNoteByIssue((m) => ({ ...m, [issue.id]: e.target.value }))}
+                    />
+                    <button type="button" className="text-sm text-brand" onClick={() => onRecordFollowup(issue.id)}>
+                      Record follow-up
+                    </button>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       <div className="mt-8 mb-2 flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold text-mute">Responses{responses.length ? ` · ${responses.length}` : ""}</h2>

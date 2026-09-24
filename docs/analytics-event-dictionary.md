@@ -82,6 +82,7 @@ Always report numerator, denominator, and the per-context distribution — never
 | `pulse_issue_acknowledged` | Host/staff acknowledged a Pulse issue | No |
 | `pulse_issue_resolved` | Host/staff resolved a Pulse issue | Yes |
 | `pulse_followup_completed` | Guest completed optional post-resolve follow-up | No |
+| `pulse_status_changed` | Host changed a Pulse status (pause / resume / archive) | No |
 | `client_error`        | Uncaught window error, unhandled rejection, or React boundary. No stack, URL, or free text — `errorClass` + `errorSource` + path only. | No                                    |
 
 Not emitted until the product exists: `event_check_in`, `subscription_state`.
@@ -144,6 +145,7 @@ Mirrors `EVENT_PROPERTY_ALLOWLIST` in `shared/analytics.ts`. `validateAnalyticsE
 | `pulse_issue_acknowledged` | `contextId`, `issueId` | `pulseId` |
 | `pulse_issue_resolved` | `contextId`, `issueId` | `pulseId`, `resolutionTimeMs` |
 | `pulse_followup_completed` | `contextId`, `issueId` | `scoreBucket` |
+| `pulse_status_changed` | `contextId`, `pulseId` | `from`, `to` |
 | `client_error` | `errorClass`, `errorSource` | `path`, `name` |
 
 Enumerated values (enforced by `isQualifiedAction`, not by the validator — unknown values validate but never count):

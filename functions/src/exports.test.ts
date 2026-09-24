@@ -75,6 +75,8 @@ const CALLABLES = [
   "publishPulse",
   "acknowledgePulseIssue",
   "resolvePulseIssue",
+  "setPulseStatus",
+  "recordPulseFollowup",
   "onPulseIssueCreated",
 ];
 

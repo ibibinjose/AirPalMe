@@ -123,12 +123,13 @@ Aligned to product definition §47, cut to Stay beachhead:
 10. Auto issue on rule match
 11. Real-time alert: in-app host bell + FCM (email/SMS later)
 12. Assign (optional MVP: assignee uid) + acknowledge
-13. Resolve + resolution note + optional follow-up rating
-14. Basic analytics (counts, avg rating, open/resolved — real queries only)
-15. Location = property for MVP (multi-site org later)
-16. Team = existing property members
-17. Permissions = host_admin vs staff (staff: inbox + resolve; host_admin: publish + settings)
-18. CSV export of responses
+13. Resolve + resolution note + staff-recorded follow-up rating (`recordPulseFollowup`)
+14. Pause / resume / archive with public-token revocation (`setPulseStatus`)
+15. Basic analytics (counts, avg rating, open/resolved — real queries only)
+16. Location = property for MVP (multi-site org later)
+17. Team = existing property members
+18. Permissions = host_admin vs staff (staff: inbox + resolve; host_admin: publish + settings)
+19. CSV export of responses
 
 **Out of MVP:** NFC admin, visual logic canvas, smart multi-condition escalation trees, AI summaries, webhooks UI, billing, templates library beyond one Stay template, employee Pulse, review-gate manipulation.
 
@@ -193,6 +194,7 @@ Demo Hotel (`/DemoHotel`) may deep-link or show a “How is your stay?” entry 
 - `pulse_issue_acknowledged`
 - `pulse_issue_resolved`
 - `pulse_followup_completed`
+- `pulse_status_changed`
 
 Document in `docs/analytics-event-dictionary.md` before shipping UI that claims them.
 

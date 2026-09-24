@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "wouter";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
@@ -29,6 +29,16 @@ export function PulsePublicPage() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<{ issueCreated: boolean } | null>(null);
   const [showContact, setShowContact] = useState(false);
+  // One idempotency key per form instance: double-taps and retried submits
+  // return the original response instead of duplicating it.
+  const clientKeyRef = useRef("");
+  if (!clientKeyRef.current) {
+    try {
+      clientKeyRef.current = crypto.randomUUID().replace(/-/g, "").slice(0, 32);
+    } catch {
+      clientKeyRef.current = `k${Date.now().toString(36)}${Math.floor(Math.random() * 1e9).toString(36)}`;
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -79,6 +89,7 @@ export function PulsePublicPage() {
         contactName: contactName.trim() || undefined,
         contactMethod: contactMethod.trim() || undefined,
         roomNumber: roomNumber.trim() || undefined,
+        clientKey: clientKeyRef.current || undefined,
       });
       setDone({ issueCreated: Boolean(result.createIssue) });
       toast.success(result.createIssue ? "Sent — the team has been alerted" : "Thanks for your feedback");

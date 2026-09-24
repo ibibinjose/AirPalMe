@@ -84,6 +84,8 @@ export const CALLABLES = {
   publishPulse: "publishPulse",
   acknowledgePulseIssue: "acknowledgePulseIssue",
   resolvePulseIssue: "resolvePulseIssue",
+  setPulseStatus: "setPulseStatus",
+  recordPulseFollowup: "recordPulseFollowup",
 } as const;
 
 export type CompleteAccountSignupRequest = {

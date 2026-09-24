@@ -6,10 +6,13 @@ import {
   evaluateLogic,
   isNegativeRating,
   isPulsePublicToken,
+  isValidClientKey,
   issueSummaryFromAnswers,
   primaryScoreFromAnswers,
   pulseResponsesToCsv,
+  resolvePulseStatusTransition,
   stayDuringStayTemplate,
+  validatePulseFollowup,
   validatePulseSubmitPayload,
   visibleQuestions,
   type PulseAnswer,
@@ -108,6 +111,48 @@ describe("submit validation", () => {
       answers: [{ questionId: "q_hack", type: "rating_5", value: 1 }],
     });
     expect(bad.ok).toBe(false);
+  });
+});
+
+describe("status transitions", () => {
+  it("pauses, resumes, and archives a live Pulse — and nothing else", () => {
+    expect(resolvePulseStatusTransition("live", "paused")).toBe(true);
+    expect(resolvePulseStatusTransition("paused", "live")).toBe(true);
+    expect(resolvePulseStatusTransition("live", "archived")).toBe(true);
+    expect(resolvePulseStatusTransition("paused", "archived")).toBe(true);
+    expect(resolvePulseStatusTransition("draft", "archived")).toBe(true);
+  });
+
+  it("rejects publish-via-transition, same-state, and archived-exit moves", () => {
+    expect(resolvePulseStatusTransition("draft", "live")).toBe(false);
+    expect(resolvePulseStatusTransition("live", "live")).toBe(false);
+    expect(resolvePulseStatusTransition("archived", "live")).toBe(false);
+    expect(resolvePulseStatusTransition("paused", "draft")).toBe(false);
+  });
+});
+
+describe("client keys", () => {
+  it("accepts URL-safe keys and rejects the rest", () => {
+    expect(isValidClientKey("kAbc123-_XYZ9")).toBe(true);
+    expect(isValidClientKey("short")).toBe(false);
+    expect(isValidClientKey("has space in it 12345")).toBe(false);
+    expect(isValidClientKey("../../../etc")).toBe(false);
+    expect(isValidClientKey(undefined)).toBe(false);
+    expect(isValidClientKey("x".repeat(65))).toBe(false);
+  });
+});
+
+describe("follow-up validation", () => {
+  it("accepts a 1–5 score with an optional short note", () => {
+    expect(validatePulseFollowup(4, "Fixed the AC")).toEqual({ ok: true, score: 4, note: "Fixed the AC" });
+    expect(validatePulseFollowup("5")).toEqual({ ok: true, score: 5, note: undefined });
+  });
+
+  it("rejects out-of-range scores and long notes", () => {
+    expect(validatePulseFollowup(0).ok).toBe(false);
+    expect(validatePulseFollowup(6).ok).toBe(false);
+    expect(validatePulseFollowup(3.5).ok).toBe(false);
+    expect(validatePulseFollowup(4, "x".repeat(501)).ok).toBe(false);
   });
 });
 

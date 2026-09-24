@@ -82,6 +82,7 @@ export const ANALYTICS_EVENT_NAMES = [
   "pulse_issue_acknowledged",
   "pulse_issue_resolved",
   "pulse_followup_completed",
+  "pulse_status_changed",
   "client_error",
 ] as const;
 
@@ -218,6 +219,7 @@ export const EVENT_PROPERTY_ALLOWLIST: Record<
   pulse_issue_acknowledged: { required: ["contextId", "issueId"], optional: ["pulseId"] },
   pulse_issue_resolved: { required: ["contextId", "issueId"], optional: ["pulseId", "resolutionTimeMs"] },
   pulse_followup_completed: { required: ["contextId", "issueId"], optional: ["scoreBucket"] },
+  pulse_status_changed: { required: ["contextId", "pulseId"], optional: ["from", "to"] },
   client_error: { required: ["errorClass", "errorSource"], optional: ["path", "name"] },
 };
 

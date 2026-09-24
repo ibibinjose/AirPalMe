@@ -523,11 +523,12 @@ export function submitPulseResponseRemote(data: {
   contactName?: string;
   contactMethod?: string;
   roomNumber?: string;
+  clientKey?: string;
 }) {
-  return callFunction<typeof data, { responseId: string; issueId: string | null; createIssue: boolean }>(
-    CALLABLES.submitPulseResponse,
-    data,
-  );
+  return callFunction<
+    typeof data,
+    { responseId: string; issueId: string | null; createIssue: boolean; duplicate?: boolean }
+  >(CALLABLES.submitPulseResponse, data);
 }
 
 export function createPulseRemote(data: { propertyId: string; template?: string; name?: string }) {
@@ -552,4 +553,17 @@ export function acknowledgePulseIssueRemote(data: { propertyId: string; issueId:
 
 export function resolvePulseIssueRemote(data: { propertyId: string; issueId: string; resolutionNote?: string }) {
   return callFunction<typeof data, { ok: true }>(CALLABLES.resolvePulseIssue, data);
+}
+
+export function setPulseStatusRemote(data: { propertyId: string; pulseId: string; status: "live" | "paused" | "archived" }) {
+  return callFunction<typeof data, { status: "live" | "paused" | "archived" }>(CALLABLES.setPulseStatus, data);
+}
+
+export function recordPulseFollowupRemote(data: {
+  propertyId: string;
+  issueId: string;
+  score: number;
+  note?: string;
+}) {
+  return callFunction<typeof data, { ok: true }>(CALLABLES.recordPulseFollowup, data);
 }

@@ -8,15 +8,19 @@ import {
   categoryFromPulseAnswers,
   createPublicToken,
   isPulsePublicToken,
+  isValidClientKey,
   issueSummaryFromAnswers,
+  resolvePulseStatusTransition,
   scoreBucket,
   stayDuringStayTemplate,
+  validatePulseFollowup,
   validatePulseSubmitPayload,
   type Pulse,
   type PulseAnswer,
   type PulseIssue,
   type PulsePublicDto,
   type PulseResponse,
+  type PulseStatus,
 } from "../../shared/pulse";
 import { enforceRateLimit, isAnonymousAuth, noteAppCheck } from "./abuse";
 import { CALLABLE, db, isPlatformAdmin, requireAuth } from "./admin";
@@ -58,9 +62,18 @@ export const getPulseByToken = onCall(CALLABLE, async (request) => {
   const publicToken = String((request.data || {}).publicToken || "").trim();
   if (!isPulsePublicToken(publicToken)) throw new HttpsError("invalid-argument", "Invalid Pulse link.");
 
+  // Scan throttle: per-device when signed in, per-link otherwise. Enumeration
+  // is already infeasible (119-bit tokens); this stops scan/analytics spam.
+  await enforceRateLimit(
+    request.auth?.uid || `token:${publicToken}`,
+    "pulse_scan",
+    !request.auth?.uid || isAnonymousAuth(request),
+  );
+
   const tokenSnap = await db.collection("pulseTokens").doc(publicToken).get();
   if (!tokenSnap.exists) throw new HttpsError("not-found", "This Pulse link is not active.");
   const token = tokenSnap.data() || {};
+  if (token.active !== true) throw new HttpsError("not-found", "This Pulse link is not active.");
   const propertyId = String(token.propertyId || "");
   const deploymentId = String(token.deploymentId || "");
   const pulseId = String(token.pulseId || "");
@@ -123,6 +136,7 @@ export const submitPulseResponse = onCall(CALLABLE, async (request) => {
   const tokenSnap = await db.collection("pulseTokens").doc(publicToken).get();
   if (!tokenSnap.exists) throw new HttpsError("not-found", "This Pulse link is not active.");
   const token = tokenSnap.data() || {};
+  if (token.active !== true) throw new HttpsError("not-found", "This Pulse link is not active.");
   const propertyId = String(token.propertyId || "");
   const deploymentId = String(token.deploymentId || "");
   const pulseId = String(token.pulseId || "");
@@ -158,68 +172,89 @@ export const submitPulseResponse = onCall(CALLABLE, async (request) => {
   if (!validated.ok) throw new HttpsError("invalid-argument", `Could not accept answers (${validated.reason}).`);
 
   const nowIso = new Date().toISOString();
-  const responseId = `presp_${Date.now().toString(36)}_${createPublicToken().slice(-6)}`;
-  let issueId: string | undefined;
+  // Idempotency: one clientKey per form instance. Replays return the original
+  // response instead of duplicating it (and its issue + staff alert).
+  const clientKey = isValidClientKey(data.clientKey) ? (data.clientKey as string) : undefined;
 
-  if (validated.createIssue) {
-    issueId = `pissue_${Date.now().toString(36)}_${createPublicToken().slice(-6)}`;
-    const category = categoryFromPulseAnswers(validated.answers);
-    const issue: PulseIssue = {
-      id: issueId,
-      propertyId,
-      pulseId,
-      responseId,
-      deploymentId,
-      status: "open",
-      category,
-      summary: issueSummaryFromAnswers(validated.answers, validated.primaryScore),
-      primaryScore: validated.primaryScore,
-      roomNumber,
-      contactRequested: validated.askContact || data.contactRequested === true,
-      contactName,
-      contactMethod,
-      createdAt: nowIso,
-    };
-    await db
-      .collection("properties")
-      .doc(propertyId)
-      .collection("pulseIssues")
-      .doc(issueId)
-      .set({
+  const responsesCol = db.collection("properties").doc(propertyId).collection("pulseResponses");
+  const issuesCol = db.collection("properties").doc(propertyId).collection("pulseIssues");
+
+  // Atomic: response + issue land together, so a crash can never orphan an
+  // issue without its response (or alert staff about nothing).
+  const written = await db.runTransaction(async (tx) => {
+    if (clientKey) {
+      const prior = await tx.get(responsesCol.doc(`presp_${clientKey}`));
+      if (prior.exists) {
+        const row = prior.data() || {};
+        return {
+          responseId: String(row.id || prior.id),
+          issueId: row.issueId ? String(row.issueId) : null,
+          createIssue: false,
+          duplicate: true,
+        };
+      }
+    }
+    const responseId = clientKey
+      ? `presp_${clientKey}`
+      : `presp_${Date.now().toString(36)}_${createPublicToken().slice(-6)}`;
+    let issueId: string | undefined;
+
+    if (validated.createIssue) {
+      issueId = `pissue_${Date.now().toString(36)}_${createPublicToken().slice(-6)}`;
+      const category = categoryFromPulseAnswers(validated.answers);
+      const issue: PulseIssue = {
+        id: issueId,
+        propertyId,
+        pulseId,
+        responseId,
+        deploymentId,
+        status: "open",
+        category,
+        summary: issueSummaryFromAnswers(validated.answers, validated.primaryScore),
+        primaryScore: validated.primaryScore,
+        roomNumber,
+        contactRequested: validated.askContact || data.contactRequested === true,
+        contactName,
+        contactMethod,
+        createdAt: nowIso,
+      };
+      tx.set(issuesCol.doc(issueId), {
         ...issue,
         createdAt: FieldValue.serverTimestamp(),
         createdAtIso: nowIso,
       });
-  }
+    }
 
-  const response: PulseResponse = {
-    id: responseId,
-    propertyId,
-    pulseId,
-    deploymentId,
-    publicToken,
-    answers: validated.answers,
-    primaryScore: validated.primaryScore,
-    contactRequested: validated.askContact || data.contactRequested === true,
-    contactName,
-    contactMethod,
-    roomNumber,
-    issueId,
-    createdAt: nowIso,
-    uid,
-    anonymous: isAnonymousAuth(request),
-  };
-
-  await db
-    .collection("properties")
-    .doc(propertyId)
-    .collection("pulseResponses")
-    .doc(responseId)
-    .set({
+    const response: PulseResponse = {
+      id: responseId,
+      propertyId,
+      pulseId,
+      deploymentId,
+      publicToken,
+      answers: validated.answers,
+      primaryScore: validated.primaryScore,
+      contactRequested: validated.askContact || data.contactRequested === true,
+      contactName,
+      contactMethod,
+      roomNumber,
+      issueId,
+      clientKey,
+      createdAt: nowIso,
+      uid,
+      anonymous: isAnonymousAuth(request),
+    };
+    tx.set(responsesCol.doc(responseId), {
       ...response,
       createdAt: FieldValue.serverTimestamp(),
       createdAtIso: nowIso,
     });
+    return { responseId, issueId: issueId || null, createIssue: Boolean(issueId), duplicate: false };
+  });
+
+  if (written.duplicate) return written;
+
+  const responseId = written.responseId;
+  const issueId = written.issueId;
 
   await writeAuthoritativeEvent({
     uid,
@@ -391,13 +426,23 @@ export const acknowledgePulseIssue = onCall(CALLABLE, async (request) => {
   const row = snap.data() || {};
   if (row.status === "resolved") throw new HttpsError("failed-precondition", "Issue already resolved.");
 
+  const assignee =
+    typeof data.assigneeUid === "string" && data.assigneeUid ? data.assigneeUid : uid;
+  if (assignee !== uid) {
+    const members =
+      prop.members && typeof prop.members === "object" ? (prop.members as Record<string, unknown>) : {};
+    if (assignee !== prop.ownerId && !members[assignee]) {
+      throw new HttpsError("invalid-argument", "Assignee is not on this property team.");
+    }
+  }
+
   const nowIso = new Date().toISOString();
   await ref.set(
     {
       status: "acknowledged",
       acknowledgedAt: nowIso,
       acknowledgedBy: uid,
-      assigneeUid: typeof data.assigneeUid === "string" && data.assigneeUid ? data.assigneeUid : uid,
+      assigneeUid: assignee,
       updatedAt: FieldValue.serverTimestamp(),
     },
     { merge: true },
@@ -471,9 +516,140 @@ export const resolvePulseIssue = onCall(CALLABLE, async (request) => {
   return { ok: true as const };
 });
 
+/** host_admin — pause / resume / archive a Pulse. Pausing and archiving revoke the public token. */
+export const setPulseStatus = onCall(CALLABLE, async (request) => {
+  await noteAppCheck(request, "setPulseStatus");
+  const uid = requireAuth(request.auth?.uid);
+  if (isAnonymousAuth(request)) throw new HttpsError("failed-precondition", "Sign in with a host account.");
+
+  const data = (request.data || {}) as Record<string, unknown>;
+  const propertyId = String(data.propertyId || "").trim();
+  const pulseId = String(data.pulseId || "").trim();
+  const status = String(data.status || "").trim() as PulseStatus;
+  if (!propertyId || !pulseId) throw new HttpsError("invalid-argument", "propertyId and pulseId are required.");
+  if (status !== "live" && status !== "paused" && status !== "archived") {
+    throw new HttpsError("invalid-argument", "status must be live, paused, or archived.");
+  }
+
+  const prop = await loadProperty(propertyId);
+  const { isHostAdmin } = callerFlags(request, propertyId, prop);
+  if (!isHostAdmin) throw new HttpsError("permission-denied", "Only a host admin can change Pulse status.");
+
+  const pulseRef = db.collection("properties").doc(propertyId).collection("pulses").doc(pulseId);
+  const snap = await pulseRef.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Pulse not found.");
+  const row = snap.data() || {};
+  const current = String(row.status || "draft") as PulseStatus;
+  if (!resolvePulseStatusTransition(current, status)) {
+    throw new HttpsError("failed-precondition", `Cannot move a Pulse from ${current} to ${status}.`);
+  }
+
+  const deploymentId = String(row.activeDeploymentId || "");
+  const publicToken = String(row.activePublicToken || "");
+  const nowIso = new Date().toISOString();
+  const batch = db.batch();
+  batch.set(
+    pulseRef,
+    { status, updatedAt: FieldValue.serverTimestamp(), updatedAtIso: nowIso },
+    { merge: true },
+  );
+  const active = status === "live";
+  if (deploymentId) {
+    batch.set(
+      db.collection("properties").doc(propertyId).collection("pulseDeployments").doc(deploymentId),
+      { active, updatedAt: FieldValue.serverTimestamp() },
+      { merge: true },
+    );
+  }
+  if (publicToken) {
+    batch.set(db.collection("pulseTokens").doc(publicToken), { active }, { merge: true });
+  }
+  if (status === "archived" && prop.activePulseId === pulseId) {
+    batch.set(
+      db.collection("properties").doc(propertyId),
+      { activePulsePublicToken: null, activePulseId: null, updatedAt: FieldValue.serverTimestamp() },
+      { merge: true },
+    );
+  }
+  await batch.commit();
+
+  await writeAuthoritativeEvent({
+    uid,
+    eventName: "pulse_status_changed",
+    contextId: propertyId,
+    contextType: "property",
+    source: "internal",
+    properties: {
+      contextId: propertyId,
+      pulseId,
+      from: current,
+      to: status,
+    },
+  });
+
+  return { status };
+});
+
+/**
+ * Staff-recorded guest follow-up on a resolved issue (score 1–5 + note).
+ * Guest-initiated SMS follow-up needs a messaging vendor and is not built.
+ */
+export const recordPulseFollowup = onCall(CALLABLE, async (request) => {
+  await noteAppCheck(request, "recordPulseFollowup");
+  const uid = requireAuth(request.auth?.uid);
+  if (isAnonymousAuth(request)) throw new HttpsError("failed-precondition", "Sign in required.");
+
+  const data = (request.data || {}) as Record<string, unknown>;
+  const propertyId = String(data.propertyId || "").trim();
+  const issueId = String(data.issueId || "").trim();
+  if (!propertyId || !issueId) throw new HttpsError("invalid-argument", "propertyId and issueId are required.");
+
+  const checked = validatePulseFollowup(data.score, data.note);
+  if (!checked.ok) throw new HttpsError("invalid-argument", `Invalid follow-up (${checked.reason}).`);
+
+  const prop = await loadProperty(propertyId);
+  const { isStaff } = callerFlags(request, propertyId, prop);
+  if (!isStaff) throw new HttpsError("permission-denied", "Only host staff can record a follow-up.");
+
+  const ref = db.collection("properties").doc(propertyId).collection("pulseIssues").doc(issueId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Issue not found.");
+  const row = snap.data() || {};
+  if (row.status !== "resolved") {
+    throw new HttpsError("failed-precondition", "Follow-up is recorded after resolution.");
+  }
+
+  const nowIso = new Date().toISOString();
+  await ref.set(
+    {
+      followupScore: checked.score,
+      followupAt: nowIso,
+      followupNote: checked.note ?? null,
+      followupBy: uid,
+      updatedAt: FieldValue.serverTimestamp(),
+    },
+    { merge: true },
+  );
+
+  await writeAuthoritativeEvent({
+    uid,
+    eventName: "pulse_followup_completed",
+    contextId: propertyId,
+    contextType: "property",
+    source: "internal",
+    properties: {
+      contextId: propertyId,
+      issueId,
+      scoreBucket: scoreBucket(checked.score) || null,
+    },
+  });
+
+  return { ok: true as const };
+});
+
 /** Mirror tickets: hostAlerts + FCM when a Pulse issue is created. */
 export const onPulseIssueCreated = onDocumentCreated(
-  "properties/{propertyId}/pulseIssues/{issueId}",
+  { document: "properties/{propertyId}/pulseIssues/{issueId}", retry: true },
   async (event) => {
     const propertyId = String(event.params.propertyId || "");
     const issueId = String(event.params.issueId || "");

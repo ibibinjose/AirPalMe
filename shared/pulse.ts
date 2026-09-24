@@ -113,6 +113,8 @@ export type PulseResponse = {
   contactMethod?: string;
   roomNumber?: string;
   issueId?: string;
+  /** Idempotency key from the respondent client, when provided. */
+  clientKey?: string;
   createdAt: string;
   uid?: string;
   anonymous: boolean;
@@ -140,6 +142,8 @@ export type PulseIssue = {
   resolutionNote?: string;
   followupScore?: number;
   followupAt?: string;
+  followupNote?: string;
+  followupBy?: string;
   staffTicketId?: string;
   createdAt: string;
 };
@@ -165,7 +169,43 @@ export type PulseSubmitPayload = {
   contactName?: string;
   contactMethod?: string;
   roomNumber?: string;
+  /**
+   * Idempotency key minted by the respondent client (one per form instance).
+   * Resubmits with the same key return the original response instead of
+   * creating a duplicate response + issue.
+   */
+  clientKey?: string;
 };
+
+/** Lifecycle transitions. Publish stays the only draft → live route. */
+const PULSE_STATUS_TRANSITIONS: Record<PulseStatus, PulseStatus[]> = {
+  draft: ["archived"],
+  live: ["paused", "archived"],
+  paused: ["live", "archived"],
+  archived: [],
+};
+
+export function resolvePulseStatusTransition(from: PulseStatus, to: PulseStatus): boolean {
+  if (from === to) return false;
+  return (PULSE_STATUS_TRANSITIONS[from] || []).includes(to);
+}
+
+const CLIENT_KEY_RE = /^[A-Za-z0-9_-]{8,64}$/;
+
+export function isValidClientKey(value: unknown): value is string {
+  return typeof value === "string" && CLIENT_KEY_RE.test(value);
+}
+
+export type FollowupValidation = { ok: true; score: number; note?: string } | { ok: false; reason: string };
+
+/** Guest follow-up after resolution: score 1–5 plus an optional short note. */
+export function validatePulseFollowup(score: unknown, note?: unknown): FollowupValidation {
+  const n = typeof score === "number" ? score : Number(score);
+  if (!Number.isInteger(n) || n < 1 || n > 5) return { ok: false, reason: "bad_score" };
+  if (note != null && String(note).length > 500) return { ok: false, reason: "note_too_long" };
+  const trimmed = note != null ? String(note).trim() : "";
+  return { ok: true, score: n, note: trimmed || undefined };
+}
 
 function randomAlphabet(length: number): string {
   const out = new Uint8Array(length);

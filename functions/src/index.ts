@@ -78,5 +78,7 @@ export {
   publishPulse,
   acknowledgePulseIssue,
   resolvePulseIssue,
+  setPulseStatus,
+  recordPulseFollowup,
   onPulseIssueCreated,
 } from "./pulse";
