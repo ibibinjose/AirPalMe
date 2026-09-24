@@ -35,3 +35,42 @@ export function toPublicUrl(href?: string | null): string {
     return raw.startsWith("/") ? `${origin}${raw}` : origin;
   }
 }
+
+/** Canonical deep link builders */
+export function buildPlanUrl(planId: string): string {
+  return toPublicUrl(`/plan/${encodeURIComponent(planId)}`);
+}
+
+export function buildPlanInviteUrl(inviteCode: string): string {
+  return toPublicUrl(`/invite/${encodeURIComponent(inviteCode)}`);
+}
+
+export function buildEventUrl(eventId: string): string {
+  return toPublicUrl(`/e/${encodeURIComponent(eventId)}`);
+}
+
+export function buildMateUrl(mateUid?: string): string {
+  return toPublicUrl(mateUid ? `/mate?select=${encodeURIComponent(mateUid)}` : "/mate");
+}
+
+export function buildBioUrl(handle: string): string {
+  const clean = handle.replace(/^@/, "").trim();
+  return toPublicUrl(`/@${encodeURIComponent(clean)}`);
+}
+
+export function buildStayUrl(propertyId: string, roomToken?: string): string {
+  return toPublicUrl(roomToken ? `/g/${encodeURIComponent(propertyId)}?r=${encodeURIComponent(roomToken)}` : `/g/${encodeURIComponent(propertyId)}`);
+}
+
+export function buildWaveUrl(code: string): string {
+  return toPublicUrl(`/w/${encodeURIComponent(code)}`);
+}
+
+export function buildMarkerUrl(markerId: string): string {
+  return toPublicUrl(`/q/${encodeURIComponent(markerId)}`);
+}
+
+export function buildPromoUrl(id: string, refUid?: string): string {
+  return toPublicUrl(refUid ? `/promotions/${encodeURIComponent(id)}?ref=${encodeURIComponent(refUid)}` : `/promotions/${encodeURIComponent(id)}`);
+}
+

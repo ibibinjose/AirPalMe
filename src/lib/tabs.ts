@@ -1,13 +1,13 @@
 /**
- * Companion tabs: Home / Explore / Trips / Inbox / Me.
- * Scan and Stay are not tabs — Scan lives behind the + Create action,
- * Stay lives inside Explore/Home. Every shipped route still resolves;
- * this only decides which tab lights up.
+ * Companion tabs: Explore / Plan / Scan / Inbox / Me.
+ * Home is accessed via the top BrandMark / App icon.
+ * Scan is the centerpiece tab for QR / Wave / NFC interaction.
  */
-export type GuestTab = "home" | "explore" | "trips" | "inbox" | "me";
+export type GuestTab = "explore" | "trips" | "scan" | "inbox" | "me";
 
 /** Map a route path to the bottom-tab it belongs to. Pure: safe to unit test. */
-export function tabFromPath(path: string): GuestTab {
+export function tabFromPath(path: string): GuestTab | "home" {
+  if (path.startsWith("/scan") || path.startsWith("/w/")) return "scan";
   if (path.startsWith("/me/inbox")) return "inbox";
   if (
     path.startsWith("/plan") ||
@@ -34,9 +34,6 @@ export function tabFromPath(path: string): GuestTab {
     return "me";
   }
   if (path === "/") return "home";
-  // Discovery content (calendar, events, places, stays, mate, club, …)
-  // and the Scan create-action all belong to Explore's world except
-  // the personal home dashboard itself.
-  if (path.startsWith("/scan") || path.startsWith("/w/")) return "home";
   return "explore";
 }
+

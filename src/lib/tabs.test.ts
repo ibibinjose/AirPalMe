@@ -2,14 +2,15 @@ import { describe, expect, it } from "vitest";
 import { tabFromPath } from "./tabs";
 
 describe("tabFromPath", () => {
-  it("maps the five companion tabs", () => {
-    expect(tabFromPath("/")).toBe("home");
+  it("maps the companion tabs", () => {
     expect(tabFromPath("/explore")).toBe("explore");
     expect(tabFromPath("/calendar")).toBe("explore");
     expect(tabFromPath("/plan")).toBe("trips");
     expect(tabFromPath("/plan/new")).toBe("trips");
     expect(tabFromPath("/invite/abc")).toBe("trips");
     expect(tabFromPath("/circle")).toBe("trips");
+    expect(tabFromPath("/scan")).toBe("scan");
+    expect(tabFromPath("/w/abcd")).toBe("scan");
     expect(tabFromPath("/me/inbox")).toBe("inbox");
     expect(tabFromPath("/concierge")).toBe("explore");
     expect(tabFromPath("/g/harbour-hotel")).toBe("explore");
@@ -23,11 +24,13 @@ describe("tabFromPath", () => {
     expect(tabFromPath("/settings")).toBe("me");
   });
 
-  it("keeps Mate and Scan off the tab bar — they fall back, not extra tabs", () => {
+  it("maps home route to home (accessible via top App icon)", () => {
+    expect(tabFromPath("/")).toBe("home");
+  });
+
+  it("maps Mate to explore fallback", () => {
     expect(tabFromPath("/mate")).toBe("explore");
     expect(tabFromPath("/mate/request")).toBe("explore");
-    expect(tabFromPath("/scan")).toBe("home");
-    expect(tabFromPath("/w/abcd")).toBe("home");
   });
 
   it("parks directory and account under Explore, not extra tabs", () => {

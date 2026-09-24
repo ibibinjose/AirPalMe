@@ -1,4 +1,4 @@
-import { AtSign, CalendarDays, Compass, Home, Inbox } from "lucide-react";
+import { AtSign, CalendarDays, Compass, Inbox, QrCode } from "lucide-react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/cn";
@@ -11,11 +11,11 @@ import { tabFromPath, type GuestTab } from "@/lib/tabs";
 
 export { tabFromPath };
 
-/** Companion IA: Home / Explore / Trips / Inbox / Me. Scan lives behind + Create. */
-const TABS: { href: string; id: GuestTab; label: string; icon: typeof Home }[] = [
-  { href: "/", id: "home", label: "Home", icon: Home },
+/** Companion IA: Explore / Plan / Scan (Center) / Inbox / Me. Home is reached via top App icon. */
+const TABS: { href: string; id: GuestTab; label: string; icon: typeof Compass }[] = [
   { href: "/explore", id: "explore", label: "Explore", icon: Compass },
   { href: "/plan", id: "trips", label: "Plan", icon: CalendarDays },
+  { href: "/scan", id: "scan", label: "Scan", icon: QrCode },
   { href: "/me/inbox", id: "inbox", label: "Inbox", icon: Inbox },
   { href: "/me", id: "me", label: "Me", icon: AtSign },
 ];
