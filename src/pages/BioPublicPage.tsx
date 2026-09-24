@@ -65,6 +65,7 @@ import { toPublicUrl } from "@/lib/public-origin";
 import { NotFoundPage } from "./NotFoundPage";
 import { cn } from "@/lib/cn";
 import { useClub } from "@/contexts/ClubContext";
+import { PingButton } from "@/components/social/PingButton";
 
 /** Round Google-style action: brand icon in a ringed circle with a label. */
 function BizCircle({
@@ -469,6 +470,9 @@ export function BioPublicPage() {
                   <UserPlus size={14} />
                   Connect
                 </Button>
+                {bio.ownerUid && (!user || bio.ownerUid !== user.uid) && (
+                  <PingButton toUid={bio.ownerUid} toHandle={bio.handle} toName={bio.name} />
+                )}
                 <Button
                   variant="ghost"
                   size="sm"

@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore";
 import { Bell, MessageCircle } from "lucide-react";
 import { SegmentedControl } from "@/components/design-system/companions";
+import { PingsPanel } from "@/components/social/PingsPanel";
 import { usePlans } from "@/contexts/PlanContext";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,7 +19,7 @@ export function InboxPage() {
   const { myPlans } = usePlans();
   const [notes, setNotes] = useState<PromotionNotification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [segment, setSegment] = useState<"messages" | "activity">("messages");
+  const [segment, setSegment] = useState<"messages" | "pings" | "activity">("messages");
 
   const conversations = useMemo(
     () =>
@@ -89,12 +90,15 @@ export function InboxPage() {
           onChange={setSegment}
           options={[
             { id: "messages", label: "Messages" },
+            { id: "pings", label: "Pings" },
             { id: "activity", label: "Activity" },
           ]}
         />
       </div>
 
-      {segment === "messages" ? (
+      {segment === "pings" ? (
+        <PingsPanel />
+      ) : segment === "messages" ? (
         <div className="mt-4">
           {conversations.length === 0 ? (
             <div className="mt-2 text-center rounded-[20px] bg-card ring-1 ring-line/80 px-4 py-10">

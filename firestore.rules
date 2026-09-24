@@ -687,6 +687,47 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // AirPal Ping: lightweight hangout nudges. Sender owns the ping;
+    // only the recipient moves it forward (sent → pinged_back /
+    // hanging_out / dismissed); sender may cancel their own sent ping.
+    // Mirrors canTransitionPing in shared/ping.ts — keep in sync.
+    match /pings/{pingId} {
+      function pingParty() {
+        return signedIn()
+          && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+      }
+      allow read: if signedIn() && (
+        resource.data.fromUid == request.auth.uid ||
+        resource.data.toUid == request.auth.uid ||
+        platformAdmin()
+      );
+      allow create: if signedIn()
+        && !isAnonymous()
+        && request.resource.data.fromUid == request.auth.uid
+        && request.resource.data.toUid != request.auth.uid
+        && request.resource.data.status == 'sent'
+        && request.resource.data.keys().hasAny(['updatedAt']);
+      allow update: if signedIn() && (
+        platformAdmin() ||
+        // Sender cancels their own sent ping.
+        (resource.data.fromUid == request.auth.uid
+          && resource.data.status == 'sent'
+          && request.resource.data.status == 'cancelled'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])) ||
+        // Recipient answers a sent ping.
+        (resource.data.toUid == request.auth.uid
+          && resource.data.status == 'sent'
+          && request.resource.data.status in ['pinged_back', 'hanging_out', 'dismissed']
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt', 'respondedAt'])) ||
+        // Either party closes a live thread.
+        (pingParty()
+          && resource.data.status in ['pinged_back', 'hanging_out']
+          && request.resource.data.status in ['hanging_out', 'dismissed']
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt', 'respondedAt']))
+      );
+      allow delete: if false;
+    }
+
     // AirPal Companion applications: applicant owns their doc, admins review.
     // Private adminNotes must never be served to non-admins; clients use the
     // public projection for any shared view.
