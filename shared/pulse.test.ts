@@ -156,7 +156,7 @@ describe("follow-up validation", () => {
   });
 });
 
-describe("csv export", () => {
+describe("csv export & security", () => {
   it("serializes responses without inventing rows", () => {
     const rows: PulseResponse[] = [
       {
@@ -177,4 +177,159 @@ describe("csv export", () => {
     expect(csv).toContain("r1");
     expect(primaryScoreFromAnswers(rows[0]!.answers)).toBe(4);
   });
+
+  it("neutralizes spreadsheet formula injection and escapes special CSV characters", () => {
+    const maliciousRows: PulseResponse[] = [
+      {
+        id: "r_evil",
+        propertyId: "p1",
+        pulseId: "pu1",
+        deploymentId: "d1",
+        publicToken: createPublicToken(),
+        answers: [{ questionId: "q_stay", type: "rating_5", value: 1 }],
+        primaryScore: 1,
+        contactRequested: true,
+        contactName: "=cmd|' /C calc'!A0",
+        contactMethod: "+61 400 000 000, ext 123",
+        roomNumber: '101 "Penthouse"',
+        issueId: "@SUM(1+1)",
+        createdAt: "2026-09-24T00:00:00.000Z",
+        anonymous: true,
+      },
+    ];
+    const csv = pulseResponsesToCsv(maliciousRows);
+    const lines = csv.split("\n");
+    expect(lines).toHaveLength(2);
+    // Formula characters must be prepended with a single quote
+    expect(csv).toContain("\"'=cmd|' /C calc'!A0\"");
+    expect(csv).toContain("\"'+61 400 000 000, ext 123\"");
+    expect(csv).toContain("\"'@SUM(1+1)\"");
+    // Double quotes must be escaped as ""
+    expect(csv).toContain('"101 ""Penthouse"""');
+  });
 });
+
+describe("category and issue summary heuristics", () => {
+  it("extracts categories from keywords when single_choice is not explicit", () => {
+    expect(
+      categoryFromPulseAnswers([
+        { questionId: "q_stay", type: "rating_5", value: 1 },
+        { questionId: "q_help", type: "text_short", value: "The bathroom towels and linen are dirty" },
+      ]),
+    ).toBe("cleanliness");
+
+    expect(
+      categoryFromPulseAnswers([
+        { questionId: "q_stay", type: "rating_5", value: 1 },
+        { questionId: "q_help", type: "text_short", value: "The receptionist and staff were very rude" },
+      ]),
+    ).toBe("staff");
+
+    expect(
+      categoryFromPulseAnswers([
+        { questionId: "q_stay", type: "rating_5", value: 1 },
+        { questionId: "q_help", type: "text_short", value: "The air con is leaking water onto the bed" },
+      ]),
+    ).toBe("maintenance");
+
+    expect(
+      categoryFromPulseAnswers([
+        { questionId: "q_stay", type: "rating_5", value: 1 },
+        { questionId: "q_help", type: "text_short", value: "Breakfast food was cold and restaurant closed early" },
+      ]),
+    ).toBe("dining");
+
+    expect(
+      categoryFromPulseAnswers([
+        { questionId: "q_stay", type: "rating_5", value: 1 },
+        { questionId: "q_help", type: "text_short", value: "Loud noise and music through the thin wall" },
+      ]),
+    ).toBe("noise");
+
+    expect(
+      categoryFromPulseAnswers([
+        { questionId: "q_stay", type: "rating_5", value: 1 },
+        { questionId: "q_help", type: "text_short", value: "Unspecified disappointment" },
+      ]),
+    ).toBe("other");
+  });
+
+  it("formats issue summaries reliably with truncated limits", () => {
+    const summary = issueSummaryFromAnswers(
+      [
+        { questionId: "q_wrong", type: "single_choice", value: "cleanliness" },
+        { questionId: "q_help", type: "text_short", value: "Need extra towels please" },
+      ],
+      2,
+    );
+    expect(summary).toBe("Stay 2/5 · cleanliness · Need extra towels please");
+  });
+});
+
+describe("stress-testing validation rules & edge cases", () => {
+  const pulse = stayDuringStayTemplate("harbour-hotel");
+  const token = createPublicToken();
+
+  it("rejects non-object or null payloads", () => {
+    expect(validatePulseSubmitPayload(pulse, null as unknown as any).ok).toBe(false);
+    expect(validatePulseSubmitPayload(pulse, undefined as unknown as any).ok).toBe(false);
+    expect(validatePulseSubmitPayload(pulse, "bad string" as unknown as any).ok).toBe(false);
+  });
+
+  it("rejects empty answers or more than 40 answers", () => {
+    expect(validatePulseSubmitPayload(pulse, { publicToken: token, answers: [] }).ok).toBe(false);
+
+    const tooMany = Array.from({ length: 41 }, () => ({
+      questionId: "q_stay",
+      type: "rating_5" as const,
+      value: 5,
+    }));
+    expect(validatePulseSubmitPayload(pulse, { publicToken: token, answers: tooMany }).ok).toBe(false);
+  });
+
+  it("rejects mismatched question types and out-of-range values", () => {
+    // NPS out of bounds
+    const pulseWithNps = {
+      ...pulse,
+      questions: [{ id: "q_nps", type: "nps" as const, prompt: "NPS", required: true, sortOrder: 1 }],
+      logic: [],
+    };
+    expect(
+      validatePulseSubmitPayload(pulseWithNps, {
+        publicToken: token,
+        answers: [{ questionId: "q_nps", type: "nps", value: 11 }],
+      }).ok,
+    ).toBe(false);
+
+    expect(
+      validatePulseSubmitPayload(pulseWithNps, {
+        publicToken: token,
+        answers: [{ questionId: "q_nps", type: "nps", value: -1 }],
+      }).ok,
+    ).toBe(false);
+
+    // text_short too long (> 500 chars)
+    expect(
+      validatePulseSubmitPayload(pulse, {
+        publicToken: token,
+        answers: [
+          { questionId: "q_stay", type: "rating_5", value: 1 },
+          { questionId: "q_wrong", type: "single_choice", value: "wifi" },
+          { questionId: "q_help", type: "text_short", value: "a".repeat(501) },
+        ],
+      }).ok,
+    ).toBe(false);
+
+    // single_choice not in options
+    expect(
+      validatePulseSubmitPayload(pulse, {
+        publicToken: token,
+        answers: [
+          { questionId: "q_stay", type: "rating_5", value: 1 },
+          { questionId: "q_wrong", type: "single_choice", value: "invalid_unsupported_choice" },
+        ],
+      }).ok,
+    ).toBe(false);
+  });
+});
+

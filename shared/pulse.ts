@@ -523,22 +523,32 @@ export function pulseResponsesToCsv(rows: PulseResponse[]): string {
     "issueId",
     "answersJson",
   ];
-  const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
+  const sanitizeCell = (v: unknown): string => {
+    if (v == null) return '""';
+    let s = String(v);
+    // Neutralize spreadsheet formula injection (=, +, -, @, tab, CR)
+    if (/^[=+\-@\t\r]/.test(s)) {
+      s = `'${s}`;
+    }
+    return `"${s.replace(/"/g, '""')}"`;
+  };
+
   const lines = [header.join(",")];
   for (const row of rows) {
     lines.push(
       [
-        row.id,
-        row.createdAt,
-        row.primaryScore ?? "",
-        row.roomNumber ?? "",
-        row.contactRequested ? "yes" : "no",
-        row.contactName ?? "",
-        row.contactMethod ?? "",
-        row.issueId ?? "",
-        escape(JSON.stringify(row.answers)),
+        sanitizeCell(row.id),
+        sanitizeCell(row.createdAt),
+        sanitizeCell(row.primaryScore ?? ""),
+        sanitizeCell(row.roomNumber ?? ""),
+        sanitizeCell(row.contactRequested ? "yes" : "no"),
+        sanitizeCell(row.contactName ?? ""),
+        sanitizeCell(row.contactMethod ?? ""),
+        sanitizeCell(row.issueId ?? ""),
+        sanitizeCell(JSON.stringify(row.answers || [])),
       ].join(","),
     );
   }
   return lines.join("\n");
 }
+
