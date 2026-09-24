@@ -15,6 +15,8 @@ describe("catch-up proposals", () => {
     expect(item.targetHandle).toBe("xyz");
     expect(item.type).toBe("catchup");
     expect(listCatchUpsForHandle("xyz").some((r) => r.id === item.id)).toBe(true);
+    // Interest is not a reminder-only toggle
+    expect(hasCatchUpReminder("xyz")).toBe(false);
   });
 
   it("toggles a reminder for a handle", () => {
@@ -23,5 +25,6 @@ describe("catch-up proposals", () => {
     expect(hasCatchUpReminder("xyz-rem")).toBe(true);
     const off = toggleCatchUpReminder({ handle: "xyz-rem", name: "Xyz" });
     expect(off).toBe(false);
+    expect(hasCatchUpReminder("xyz-rem")).toBe(false);
   });
 });

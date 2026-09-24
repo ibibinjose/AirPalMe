@@ -37,7 +37,14 @@ import { BioCatchUpModal } from "@/components/bio/BioCatchUpModal";
 import { BioStatusModal } from "@/components/bio/BioStatusModal";
 import { BioKindIcon } from "@/components/bio/BioKindBadge";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
-import { listCatchUpsForHandle, subscribeCatchUpsForOwner, updateCatchUpStatus, type CatchUpItem } from "@/lib/catchup";
+import {
+  listCatchUpsForHandle,
+  subscribeCatchUpsForOwner,
+  updateCatchUpStatus,
+  hasCatchUpReminder,
+  toggleCatchUpReminder,
+  type CatchUpItem,
+} from "@/lib/catchup";
 import { toZonedDateStr } from "@/lib/local-time";
 import { Photo } from "@/components/ui/Photo";
 import { Button } from "@/components/ui/Button";
@@ -1010,14 +1017,39 @@ export function BioPublicPage() {
           {!isOwner && !(bio.kind === "business" && ((bio.products || []).length > 0 || (bio.services || []).length > 0)) && (
             <div className="mt-6 rounded-3xl bg-gradient-to-br from-paper/90 via-card to-paper/60 p-5 ring-1 ring-line/80 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
-                  Meet &amp; Hangout
+                <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold flex items-center gap-1.5">
+                  <Sparkles size={12} className="text-gold" />
+                  <span>Meet &amp; Hangout</span>
                 </span>
-                <span className="text-[10px] font-medium text-mute uppercase tracking-wider">
-                  AirPal Connect
-                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void triggerHaptic("light");
+                    const next = toggleCatchUpReminder({
+                      handle: bio.handle,
+                      name: bio.name,
+                      photo: avatar,
+                      city: bio.city,
+                    });
+                    toast[next ? "success" : "info"](
+                      next ? `Saved a reminder to catch up with ${bio.name}` : `Removed reminder for ${bio.name}`,
+                    );
+                    // Force refresh inbox state
+                    setCatchUpsList(listCatchUpsForHandle(bio.handle));
+                  }}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold ring-1 transition cursor-pointer active:scale-95",
+                    hasCatchUpReminder(bio.handle)
+                      ? "bg-amber-500/15 text-amber-800 ring-amber-500/40 font-bold"
+                      : "bg-card text-mute ring-line hover:text-ink hover:bg-paper",
+                  )}
+                  title={hasCatchUpReminder(bio.handle) ? "Catch-up reminder active" : "Set a reminder to catch up"}
+                >
+                  <span className={cn("h-1.5 w-1.5 rounded-full", hasCatchUpReminder(bio.handle) ? "bg-amber-500 animate-pulse" : "bg-mute/50")} />
+                  <span>{hasCatchUpReminder(bio.handle) ? "Reminder on ✓" : "Remind me"}</span>
+                </button>
               </div>
-              <h3 className="font-display mt-1.5 text-lg font-bold text-ink">
+              <h3 className="font-display mt-2 text-lg font-bold text-ink">
                 Catch up with {bio.name}
               </h3>
               <p className="mt-1 text-xs leading-relaxed text-mute">
@@ -1054,10 +1086,11 @@ export function BioPublicPage() {
                     key={opt.type}
                     type="button"
                     onClick={() => {
+                      void triggerHaptic("light");
                       setCatchUpInitialType(opt.type);
                       setCatchUpModalOpen(true);
                     }}
-                    className="flex flex-col items-center rounded-2xl bg-card p-3 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98]"
+                    className="flex flex-col items-center rounded-2xl bg-card p-3 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98] cursor-pointer"
                   >
                     <span className={cn("mb-2 grid h-10 w-10 place-items-center rounded-2xl", opt.tint)}>
                       <opt.Icon size={18} />

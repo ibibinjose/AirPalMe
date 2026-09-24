@@ -86,7 +86,9 @@ export function listMyCatchUpReminders(): CatchUpItem[] {
 
 export function hasCatchUpReminder(targetHandle: string): boolean {
   const norm = normalizeHandle(targetHandle);
-  return listCatchUps().some((item) => normalizeHandle(item.targetHandle) === norm && item.status !== "dismissed");
+  return listCatchUps().some(
+    (item) => normalizeHandle(item.targetHandle) === norm && Boolean(item.isReminderOnly) && item.status !== "dismissed",
+  );
 }
 
 export function toggleCatchUpReminder(target: {
@@ -97,7 +99,9 @@ export function toggleCatchUpReminder(target: {
 }): boolean {
   const items = listCatchUps();
   const norm = normalizeHandle(target.handle);
-  const existingIdx = items.findIndex((i) => normalizeHandle(i.targetHandle) === norm && i.isReminderOnly);
+  const existingIdx = items.findIndex(
+    (i) => normalizeHandle(i.targetHandle) === norm && Boolean(i.isReminderOnly) && i.status !== "dismissed",
+  );
 
   if (existingIdx >= 0) {
     items.splice(existingIdx, 1);

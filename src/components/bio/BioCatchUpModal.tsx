@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useLocation } from "wouter";
 import { Bell, Calendar, Clock, Coffee, MapPin, MessageSquare, Sparkles, Users, X, Zap } from "lucide-react";
 import { Photo } from "@/components/ui/Photo";
@@ -9,6 +10,7 @@ import { useBio } from "@/contexts/BioContext";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { recordCatchUpInterest, toggleCatchUpReminder, hasCatchUpReminder } from "@/lib/catchup";
 import { toZonedDateStr } from "@/lib/local-time";
+import { triggerHaptic } from "@/lib/native";
 import type { PlanType } from "@shared/plan";
 import { toast } from "sonner";
 import { cn } from "@/lib/cn";
@@ -60,7 +62,13 @@ export function BioCatchUpModal({
     setVenue(city ? `${city}` : "");
     setNotes("");
     setIsRemembered(hasCatchUpReminder(handle));
-  }, [open, initialType, handle, city]);
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, initialType, handle, city, onClose]);
 
   const typeOptions: Array<{
     type: PlanType;
@@ -105,6 +113,7 @@ export function BioCatchUpModal({
   if (!open) return null;
 
   const handleToggleReminder = () => {
+    void triggerHaptic("light");
     const nextState = toggleCatchUpReminder({ handle, name, photo: avatar, city });
     setIsRemembered(nextState);
     toast[nextState ? "success" : "info"](
@@ -117,6 +126,7 @@ export function BioCatchUpModal({
     const place = venue.trim() || city;
     setIsSubmitting(true);
     try {
+      void triggerHaptic("success");
       const oneOnOne = selectedType !== "nightout";
       const created = createPlan({
         title: currentOption.defaultTitle,
@@ -169,23 +179,23 @@ export function BioCatchUpModal({
     city,
   };
 
-  return (
+  const content = (
     <div
-      className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-ink/65 p-4 backdrop-blur-sm sm:p-6"
+      className="fixed inset-0 z-[9999] grid place-items-center overflow-y-auto bg-ink/65 p-4 backdrop-blur-sm sm:p-6 animate-in fade-in duration-200"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="catchup-modal-title"
     >
       <div
-        className="relative w-full max-w-lg overflow-hidden rounded-[32px] bg-paper shadow-2xl ring-1 ring-line"
+        className="relative w-full max-w-lg overflow-hidden rounded-[32px] bg-paper shadow-2xl ring-1 ring-line animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative border-b border-line px-6 pb-4 pt-6">
+        <div className="relative border-b border-line px-6 pb-4 pt-6 bg-card/60">
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-card text-mute ring-1 ring-line hover:text-ink"
+            className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-card text-mute ring-1 ring-line hover:text-ink transition cursor-pointer"
             aria-label="Close dialog"
           >
             <X size={16} />
@@ -213,7 +223,7 @@ export function BioCatchUpModal({
           </div>
         </div>
 
-        <div className="max-h-[70vh] space-y-5 overflow-y-auto p-6">
+        <div className="max-h-[65vh] space-y-5 overflow-y-auto p-6">
           <div>
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-mute">How</p>
             <div className="grid grid-cols-3 gap-2">
@@ -224,10 +234,13 @@ export function BioCatchUpModal({
                   <button
                     key={opt.type}
                     type="button"
-                    onClick={() => setSelectedType(opt.type)}
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      setSelectedType(opt.type);
+                    }}
                     className={cn(
-                      "flex flex-col items-center rounded-2xl p-3 text-center ring-1 transition",
-                      isSelected ? "bg-card ring-brand" : "bg-card/60 ring-line hover:bg-card",
+                      "flex flex-col items-center rounded-2xl p-3 text-center ring-1 transition cursor-pointer active:scale-95",
+                      isSelected ? "bg-card ring-brand shadow-xs" : "bg-card/60 ring-line hover:bg-card",
                     )}
                   >
                     <span className={cn("mb-1.5 rounded-xl border p-2", opt.color)}>
@@ -257,12 +270,16 @@ export function BioCatchUpModal({
                 {[
                   ["Today", 0],
                   ["Tomorrow", 1],
+                  ["Weekend", 3],
                 ].map(([label, days]) => (
                   <button
                     key={String(label)}
                     type="button"
-                    onClick={() => setDate(localDate(Number(days)))}
-                    className="rounded-lg bg-card px-2 py-0.5 text-[10px] font-semibold text-mute ring-1 ring-line hover:text-ink"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      setDate(localDate(Number(days)));
+                    }}
+                    className="rounded-lg bg-card px-2 py-0.5 text-[10px] font-semibold text-mute ring-1 ring-line hover:text-ink cursor-pointer"
                   >
                     {label}
                   </button>
@@ -305,40 +322,45 @@ export function BioCatchUpModal({
                 rows={2}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Optional"
+                placeholder="Optional notes or meetup idea"
                 className="w-full resize-none rounded-2xl border border-line bg-card py-2.5 pl-9 pr-3 text-xs outline-none focus:border-brand"
               />
             </div>
           </div>
         </div>
 
-        <div className="space-y-3 border-t border-line bg-card/40 p-5">
-          <Button className="h-12 w-full gap-2 rounded-full" onClick={handleLaunch} disabled={isSubmitting}>
+        <div className="space-y-3 border-t border-line bg-card/60 p-5">
+          <Button className="h-12 w-full gap-2 rounded-full font-bold shadow-md" onClick={handleLaunch} disabled={isSubmitting}>
             <Zap size={16} />
-            Create plan
+            Create plan &amp; Propose
           </Button>
           <div className="flex items-center justify-between gap-2">
             <button
               type="button"
               onClick={handleToggleReminder}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ring-1",
-                isRemembered ? "bg-amber-500/15 text-amber-800 ring-amber-500/30" : "bg-card text-ink ring-line",
+                "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold ring-1 transition cursor-pointer active:scale-95",
+                isRemembered
+                  ? "bg-amber-500/15 text-amber-800 ring-amber-500/40 font-bold"
+                  : "bg-card text-ink ring-line hover:bg-paper",
               )}
             >
-              <Bell size={13} />
-              {isRemembered ? "Reminder on" : "Remind me"}
+              <Bell size={13} className={isRemembered ? "fill-amber-500 text-amber-600" : ""} />
+              {isRemembered ? "Reminder on ✓" : "Remind me"}
             </button>
             <AddToCalendarMenu
               event={eventPayload}
               size="sm"
-              variant="ghost"
+              variant="secondary"
               label="Sync Calendar"
-              buttonClassName="rounded-full text-xs font-semibold text-mute hover:text-ink"
+              buttonClassName="rounded-full text-xs font-semibold"
             />
           </div>
         </div>
       </div>
     </div>
   );
+
+  return typeof document !== "undefined" ? createPortal(content, document.body) : null;
 }
+

@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from "react";
-import { Calendar as CalendarIcon, ChevronDown, Download, ExternalLink, Sparkles } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
+import { Calendar as CalendarIcon, ChevronDown, Download, ExternalLink, Sparkles, X } from "lucide-react";
 import {
   downloadIcs,
   getGoogleCalendarUrl,
@@ -10,6 +11,7 @@ import {
 } from "@/lib/calendar-export";
 import type { CalendarEvent } from "@shared/event";
 import { toast } from "sonner";
+import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
 interface AddToCalendarMenuProps {
@@ -21,6 +23,12 @@ interface AddToCalendarMenuProps {
   size?: "sm" | "md" | "lg";
 }
 
+interface Coords {
+  top: number;
+  left: number;
+  isBottomClamped: boolean;
+}
+
 export function AddToCalendarMenu({
   event,
   className,
@@ -30,25 +38,63 @@ export function AddToCalendarMenu({
   size = "md",
 }: AddToCalendarMenuProps) {
   const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState<Coords | null>(null);
+
+  const updatePosition = useCallback(() => {
+    if (!buttonRef.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    const menuWidth = 280;
+    const menuHeight = 340;
+    const padding = 12;
+
+    // Determine horizontal alignment
+    let left = rect.right - menuWidth;
+    if (left < padding) {
+      left = Math.max(padding, rect.left);
+    }
+    if (left + menuWidth > window.innerWidth - padding) {
+      left = Math.max(padding, window.innerWidth - menuWidth - padding);
+    }
+
+    // Determine vertical placement (below or flip above)
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const isBottomClamped = spaceBelow < menuHeight && rect.top > menuHeight;
+    const top = isBottomClamped ? rect.top - menuHeight - 6 : rect.bottom + 6;
+
+    setCoords({ top, left, isBottomClamped });
+  }, []);
 
   useEffect(() => {
     if (!open) return;
-    function handleClickOutside(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+    updatePosition();
+
+    function handleScrollOrResize() {
+      updatePosition();
     }
+
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") setOpen(false);
     }
-    document.addEventListener("mousedown", handleClickOutside);
+
+    window.addEventListener("scroll", handleScrollOrResize, true);
+    window.addEventListener("resize", handleScrollOrResize);
     document.addEventListener("keydown", handleKeyDown);
+
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("scroll", handleScrollOrResize, true);
+      window.removeEventListener("resize", handleScrollOrResize);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open]);
+  }, [open, updatePosition]);
+
+  const handleToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    void triggerHaptic("light");
+    setOpen((prev) => !prev);
+  };
 
   const options = [
     {
@@ -56,6 +102,7 @@ export function AddToCalendarMenu({
       name: "Google Calendar",
       icon: "🌐",
       action: () => {
+        void triggerHaptic("light");
         const url = getGoogleCalendarUrl(event);
         window.open(url, "_blank", "noopener,noreferrer");
         setOpen(false);
@@ -67,6 +114,7 @@ export function AddToCalendarMenu({
       name: "Apple Calendar (.ics)",
       icon: "🍎",
       action: () => {
+        void triggerHaptic("light");
         downloadIcs(event);
         setOpen(false);
         toast.success("Downloaded Apple Calendar (.ics) file");
@@ -77,6 +125,7 @@ export function AddToCalendarMenu({
       name: "Microsoft Outlook (Live)",
       icon: "🟦",
       action: () => {
+        void triggerHaptic("light");
         const url = getOutlookLiveCalendarUrl(event);
         window.open(url, "_blank", "noopener,noreferrer");
         setOpen(false);
@@ -88,6 +137,7 @@ export function AddToCalendarMenu({
       name: "Microsoft 365 / Work",
       icon: "💼",
       action: () => {
+        void triggerHaptic("light");
         const url = getOffice365CalendarUrl(event);
         window.open(url, "_blank", "noopener,noreferrer");
         setOpen(false);
@@ -99,6 +149,7 @@ export function AddToCalendarMenu({
       name: "Yahoo Calendar",
       icon: "🟣",
       action: () => {
+        void triggerHaptic("light");
         const url = getYahooCalendarUrl(event);
         window.open(url, "_blank", "noopener,noreferrer");
         setOpen(false);
@@ -110,6 +161,7 @@ export function AddToCalendarMenu({
       name: "Download iCal (.ics file)",
       icon: "📥",
       action: () => {
+        void triggerHaptic("light");
         downloadIcs(event);
         setOpen(false);
         toast.success("iCal file downloaded");
@@ -118,12 +170,13 @@ export function AddToCalendarMenu({
   ];
 
   return (
-    <div className={cn("relative inline-block text-left", className)} ref={containerRef}>
+    <div className={cn("relative inline-block text-left", className)}>
       <button
+        ref={buttonRef}
         type="button"
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={handleToggle}
         className={cn(
-          "inline-flex items-center justify-center gap-1.5 font-semibold transition active:scale-95",
+          "inline-flex items-center justify-center gap-1.5 font-semibold transition active:scale-95 cursor-pointer touch-manipulation",
           size === "sm" && "h-8 px-3 text-xs rounded-xl",
           size === "md" && "h-10 px-4 text-xs rounded-full",
           size === "lg" && "h-12 px-5 text-sm rounded-full",
@@ -133,7 +186,7 @@ export function AddToCalendarMenu({
           variant === "pill" && "bg-brand/10 text-brand ring-1 ring-brand/20 hover:bg-brand/15",
           buttonClassName,
         )}
-        aria-haspopup="true"
+        aria-haspopup="dialog"
         aria-expanded={open}
       >
         <CalendarIcon size={size === "sm" ? 13 : 15} className="text-gold shrink-0" />
@@ -141,38 +194,117 @@ export function AddToCalendarMenu({
         <ChevronDown size={13} className={cn("text-mute transition-transform duration-200", open && "rotate-180")} />
       </button>
 
-      {open && (
-        <div className="absolute right-0 z-50 mt-2 w-64 origin-top-right rounded-2xl bg-card p-1.5 shadow-2xl ring-1 ring-line animate-in fade-in zoom-in-95 duration-150">
-          <div className="px-3 py-2 border-b border-line/60">
-            <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gold">
-              <Sparkles size={11} />
-              <span>Sync with Calendar</span>
-            </div>
-            <p className="text-[11px] text-mute truncate mt-0.5">{event.title}</p>
-          </div>
+      {open &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div className="fixed inset-0 z-[99999]">
+            {/* Backdrop click to dismiss */}
+            <div
+              className="fixed inset-0 bg-ink/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-150"
+              onClick={() => setOpen(false)}
+            />
 
-          <div className="py-1 space-y-0.5">
-            {options.map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={opt.action}
-                className="flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left text-xs font-medium text-ink transition hover:bg-paper active:scale-[0.98]"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-base">{opt.icon}</span>
-                  <span>{opt.name}</span>
+            {/* Mobile Sheet (screen < 640px) */}
+            <div className="sm:hidden fixed inset-x-0 bottom-0 z-10 rounded-t-[32px] bg-paper p-5 shadow-2xl ring-1 ring-line animate-in slide-in-from-bottom duration-200 pb-safe">
+              <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-line" />
+              <div className="flex items-center justify-between border-b border-line/60 pb-3">
+                <div className="min-w-0 pr-3">
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gold">
+                    <Sparkles size={11} />
+                    <span>Sync with Calendar</span>
+                  </div>
+                  <p className="text-xs font-semibold text-ink truncate mt-0.5">{event.title}</p>
                 </div>
-                {opt.id === "ics" ? (
-                  <Download size={12} className="text-mute opacity-60" />
-                ) : (
-                  <ExternalLink size={12} className="text-mute opacity-60" />
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-card text-mute ring-1 ring-line hover:text-ink"
+                  aria-label="Close"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+
+              <div className="mt-3 space-y-1">
+                {options.map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={opt.action}
+                    className="flex w-full min-h-[44px] items-center justify-between rounded-2xl bg-card px-3.5 py-2.5 text-left text-xs font-semibold text-ink ring-1 ring-line/70 transition hover:bg-paper active:scale-[0.98]"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-lg">{opt.icon}</span>
+                      <span>{opt.name}</span>
+                    </div>
+                    {opt.id === "ics" ? (
+                      <Download size={14} className="text-mute opacity-70" />
+                    ) : (
+                      <ExternalLink size={14} className="text-mute opacity-70" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop Popover Menu (screen >= 640px) */}
+            {coords && (
+              <div
+                ref={menuRef}
+                style={{
+                  position: "fixed",
+                  top: `${coords.top}px`,
+                  left: `${coords.left}px`,
+                  width: "280px",
+                }}
+                className={cn(
+                  "hidden sm:block z-10 rounded-2xl bg-card p-2 shadow-2xl ring-1 ring-line duration-150 animate-in fade-in zoom-in-95",
                 )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="px-3 py-2 border-b border-line/60">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gold">
+                      <Sparkles size={11} />
+                      <span>Sync with Calendar</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setOpen(false)}
+                      className="text-mute hover:text-ink transition"
+                    >
+                      <X size={13} />
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-mute truncate mt-0.5">{event.title}</p>
+                </div>
+
+                <div className="py-1 space-y-0.5">
+                  {options.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={opt.action}
+                      className="flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left text-xs font-medium text-ink transition hover:bg-paper active:scale-[0.98] cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">{opt.icon}</span>
+                        <span>{opt.name}</span>
+                      </div>
+                      {opt.id === "ics" ? (
+                        <Download size={12} className="text-mute opacity-60" />
+                      ) : (
+                        <ExternalLink size={12} className="text-mute opacity-60" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
+
