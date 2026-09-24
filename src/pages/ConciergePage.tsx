@@ -275,9 +275,11 @@ export function ConciergePage() {
                   key={t.id}
                   type="button"
                   onClick={t.run}
-                  className="flex touch-manipulation items-center gap-3 rounded-2xl ring-1 ring-line bg-card px-4 py-3.5 shadow-xs transition hover:bg-paper active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                  className="apple-liquid-glass-card hover-lift flex touch-manipulation items-center gap-3 rounded-2xl p-3.5 shadow-xs transition active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
-                  <t.icon size={18} className="shrink-0 text-brand" />
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand">
+                    <t.icon size={17} />
+                  </span>
                   <span className="truncate text-sm font-bold text-ink">{t.label}</span>
                 </button>
               ))}
@@ -289,7 +291,7 @@ export function ConciergePage() {
         <div className="mt-6 lg:mt-0 lg:col-span-7 space-y-5">
           {/* Ask AirPal Input Form */}
           <form
-            className="flex items-center gap-2 rounded-full ring-1 ring-line bg-card px-4 py-2.5 shadow-xs transition focus-within:ring-2 focus-within:ring-brand"
+            className="apple-liquid-glass-light flex items-center gap-2 rounded-full px-4 py-2 shadow-sm transition-all focus-within:ring-2 focus-within:ring-brand focus-within:shadow-md"
             onSubmit={(e) => {
               e.preventDefault();
               if (!ask.trim()) return;

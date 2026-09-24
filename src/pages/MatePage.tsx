@@ -515,9 +515,9 @@ export function MatePage() {
                 <li key={c.id}>
                   <Link
                     href={`/mate/request?useCase=${c.id}`}
-                    className="flex items-center gap-3 rounded-2xl border border-line bg-card p-3.5 hover:border-brand/40 transition"
+                    className="apple-liquid-glass-card hover-lift flex items-center gap-3 rounded-2xl p-3.5 transition active:scale-[0.97]"
                   >
-                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand/10 text-brand">
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand">
                       {c.id === "events" ? (
                         <Sparkles size={18} />
                       ) : c.id === "social" ? (
@@ -526,9 +526,9 @@ export function MatePage() {
                         <CalendarDays size={18} />
                       )}
                     </span>
-                    <span>
-                      <span className="block text-sm font-semibold">{c.label}</span>
-                      <span className="block text-xs text-mute">{c.line}</span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-bold text-ink">{c.label}</span>
+                      <span className="block truncate text-xs text-mute font-medium">{c.line}</span>
                     </span>
                   </Link>
                 </li>
@@ -536,15 +536,15 @@ export function MatePage() {
             </ul>
           </section>
 
-          <section className="rounded-3xl border border-line bg-card p-5 shadow-xs">
+          <section className="apple-liquid-glass-card rounded-3xl p-5 shadow-xs">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <h2 className="font-display text-base font-bold">Or start from an experience</h2>
-                <p className="mt-0.5 text-[13px] text-mute">Pick something worth doing — then take a Mate along.</p>
+                <p className="mt-0.5 text-[13px] text-mute font-medium">Pick something worth doing — then take a Mate along.</p>
               </div>
               <Link
                 href="/experiences"
-                className="shrink-0 rounded-full bg-brand px-4 py-2 text-[13px] font-semibold text-white hover:bg-brand-ink"
+                className="shrink-0 rounded-full bg-brand px-4 py-2 text-[13px] font-semibold text-white shadow-sm hover:bg-brand-ink transition active:scale-95"
               >
                 Browse
               </Link>

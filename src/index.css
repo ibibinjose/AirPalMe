@@ -420,22 +420,73 @@ body.keyboard-open .keyboard-hide {
 }
 
 .apple-liquid-glass-light {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow:
-    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.8),
-    0 12px 32px -6px rgba(0, 0, 0, 0.12);
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.9),
+    0 12px 32px -6px rgba(18, 22, 20, 0.08);
+}
+
+.apple-liquid-glass-dock {
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 1px 0 rgba(18, 22, 20, 0.03),
+    0 18px 42px -12px rgba(24, 5, 219, 0.18),
+    0 4px 16px -2px rgba(18, 22, 20, 0.06);
+}
+
+.apple-liquid-glass-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.9),
+    0 8px 24px -8px rgba(18, 22, 20, 0.05);
 }
 
 .apple-liquid-glass-clear {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
   backdrop-filter: blur(36px) saturate(220%);
   -webkit-backdrop-filter: blur(36px) saturate(220%);
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   box-shadow:
     inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.6),
     inset 0 -1px 1px 0 rgba(0, 0, 0, 0.15),
     0 12px 32px -4px rgba(0, 0, 0, 0.35);
 }
+
+/* Micro-interaction utilities */
+.hover-lift {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -8px rgba(24, 5, 219, 0.14), 0 4px 12px -2px rgba(18, 22, 20, 0.04);
+}
+.hover-lift:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.glass-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.glass-sheen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+

@@ -122,10 +122,10 @@ export function AirPalSearchField({ placeholder = "Search AirPal" }: { placehold
     <button
       type="button"
       onClick={openGlobalSearch}
-      className="flex h-[52px] w-full cursor-pointer touch-manipulation items-center gap-2.5 rounded-full bg-card px-5 text-left ring-1 ring-line transition hover:ring-brand/30 active:scale-[0.99]"
+      className="apple-liquid-glass-light flex h-[52px] w-full cursor-pointer touch-manipulation items-center gap-2.5 rounded-full px-5 text-left ring-1 ring-white/80 transition-all hover:ring-brand/40 active:scale-[0.99] shadow-sm hover:shadow-md"
     >
-      <Search size={18} className="shrink-0 text-mute" />
-      <span className="truncate text-[15px] text-mute">{placeholder}</span>
+      <Search size={18} className="shrink-0 text-brand" />
+      <span className="truncate text-[15px] font-medium text-mute">{placeholder}</span>
     </button>
   );
 }
@@ -134,7 +134,7 @@ export function GlassPanel({ children, className }: { children: ReactNode; class
   return (
     <div
       className={cn(
-        "apple-liquid-glass-light rounded-2xl px-4 py-3 ring-1 ring-white/60",
+        "apple-liquid-glass-card rounded-3xl p-5 ring-1 ring-white/80",
         className,
       )}
     >
@@ -157,8 +157,8 @@ export function CardShell({
   label?: string;
 }) {
   const cls = cn(
-    "block overflow-hidden rounded-[28px] bg-card text-left ring-1 ring-line transition active:scale-[0.99]",
-    (href || onClick) && "hover:ring-brand/30",
+    "block overflow-hidden rounded-[28px] bg-card text-left ring-1 ring-line/80 shadow-xs transition-all duration-280 active:scale-[0.99]",
+    (href || onClick) && "hover-lift hover:ring-brand/40",
     className,
   );
   if (href) {
@@ -199,15 +199,15 @@ export function CategoryTile({
   return (
     <Link
       href={href}
-      className="flex touch-manipulation flex-col items-center gap-1.5 transition active:scale-[0.96]"
+      className="group flex touch-manipulation flex-col items-center gap-1.5 transition-all duration-200 active:scale-[0.94]"
     >
       <span
-        className="grid h-[68px] w-[68px] place-items-center rounded-[20px] shadow-[0_4px_12px_rgba(18,22,20,0.10)]"
+        className="grid h-[68px] w-[68px] place-items-center rounded-[22px] shadow-[0_4px_14px_rgba(18,22,20,0.08)] ring-1 ring-black/5 transition-all duration-280 group-hover:-translate-y-1 group-hover:shadow-[0_8px_20px_rgba(18,22,20,0.12)]"
         style={{ backgroundColor: tint }}
       >
-        <Icon size={28} style={{ color: fg }} strokeWidth={2.2} />
+        <Icon size={28} style={{ color: fg }} strokeWidth={2.2} className="transition-transform duration-200 group-hover:scale-105" />
       </span>
-      <span className="px-1 text-center text-[12px] font-semibold leading-tight text-ink">{label}</span>
+      <span className="px-1 text-center text-[12px] font-semibold leading-tight text-ink group-hover:text-brand transition-colors">{label}</span>
     </Link>
   );
 }
