@@ -42,6 +42,8 @@ const CALLABLES = [
   "createStaffTicket",
   "resolveStaffTicket",
   "onStaffTicketCreated",
+  "onPingCreated",
+  "onPingUpdated",
   "createManagedProduct",
   "createManagedCheckoutSession",
   "placeDiningOrder",

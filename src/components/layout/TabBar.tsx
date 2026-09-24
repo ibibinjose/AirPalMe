@@ -1,6 +1,9 @@
 import { AtSign, CalendarDays, Compass, Inbox, QrCode } from "lucide-react";
 import { useLocation } from "wouter";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { collection, limit, onSnapshot, query, where } from "firebase/firestore";
+import { getFirebaseDb } from "@/lib/firebase";
 import { cn } from "@/lib/cn";
 import { enterEase } from "@/lib/motion";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,6 +23,43 @@ const TABS: { href: string; id: GuestTab; label: string; icon: typeof Compass }[
   { href: "/me", id: "me", label: "Me", icon: AtSign },
 ];
 
+/** Live unread count for the Inbox tab: unanswered pings + unread activity. */
+function useInboxUnread(uid: string | undefined): number {
+  const [unread, setUnread] = useState(0);
+  useEffect(() => {
+    if (!uid) {
+      setUnread(0);
+      return;
+    }
+    const db = getFirebaseDb();
+    if (!db) return;
+    let pings = 0;
+    let activity = 0;
+    const update = () => setUnread(Math.min(99, pings + activity));
+    const offPing = onSnapshot(
+      query(collection(db, "pings"), where("toUid", "==", uid), where("status", "==", "sent"), limit(20)),
+      (snap) => {
+        pings = snap.size;
+        update();
+      },
+      () => undefined,
+    );
+    const offActivity = onSnapshot(
+      query(collection(db, "promotion_notifications"), where("uid", "==", uid), where("read", "==", false), limit(20)),
+      (snap) => {
+        activity = snap.size;
+        update();
+      },
+      () => undefined,
+    );
+    return () => {
+      offPing();
+      offActivity();
+    };
+  }, [uid]);
+  return unread;
+}
+
 export function TabBar({ path, enter = false }: { path: string; enter?: boolean }) {
   const [, nav] = useLocation();
   const { user } = useAuth();
@@ -27,6 +67,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
   const active = tabFromPath(path);
   const { isKeyboardOpen } = useVirtualKeyboard();
   const meHref = !user ? "/start" : mine?.handle ? `/@${mine.handle}` : "/bio/setup";
+  const inboxUnread = useInboxUnread(user?.uid);
 
   return (
     <motion.nav
@@ -73,7 +114,17 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
                   {tab.id === "me" ? (
                     <span className="text-[17px] font-bold leading-none">@</span>
                   ) : (
-                    <Icon size={21} strokeWidth={on ? 2.3 : 1.75} fill={on ? "currentColor" : "none"} />
+                    <span className="relative">
+                      <Icon size={21} strokeWidth={on ? 2.3 : 1.75} fill={on ? "currentColor" : "none"} />
+                      {tab.id === "inbox" && inboxUnread > 0 && (
+                        <span
+                          className="absolute -right-2 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white"
+                          aria-label={`${inboxUnread} unread`}
+                        >
+                          {inboxUnread > 9 ? "9+" : inboxUnread}
+                        </span>
+                      )}
+                    </span>
                   )}
                   <span className="max-w-full truncate px-0.5 text-[11px] font-semibold tracking-tight">
                     {tab.label}
