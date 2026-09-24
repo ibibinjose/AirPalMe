@@ -48,6 +48,17 @@ import { signInWithSocial, type SocialProvider } from "@/lib/social-auth";
 import { saveCachedProperty } from "@/lib/properties";
 import { track } from "@/lib/analytics";
 
+import {
+  authenticateWithBiometrics,
+  enrollBiometrics,
+  getBiometricLabel,
+  getBiometricType,
+  hasEnrolledBiometrics,
+  isBiometricsSupported,
+  removeBiometrics,
+  type BiometricType,
+} from "@/lib/biometrics";
+
 type RegisterOpts = {
   kind?: HostPropertyKind;
   propertyName?: string;
@@ -64,6 +75,13 @@ type AuthValue = {
   login: (email: string, password: string) => Promise<void>;
   loginWithPhonePassword: (phone: string, password: string) => Promise<void>;
   loginWithSocial: (provider: SocialProvider) => Promise<void>;
+  loginWithBiometrics: () => Promise<void>;
+  enrollUserBiometrics: () => Promise<void>;
+  removeUserBiometrics: () => void;
+  hasEnrolledBiometrics: boolean;
+  biometricsSupported: boolean;
+  biometricLabel: string;
+  biometricType: BiometricType;
   register: (email: string, name: string, opts?: RegisterOpts) => Promise<{ propertyId?: string }>;
   sendPhoneCode: (phone: string) => Promise<void>;
   confirmPhoneCode: (code: string) => Promise<void>;
@@ -104,6 +122,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [authReady, setAuthReady] = useState(!isFirebaseConfigured);
   const [signInPrompt, setSignInPrompt] = useState<{ reason: string } | null>(null);
+  const [biometricsSupported, setBiometricsSupported] = useState(false);
+  const [hasBiometrics, setHasBiometrics] = useState(() => hasEnrolledBiometrics());
+
+  const biometricType: BiometricType = getBiometricType();
+  const biometricLabel: string = getBiometricLabel(biometricType);
+
+  useEffect(() => {
+    void isBiometricsSupported().then(setBiometricsSupported);
+  }, []);
 
   useEffect(() => {
     if (user) setSignInPrompt(null);
@@ -258,6 +285,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         });
       },
+      async loginWithBiometrics() {
+        const record = await authenticateWithBiometrics();
+        if (record.uid) {
+          const auth = getFirebaseAuth();
+          if (auth?.currentUser && auth.currentUser.uid === record.uid) {
+            await pullUser();
+          } else {
+            const db = getFirebaseDb();
+            if (db) {
+              const snap = await getDoc(doc(db, "users", record.uid));
+              if (snap.exists()) {
+                setUser({
+                  uid: record.uid,
+                  email: record.email || "",
+                  displayName: record.displayName || "You",
+                  role: "guest",
+                  ...(snap.data() as Partial<UserProfile>),
+                });
+              }
+            }
+            await pullUser();
+          }
+          setHasBiometrics(true);
+        }
+      },
+      async enrollUserBiometrics() {
+        if (!user) throw new Error(`Sign in first to enable ${biometricLabel}`);
+        await enrollBiometrics({
+          uid: user.uid,
+          email: user.email,
+          phone: user.phone,
+          displayName: user.displayName,
+          handle: user.displayName,
+        });
+        setHasBiometrics(true);
+      },
+      removeUserBiometrics() {
+        removeBiometrics();
+        setHasBiometrics(false);
+      },
+      hasEnrolledBiometrics: hasBiometrics,
+      biometricsSupported,
+      biometricLabel,
+      biometricType,
       async linkEmailPassword(email, password) {
         await linkEmailPasswordToAccount(normalizeEmail(email), password);
         await pullUser();
@@ -497,7 +568,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSignInPrompt(null);
       },
     };
-  }, [user, authReady, signInPrompt]);
+  }, [user, authReady, signInPrompt, hasBiometrics, biometricsSupported, biometricLabel, biometricType]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -13,11 +13,21 @@ import { useBio } from "@/contexts/BioContext";
 import { useHandleStatus } from "@/hooks/useHandleStatus";
 import { resetPhoneLogin } from "@/lib/phone-auth";
 import { cn } from "@/lib/cn";
+import { ScanFace } from "lucide-react";
 
 type Step = "handle" | "code" | "account";
 
 export function SignupFlow({ onDone }: { onDone: () => void }) {
-  const { sendPhoneCode, confirmPhoneCode, linkEmailPassword, completeAccount, sendVerificationEmail } = useAuth();
+  const {
+    sendPhoneCode,
+    confirmPhoneCode,
+    linkEmailPassword,
+    completeAccount,
+    sendVerificationEmail,
+    biometricsSupported,
+    biometricLabel,
+    enrollUserBiometrics,
+  } = useAuth();
   const { createProfile, updateProfile, mine } = useBio();
 
   const [step, setStep] = useState<Step>("handle");
@@ -29,6 +39,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
   const [password, setPassword] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [enableBiometrics, setEnableBiometrics] = useState(true);
   const [busy, setBusy] = useState(false);
   const [wait, setWait] = useState(0);
   const handleStatus = useHandleStatus(handle, mine?.id);
@@ -130,6 +141,13 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
         await completeAccount({ handle: h, name: name.trim(), email: email.trim(), birthDate: birthDate.trim() });
       } catch {
         /* local profile already saved */
+      }
+      if (enableBiometrics && biometricsSupported) {
+        try {
+          await enrollUserBiometrics();
+        } catch {
+          /* can be enabled later */
+        }
       }
       try {
         await sendVerificationEmail();
@@ -353,6 +371,26 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
                 />
               </div>
             </ValidField>
+            {biometricsSupported && (
+              <label className="flex items-center gap-2.5 rounded-2xl bg-brand/5 p-3 ring-1 ring-brand/20 cursor-pointer transition hover:bg-brand/10">
+                <input
+                  type="checkbox"
+                  checked={enableBiometrics}
+                  onChange={(e) => setEnableBiometrics(e.target.checked)}
+                  className="h-4 w-4 rounded text-brand focus:ring-brand accent-[#1805db]"
+                />
+                <div className="min-w-0 flex-1">
+                  <span className="block text-xs font-bold text-ink">
+                    Enable {biometricLabel} for instant 1-tap sign in
+                  </span>
+                  <span className="block text-[11px] text-mute">
+                    Never need passwords or SMS codes on this device
+                  </span>
+                </div>
+                <ScanFace size={18} className="text-brand shrink-0" />
+              </label>
+            )}
+
             <p className="text-[11px] text-mute">
               @{normalizeHandle(handle) || "handle"} is your personal profile. Add a place later if you run a business.
             </p>

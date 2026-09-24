@@ -24,17 +24,20 @@ export function AvatarFace({
   const [imgError, setImgError] = useState(false);
   const raw = customSrc || mine?.avatar || user?.photoURL;
   const src = useMediaSrc(raw) || (raw && !raw.startsWith("idb:") ? raw : undefined);
-  const letter = (mine?.name || user?.displayName || user?.email || "M").trim().charAt(0).toUpperCase();
+  const nameStr = String(mine?.name || user?.displayName || user?.email || "M");
+  const letter = (nameStr.trim().charAt(0) || "M").toUpperCase();
 
   const statusKey: AvailabilityStatus =
     mine?.availabilityStatus || (mine?.openNow ? "available" : user ? "available" : "offline");
+
+  const statusInfo = AVAILABILITY_STATUSES[statusKey] || AVAILABILITY_STATUSES.available;
 
   const ring = showRing
     ? statusKey === "available"
       ? "ring-2 ring-brand ring-offset-2 ring-offset-card"
       : statusKey === "offline"
         ? "ring-1 ring-line ring-offset-1 ring-offset-card"
-        : cn(AVAILABILITY_STATUSES[statusKey]?.ringClass || "ring-1 ring-line", "ring-2 ring-offset-2 ring-offset-card")
+        : cn(statusInfo.ringClass || "ring-1 ring-line", "ring-2 ring-offset-2 ring-offset-card")
     : "";
 
   return (

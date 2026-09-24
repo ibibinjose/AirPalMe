@@ -5,6 +5,7 @@ import { authErrorMessage } from "@shared/auth-email";
 import { Button } from "@/components/ui/Button";
 import { MeAvatar } from "@/components/auth/MeAvatar";
 import { AccountContacts } from "@/components/auth/AccountContacts";
+import { BiometricEnrollCard } from "@/components/auth/BiometricEnrollCard";
 import { VerifyEmailBanner } from "@/components/auth/VerifyEmailBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
@@ -95,27 +96,30 @@ export function SettingsPage() {
         </button>
       </div>
 
-      {user?.email && (
+      {user && (
         <>
-          <h2 className="font-display mt-8 text-xl">Security</h2>
-          <button
-            type="button"
-            className="mt-3 w-full rounded-2xl bg-card px-4 py-3 text-left text-sm ring-1 ring-line disabled:opacity-50"
-            disabled={resetBusy}
-            onClick={() => {
-              if (!user.email) {
-                toast.message("Add an email to reset a password. Mobile login uses a text code.");
-                return;
-              }
-              setResetBusy(true);
-              void requestPasswordReset(user.email)
-                .then(() => toast.success("Reset link sent to your email"))
-                .catch((err) => toast.error(authErrorMessage(err, "Could not send reset email")))
-                .finally(() => setResetBusy(false));
-            }}
-          >
-            {resetBusy ? "Sending…" : "Email a password reset"}
-          </button>
+          <h2 className="font-display mt-8 text-xl">Security & Biometrics</h2>
+          <BiometricEnrollCard />
+          {user.email && (
+            <button
+              type="button"
+              className="mt-3 w-full rounded-2xl bg-card px-4 py-3 text-left text-sm ring-1 ring-line disabled:opacity-50"
+              disabled={resetBusy}
+              onClick={() => {
+                if (!user.email) {
+                  toast.message("Add an email to reset a password. Mobile login uses a text code.");
+                  return;
+                }
+                setResetBusy(true);
+                void requestPasswordReset(user.email)
+                  .then(() => toast.success("Reset link sent to your email"))
+                  .catch((err) => toast.error(authErrorMessage(err, "Could not send reset email")))
+                  .finally(() => setResetBusy(false));
+              }}
+            >
+              {resetBusy ? "Sending…" : "Email a password reset"}
+            </button>
+          )}
         </>
       )}
 

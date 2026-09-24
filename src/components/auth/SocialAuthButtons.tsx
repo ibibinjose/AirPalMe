@@ -6,13 +6,19 @@ import { track } from "@/lib/analytics";
 import { triggerHaptic } from "@/lib/native";
 import type { SocialProvider } from "@/lib/social-auth";
 
+import { useAuth } from "@/contexts/AuthContext";
+import { BiometricAuthButton } from "./BiometricAuthButton";
+
 export function SocialAuthButtons({
   busy,
   onSocial,
+  showBiometrics = true,
 }: {
   busy?: boolean;
   onSocial: (provider: SocialProvider) => Promise<void>;
+  showBiometrics?: boolean;
 }) {
+  const { hasEnrolledBiometrics } = useAuth();
   const [pending, setPending] = useState<SocialProvider | null>(null);
   const locked = Boolean(busy || pending);
 
@@ -42,12 +48,15 @@ export function SocialAuthButtons({
 
   return (
     <div className="space-y-2">
+      {showBiometrics && hasEnrolledBiometrics && (
+        <BiometricAuthButton variant="social" />
+      )}
       <button
         type="button"
         disabled={locked}
         onClick={() => void go("google")}
         className={cn(
-          "flex h-12 w-full items-center justify-center gap-2 rounded-full bg-card text-sm font-semibold ring-1 ring-line transition hover:bg-paper active:scale-[0.99] disabled:opacity-60",
+          "flex h-12 w-full items-center justify-center gap-2 rounded-full bg-card text-sm font-semibold ring-1 ring-line transition hover:bg-paper active:scale-[0.99] disabled:opacity-60 shadow-2xs",
         )}
       >
         <GoogleMark />
@@ -57,7 +66,7 @@ export function SocialAuthButtons({
         type="button"
         disabled={locked}
         onClick={() => void go("apple")}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-white transition hover:bg-neutral-800 active:scale-[0.99] disabled:opacity-60"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-white transition hover:bg-neutral-800 active:scale-[0.99] disabled:opacity-60 shadow-2xs"
       >
         <AppleMark />
         {pending === "apple" ? "Continuing with Apple…" : "Continue with Apple"}

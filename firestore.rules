@@ -406,6 +406,25 @@ match /dining_orders/{orderId} {
         || platformAdmin();
     }
 
+    // Partnership inquiries: anyone can introduce themselves (tightly validated);
+    // only admins read and triage. No sign-in so discovery converts.
+    match /partner_leads/{leadId} {
+      allow get, list: if signedIn() && platformAdmin();
+      allow create: if request.resource.data.segment in ['stay', 'experience', 'event', 'fashion', 'other']
+        && request.resource.data.source in ['google', 'ai', 'word', 'other']
+        && request.resource.data.company is string
+        && request.resource.data.company.size() > 0 && request.resource.data.company.size() < 121
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0 && request.resource.data.name.size() < 81
+        && request.resource.data.email is string
+        && request.resource.data.email.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$')
+        && request.resource.data.message is string
+        && request.resource.data.message.size() >= 10 && request.resource.data.message.size() < 2001
+        && request.resource.data.status == 'new';
+      allow update: if signedIn() && platformAdmin();
+      allow delete: if false;
+    }
+
     // AirPal Studio walkthrough bookings: owner + admins can read; team triages.
     match /studio_walkthroughs/{bookingId} {
       allow read: if signedIn() && (

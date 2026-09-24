@@ -38,6 +38,8 @@ import { isNativeApp, triggerHaptic } from "@/lib/native";
 import { useVirtualKeyboard } from "@/lib/keyboard";
 import { phonePasswordNeedsSms, phoneReady } from "@shared/phone-auth";
 import { MeAvatar } from "@/components/auth/MeAvatar";
+import { BiometricAuthButton } from "@/components/auth/BiometricAuthButton";
+import { BiometricEnrollCard } from "@/components/auth/BiometricEnrollCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 
@@ -128,6 +130,7 @@ export function StartPage() {
     sendVerificationEmail,
     requestPasswordReset,
     logout,
+    hasEnrolledBiometrics,
   } = useAuth();
   const { mine, business, biosReady } = useBio();
   const [pendingGo, setPendingGo] = useState(false);
@@ -395,7 +398,7 @@ export function StartPage() {
   }
 
   // Already logged in view
-  if (user && !phoneSignup && mode !== "signup") {
+  if (user && !phoneSignup) {
     const isHostUser = Boolean(user.propertyIds?.length || user.role === "host_admin" || user.role === "super_admin");
     return (
       <div className="mx-auto max-w-md px-4 py-10">
@@ -423,6 +426,7 @@ export function StartPage() {
 
           <div className="mt-6 text-left">
             <AccountContacts compact />
+            <BiometricEnrollCard compact />
           </div>
 
           {user.email && user.emailVerified === false && (
@@ -822,9 +826,19 @@ export function StartPage() {
               </div>
             )}
 
-            <div className="mt-5">
+            {mode === "signin" && hasEnrolledBiometrics && (
+              <div className="mt-4">
+                <BiometricAuthButton
+                  variant="hero"
+                  onSuccess={() => setPendingGo(true)}
+                />
+              </div>
+            )}
+
+            <div className="mt-4">
               <SocialAuthButtons
                 busy={busy}
+                showBiometrics={false}
                 onSocial={async (provider) => {
                   setInlineError(null);
                   await loginWithSocial(provider);

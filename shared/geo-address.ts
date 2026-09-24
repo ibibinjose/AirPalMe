@@ -252,23 +252,27 @@ export function addressOk(parts: AddressParts) {
   return Boolean(parts.line1.trim() && parts.city.trim() && parts.countryCode);
 }
 
-export function nationalDigits(raw: string) {
+export function nationalDigits(raw?: string | null) {
+  if (!raw || typeof raw !== "string") return "";
   return raw.replace(/\D/g, "");
 }
 
-export function composePhone(dial: string, national: string) {
-  const d = dial.startsWith("+") ? dial : `+${nationalDigits(dial)}`;
+export function composePhone(dial?: string | null, national?: string | null) {
+  const dStr = typeof dial === "string" ? dial : "";
+  const d = dStr.startsWith("+") ? dStr : `+${nationalDigits(dStr)}`;
   let n = nationalDigits(national);
   if (n.startsWith("0")) n = n.slice(1);
   return n ? `${d} ${n}` : "";
 }
 
-export function isValidPhone(raw: string) {
+export function isValidPhone(raw?: string | null) {
+  if (!raw || typeof raw !== "string") return false;
   const compact = raw.replace(/[^\d+]/g, "");
   return /^\+[1-9]\d{7,14}$/.test(compact);
 }
 
-export function splitPhone(raw: string): { dial: string; national: string } {
+export function splitPhone(raw?: string | null): { dial: string; national: string } {
+  if (!raw || typeof raw !== "string") return { dial: "+61", national: "" };
   const compact = raw.replace(/[^\d+]/g, "");
   const known = countryFromPhone(compact);
   if (known) return { dial: known.dial, national: compact.slice(known.dial.length) };

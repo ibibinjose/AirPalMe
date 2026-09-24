@@ -43,6 +43,7 @@ const PulsePublicPage = lazy(() => import("@/pages/PulsePublicPage").then((m) =>
 const StartPage = lazy(() => import("@/pages/StartPage").then((m) => ({ default: m.StartPage })));
 const AuthActionPage = lazy(() => import("@/pages/AuthActionPage").then((m) => ({ default: m.AuthActionPage })));
 const PartnersPage = lazy(() => import("@/pages/PartnersPage").then((m) => ({ default: m.PartnersPage })));
+const PartnerPage = lazy(() => import("@/pages/PartnerPage").then((m) => ({ default: m.PartnerPage })));
 const JoinPage = lazy(() => import("@/pages/JoinPage").then((m) => ({ default: m.JoinPage })));
 const BusinessPage = lazy(() => import("@/pages/BusinessPage").then((m) => ({ default: m.BusinessPage })));
 const BusinessOnboardPage = lazy(() =>
@@ -215,9 +216,7 @@ export function AppRoutes() {
           <Redirect to="/start?tab=signin" />
         </Route>
         <Route path="/partners" component={PartnersPage} />
-        <Route path="/partner">
-          <Redirect to="/partners" />
-        </Route>
+        <Route path="/partner" component={PartnerPage} />
         <Route path="/admin" component={AdminPage} />
         <Route path="/admin/promotions" component={PromotionsAdminPage} />
         <Route path="/admin/promotions/:id" component={PromotionAdminDetailPage} />

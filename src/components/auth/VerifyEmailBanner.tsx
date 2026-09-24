@@ -2,8 +2,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { authErrorMessage } from "@shared/auth-email";
 
-export function VerifyEmailBanner({ email, onSend }: { email: string; onSend: () => Promise<void> }) {
+export function VerifyEmailBanner({ email, onSend }: { email?: string; onSend: () => Promise<void> }) {
   const [busy, setBusy] = useState(false);
+
+  if (!email) return null;
 
   async function send() {
     setBusy(true);

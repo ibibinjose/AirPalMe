@@ -32,9 +32,11 @@ function dropRecaptchaHost() {
   const el = document.getElementById(PHONE_RECAPTCHA_ID);
   if (!el) return;
   if (el.dataset.airpalRecaptcha === "owned") {
-    el.parentNode?.removeChild(el);
-  } else {
-    el.innerHTML = "";
+    try {
+      el.parentNode?.removeChild(el);
+    } catch {
+      /* ignore */
+    }
   }
 }
 
