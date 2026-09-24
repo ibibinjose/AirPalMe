@@ -2,11 +2,22 @@ import { useMemo, useRef, useState } from "react";
 import { useLocation, useSearch } from "wouter";
 import {
   ArrowLeft,
+  ArrowRight,
   Briefcase,
+  Calendar,
   CalendarDays,
+  Check,
   ChevronRight,
+  Clock,
   Coffee,
   Footprints,
+  Globe,
+  Lock,
+  MapPin,
+  Palmtree,
+  PartyPopper,
+  Search,
+  Share2,
   Sparkles,
   Ticket,
   Users,
@@ -26,30 +37,129 @@ import { toZonedDateStr, zonedWeekdayIndex } from "@/lib/local-time";
 import { listPeople } from "@/lib/people";
 import { circleHandles } from "@/lib/circle";
 import { triggerHaptic } from "@/lib/native";
-import { PLAN_TYPES, type PlanType } from "@shared/plan";
+import { PLAN_TYPES, formatPlanDate, type PlanType } from "@shared/plan";
 import { cn } from "@/lib/cn";
 import { PlaceAddressField, type PickedPlace } from "@/components/forms/PlaceAddressField";
 import type { Geo } from "@shared/nearby";
 import { solveAirPalIntent } from "@/lib/brain";
 
-const KINDS: Array<{ id: PlanType; label: string }> = [
-  { id: "catchup", label: "Catch up" },
-  { id: "meeting", label: "Meeting" },
-  { id: "lunch", label: "Lunch" },
-  { id: "nightout", label: "Hangout" },
-  { id: "walk", label: "Walk" },
+interface TemplateItem {
+  id: PlanType;
+  label: string;
+  tag: string;
+  desc: string;
+  Icon: typeof Coffee;
+  bgGrad: string;
+  iconBg: string;
+  textColor: string;
+}
+
+const TEMPLATES: TemplateItem[] = [
+  {
+    id: "catchup",
+    label: "Coffee & Catchup",
+    tag: "Casual",
+    desc: "Coffee, bakery run, brunch, or casual chats.",
+    Icon: Coffee,
+    bgGrad: "from-amber-500/10 via-amber-500/5 to-transparent hover:border-amber-500/40",
+    iconBg: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+    textColor: "text-amber-600 dark:text-amber-400",
+  },
+  {
+    id: "lunch",
+    label: "Lunch & Dining",
+    tag: "Food & Eats",
+    desc: "Midday feast, food markets, or quick foodie breaks.",
+    Icon: UtensilsCrossed,
+    bgGrad: "from-orange-500/10 via-orange-500/5 to-transparent hover:border-orange-500/40",
+    iconBg: "bg-orange-500/15 text-orange-600 dark:text-orange-400",
+    textColor: "text-orange-600 dark:text-orange-400",
+  },
+  {
+    id: "nightout",
+    label: "Hangout & Night Out",
+    tag: "Social & Drinks",
+    desc: "Cocktails, sunset drinks, dinner, or weekend parties.",
+    Icon: Users,
+    bgGrad: "from-brand/10 via-brand/5 to-transparent hover:border-brand/40",
+    iconBg: "bg-brand/15 text-brand",
+    textColor: "text-brand",
+  },
+  {
+    id: "walk",
+    label: "Walk & Outdoors",
+    tag: "Fresh Air",
+    desc: "Scenic coastal walk, park stroll, or outdoor activity.",
+    Icon: Footprints,
+    bgGrad: "from-emerald-500/10 via-emerald-500/5 to-transparent hover:border-emerald-500/40",
+    iconBg: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+    textColor: "text-emerald-600 dark:text-emerald-400",
+  },
+  {
+    id: "meeting",
+    label: "Meeting & Co-Work",
+    tag: "Productive",
+    desc: "Work sync, brainstorm session, or side hustle sprint.",
+    Icon: Briefcase,
+    bgGrad: "from-blue-500/10 via-blue-500/5 to-transparent hover:border-blue-500/40",
+    iconBg: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+    textColor: "text-blue-600 dark:text-blue-400",
+  },
+  {
+    id: "escape",
+    label: "Road Trip & Escape",
+    tag: "Adventure",
+    desc: "Day trip, beach escape, or weekend road adventure.",
+    Icon: Palmtree,
+    bgGrad: "from-teal-500/10 via-teal-500/5 to-transparent hover:border-teal-500/40",
+    iconBg: "bg-teal-500/15 text-teal-600 dark:text-teal-400",
+    textColor: "text-teal-600 dark:text-teal-400",
+  },
+  {
+    id: "birthday",
+    label: "Birthday & Celebration",
+    tag: "Party & Milestone",
+    desc: "Milestone birthdays, celebration dinners & toasts.",
+    Icon: PartyPopper,
+    bgGrad: "from-rose-500/10 via-rose-500/5 to-transparent hover:border-rose-500/40",
+    iconBg: "bg-rose-500/15 text-rose-600 dark:text-rose-400",
+    textColor: "text-rose-600 dark:text-rose-400",
+  },
 ];
 
-/** Podz-style template cards: one tappable card per plan kind. */
-const TEMPLATES: Array<{ id: PlanType; label: string; desc: string; Icon: typeof Coffee }> = [
-  { id: "catchup", label: "Catch up", desc: "Coffee, dinner, or just because.", Icon: Coffee },
-  { id: "nightout", label: "Hangout", desc: "A night out with your people.", Icon: Users },
-  { id: "lunch", label: "Lunch", desc: "Midday break, together.", Icon: UtensilsCrossed },
-  { id: "walk", label: "Walk", desc: "Fresh air and good company.", Icon: Footprints },
-  { id: "meeting", label: "Meeting", desc: "Work sync or side project.", Icon: Briefcase },
+const TITLE_SUGGESTIONS: Record<string, string[]> = {
+  catchup: ["☕ Morning Flat Whites", "🥑 Sunday Brunch & Coffee", "💬 Quick Catchup & Chat", "🥐 Bakery Run & Walk"],
+  lunch: ["🍕 Casual Lunch & Chats", "🍣 Sushi Feast with Friends", "🍔 Midday Foodie Break", "🌮 Market Stalls & Eats"],
+  nightout: ["🍸 Friday Sunset Drinks", "🍻 Weekend Hangout & Beats", "🍹 Cocktails & Chats", "🍕 Dinner & Night Out"],
+  walk: ["🌊 Bondi to Bronte Walk", "🌿 Park Stroll & Flat Whites", "🏃 Sunset Walk & Stretch", "🐕 Weekend Dog Walk"],
+  meeting: ["💻 Strategy & Brainstorm", "☕ Coffee & Work Sync", "🚀 Side Hustle Sprint", "📊 Project Catchup"],
+  escape: ["🚗 South Coast Road Trip", "🏖️ Beach Afternoon & Sunset", "⛰️ Blue Mountains Day Trip", "🌴 Weekend Escape"],
+  birthday: ["🎂 Birthday Celebration Drinks", "🎉 Milestone Birthday Dinner", "🥂 Sunset Birthday Toast", "🥳 Birthday Bash"],
+};
+
+const SYDNEY_PRESETS = [
+  "The Rocks, Sydney",
+  "Surry Hills, NSW",
+  "Barangaroo, Sydney",
+  "Bondi Beach, NSW",
+  "Newtown, NSW",
+  "Manly Beach, NSW",
+  "CBD, Sydney",
 ];
 
-const STEPS = ["Plan", "Details", "Who"] as const;
+const TIME_PRESETS = [
+  { label: "Morning", time: "09:30" },
+  { label: "Lunch", time: "12:30" },
+  { label: "Arvo", time: "15:30" },
+  { label: "Dinner", time: "18:30" },
+  { label: "Night", time: "20:30" },
+];
+
+const STEPS = [
+  { num: 1, label: "Plan", hint: "Type" },
+  { num: 2, label: "Details", hint: "When & where" },
+  { num: 3, label: "Who", hint: "Invites" },
+] as const;
 
 function addDays(base: string, days: number) {
   const [y, m, d] = base.split("-").map(Number);
@@ -103,7 +213,7 @@ export function PlanCreatePage() {
   const paramType = params.get("type") as PlanType | null;
 
   const initialType: PlanType =
-    paramType && KINDS.some((k) => k.id === paramType)
+    paramType && TEMPLATES.some((k) => k.id === paramType)
       ? paramType
       : solvedIntent
         ? mapCategoryToPlanType(solvedIntent.category, solvedIntent.timeSlot)
@@ -131,8 +241,10 @@ export function PlanCreatePage() {
   const [isPublic, setIsPublic] = useState(false);
   const [hero, setHero] = useState<string | undefined>();
   const [invite, setInvite] = useState<Set<string>>(() => new Set(targetHandle ? [targetHandle] : []));
+  const [peopleSearch, setPeopleSearch] = useState("");
   const [busy, setBusy] = useState(false);
-  // Stepped flow: template → details → who. A prefilled invite or intent skips straight to details.
+
+  // Stepped flow: 0 (Plan Type) → 1 (Details: When & where) → 2 (Who: Invites).
   const [step, setStep] = useState<0 | 1 | 2>(targetHandle || solvedIntent ? 1 : 0);
   const guardRef = useRef(createSubmitGuard());
 
@@ -151,6 +263,12 @@ export function PlanCreatePage() {
     });
   }, [followedHandles, followerHandles, likedHandles, likedByHandles, people, targetHandle, targetName]);
 
+  const filteredCircle = useMemo(() => {
+    if (!peopleSearch.trim()) return circle;
+    const q = peopleSearch.toLowerCase().trim();
+    return circle.filter((p) => p.name.toLowerCase().includes(q) || p.handle.toLowerCase().includes(q));
+  }, [circle, peopleSearch]);
+
   if (!authReady) {
     return <div className="mx-auto max-w-md px-4 py-16 text-center text-sm text-mute">Loading…</div>;
   }
@@ -167,12 +285,23 @@ export function PlanCreatePage() {
   }
 
   function toggleInvite(handle: string) {
+    void triggerHaptic("light");
     setInvite((prev) => {
       const next = new Set(prev);
       if (next.has(handle)) next.delete(handle);
       else next.add(handle);
       return next;
     });
+  }
+
+  function selectAllCircle() {
+    void triggerHaptic("medium");
+    setInvite(new Set(circle.map((p) => p.handle)));
+  }
+
+  function clearAllInvites() {
+    void triggerHaptic("light");
+    setInvite(new Set());
   }
 
   function pickType(id: PlanType) {
@@ -226,112 +355,221 @@ export function PlanCreatePage() {
     }
   }
 
-  const stepTitles = ["What are you planning?", "Where & when?", "Who's in?"] as const;
+  const stepMeta = [
+    { title: "What are you planning?", sub: "Choose a plan template or activity" },
+    { title: "Where & when?", sub: "Set your plan name, schedule & location" },
+    { title: "Who's in?", sub: "Invite mates or generate your RSVP link" },
+  ][step];
+
+  const activeTemplate = TEMPLATES.find((t) => t.id === type) || TEMPLATES[0]!;
 
   return (
-    <div className="mx-auto max-w-md px-4 py-6 pb-28">
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => {
-            if (step > 0) setStep((step - 1) as 0 | 1 | 2);
-            else if (window.history.length > 1) window.history.back();
-            else nav("/plan");
-          }}
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-paper text-ink"
-          aria-label="Back"
-        >
-          <ArrowLeft size={18} />
-        </button>
-        <div>
-          <p className="text-[13px] font-semibold text-mute">Family & friends</p>
-          <h1 className="font-display text-[28px] font-bold tracking-tight">{stepTitles[step]}</h1>
+    <div className="mx-auto max-w-xl px-4 py-6 pb-32">
+      {/* Header & Breadcrumb Navigation */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              void triggerHaptic("light");
+              if (step > 0) setStep((step - 1) as 0 | 1 | 2);
+              else if (window.history.length > 1) window.history.back();
+              else nav("/plan");
+            }}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-paper text-ink ring-1 ring-line/80 shadow-2xs transition hover:bg-card hover:ring-brand/40 active:scale-95 cursor-pointer"
+            aria-label="Back"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-brand">
+                Family & Friends
+              </span>
+              <span className="text-[10px] font-semibold text-mute">· Step {step + 1} of 3</span>
+            </div>
+            <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+              {stepMeta.title}
+            </h1>
+          </div>
         </div>
+
+        {step > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              void triggerHaptic("light");
+              setStep(0);
+            }}
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-xs font-semibold text-mute hover:text-ink ring-1 ring-line/70 transition hover:bg-card"
+          >
+            <activeTemplate.Icon size={14} className={activeTemplate.textColor} />
+            <span>{activeTemplate.label}</span>
+          </button>
+        )}
       </div>
 
-      {/* Podz-style stepper: Plan → Details → Who */}
-      <ol className="mt-4 flex items-center gap-1.5" aria-label="Progress">
-        {STEPS.map((label, i) => {
-          const done = i < step;
-          const current = i === step;
-          return (
-            <li key={label} className="flex flex-1 items-center gap-1.5 last:flex-none">
-              <span
+      <p className="mt-1 text-xs sm:text-sm text-mute leading-relaxed pl-13">
+        {stepMeta.sub}
+      </p>
+
+      {/* Modern Interactive Liquid Glass Stepper */}
+      <div className="mt-6 rounded-2xl bg-paper/60 p-2 border border-line/80 shadow-2xs">
+        <ol className="flex items-center justify-between gap-2" aria-label="Creation Progress">
+          {STEPS.map((s, i) => {
+            const done = i < step;
+            const current = i === step;
+            const isClickable = i <= step;
+
+            return (
+              <li
+                key={s.label}
                 className={cn(
-                  "grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-bold",
-                  done || current ? "bg-brand text-white" : "bg-paper text-mute ring-1 ring-line",
+                  "flex flex-1 items-center gap-2 rounded-xl p-2 transition-all duration-200",
+                  current ? "bg-card shadow-xs ring-1 ring-brand/30" : "",
+                  isClickable ? "cursor-pointer" : "opacity-60 cursor-default",
                 )}
+                onClick={() => {
+                  if (isClickable && i !== step) {
+                    void triggerHaptic("light");
+                    setStep(i as 0 | 1 | 2);
+                  }
+                }}
               >
-                {done ? "✓" : i + 1}
-              </span>
-              <span className={cn("text-[12px] font-semibold", current ? "text-ink" : "text-mute")}>{label}</span>
-              {i < STEPS.length - 1 && <span className="mx-1 h-px flex-1 bg-line" aria-hidden="true" />}
-            </li>
-          );
-        })}
-      </ol>
+                <span
+                  className={cn(
+                    "grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-bold transition-all duration-200",
+                    done
+                      ? "bg-emerald-500 text-white shadow-2xs"
+                      : current
+                        ? "bg-brand text-white shadow-sm ring-2 ring-brand/25"
+                        : "bg-paper text-mute ring-1 ring-line/80",
+                  )}
+                >
+                  {done ? <Check size={14} strokeWidth={3} /> : s.num}
+                </span>
+                <div className="min-w-0">
+                  <span
+                    className={cn(
+                      "block truncate text-xs font-bold",
+                      current ? "text-brand" : done ? "text-ink" : "text-mute",
+                    )}
+                  >
+                    {s.label}
+                  </span>
+                  <span className="hidden xs:block truncate text-[10px] text-mute">{s.hint}</span>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
 
       {targetHandle && step > 0 && (
-        <p className="mt-4 rounded-[16px] bg-paper px-4 py-3 text-[15px]">
-          With <span className="font-semibold">{targetName || `@${targetHandle}`}</span>
-        </p>
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-brand/10 border border-brand/20 p-3.5 shadow-2xs">
+          <div className="flex items-center gap-2.5">
+            <span className="grid h-8 w-8 place-items-center rounded-xl bg-brand text-white text-xs font-bold">
+              @
+            </span>
+            <div>
+              <p className="text-xs font-bold text-ink">
+                Planning with {targetName || `@${targetHandle}`}
+              </p>
+              <p className="text-[11px] text-mute">Automatic invite will be attached</p>
+            </div>
+          </div>
+          <span className="rounded-full bg-brand/15 px-2.5 py-0.5 text-[10px] font-bold text-brand uppercase tracking-wider">
+            Connected
+          </span>
+        </div>
       )}
 
+      {/* STEP 0: PLAN TEMPLATES */}
       {step === 0 && (
-        <div className="mt-6 space-y-2.5">
-          {TEMPLATES.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => pickType(t.id)}
-              className="flex w-full items-center gap-3 rounded-[28px] bg-card p-4 text-left ring-1 ring-line shadow-xs transition hover:ring-brand/40 active:scale-[0.99]"
-            >
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
-                <t.Icon size={22} />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[16px] font-semibold text-ink">{t.label}</span>
-                <span className="block truncate text-[13px] text-mute">{t.desc}</span>
-              </span>
-              <ChevronRight size={18} className="shrink-0 text-mute" />
-            </button>
-          ))}
+        <div className="mt-6 space-y-3 animate-in fade-in duration-200">
+          <div className="grid gap-3 sm:grid-cols-2">
+            {TEMPLATES.map((t) => {
+              const Icon = t.Icon;
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => pickType(t.id)}
+                  className={cn(
+                    "group relative flex flex-col justify-between rounded-3xl border border-line/80 bg-gradient-to-br p-4 sm:p-5 text-left shadow-xs transition-all duration-200 hover:shadow-md hover:scale-[1.01] active:scale-[0.99] cursor-pointer",
+                    t.bgGrad,
+                  )}
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <span
+                        className={cn(
+                          "grid h-12 w-12 shrink-0 place-items-center rounded-2xl transition-transform duration-200 group-hover:scale-110 ring-1 ring-black/5 shadow-2xs",
+                          t.iconBg,
+                        )}
+                      >
+                        <Icon size={24} strokeWidth={2.2} />
+                      </span>
+                      <span className="rounded-full bg-paper/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-mute ring-1 ring-line/60">
+                        {t.tag}
+                      </span>
+                    </div>
+
+                    <h3 className="font-display text-base sm:text-lg font-bold text-ink group-hover:text-brand transition-colors">
+                      {t.label}
+                    </h3>
+                    <p className="mt-1 text-xs text-mute leading-relaxed">{t.desc}</p>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between pt-3 border-t border-line/40 text-xs font-semibold text-brand">
+                    <span>Start {t.label.split(" ")[0]}</span>
+                    <ChevronRight
+                      size={15}
+                      className="opacity-60 transition-transform duration-200 group-hover:translate-x-1 group-hover:opacity-100"
+                    />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
           {/* Highlighted Ticketed Public Event Card */}
-          <div className="pt-2">
+          <div className="pt-3">
             <button
               type="button"
               onClick={() => {
                 void triggerHaptic("medium");
                 nav("/event/new");
               }}
-              className="group relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-[26px] border border-brand/30 bg-gradient-to-r from-brand/10 via-brand/5 to-gold/15 p-4 text-left shadow-xs transition-all duration-200 hover:border-brand hover:shadow-md hover:brightness-105 active:scale-[0.99]"
+              className="group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-3xl border border-brand/35 bg-gradient-to-r from-brand/15 via-brand/5 to-gold/20 p-5 text-left shadow-xs transition-all duration-200 hover:border-brand hover:shadow-md hover:brightness-105 active:scale-[0.99] cursor-pointer"
             >
-              <div className="flex items-center gap-3.5 min-w-0">
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-sm ring-2 ring-brand/30 transition group-hover:scale-105">
-                  <Ticket size={22} className="rotate-[-10deg]" />
+              <div className="flex items-center gap-4 min-w-0">
+                <span className="grid h-13 w-13 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-md ring-4 ring-brand/20 transition-transform group-hover:scale-105">
+                  <Ticket size={24} className="rotate-[-10deg]" />
                 </span>
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[15px] font-bold text-ink group-hover:text-brand transition-colors">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-display text-base sm:text-lg font-bold text-ink group-hover:text-brand transition-colors">
                       Ticketed Public Event
                     </span>
-                    <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-2xs">
+                    <span className="rounded-full bg-brand px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-2xs">
                       Sell Tickets
                     </span>
                   </div>
-                  <p className="truncate text-xs text-mute group-hover:text-ink/80 transition-colors">
-                    Host a show, party, festival, or ticketed community gathering
+                  <p className="mt-0.5 text-xs text-mute leading-relaxed">
+                    Host a show, party, festival, market, or ticketed community gathering
                   </p>
                 </div>
               </div>
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-card ring-1 ring-line text-brand transition-transform group-hover:translate-x-0.5">
-                <ChevronRight size={16} />
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-card ring-1 ring-line text-brand transition-transform group-hover:translate-x-1 shadow-2xs">
+                <ChevronRight size={18} />
               </span>
             </button>
           </div>
         </div>
       )}
 
+      {/* Solved Brain Intent Preview */}
       {solvedIntent && (
         <div className="mt-4 rounded-2xl bg-gradient-to-br from-brand/10 via-brand/5 to-transparent p-4 ring-1 ring-brand/20 shadow-xs">
           <div className="flex items-center gap-2 text-brand">
@@ -356,133 +594,470 @@ export function PlanCreatePage() {
         </div>
       )}
 
+      {/* STEP 1: DETAILS (WHEN & WHERE) */}
       {step === 1 && (
-        <div className="mt-6 space-y-7">
-          <section aria-label="Title">
-          <label className="block">
-            <span className="text-[13px] font-semibold text-mute">What</span>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={PLAN_TYPES[type]?.defaultTitle || "Friday drinks"}
-              className={`${fieldInput} mt-1`}
-            />
-          </label>
+        <div className="mt-6 space-y-6 animate-in fade-in duration-200">
+          {/* Plan Title & Suggestion Chips */}
+          <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
+            <label className="block">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-bold uppercase tracking-wider text-gold">
+                  1 · Plan Title
+                </span>
+                <span className="text-[11px] font-medium text-mute">Required</span>
+              </div>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder={PLAN_TYPES[type]?.defaultTitle || "e.g. Friday drinks at The Rocks"}
+                className={cn(fieldInput, "text-sm sm:text-base font-semibold py-3")}
+              />
+            </label>
+
+            {/* Quick Title Suggestions */}
+            <div className="mt-3">
+              <span className="text-[11px] font-semibold text-mute block mb-1.5">
+                Quick Suggestions:
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {(TITLE_SUGGESTIONS[type] || TITLE_SUGGESTIONS.catchup)!.map((sug) => (
+                  <button
+                    key={sug}
+                    type="button"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      setTitle(sug);
+                    }}
+                    className={cn(
+                      "rounded-full px-3 py-1 text-xs font-medium border transition active:scale-95",
+                      title === sug
+                        ? "bg-brand text-white border-brand font-semibold shadow-2xs"
+                        : "bg-paper text-ink/80 border-line/80 hover:bg-card hover:border-brand/40",
+                    )}
+                  >
+                    {sug}
+                  </button>
+                ))}
+              </div>
+            </div>
           </section>
 
-        <section aria-label="Step 2: when and where">
-          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">2 · When & where</p>
-          <div className="mt-2">
-            <span className="text-[13px] font-semibold text-mute">When</span>
-          <div className="mt-1.5 flex gap-1.5">
-            {[
-              { label: "Today", value: today },
-              { label: "Tomorrow", value: today ? addDays(today, 1) : "" },
-              { label: "Friday", value: today ? addDays(today, (5 - zonedWeekdayIndex(new Date()) + 7) % 7 || 7) : "" },
-            ].map((q) => (
+          {/* Schedule: When (Date & Time) */}
+          <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
+                <Calendar size={14} />
+                2 · Date & Time
+              </span>
+              <span className="text-[11px] font-semibold text-brand">
+                {date ? formatPlanDate(date, time) : "Set Schedule"}
+              </span>
+            </div>
+
+            {/* Quick Date Shortcuts */}
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {[
+                { label: "Today", value: today },
+                { label: "Tomorrow", value: today ? addDays(today, 1) : "" },
+                {
+                  label: "This Friday",
+                  value: today ? addDays(today, (5 - zonedWeekdayIndex(new Date()) + 7) % 7 || 7) : "",
+                },
+                {
+                  label: "Saturday",
+                  value: today ? addDays(today, (6 - zonedWeekdayIndex(new Date()) + 7) % 7 || 7) : "",
+                },
+                {
+                  label: "Sunday",
+                  value: today ? addDays(today, (7 - zonedWeekdayIndex(new Date()) + 7) % 7 || 7) : "",
+                },
+              ].map((q) => (
+                <button
+                  key={q.label}
+                  type="button"
+                  disabled={!q.value}
+                  onClick={() => {
+                    if (q.value) {
+                      void triggerHaptic("light");
+                      setDate(q.value);
+                    }
+                  }}
+                  className={cn(
+                    "h-8 rounded-full px-3.5 text-xs font-semibold border transition active:scale-95 cursor-pointer",
+                    date === q.value
+                      ? "bg-brand text-white border-brand shadow-xs"
+                      : "bg-paper text-ink/80 border-line/80 hover:bg-card hover:border-brand/40",
+                  )}
+                >
+                  {q.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              <div>
+                <label className="block text-[11px] font-semibold text-mute mb-1">Calendar Date</label>
+                <input
+                  type="date"
+                  value={date}
+                  min={today}
+                  onChange={(e) => setDate(e.target.value)}
+                  className={fieldInput}
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-semibold text-mute mb-1">Meetup Time</label>
+                <input
+                  type="time"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  className={fieldInput}
+                />
+              </div>
+            </div>
+
+            {/* Quick Time Slots */}
+            <div className="mt-3 pt-3 border-t border-line/60">
+              <span className="text-[11px] font-semibold text-mute block mb-1.5 flex items-center gap-1">
+                <Clock size={12} /> Quick Time Slots:
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {TIME_PRESETS.map((p) => (
+                  <button
+                    key={p.label}
+                    type="button"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      setTime(p.time);
+                    }}
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-xs border transition active:scale-95",
+                      time === p.time
+                        ? "bg-brand text-white border-brand font-semibold shadow-2xs"
+                        : "bg-paper text-ink/75 border-line/70 hover:bg-card",
+                    )}
+                  >
+                    {p.label} ({p.time})
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Location: Where */}
+          <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
+                <MapPin size={14} />
+                3 · Location & Venue
+              </span>
+              <span className="text-[11px] font-medium text-mute">Search or Pick</span>
+            </div>
+
+            <PlaceAddressField
+              value={place}
+              onChange={setPlace}
+              onPick={(picked: PickedPlace) => {
+                setPlace(picked.label);
+                setPlaceGeo(picked.geo);
+              }}
+              placeholder={city || "Search Google Maps or Sydney venues"}
+            />
+
+            {/* Sydney Area Presets */}
+            <div className="mt-3">
+              <span className="text-[11px] font-semibold text-mute block mb-1.5">
+                Popular Sydney Neighborhoods:
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {SYDNEY_PRESETS.map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      setPlace(preset);
+                    }}
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-xs border transition active:scale-95",
+                      place === preset
+                        ? "bg-brand text-white border-brand font-semibold shadow-2xs"
+                        : "bg-paper text-ink/75 border-line/70 hover:bg-card",
+                    )}
+                  >
+                    {preset.split(",")[0]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Optional Photo Cover */}
+          <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
+            <ImageField
+              kind="square"
+              folder="listings"
+              label="Cover Photo (Optional — change anytime)"
+              value={hero}
+              onChange={setHero}
+            />
+          </section>
+
+          {/* Privacy & Discovery Settings */}
+          <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs space-y-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-gold block">
+              4 · Privacy & Visibility
+            </span>
+
+            <div className="grid grid-cols-2 gap-2.5">
               <button
-                key={q.label}
                 type="button"
-                disabled={!q.value}
-                onClick={() => q.value && setDate(q.value)}
+                onClick={() => {
+                  void triggerHaptic("light");
+                  setIsPublic(false);
+                }}
                 className={cn(
-                  "h-8 rounded-full px-3 text-[12px] font-semibold",
-                  date === q.value ? "bg-brand text-white" : "bg-paper text-ink",
+                  "flex flex-col items-start gap-1 rounded-2xl p-3.5 border text-left transition active:scale-98 cursor-pointer",
+                  !isPublic
+                    ? "bg-brand/10 border-brand font-semibold shadow-xs ring-1 ring-brand/20"
+                    : "bg-paper border-line/80 hover:bg-card text-mute",
                 )}
               >
-                {q.label}
+                <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
+                  <Lock size={14} className={!isPublic ? "text-brand" : "text-mute"} />
+                  <span>Private / Invite-Only</span>
+                </div>
+                <p className="text-[11px] text-mute leading-tight">
+                  Only people with the link or invited friends can see this plan.
+                </p>
               </button>
-            ))}
-          </div>
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            <input
-              type="date"
-              value={date}
-              min={today}
-              onChange={(e) => setDate(e.target.value)}
-              className={fieldInput}
-            />
-            <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className={fieldInput} />
-          </div>
-        </div>
 
-        <PlaceAddressField
-          value={place}
-          onChange={setPlace}
-          onPick={(picked: PickedPlace) => {
-            setPlace(picked.label);
-            setPlaceGeo(picked.geo);
-          }}
-          placeholder={city || "Search Google Maps"}
-        />
-        </section>
+              <button
+                type="button"
+                onClick={() => {
+                  void triggerHaptic("light");
+                  setIsPublic(true);
+                }}
+                className={cn(
+                  "flex flex-col items-start gap-1 rounded-2xl p-3.5 border text-left transition active:scale-98 cursor-pointer",
+                  isPublic
+                    ? "bg-brand/10 border-brand font-semibold shadow-xs ring-1 ring-brand/20"
+                    : "bg-paper border-line/80 hover:bg-card text-mute",
+                )}
+              >
+                <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
+                  <Globe size={14} className={isPublic ? "text-brand" : "text-mute"} />
+                  <span>Public Discovery</span>
+                </div>
+                <p className="text-[11px] text-mute leading-tight">
+                  Discoverable on Sydney Explore and nearby hangouts.
+                </p>
+              </button>
+            </div>
+          </section>
 
-        <ImageField kind="square" folder="listings" label="Photo (optional — change anytime)" value={hero} onChange={setHero} />
-
-        <label className="flex items-center gap-3 py-1">
-          <input
-            type="checkbox"
-            checked={isPublic}
-            onChange={(e) => setIsPublic(e.target.checked)}
-            className="h-5 w-5 accent-[#1805db]"
-          />
-          <span className="text-[15px]">Anyone nearby can join</span>
-        </label>
-
-        <Button className="h-12 w-full" onClick={() => setStep(2)}>
-          Continue
-        </Button>
+          {/* Next Button */}
+          <Button
+            className="h-13 w-full gap-2 rounded-2xl text-sm font-bold shadow-md active:scale-98"
+            onClick={() => {
+              void triggerHaptic("medium");
+              setStep(2);
+            }}
+          >
+            <span>Continue to Invites</span>
+            <ArrowRight size={16} />
+          </Button>
         </div>
       )}
 
+      {/* STEP 2: WHO (INVITES & CONFIRMATION) */}
       {step === 2 && (
-        <div className="mt-6 space-y-7">
-        {circle.length > 0 && (
-          <section aria-label="Step 3: who">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Who&apos;s in? <span className="font-medium normal-case text-mute">— optional, add later anytime</span></p>
-            <p className="mt-2 flex items-center gap-1.5 text-[13px] font-semibold text-mute">
-              <Users size={14} /> Invite
-            </p>
-            <ul className="mt-2 max-h-36 space-y-1 overflow-y-auto">
-              {circle.slice(0, 16).map((p) => {
-                const on = invite.has(p.handle);
-                return (
-                  <li key={p.handle}>
+        <div className="mt-6 space-y-6 animate-in fade-in duration-200">
+          {/* Plan Preview Summary Card */}
+          <div className="overflow-hidden rounded-3xl border border-line bg-card p-5 shadow-sm">
+            <div className="flex items-center justify-between gap-2 pb-3 border-b border-line/60">
+              <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-brand">
+                <activeTemplate.Icon size={14} className={activeTemplate.textColor} />
+                {activeTemplate.label}
+              </span>
+              <span
+                className={cn(
+                  "rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+                  isPublic ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-brand/10 text-brand",
+                )}
+              >
+                {isPublic ? "Public Plan" : "Private Plan"}
+              </span>
+            </div>
+
+            <h3 className="mt-3 font-display text-xl font-bold text-ink">
+              {title.trim() || PLAN_TYPES[type]?.defaultTitle || "Hangout"}
+            </h3>
+
+            <div className="mt-2.5 flex flex-wrap items-center gap-y-1.5 gap-x-4 text-xs font-medium text-mute">
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar size={13} className="text-brand shrink-0" />
+                {formatPlanDate(date, time)}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin size={13} className="text-emerald-500 shrink-0" />
+                {place || city || "Sydney"}
+              </span>
+            </div>
+          </div>
+
+          {/* Circle & Friends Selection */}
+          <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
+                  <Users size={14} />
+                  Invite from Circle
+                </p>
+                <p className="text-[11px] text-mute">
+                  Select friends to receive an instant push notification
+                </p>
+              </div>
+              <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-bold text-brand">
+                {invite.size} selected
+              </span>
+            </div>
+
+            {circle.length > 0 && (
+              <>
+                {/* Search / Filter Bar */}
+                <div className="mt-3 flex items-center gap-2 rounded-xl bg-paper px-3 py-2 border border-line/70">
+                  <Search size={14} className="text-mute shrink-0" />
+                  <input
+                    type="text"
+                    value={peopleSearch}
+                    onChange={(e) => setPeopleSearch(e.target.value)}
+                    placeholder="Search circle by name or @handle…"
+                    className="h-full flex-1 bg-transparent text-xs text-ink outline-none placeholder:text-mute"
+                  />
+                  {peopleSearch && (
                     <button
                       type="button"
-                      aria-pressed={on}
-                      onClick={() => toggleInvite(p.handle)}
-                      className={cn(
-                        "flex w-full items-center justify-between rounded-[14px] px-3 py-2.5 text-left text-[15px]",
-                        on ? "bg-brand/10 font-semibold" : "bg-paper",
-                      )}
+                      onClick={() => setPeopleSearch("")}
+                      className="text-xs text-mute hover:text-ink"
                     >
-                      <span className="truncate">{p.name}</span>
-                      <span className="text-[12px] text-mute">@{p.handle}</span>
+                      Clear
                     </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        )}
+                  )}
+                </div>
 
-        <Button className="h-12 w-full" disabled={busy} loading={busy} onClick={() => void create()}>
-          <CalendarDays size={16} /> Create plan
-        </Button>
-        <div className="pt-1">
-          <button
-            type="button"
-            className="group flex w-full items-center justify-center gap-2 rounded-2xl border border-brand/25 bg-gradient-to-r from-brand/10 to-gold/10 py-3 text-xs font-bold text-brand shadow-2xs transition-all hover:bg-brand/15 hover:border-brand/40 active:scale-[0.99]"
-            onClick={() => {
-              void triggerHaptic("medium");
-              nav("/event/new");
-            }}
+                {/* Quick Select Buttons */}
+                <div className="mt-2 flex items-center justify-between text-xs">
+                  <button
+                    type="button"
+                    onClick={selectAllCircle}
+                    className="font-semibold text-brand hover:underline cursor-pointer"
+                  >
+                    Select All ({circle.length})
+                  </button>
+                  {invite.size > 0 && (
+                    <button
+                      type="button"
+                      onClick={clearAllInvites}
+                      className="text-mute hover:text-ink cursor-pointer"
+                    >
+                      Clear selection
+                    </button>
+                  )}
+                </div>
+
+                {/* Friend Selection List */}
+                <div className="mt-2.5 max-h-52 space-y-1.5 overflow-y-auto pr-1">
+                  {filteredCircle.map((p) => {
+                    const selected = invite.has(p.handle);
+                    return (
+                      <button
+                        key={p.handle}
+                        type="button"
+                        onClick={() => toggleInvite(p.handle)}
+                        className={cn(
+                          "flex w-full items-center justify-between rounded-2xl p-2.5 text-left border transition active:scale-[0.99] cursor-pointer",
+                          selected
+                            ? "bg-brand/10 border-brand font-semibold shadow-2xs"
+                            : "bg-paper border-line/60 hover:bg-card",
+                        )}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand/15 text-xs font-bold text-brand uppercase">
+                            {p.name[0] || p.handle[0]}
+                          </span>
+                          <div className="min-w-0">
+                            <span className="block truncate text-xs sm:text-[13px] text-ink font-semibold">
+                              {p.name}
+                            </span>
+                            <span className="block truncate text-[11px] text-mute">@{p.handle}</span>
+                          </div>
+                        </div>
+
+                        <span
+                          className={cn(
+                            "grid h-6 w-6 shrink-0 place-items-center rounded-full border transition",
+                            selected
+                              ? "bg-brand border-brand text-white shadow-2xs"
+                              : "border-line/80 bg-card text-transparent",
+                          )}
+                        >
+                          <Check size={12} strokeWidth={3} />
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+
+            {circle.length === 0 && (
+              <div className="mt-3 rounded-2xl bg-paper/60 p-4 text-center border border-line/60">
+                <p className="text-xs text-mute">
+                  No friends in your Circle yet. Once created, you will get an instant shareable link and QR code!
+                </p>
+              </div>
+            )}
+          </section>
+
+          {/* Instant Share Link Banner */}
+          <div className="rounded-3xl border border-line/80 bg-paper/70 p-4 shadow-2xs flex items-start gap-3">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
+              <Share2 size={18} />
+            </span>
+            <div className="text-xs leading-relaxed text-ink/80">
+              <span className="font-bold text-ink block mb-0.5">
+                Instant RSVP Link & QR Code
+              </span>
+              Creating this plan generates a private link ready to copy and share directly to WhatsApp, Messages, or Instagram groups.
+            </div>
+          </div>
+
+          {/* Primary Action Button */}
+          <Button
+            className="h-14 w-full gap-2 rounded-2xl text-base font-bold shadow-lg shadow-brand/20 active:scale-98 cursor-pointer"
+            disabled={busy}
+            loading={busy}
+            onClick={() => void create()}
           >
-            <Ticket size={16} className="rotate-[-10deg] text-brand" />
-            <span>Organising a public event or selling tickets? Create Event →</span>
-          </button>
-        </div>
+            <CalendarDays size={18} />
+            <span>Create Plan & Get Invite Link</span>
+          </Button>
+
+          {/* Ticketed Public Event Shortcut */}
+          <div className="pt-1">
+            <button
+              type="button"
+              className="group flex w-full items-center justify-center gap-2 rounded-2xl border border-brand/25 bg-gradient-to-r from-brand/10 to-gold/10 py-3 text-xs font-bold text-brand shadow-2xs transition-all hover:bg-brand/15 hover:border-brand/40 active:scale-[0.99] cursor-pointer"
+              onClick={() => {
+                void triggerHaptic("medium");
+                nav("/event/new");
+              }}
+            >
+              <Ticket size={16} className="rotate-[-10deg] text-brand" />
+              <span>Organising a public event or selling tickets? Create Event →</span>
+            </button>
+          </div>
         </div>
       )}
     </div>
