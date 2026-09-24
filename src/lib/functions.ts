@@ -511,3 +511,45 @@ export function claimFreeVenuePresenceRemote(data: ClaimFreeVenuePresenceRequest
     data,
   );
 }
+
+export function getPulseByTokenRemote(data: { publicToken: string }) {
+  return callFunction<typeof data, import("@shared/pulse").PulsePublicDto>(CALLABLES.getPulseByToken, data);
+}
+
+export function submitPulseResponseRemote(data: {
+  publicToken: string;
+  answers: import("@shared/pulse").PulseAnswer[];
+  contactRequested?: boolean;
+  contactName?: string;
+  contactMethod?: string;
+  roomNumber?: string;
+}) {
+  return callFunction<typeof data, { responseId: string; issueId: string | null; createIssue: boolean }>(
+    CALLABLES.submitPulseResponse,
+    data,
+  );
+}
+
+export function createPulseRemote(data: { propertyId: string; template?: string; name?: string }) {
+  return callFunction<typeof data, { pulseId: string; status: "draft" }>(CALLABLES.createPulse, data);
+}
+
+export function publishPulseRemote(data: {
+  propertyId: string;
+  pulseId: string;
+  placement?: "room" | "lobby" | "other";
+  label?: string;
+}) {
+  return callFunction<typeof data, { deploymentId: string; publicToken: string; path: string }>(
+    CALLABLES.publishPulse,
+    data,
+  );
+}
+
+export function acknowledgePulseIssueRemote(data: { propertyId: string; issueId: string; assigneeUid?: string }) {
+  return callFunction<typeof data, { ok: true }>(CALLABLES.acknowledgePulseIssue, data);
+}
+
+export function resolvePulseIssueRemote(data: { propertyId: string; issueId: string; resolutionNote?: string }) {
+  return callFunction<typeof data, { ok: true }>(CALLABLES.resolvePulseIssue, data);
+}

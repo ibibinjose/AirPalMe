@@ -71,3 +71,12 @@ export {
 export { createBroadcast, reviewBroadcast } from "./notifications";
 export { shareHere, stopHere } from "./here";
 export { startWave, waveAt, stopWave } from "./wave";
+export {
+  getPulseByToken,
+  submitPulseResponse,
+  createPulse,
+  publishPulse,
+  acknowledgePulseIssue,
+  resolvePulseIssue,
+  onPulseIssueCreated,
+} from "./pulse";

@@ -8,6 +8,7 @@ export type QrIntent =
   | { kind: "campus"; campusId: string; room?: string }
   | { kind: "marker"; markerId: string }
   | { kind: "vanity"; city: string; handle: string }
+  | { kind: "pulse"; publicToken: string }
   | { kind: "url"; href: string }
   | { kind: "unknown"; raw: string };
 
@@ -59,6 +60,12 @@ export function parseQrPayload(raw: string): QrIntent {
     const campus = url.pathname.match(/^\/c\/([^/]+)/);
     if (campus?.[1]) {
       return { kind: "campus", campusId: campus[1], room: url.searchParams.get("room") || undefined };
+    }
+
+    // Pulse public: /pulse/:publicToken
+    const pulse = url.pathname.match(/^\/pulse\/([^/]+)/);
+    if (pulse?.[1]) {
+      return { kind: "pulse", publicToken: decodeURIComponent(pulse[1]) };
     }
 
     // Wave codes: /w/CODE
@@ -115,6 +122,8 @@ export function pathForIntent(intent: QrIntent): string | null {
       return `/q/${intent.markerId}`;
     case "vanity":
       return `/q/${intent.city}/${intent.handle}`;
+    case "pulse":
+      return `/pulse/${encodeURIComponent(intent.publicToken)}`;
     case "url":
       return intent.href;
     default:

@@ -76,6 +76,12 @@ Always report numerator, denominator, and the per-context distribution — never
 | `companion_application_reviewed` | Mate application reviewed (requires `status`)                                                                             | No                                    |
 | `rating_submitted`    | Guest rating stored                                                                                                                    | Yes                                   |
 | `share_created`       | Share sheet used                                                                                                                       | No                                    |
+| `pulse_viewed` | Public Pulse opened by token | No |
+| `pulse_response_completed` | Guest submitted Pulse answers (server) | Yes |
+| `pulse_issue_created` | Negative path created a Pulse issue (server) | Yes |
+| `pulse_issue_acknowledged` | Host/staff acknowledged a Pulse issue | No |
+| `pulse_issue_resolved` | Host/staff resolved a Pulse issue | Yes |
+| `pulse_followup_completed` | Guest completed optional post-resolve follow-up | No |
 | `client_error`        | Uncaught window error, unhandled rejection, or React boundary. No stack, URL, or free text — `errorClass` + `errorSource` + path only. | No                                    |
 
 Not emitted until the product exists: `event_check_in`, `subscription_state`.
@@ -132,6 +138,12 @@ Mirrors `EVENT_PROPERTY_ALLOWLIST` in `shared/analytics.ts`. `validateAnalyticsE
 | `companion_application_started` | — | — |
 | `companion_application_submitted` | — | `roles` |
 | `companion_application_reviewed` | `status` | — |
+| `pulse_viewed` | `contextId`, `pulseId` | `deploymentId`, `template` |
+| `pulse_response_completed` | `contextId`, `pulseId`, `responseId` | `scoreBucket`, `issueCreated` |
+| `pulse_issue_created` | `contextId`, `pulseId`, `issueId`, `responseId` | `category` |
+| `pulse_issue_acknowledged` | `contextId`, `issueId` | `pulseId` |
+| `pulse_issue_resolved` | `contextId`, `issueId` | `pulseId`, `resolutionTimeMs` |
+| `pulse_followup_completed` | `contextId`, `issueId` | `scoreBucket` |
 | `client_error` | `errorClass`, `errorSource` | `path`, `name` |
 
 Enumerated values (enforced by `isQualifiedAction`, not by the validator — unknown values validate but never count):

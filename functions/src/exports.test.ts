@@ -69,6 +69,13 @@ const CALLABLES = [
   "votePlanStop",
   "postPlanComment",
   "confirmExperienceBooking",
+  "getPulseByToken",
+  "submitPulseResponse",
+  "createPulse",
+  "publishPulse",
+  "acknowledgePulseIssue",
+  "resolvePulseIssue",
+  "onPulseIssueCreated",
 ];
 
 describe("functions barrel", () => {

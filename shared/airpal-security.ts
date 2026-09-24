@@ -78,6 +78,12 @@ export const CALLABLES = {
   startWave: "startWave",
   waveAt: "waveAt",
   stopWave: "stopWave",
+  getPulseByToken: "getPulseByToken",
+  submitPulseResponse: "submitPulseResponse",
+  createPulse: "createPulse",
+  publishPulse: "publishPulse",
+  acknowledgePulseIssue: "acknowledgePulseIssue",
+  resolvePulseIssue: "resolvePulseIssue",
 } as const;
 
 export type CompleteAccountSignupRequest = {

@@ -271,6 +271,9 @@ export function HostPage() {
           <Button variant="ghost" className="h-8 px-3 text-xs" onClick={() => nav("/business")}>
             Place page
           </Button>
+          <Button variant="ghost" className="h-8 px-3 text-xs" onClick={() => nav("/host/pulse")}>
+            Pulse
+          </Button>
         </div>
 
         <TabPills

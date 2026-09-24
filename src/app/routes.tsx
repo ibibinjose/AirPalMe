@@ -36,6 +36,8 @@ const MarkerPage = lazy(() => import("@/pages/MarkerPage").then((m) => ({ defaul
 const StayPage = lazy(() => import("@/pages/StayPage").then((m) => ({ default: m.StayPage })));
 const DemoHotelPage = lazy(() => import("@/pages/DemoHotelPage").then((m) => ({ default: m.DemoHotelPage })));
 const HostPage = lazy(() => import("@/pages/HostPage").then((m) => ({ default: m.HostPage })));
+const HostPulsePage = lazy(() => import("@/pages/HostPulsePage").then((m) => ({ default: m.HostPulsePage })));
+const PulsePublicPage = lazy(() => import("@/pages/PulsePublicPage").then((m) => ({ default: m.PulsePublicPage })));
 const StartPage = lazy(() => import("@/pages/StartPage").then((m) => ({ default: m.StartPage })));
 const AuthActionPage = lazy(() => import("@/pages/AuthActionPage").then((m) => ({ default: m.AuthActionPage })));
 const PartnersPage = lazy(() => import("@/pages/PartnersPage").then((m) => ({ default: m.PartnersPage })));
@@ -172,7 +174,9 @@ export function AppRoutes() {
         <Route path="/campus">
           <Redirect to="/c/harbour-college" />
         </Route>
+        <Route path="/host/pulse" component={HostPulsePage} />
         <Route path="/host" component={HostPage} />
+        <Route path="/pulse/:publicToken" component={PulsePublicPage} />
         <Route path="/start" component={StartPage} />
         <Route path="/reset">
           <Redirect to="/start?tab=reset" />

@@ -1,6 +1,10 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /pulseTokens/{tokenId} {
+      allow read, write: if false;
+    }
+
     function signedIn() {
       return request.auth != null;
     }
@@ -242,7 +246,25 @@ service cloud.firestore {
           && request.resource.data.id == resource.data.id;
       }
 
-      match /dining_orders/{orderId} {
+      
+      match /pulses/{pulseId} {
+        allow read: if manages(propertyId);
+        allow create, update, delete: if false;
+      }
+      match /pulseDeployments/{deploymentId} {
+        allow read: if manages(propertyId);
+        allow create, update, delete: if false;
+      }
+      match /pulseResponses/{responseId} {
+        allow read: if manages(propertyId);
+        allow create, update, delete: if false;
+      }
+      match /pulseIssues/{issueId} {
+        allow read: if manages(propertyId);
+        allow create, update, delete: if false;
+      }
+
+match /dining_orders/{orderId} {
         allow read: if manages(propertyId)
           || (signedIn() && resource.data.guestUid == request.auth.uid);
         allow create, update, delete: if false;

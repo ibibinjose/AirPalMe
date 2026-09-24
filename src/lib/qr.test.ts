@@ -35,4 +35,14 @@ describe("qr payload", () => {
       "/q/sydney/harbour-rocks-hotel",
     );
   });
+
+  it("routes a Pulse QR to /pulse/:token", () => {
+    expect(parseQrPayload("https://airpal.me/pulse/pls_abcABC1234567890xyz")).toEqual({
+      kind: "pulse",
+      publicToken: "pls_abcABC1234567890xyz",
+    });
+    expect(pathForIntent({ kind: "pulse", publicToken: "pls_abcABC1234567890xyz" })).toBe(
+      "/pulse/pls_abcABC1234567890xyz",
+    );
+  });
 });

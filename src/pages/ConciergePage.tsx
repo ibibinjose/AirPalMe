@@ -331,6 +331,24 @@ export function ConciergePage() {
 
           {property.name ? <ArrivalGuide /> : null}
 
+          {(() => {
+            const pulseToken = (property as unknown as { activePulsePublicToken?: string }).activePulsePublicToken;
+            if (!pulseToken) return null;
+            return (
+              <button
+                type="button"
+                className="mt-6 flex w-full items-center justify-between rounded-[22px] bg-card px-4 py-3 text-left ring-1 ring-line"
+                onClick={() => nav(`/pulse/${pulseToken}`)}
+              >
+                <span>
+                  <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">Pulse</span>
+                  <span className="block text-sm font-semibold">How is your stay?</span>
+                </span>
+                <span aria-hidden>→</span>
+              </button>
+            );
+          })()}
+
           <EmojiRate
             target="stay"
             propertyId={session.propertyId || property.id}

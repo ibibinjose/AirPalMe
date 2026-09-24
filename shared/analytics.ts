@@ -76,6 +76,12 @@ export const ANALYTICS_EVENT_NAMES = [
   "companion_application_started",
   "companion_application_submitted",
   "companion_application_reviewed",
+  "pulse_viewed",
+  "pulse_response_completed",
+  "pulse_issue_created",
+  "pulse_issue_acknowledged",
+  "pulse_issue_resolved",
+  "pulse_followup_completed",
   "client_error",
 ] as const;
 
@@ -206,6 +212,12 @@ export const EVENT_PROPERTY_ALLOWLIST: Record<
   companion_application_started: { required: [], optional: [] },
   companion_application_submitted: { required: [], optional: ["roles"] },
   companion_application_reviewed: { required: ["status"], optional: [] },
+  pulse_viewed: { required: ["contextId", "pulseId"], optional: ["deploymentId", "template"] },
+  pulse_response_completed: { required: ["contextId", "pulseId", "responseId"], optional: ["scoreBucket", "issueCreated"] },
+  pulse_issue_created: { required: ["contextId", "pulseId", "issueId", "responseId"], optional: ["category"] },
+  pulse_issue_acknowledged: { required: ["contextId", "issueId"], optional: ["pulseId"] },
+  pulse_issue_resolved: { required: ["contextId", "issueId"], optional: ["pulseId", "resolutionTimeMs"] },
+  pulse_followup_completed: { required: ["contextId", "issueId"], optional: ["scoreBucket"] },
   client_error: { required: ["errorClass", "errorSource"], optional: ["path", "name"] },
 };
 
@@ -392,6 +404,16 @@ export function analyticsDedupeKey(event: AnalyticsEvent): string {
       return `rating|${session}|${String(props.targetId || "")}|${day}`;
     case "event_save":
       return `save|${session}|${String(props.eventId || "")}|${String(props.stallId || "")}|${day}`;
+    case "pulse_response_completed":
+      return `pulse_response:${String(props.responseId || event.eventId)}`;
+    case "pulse_issue_created":
+      return `pulse_issue:${String(props.issueId || event.eventId)}`;
+    case "pulse_issue_acknowledged":
+      return `pulse_ack:${String(props.issueId || event.eventId)}`;
+    case "pulse_issue_resolved":
+      return `pulse_resolved:${String(props.issueId || event.eventId)}`;
+    case "pulse_followup_completed":
+      return `pulse_followup:${String(props.issueId || event.eventId)}`;
     default:
       return `id:${event.eventId}`;
   }
@@ -420,6 +442,9 @@ export function isQualifiedAction(event: AnalyticsEvent): boolean {
     case "support_request":
     case "support_resolved":
     case "rating_submitted":
+    case "pulse_response_completed":
+    case "pulse_issue_created":
+    case "pulse_issue_resolved":
       return true;
     default:
       return false;
