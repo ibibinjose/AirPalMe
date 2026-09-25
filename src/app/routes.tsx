@@ -108,6 +108,7 @@ const PlanHubPage = lazy(() => import("@/pages/PlanHubPage").then((m) => ({ defa
 const PlanCreatePage = lazy(() => import("@/pages/PlanCreatePage").then((m) => ({ default: m.PlanCreatePage })));
 const PlanDetailPage = lazy(() => import("@/pages/PlanDetailPage").then((m) => ({ default: m.PlanDetailPage })));
 const PlanEditPage = lazy(() => import("@/pages/PlanEditPage").then((m) => ({ default: m.PlanEditPage })));
+const HelpDeskPage = lazy(() => import("@/pages/HelpDeskPage").then((m) => ({ default: m.HelpDeskPage })));
 
 function RouteFallback() {
   return (
@@ -203,6 +204,9 @@ export function AppRoutes() {
         <Route path="/business/onboard" component={BusinessOnboardPage} />
         <Route path="/business/setup" component={BusinessShowcasePage} />
         <Route path="/business/campaigns" component={BusinessCampaignsPage} />
+        <Route path="/business/helpdesk" component={HelpDeskPage} />
+        <Route path="/host/helpdesk" component={HelpDeskPage} />
+        <Route path="/helpdesk" component={HelpDeskPage} />
         <Route path="/business" component={BusinessPage} />
         <Route path="/experiences" component={ExperiencesPage} />
         <Route path="/studio" component={StudioPage} />

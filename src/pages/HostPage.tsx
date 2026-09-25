@@ -29,14 +29,38 @@ import { activeOrderCount, subscribePropertyDiningOrders } from "@/lib/dining-st
 import { enableHostTicketPush, ticketPushPrefEnabled } from "@/lib/tickets-push";
 import { hostWorkspacePropertyId, roomTokenEntries } from "@/lib/host-workspace";
 import { getPropertyWifiRemote, liveBackendEnabled, updateDiningOrderStatusRemote } from "@/lib/functions";
+import { playResolutionChime, stopTicketAlarm } from "@/lib/ticket-alert-sound";
 
 type Tab = "today" | "facilities" | "dining" | "rooms" | "place" | "print";
+
+const TICKET_CATEGORIES: Record<StaffTicket["category"], { label: string; icon: string; badgeClass: string }> = {
+  reception: { label: "Reception", icon: "🛎️", badgeClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
+  housekeeping: { label: "Housekeeping", icon: "✨", badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+  maintenance: { label: "Maintenance", icon: "🔧", badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+  dining: { label: "Dining", icon: "🍽️", badgeClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
+  late_checkout: { label: "Late Checkout", icon: "⏰", badgeClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400" },
+};
+
+function timeAgo(isoString?: string): string {
+  if (!isoString) return "";
+  try {
+    const diff = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
+    if (diff < 60) return "Just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+  } catch {
+    return "";
+  }
+}
 
 export function HostPage() {
   const { user, isHost, isAdmin, authReady, createHostProperty, sendVerificationEmail } = useAuth();
   const { business } = useBio();
   const [, nav] = useLocation();
   const [tab, setTab] = useState<Tab>("today");
+  const [ticketTab, setTicketTab] = useState<"active" | "resolved">("active");
+  const [orderTab, setOrderTab] = useState<"active" | "history">("active");
   const workspaceId = hostWorkspacePropertyId(user?.propertyIds, isAdmin);
   const [property, setProperty] = useState<PropertyInfo>(() =>
     workspaceId ? unknownProperty(workspaceId) : unknownProperty("unknown"),
@@ -335,149 +359,421 @@ export function HostPage() {
               </section>
             )}
 
-            <button
-              type="button"
-              onClick={() => nav("/business/campaigns")}
-              className="mt-4 flex w-full items-center justify-between gap-3 rounded-[22px] bg-ink p-4 text-left text-white"
-            >
-              <span>
-                <span className="block text-sm font-semibold">Fill slow nights with an Experience</span>
-                <span className="block text-xs text-white/70">AirPal recruits the guests, you host.</span>
-              </span>
-              <span aria-hidden>→</span>
-            </button>
-
-            <div className="mt-6 mb-2 flex items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold text-mute">
-                Guest tickets{openTicketCount(tickets) ? ` · ${openTicketCount(tickets)} open` : ""}
-              </h2>
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 type="button"
-                className="text-xs font-medium text-brand"
-                onClick={() => {
-                  void enableHostTicketPush().then((state) => {
-                    setAlertsOn(state === "granted");
-                    if (state === "granted") toast.success("Alerts on — new requests will ping this device");
-                    else if (state === "denied") toast.error("Notifications blocked in the browser");
-                    else toast.message("This browser can’t show background alerts");
-                  });
-                }}
+                onClick={() => nav("/helpdesk")}
+                className="flex items-center justify-between gap-3 rounded-[22px] bg-brand p-4 text-left text-white shadow-xs hover:bg-brand/95 transition active:scale-[0.99]"
               >
-                {alertsOn ? "Alerts on" : "Enable alerts"}
+                <span>
+                  <span className="block text-sm font-bold flex items-center gap-1.5">
+                    <span>🎧</span> Open Universal Help Desk
+                  </span>
+                  <span className="block text-xs text-white/80">Unified desk for Stays, Dining & Events</span>
+                </span>
+                <span aria-hidden className="font-bold">→</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => nav("/business/campaigns")}
+                className="flex items-center justify-between gap-3 rounded-[22px] bg-ink p-4 text-left text-white shadow-xs hover:bg-ink/90 transition active:scale-[0.99]"
+              >
+                <span>
+                  <span className="block text-sm font-semibold">Fill slow nights with an Experience</span>
+                  <span className="block text-xs text-white/70">AirPal recruits the guests, you host.</span>
+                </span>
+                <span aria-hidden>→</span>
               </button>
             </div>
-            <ul className="space-y-2">
-              {openTicketCount(tickets) === 0 ? (
-                <li className="rounded-[22px] bg-card p-6 text-center text-sm text-mute ring-1 ring-line">
-                  No open guest tickets.
-                </li>
-              ) : (
-                tickets
-                  .filter((t) => t.status !== "resolved")
-                  .slice(0, 8)
-                  .map((t) => (
-                    <li
-                      key={t.id}
-                      className="flex items-center justify-between gap-3 rounded-[22px] bg-card px-4 py-3 ring-1 ring-line"
-                    >
-                      <div className="min-w-0">
-                        <p className="text-[12px] text-mute">
-                          Room {t.roomNumber} · {t.category}
-                          {t.urgency === "urgent" ? " · urgent" : ""}
-                        </p>
-                        <p className="truncate font-medium">{t.details}</p>
-                      </div>
-                      <button
-                        className="text-sm text-brand"
-                        onClick={() => {
-                          void (async () => {
-                            await resolveStaffTicket(property.id, t.id);
-                            void track("support_resolved", {
-                              contextId: property.id,
-                              requestId: t.id,
-                              resolutionStatus: "resolved",
-                            });
-                            toast.success("Done");
-                          })();
-                        }}
-                      >
-                        Close
-                      </button>
-                    </li>
-                  ))
-              )}
-            </ul>
 
-            <div className="mt-6 mb-2 flex items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold text-mute">
-                Dining orders{activeOrderCount(orders) ? ` · ${activeOrderCount(orders)} active` : ""}
-              </h2>
-            </div>
-            <ul className="space-y-2">
-              {activeOrderCount(orders) === 0 ? (
-                <li className="rounded-[22px] bg-card p-6 text-center text-sm text-mute ring-1 ring-line">
-                  No active dining orders.
-                </li>
-              ) : (
-                orders
-                  .filter(
-                    (o) =>
-                      o.status === "pending" || o.status === "paid" || o.status === "preparing" || o.status === "ready",
+            {/* Front Desk Guest Tickets */}
+            <div className="mt-8 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-xs md:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-display text-lg font-semibold tracking-tight">Guest Tickets</h2>
+                    {openTicketCount(tickets) > 0 ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-semibold text-red-600 dark:text-red-400 animate-pulse">
+                        {openTicketCount(tickets)} open
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                        All clear
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-0.5 text-[13px] text-mute">
+                    Real-time front desk requests from in-stay guests via AI Receptionist & Compendium.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {openTicketCount(tickets) > 1 && (
+                    <button
+                      type="button"
+                      className="rounded-full bg-brand/10 px-3 py-1.5 text-xs font-semibold text-brand hover:bg-brand/15 transition"
+                      onClick={() => {
+                        const openOnes = tickets.filter((t) => t.status !== "resolved");
+                        void (async () => {
+                          stopTicketAlarm();
+                          playResolutionChime();
+                          await Promise.all(openOnes.map((t) => resolveStaffTicket(property.id, t.id)));
+                          toast.success(`Resolved all ${openOnes.length} tickets`);
+                        })();
+                      }}
+                    >
+                      Resolve All ({openTicketCount(tickets)})
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="rounded-full ring-1 ring-line bg-paper px-3 py-1.5 text-xs font-medium text-mute hover:text-ink transition"
+                    onClick={() => {
+                      void enableHostTicketPush().then((state) => {
+                        setAlertsOn(state === "granted");
+                        if (state === "granted") toast.success("Alerts active — new requests will ping this device");
+                        else if (state === "denied") toast.error("Notifications blocked in the browser");
+                        else toast.message("This browser can't show background alerts");
+                      });
+                    }}
+                  >
+                    {alertsOn ? "🔔 Alerts On" : "🔕 Enable Alerts"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Tickets Filter Tabs */}
+              <div className="mt-4 flex items-center gap-2 border-b border-line pb-3">
+                <button
+                  type="button"
+                  onClick={() => setTicketTab("active")}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                    ticketTab === "active"
+                      ? "bg-brand text-white shadow-xs"
+                      : "text-mute hover:text-ink hover:bg-paper"
+                  }`}
+                >
+                  Active ({tickets.filter((t) => t.status !== "resolved").length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTicketTab("resolved")}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                    ticketTab === "resolved"
+                      ? "bg-brand text-white shadow-xs"
+                      : "text-mute hover:text-ink hover:bg-paper"
+                  }`}
+                >
+                  Resolved History ({tickets.filter((t) => t.status === "resolved").length})
+                </button>
+              </div>
+
+              <ul className="mt-4 space-y-2.5">
+                {ticketTab === "active" ? (
+                  tickets.filter((t) => t.status !== "resolved").length === 0 ? (
+                    <li className="rounded-2xl bg-paper/60 p-6 text-center text-sm text-mute ring-1 ring-line">
+                      🎉 No open guest requests. Front desk is fully caught up.
+                    </li>
+                  ) : (
+                    tickets
+                      .filter((t) => t.status !== "resolved")
+                      .map((t) => {
+                        const catMeta = TICKET_CATEGORIES[t.category] || TICKET_CATEGORIES.reception;
+                        return (
+                          <li
+                            key={t.id}
+                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl bg-paper/80 p-4 ring-1 ring-line shadow-2xs hover:bg-paper transition"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ${catMeta.badgeClass}`}>
+                                  <span>{catMeta.icon}</span> {catMeta.label}
+                                </span>
+                                <span className="text-xs font-semibold text-ink">
+                                  Room {t.roomNumber}
+                                </span>
+                                {t.urgency === "urgent" && (
+                                  <span className="inline-flex items-center gap-1 rounded-md bg-red-500/15 px-2 py-0.5 text-[11px] font-bold text-red-600 dark:text-red-400">
+                                    🚨 Urgent
+                                  </span>
+                                )}
+                                <span className="text-[11px] text-mute">{timeAgo(t.createdAt)}</span>
+                              </div>
+                              <p className="mt-1.5 text-sm font-medium text-ink leading-relaxed break-words">
+                                {t.details}
+                              </p>
+                            </div>
+                            <div className="flex shrink-0 items-center gap-2 sm:self-center">
+                              <button
+                                type="button"
+                                className="flex items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 active:scale-95 transition"
+                                onClick={() => {
+                                  void (async () => {
+                                    stopTicketAlarm();
+                                    playResolutionChime();
+                                    await resolveStaffTicket(property.id, t.id);
+                                    void track("support_resolved", {
+                                      contextId: property.id,
+                                      requestId: t.id,
+                                      resolutionStatus: "resolved",
+                                    });
+                                    toast.success("Resolved & alert turned off");
+                                  })();
+                                }}
+                              >
+                                <span>✓</span> Resolve & Close
+                              </button>
+                            </div>
+                          </li>
+                        );
+                      })
                   )
-                  .slice(0, 8)
-                  .map((o) => {
-                    const next = o.status === "ready" ? "delivered" : o.status === "preparing" ? "ready" : "preparing";
-                    const nextLabel = next === "delivered" ? "Delivered" : next === "ready" ? "Ready" : "Prepare";
-                    return (
-                      <li
-                        key={o.id}
-                        className="flex items-center justify-between gap-3 rounded-[22px] bg-card px-4 py-3 ring-1 ring-line"
-                      >
-                        <div className="min-w-0">
-                          <p className="text-[12px] text-mute">
-                            Room {o.roomNumber} · {o.status}
-                            {o.paymentMode === "desk" ? " · pay at desk" : ""}
-                          </p>
-                          <p className="truncate font-medium">{o.items.map((l) => `${l.qty}× ${l.name}`).join(", ")}</p>
-                          <p className="text-[12px] text-mute">A${(o.totalCents / 100).toFixed(2)}</p>
-                        </div>
-                        <div className="flex shrink-0 items-center gap-3">
-                          <button
-                            className="text-sm text-mute"
-                            onClick={() => {
-                              void updateDiningOrderStatusRemote({
-                                propertyId: property.id,
-                                orderId: o.id,
-                                status: "cancelled",
-                              })
-                                .then(() => toast.success("Order cancelled"))
-                                .catch((err) => toast.error(err instanceof Error ? err.message : "Couldn't cancel"));
-                            }}
+                ) : (
+                  tickets.filter((t) => t.status === "resolved").length === 0 ? (
+                    <li className="rounded-2xl bg-paper/60 p-6 text-center text-sm text-mute ring-1 ring-line">
+                      No resolved tickets in history yet.
+                    </li>
+                  ) : (
+                    tickets
+                      .filter((t) => t.status === "resolved")
+                      .slice(0, 15)
+                      .map((t) => {
+                        const catMeta = TICKET_CATEGORIES[t.category] || TICKET_CATEGORIES.reception;
+                        return (
+                          <li
+                            key={t.id}
+                            className="flex items-center justify-between gap-3 rounded-2xl bg-paper/40 px-4 py-3 ring-1 ring-line/60 opacity-85"
                           >
-                            Cancel
-                          </button>
-                          <button
-                            className="text-sm font-semibold text-brand"
-                            onClick={() => {
-                              void updateDiningOrderStatusRemote({
-                                propertyId: property.id,
-                                orderId: o.id,
-                                status: next,
-                              })
-                                .then(() => {
-                                  toast.success(nextLabel);
-                                })
-                                .catch((err) => toast.error(err instanceof Error ? err.message : "Couldn't update"));
-                            }}
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-medium text-ink/70">
+                                  {catMeta.icon} Room {t.roomNumber}
+                                </span>
+                                <span className="text-[11px] text-mute">
+                                  Resolved {t.resolvedAt ? timeAgo(t.resolvedAt) : "recently"}
+                                </span>
+                              </div>
+                              <p className="truncate text-xs text-mute mt-0.5 line-through">{t.details}</p>
+                            </div>
+                            <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">
+                              Resolved ✓
+                            </span>
+                          </li>
+                        );
+                      })
+                  )
+                )}
+              </ul>
+            </div>
+
+            {/* Front Desk Dining Orders */}
+            <div className="mt-8 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-xs md:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-display text-lg font-semibold tracking-tight">Dining Orders</h2>
+                    {activeOrderCount(orders) > 0 ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-600 dark:text-amber-400">
+                        {activeOrderCount(orders)} active
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                        Kitchen idle
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-0.5 text-[13px] text-mute">
+                    In-room dining orders placed by guests via QR menu.
+                  </p>
+                </div>
+              </div>
+
+              {/* Dining Filter Tabs */}
+              <div className="mt-4 flex items-center gap-2 border-b border-line pb-3">
+                <button
+                  type="button"
+                  onClick={() => setOrderTab("active")}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                    orderTab === "active"
+                      ? "bg-brand text-white shadow-xs"
+                      : "text-mute hover:text-ink hover:bg-paper"
+                  }`}
+                >
+                  Active Orders ({orders.filter((o) => o.status !== "delivered" && o.status !== "cancelled").length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrderTab("history")}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                    orderTab === "history"
+                      ? "bg-brand text-white shadow-xs"
+                      : "text-mute hover:text-ink hover:bg-paper"
+                  }`}
+                >
+                  Past Orders ({orders.filter((o) => o.status === "delivered" || o.status === "cancelled").length})
+                </button>
+              </div>
+
+              <ul className="mt-4 space-y-3">
+                {orderTab === "active" ? (
+                  orders.filter((o) => o.status !== "delivered" && o.status !== "cancelled").length === 0 ? (
+                    <li className="rounded-2xl bg-paper/60 p-6 text-center text-sm text-mute ring-1 ring-line">
+                      🍽️ No active kitchen orders.
+                    </li>
+                  ) : (
+                    orders
+                      .filter((o) => o.status !== "delivered" && o.status !== "cancelled")
+                      .map((o) => {
+                        const next =
+                          o.status === "ready"
+                            ? "delivered"
+                            : o.status === "preparing"
+                              ? "ready"
+                              : "preparing";
+                        const nextLabel =
+                          next === "delivered"
+                            ? "Complete Delivery"
+                            : next === "ready"
+                              ? "Mark Ready"
+                              : "Start Preparing";
+
+                        return (
+                          <li
+                            key={o.id}
+                            className="rounded-2xl bg-paper/80 p-4 ring-1 ring-line shadow-2xs hover:bg-paper transition"
                           >
-                            {nextLabel}
-                          </button>
-                        </div>
-                      </li>
-                    );
-                  })
-              )}
-            </ul>
+                            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line/60 pb-2.5">
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-sm text-ink">Room {o.roomNumber}</span>
+                                <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-semibold text-brand uppercase tracking-wider">
+                                  {o.status}
+                                </span>
+                                {o.paymentMode === "desk" ? (
+                                  <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+                                    💳 Pay at Desk
+                                  </span>
+                                ) : (
+                                  <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+                                    ✓ Stripe Paid
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-display font-semibold text-sm text-ink">
+                                  A${(o.totalCents / 100).toFixed(2)}
+                                </span>
+                                <span className="text-[11px] text-mute">{timeAgo(o.createdAt)}</span>
+                              </div>
+                            </div>
+
+                            <div className="mt-2.5 text-xs text-ink/80 space-y-1">
+                              {o.items.map((it, idx) => (
+                                <div key={idx} className="flex justify-between">
+                                  <span>
+                                    <strong className="text-brand">{it.qty}×</strong> {it.name}
+                                  </span>
+                                  <span className="text-mute">
+                                    A${((it.unitCents * it.qty) / 100).toFixed(2)}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="mt-3.5 flex items-center justify-end gap-2 border-t border-line/60 pt-2.5">
+                              <button
+                                type="button"
+                                className="rounded-full px-3 py-1.5 text-xs text-mute hover:text-red-600 transition"
+                                onClick={() => {
+                                  void updateDiningOrderStatusRemote({
+                                    propertyId: property.id,
+                                    orderId: o.id,
+                                    status: "cancelled",
+                                  })
+                                    .then(() => toast.success("Order cancelled"))
+                                    .catch((err) =>
+                                      toast.error(err instanceof Error ? err.message : "Couldn't cancel"),
+                                    );
+                                }}
+                              >
+                                Cancel Order
+                              </button>
+                              <button
+                                type="button"
+                                className="rounded-full bg-brand px-4 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 active:scale-95 transition"
+                                onClick={() => {
+                                  void (async () => {
+                                    if (next === "delivered") {
+                                      stopTicketAlarm();
+                                      playResolutionChime();
+                                    }
+                                    try {
+                                      await updateDiningOrderStatusRemote({
+                                        propertyId: property.id,
+                                        orderId: o.id,
+                                        status: next,
+                                      });
+                                      toast.success(
+                                        next === "delivered" ? "Order Delivered & Closed" : `Order ${nextLabel}`,
+                                      );
+                                    } catch (err) {
+                                      toast.error(
+                                        err instanceof Error ? err.message : "Couldn't update order",
+                                      );
+                                    }
+                                  })();
+                                }}
+                              >
+                                {nextLabel} →
+                              </button>
+                            </div>
+                          </li>
+                        );
+                      })
+                  )
+                ) : (
+                  orders.filter((o) => o.status === "delivered" || o.status === "cancelled").length === 0 ? (
+                    <li className="rounded-2xl bg-paper/60 p-6 text-center text-sm text-mute ring-1 ring-line">
+                      No order history yet.
+                    </li>
+                  ) : (
+                    orders
+                      .filter((o) => o.status === "delivered" || o.status === "cancelled")
+                      .slice(0, 15)
+                      .map((o) => (
+                        <li
+                          key={o.id}
+                          className="flex items-center justify-between gap-3 rounded-2xl bg-paper/40 px-4 py-3 ring-1 ring-line/60 opacity-85"
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-medium text-ink/80">Room {o.roomNumber}</span>
+                              <span className="text-[11px] text-mute">{timeAgo(o.updatedAt)}</span>
+                            </div>
+                            <p className="truncate text-xs text-mute mt-0.5">
+                              {o.items.map((i) => `${i.qty}× ${i.name}`).join(", ")}
+                            </p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <span
+                              className={`text-[11px] font-semibold ${
+                                o.status === "delivered"
+                                  ? "text-emerald-600 dark:text-emerald-400"
+                                  : "text-red-500"
+                              }`}
+                            >
+                              {o.status === "delivered" ? "Delivered ✓" : "Cancelled ✕"}
+                            </span>
+                            <p className="text-xs font-medium text-ink/70">
+                              A${(o.totalCents / 100).toFixed(2)}
+                            </p>
+                          </div>
+                        </li>
+                      ))
+                  )
+                )}
+              </ul>
+            </div>
           </>
         )}
 

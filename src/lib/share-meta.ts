@@ -38,6 +38,11 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
     description: "Discover places, events, experiences and people near you.",
   },
   {
+    match: /^\/helpdesk(\/|$)/,
+    title: "Help Desk Operations · AirPal.Me",
+    description: "Live Help Desk Console for Stays, In-Room Dining, Event Hosts and Local Venues on AirPal.Me.",
+  },
+  {
     match: /^\/business(\/|$)/,
     title: "AirPal for Business",
     description: "List your place, publish experiences and offers, take bookings on AirPal.Me.",

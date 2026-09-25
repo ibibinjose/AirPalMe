@@ -62,11 +62,14 @@ export function BusinessNavHub({
 
         {/* Workspace Quick Actions */}
         <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 border-t border-line/60 pt-3 text-xs font-semibold">
-          <Link href="/business/campaigns" className="inline-flex items-center gap-1 text-brand hover:underline">
-            <Sparkles size={13} /> Manage Experiences <ChevronRight size={12} />
+          <Link href="/helpdesk" className="inline-flex items-center gap-1 text-brand hover:underline">
+            <span>🎧</span> Help Desk & Operations <ChevronRight size={12} />
           </Link>
-          <Link href="/business/promotions" className="inline-flex items-center gap-1 text-brand hover:underline">
-            <Gift size={13} /> Promotions & Giveaways <ChevronRight size={12} />
+          <Link href="/business/campaigns" className="inline-flex items-center gap-1 text-ink/75 hover:text-brand hover:underline">
+            <Sparkles size={13} /> Experiences
+          </Link>
+          <Link href="/business/promotions" className="inline-flex items-center gap-1 text-ink/75 hover:text-brand hover:underline">
+            <Gift size={13} /> Promotions
           </Link>
         </div>
       </div>

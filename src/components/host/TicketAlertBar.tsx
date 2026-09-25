@@ -7,7 +7,7 @@ import { subscribePropertyTickets, type StaffTicket } from "@/lib/tickets-store"
 import { activeOrderCount, subscribePropertyDiningOrders } from "@/lib/dining-store";
 import type { DiningOrder } from "@shared/airpal-data";
 import { summarizeOpenTickets } from "@/lib/ticket-alert";
-import { playTicketAlarm, setTicketSoundEnabled, ticketSoundEnabled } from "@/lib/ticket-alert-sound";
+import { playTicketAlarm, setTicketSoundEnabled, stopTicketAlarm, ticketSoundEnabled } from "@/lib/ticket-alert-sound";
 
 /**
  * Red blinking top alert while this host's own properties have open guest
@@ -74,6 +74,12 @@ export function TicketAlertBar() {
     () => Object.values(ordersByProperty).reduce((n, rows) => n + activeOrderCount(rows), 0),
     [ordersByProperty],
   );
+
+  useEffect(() => {
+    if (summary.openCount === 0 && orderCount === 0) {
+      stopTicketAlarm();
+    }
+  }, [summary.openCount, orderCount]);
 
   if (!canWatch || (summary.openCount === 0 && orderCount === 0)) return null;
 

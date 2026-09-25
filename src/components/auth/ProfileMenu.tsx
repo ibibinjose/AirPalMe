@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Compass,
   HeartHandshake,
+  Headphones,
   Images,
   Info,
   Languages,
@@ -494,6 +495,15 @@ export function ProfileMenu() {
           badge="NEW"
           badgeColor="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
           onClick={() => go("/pulse")}
+        />
+
+        <Row
+          icon={Headphones}
+          label="Help Desk Operations"
+          hint="Front desk, kitchen & event support"
+          badge="LIVE"
+          badgeColor="bg-brand/15 text-brand"
+          onClick={() => go("/helpdesk")}
         />
 
         {isHost ? (
