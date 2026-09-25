@@ -21,7 +21,7 @@ import { track } from "@/lib/analytics";
 import { HostActivationChecklist } from "@/components/host/HostActivationChecklist";
 import { HostPlaceForm } from "@/components/host/HostPlaceForm";
 import { HostRoomsPanel } from "@/components/host/HostRoomsPanel";
-import { StayBlocksPanel } from "@/components/host/StayBlocksPanel";
+import { HostFacilitiesPanel } from "@/components/host/HostFacilitiesPanel";
 import { HostDiningPanel } from "@/components/host/HostDiningPanel";
 import { HostPrintPanel } from "@/components/host/HostPrintPanel";
 import { openTicketCount, resolveStaffTicket, subscribePropertyTickets } from "@/lib/tickets-store";
@@ -30,7 +30,7 @@ import { enableHostTicketPush, ticketPushPrefEnabled } from "@/lib/tickets-push"
 import { hostWorkspacePropertyId, roomTokenEntries } from "@/lib/host-workspace";
 import { getPropertyWifiRemote, liveBackendEnabled, updateDiningOrderStatusRemote } from "@/lib/functions";
 
-type Tab = "today" | "rooms" | "place" | "dining" | "print";
+type Tab = "today" | "facilities" | "dining" | "rooms" | "place" | "print";
 
 export function HostPage() {
   const { user, isHost, isAdmin, authReady, createHostProperty, sendVerificationEmail } = useAuth();
@@ -269,11 +269,12 @@ export function HostPage() {
           <Button variant="ghost" className="h-8 px-3 text-xs" onClick={() => nav("/event")}>
             Event
           </Button>
-          <Button variant="ghost" className="h-8 px-3 text-xs" onClick={() => nav("/business")}>
-            Place page
-          </Button>
-          <Button variant="ghost" className="h-8 px-3 text-xs" onClick={() => nav("/host/pulse")}>
-            Pulse
+          <Button
+            variant="ghost"
+            className="h-8 px-3 text-xs text-brand font-semibold"
+            onClick={() => nav(`/stay/${property.id}`)}
+          >
+            Preview Guest Stay →
           </Button>
         </div>
 
@@ -281,7 +282,7 @@ export function HostPage() {
           layout="contained"
           ariaLabel="Host sections"
           className="mt-5"
-          items={["today", "rooms", "place", "dining", "print"].map((t) => ({ id: t as Tab, label: t }))}
+          items={["today", "facilities", "dining", "rooms", "place", "print"].map((t) => ({ id: t as Tab, label: t }))}
           active={tab}
           onChange={setTab}
         />
@@ -480,12 +481,8 @@ export function HostPage() {
           </>
         )}
 
-        {tab === "rooms" && (
-          <>
-            <HostRoomsPanel property={property} onSaved={setProperty} />
-            <StayBlocksPanel propertyId={property.id} />
-          </>
-        )}
+        {tab === "facilities" && <HostFacilitiesPanel property={property} onSaved={setProperty} />}
+        {tab === "rooms" && <HostRoomsPanel property={property} onSaved={setProperty} />}
         {tab === "place" && <HostPlaceForm property={property} onSaved={setProperty} />}
         {tab === "dining" && <HostDiningPanel propertyId={property.id} menu={menu} />}
         {tab === "print" && <HostPrintPanel property={property} />}

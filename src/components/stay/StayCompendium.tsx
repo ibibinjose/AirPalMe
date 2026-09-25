@@ -22,6 +22,7 @@ import {
   Luggage,
   Receipt,
   X,
+  Sparkles,
 } from "lucide-react";
 import { useStay } from "@/contexts/StayContext";
 import { useLocation } from "wouter";
@@ -31,6 +32,9 @@ import type { MenuItem } from "@shared/airpal-data";
 import { toast } from "sonner";
 import { triggerHaptic } from "@/lib/native";
 import { AirPalAiReceptionist } from "./AirPalAiReceptionist";
+import { AirPalChatModal } from "@/components/messaging/AirPalChatModal";
+import { createConversationRecord } from "@/lib/chat-store";
+import type { UniversalConversation } from "@shared/messaging";
 
 type CategoryTab = "info" | "activities" | "tours" | "recommendations";
 
@@ -56,6 +60,10 @@ export function StayCompendium() {
   // Free Drink Voucher Modal State
   const [showDrinkModal, setShowDrinkModal] = useState(false);
   const [drinkClaimed, setDrinkClaimed] = useState(false);
+
+  // AirPal Universal Chat Modal State
+  const [showChatModal, setShowChatModal] = useState(false);
+  const [chatConv, setChatConv] = useState<UniversalConversation | null>(null);
 
   // Digital Check-In & Check-Out Modal States
   const [showCheckInModal, setShowCheckInModal] = useState(false);
@@ -283,7 +291,32 @@ export function StayCompendium() {
 
       {/* Hero Action Buttons (Exact layout from reference) */}
       <div className="mt-5 space-y-2.5">
-        {/* Banner 1: Group Chat / Social Circles */}
+        {/* Banner 1: Live Chat with Front Desk & AirPal AI */}
+        <button
+          type="button"
+          onClick={() => {
+            void triggerHaptic("light");
+            const stayId = property.id || "harbour-hotel";
+            const conv = createConversationRecord({
+              type: "stay",
+              targetId: stayId,
+              title: `${property.name || "Stay"} Front Desk & AI`,
+              photo: property.heroImage,
+              userUid: "guest",
+              userName: "Guest",
+              peerUid: stayId,
+              peerName: property.name || "Front Desk",
+            });
+            setChatConv(conv);
+            setShowChatModal(true);
+          }}
+          className="group relative flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-brand via-[#240cf0] to-[#0a0270] hover:brightness-110 px-4 py-3.5 text-center text-sm font-black text-white shadow-md transition active:scale-[0.98]"
+        >
+          <Sparkles size={18} className="text-amber-300" />
+          <span>Chat with Front Desk &amp; AirPal AI</span>
+        </button>
+
+        {/* Banner 2: Group Chat / Social Circles */}
         <button
           type="button"
           onClick={() => nav("/circle")}
@@ -1071,6 +1104,23 @@ export function StayCompendium() {
           </div>
         </div>
       )}
+
+      {/* AirPal Universal Chat with Front Desk & AI */}
+      <AirPalChatModal
+        open={showChatModal}
+        onClose={() => {
+          setShowChatModal(false);
+          setChatConv(null);
+        }}
+        conversation={chatConv}
+        propertyContext={property}
+        onActionClick={(action) => {
+          if (action === "copy_wifi") void handleCopyWifi();
+          if (action === "view_dining") toggleAccordion("dining");
+          if (action === "request_towels") void handleQuickHousekeeping("Fresh Towels");
+          if (action === "late_checkout") setShowCheckOutModal(true);
+        }}
+      />
     </div>
   );
 }

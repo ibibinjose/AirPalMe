@@ -20,6 +20,7 @@ import {
   Luggage,
   MapPin,
   MessageCircle,
+  MessageSquare,
   Navigation,
   Phone,
   QrCode,
@@ -50,6 +51,9 @@ import { BioCatchUpModal } from "@/components/bio/BioCatchUpModal";
 import { BioStatusModal } from "@/components/bio/BioStatusModal";
 import { BioKindIcon } from "@/components/bio/BioKindBadge";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
+import { AirPalChatModal } from "@/components/messaging/AirPalChatModal";
+import { createConversationRecord } from "@/lib/chat-store";
+import type { UniversalConversation } from "@shared/messaging";
 import {
   listCatchUpsForHandle,
   subscribeCatchUpsForOwner,
@@ -186,6 +190,8 @@ export function BioPublicPage() {
   const [catchUpInitialType, setCatchUpInitialType] = useState<PlanType>("catchup");
   const [catchUpsList, setCatchUpsList] = useState<CatchUpItem[]>([]);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [chatModalOpen, setChatModalOpen] = useState(false);
+  const [chatConversation, setChatConversation] = useState<UniversalConversation | null>(null);
   const { stalls, getEvent } = useEvents();
   const local = resolvePublicBio(handle, byHandle);
   const [remote, setRemote] = useState<typeof local>();
@@ -537,6 +543,40 @@ export function BioPublicPage() {
     }
   };
 
+  const handleStartChat = () => {
+    void triggerHaptic("light");
+    const currentUid = user?.uid || "guest_user";
+    let convType: UniversalConversation["type"] = "direct";
+    let targetId = bio.handle;
+
+    if (isStay) {
+      convType = "stay";
+      targetId = stayTargetId;
+    } else if (bio.kind === "business") {
+      convType = "business";
+      targetId = bio.handle;
+    } else {
+      convType = "direct";
+      targetId = bio.ownerUid || bio.handle;
+    }
+
+    const conv = createConversationRecord({
+      type: convType,
+      targetId,
+      title: bio.name,
+      photo: avatar || bio.cover,
+      userUid: currentUid,
+      userName: user?.displayName || "Guest",
+      userPhoto: user?.photoURL || undefined,
+      peerUid: targetId,
+      peerName: bio.name,
+      peerPhoto: avatar || bio.cover,
+    });
+
+    setChatConversation(conv);
+    setChatModalOpen(true);
+  };
+
   return (
     <div className="mx-auto max-w-2xl pb-20 pb-safe sm:py-6">
       {/* Main Glass Card Wrapper */}
@@ -833,8 +873,17 @@ export function BioPublicPage() {
             </button>
           </div>
 
-          {/* 1-Tap Quick Action Deck: [Website], [WhatsApp], [Call] */}
-          <div className="mt-3 grid grid-cols-3 gap-2">
+          {/* 1-Tap Quick Action Deck: [Chat], [Website], [WhatsApp], [Call] */}
+          <div className="mt-3 grid grid-cols-4 gap-1.5 sm:gap-2">
+            <button
+              type="button"
+              onClick={handleStartChat}
+              className="group flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-brand/10 px-2 text-xs font-bold text-brand ring-1 ring-brand/30 transition-all duration-200 hover:bg-brand hover:text-white active:scale-95 shadow-2xs"
+            >
+              <MessageSquare size={15} className="shrink-0 group-hover:scale-110 transition-transform" />
+              <span className="truncate">Chat</span>
+            </button>
+
             {websiteUrl ? (
               <a
                 href={websiteUrl}
@@ -977,6 +1026,11 @@ export function BioPublicPage() {
 
               {/* Action Circles */}
               <div className="mt-4 flex gap-3 overflow-x-auto pb-1 no-scrollbar" aria-label="Contact actions">
+                <BizCircle
+                  label="Chat"
+                  Icon={MessageSquare}
+                  onClick={handleStartChat}
+                />
                 {propertyData?.bookingUrl ? (
                   <BizCircle
                     label="Book Direct"
@@ -1693,6 +1747,16 @@ export function BioPublicPage() {
             });
           }
         }}
+      />
+      {/* AirPal Universal Chat Modal */}
+      <AirPalChatModal
+        open={chatModalOpen}
+        onClose={() => {
+          setChatModalOpen(false);
+          setChatConversation(null);
+        }}
+        conversation={chatConversation}
+        propertyContext={isStay ? propertyData : undefined}
       />
     </div>
   );

@@ -1,7 +1,9 @@
 /**
- * §8 messaging: every conversation is tied to a mate_request match.
- * Participants = request owner + assigned mate (+ admins read for moderation).
- * No phone/email exposure — identity stays inside the chat.
+ * Universal messaging system for AirPal:
+ * - Direct mate & peer conversations
+ * - Business & Venue inquiries
+ * - Stay & Hotel Front Desk guest communications
+ * - AirPal AI Copilot assistant
  */
 
 export interface ChatMessageInput {
@@ -13,6 +15,48 @@ export interface ChatMessage extends ChatMessageInput {
   id: string;
   createdAt: string;
   readBy: string[];
+}
+
+export type ConversationType = "direct" | "business" | "stay" | "plan" | "ai";
+
+export interface ChatParticipant {
+  uid: string;
+  name: string;
+  handle?: string;
+  photo?: string;
+  role?: "user" | "host" | "business" | "mate" | "ai";
+}
+
+export interface UniversalConversation {
+  id: string;
+  type: ConversationType;
+  participants: ChatParticipant[];
+  participantUids: string[];
+  title: string;
+  subtitle?: string;
+  photo?: string;
+  targetId?: string; // propertyId, handle, planId, etc.
+  lastMessage?: string;
+  lastSenderUid?: string;
+  lastMessageAt?: string;
+  unreadCount?: Record<string, number>;
+  createdAt: string;
+  updatedAt: string;
+  isAiEnabled?: boolean;
+}
+
+export interface UniversalChatMessage {
+  id: string;
+  conversationId: string;
+  senderUid: string;
+  senderName: string;
+  senderPhoto?: string;
+  text: string;
+  isAi?: boolean;
+  suggestedActions?: Array<{ label: string; action: string; payload?: string }>;
+  readBy: string[];
+  createdAt: string;
+  updatedAt?: string;
 }
 
 export const MESSAGE_MAX = 1000;
