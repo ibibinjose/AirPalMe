@@ -1,9 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { collection, endAt, getDocs, limit, orderBy, query, startAt } from "firebase/firestore";
-import { ArrowLeft, ArrowRight, BadgeCheck, Building2, ShieldCheck, Store } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BadgeCheck,
+  Building2,
+  Globe2,
+  ShieldCheck,
+  Sparkles,
+  Store,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useListings } from "@/contexts/ListingsContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { claimFreeVenuePresenceRemote, submitPartnerClaimRemote, upsertBusinessListingRemote } from "@/lib/functions";
 import { cn } from "@/lib/cn";
@@ -38,34 +48,36 @@ interface DirectoryVenue {
 }
 
 const inputCls =
-  "mt-1 w-full rounded-xl border border-line bg-card px-3 py-2.5 text-sm outline-none placeholder:text-mute focus:border-brand focus:ring-2 focus:ring-brand/20";
+  "mt-1.5 w-full rounded-2xl border border-line bg-paper px-3.5 py-2.5 text-xs sm:text-sm text-ink outline-none placeholder:text-mute focus:border-brand focus:ring-2 focus:ring-brand/20 transition";
 
 function Stepper({ step }: { step: number }) {
   return (
-    <ol className="mt-4 space-y-0" aria-label="Onboarding progress">
+    <ol className="flex flex-row md:flex-col justify-between md:justify-start gap-2 md:gap-1" aria-label="Onboarding progress">
       {ONBOARD_STEPS.map((s, i) => {
         const done = i < step;
         const current = i === step;
         return (
-          <li key={s.id} className="flex items-start gap-3">
+          <li key={s.id} className="flex flex-col md:flex-row items-center md:items-start gap-2 md:gap-3 flex-1">
             <span className="flex flex-col items-center">
               <span
                 className={cn(
-                  "grid h-7 w-7 place-items-center rounded-full text-xs font-bold",
+                  "grid h-8 w-8 place-items-center rounded-2xl text-xs font-bold transition shadow-2xs",
                   done
-                    ? "bg-brand text-white"
+                    ? "bg-brand text-white shadow-sm"
                     : current
-                      ? "bg-brand/15 text-brand"
+                      ? "bg-brand/15 text-brand ring-2 ring-brand/30"
                       : "bg-paper text-mute ring-1 ring-line",
                 )}
               >
                 {done ? "✓" : i + 1}
               </span>
-              {i < ONBOARD_STEPS.length - 1 && <span className="my-0.5 h-4 w-px bg-line" />}
+              {i < ONBOARD_STEPS.length - 1 && <span className="hidden md:block my-1 h-5 w-px bg-line/80" />}
             </span>
-            <span className={cn("pb-3 pt-1 text-sm", current ? "font-semibold" : done ? "text-mute" : "text-mute")}>
-              {s.label}
-            </span>
+            <div className="text-center md:text-left pb-1 pt-1">
+              <span className={cn("block text-xs md:text-sm transition", current ? "font-bold text-ink" : done ? "font-semibold text-ink/70" : "text-mute")}>
+                {s.label}
+              </span>
+            </div>
           </li>
         );
       })}
@@ -76,6 +88,7 @@ function Stepper({ step }: { step: number }) {
 export function BusinessOnboardPage() {
   const [, nav] = useLocation();
   const { user, authReady, requireUser } = useAuth();
+  const { setSelectedListingId } = useListings();
   const { business, updateProfile } = useBio();
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState<OnboardDraft>(() => {
@@ -85,8 +98,6 @@ export function BusinessOnboardPage() {
   });
   const [results, setResults] = useState<DirectoryVenue[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  // Synchronous double-tap guard: `submitting` only disables the button after
-  // a re-render, so a second tap can file a second business claim.
   const guardRef = useRef(createSubmitGuard());
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [changeListing, setChangeListing] = useState(false);
@@ -211,6 +222,7 @@ export function BusinessOnboardPage() {
           });
           listingId = listing.listingId;
           placeId = listing.placeId;
+          if (listingId) setSelectedListingId(listingId);
           if (business?.handle) {
             const imported = bioLinksFromGooglePlace({
               placeId: draft.googlePlaceId,
@@ -259,7 +271,7 @@ export function BusinessOnboardPage() {
         heroImage: draft.heroImage,
         logoUrl: draft.logoUrl,
       });
-      nav("/business/setup");
+      nav("/business");
       return;
     } catch (e) {
       guardRef.current.release();
@@ -270,405 +282,418 @@ export function BusinessOnboardPage() {
   }
 
   if (!authReady) {
-    return <div className="mx-auto max-w-md px-4 py-16 text-center text-sm text-mute">Loading…</div>;
+    return (
+      <div className="mx-auto max-w-md px-4 py-24 text-center">
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+        <p className="mt-3 text-sm text-mute font-medium">Checking authorization…</p>
+      </div>
+    );
   }
 
   const domainOk = googleOwnerVerified(draft, user?.email);
   const featuredOk = canPublishFeatured(draft, user?.email);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/join" className="flex items-center gap-1 text-[13px] font-medium text-mute">
-        <ArrowLeft size={14} /> {NAMES.addPlace}
+    <div className="mx-auto max-w-4xl px-4 sm:px-6 py-6 sm:py-8">
+      <Link href="/business" className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand hover:underline">
+        <ArrowLeft className="h-3.5 w-3.5" /> Back to Business Studio
       </Link>
-      <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">{NAMES.partnerAccount}</p>
-      <h1 className="font-display mt-1 text-3xl font-bold tracking-tight">Register the business</h1>
-      <p className="mt-1 text-sm text-mute">
-        Same AirPal login. Search Google, pick the listing, go live. Guests then find this place on What&apos;s on and
-        in search.
-      </p>
 
-      <div className="mt-6 grid gap-6 md:grid-cols-[200px_1fr]">
-        <Stepper step={step} />
+      <div className="mt-3 rounded-[32px] bg-card p-6 sm:p-8 ring-1 ring-line shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-line/60 pb-5">
+          <div>
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">{NAMES.partnerAccount}</span>
+            <h1 className="font-display mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+              Register a Business Venue
+            </h1>
+            <p className="mt-1 text-xs sm:text-sm text-mute">
+              Import directly from Google Places, verify your contact details, and go live on AirPal.
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-bold text-brand">
+            <Sparkles className="h-3.5 w-3.5" /> Step {step + 1} of 4
+          </span>
+        </div>
 
-        <div className="rounded-2xl border border-line bg-card p-5">
-          {stepId === "venue" && (
-            <section>
-              <h2 className="font-display text-lg font-bold">What&apos;s the business called?</h2>
-              <p className="mt-1 text-[13px] text-mute">
-                Search Google. Pick your listing — name, photo, address, hours, and phone fill in.
-              </p>
-              <div className="mt-3">
-                <GooglePlaceImportCard
-                  variant="field"
-                  importedPlaceId={draft.googlePlaceId}
-                  initialQuery={draft.venue.venueName}
-                  onQueryChange={(q) =>
-                    setDraft((d) => ({
-                      ...d,
-                      venue: { mode: "unlisted", venueId: "", venueName: q },
-                      googlePlaceId: d.googlePlaceId && q.trim() === d.venue.venueName.trim() ? d.googlePlaceId : "",
-                    }))
-                  }
-                  onImport={(place) => setDraft((d) => applyGooglePlace(d, place))}
-                />
-              </div>
-              {(draft.venue.venueName.trim().length >= 2 || draft.googlePlaceId) && (
-                <>
-                  <p className="mt-4 text-[13px] font-semibold">Category</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {BUSINESS_CATEGORIES.filter(
-                      (c) => (c.id !== "parking" && c.id !== "fashion") || c.id === draft.category,
-                    ).map((c) => (
-                      <button
-                        key={c.id}
-                        type="button"
-                        onClick={() => set("category", c.id)}
-                        aria-pressed={draft.category === c.id}
-                        className={cn(
-                          "h-9 rounded-full px-3 text-sm",
-                          draft.category === c.id ? "bg-brand text-white" : "bg-paper text-ink ring-1 ring-line",
-                        )}
-                      >
-                        {c.label}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="mt-2 text-[12px] text-mute">
-                    {BUSINESS_CATEGORIES.find((c) => c.id === draft.category)?.line}
+        <div className="mt-6 grid gap-8 md:grid-cols-[220px_1fr] items-start">
+          <Stepper step={step} />
+
+          <div className="rounded-3xl bg-paper p-5 sm:p-6 ring-1 ring-line/70">
+            {stepId === "venue" && (
+              <section className="space-y-4">
+                <div>
+                  <h2 className="font-display text-lg font-bold text-ink">What is the venue or business called?</h2>
+                  <p className="text-xs text-mute mt-0.5">
+                    Search Google Places. Pick your location to auto-populate photos, street address, trading hours, and phone.
                   </p>
-                </>
-              )}
-            </section>
-          )}
-
-          {stepId === "owner" && (
-            <section>
-              <h2 className="font-display text-lg font-bold">You</h2>
-              <p className="mt-1 text-[13px] text-mute">Who we can contact about this place.</p>
-              <div className="mt-3 space-y-3">
-                <label className="block">
-                  <span className="text-[13px] font-semibold">Full name</span>
-                  <input
-                    value={draft.owner.name}
-                    onChange={(e) => set("owner", { ...draft.owner, name: e.target.value })}
-                    className={inputCls}
-                    placeholder="Sam Chen"
-                  />
-                </label>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <label className="block">
-                    <span className="text-[13px] font-semibold">Work email</span>
-                    <input
-                      type="email"
-                      value={draft.owner.email}
-                      onChange={(e) => set("owner", { ...draft.owner, email: e.target.value })}
-                      className={inputCls}
-                      placeholder="sam@venue.com.au"
-                    />
-                    <span className="mt-1 block text-[12px] text-mute">
-                      {user?.email
-                        ? `Signed in as ${user.email}. Featured uses that address vs the Google website — not a typed contact.`
-                        : "Gmail is fine for a free listing. Featured needs the work email on the Google website, or an ABN."}
-                    </span>
-                  </label>
-                  <label className="block">
-                    <span className="text-[13px] font-semibold">Phone</span>
-                    <input
-                      type="tel"
-                      value={draft.owner.phone}
-                      onChange={(e) => set("owner", { ...draft.owner, phone: e.target.value })}
-                      className={inputCls}
-                      placeholder="0412 345 678"
-                    />
-                  </label>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <label className="block">
-                    <span className="text-[13px] font-semibold">Your role</span>
-                    <select
-                      value={draft.owner.role}
-                      onChange={(e) => set("owner", { ...draft.owner, role: e.target.value })}
-                      className={inputCls}
-                    >
-                      {["Owner", "Manager", "Marketing", "Staff"].map((r) => (
-                        <option key={r}>{r}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="block">
-                    <span className="text-[13px] font-semibold">ABN / Tax ID (optional)</span>
-                    <input
-                      value={draft.owner.abnOrTaxId}
-                      onChange={(e) => set("owner", { ...draft.owner, abnOrTaxId: e.target.value })}
-                      className={inputCls}
-                      placeholder="51 824 753 556"
-                    />
-                  </label>
-                </div>
-                <label className="block">
-                  <span className="text-[13px] font-semibold">Welcome perk for AirPal guests (optional)</span>
-                  <input
-                    value={draft.owner.customPerk}
-                    onChange={(e) => set("owner", { ...draft.owner, customPerk: e.target.value })}
-                    className={inputCls}
-                    placeholder="Free house drink with any main"
-                  />
-                </label>
-              </div>
-            </section>
-          )}
-
-          {stepId === "verify" && (
-            <section>
-              <h2 className="font-display text-lg font-bold">Verify {draft.venue.venueName || "the business"}</h2>
-              <p className="mt-1 text-[13px] text-mute">
-                {draft.googlePlaceId
-                  ? "Check the imported Google details. A checkbox is a directory claim, not Google ownership."
-                  : "Search the public Google listing so we don't retype it. A checkbox is a directory claim, not Google ownership."}
-              </p>
-              <div className="mt-3">
-                {draft.googlePlaceId && !changeListing ? (
-                  <div className="overflow-hidden rounded-2xl ring-1 ring-line bg-paper">
-                    {draft.heroImage && <img src={draft.heroImage} alt="" className="h-28 w-full object-cover" />}
-                    <div className="p-4">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-brand">From Google</p>
-                      <p className="font-display mt-1 text-lg font-bold">{draft.venue.venueName}</p>
-                      {draft.address && <p className="mt-0.5 text-[13px] text-mute">{draft.address}</p>}
-                      <p className="mt-1 truncate text-[12px] text-mute">
-                        {[draft.phoneFromGoogle || draft.owner.phone, draft.website.replace(/^https?:\/\//, "")]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </p>
-                      <button
-                        type="button"
-                        className="mt-3 text-[13px] font-semibold text-brand"
-                        onClick={() => setChangeListing(true)}
-                      >
-                        Change listing
-                      </button>
-                    </div>
-                  </div>
-                ) : (
+                <div className="mt-3">
                   <GooglePlaceImportCard
+                    variant="field"
                     importedPlaceId={draft.googlePlaceId}
                     initialQuery={draft.venue.venueName}
-                    onImport={(place) => {
-                      setChangeListing(false);
-                      setDraft((d) => applyGooglePlace(d, place));
-                    }}
+                    onQueryChange={(q) =>
+                      setDraft((d) => ({
+                        ...d,
+                        venue: { mode: "unlisted", venueId: "", venueName: q },
+                        googlePlaceId: d.googlePlaceId && q.trim() === d.venue.venueName.trim() ? d.googlePlaceId : "",
+                      }))
+                    }
+                    onImport={(place) => setDraft((d) => applyGooglePlace(d, place))}
                   />
-                )}
-              </div>
-              {draft.googlePlaceId && (
-                <p
-                  className={cn(
-                    "mt-3 rounded-xl px-3 py-2 text-[13px] font-medium",
-                    domainOk ? "bg-brand/5 text-brand" : "bg-paper text-mute ring-1 ring-line",
-                  )}
-                >
-                  {domainOk
-                    ? "Signed-in email matches the Google website. That is ownership for Featured."
-                    : "Imported from Google. To prove ownership, sign in with the work email on that website — or add an ABN. The checkbox below is only a directory claim."}
-                </p>
-              )}
-              <label className="mt-4 block">
-                <span className="text-[13px] font-semibold">Address</span>
-                <input
-                  value={draft.address}
-                  onChange={(e) => set("address", e.target.value)}
-                  className={inputCls}
-                  placeholder="18 Lower Fort St, The Rocks NSW"
-                />
-              </label>
-              <label className="mt-3 block">
-                <span className="text-[13px] font-semibold">Website (optional)</span>
-                <input
-                  value={draft.website}
-                  onChange={(e) => set("website", e.target.value)}
-                  className={inputCls}
-                  placeholder="https://glenmorehotel.com.au"
-                />
-              </label>
-              <label className="mt-3 block">
-                <span className="text-[13px] font-semibold">Short description (optional)</span>
-                <textarea
-                  value={draft.shortWhy}
-                  onChange={(e) => set("shortWhy", e.target.value)}
-                  rows={2}
-                  className={inputCls}
-                  placeholder="What should people know in one line?"
-                />
-              </label>
-              {results.length > 0 && (
-                <div className="mt-3">
-                  <p className="text-[12px] font-semibold text-mute">Already on AirPal?</p>
-                  <ul className="mt-1 divide-y divide-line overflow-hidden rounded-xl border border-line">
-                    {results.map((v) => (
-                      <li key={v.id}>
+                </div>
+                {(draft.venue.venueName.trim().length >= 2 || draft.googlePlaceId) && (
+                  <div className="border-t border-line/60 pt-4">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-mute mb-2">
+                      Primary Category
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {BUSINESS_CATEGORIES.filter(
+                        (c) => (c.id !== "parking" && c.id !== "fashion") || c.id === draft.category,
+                      ).map((c) => (
                         <button
+                          key={c.id}
                           type="button"
-                          onClick={() => set("venue", { mode: "listed", venueId: v.id, venueName: v.name })}
+                          onClick={() => set("category", c.id)}
+                          aria-pressed={draft.category === c.id}
                           className={cn(
-                            "flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm",
-                            draft.venue.venueId === v.id ? "bg-brand/5" : "hover:bg-paper",
+                            "h-9 rounded-2xl px-3.5 text-xs font-semibold transition shadow-2xs",
+                            draft.category === c.id
+                              ? "bg-brand text-white shadow-sm ring-2 ring-brand/30"
+                              : "bg-card text-ink ring-1 ring-line hover:bg-paper",
                           )}
                         >
-                          <Store size={15} className="shrink-0 text-gold" />
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate font-semibold">{v.name}</span>
-                            {v.address && <span className="block truncate text-xs text-mute">{v.address}</span>}
-                          </span>
-                          {draft.venue.venueId === v.id && <BadgeCheck size={16} className="shrink-0 text-brand" />}
+                          {c.label}
                         </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              <div className="mt-4 space-y-2">
-                {(
-                  [
-                    ["googleListingConfirmed", "I manage this listing (directory claim — not Google ownership)"],
-                    ["authorityConfirmed", "This is my business and the details look right"],
-                  ] as const
-                ).map(([key, label]) => (
-                  <label
-                    key={key}
-                    className={cn(
-                      "flex cursor-pointer items-start gap-2.5 rounded-xl border p-3 text-sm",
-                      draft.verify[key] ? "border-brand bg-brand/5" : "border-line",
-                    )}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={draft.verify[key]}
-                      onChange={(e) => set("verify", { ...draft.verify, [key]: e.target.checked })}
-                      className="mt-0.5 h-4 w-4 accent-[#1805db]"
-                    />
-                    <span className={draft.verify[key] ? "font-medium" : "text-mute"}>{label}</span>
-                  </label>
-                ))}
-              </div>
-              <p className="mt-3 flex items-start gap-1.5 text-xs leading-5 text-mute">
-                <ShieldCheck size={14} className="mt-0.5 shrink-0 text-gold" />
-                Products, services, and offers come after this. False claims are removed.
-              </p>
-            </section>
-          )}
+                      ))}
+                    </div>
+                    <p className="mt-2 text-[11px] text-mute">
+                      {BUSINESS_CATEGORIES.find((c) => c.id === draft.category)?.line}
+                    </p>
+                  </div>
+                )}
+              </section>
+            )}
 
-          {stepId === "review" && (
-            <section>
-              <h2 className="font-display text-lg font-bold">Check everything</h2>
-              <p className="mt-1 text-[13px] text-mute">
-                Go live, then add three things people can find. Featured needs a work-email match or an ABN.
-              </p>
-              <dl className="mt-3 space-y-2 rounded-xl bg-paper p-4 text-sm ring-1 ring-line">
-                <div className="flex justify-between gap-3">
-                  <dt className="text-mute">Place</dt>
-                  <dd className="text-right font-semibold">
-                    {draft.googlePlaceId
-                      ? `${draft.venue.venueName} · Google`
-                      : draft.venue.mode === "listed"
-                        ? draft.venue.venueName
-                        : `${draft.venue.venueName} (new)`}
-                  </dd>
+            {stepId === "owner" && (
+              <section className="space-y-4">
+                <div>
+                  <h2 className="font-display text-lg font-bold text-ink">Owner & Contact Details</h2>
+                  <p className="text-xs text-mute mt-0.5">Primary liaison for reservations, payouts, and partner communications.</p>
                 </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-mute">Contact</dt>
-                  <dd className="text-right font-semibold">
-                    {draft.owner.name} · {draft.owner.role}
-                  </dd>
+                <div className="space-y-3">
+                  <label className="block">
+                    <span className="text-xs font-bold uppercase tracking-wider text-mute">Full Name</span>
+                    <input
+                      value={draft.owner.name}
+                      onChange={(e) => set("owner", { ...draft.owner, name: e.target.value })}
+                      className={inputCls}
+                      placeholder="e.g. Sarah Jenkins"
+                      required
+                    />
+                  </label>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-xs font-bold uppercase tracking-wider text-mute">Business Email</span>
+                      <input
+                        type="email"
+                        value={draft.owner.email}
+                        onChange={(e) => set("owner", { ...draft.owner, email: e.target.value })}
+                        className={inputCls}
+                        placeholder="sarah@venue.com.au"
+                        required
+                      />
+                      <span className="mt-1 block text-[11px] text-mute">
+                        {user?.email
+                          ? `Signed in as ${user.email}.`
+                          : "Used for reservation confirmations and alerts."}
+                      </span>
+                    </label>
+                    <label className="block">
+                      <span className="text-xs font-bold uppercase tracking-wider text-mute">Direct Phone</span>
+                      <input
+                        type="tel"
+                        value={draft.owner.phone}
+                        onChange={(e) => set("owner", { ...draft.owner, phone: e.target.value })}
+                        className={inputCls}
+                        placeholder="0412 345 678"
+                        required
+                      />
+                    </label>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="text-xs font-bold uppercase tracking-wider text-mute">Role / Title</span>
+                      <select
+                        value={draft.owner.role}
+                        onChange={(e) => set("owner", { ...draft.owner, role: e.target.value })}
+                        className={inputCls}
+                      >
+                        {["Owner", "General Manager", "Head Chef / Host", "Marketing Director", "Staff Lead"].map((r) => (
+                          <option key={r}>{r}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="block">
+                      <span className="text-xs font-bold uppercase tracking-wider text-mute">ABN / Business Tax ID (Optional)</span>
+                      <input
+                        value={draft.owner.abnOrTaxId}
+                        onChange={(e) => set("owner", { ...draft.owner, abnOrTaxId: e.target.value })}
+                        className={inputCls}
+                        placeholder="51 824 753 556"
+                      />
+                    </label>
+                  </div>
+                  <label className="block">
+                    <span className="text-xs font-bold uppercase tracking-wider text-mute">AirPal Welcome Perk (Optional)</span>
+                    <input
+                      value={draft.owner.customPerk}
+                      onChange={(e) => set("owner", { ...draft.owner, customPerk: e.target.value })}
+                      className={inputCls}
+                      placeholder="e.g. Free glass of sparkling wine with any main course"
+                    />
+                  </label>
                 </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-mute">Email / Phone</dt>
-                  <dd className="text-right font-semibold">
-                    {draft.owner.email} · {draft.owner.phone}
-                  </dd>
+              </section>
+            )}
+
+            {stepId === "verify" && (
+              <section className="space-y-4">
+                <div>
+                  <h2 className="font-display text-lg font-bold text-ink">Verify Location Details</h2>
+                  <p className="text-xs text-mute mt-0.5">
+                    Confirm street address, website, and operating presence for {draft.venue.venueName || "your business"}.
+                  </p>
                 </div>
-                {draft.owner.abnOrTaxId.trim() && (
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-mute">ABN / Tax ID</dt>
-                    <dd className="text-right font-semibold">{draft.owner.abnOrTaxId.trim()}</dd>
+                <div>
+                  {draft.googlePlaceId && !changeListing ? (
+                    <div className="overflow-hidden rounded-2xl ring-1 ring-line bg-card">
+                      {draft.heroImage && <img src={draft.heroImage} alt="" className="h-32 w-full object-cover" />}
+                      <div className="p-4">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand uppercase">
+                          <Globe2 className="h-3 w-3" /> Imported from Google
+                        </span>
+                        <p className="font-display mt-2 text-lg font-bold text-ink">{draft.venue.venueName}</p>
+                        {draft.address && <p className="mt-0.5 text-xs text-mute">{draft.address}</p>}
+                        <button
+                          type="button"
+                          className="mt-3 text-xs font-semibold text-brand hover:underline"
+                          onClick={() => setChangeListing(true)}
+                        >
+                          Change Google Listing
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <GooglePlaceImportCard
+                      importedPlaceId={draft.googlePlaceId}
+                      initialQuery={draft.venue.venueName}
+                      onImport={(place) => {
+                        setChangeListing(false);
+                        setDraft((d) => applyGooglePlace(d, place));
+                      }}
+                    />
+                  )}
+                </div>
+
+                <label className="block">
+                  <span className="text-xs font-bold uppercase tracking-wider text-mute">Street Address</span>
+                  <input
+                    value={draft.address}
+                    onChange={(e) => set("address", e.target.value)}
+                    className={inputCls}
+                    placeholder="18 Lower Fort St, The Rocks NSW 2000"
+                    required
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-xs font-bold uppercase tracking-wider text-mute">Website URL (Optional)</span>
+                  <input
+                    value={draft.website}
+                    onChange={(e) => set("website", e.target.value)}
+                    className={inputCls}
+                    placeholder="https://venue.com.au"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="text-xs font-bold uppercase tracking-wider text-mute">Short Description (Optional)</span>
+                  <textarea
+                    value={draft.shortWhy}
+                    onChange={(e) => set("shortWhy", e.target.value)}
+                    rows={2}
+                    className={inputCls}
+                    placeholder="What makes your venue special for guests?"
+                  />
+                </label>
+
+                {results.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-xs font-bold uppercase tracking-wider text-mute">Matching Directory Venues</p>
+                    <ul className="mt-1.5 divide-y divide-line/60 overflow-hidden rounded-2xl border border-line bg-card">
+                      {results.map((v) => (
+                        <li key={v.id}>
+                          <button
+                            type="button"
+                            onClick={() => set("venue", { mode: "listed", venueId: v.id, venueName: v.name })}
+                            className={cn(
+                              "flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-xs transition",
+                              draft.venue.venueId === v.id ? "bg-brand/10 text-brand font-semibold" : "hover:bg-paper",
+                            )}
+                          >
+                            <Store className="h-4 w-4 shrink-0 text-gold" />
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate font-semibold text-ink">{v.name}</span>
+                              {v.address && <span className="block truncate text-[11px] text-mute">{v.address}</span>}
+                            </span>
+                            {draft.venue.venueId === v.id && <BadgeCheck className="h-4 w-4 shrink-0 text-brand" />}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
-                {draft.address && (
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-mute">Address</dt>
-                    <dd className="text-right font-semibold">{draft.address}</dd>
-                  </div>
-                )}
-                {draft.website && (
-                  <div className="flex justify-between gap-3">
-                    <dt className="text-mute">Website</dt>
-                    <dd className="text-right font-semibold">{draft.website.replace(/^https?:\/\//, "")}</dd>
-                  </div>
-                )}
-                <div className="flex justify-between gap-3">
-                  <dt className="text-mute">Ownership</dt>
-                  <dd className="text-right font-semibold">
-                    {domainOk ? "Work email matches Google site" : "Directory claim"}
-                  </dd>
-                </div>
-              </dl>
-              <p className="mt-4 text-[13px] font-semibold">Plan</p>
-              <div className="mt-2 grid gap-2">
-                {BUSINESS_PLANS.map((p) => {
-                  const locked = p.id !== "presence" && !featuredOk;
-                  const selected = draft.plan === p.id;
-                  return (
-                    <button
-                      key={p.id}
-                      type="button"
-                      disabled={locked}
-                      onClick={() => set("plan", p.id)}
+
+                <div className="space-y-2 border-t border-line/60 pt-4">
+                  {(
+                    [
+                      ["googleListingConfirmed", "I manage this venue listing and authorize publication on AirPal"],
+                      ["authorityConfirmed", "This is my legitimate business and trading hours are accurate"],
+                    ] as const
+                  ).map(([key, label]) => (
+                    <label
+                      key={key}
                       className={cn(
-                        "rounded-xl border p-3 text-left",
-                        selected ? "border-brand bg-brand/5" : "border-line",
-                        locked && "cursor-not-allowed opacity-60",
+                        "flex cursor-pointer items-start gap-2.5 rounded-2xl border p-3 text-xs sm:text-sm transition",
+                        draft.verify[key] ? "border-brand bg-brand/5 ring-1 ring-brand/20" : "border-line bg-card",
                       )}
                     >
-                      <span className="flex items-baseline justify-between gap-2">
-                        <span className="font-semibold">{p.name}</span>
-                        <span className="text-[12px] text-mute">{p.price}</span>
-                      </span>
-                      <span className="mt-0.5 block text-[12px] text-mute">
-                        {locked ? "Needs a work email on the Google website, or an ABN." : p.blurb}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-              <label className="mt-3 flex cursor-pointer items-start gap-2.5 text-sm">
-                <input
-                  type="checkbox"
-                  checked={draft.acceptedTerms}
-                  onChange={(e) => set("acceptedTerms", e.target.checked)}
-                  className="mt-0.5 h-4 w-4 accent-[#1805db]"
-                />
-                <span className="text-mute">
-                  I accept the AirPal terms and confirm this business profile is truthful.
-                </span>
-              </label>
-              {submitError && (
-                <p className="mt-3 rounded-xl bg-paper p-3 text-[13px] text-mute ring-1 ring-line">{submitError}</p>
-              )}
-            </section>
-          )}
-
-          <div className="mt-5 flex items-center justify-between gap-2">
-            <Button variant="ghost" disabled={step === 0 || submitting} onClick={() => setStep((s) => s - 1)}>
-              <ArrowLeft size={15} /> Back
-            </Button>
-            {step < ONBOARD_STEPS.length - 1 ? (
-              <Button disabled={!canNext} onClick={() => setStep((s) => s + 1)}>
-                Continue <ArrowRight size={15} />
-              </Button>
-            ) : (
-              <Button disabled={!canNext || submitting} loading={submitting} onClick={() => void submit()}>
-                <Building2 size={15} /> Go live
-              </Button>
+                      <input
+                        type="checkbox"
+                        checked={draft.verify[key]}
+                        onChange={(e) => set("verify", { ...draft.verify, [key]: e.target.checked })}
+                        className="mt-0.5 h-4 w-4 rounded accent-[#1805db]"
+                      />
+                      <span className={draft.verify[key] ? "font-semibold text-ink" : "text-mute"}>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </section>
             )}
+
+            {stepId === "review" && (
+              <section className="space-y-4">
+                <div>
+                  <h2 className="font-display text-lg font-bold text-ink">Review & Go Live</h2>
+                  <p className="text-xs text-mute mt-0.5">
+                    Your venue will be published instantly on the Explore discovery map and What&apos;s On.
+                  </p>
+                </div>
+                <dl className="space-y-2 rounded-2xl bg-card p-4 text-xs sm:text-sm ring-1 ring-line">
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-mute">Venue Name</dt>
+                    <dd className="text-right font-semibold text-ink">{draft.venue.venueName}</dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-mute">Category</dt>
+                    <dd className="text-right font-semibold text-ink capitalize">{draft.category}</dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-mute">Primary Contact</dt>
+                    <dd className="text-right font-semibold text-ink">
+                      {draft.owner.name} ({draft.owner.role})
+                    </dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-mute">Contact Phone</dt>
+                    <dd className="text-right font-semibold text-ink">{draft.owner.phone}</dd>
+                  </div>
+                  {draft.address && (
+                    <div className="flex justify-between gap-3">
+                      <dt className="text-mute">Address</dt>
+                      <dd className="text-right font-semibold text-ink">{draft.address}</dd>
+                    </div>
+                  )}
+                  <div className="flex justify-between gap-3 border-t border-line/60 pt-2">
+                    <dt className="text-mute flex items-center gap-1.5">
+                      <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Verification Status
+                    </dt>
+                    <dd className="text-right font-semibold text-ink">
+                      {domainOk ? "Email matches Google domain" : "Directory Owner Claim"}
+                    </dd>
+                  </div>
+                </dl>
+
+                {/* Plan Selector */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-mute mb-2">
+                    Select Partner Tier
+                  </label>
+                  <div className="grid gap-2">
+                    {BUSINESS_PLANS.map((p) => {
+                      const locked = p.id !== "presence" && !featuredOk;
+                      const selected = draft.plan === p.id;
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          disabled={locked}
+                          onClick={() => set("plan", p.id)}
+                          className={cn(
+                            "rounded-2xl border p-3.5 text-left transition shadow-2xs",
+                            selected ? "border-brand bg-brand/5 ring-1 ring-brand/30" : "border-line bg-card hover:bg-paper",
+                            locked && "cursor-not-allowed opacity-60",
+                          )}
+                        >
+                          <div className="flex items-baseline justify-between gap-2">
+                            <span className="font-bold text-xs text-ink">{p.name}</span>
+                            <span className="text-[11px] font-mono text-mute">{p.price}</span>
+                          </div>
+                          <p className="mt-1 text-[11px] text-mute">
+                            {locked ? "Requires matching domain or verified ABN." : p.blurb}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <label className="flex cursor-pointer items-start gap-2.5 text-xs text-mute border-t border-line/60 pt-3">
+                  <input
+                    type="checkbox"
+                    checked={draft.acceptedTerms}
+                    onChange={(e) => set("acceptedTerms", e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded accent-[#1805db]"
+                  />
+                  <span>
+                    I accept the AirPal Partner Terms and confirm this business listing is accurate and authorized.
+                  </span>
+                </label>
+
+                {submitError && (
+                  <p className="rounded-2xl bg-red-500/10 p-3 text-xs text-red-600 dark:text-red-400 ring-1 ring-red-500/20">
+                    {submitError}
+                  </p>
+                )}
+              </section>
+            )}
+
+            {/* Stepper Controls */}
+            <div className="mt-6 flex items-center justify-between gap-3 border-t border-line/60 pt-4">
+              <Button variant="ghost" size="sm" disabled={step === 0 || submitting} onClick={() => setStep((s) => s - 1)}>
+                <ArrowLeft className="h-3.5 w-3.5" /> Back
+              </Button>
+              {step < ONBOARD_STEPS.length - 1 ? (
+                <Button size="sm" disabled={!canNext} onClick={() => setStep((s) => s + 1)} className="gap-1.5">
+                  Continue <ArrowRight className="h-3.5 w-3.5" />
+                </Button>
+              ) : (
+                <Button size="sm" disabled={!canNext || submitting} loading={submitting} onClick={() => void submit()} className="gap-1.5">
+                  <Building2 className="h-3.5 w-3.5" /> Go Live on AirPal
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

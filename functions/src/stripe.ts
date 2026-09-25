@@ -12,6 +12,7 @@ import {
   canReleasePayout,
   payoutStatusAfterGuestPaid,
   quoteFees,
+  repriceSourcedBooking,
   type Booking,
   type FeeConfig,
   type PayoutStatus,
@@ -535,6 +536,34 @@ export const createBookingCheckoutSession = onCall(STRIPE_CALLABLE, async (reque
 
   // C1 — the server is the fee authority: restamp from live admin config so a
   // stale or tampered client fee can never reach the ledger or the payout.
+  // C2 — the server is the price authority for sourced bookings: re-price
+  // from the event/campaign row so a forged client priceCents can never
+  // reach Stripe. Fail closed when the source is gone.
+  if (booking.eventId) {
+    const eventSnap = await db.collection("events").doc(booking.eventId).get();
+    const repriced = repriceSourcedBooking(
+      eventSnap.exists
+        ? { exists: true, priceCents: (eventSnap.data() as { ticketPriceCents?: unknown }).ticketPriceCents }
+        : null,
+    );
+    if ("error" in repriced) throw new HttpsError("failed-precondition", "This event is no longer on sale.");
+    if (booking.priceCents !== repriced.priceCents) {
+      await ref.update({ priceCents: repriced.priceCents, updatedAt: new Date().toISOString() });
+      booking.priceCents = repriced.priceCents;
+    }
+  } else if (booking.campaignId) {
+    const campaignSnap = await db.collection("campaigns").doc(booking.campaignId).get();
+    const repriced = repriceSourcedBooking(
+      campaignSnap.exists
+        ? { exists: true, priceCents: (campaignSnap.data() as { priceCents?: unknown }).priceCents }
+        : null,
+    );
+    if ("error" in repriced) throw new HttpsError("failed-precondition", "This experience is no longer on sale.");
+    if (booking.priceCents !== repriced.priceCents) {
+      await ref.update({ priceCents: repriced.priceCents, updatedAt: new Date().toISOString() });
+      booking.priceCents = repriced.priceCents;
+    }
+  }
   const liveFees = quoteFees(booking.priceCents, await loadFeeConfig());
   if (booking.feeCents !== liveFees.feeCents) {
     await ref.update({ feeCents: liveFees.feeCents, updatedAt: new Date().toISOString() });

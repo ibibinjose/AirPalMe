@@ -133,6 +133,7 @@ export function StartPage() {
     hasEnrolledBiometrics,
   } = useAuth();
   const { mine, business, biosReady } = useBio();
+  const { keyboardHeight } = useVirtualKeyboard();
   const [pendingGo, setPendingGo] = useState(false);
 
   // Mode resolution
@@ -486,7 +487,6 @@ export function StartPage() {
   }
 
   const RoleIcon = roleContext.icon;
-  const { keyboardHeight } = useVirtualKeyboard();
 
   return (
     <div

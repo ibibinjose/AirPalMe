@@ -21,6 +21,8 @@ interface Kpi {
   value: string;
   hint: string;
   tab: AdminTab;
+  badgeClass?: string;
+  urgent?: boolean;
 }
 
 async function countIn(col: string, field: string, value: string): Promise<number> {
@@ -76,18 +78,18 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
         }
         if (cancelled) return;
         setKpis([
-          { label: "Open requests", value: String(open), hint: "need matching", tab: "marketplace" },
-          { label: "Matched", value: String(matched), hint: "in conversation", tab: "marketplace" },
-          { label: "Completed", value: String(completed), hint: "awaiting review", tab: "marketplace" },
-          { label: "Bookings pending", value: String(bPending), hint: "awaiting mate", tab: "marketplace" },
-          { label: "Bookings confirmed", value: String(bConfirmed), hint: "upcoming", tab: "marketplace" },
-          { label: "Bookings done", value: String(bDone), hint: "completed", tab: "marketplace" },
-          { label: "GMV (recent)", value: aud(gmv), hint: "pre-Stripe", tab: "marketplace" },
-          { label: "Campaigns pending", value: String(cPending), hint: "need review", tab: "experiences" },
-          { label: "Experiences live", value: String(cLive), hint: "bookable", tab: "experiences" },
-          { label: "Safety new", value: String(sNew), hint: "triage first", tab: "safety" },
-          { label: "Walkthroughs new", value: String(wNew), hint: "team inbox", tab: "studio" },
-          { label: "Audited actions", value: String(audits), hint: "trail", tab: "audit" },
+          { label: "Open Requests", value: String(open), hint: "needs mate match", tab: "marketplace", badgeClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
+          { label: "Active Matches", value: String(matched), hint: "in conversation", tab: "marketplace", badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+          { label: "Completed Plans", value: String(completed), hint: "awaiting review", tab: "marketplace", badgeClass: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" },
+          { label: "Pending Bookings", value: String(bPending), hint: "awaiting provider", tab: "marketplace", badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+          { label: "Confirmed Bookings", value: String(bConfirmed), hint: "upcoming experiences", tab: "marketplace", badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+          { label: "Completed Bookings", value: String(bDone), hint: "ready for payout", tab: "marketplace", badgeClass: "bg-brand/10 text-brand" },
+          { label: "Recent GMV", value: aud(gmv), hint: "marketplace volume", tab: "marketplace", badgeClass: "bg-emerald-500/10 text-emerald-700 font-mono" },
+          { label: "Pending Campaigns", value: String(cPending), hint: "needs admin review", tab: "experiences", badgeClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400", urgent: cPending > 0 },
+          { label: "Live Experiences", value: String(cLive), hint: "bookable in Sydney", tab: "experiences", badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+          { label: "Safety Triage", value: String(sNew), hint: "unresolved incidents", tab: "safety", badgeClass: "bg-red-500/10 text-red-600 dark:text-red-400", urgent: sNew > 0 },
+          { label: "Studio Leads", value: String(wNew), hint: "partner inquiries", tab: "studio", badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+          { label: "Audit Logs", value: String(audits), hint: "immutable trail", tab: "audit", badgeClass: "bg-zinc-500/10 text-zinc-600 dark:text-zinc-400" },
         ]);
       } catch {
         if (!cancelled) setKpis([]);
@@ -99,26 +101,43 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
   }, []);
 
   if (kpis === null) {
-    return <p className="mt-4 text-sm text-mute">Loading platform numbers…</p>;
+    return (
+      <div className="mt-4 rounded-3xl bg-card p-8 text-center ring-1 ring-line">
+        <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+        <p className="mt-2 text-xs text-mute font-medium">Loading live platform telemetry…</p>
+      </div>
+    );
   }
   if (kpis.length === 0) {
     return (
-      <p className="mt-4 rounded-2xl bg-card p-4 text-sm text-mute ring-1 ring-line">
-        Connect Firebase to see live numbers. Queues below still work once signed in as admin.
+      <p className="mt-4 rounded-3xl bg-card p-5 text-center text-xs text-mute ring-1 ring-line">
+        Connect Firebase to see live platform telemetry. Administration queues remain fully accessible.
       </p>
     );
   }
   return (
-    <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4">
+    <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
       {kpis.map((k) => (
         <button
           key={k.label}
+          type="button"
           onClick={() => onSelectTab(k.tab)}
-          className="rounded-2xl bg-card p-3 text-center ring-1 ring-line transition hover:ring-mute"
+          className={`group relative rounded-2xl bg-card/90 p-3.5 text-left ring-1 ring-line transition-all duration-150 hover:bg-paper hover:ring-2 hover:ring-brand/40 shadow-2xs ${
+            k.urgent ? "ring-red-500/30 bg-red-500/5" : ""
+          }`}
         >
-          <p className="font-display text-2xl font-semibold">{k.value}</p>
-          <p className="text-[11px] font-medium">{k.label}</p>
-          <p className="text-[11px] text-mute">{k.hint}</p>
+          <div className="flex items-center justify-between gap-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-mute truncate">{k.label}</span>
+            {k.badgeClass && (
+              <span className={`inline-block rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${k.badgeClass}`}>
+                {k.tab}
+              </span>
+            )}
+          </div>
+          <p className="font-display mt-1 text-2xl font-bold tracking-tight text-ink group-hover:text-brand transition-colors">
+            {k.value}
+          </p>
+          <p className="text-[11px] text-mute mt-0.5 truncate">{k.hint}</p>
         </button>
       ))}
     </div>

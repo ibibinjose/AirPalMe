@@ -20,6 +20,7 @@ import {
   isOpenProviderBooking,
   providerShareCents,
   quoteFees,
+  repriceSourcedBooking,
 } from "./booking";
 
 describe("booking engine", () => {
@@ -82,6 +83,16 @@ describe("booking engine", () => {
       }),
     ).toBe(true);
     expect(bookingValid({ ...good, requestId: "", planId: "" })).toBe(false);
+  });
+
+  it("re-prices sourced bookings from the source row", () => {
+    // Forged client price is discarded; the source always wins.
+    expect(repriceSourcedBooking({ exists: true, priceCents: 5000 })).toEqual({ priceCents: 5000 });
+    expect(repriceSourcedBooking({ exists: true, priceCents: 0 })).toEqual({ priceCents: 0 });
+    expect(repriceSourcedBooking({ exists: true, priceCents: -50 })).toEqual({ priceCents: 0 });
+    expect(repriceSourcedBooking({ exists: true, priceCents: "junk" })).toEqual({ priceCents: 0 });
+    expect(repriceSourcedBooking({ exists: false, priceCents: 5000 })).toEqual({ error: "no-longer-on-sale" });
+    expect(repriceSourcedBooking(null)).toEqual({ error: "no-longer-on-sale" });
   });
 
   it("accepts host plan bookings without a mate request", () => {

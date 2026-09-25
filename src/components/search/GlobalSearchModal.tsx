@@ -236,7 +236,7 @@ export function GlobalSearchModal() {
         title: "Sell tickets",
         subtitle: "Create a public event or experience",
         badge: "Tickets",
-        href: "/event/new",
+        href: "/create",
         icon: CalendarDays,
       });
       items.push({

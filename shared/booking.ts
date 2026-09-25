@@ -232,6 +232,20 @@ export function canCustomerCancel(status: BookingStatus): boolean {
 }
 
 /**
+ * C2 — checkout price authority. Sourced bookings (event/campaign) re-price
+ * from the source row so a forged client priceCents can never reach Stripe.
+ * Fail closed when the source is gone. Pure for testing; the server applies it.
+ */
+export function repriceSourcedBooking(
+  source: { exists: boolean; priceCents: unknown } | null,
+): { priceCents: number } | { error: "no-longer-on-sale" } {
+  if (!source || !source.exists) return { error: "no-longer-on-sale" };
+  const n = typeof source.priceCents === "number" ? source.priceCents : Number(source.priceCents);
+  const cents = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+  return { priceCents: cents };
+}
+
+/**
  * C3 — refund guard: paid, share still held on the platform, provider/admin
  * only. Transferred payouts never auto-refund; those need human review.
  * Returns null when the refund may proceed, otherwise the reason it cannot.

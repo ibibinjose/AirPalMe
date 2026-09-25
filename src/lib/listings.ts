@@ -58,6 +58,13 @@ export function upsertCachedListing(listing: BusinessListing) {
   return listing;
 }
 
+export function removeCachedListing(listingId: string) {
+  const rows = getCachedListings();
+  const next = rows.filter((row) => row.id !== listingId && row.placeId !== listingId);
+  write(next);
+  return next;
+}
+
 export function listingDefaults(
   partial: Partial<BusinessListing> &
     Pick<BusinessListing, "id" | "name" | "category" | "placeCategory" | "address" | "shortWhy">,

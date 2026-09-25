@@ -21,11 +21,12 @@ const NAV_EXPLORE = [
 ];
 
 const NAV_HOSPITALITY = [
+  { href: "/create", label: "Create anything" },
   { href: "/pulse", label: "Create a Pulse" },
   { href: "/join", label: "Partner account" },
   { href: "/business", label: "Your place" },
   { href: "/plan/new", label: "Create plan" },
-  { href: "/event/new", label: "Create event" },
+  { href: "/event", label: "Create event" },
   { href: "/host", label: "Stay host" },
   { href: "/partners", label: "Partners" },
 ];

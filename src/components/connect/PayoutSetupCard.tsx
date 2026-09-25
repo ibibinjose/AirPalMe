@@ -24,6 +24,8 @@ export function PayoutSetupCard() {
   const [heldCents, setHeldCents] = useState(0);
   const [paidCents, setPaidCents] = useState(0);
   const [heldCount, setHeldCount] = useState(0);
+  /** Only sellers ever see this card — pure guests get a clean Me page. */
+  const [isSeller, setIsSeller] = useState(false);
 
   async function load() {
     const db = getFirebaseDb();
@@ -36,7 +38,9 @@ export function PayoutSetupCard() {
       const row = acct.data() as { transfersActive?: boolean };
       setHasAccount(true);
       setReady(Boolean(row.transfersActive));
+      setIsSeller(true);
     }
+    if (!books.empty) setIsSeller(true);
     let held = 0;
     let heldN = 0;
     let paid = 0;
@@ -142,7 +146,7 @@ export function PayoutSetupCard() {
     }
   }
 
-  if (!user) return null;
+  if (!user || !isSeller) return null;
 
   return (
     <section className="mt-6 rounded-2xl border border-line bg-card p-4 text-left">

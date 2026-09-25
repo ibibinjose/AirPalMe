@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import {
   Activity,
@@ -10,12 +10,17 @@ import {
   Copy,
   Download,
   ExternalLink,
+  Headphones,
   Hotel,
   PartyPopper,
   Printer,
+  QrCode,
   Scissors,
   Sparkles,
   Star,
+  ThumbsUp,
+  TrendingUp,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -40,6 +45,7 @@ import {
   type PulseResponse,
   type PulseTemplate,
 } from "@shared/pulse";
+import { playResolutionChime } from "@/lib/ticket-alert-sound";
 
 interface TemplateOption {
   id: PulseTemplate;
@@ -105,7 +111,13 @@ const TEMPLATES: TemplateOption[] = [
   },
 ];
 
-const EMOJIS = ["😠", "😕", "😐", "🙂", "😍"];
+const EMOJIS = [
+  { emoji: "😠", label: "Terrible", score: 1, color: "text-red-500" },
+  { emoji: "😕", label: "Poor", score: 2, color: "text-amber-500" },
+  { emoji: "😐", label: "Okay", score: 3, color: "text-yellow-500" },
+  { emoji: "🙂", label: "Good", score: 4, color: "text-blue-500" },
+  { emoji: "😍", label: "Amazing", score: 5, color: "text-emerald-500" },
+];
 
 export function PulseHubPage() {
   const { user } = useAuth();
@@ -134,6 +146,7 @@ export function PulseHubPage() {
   const [activePublicToken, setActivePublicToken] = useState<string | null>(null);
   const [activeQrUrl, setActiveQrUrl] = useState<string | null>(null);
   const [previewRating, setPreviewRating] = useState<number>(5);
+  const [showPrintModal, setShowPrintModal] = useState(false);
 
   // Issue action notes
   const [resolutionNoteByIssue, setResolutionNoteByIssue] = useState<Record<string, string>>({});
@@ -170,6 +183,20 @@ export function PulseHubPage() {
   const avgScore = useMemo(() => averagePrimaryScore(responses), [responses]);
   const openIssues = useMemo(() => issues.filter((i) => i.status !== "resolved"), [issues]);
   const resolvedIssues = useMemo(() => issues.filter((i) => i.status === "resolved"), [issues]);
+
+  // Score distribution calculation
+  const scoreCounts = useMemo(() => {
+    const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    responses.forEach((r) => {
+      const p = r.primaryScore;
+      if (p && p >= 1 && p <= 5) {
+        counts[p as keyof typeof counts] += 1;
+      }
+    });
+    return counts;
+  }, [responses]);
+
+  const totalRated = responses.length || 1;
 
   const activeLivePulse = useMemo(() => {
     return pulses.find((p) => p.status === "live") || pulses[0];
@@ -226,10 +253,6 @@ export function PulseHubPage() {
     toast.success("CSV export downloaded");
   }
 
-  function handlePrintCard() {
-    window.print();
-  }
-
   async function handleAcknowledge(issueId: string) {
     try {
       await acknowledgePulseIssue(workspaceId, issueId);
@@ -242,8 +265,9 @@ export function PulseHubPage() {
   async function handleResolve(issueId: string) {
     const note = resolutionNoteByIssue[issueId]?.trim();
     try {
+      playResolutionChime();
       await resolvePulseIssue(workspaceId, issueId, note || undefined);
-      toast.success("Issue marked resolved");
+      toast.success("Issue marked resolved & closed");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to resolve");
     }
@@ -252,19 +276,20 @@ export function PulseHubPage() {
   return (
     <div className="min-h-screen bg-bg text-ink pb-24">
       {/* Hero Header */}
-      <section className="relative overflow-hidden border-b border-line bg-gradient-to-b from-brand/10 via-card/50 to-bg pt-12 pb-14 px-4 sm:px-6">
+      <section className="relative overflow-hidden border-b border-line bg-gradient-to-b from-brand/12 via-card/60 to-bg pt-12 pb-14 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/15 text-brand text-xs font-semibold ring-1 ring-brand/30">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/15 text-brand text-xs font-semibold ring-1 ring-brand/30 shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-brand" />
-            <span>AirPal Pulse · Real-Time QR Feedback Engine</span>
+            <span>AirPal Pulse · Real-Time In-Venue Feedback Engine</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-ink">
-            Instant Customer Feedback with <span className="text-brand">Zero Apps</span>
+          <h1 className="font-display text-3xl sm:text-5xl font-black tracking-tight text-ink">
+            Catch Unhappy Guests <span className="text-brand">Before Bad Reviews</span>
           </h1>
 
-          <p className="text-base sm:text-lg text-ink-muted max-w-2xl mx-auto">
-            Collect real-time ratings, catch unhappy customers before they leave bad reviews, and resolve issues on the spot. Designed for any business, venue, event, or individual.
+          <p className="text-sm sm:text-base text-ink/75 max-w-2xl mx-auto leading-relaxed">
+            Real-time QR ratings for cafes, restaurants, hotels, events, and venues. 
+            Automated service recovery gates negative feedback to your manager desk instantly—zero app download required.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
@@ -273,24 +298,18 @@ export function PulseHubPage() {
                 const el = document.getElementById("pulse-builder");
                 el?.scrollIntoView({ behavior: "smooth" });
               }}
-              className="bg-brand text-white hover:bg-brand-hover h-11 px-6 font-semibold shadow-md"
+              className="bg-brand text-white hover:bg-brand/90 h-11 px-6 font-semibold shadow-xs"
             >
               Create Your Free Pulse
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            {user && (
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  const el = document.getElementById("pulse-live-hub");
-                  el?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="h-11 px-5"
-              >
-                <Activity className="w-4 h-4 mr-2 text-brand" />
-                Live Inbox ({openIssues.length} open)
-              </Button>
-            )}
+            <Link
+              href="/helpdesk"
+              className="inline-flex items-center gap-2 rounded-2xl bg-card px-5 h-11 text-sm font-semibold text-ink ring-1 ring-line shadow-2xs hover:bg-paper transition"
+            >
+              <Headphones className="w-4 h-4 text-brand" />
+              <span>Universal Help Desk</span>
+            </Link>
           </div>
         </div>
       </section>
@@ -300,11 +319,13 @@ export function PulseHubPage() {
         <section id="pulse-builder" className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-line pb-4">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight">Pulse Studio</h2>
-              <p className="text-sm text-ink-muted">Choose your industry template, customize the prompt, and mint a live QR code.</p>
+              <h2 className="font-display text-2xl font-bold tracking-tight text-ink">Pulse Studio</h2>
+              <p className="text-xs sm:text-sm text-mute">
+                Select your industry blueprint, customize the header question, and deploy a live QR code in 10 seconds.
+              </p>
             </div>
-            <span className="text-xs font-mono bg-card px-2.5 py-1 rounded-md border border-line text-ink-muted">
-              Step 1 of 2 · 1-Click Deploy
+            <span className="text-xs font-semibold bg-brand/10 text-brand px-3 py-1 rounded-full ring-1 ring-brand/25">
+              1-Click Deploy
             </span>
           </div>
 
@@ -313,8 +334,8 @@ export function PulseHubPage() {
             <div className="lg:col-span-7 space-y-6">
               {/* Template Selector */}
               <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-wider text-ink-muted">
-                  1. Select Template
+                <label className="text-xs font-bold uppercase tracking-wider text-mute">
+                  1. Select Industry Blueprint
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {TEMPLATES.map((tmpl) => {
@@ -325,19 +346,19 @@ export function PulseHubPage() {
                         key={tmpl.id}
                         type="button"
                         onClick={() => setSelectedTemplate(tmpl.id)}
-                        className={`text-left p-3.5 rounded-xl border transition-all text-sm ${
+                        className={`text-left p-3.5 rounded-2xl ring-1 transition-all text-sm ${
                           isSelected
-                            ? "border-brand bg-brand/5 ring-2 ring-brand/20 shadow-xs"
-                            : "border-line bg-card hover:border-brand/40"
+                            ? "ring-2 ring-brand bg-brand/5 shadow-xs"
+                            : "ring-line bg-card hover:bg-paper"
                         }`}
                       >
                         <div className="flex items-center gap-2.5 font-bold text-ink">
-                          <div className={`p-2 rounded-lg ${isSelected ? "bg-brand text-white" : "bg-bg text-brand"}`}>
+                          <div className={`p-2 rounded-xl ${isSelected ? "bg-brand text-white" : "bg-paper text-brand ring-1 ring-line"}`}>
                             <Icon className="w-4 h-4" />
                           </div>
-                          <span>{tmpl.title}</span>
+                          <span className="text-xs font-bold">{tmpl.title}</span>
                         </div>
-                        <p className="text-xs text-ink-muted mt-2 line-clamp-2">{tmpl.description}</p>
+                        <p className="text-[11px] text-mute mt-2 line-clamp-2 leading-relaxed">{tmpl.description}</p>
                       </button>
                     );
                   })}
@@ -345,48 +366,48 @@ export function PulseHubPage() {
               </div>
 
               {/* Customizer */}
-              <div className="p-5 rounded-2xl bg-card border border-line space-y-4 shadow-xs">
-                <label className="text-xs font-bold uppercase tracking-wider text-ink-muted">
-                  2. Customize Your Pulse
+              <div className="p-5 rounded-[28px] bg-card/90 ring-1 ring-line space-y-4 shadow-xs">
+                <label className="text-xs font-bold uppercase tracking-wider text-mute">
+                  2. Customize Question & Placement
                 </label>
 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-medium text-ink mb-1">
+                    <label className="block text-xs font-semibold text-ink mb-1">
                       Business or Pulse Name
                     </label>
                     <input
                       type="text"
                       value={pulseName}
                       onChange={(e) => setPulseName(e.target.value)}
-                      placeholder="e.g. Surry Hills Cafe & Bar, Table 12, Workshop Q&A"
-                      className="w-full h-10 px-3.5 rounded-lg bg-bg border border-line text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand"
+                      placeholder="e.g. Surry Hills Cafe & Bar, Table 12, Harbour Hotel Room 302"
+                      className="w-full h-11 px-4 rounded-2xl bg-paper ring-1 ring-line text-xs sm:text-sm text-ink outline-none focus:ring-2 focus:ring-brand/40"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-ink mb-1">
-                      Header Question / Prompt
+                    <label className="block text-xs font-semibold text-ink mb-1">
+                      Header Question / Customer Prompt
                     </label>
                     <input
                       type="text"
                       value={pulseTitle}
                       onChange={(e) => setPulseTitle(e.target.value)}
-                      placeholder="e.g. How was your coffee & service today?"
-                      className="w-full h-10 px-3.5 rounded-lg bg-bg border border-line text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand"
+                      placeholder="e.g. How was your food & dining experience today?"
+                      className="w-full h-11 px-4 rounded-2xl bg-paper ring-1 ring-line text-xs sm:text-sm text-ink outline-none focus:ring-2 focus:ring-brand/40"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-ink mb-1">
-                      Placement Label
+                    <label className="block text-xs font-semibold text-ink mb-1">
+                      Physical Placement Tag
                     </label>
                     <input
                       type="text"
                       value={placementLabel}
                       onChange={(e) => setPlacementLabel(e.target.value)}
-                      placeholder="e.g. Table card, Receipt footer, Entrance banner"
-                      className="w-full h-10 px-3.5 rounded-lg bg-bg border border-line text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand"
+                      placeholder="e.g. Table card, Bedside stand, Receipt footer, Entrance banner"
+                      className="w-full h-11 px-4 rounded-2xl bg-paper ring-1 ring-line text-xs sm:text-sm text-ink outline-none focus:ring-2 focus:ring-brand/40"
                     />
                   </div>
                 </div>
@@ -394,98 +415,127 @@ export function PulseHubPage() {
                 <Button
                   onClick={handleCreateAndPublish}
                   disabled={busy}
-                  className="w-full bg-brand text-white hover:bg-brand-hover h-11 text-base font-semibold mt-2 shadow-sm"
+                  className="w-full bg-brand text-white hover:bg-brand/90 h-11 text-sm font-semibold mt-2 shadow-xs"
                 >
-                  {busy ? "Minting QR & Link..." : "Generate Live Pulse & QR Code"}
+                  {busy ? "Minting QR & Link…" : "Generate Live Pulse & QR Code"}
                 </Button>
               </div>
             </div>
 
-            {/* Right Column: Live Guest Preview Card */}
+            {/* Right Column: Live Guest Mobile Preview Card */}
             <div className="lg:col-span-5 space-y-4 sticky top-6">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
-                  Live Guest Mobile Preview
+                <span className="text-xs font-bold uppercase tracking-wider text-mute">
+                  Interactive Guest Mobile Preview
                 </span>
-                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
+                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  Real-Time Output
+                  Live Reactive
                 </span>
               </div>
 
               {/* Mobile Mockup Frame */}
-              <div className="p-4 rounded-3xl bg-card border-2 border-line/80 shadow-lg max-w-sm mx-auto">
+              <div className="p-4 rounded-[32px] bg-card ring-2 ring-line shadow-xl max-w-sm mx-auto">
                 <div className="w-12 h-1 bg-line rounded-full mx-auto mb-4" />
-                <div className="p-4 rounded-2xl bg-bg border border-line space-y-4">
+                <div className="p-4 rounded-2xl bg-paper/80 ring-1 ring-line space-y-4">
                   <div className="text-center space-y-1">
                     <span className="text-[10px] font-bold text-brand uppercase tracking-wider">
                       {pulseName.trim() || "Your Business"}
                     </span>
-                    <h3 className="text-base font-extrabold text-ink">
+                    <h3 className="text-sm font-bold text-ink">
                       {pulseTitle.trim() || "How was your experience?"}
                     </h3>
                   </div>
 
                   {/* Emoji Rating Row */}
-                  <div className="flex items-center justify-between gap-1 p-2 bg-card rounded-xl border border-line">
-                    {EMOJIS.map((emoji, idx) => {
-                      const score = idx + 1;
-                      const active = previewRating === score;
+                  <div className="flex items-center justify-between gap-1 p-2 bg-card rounded-2xl ring-1 ring-line">
+                    {EMOJIS.map((item) => {
+                      const active = previewRating === item.score;
                       return (
                         <button
-                          key={emoji}
+                          key={item.score}
                           type="button"
-                          onClick={() => setPreviewRating(score)}
-                          className={`text-2xl p-2 rounded-lg transition-all ${
-                            active ? "bg-brand/20 scale-110 ring-1 ring-brand" : "hover:bg-bg opacity-75"
+                          onClick={() => setPreviewRating(item.score)}
+                          className={`flex flex-col items-center p-2 rounded-xl transition-all ${
+                            active
+                              ? "bg-brand/15 scale-110 ring-1 ring-brand"
+                              : "hover:bg-paper opacity-75"
                           }`}
                         >
-                          {emoji}
+                          <span className="text-2xl">{item.emoji}</span>
+                          <span className="text-[9px] font-semibold text-mute mt-0.5">{item.label}</span>
                         </button>
                       );
                     })}
                   </div>
 
                   {/* Dynamic conditional reveal preview */}
-                  {previewRating <= 2 && (
-                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs space-y-2 animate-in fade-in">
-                      <div className="flex items-center gap-1.5 text-amber-700 font-semibold">
-                        <AlertCircle className="w-3.5 h-3.5" />
-                        <span>Smart Logic: Issue Gating Active</span>
+                  {previewRating <= 2 ? (
+                    <div className="p-3.5 rounded-2xl bg-amber-500/10 ring-1 ring-amber-500/30 text-xs space-y-2 animate-in fade-in">
+                      <div className="flex items-center gap-1.5 text-amber-700 dark:text-amber-400 font-bold">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <span>Service Recovery Active</span>
                       </div>
-                      <p className="text-ink-muted text-[11px]">
-                        Guest rates $\le 2$ $\rightarrow$ System automatically asks for issue category, help note & triggers real-time host alert.
+                      <p className="text-ink/80 text-[11px] leading-relaxed">
+                        Guest rates $\le 2$ $\rightarrow$ Prompts for issue categories (Food, Service, Speed, Noise) and immediately notifies front desk / manager.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="p-3.5 rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-500/30 text-xs space-y-2 animate-in fade-in">
+                      <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold">
+                        <ThumbsUp className="w-4 h-4 shrink-0" />
+                        <span>Promoter Boost Active</span>
+                      </div>
+                      <p className="text-ink/80 text-[11px] leading-relaxed">
+                        Guest rates $\ge 4$ $\rightarrow$ Offers 1-click Google Review boost, tip option, or VIP club invite.
                       </p>
                     </div>
                   )}
 
-                  <div className="text-center pt-2">
-                    <span className="text-[10px] text-ink-muted">Powered by AirPal Pulse · Frictionless</span>
+                  <div className="text-center pt-1">
+                    <span className="text-[10px] text-mute">Powered by AirPal Pulse · Zero App Needed</span>
                   </div>
                 </div>
               </div>
 
               {/* QR Code Action Output */}
               {activePublicToken && activeQrUrl && (
-                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-3">
-                  <div className="flex items-center gap-3">
-                    <img src={activeQrUrl} alt="Pulse QR" className="w-20 h-20 rounded-lg border border-line bg-white p-1" />
-                    <div className="space-y-1 flex-1">
-                      <div className="text-xs font-bold text-emerald-800">Your Pulse is Live!</div>
-                      <div className="text-[11px] font-mono text-ink-muted truncate">
+                <div className="p-5 rounded-[28px] bg-emerald-500/10 ring-1 ring-emerald-500/30 space-y-3">
+                  <div className="flex items-center gap-3.5">
+                    <img
+                      src={activeQrUrl}
+                      alt="Pulse QR"
+                      className="w-20 h-20 rounded-xl ring-1 ring-line bg-white p-1.5 shadow-2xs"
+                    />
+                    <div className="space-y-1 flex-1 min-w-0">
+                      <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300">
+                        Live QR Ready for Print & Placement
+                      </div>
+                      <div className="text-[11px] font-mono text-mute truncate">
                         {buildPulsePublicUrl(activePublicToken, publicSiteOrigin())}
                       </div>
-                      <div className="flex gap-2 pt-1">
-                        <Button variant="outlined" size="sm" onClick={handleCopyLink} className="h-7 text-xs px-2.5">
-                          <Copy className="w-3 h-3 mr-1" /> Copy Link
-                        </Button>
+                      <div className="flex flex-wrap gap-2 pt-1.5">
+                        <button
+                          type="button"
+                          onClick={handleCopyLink}
+                          className="inline-flex items-center gap-1 rounded-full bg-paper px-3 py-1 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card transition"
+                        >
+                          <Copy className="w-3 h-3" /> Copy Link
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowPrintModal(true)}
+                          className="inline-flex items-center gap-1 rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition"
+                        >
+                          <Printer className="w-3 h-3" /> Print Standee
+                        </button>
                         <a
                           href={buildPulsePublicUrl(activePublicToken, publicSiteOrigin())}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center text-xs font-semibold text-brand hover:underline"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-brand hover:underline"
                         >
-                          Test View <ExternalLink className="w-3 h-3 ml-1" />
+                          Test View <ExternalLink className="w-3 h-3" />
                         </a>
                       </div>
                     </div>
@@ -500,77 +550,137 @@ export function PulseHubPage() {
         <section id="pulse-live-hub" className="space-y-6 pt-6 border-t border-line">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+              <h2 className="font-display text-2xl font-bold tracking-tight flex items-center gap-2.5">
                 <Activity className="w-6 h-6 text-brand" />
-                Live Feedback & Issues Hub
+                <span>Live Feedback & Recovery Hub</span>
               </h2>
-              <p className="text-sm text-ink-muted">Real-time incoming guest ratings, resolution tickets, and follow-ups.</p>
+              <p className="text-xs sm:text-sm text-mute">
+                Real-time incoming customer ratings, sentiment analysis, and service recovery tickets.
+              </p>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outlined" size="sm" onClick={handleDownloadCsv} className="h-9">
-                <Download className="w-4 h-4 mr-1.5" />
+            <div className="flex items-center gap-2">
+              <Button variant="outlined" size="sm" onClick={handleDownloadCsv} className="h-9 rounded-full text-xs">
+                <Download className="w-3.5 h-3.5 mr-1.5" />
                 Export CSV
               </Button>
-              <Button variant="outlined" size="sm" onClick={handlePrintCard} className="h-9">
-                <Printer className="w-4 h-4 mr-1.5" />
-                Print Cards
-              </Button>
+              <Link
+                href="/helpdesk"
+                className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 h-9 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition"
+              >
+                <Headphones className="w-3.5 h-3.5" />
+                Help Desk Console
+              </Link>
             </div>
           </div>
 
           {/* Metric Stats Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="p-4 rounded-2xl bg-card border border-line shadow-xs">
-              <div className="text-xs text-ink-muted">Total Responses</div>
-              <div className="text-2xl font-black text-ink mt-1">{responses.length}</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-card border border-line shadow-xs">
-              <div className="text-xs text-ink-muted">Average Score</div>
-              <div className="text-2xl font-black text-brand mt-1">
-                {avgScore != null ? `${avgScore.toFixed(1)} / 5.0` : "—"}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="p-4 rounded-2xl bg-card ring-1 ring-line shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-mute">Total Responses</span>
+                <QrCode size={16} className="text-brand" />
               </div>
+              <p className="font-display text-2xl font-bold text-ink mt-2">{responses.length}</p>
+              <p className="text-[10px] text-mute mt-0.5">Scanned & submitted</p>
             </div>
-            <div className="p-4 rounded-2xl bg-card border border-line shadow-xs">
-              <div className="text-xs text-ink-muted">Open Issues</div>
-              <div className="text-2xl font-black text-rose-600 mt-1">{openIssues.length}</div>
+
+            <div className="p-4 rounded-2xl bg-card ring-1 ring-line shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-mute">Average Score</span>
+                <TrendingUp size={16} className="text-emerald-500" />
+              </div>
+              <p className="font-display text-2xl font-bold text-brand mt-2">
+                {avgScore != null ? `${avgScore.toFixed(1)} / 5.0` : "5.0"}
+              </p>
+              <p className="text-[10px] text-mute mt-0.5">Customer satisfaction</p>
             </div>
-            <div className="p-4 rounded-2xl bg-card border border-line shadow-xs">
-              <div className="text-xs text-ink-muted">Resolved</div>
-              <div className="text-2xl font-black text-emerald-600 mt-1">{resolvedIssues.length}</div>
+
+            <div className="p-4 rounded-2xl bg-card ring-1 ring-line shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-mute">Open Tickets</span>
+                <AlertCircle size={16} className="text-rose-500" />
+              </div>
+              <p className={`font-display text-2xl font-bold mt-2 ${openIssues.length > 0 ? "text-rose-600 animate-pulse" : "text-ink"}`}>
+                {openIssues.length}
+              </p>
+              <p className="text-[10px] text-mute mt-0.5">Awaiting staff recovery</p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-card ring-1 ring-line shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-mute">Resolved Cases</span>
+                <CheckCircle2 size={16} className="text-emerald-500" />
+              </div>
+              <p className="font-display text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-2">
+                {resolvedIssues.length}
+              </p>
+              <p className="text-[10px] text-mute mt-0.5">Successfully closed</p>
             </div>
           </div>
 
+          {/* Rating Breakdown Strip */}
+          {responses.length > 0 && (
+            <div className="p-5 rounded-[28px] bg-card ring-1 ring-line shadow-2xs space-y-3">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-mute">Satisfaction Distribution</h3>
+              <div className="space-y-2">
+                {[5, 4, 3, 2, 1].map((rating) => {
+                  const count = scoreCounts[rating as keyof typeof scoreCounts] || 0;
+                  const pct = Math.round((count / totalRated) * 100);
+                  const emoji = EMOJIS.find((e) => e.score === rating)?.emoji || "⭐";
+                  return (
+                    <div key={rating} className="flex items-center gap-3 text-xs">
+                      <span className="w-12 font-semibold text-ink flex items-center gap-1">
+                        <span>{emoji}</span> {rating}★
+                      </span>
+                      <div className="flex-1 h-3 rounded-full bg-paper ring-1 ring-line overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            rating >= 4 ? "bg-emerald-500" : rating === 3 ? "bg-amber-500" : "bg-rose-500"
+                          }`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="w-12 text-right font-mono text-mute">{count} ({pct}%)</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Open Issues Action Board */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-rose-500" />
-              Action Required · Open Tickets ({openIssues.length})
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-base font-bold flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-rose-500" />
+                <span>Service Recovery Queue ({openIssues.length})</span>
+              </h3>
+            </div>
 
             {openIssues.length === 0 ? (
-              <div className="p-8 rounded-2xl bg-card border border-line text-center space-y-2">
+              <div className="p-8 rounded-[28px] bg-card ring-1 ring-line text-center space-y-2 shadow-2xs">
                 <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto" />
                 <div className="font-bold text-ink">All Clear! No Open Issues</div>
-                <p className="text-xs text-ink-muted max-w-sm mx-auto">
-                  When guests submit ratings $\le 2$ or request contact, tickets appear here in real time.
+                <p className="text-xs text-mute max-w-sm mx-auto">
+                  When guests submit ratings $\le 2$ or request contact, tickets appear here and in the Help Desk in real time.
                 </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {openIssues.map((issue) => (
-                  <div key={issue.id} className="p-5 rounded-2xl bg-card border border-line space-y-3 shadow-xs">
+                  <div key={issue.id} className="p-5 rounded-[28px] bg-card ring-1 ring-line space-y-3 shadow-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-rose-500/15 text-rose-600">
+                      <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-500/15 text-red-600 dark:text-red-400">
                         {issue.category} · Score {issue.primaryScore ?? "?"}/5
                       </span>
-                      <span className="text-xs text-ink-muted">{issue.status}</span>
+                      <span className="text-xs text-mute">{issue.status}</span>
                     </div>
 
-                    <div className="font-semibold text-sm text-ink">{issue.summary}</div>
+                    <div className="font-semibold text-sm text-ink leading-relaxed">{issue.summary}</div>
 
                     {issue.contactRequested && (
-                      <div className="text-xs bg-bg p-2.5 rounded-lg border border-line space-y-1">
-                        <div className="font-medium text-brand">Guest Requested Contact:</div>
+                      <div className="text-xs bg-paper p-3 rounded-xl ring-1 ring-line space-y-1">
+                        <div className="font-semibold text-brand">Guest Requested Contact:</div>
                         <div>Name: {issue.contactName || "Guest"}</div>
                         <div>Method: {issue.contactMethod || "Not provided"}</div>
                       </div>
@@ -578,33 +688,32 @@ export function PulseHubPage() {
 
                     <div className="space-y-2 pt-2 border-t border-line">
                       {issue.status === "open" && (
-                        <Button
-                          size="sm"
-                          variant="outlined"
+                        <button
+                          type="button"
                           onClick={() => handleAcknowledge(issue.id)}
-                          className="w-full text-xs h-8"
+                          className="w-full rounded-full bg-paper py-1.5 text-xs font-semibold text-mute hover:text-ink ring-1 ring-line transition"
                         >
                           Acknowledge Issue
-                        </Button>
+                        </button>
                       )}
 
                       <div className="flex gap-2">
                         <input
                           type="text"
-                          placeholder="Resolution note (e.g. comped meal, fixed AC)"
+                          placeholder="Resolution note (e.g. comped drink, apologized)"
                           value={resolutionNoteByIssue[issue.id] || ""}
                           onChange={(e) =>
                             setResolutionNoteByIssue({ ...resolutionNoteByIssue, [issue.id]: e.target.value })
                           }
-                          className="flex-1 h-8 px-2.5 rounded-md bg-bg border border-line text-xs"
+                          className="flex-1 h-9 px-3 rounded-full bg-paper ring-1 ring-line text-xs text-ink outline-none focus:ring-2 focus:ring-brand/40"
                         />
-                        <Button
-                          size="sm"
+                        <button
+                          type="button"
                           onClick={() => handleResolve(issue.id)}
-                          className="bg-emerald-600 text-white hover:bg-emerald-700 h-8 text-xs px-3"
+                          className="rounded-full bg-emerald-600 text-white hover:bg-emerald-700 h-9 text-xs font-semibold px-4 shadow-xs transition"
                         >
                           Resolve
-                        </Button>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -614,7 +723,54 @@ export function PulseHubPage() {
           </div>
         </section>
       </div>
+
+      {/* Printable QR Standee Modal */}
+      {showPrintModal && activeQrUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs animate-in fade-in">
+          <div className="w-full max-w-sm rounded-[32px] bg-white text-zinc-900 p-8 shadow-2xl space-y-6 text-center">
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowPrintModal(false)}
+                className="text-zinc-400 hover:text-zinc-800"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#1805db]">
+                AirPal Pulse
+              </span>
+              <h3 className="font-display text-2xl font-extrabold tracking-tight">
+                {pulseName.trim() || "Your Place"}
+              </h3>
+              <p className="text-xs text-zinc-600 font-medium max-w-xs mx-auto">
+                {pulseTitle.trim() || "How was your experience today?"}
+              </p>
+            </div>
+
+            <div className="p-4 bg-zinc-50 rounded-2xl inline-block ring-1 ring-zinc-200 shadow-inner">
+              <img src={activeQrUrl} alt="Pulse QR Card" className="w-44 h-44 mx-auto rounded-lg" />
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-zinc-800">Scan with Phone Camera</p>
+              <p className="text-[11px] text-zinc-500">Zero Apps · Takes 5 Seconds</p>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="flex-1 rounded-full bg-[#1805db] text-white py-3 text-xs font-bold shadow-md hover:bg-[#1404be] transition flex items-center justify-center gap-1.5"
+              >
+                <Printer size={15} /> Print Standee
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

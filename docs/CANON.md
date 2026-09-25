@@ -130,6 +130,7 @@ Reuse these. Do not add a parallel page for the same job.
 | Zoo / memories / people | `/me/zoo`, `/me/memories`, `/me/people` |
 | Start / auth | `/start` |
 | Partner inquiry | `/partner` (segmented B2B form → `partner_leads`; admin triage under Studio; distinct from `/partners` directory) |
+| Create hub | `/create` (one door: individual tools + partner tools gated by partner profile; locked → `/join`) |
 | AirPal Wallet (tickets) | `/me/tickets` (every booking as a branded pass; save-as-PDF + share) |
 | Create festival | `/f/new` (organizer draft → live; manage panel on `/f/:slug`; admin list under Experiences) |
 

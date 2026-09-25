@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { nanoid } from "nanoid";
 import {
   DEFAULT_LISTING_GEO,
@@ -15,6 +15,7 @@ import {
   getCachedListings,
   hydrateListings,
   listingDefaults,
+  removeCachedListing,
   subscribeListings,
   upsertCachedListing,
 } from "@/lib/listings";
@@ -25,7 +26,7 @@ import { useOptionalSync } from "@/contexts/SyncContext";
 import { track } from "@/lib/analytics";
 import { isoFromUnknown } from "@shared/freshness";
 
-type SavePlaceInput = {
+export type SavePlaceInput = {
   name: string;
   category: BusinessCategoryId;
   address: string;
@@ -42,10 +43,15 @@ type SavePlaceInput = {
 type ListingsValue = {
   listings: BusinessListing[];
   mine: BusinessListing | null;
+  myListings: BusinessListing[];
+  selectedListingId: string | null;
+  setSelectedListingId: (id: string | null) => void;
   version: number;
   /** True after the first listings + places fetch settles (success or fail). */
   remoteLoaded: boolean;
-  savePlace: (input: SavePlaceInput) => Promise<BusinessListing>;
+  savePlace: (input: SavePlaceInput, targetListingId?: string) => Promise<BusinessListing>;
+  createPlace: (input: SavePlaceInput) => Promise<BusinessListing>;
+  deleteListing: (listingId: string) => Promise<void>;
   saveDeal: (listingId: string, deal: PlaceDeal | null) => Promise<void>;
   confirmHours: () => Promise<void>;
 };
@@ -83,12 +89,31 @@ function fromFirestore(id: string, data: Record<string, unknown>): BusinessListi
   });
 }
 
+const SELECTED_LISTING_STORAGE_KEY = "airpal.selected_listing_id";
+
 export function ListingsProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const sync = useOptionalSync();
   const [listings, setListings] = useState<BusinessListing[]>([]);
   const [version, setVersion] = useState(0);
   const [remoteLoaded, setRemoteLoaded] = useState(false);
+  const [selectedListingId, setSelectedListingIdState] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem(SELECTED_LISTING_STORAGE_KEY);
+    } catch {
+      return null;
+    }
+  });
+
+  const setSelectedListingId = useCallback((id: string | null) => {
+    setSelectedListingIdState(id);
+    try {
+      if (id) localStorage.setItem(SELECTED_LISTING_STORAGE_KEY, id);
+      else localStorage.removeItem(SELECTED_LISTING_STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   const bump = useCallback((rows: BusinessListing[]) => {
     setListings(rows);
@@ -109,7 +134,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
     void Promise.all([
       getDocs(query(collection(db, "listings"), where("status", "==", "active")))
         .then((snap) => {
-          const remote = snap.docs.map((doc) => fromFirestore(doc.id, doc.data() as Record<string, unknown>));
+          const remote = snap.docs.map((d) => fromFirestore(d.id, d.data() as Record<string, unknown>));
           const local = getCachedListings();
           const byId = new Map<string, BusinessListing>();
           for (const row of [...local, ...remote]) byId.set(row.id, row);
@@ -135,19 +160,39 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
     };
   }, [bump]);
 
-  const mine = useMemo(() => {
-    if (!user) return listings.find((row) => row.ownerEmail && !row.ownerUid) || listings[0] || null;
-    return listings.find((row) => row.ownerUid === user.uid || row.ownerEmail === user.email) || null;
+  const myListings = useMemo(() => {
+    if (!user) return [];
+    return listings.filter(
+      (row) =>
+        row.ownerUid === user.uid ||
+        (user.email && row.ownerEmail?.trim().toLowerCase() === user.email.trim().toLowerCase()),
+    );
   }, [listings, user]);
+
+  const mine = useMemo(() => {
+    if (!user) {
+      return listings.find((row) => row.ownerEmail && !row.ownerUid) || listings[0] || null;
+    }
+    if (selectedListingId) {
+      const target = myListings.find((row) => row.id === selectedListingId);
+      if (target) return target;
+    }
+    return myListings[0] || null;
+  }, [listings, myListings, selectedListingId, user]);
 
   const value = useMemo<ListingsValue>(
     () => ({
       listings,
       mine,
+      myListings,
+      selectedListingId,
+      setSelectedListingId,
       version,
       remoteLoaded,
-      async savePlace(input) {
-        const existing = mine;
+      async savePlace(input, targetListingId) {
+        const existing = targetListingId
+          ? listings.find((r) => r.id === targetListingId) || mine
+          : mine;
         const id = existing?.id || `list-${nanoid(8)}`;
         const listing = listingDefaults({
           ...existing,
@@ -171,6 +216,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
         upsertCachedListing(listing);
         syncListingToBio(listing);
         bump(getCachedListings());
+        setSelectedListingId(listing.id);
         if (!existing) {
           void track("host_activation", {
             tenantId: listing.ownerUid || "local",
@@ -208,6 +254,92 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
               : undefined,
         });
         return listing;
+      },
+      async createPlace(input) {
+        const id = `list-${nanoid(8)}`;
+        const listing = listingDefaults({
+          id,
+          name: input.name.trim(),
+          category: input.category,
+          placeCategory: placeCategoryFor(input.category),
+          address: input.address.trim(),
+          hours: input.hours.trim() || "See venue",
+          shortWhy: input.shortWhy.trim(),
+          phone: input.phone?.trim(),
+          ownerEmail: getFirebaseAuth()?.currentUser?.email || user?.email || input.name,
+          ownerUid: getFirebaseAuth()?.currentUser?.uid || user?.uid,
+          geo: input.geo || DEFAULT_LISTING_GEO,
+          handle: input.handle,
+          heroImage: input.heroImage,
+          mapsPlaceId: input.mapsPlaceId,
+          website: input.website,
+          hoursVerifiedAt: new Date().toISOString(),
+        });
+        upsertCachedListing(listing);
+        syncListingToBio(listing);
+        bump(getCachedListings());
+        setSelectedListingId(listing.id);
+        void track("host_activation", {
+          tenantId: listing.ownerUid || "local",
+          activationStep: "listing_created",
+          contextId: listing.id,
+          actorRole: "host_admin",
+        });
+        await sync?.runJob({
+          id: `listing-${listing.id}`,
+          label: "Listing",
+          remote:
+            liveBackendEnabled() && getFirebaseAuth()?.currentUser
+              ? async () => {
+                  const res = await upsertBusinessListingRemote({
+                    listingId: listing.id,
+                    name: listing.name,
+                    category: listing.category,
+                    address: listing.address,
+                    hours: listing.hours,
+                    shortWhy: listing.shortWhy,
+                    phone: listing.phone,
+                    lat: listing.geo.lat,
+                    lng: listing.geo.lng,
+                    precinctId: listing.precinctId,
+                    heroImage: listing.heroImage,
+                    mapsPlaceId: listing.mapsPlaceId,
+                    website: listing.website,
+                  });
+                  listing.id = res.listingId;
+                  listing.placeId = res.placeId;
+                  upsertCachedListing(listing);
+                  bump(getCachedListings());
+                }
+              : undefined,
+        });
+        return listing;
+      },
+      async deleteListing(listingId: string) {
+        removeCachedListing(listingId);
+        const nextListings = listings.filter((r) => r.id !== listingId && r.placeId !== listingId);
+        bump(nextListings);
+        if (selectedListingId === listingId) {
+          const remaining = nextListings.filter(
+            (r) => r.ownerUid === user?.uid || (user?.email && r.ownerEmail === user.email),
+          );
+          setSelectedListingId(remaining[0]?.id || null);
+        }
+        const db = getFirebaseDb();
+        if (db && user) {
+          try {
+            await deleteDoc(doc(db, "listings", listingId));
+            const placeId = listingId.replace(/^list-/, "pl-");
+            await setDoc(doc(db, "places", placeId), { status: "inactive", updatedAt: new Date().toISOString() }, { merge: true });
+          } catch {
+            /* ignore */
+          }
+        }
+        void track("host_activation", {
+          tenantId: user?.uid || "local",
+          activationStep: "listing_deleted",
+          contextId: listingId,
+        });
       },
       async confirmHours() {
         if (!mine) return;
@@ -269,7 +401,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
         });
       },
     }),
-    [bump, listings, mine, remoteLoaded, sync, user, version],
+    [bump, listings, mine, myListings, remoteLoaded, selectedListingId, setSelectedListingId, sync, user, version],
   );
 
   return <ListingsContext.Provider value={value}>{children}</ListingsContext.Provider>;
