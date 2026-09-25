@@ -1,5 +1,16 @@
-import type { ReactNode } from "react";
-import { useLocation } from "wouter";
+import { useEffect, useState, type ReactNode } from "react";
+import { Link, useLocation } from "wouter";
+import {
+  Calendar,
+  Check,
+  Coffee,
+  Copy,
+  HeartHandshake,
+  Plus,
+  Sparkles,
+  Users,
+  X,
+} from "lucide-react";
 import { ImageField } from "@/components/media/ImageField";
 import { Photo } from "@/components/ui/Photo";
 import { EVENT_FLAVOUR_LABELS } from "@shared/event";
@@ -24,6 +35,19 @@ import { InvitePanel } from "@/components/invite/InvitePanel";
 import { ChangeHandleForm } from "@/components/bio/ChangeHandleForm";
 import { BookingsSection } from "@/components/booking/BookingsSection";
 import { PayoutSetupCard } from "@/components/connect/PayoutSetupCard";
+import { BioCatchUpModal } from "@/components/bio/BioCatchUpModal";
+import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
+import { PlanGridCard } from "@/components/airpal/PlanGridCard";
+import {
+  subscribeCatchUpsForOwner,
+  updateCatchUpStatus,
+  type CatchUpItem,
+} from "@/lib/catchup";
+import { toZonedDateStr } from "@/lib/local-time";
+import { triggerHaptic } from "@/lib/native";
+import { toPublicUrl } from "@/lib/public-origin";
+import type { PlanType } from "@shared/plan";
+import { toast } from "sonner";
 import { cn } from "@/lib/cn";
 import { partnerAccountPath } from "@/lib/partner-account";
 import { NAMES } from "@shared/names";
@@ -80,6 +104,37 @@ export function MePage() {
   const { myPlans } = usePlans();
   const tripCount = myPlans.length;
   const savedCount = savedEvents.length + savedStalls.length;
+
+  const [catchUpModalOpen, setCatchUpModalOpen] = useState(false);
+  const [catchUpInitialType, setCatchUpInitialType] = useState<PlanType>("catchup");
+  const [catchUpsList, setCatchUpsList] = useState<CatchUpItem[]>([]);
+  const [copiedBioLink, setCopiedBioLink] = useState(false);
+
+  const myPublicPlans = myPlans.filter((p) => p.isPublic && p.status !== "cancelled");
+
+  useEffect(() => {
+    if (!user) return;
+    return subscribeCatchUpsForOwner(user.uid, (items) => {
+      setCatchUpsList(items);
+    });
+  }, [user]);
+
+  const handleCopyBioLink = async () => {
+    if (!mine?.handle) {
+      nav("/bio/setup");
+      return;
+    }
+    void triggerHaptic("light");
+    const link = toPublicUrl(bioPath(mine.handle));
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopiedBioLink(true);
+      toast.success("Meet & Hangout link copied to clipboard!");
+      setTimeout(() => setCopiedBioLink(false), 2000);
+    } catch {
+      toast.message(link);
+    }
+  };
 
   if (!user) {
     return (
@@ -227,8 +282,250 @@ export function MePage() {
           </section>
         </div>
 
-        {/* Right Column: Activity, Spaces, Belonging, Keepsakes & Saved (7 cols) */}
+        {/* Right Column: Meet & Hangout Hub, Activity, Spaces, Belonging, Keepsakes & Saved (7 cols) */}
         <div className="mt-6 lg:mt-0 lg:col-span-7 space-y-6">
+          {/* 🌟 MEET & HANGOUT + PUBLIC ACTIVITIES HUB */}
+          <section className="overflow-hidden rounded-[28px] bg-gradient-to-br from-paper via-card to-paper/80 p-5 ring-1 ring-brand/30 shadow-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand flex items-center gap-1.5">
+                <Sparkles size={13} className="text-brand" />
+                <span>Meet &amp; Hangout · Hub</span>
+              </span>
+              {mine ? (
+                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/15 rounded-full px-2.5 py-0.5">
+                  @{mine.handle} Active
+                </span>
+              ) : (
+                <span className="text-[10px] font-bold text-amber-600 bg-amber-500/15 rounded-full px-2.5 py-0.5">
+                  Set Up @handle
+                </span>
+              )}
+            </div>
+
+            <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="font-display text-lg font-bold text-ink">
+                  Your Meet &amp; Hangout Links
+                </h3>
+                <p className="text-xs text-mute leading-relaxed">
+                  Propose coffee, sync meetings, or group hangouts. Sync any confirmed plan to your phone calendar.
+                </p>
+              </div>
+              {mine && (
+                <button
+                  type="button"
+                  onClick={handleCopyBioLink}
+                  className="inline-flex h-8 items-center gap-1.5 rounded-full bg-paper px-3 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card active:scale-95 shrink-0 self-start sm:self-auto cursor-pointer"
+                  title="Copy your Meet & Hangout link"
+                >
+                  {copiedBioLink ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} className="text-mute" />}
+                  <span>{copiedBioLink ? "Copied" : "Share Link"}</span>
+                </button>
+              )}
+            </div>
+
+            {/* Quick Format Launcher Buttons */}
+            <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+              {(
+                [
+                  {
+                    type: "catchup" as const,
+                    label: "Catch Up",
+                    sub: "1-on-1 coffee",
+                    Icon: Coffee,
+                    tint: "bg-amber-500/15 text-amber-700",
+                  },
+                  {
+                    type: "meeting" as const,
+                    label: "Meeting",
+                    sub: "1-on-1 sync",
+                    Icon: Calendar,
+                    tint: "bg-sky-500/15 text-sky-700",
+                  },
+                  {
+                    type: "nightout" as const,
+                    label: "Hangout",
+                    sub: "Group plan",
+                    Icon: Users,
+                    tint: "bg-violet-500/15 text-violet-700",
+                  },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.type}
+                  type="button"
+                  onClick={() => {
+                    void triggerHaptic("light");
+                    setCatchUpInitialType(opt.type);
+                    setCatchUpModalOpen(true);
+                  }}
+                  className="flex flex-col items-center rounded-2xl bg-card p-3 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98] cursor-pointer"
+                >
+                  <span className={cn("mb-2 grid h-10 w-10 place-items-center rounded-2xl", opt.tint)}>
+                    <opt.Icon size={18} />
+                  </span>
+                  <span className="text-xs font-bold text-ink">{opt.label}</span>
+                  <span className="mt-0.5 text-[10px] text-mute">{opt.sub}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Meetup Proposals Inbox */}
+            {catchUpsList.length > 0 && (
+              <div className="mt-5 border-t border-line/70 pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-amber-700">
+                    <HeartHandshake size={14} className="text-amber-600" />
+                    <span>Meetup Proposals &amp; Requests ({catchUpsList.length})</span>
+                  </div>
+                  <span className="text-[10px] font-bold rounded-full bg-amber-500/20 px-2.5 py-0.5 text-amber-800">
+                    Inbox
+                  </span>
+                </div>
+
+                <div className="space-y-2.5">
+                  {catchUpsList.map((item) => {
+                    const eventPayload = {
+                      title: `${item.type === "meeting" ? "Meeting" : item.type === "nightout" ? "Hangout" : "Catch Up"}: ${item.requesterName}`,
+                      description: `${item.notes || `AirPal with ${item.requesterName}`}\nVenue: ${item.venue || "TBD"}\nhttps://airpal.me/@${mine?.handle || ""}`,
+                      startsAt: `${item.date || toZonedDateStr(new Date())}T${item.time || "14:00"}:00`,
+                      venue: item.venue,
+                      city: mine?.city || "Sydney",
+                    };
+
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl bg-card p-3.5 ring-1 ring-line/80 shadow-2xs"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="h-10 w-10 overflow-hidden rounded-full ring-1 ring-line bg-paper shrink-0">
+                            {item.requesterPhoto ? (
+                              <Photo src={item.requesterPhoto} className="h-full w-full object-cover" />
+                            ) : (
+                              <span className="grid h-full w-full place-items-center bg-ink font-bold text-sm text-white">
+                                {item.requesterName[0]}
+                              </span>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <p className="font-semibold text-xs text-ink truncate">{item.requesterName}</p>
+                              {item.requesterHandle && (
+                                <Link
+                                  href={`/@${item.requesterHandle}`}
+                                  className="text-[11px] text-mute hover:text-brand truncate"
+                                >
+                                  @{item.requesterHandle}
+                                </Link>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-mute truncate mt-0.5">
+                              {item.type === "meeting"
+                                ? "📅 Meeting"
+                                : item.type === "nightout"
+                                  ? "👥 Hangout"
+                                  : "☕ Catch Up"}
+                              {item.date && ` · ${item.date}`}
+                              {item.time && ` @ ${item.time}`}
+                              {item.venue && ` · ${item.venue}`}
+                            </p>
+                            {item.notes && <p className="text-[11px] text-ink/80 italic mt-0.5 truncate">"{item.notes}"</p>}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                          <AddToCalendarMenu
+                            event={eventPayload}
+                            size="sm"
+                            variant="ghost"
+                            label="Sync to Phone"
+                            buttonClassName="h-8 px-2.5 text-[11px] rounded-full border border-line"
+                          />
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 w-8 p-0 rounded-full text-mute hover:text-ink hover:bg-black/5"
+                            onClick={() => {
+                              updateCatchUpStatus(item.id, "dismissed");
+                              setCatchUpsList((prev) => prev.filter((i) => i.id !== item.id));
+                              toast.info("Request dismissed");
+                            }}
+                          >
+                            <X size={14} />
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Public Plans & Hangouts Section */}
+            <div className="mt-5 border-t border-line/70 pt-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-brand">
+                  <Sparkles size={13} className="text-brand" />
+                  <span>Your Public Plans &amp; Hangouts ({myPublicPlans.length})</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => nav("/plan/new")}
+                  className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold text-brand hover:bg-brand/20 transition"
+                >
+                  <Plus size={11} />
+                  <span>New Plan</span>
+                </button>
+              </div>
+
+              {myPublicPlans.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {myPublicPlans.map((plan) => {
+                    const planEventPayload = {
+                      title: plan.title,
+                      description: `${plan.notes || `AirPal Public Plan`}\nhttps://airpal.me/plan/${plan.id}`,
+                      startsAt: `${plan.date}T${plan.time || "12:00"}:00`,
+                      venue: plan.destination || plan.city,
+                      city: plan.city,
+                    };
+
+                    return (
+                      <div
+                        key={plan.id}
+                        className="flex flex-col justify-between rounded-2xl bg-card p-3.5 ring-1 ring-line shadow-2xs transition-all hover:ring-brand/40"
+                      >
+                        <PlanGridCard plan={plan} />
+                        <div className="mt-2.5 pt-2.5 border-t border-line/60 flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-medium text-mute">
+                            {plan.destination || plan.city || "Sydney"}
+                          </span>
+                          <AddToCalendarMenu
+                            event={planEventPayload}
+                            size="sm"
+                            variant="ghost"
+                            label="Sync to Phone"
+                            buttonClassName="h-7 px-2.5 text-[10px] rounded-full border border-line"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-line p-4 text-center">
+                  <p className="text-xs text-mute">You don't have any public plans yet.</p>
+                  <button
+                    type="button"
+                    onClick={() => nav("/plan/new")}
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-brand underline"
+                  >
+                    Create a public hangout plan →
+                  </button>
+                </div>
+              )}
+            </div>
+          </section>
           <Section title="Activity">
             <Row kicker="Mate" title="Find someone to go with you" action="Open" onClick={() => nav("/mate")} />
             <Row kicker="Requests" title="Your matches, chat and bookings" action="Open" onClick={() => nav("/mate")} />
@@ -407,6 +704,20 @@ export function MePage() {
           </button>
         </div>
       </div>
+
+      {/* Meet & Hangout Propose Modal */}
+      {mine && (
+        <BioCatchUpModal
+          open={catchUpModalOpen}
+          onClose={() => setCatchUpModalOpen(false)}
+          handle={mine.handle}
+          name={mine.name || user.displayName || "Me"}
+          city={mine.city || "Sydney"}
+          avatar={mine.avatar}
+          ownerUid={user.uid}
+          initialType={catchUpInitialType}
+        />
+      )}
     </div>
   );
 }

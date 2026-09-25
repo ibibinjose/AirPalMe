@@ -1258,103 +1258,166 @@ export function BioPublicPage() {
             </div>
           )}
 
-          {/* Owner Catch-up Proposals & Requests Inbox */}
-          {isOwner && catchUpsList.length > 0 && (
-            <div className="mt-6 rounded-3xl bg-gradient-to-br from-amber-500/10 via-paper to-card p-5 ring-1 ring-amber-500/30 shadow-xs">
+          {/* Owner Meet & Hangout Hub and Proposals Inbox */}
+          {isOwner && (
+            <div className="mt-6 rounded-3xl bg-gradient-to-br from-paper/90 via-card to-paper/60 p-5 ring-1 ring-brand/30 shadow-xs">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-amber-700">
-                  <HeartHandshake size={14} className="text-amber-600" />
-                  <span>Interested in Catching Up ({catchUpsList.length})</span>
-                </div>
-                <span className="text-[10px] font-bold rounded-full bg-amber-500/20 px-2.5 py-0.5 text-amber-800">
-                  Inbox
+                <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand flex items-center gap-1.5">
+                  <Sparkles size={12} className="text-brand" />
+                  <span>Meet &amp; Hangout · Your AirPal Link</span>
+                </span>
+                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/15 rounded-full px-2.5 py-0.5">
+                  Live on @{bio.handle}
                 </span>
               </div>
-
-              <p className="mt-1 text-xs text-mute leading-relaxed">
-                People who want to meet, grab coffee, or collaborate with you.
+              <h3 className="font-display mt-2 text-lg font-bold text-ink">
+                Meet &amp; Hangout with Friends &amp; Mates
+              </h3>
+              <p className="mt-1 text-xs leading-relaxed text-mute">
+                Anyone visiting your bio can request a 1-on-1 coffee, schedule a meeting, or invite you to a group hangout.
               </p>
 
-              <div className="mt-3.5 space-y-2.5">
-                {catchUpsList.map((item) => {
-                  const eventPayload = {
-                    title: `${item.type === "meeting" ? "Meeting" : item.type === "nightout" ? "Hangout" : "Catch Up"}: ${item.requesterName}`,
-                    description: `${item.notes || `AirPal with ${item.requesterName}`}\nVenue: ${item.venue || "TBD"}\nhttps://airpal.me/@${bio.handle}`,
-                    startsAt: `${item.date || toZonedDateStr(new Date())}T${item.time || "14:00"}:00`,
-                    venue: item.venue,
-                    city: bio.city,
-                  };
-
-                  return (
-                    <div
-                      key={item.id}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl bg-card p-3.5 ring-1 ring-line/80 shadow-2xs"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="h-10 w-10 overflow-hidden rounded-full ring-1 ring-line bg-paper shrink-0">
-                          {item.requesterPhoto ? (
-                            <Photo src={item.requesterPhoto} className="h-full w-full object-cover" />
-                          ) : (
-                            <span className="grid h-full w-full place-items-center bg-ink font-bold text-sm text-white">
-                              {item.requesterName[0]}
-                            </span>
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <p className="font-semibold text-xs text-ink truncate">{item.requesterName}</p>
-                            {item.requesterHandle && (
-                              <Link
-                                href={`/@${item.requesterHandle}`}
-                                className="text-[11px] text-mute hover:text-brand truncate"
-                              >
-                                @{item.requesterHandle}
-                              </Link>
-                            )}
-                          </div>
-                          <p className="text-[11px] text-mute truncate mt-0.5">
-                            {item.type === "meeting"
-                              ? "📅 Meeting"
-                              : item.type === "nightout"
-                                ? "👥 Hangout"
-                                : "☕ Catch Up"}
-                            {item.date && ` · ${item.date}`}
-                            {item.time && ` @ ${item.time}`}
-                            {item.venue && ` · ${item.venue}`}
-                          </p>
-                          {item.notes && <p className="text-[11px] text-ink/80 italic mt-0.5 truncate">"{item.notes}"</p>}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
-                        <AddToCalendarMenu
-                          event={eventPayload}
-                          size="sm"
-                          variant="ghost"
-                          label="Sync"
-                          buttonClassName="h-8 px-2.5 text-[11px] rounded-full border border-line"
-                        />
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-8 w-8 p-0 rounded-full text-mute hover:text-ink hover:bg-black/5"
-                          onClick={() => {
-                            updateCatchUpStatus(item.id, "dismissed");
-                            setCatchUpsList((prev) => prev.filter((i) => i.id !== item.id));
-                            toast.info("Request dismissed");
-                          }}
-                        >
-                          <X size={14} />
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
+              {/* Format Launcher Options */}
+              <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+                {(
+                  [
+                    {
+                      type: "catchup" as const,
+                      label: "Catch Up",
+                      sub: "1-on-1 coffee",
+                      Icon: Coffee,
+                      tint: "bg-amber-500/15 text-amber-700",
+                    },
+                    {
+                      type: "meeting" as const,
+                      label: "Meeting",
+                      sub: "1-on-1 sync",
+                      Icon: Calendar,
+                      tint: "bg-sky-500/15 text-sky-700",
+                    },
+                    {
+                      type: "nightout" as const,
+                      label: "Hangout",
+                      sub: "Group plan",
+                      Icon: Users,
+                      tint: "bg-violet-500/15 text-violet-700",
+                    },
+                  ] as const
+                ).map((opt) => (
+                  <button
+                    key={opt.type}
+                    type="button"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      setCatchUpInitialType(opt.type);
+                      setCatchUpModalOpen(true);
+                    }}
+                    className="flex flex-col items-center rounded-2xl bg-card p-3 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98] cursor-pointer"
+                  >
+                    <span className={cn("mb-2 grid h-10 w-10 place-items-center rounded-2xl", opt.tint)}>
+                      <opt.Icon size={18} />
+                    </span>
+                    <span className="text-xs font-bold text-ink">{opt.label}</span>
+                    <span className="mt-0.5 text-[10px] text-mute">{opt.sub}</span>
+                  </button>
+                ))}
               </div>
+
+              {/* Proposals Inbox when requests exist */}
+              {catchUpsList.length > 0 && (
+                <div className="mt-5 border-t border-line/70 pt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-amber-700">
+                      <HeartHandshake size={14} className="text-amber-600" />
+                      <span>Meetup Proposals ({catchUpsList.length})</span>
+                    </div>
+                    <span className="text-[10px] font-bold rounded-full bg-amber-500/20 px-2.5 py-0.5 text-amber-800">
+                      Inbox
+                    </span>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {catchUpsList.map((item) => {
+                      const eventPayload = {
+                        title: `${item.type === "meeting" ? "Meeting" : item.type === "nightout" ? "Hangout" : "Catch Up"}: ${item.requesterName}`,
+                        description: `${item.notes || `AirPal with ${item.requesterName}`}\nVenue: ${item.venue || "TBD"}\nhttps://airpal.me/@${bio.handle}`,
+                        startsAt: `${item.date || toZonedDateStr(new Date())}T${item.time || "14:00"}:00`,
+                        venue: item.venue,
+                        city: bio.city,
+                      };
+
+                      return (
+                        <div
+                          key={item.id}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl bg-card p-3.5 ring-1 ring-line/80 shadow-2xs"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="h-10 w-10 overflow-hidden rounded-full ring-1 ring-line bg-paper shrink-0">
+                              {item.requesterPhoto ? (
+                                <Photo src={item.requesterPhoto} className="h-full w-full object-cover" />
+                              ) : (
+                                <span className="grid h-full w-full place-items-center bg-ink font-bold text-sm text-white">
+                                  {item.requesterName[0]}
+                                </span>
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <p className="font-semibold text-xs text-ink truncate">{item.requesterName}</p>
+                                {item.requesterHandle && (
+                                  <Link
+                                    href={`/@${item.requesterHandle}`}
+                                    className="text-[11px] text-mute hover:text-brand truncate"
+                                  >
+                                    @{item.requesterHandle}
+                                  </Link>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-mute truncate mt-0.5">
+                                {item.type === "meeting"
+                                  ? "📅 Meeting"
+                                  : item.type === "nightout"
+                                    ? "👥 Hangout"
+                                    : "☕ Catch Up"}
+                                {item.date && ` · ${item.date}`}
+                                {item.time && ` @ ${item.time}`}
+                                {item.venue && ` · ${item.venue}`}
+                              </p>
+                              {item.notes && <p className="text-[11px] text-ink/80 italic mt-0.5 truncate">"{item.notes}"</p>}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                            <AddToCalendarMenu
+                              event={eventPayload}
+                              size="sm"
+                              variant="ghost"
+                              label="Sync to Phone"
+                              buttonClassName="h-8 px-2.5 text-[11px] rounded-full border border-line"
+                            />
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 w-8 p-0 rounded-full text-mute hover:text-ink hover:bg-black/5"
+                              onClick={() => {
+                                updateCatchUpStatus(item.id, "dismissed");
+                                setCatchUpsList((prev) => prev.filter((i) => i.id !== item.id));
+                                toast.info("Request dismissed");
+                              }}
+                            >
+                              <X size={14} />
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {/* Catch Up & Hangout Deck for Personal / Mate Profiles */}
+          {/* Catch Up & Hangout Deck for Visitors */}
           {!isOwner && !(bio.kind === "business" && ((bio.products || []).length > 0 || (bio.services || []).length > 0)) && (
             <div className="mt-6 rounded-3xl bg-gradient-to-br from-paper/90 via-card to-paper/60 p-5 ring-1 ring-line/80 shadow-xs">
               <div className="flex items-center justify-between">
@@ -1375,7 +1438,6 @@ export function BioPublicPage() {
                     toast[next ? "success" : "info"](
                       next ? `Saved a reminder to catch up with ${bio.name}` : `Removed reminder for ${bio.name}`,
                     );
-                    // Force refresh inbox state
                     setCatchUpsList(listCatchUpsForHandle(bio.handle));
                   }}
                   className={cn(
@@ -1450,17 +1512,44 @@ export function BioPublicPage() {
               <div className="flex items-center justify-between mb-3 px-0.5">
                 <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand flex items-center gap-1.5">
                   <Sparkles size={13} className="text-brand" />
-                  <span>Plans & Hangouts</span>
+                  <span>Public Plans &amp; Hangouts</span>
                 </h3>
                 <span className="text-[10px] font-bold text-mute uppercase tracking-wider">
-                  {userPlans.length} {userPlans.length === 1 ? "Plan" : "Plans"}
+                  {userPlans.length} {userPlans.length === 1 ? "Public Plan" : "Public Plans"}
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                {userPlans.map((plan) => (
-                  <PlanGridCard key={plan.id} plan={plan} />
-                ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                {userPlans.map((plan) => {
+                  const planEventPayload = {
+                    title: plan.title,
+                    description: `${plan.notes || `AirPal Public Plan with @${bio.handle}`}\nhttps://airpal.me/plan/${plan.id}`,
+                    startsAt: `${plan.date}T${plan.time || "12:00"}:00`,
+                    venue: plan.destination || plan.city,
+                    city: plan.city,
+                  };
+
+                  return (
+                    <div
+                      key={plan.id}
+                      className="group flex flex-col justify-between rounded-3xl bg-card p-4 ring-1 ring-line shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs"
+                    >
+                      <PlanGridCard plan={plan} />
+                      <div className="mt-3 pt-3 border-t border-line/60 flex items-center justify-between gap-2">
+                        <span className="text-[11px] font-medium text-mute">
+                          {plan.destination || plan.city || "Sydney"}
+                        </span>
+                        <AddToCalendarMenu
+                          event={planEventPayload}
+                          size="sm"
+                          variant="ghost"
+                          label="Sync to Phone"
+                          buttonClassName="h-7 px-2.5 text-[10px] rounded-full border border-line"
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -1468,24 +1557,55 @@ export function BioPublicPage() {
           {/* What's On / Appearing at Events */}
           {appearing.length > 0 && (
             <div className="mt-7">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">What’s On</p>
-              <div className="mt-2.5 space-y-2">
+              <div className="flex items-center justify-between mb-2.5 px-0.5">
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">What’s On</p>
+                <span className="text-[10px] font-bold text-mute uppercase tracking-wider">
+                  {appearing.length} {appearing.length === 1 ? "Event" : "Events"}
+                </span>
+              </div>
+              <div className="space-y-2">
                 {appearing.map((s) => {
                   const event = getEvent(s.eventId);
+                  const stallEventPayload = {
+                    title: `${bio.name} at ${event?.name || s.eventId}`,
+                    description: `${s.offer ? `Offer: ${s.offer}\n` : ""}Booth: ${s.booth || "TBD"}\nhttps://airpal.me/@${bio.handle}`,
+                    startsAt: event?.startsAt || `${toZonedDateStr(new Date())}T10:00:00`,
+                    venue: s.location || event?.venue || "Sydney",
+                    city: event?.city || bio.city,
+                  };
+
                   return (
-                    <button
+                    <div
                       key={s.id}
-                      type="button"
-                      onClick={() => nav(`/e/${s.eventId}`)}
-                      className="w-full flex items-center justify-between rounded-3xl bg-card p-4 text-left ring-1 ring-line/80 transition hover:bg-paper shadow-2xs active:scale-[0.99]"
+                      className="w-full flex items-center justify-between rounded-3xl bg-card p-4 text-left ring-1 ring-line/80 transition hover:bg-paper shadow-2xs"
                     >
-                      <div>
+                      <button
+                        type="button"
+                        onClick={() => nav(`/e/${s.eventId}`)}
+                        className="min-w-0 flex-1 text-left active:scale-[0.99] cursor-pointer"
+                      >
                         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold">Appearing at</p>
                         <p className="font-display text-sm font-bold text-ink mt-0.5">{event?.name || "Event / Market"}</p>
                         {s.booth && <p className="text-xs text-mute mt-0.5">Booth {s.booth}</p>}
+                      </button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <AddToCalendarMenu
+                          event={stallEventPayload}
+                          size="sm"
+                          variant="ghost"
+                          label="Sync"
+                          buttonClassName="h-8 px-2.5 text-[11px] rounded-full border border-line"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => nav(`/e/${s.eventId}`)}
+                          className="p-1 text-mute hover:text-ink"
+                          aria-label="View event"
+                        >
+                          <ChevronRight size={18} />
+                        </button>
                       </div>
-                      <ChevronRight size={18} className="text-mute shrink-0" />
-                    </button>
+                    </div>
                   );
                 })}
               </div>

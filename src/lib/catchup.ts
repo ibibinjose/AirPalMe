@@ -200,3 +200,58 @@ export function removeCatchUp(id: string): void {
   const items = listCatchUps().filter((item) => item.id !== id);
   persist(items);
 }
+
+export interface TimeConflict {
+  hasConflict: boolean;
+  conflictingTitle?: string;
+  conflictingTime?: string;
+  conflictingType?: string;
+}
+
+/** Check if a date & time slot conflicts with existing plans or scheduled meetups (+/- 60 mins) */
+export function checkTimeConflict(
+  date: string,
+  time: string,
+  existingPlans: Array<{ date: string; time?: string; title: string; type?: string }> = [],
+  existingCatchups: CatchUpItem[] = [],
+): TimeConflict {
+  if (!date || !time) return { hasConflict: false };
+
+  const [th, tm] = time.split(":").map(Number);
+  const targetMinutes = (th || 0) * 60 + (tm || 0);
+
+  // Check existing user plans
+  for (const p of existingPlans) {
+    if (p.date === date && p.time) {
+      const [ph, pm] = p.time.split(":").map(Number);
+      const planMinutes = (ph || 0) * 60 + (pm || 0);
+      if (Math.abs(targetMinutes - planMinutes) < 60) {
+        return {
+          hasConflict: true,
+          conflictingTitle: p.title,
+          conflictingTime: p.time,
+          conflictingType: p.type || "Plan",
+        };
+      }
+    }
+  }
+
+  // Check existing catch-ups & meetings
+  for (const c of existingCatchups) {
+    if (c.date === date && c.time && c.status !== "dismissed") {
+      const [ch, cm] = c.time.split(":").map(Number);
+      const catchupMinutes = (ch || 0) * 60 + (cm || 0);
+      if (Math.abs(targetMinutes - catchupMinutes) < 60) {
+        return {
+          hasConflict: true,
+          conflictingTitle: `Meetup with ${c.requesterName}`,
+          conflictingTime: c.time,
+          conflictingType: c.type,
+        };
+      }
+    }
+  }
+
+  return { hasConflict: false };
+}
+

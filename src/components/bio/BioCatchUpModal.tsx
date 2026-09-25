@@ -1,14 +1,32 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "wouter";
-import { Bell, Calendar, Clock, Coffee, MapPin, MessageSquare, Sparkles, Users, X, Zap } from "lucide-react";
+import {
+  AlertTriangle,
+  Bell,
+  Calendar,
+  Clock,
+  Coffee,
+  MapPin,
+  MessageSquare,
+  Sparkles,
+  Users,
+  X,
+  Zap,
+} from "lucide-react";
 import { Photo } from "@/components/ui/Photo";
 import { Button } from "@/components/ui/Button";
 import { usePlans } from "@/contexts/PlanContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
-import { recordCatchUpInterest, toggleCatchUpReminder, hasCatchUpReminder } from "@/lib/catchup";
+import {
+  recordCatchUpInterest,
+  toggleCatchUpReminder,
+  hasCatchUpReminder,
+  checkTimeConflict,
+  listCatchUps,
+} from "@/lib/catchup";
 import { toZonedDateStr } from "@/lib/local-time";
 import { triggerHaptic } from "@/lib/native";
 import type { PlanType } from "@shared/plan";
@@ -43,7 +61,7 @@ export function BioCatchUpModal({
   initialType = "catchup",
 }: BioCatchUpModalProps) {
   const [, nav] = useLocation();
-  const { createPlan } = usePlans();
+  const { createPlan, myPlans } = usePlans();
   const { user, requireUser } = useAuth();
   const { mine } = useBio();
   const [selectedType, setSelectedType] = useState<PlanType>(initialType);
@@ -110,6 +128,9 @@ export function BioCatchUpModal({
 
   const currentOption = typeOptions.find((o) => o.type === selectedType) || typeOptions[0]!;
 
+  // Double-booking collision detection against user's plans and existing meetups
+  const conflict = checkTimeConflict(date, time, myPlans, listCatchUps());
+
   if (!open) return null;
 
   const handleToggleReminder = () => {
@@ -162,6 +183,7 @@ export function BioCatchUpModal({
         planId: created.id,
       });
 
+      toast.success(`Proposed ${currentOption.label} with ${name}`);
       onClose();
       nav(`/plan/${created.id}?share=true`);
     } catch (err) {
@@ -213,7 +235,7 @@ export function BioCatchUpModal({
             <div>
               <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gold">
                 <Sparkles size={10} />
-                Meet &amp; hangout
+                Meet &amp; Hangout
               </p>
               <h2 id="catchup-modal-title" className="font-display text-lg font-semibold text-ink">
                 Catch up or meet with {name}
@@ -224,8 +246,43 @@ export function BioCatchUpModal({
         </div>
 
         <div className="max-h-[65vh] space-y-5 overflow-y-auto p-6">
+          {/* Double-booking Collision Warning */}
+          {conflict.hasConflict && (
+            <div className="rounded-2xl bg-amber-500/10 p-3.5 ring-1 ring-amber-500/30 text-xs animate-in fade-in">
+              <div className="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-400">
+                <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600" />
+                <span>Double-Booking Warning</span>
+              </div>
+              <p className="mt-1 text-amber-900/90 dark:text-amber-200/90 leading-relaxed">
+                You already have <strong className="font-semibold">&ldquo;{conflict.conflictingTitle}&rdquo;</strong> scheduled at{" "}
+                <strong className="font-semibold">{conflict.conflictingTime}</strong> on this date.
+              </p>
+              <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                <span className="text-[11px] font-medium text-amber-800/80">Available slots:</span>
+                {["10:00", "11:30", "15:00", "16:30", "18:00"].map((altTime) => (
+                  <button
+                    key={altTime}
+                    type="button"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      setTime(altTime);
+                    }}
+                    className={cn(
+                      "rounded-lg px-2 py-0.5 text-[10px] font-bold transition cursor-pointer",
+                      time === altTime
+                        ? "bg-amber-600 text-white"
+                        : "bg-amber-500/20 text-amber-900 dark:text-amber-200 hover:bg-amber-500/30",
+                    )}
+                  >
+                    {altTime}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div>
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-mute">How</p>
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-mute">Meeting Format</p>
             <div className="grid grid-cols-3 gap-2">
               {typeOptions.map((opt) => {
                 const Icon = opt.icon;
@@ -301,7 +358,7 @@ export function BioCatchUpModal({
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-mute">Where</label>
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-mute">Where / Venue</label>
             <div className="relative">
               <MapPin size={14} className="absolute left-3.5 top-3.5 text-mute" />
               <input
@@ -315,14 +372,14 @@ export function BioCatchUpModal({
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-mute">Note</label>
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-mute">Note / Agenda</label>
             <div className="relative">
               <MessageSquare size={14} className="absolute left-3.5 top-3 text-mute" />
               <textarea
                 rows={2}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Optional notes or meetup idea"
+                placeholder="Optional notes, topic, or meetup idea"
                 className="w-full resize-none rounded-2xl border border-line bg-card py-2.5 pl-9 pr-3 text-xs outline-none focus:border-brand"
               />
             </div>
@@ -332,7 +389,7 @@ export function BioCatchUpModal({
         <div className="space-y-3 border-t border-line bg-card/60 p-5">
           <Button className="h-12 w-full gap-2 rounded-full font-bold shadow-md" onClick={handleLaunch} disabled={isSubmitting}>
             <Zap size={16} />
-            Create plan &amp; Propose
+            Create Plan &amp; Propose
           </Button>
           <div className="flex items-center justify-between gap-2">
             <button
@@ -352,7 +409,7 @@ export function BioCatchUpModal({
               event={eventPayload}
               size="sm"
               variant="secondary"
-              label="Sync Calendar"
+              label="Sync to Phone Calendar"
               buttonClassName="rounded-full text-xs font-semibold"
             />
           </div>
@@ -363,4 +420,3 @@ export function BioCatchUpModal({
 
   return typeof document !== "undefined" ? createPortal(content, document.body) : null;
 }
-
