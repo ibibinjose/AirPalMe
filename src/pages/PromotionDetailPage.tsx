@@ -4,6 +4,8 @@ import { collection, doc, getDoc, getDocs, limit, query, where } from "firebase/
 import { ArrowLeft, BadgeCheck, CalendarDays, CheckCircle2, Gift, MapPin, Share2, Trophy, User } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
+import { AirPalMascot } from "@/components/brand/AirPalMascot";
+import { ConfettiBurst } from "@/components/brand/ConfettiBurst";
 import { PromotionTerms } from "@/components/promotions/PromotionTerms";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
@@ -32,6 +34,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
   const [redeemCode, setRedeemCode] = useState<string | null>(null);
   const [reference, setReference] = useState<string | null>(null);
   const [founderNumber, setFounderNumber] = useState<number | null>(null);
+  const [celebrate, setCelebrate] = useState(0);
 
   const refParam = new URLSearchParams(search).get("ref") || "";
 
@@ -101,6 +104,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
       const res = await enterPromotionRemote({ promotionId: id, code: code || undefined, ref: refParam || undefined });
       setReference(res.reference);
       if (typeof res.founderNumber === "number") setFounderNumber(res.founderNumber);
+      if (!res.duplicate) setCelebrate((n) => n + 1);
       toast.success(
         typeof res.founderNumber === "number" && !res.duplicate
           ? `You're founder #${res.founderNumber.toLocaleString("en-AU")}. Good luck!`
@@ -261,7 +265,9 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
       <div className="mt-4">
         {reference ? (
           <div className="rounded-2xl border-2 border-emerald-600 bg-emerald-50 p-4 text-center">
-            <CheckCircle2 size={28} className="mx-auto text-emerald-600" />
+            <ConfettiBurst fireKey={celebrate} />
+            <AirPalMascot className="mx-auto h-28 w-auto" />
+            <CheckCircle2 size={28} className="mx-auto mt-2 text-emerald-600" />
             <p className="font-display mt-1 text-lg font-bold">Entry confirmed</p>
             {founderNumber !== null && (
               <p className="font-display mt-1 text-3xl font-black text-ink">
