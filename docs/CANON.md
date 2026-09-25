@@ -106,13 +106,13 @@ Reuse these. Do not add a parallel page for the same job.
 | Plan hub | `/plan` |
 | Create / view / edit plan | `/plan/new`, `/plan/:id`, `/plan/:id/edit`, `/invite/:code` |
 | Scan QR | `/scan` |
-| Stay concierge | `/concierge`, `/stay`, `/g/:id` |
+| Stay concierge / compendium | `/concierge`, `/stay`, `/stay/:id`, `/g/:id` |
 | Demo Hotel stay QR showcase | `/DemoHotel` |
 | Marker / campus | `/q/:id`, `/c/:id` |
 | Calendar / events | `/calendar`, `/e/:id`, `/event` (single organizer door; `/event/new` redirects there; ticketed + free) |
 | Festival program | `/f/:slug` (sessions are `events` with `festivalSlug`; attend/calendar reuse the events engine) |
 | Places / experiences | `/p/:id`, `/experiences` |
-| Public bio | `/@handle` |
+| Public bio & Stay showcase | `/@handle` (links stack, catalog, deals, hotel facilities deck & chat trigger) |
 | Join | `/join` |
 | Get the app | `/getAirPalApp` |
 | Legal | `/privacy` `/terms` `/cookies` `/contact` `/about` |
@@ -125,7 +125,8 @@ Reuse these. Do not add a parallel page for the same job.
 | Account / Me | `/me` |
 | Claim / edit bio | `/bio/setup`, `/bio/edit` |
 | Circle | `/circle` |
-| Inbox / settings | `/me/inbox`, `/settings` |
+| Inbox / Universal Chat | `/me/inbox`, Universal AirPal Chat modal (guests, mates, hosts, AirPal AI) |
+| Settings & Passkeys | `/settings` (profile, privacy, WebAuthn biometric passkeys) |
 | Zoo / memories / people | `/me/zoo`, `/me/memories`, `/me/people` |
 | Start / auth | `/start` |
 | Partner inquiry | `/partner` (segmented B2B form → `partner_leads`; admin triage under Studio; distinct from `/partners` directory) |
@@ -146,8 +147,8 @@ Reuse these. Do not add a parallel page for the same job.
 
 | Case | Path |
 | --- | --- |
-| Host workspace | `/host` |
-| Stay guest (QR) | `/g/:propertyId` — session on device |
+| Host workspace & Facilities | `/host` (today, facilities CRUD, tickets dispatch, place info, Wi-Fi, QR print kit) |
+| Stay guest (QR) | `/g/:propertyId`, `/stay/:propertyId` — session on device |
 
 ### Mate (off chrome)
 

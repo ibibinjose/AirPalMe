@@ -14,6 +14,7 @@ import {
   Info,
   Lock,
   Mail,
+  MessageSquare,
   Pencil,
   Printer,
   QrCode,
@@ -57,6 +58,8 @@ import { CityMap, type MapPin } from "@/components/map/CityMap";
 import { knownCityCenter } from "@/lib/cities";
 import { evaluatePlanHealth } from "@/lib/brain";
 import { triggerHaptic } from "@/lib/native";
+import { AirPalChatView } from "@/components/messaging/AirPalChatView";
+import { createConversationRecord } from "@/lib/chat-store";
 
 export function PlanDetailPage() {
   const [, paramsPlan] = useRoute("/plan/:id");
@@ -150,12 +153,25 @@ export function PlanDetailPage() {
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
-  const [detailTab, setDetailTab] = useState<"overview" | "plan" | "map" | "people">("overview");
+  const [detailTab, setDetailTab] = useState<"overview" | "plan" | "map" | "people" | "chat">("overview");
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null);
   const autoRsvpShown = useRef(false);
   const arrivedViaInvite = Boolean(paramsInvite?.code);
 
   const bookedId = searchParams.get("booked") || "";
+
+  const planConv = useMemo(() => {
+    if (!plan) return null;
+    return createConversationRecord({
+      type: "plan",
+      targetId: plan.id,
+      title: plan.title,
+      subtitle: `${plan.destination || plan.city || "Sydney"} · ${plan.date || "Upcoming"}`,
+      photo: plan.heroImage,
+      userUid: user?.uid || "guest",
+      userName: user?.displayName || "Guest",
+    });
+  }, [plan, user]);
 
   async function handlePrintGuide() {
     if (!plan) return;
@@ -441,6 +457,7 @@ export function PlanDetailPage() {
             { id: "plan", label: `Plan (${plan.stops.length})` },
             { id: "map", label: `Map (${stopPins.length})` },
             { id: "people", label: `People (${goingAttendees.length})` },
+            { id: "chat", label: "Chat & AI" },
           ]}
         />
       </div>
@@ -982,8 +999,31 @@ export function PlanDetailPage() {
         </div>
       </div>
 
+      {/* Live Plan Chat & Copilot Banner */}
+      <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 rounded-3xl bg-gradient-to-r from-brand/10 via-indigo-500/10 to-transparent p-4 ring-1 ring-brand/20">
+        <div className="flex items-center gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
+            <MessageSquare size={18} />
+          </span>
+          <div>
+            <p className="font-display text-sm font-bold text-ink">Plan Chat & AirPal AI</p>
+            <p className="text-xs text-mute">Coordinate with attendees in real-time or ask AirPal AI for suggestions</p>
+          </div>
+        </div>
+        <Button
+          size="sm"
+          onClick={() => {
+            void triggerHaptic("light");
+            setDetailTab("chat");
+          }}
+          className="rounded-full px-4 text-xs font-semibold shrink-0"
+        >
+          Open Chat
+        </Button>
+      </div>
+
       {/* Discussion Wall & Activity Stream */}
-      <div className="mt-8">
+      <div className="mt-6">
         <PlanDiscussionWall
           plan={plan}
           onPostComment={(text, photoUrl) => {
@@ -993,6 +1033,12 @@ export function PlanDetailPage() {
       </div>
 
         </>
+      )}
+
+      {detailTab === "chat" && planConv && (
+        <div className="mt-6 overflow-hidden rounded-3xl bg-card ring-1 ring-line shadow-xs min-h-[520px] flex flex-col">
+          <AirPalChatView conversation={planConv} />
+        </div>
       )}
 
       {isHost && (

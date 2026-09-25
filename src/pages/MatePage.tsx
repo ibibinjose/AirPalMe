@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { collection, doc, getDoc, getDocs, limit, orderBy, query, runTransaction, updateDoc, where } from "firebase/firestore";
-import { ArrowRight, BadgeCheck, CalendarDays, ShieldCheck, Sparkles, Star, Users } from "lucide-react";
+import { ArrowRight, BadgeCheck, CalendarDays, MessageSquare, ShieldCheck, Sparkles, Star, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Photo } from "@/components/ui/Photo";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { ChatBox } from "@/components/messaging/ChatBox";
+import { AirPalChatModal } from "@/components/messaging/AirPalChatModal";
+import { createConversationRecord } from "@/lib/chat-store";
+import type { UniversalConversation } from "@shared/messaging";
 import { BookingsSection, createBookingForRequest } from "@/components/booking/BookingsSection";
 import { createBookingCheckoutSessionRemote } from "@/lib/functions";
 import { TicketPass } from "@/components/plan/TicketPass";
@@ -51,6 +55,24 @@ export function MatePage() {
   const [chatFor, setChatFor] = useState<string | null>(null);
   const [booked, setBooked] = useState<Record<string, boolean>>({});
   const [bookingBusy, setBookingBusy] = useState(false);
+  const [activeChatConv, setActiveChatConv] = useState<UniversalConversation | null>(null);
+  const [chatModalOpen, setChatModalOpen] = useState(false);
+
+  function openMateChat(m: PublicMate) {
+    const conv = createConversationRecord({
+      type: "direct",
+      peerUid: m.uid,
+      peerName: m.firstName,
+      peerPhoto: m.photo,
+      title: `${m.firstName} · AirPal Mate`,
+      subtitle: m.suburb || m.city || "Sydney",
+      userUid: user?.uid || "guest",
+      userName: user?.displayName || "Guest",
+      photo: m.photo,
+    });
+    setActiveChatConv(conv);
+    setChatModalOpen(true);
+  }
 
   async function book(r: MateRequest) {
     if (!user || !r.matchedMateUid) return;
@@ -498,25 +520,65 @@ export function MatePage() {
         <div className="mt-6 lg:mt-0 lg:col-span-5 space-y-6">
           {user && publicMates.length > 0 && (
             <section className="rounded-3xl border border-line bg-card p-5 shadow-xs">
-              <h2 className="font-display text-base font-bold">Approved Mates</h2>
-              <p className="mt-1 text-[13px] text-mute">
-                People already reviewed by AirPal — reasons, not a mystery score.
-              </p>
-              <ul className="mt-3 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-display text-base font-bold">Approved Mates</h2>
+                  <p className="mt-0.5 text-[12px] text-mute">
+                    Verified locals reviewed by AirPal — reasons, not a mystery score.
+                  </p>
+                </div>
+                <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold text-brand">
+                  {publicMates.length} Active
+                </span>
+              </div>
+              <ul className="mt-4 space-y-3">
                 {publicMates.slice(0, 8).map((m) => (
-                  <li key={m.uid} className="rounded-2xl bg-paper p-3.5 ring-1 ring-line">
-                    <p className="text-sm font-semibold">{m.firstName}</p>
-                    <p className="mt-0.5 text-[12px] text-mute">{m.introduction || "Approved local Mate."}</p>
-                    <span className="mt-1.5 flex flex-wrap gap-1">
-                      {mateDiscoverReasons(m, requests?.[0]).map((reason) => (
-                        <span
-                          key={reason}
-                          className="rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-medium text-brand"
-                        >
-                          {reason}
-                        </span>
-                      ))}
-                    </span>
+                  <li key={m.uid} className="rounded-2xl bg-paper p-3.5 ring-1 ring-line transition hover:shadow-xs">
+                    <div className="flex items-start gap-3">
+                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-card ring-1 ring-line">
+                        <Photo src={m.photo || "/media/harbour.jpg"} className="h-full w-full object-cover" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <div className="flex items-center gap-1 min-w-0">
+                            <p className="font-display text-sm font-bold truncate text-ink">{m.firstName}</p>
+                            <BadgeCheck size={14} className="text-brand shrink-0" />
+                          </div>
+                          <span className="text-[11px] font-semibold text-mute shrink-0">
+                            {m.suburb || m.city || "Sydney"}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-[12px] text-mute line-clamp-2 leading-relaxed">
+                          {m.introduction || "Approved local AirPal Mate for outings and experiences."}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {mateDiscoverReasons(m, requests?.[0]).map((reason) => (
+                            <span
+                              key={reason}
+                              className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-medium text-brand"
+                            >
+                              {reason}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="mt-3 flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => openMateChat(m)}
+                            className="inline-flex items-center gap-1 rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white hover:bg-brand-ink transition active:scale-95 cursor-pointer"
+                          >
+                            <MessageSquare size={13} />
+                            Chat
+                          </button>
+                          <Link
+                            href={`/mate/request?preferredMate=${m.uid}&name=${encodeURIComponent(m.firstName)}`}
+                            className="inline-flex items-center gap-1 rounded-full bg-card px-3 py-1 text-xs font-semibold text-ink ring-1 ring-line hover:bg-line/40 transition active:scale-95 cursor-pointer"
+                          >
+                            Pick for Request
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -603,6 +665,12 @@ export function MatePage() {
           </section>
         </div>
       </div>
+
+      <AirPalChatModal
+        open={chatModalOpen}
+        onClose={() => setChatModalOpen(false)}
+        conversation={activeChatConv}
+      />
     </div>
   );
 }

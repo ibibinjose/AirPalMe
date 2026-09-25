@@ -145,6 +145,9 @@ export function MePage() {
                     Public bio
                   </Button>
                 )}
+                <Button size="sm" variant="ghost" className="rounded-full border border-line" onClick={() => nav("/me/tickets")}>
+                  Tickets
+                </Button>
                 <Button size="sm" variant="ghost" className="rounded-full border border-line" onClick={() => nav("/settings")}>
                   Settings
                 </Button>

@@ -17,6 +17,9 @@ import {
   Ticket,
   Users,
   Footprints,
+  Hotel,
+  Wifi,
+  Clock,
 } from "lucide-react";
 import { usePlans } from "@/contexts/PlanContext";
 import { useEvents } from "@/contexts/EventsContext";
@@ -42,6 +45,7 @@ import { CityMap, type MapPin as Pin } from "@/components/map/CityMap";
 import { RatingBadge } from "@/components/design-system/companions";
 import { triggerHaptic } from "@/lib/native";
 import { Button } from "@/components/ui/Button";
+import { harbourStaySeeds } from "@/lib/seed-stay";
 import { cn } from "@/lib/cn";
 
 type ExploreFilter = "all" | "nearby" | "events" | "places" | "food" | "experiences" | "communities" | "travel" | "people";
@@ -488,38 +492,138 @@ export function ExplorePage() {
             </div>
           )}
 
-          {/* Travel / Stays Split */}
+          {/* Travel & Stays Showcase */}
           {showTravel && (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs flex flex-col justify-between">
-                <div>
-                  <h3 className="font-display text-xl font-bold text-ink">Trip Itineraries & Plans</h3>
-                  <p className="mt-1 text-xs text-mute">
-                    Craft multi-stop itineraries, vote on stops, and share invites with friends.
-                  </p>
+            <div className="space-y-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-display text-xl font-bold text-ink">Trip Itineraries & Plans</h3>
+                    <p className="mt-1 text-xs text-mute">
+                      Craft multi-stop itineraries, vote on stops, and share live invites with friends.
+                    </p>
+                  </div>
+                  <div className="mt-4">
+                    <Button onClick={() => nav("/plan")} className="h-10 rounded-full px-5 text-xs font-bold">
+                      <span>Open Plans</span>
+                      <ArrowRight size={13} />
+                    </Button>
+                  </div>
                 </div>
-                <div className="mt-4">
-                  <Button onClick={() => nav("/plan")} className="h-10 rounded-full px-5 text-xs font-bold">
-                    <span>Open Plans</span>
-                    <ArrowRight size={13} />
-                  </Button>
+
+                <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-display text-xl font-bold text-ink">Digital Compendium & Concierge</h3>
+                    <p className="mt-1 text-xs text-mute">
+                      One scan replaces binders and PDFs. 1-tap door PIN, Wi-Fi, in-room dining, and 24/7 AI receptionist.
+                    </p>
+                  </div>
+                  <div className="mt-4 flex items-center gap-2">
+                    <Button onClick={() => nav("/concierge")} className="h-10 rounded-full px-5 text-xs font-bold">
+                      <span>Open Stay Concierge</span>
+                      <ArrowRight size={13} />
+                    </Button>
+                  </div>
                 </div>
               </div>
 
-              <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs flex flex-col justify-between">
-                <div>
-                  <h3 className="font-display text-xl font-bold text-ink">Verified Stays & Hotels</h3>
-                  <p className="mt-1 text-xs text-mute">
-                    Boutique accommodation, serviced apartments, and partner stays in {effectiveCity}.
-                  </p>
+              {/* Verified Partner Stays Grid */}
+              <section aria-label="Verified Partner Stays">
+                <div className="flex items-center justify-between pb-3">
+                  <div>
+                    <h2 className="font-display text-xl font-bold text-ink flex items-center gap-2">
+                      <Hotel size={18} className="text-brand" />
+                      <span>Verified Stays in {effectiveCity}</span>
+                    </h2>
+                    <p className="text-xs text-mute mt-0.5">
+                      Hotels and boutique retreats powered by AirPal Digital Compendium.
+                    </p>
+                  </div>
                 </div>
-                <div className="mt-4">
-                  <Button onClick={() => nav("/concierge")} className="h-10 rounded-full px-5 text-xs font-bold">
-                    <span>Explore Stays</span>
-                    <ArrowRight size={13} />
-                  </Button>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                  {harbourStaySeeds().map((seed) => {
+                    const p = seed.property;
+                    return (
+                      <div
+                        key={p.id}
+                        className="group relative flex flex-col overflow-hidden rounded-3xl bg-card ring-1 ring-line shadow-xs transition hover:shadow-md"
+                      >
+                        <div className="relative aspect-video overflow-hidden bg-paper">
+                          <Photo
+                            src={p.heroImage || p.galleryImages?.[0] || "/media/harbour.jpg"}
+                            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                            alt={p.name}
+                          />
+                          <div className="hero-scrim absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                          <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-brand/90 px-3 py-1 text-xs font-bold text-white shadow-xs backdrop-blur-md">
+                            <Hotel size={13} /> Verified Stay
+                          </span>
+                          <div className="absolute bottom-3 left-3 right-3">
+                            <p className="font-display text-lg font-bold text-white leading-tight">
+                              {p.name}
+                            </p>
+                            <p className="text-xs font-medium text-white/80 line-clamp-1 mt-0.5">
+                              {p.tagline || p.address}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="p-4 space-y-3">
+                          <div className="flex items-center justify-between text-xs text-mute">
+                            <span className="flex items-center gap-1">
+                              <MapPin size={12} className="text-brand" />
+                              {p.address || p.city}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock size={12} />
+                              Check-in: {p.checkIn || "2:00 PM"}
+                            </span>
+                          </div>
+
+                          {p.wifi?.speed && (
+                            <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 rounded-xl px-2.5 py-1">
+                              <Wifi size={13} />
+                              <span>{p.wifi.speed}</span>
+                            </div>
+                          )}
+
+                          {p.facilities && p.facilities.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {p.facilities.slice(0, 4).map((f) => (
+                                <span
+                                  key={f.id}
+                                  className="rounded-full bg-paper px-2 py-0.5 text-[10px] font-medium text-mute ring-1 ring-line"
+                                >
+                                  {f.name}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
+                          <div className="flex items-center gap-2 pt-1 border-t border-line/60">
+                            <Button
+                              size="sm"
+                              onClick={() => nav(`/stay/${p.id}`)}
+                              className="h-9 flex-1 rounded-full text-xs font-bold"
+                            >
+                              Digital Compendium
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => nav(`/concierge?p=${p.id}`)}
+                              className="h-9 flex-1 rounded-full text-xs font-semibold ring-1 ring-line"
+                            >
+                              AI Concierge
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
+              </section>
             </div>
           )}
 

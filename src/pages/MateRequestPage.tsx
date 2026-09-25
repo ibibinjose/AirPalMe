@@ -35,9 +35,15 @@ export function MateRequestPage() {
   const params = new URLSearchParams(useSearch());
   const [, nav] = useLocation();
   const { user, authReady, requireUser } = useAuth();
+  const preferredMateUid = params.get("preferredMate") || "";
+  const preferredMateName = params.get("name") || "";
+
   const initial = emptyMateRequest();
   const hinted = params.get("useCase");
   if (hinted && isUseCase(hinted)) initial.useCase = hinted;
+  if (preferredMateName && !initial.mateKind) {
+    initial.mateKind = `Preferred Mate: ${preferredMateName}`;
+  }
 
   const [form, setForm] = useState(initial);
   const [sending, setSending] = useState(false);
@@ -71,6 +77,8 @@ export function MateRequestPage() {
         partySize: form.partySize,
         budget: form.budget,
         mateKind: form.mateKind.trim(),
+        preferredMateUid: preferredMateUid || undefined,
+        preferredMateName: preferredMateName || undefined,
         status: "open",
         adminNote: "",
         createdAt: now,
@@ -118,6 +126,27 @@ export function MateRequestPage() {
       <p className="mt-1 text-sm text-mute">
         One request, one match. If you set a budget, you pay by card on AirPal after you’re matched.
       </p>
+
+      {preferredMateName && (
+        <div className="mt-4 flex items-center justify-between rounded-2xl bg-brand/10 p-3.5 ring-1 ring-brand/20">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-brand animate-pulse" />
+            <span className="text-xs font-semibold text-brand">
+              Requesting with preferred Mate: <strong>{preferredMateName}</strong>
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setForm((f) => ({ ...f, mateKind: "" }));
+              nav("/mate/request");
+            }}
+            className="text-[11px] font-semibold text-mute hover:text-ink cursor-pointer"
+          >
+            Clear
+          </button>
+        </div>
+      )}
 
       <div className="mt-5 rounded-2xl border border-line bg-card p-5">
         <span className="text-[13px] font-semibold">I want someone to…</span>

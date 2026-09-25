@@ -32,16 +32,17 @@ AirPal closes that gap.
 2. One identity. People, places, experiences, things, and trips are supply and demand on that identity. They are not five companies.
 3. One loop, proven, before the next layer.
 4. Trust is infrastructure, because AirPal connects people who may not know each other.
-5. Intelligence is quiet. It proposes a real plan. It does not sit on the product as a chatbot.
-6. Money is taken when value is created. Ads are not the business.
+5. Intelligence is quiet and actionable. It proposes real plans, assists guests 24/7, and connects people. It does not sit on the product as a gimmicky chatbot.
+6. Communication is seamless. Built-in real-time AirPal Chat lets users, businesses, staying guests, and AirPal AI communicate directly.
+7. Money is taken when value is created. Ads are not the business.
 
 ---
 
 ## 3. Customer
 
-**People new to a city who want people to do things with.**
+**People new to a city who want people to do things with, and travellers/guests seeking seamless real-world experiences.**
 
-That includes international students, migrants, backpackers, newcomers, young professionals, solo travellers, people new to Sydney, and locals widening their circle.
+That includes international students, migrants, backpackers, newcomers, young professionals, solo travellers, hotel guests, people new to Sydney, and locals widening their circle.
 
 This is an acquisition beachhead. The brand is not "the migrant student app" and it is not "for everyone."
 
@@ -54,6 +55,8 @@ First city: Sydney. The same loop can open another city only after Sydney produc
 A person has time and an urge, and no simple way to turn that into a plan with a place and other people.
 
 Directories list things. Social networks collect attention. Marketplaces list inventory. None of them own the step from "I feel like doing something" to "we went."
+
+Similarly, hotel and accommodation guests struggle with outdated binders and PDFs, lack 24/7 front desk access at 2am, and cannot easily discover vetted local activities.
 
 ---
 
@@ -70,6 +73,12 @@ Then:
 > **Who do you want to do it with?**
 
 AirPal helps create the plan and get people there.
+
+For staying guests:
+
+> **Everything for your stay in one scan.**
+
+Digital compendium, 24/7 AirPal AI receptionist, in-room dining, 1-tap Wi-Fi, digital key code, housekeeping requests, and local recommendations.
 
 ---
 
@@ -98,18 +107,18 @@ A completed experience is someone who wanted something, made a plan, showed up, 
 
 Supporting metrics, in service of that number:
 
-- Active users
-- Plans created
-- People connected
-- Matches
-- Bookings
+- Active users & qualified guest actions
+- Plans created & RSVPs
+- People connected & conversations started
+- Matches & Mate requests
+- Bookings (stays, dining, experiences)
 - Attendance and completion
 - Repeat experiences
 - GMV and revenue
 - Retention
 - Cancellation rate
-- Safety incidents
-- Reviews
+- Safety incidents & resolutions
+- Reviews & ratings
 - Referral rate
 
 If completed experiences per active user are flat, more screens will not fix the company.
@@ -122,16 +131,6 @@ More users → more plans → more demand → more Mates, hosts, and businesses 
 
 Around the wheel: data improves matching, matching improves experiences, experiences improve retention.
 
-The wheel is weak if any of these is missing:
-
-| Condition | Result |
-| --- | --- |
-| Great discovery, no people | Weak |
-| Lots of people, nothing to do | Weak |
-| Great experiences, no trust | Dangerous |
-| A marketplace nobody completes | Broken economics |
-| A polished app nobody repeats | A dead product |
-
 The business equation:
 
 > **Intent × Discovery × Connection × Transaction × Trust = AirPal**
@@ -143,62 +142,69 @@ The business equation:
 Six layers. Build them in order. Do not build them at once.
 
 ### Layer 1 — AirPal Core
-
-Identity, trust, profiles, Circles, messaging, notifications, reputation.
+Identity, biometric authentication (Face ID / WebAuthn passkeys), trust, profiles (`/@handle`), Circles, real-time Universal Chat, notifications, reputation.
 
 ### Layer 2 — AirPal Plan
-
-Intent, plans, invitations, matching, calendar, maps.
+Intent, plans, invitations, matching, calendar, maps, collaborative trip planning.
 
 ### Layer 3 — AirPal Marketplace
-
-People, businesses, experiences, stays, offers, bookings, payments.
+People (AirPal Mate), businesses, experiences, stays (AirPal Stay & Digital Compendium), offers, bookings, payments.
 
 ### Layer 4 — AirPal Discovery
-
 What's on, events, places, Daily, deals, local discovery.
 
 ### Layer 5 — AirPal Travel
-
 Trips, itineraries, stays, experiences, people, destinations.
 
 ### Layer 6 — AirPal Commerce
-
 Fashion, products, rentals, memberships, partnerships.
 
-Inside the product, the chain is:
+---
 
-**Person → Intent → Discovery → Match → Plan → Transaction → Experience → Reputation → Repeat**
+## 10. Universal AirPal Chat & Quiet Intelligence
 
-### AirPal Mate
+AirPal includes a native, real-time Universal Chat system (`shared/messaging.ts`, `src/lib/chat-store.ts`) powering:
 
-The first meaning of Mate is: **find an AirPal to do something with.**
-
-- Social Mate — someone to spend time with
-- Activity Mate — hike, gym, sport, photography
-- Travel Mate — someone to explore or travel with
-- Experience Mate — someone to attend something with
-- Paid AirPal Companion — a later professional service
-
-Do not lead the product with paid companionship. That pulls trust, safety, regulation, insurance, and public perception forward before the free plan loop is proven. The paid application and admin review that already exist stay in the product. They are not the front door.
+1. **User $\leftrightarrow$ User (Direct / Mates)**: Coordinate catch-ups, hangouts, and trips.
+2. **User $\leftrightarrow$ Business / Venue**: Direct inquiries, reservations, and special requests.
+3. **Guest $\leftrightarrow$ Stay Front Desk**: In-room dining orders, fresh towels, late checkout, and maintenance escalation.
+4. **User/Guest $\leftrightarrow$ 24/7 AirPal AI**: Quiet, context-aware copilot providing instant answers (Wi-Fi, dining, hotel amenities, local secrets) without hallucinations.
 
 ---
 
-## 10. Business model
+## 11. AirPal Stay & Host Operating Model
 
-AirPal is a connection, discovery, and transaction platform. Revenue starts when an experience actually happens.
+### Digital Compendium (`/stay`, `/stay/:id`, `/concierge`, `/g/:id`)
+Replaces paper binders and PDFs with a modern, mobile-first companion:
+- **Digital Key / Door PIN Code**: Instant keypad access.
+- **Welcome Drink Voucher**: Digital redemption at the hotel bar.
+- **1-Tap Wi-Fi Copy**: Instant access with tactile feedback.
+- **In-Room Dining**: Live menu cart with room delivery selection and kitchen staff ticket dispatch.
+- **1-Tap Housekeeping**: Fast amenity requests (towels, pillow, room refresh, iron).
+- **Express Check-In / Check-Out**: Fast room registration, stay folio settlement, luggage storage, and airport taxi booking.
+- **24/7 AirPal AI Receptionist**: Multi-language AI concierge with automatic physical staff escalation.
 
-1. **Transaction commission.** An experience is booked. AirPal takes a platform fee. The fee is admin-configurable. It is never a hard-coded percent.
-2. **Business subscription.** A place pays for a stronger profile, bookings, offers, analytics, campaigns, and customer tools. The partner account is the same AirPal login plus a place guests can find.
-3. **Promoted discovery.** A business pays to appear where someone is already deciding what to do.
-4. **Membership.** Later: exclusive experiences, offers, priority matching, partner benefits.
-5. **Sponsored experiences.** A brand sponsors an experience. That is not a banner ad.
-
-No ad network before the loop has liquidity.
+### Host Operations Hub (`/host`)
+- **Hotel Facilities Manager**: Full CRUD control to add/edit/delete amenities with custom hours, floor locations, and icons.
+- **Staff Ticket Queue**: Live urgent/normal escalation board with 1-tap mark complete.
+- **Live Dining Orders**: Kitchen order dispatch and room billing.
+- **Menu Manager**: Pricing, availability toggles, and instant updates.
 
 ---
 
-## 11. Trust principles
+## 12. Business & Stay Public Link-in-Bio (`/@handle`)
+
+Every business, venue, and stay receives a public presence on `AirPal.me/@handle`:
+- Category badge and verified credentials.
+- Digital Compendium and 24/7 Concierge launcher.
+- Hotel facilities & amenities showcase.
+- Direct booking link (`Book Direct`).
+- 1-tap quick action deck: `[Chat on AirPal]`, `[Website]`, `[WhatsApp]`, `[Call]`, `[Directions]`.
+- Trading hours schedule and live open status.
+
+---
+
+## 13. Trust principles
 
 Trust is part of the marketplace, not a settings page added later.
 
@@ -218,42 +224,17 @@ A machine may help review. A machine does not give the final safety decision. Ho
 
 ---
 
-## 12. AI principles
-
-Build AirPal Intelligence. Do not build an AirPal chatbot.
-
-A person says: "I have Saturday afternoon free. What can I do?"
-
-Intelligence may use location, time, interests, budget, weather, experiences, events, people, and distance, and answer with a few things they could actually do. Then: find people, create the plan, book if needed, go.
-
-AI may suggest, search, draft, and help moderate. It does not remove people, close incidents, decide payment disputes, approve verification, or state legal conclusions. A human review stays available.
-
----
-
-## 13. Growth principles
-
-- Acquire through the beachhead in §3. One city. One question. One plan.
-- A partner place exists so a plan has somewhere to go, on the same login.
-- Invite the people already in a plan. That is the referral.
-- Repeat use is another completed experience, not a streak or a feed.
-- Open a second city only after Sydney shows repeat completion.
-- Do not buy growth for a loop that does not complete.
-
----
-
 ## 14. Product priorities
 
 | Priority | Job | Includes | Closed until the row above is real |
 | --- | --- | --- | --- |
 | P0 | Prove the loop | Plan → connect → experience → complete | — |
-| P1 | Make it repeatable | Discovery, matching, messaging, calendar, notifications, reviews, doing it again | — |
+| P1 | Make it repeatable | Discovery, matching, universal messaging, calendar, notifications, reviews, doing it again | — |
 | P2 | Monetize | Bookings, commission, paid experiences, business partnerships, premium | Ads |
 | P3 | Expand | Stay as a marketplace, Travel, Fashion, offers, Daily as a media layer | — |
 | P4 | Infrastructure | Studio, business SaaS, advertising, advanced AI, large marketplace tooling | A second native app |
 
 Never start P3 or P4 while P0 is unproven.
-
-What "proven" means: real people in Sydney, new to the city or widening their circle, create a plan, meet, and do it again. The count is completed experiences per active user.
 
 ---
 
@@ -321,29 +302,9 @@ Every feature has to answer:
 
 If the answer is no to most of these, do not build it.
 
-A feature that only adds a tab, a vertical, or a second app fails this test while P0 is open.
-
 ---
 
-## 19. 12-month strategy
-
-The year is one loop in Sydney. Dates below are a sequence, not a promise of headcount.
-
-**Months 1–3. Make the question the product.**
-Home and Plan answer "what do you want to do?", then when, where, and who. A plan can be shared. A partner place can be found on the same login so the plan has a where. Count plans created and experiences completed. Do not open a new vertical.
-
-**Months 4–6. Make people show up again.**
-Reminders, messages tied to the plan, and a review after completion. The number that matters is completed experiences per active user, and whether the same people do it twice.
-
-**Months 7–9. Charge when value happened.**
-Commission on a booking that belongs to a real experience. Payouts for a provider who delivered. Business subscriptions stay behind a live place, not a brochure. No advertising.
-
-**Months 10–12. Earn a second city, or stay in Sydney.**
-A second city uses the same loop. Stay-as-marketplace, Fashion, Travel-as-a-product, Daily-as-media, Studio, and paid Companion stay behind the feature test. Paid Companion opens only after free plans complete safely and a human still approves supply.
-
----
-
-## 20. Long-term vision
+## 19. Long-term vision
 
 AirPal is how a person anywhere turns a few free hours into a real-world plan: what to do, who with, where, and then the memory of having done it.
 
@@ -351,8 +312,3 @@ People, places, experiences, things, and trips stay on one identity. The company
 
 Not six apps. One experience network.
 
----
-
-## How this document changes
-
-The human asks, in plain language. Update this file in the same change as any product rule that contradicts it. Do not let a feature ship around the test in §18.

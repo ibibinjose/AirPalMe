@@ -20,21 +20,25 @@ AirPal.me (scan-first guest concierge + precinct guide, no account for guests)
 │   │   fallback = map embed, never dev card on guest surfaces
 │   └── Analytics: WQGA dictionary, anonymousSessionId, backendState live/offline_queued/local_demo/failed
 │
-├── PRIMARY CHROME: Scan / Stay / Explore
-│   ├── /scan — camera (jsQR) + manual code + 7 demo tiles (room/lobby/street/campus/market/bio/zoo)
+├── PRIMARY CHROME: Scan / Stay / Explore / Inbox
+│   ├── /scan — camera (jsQR) + manual code + demo tiles (room/lobby/street/campus/market/bio/zoo)
 │   │   sets Stay session (stay/marker/campus) + noteQrContext, then navs to /g /q /c /e /@
-│   ├── /concierge + /g/:id (StayPage → ConciergePage) — room stay home
-│   │   Wi-Fi reveal, Ask AirPal (local askLocal + askAirPal callable), staff ticket,
-│   │   dining, safety, arrival guide, checkout checklist, nearby (nearbyForMarker), rating
+│   ├── /concierge + /stay + /stay/:id + /g/:id (StayPage → ConciergePage → StayCompendium) — room stay home
+│   │   Wi-Fi reveal, 1-tap door PIN, welcome voucher, Ask AirPal (local askLocal + 24/7 AirPal AI concierge),
+│   │   staff ticket dispatch, in-room dining orders, 1-tap housekeeping, arrival guide, express checkout,
+│   │   hotel facilities directory (pool, spa, gym, rooftop), nearby (nearbyForMarker), rating
+│   ├── /me/inbox + Universal AirPal Chat Modal — real-time messaging engine
+│   │   Universal chat across guests, mates, hosts, and AirPal AI copilot. Context-aware chips,
+│   │   auto-escalation, local-first cache with Firestore sync (`shared/messaging.ts`, `chat-store.ts`)
 │   └── / (DiscoverPage) — Explore: tonight/live (zoned clock), nearby/featured (discoverPlaces),
 │       filter chips + search, list/map toggle (CityMap pins: places + public plans), walks teaser
 │
 ├── QR CONTEXTS (one shell, five context types)
-│   ├── Stay /g/:id — property + room + roomToken (?r &room &in &open)
+│   ├── Stay /g/:id, /stay/:id — property + room + roomToken (?r &room &in &open)
 │   ├── Marker /q/:a, /q/:city/:handle — street/lobby markers, nearby + ask
 │   ├── Campus /c/:id — classes/places/events tabs, Wi-Fi reveal, help
 │   ├── Event /e/:id + stall /e/:eventId/s/:stallId — market/event + stall save
-│   └── Bio /@:handle — public business/creator profile (see Identity below)
+│   └── Bio /@:handle — public business/creator profile & Stay showcase with facilities deck + chat
 │
 ├── PLAN & TIME
 │   ├── /mate, /mate/request — the wedge: find someone to go with (request loop)
@@ -47,16 +51,16 @@ AirPal.me (scan-first guest concierge + precinct guide, no account for guests)
 │   └── /guide + /tour/:id — precinct walks (toursForPrecinct), sights sorted by walk distance
 │
 ├── PEOPLE / IDENTITY / SOCIAL
-│   ├── /@:handle (BioPublic) — links stack, catalog/deals, vCard, follow/like, tap tracking, claim offer
-│   ├── /bio/setup /bio/edit /bio/recover — handles, claims, photos, socials
+│   ├── /@:handle (BioPublic) — links stack, catalog/deals, hotel facilities deck, vCard, chat trigger, tap tracking
+│   ├── /bio/setup /bio/edit /bio/recover — handles, claims, photos, socials, facilities CRUD
 │   ├── /club, /club/list — AirPal Club (device-kept invites/offers; invites via mail BCC today)
 │   ├── /companion — find/become companion (roles, activities, availability, pricing; admin review)
-│   ├── /me, /me/zoo, /me/memories, /me/people — account, zoo hunt progress, memories, people/contacts
+│   ├── /me, /me/zoo, /me/memories, /me/people, /me/inbox — account, zoo hunt progress, memories, conversations
 │   └── /p/:id (PlacePage) — place detail + map_open, booking intent
 │
 ├── OPERATOR SIDE (auth-gated)
-│   ├── /start (auth entry: signin/reset/tabs) → /host (today/place/print tabs)
-│   │   property create, Wi-Fi edit, roomTokens, QR print kit, tickets inbox
+│   ├── /start (auth entry: signin/reset/tabs) → /host (today/facilities/place/print tabs)
+│   │   property create, facilities CRUD manager, Wi-Fi edit, roomTokens, QR print kit, tickets inbox
 │   ├── /business — place + offer listings, address/phone/geo validation, guest-list panel
 │   ├── /event (OrganiserEventPage) — create/edit events + stalls
 │   ├── /partners, /join — supply side funnels
