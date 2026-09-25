@@ -711,6 +711,44 @@ match /dining_orders/{orderId} {
       allow update, delete: if signedIn() && platformAdmin();
     }
 
+    // §8 messaging: universal conversations (AirPal Chat) — participants only,
+    // admins read-only for moderation. No personal phone/email exposure by default.
+    match /conversations/{conversationId} {
+      function convParty() {
+        return signedIn() && !isAnonymous()
+          && request.auth.uid in resource.data.participantUids;
+      }
+      function convPartyCreate() {
+        return signedIn() && !isAnonymous()
+          && request.auth.uid in request.resource.data.participantUids;
+      }
+      allow create: if convPartyCreate()
+        && request.resource.data.participantUids is list
+        && request.resource.data.participantUids.size() >= 1
+        && request.resource.data.participantUids.size() <= 20
+        && request.resource.data.keys().hasAny(['updatedAt']);
+      allow read: if convParty() || (signedIn() && platformAdmin());
+      allow update: if convParty();
+      allow delete: if false;
+
+      match /messages/{messageId} {
+        function msgParty() {
+          return signedIn() && !isAnonymous()
+            && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participantUids;
+        }
+        allow create: if msgParty()
+          && request.resource.data.senderUid == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() >= 1
+          && request.resource.data.text.size() <= 1000
+          && request.resource.data.keys().hasAny(['createdAt']);
+        allow get, list: if msgParty() || (signedIn() && platformAdmin());
+        allow update: if msgParty()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readBy']);
+        allow delete: if false;
+      }
+    }
+
     // §8 messaging: one chat per matched request, parties only (+ admins for moderation).
     match /request_chats/{requestId} {
       function chatParty() {
