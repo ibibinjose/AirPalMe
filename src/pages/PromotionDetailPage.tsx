@@ -31,6 +31,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
   const [code, setCode] = useState("");
   const [redeemCode, setRedeemCode] = useState<string | null>(null);
   const [reference, setReference] = useState<string | null>(null);
+  const [founderNumber, setFounderNumber] = useState<number | null>(null);
 
   const refParam = new URLSearchParams(search).get("ref") || "";
 
@@ -84,7 +85,10 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
       query(collection(db, "promotion_entries"), where("promotionId", "==", id), where("uid", "==", user.uid)),
     )
       .then((snap) => {
-        if (!snap.empty) setReference(String(snap.docs[0].data().reference || ""));
+        if (snap.empty) return;
+        const data = snap.docs[0].data() as { reference?: string; founderNumber?: number };
+        setReference(String(data.reference || ""));
+        if (typeof data.founderNumber === "number") setFounderNumber(data.founderNumber);
       })
       .catch(() => undefined);
   }, [user, id, promo]);
@@ -96,7 +100,14 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
     try {
       const res = await enterPromotionRemote({ promotionId: id, code: code || undefined, ref: refParam || undefined });
       setReference(res.reference);
-      toast.success(res.duplicate ? "You're already in — entry confirmed." : "Entry confirmed. Good luck!");
+      if (typeof res.founderNumber === "number") setFounderNumber(res.founderNumber);
+      toast.success(
+        typeof res.founderNumber === "number" && !res.duplicate
+          ? `You're founder #${res.founderNumber.toLocaleString("en-AU")}. Good luck!`
+          : res.duplicate
+            ? "You're already in — entry confirmed."
+            : "Entry confirmed. Good luck!",
+      );
     } catch (err) {
       toast.error(friendlyPromotionError(err));
     } finally {
@@ -252,6 +263,11 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
           <div className="rounded-2xl border-2 border-emerald-600 bg-emerald-50 p-4 text-center">
             <CheckCircle2 size={28} className="mx-auto text-emerald-600" />
             <p className="font-display mt-1 text-lg font-bold">Entry confirmed</p>
+            {founderNumber !== null && (
+              <p className="font-display mt-1 text-3xl font-black text-ink">
+                #{founderNumber.toLocaleString("en-AU")}
+              </p>
+            )}
             <p className="mt-0.5 text-sm text-mute">
               Reference <span className="font-mono font-bold text-ink">{reference}</span>
             </p>

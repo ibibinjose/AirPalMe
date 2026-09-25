@@ -674,7 +674,11 @@ export function StartPage() {
 
       {mode === "signup" && inviterHandle && (
         <p className="mb-4 rounded-2xl ring-1 ring-line bg-card px-4 py-3 text-center text-sm">
-          You’re invited by <span className="font-semibold text-brand">@{inviterHandle}</span>
+          You’re invited by <span className="font-semibold text-brand">@{inviterHandle}</span> — your
+          signup lands you in the{" "}
+          <Link href="/founders" className="font-semibold text-brand hover:underline">
+            Founders 100K pool
+          </Link>
         </p>
       )}
 

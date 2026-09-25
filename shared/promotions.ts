@@ -115,6 +115,11 @@ export interface Promotion {
   promoCode?: string;
   /** Points cost to redeem this member offer (mechanicType member). */
   pointsCost?: number;
+  /**
+   * Global entry cap (e.g. a founding pool of the first 100,000 entries).
+   * Enforced server-side inside a transaction. Absent = uncapped.
+   */
+  entriesCap?: number;
   /** Privacy-conscious counters, maintained server-side. */
   viewsCount?: number;
   clicksCount?: number;
@@ -136,8 +141,22 @@ export interface PromotionEntry {
   promotionId: string;
   uid: string;
   reference: string;
+  /** Referrer uid, when the entrant arrived via a mate's share link. */
+  referrerUid?: string;
+  /** Sequential founding-pool number, assigned server-side on capped campaigns. */
+  founderNumber?: number;
   status: string;
   createdAt: string;
+}
+
+export interface EnterPromotionResponse {
+  ok: boolean;
+  duplicate: boolean;
+  reference: string;
+  /** Sequential founding-pool number for this entry, on capped campaigns. */
+  founderNumber?: number;
+  /** Remaining founding-pool spots after this entry, on capped campaigns. */
+  spotsLeft?: number;
 }
 
 export interface PromotionAuditLog {
@@ -269,6 +288,25 @@ export type EnterPromotionRequest = {
   /** Referrer uid, when the entrant arrived via a mate's share link. */
   ref?: string;
 };
+
+export interface FoundingPoolState {
+  capped: boolean;
+  cap: number;
+  used: number;
+  left: number;
+  full: boolean;
+  /** 0–100, rounded, for progress display. */
+  percent: number;
+}
+
+/** Pure pool math for founding-pool campaigns (first-N entries win a place). */
+export function foundingPoolState(entriesCount: unknown, entriesCap: unknown): FoundingPoolState {
+  const cap = Math.floor(Number(entriesCap || 0));
+  if (!(cap > 0)) return { capped: false, cap: 0, used: 0, left: 0, full: false, percent: 0 };
+  const used = Math.max(0, Math.min(cap, Math.floor(Number(entriesCount || 0))));
+  const left = cap - used;
+  return { capped: true, cap, used, left, full: left <= 0, percent: Math.round((used / cap) * 100) };
+}
 
 export const WINNER_TRANSITIONS: Record<WinnerStatus, WinnerStatus[]> = {
   selected: ["pending_verification", "disqualified"],

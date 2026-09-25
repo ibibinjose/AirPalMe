@@ -46,6 +46,7 @@ const PartnersPage = lazy(() => import("@/pages/PartnersPage").then((m) => ({ de
 const CreatePage = lazy(() => import("@/pages/CreatePage").then((m) => ({ default: m.CreatePage })));
 const PartnerPage = lazy(() => import("@/pages/PartnerPage").then((m) => ({ default: m.PartnerPage })));
 const JoinPage = lazy(() => import("@/pages/JoinPage").then((m) => ({ default: m.JoinPage })));
+const FoundersPage = lazy(() => import("@/pages/FoundersPage").then((m) => ({ default: m.FoundersPage })));
 const BusinessPage = lazy(() => import("@/pages/BusinessPage").then((m) => ({ default: m.BusinessPage })));
 const BusinessOnboardPage = lazy(() =>
   import("@/pages/BusinessOnboardPage").then((m) => ({ default: m.BusinessOnboardPage })),
@@ -199,6 +200,7 @@ export function AppRoutes() {
         </Route>
         <Route path="/auth/action" component={AuthActionPage} />
         <Route path="/join" component={JoinPage} />
+        <Route path="/founders" component={FoundersPage} />
         <Route path="/fashion" component={FashionPage} />
         <Route path="/club/list" component={ClubListPage} />
         <Route path="/club" component={ClubPage} />
