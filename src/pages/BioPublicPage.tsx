@@ -310,6 +310,69 @@ export function BioPublicPage() {
     });
   }, [profile, recordTap]);
 
+  const propertyData = useMemo(() => {
+    const target = remote || local;
+    if (!target) return undefined;
+    if (target.propertyId) return getCachedProperty(target.propertyId);
+    if (target.handle === "harbour-hotel" || target.handle === "harbour-rocks-hotel") return CURRENT_PROPERTY;
+    return getCachedProperty(target.handle);
+  }, [remote, local]);
+
+  const isStay = Boolean(
+    profile &&
+      (profile.category === "stay" ||
+        Boolean(profile.propertyId) ||
+        Boolean(propertyData) ||
+        (profile.categoryTag && /stay|hotel|accommodation|hostel|resort|lodge|motel|inn/i.test(profile.categoryTag)) ||
+        (profile.facilities && profile.facilities.length > 0)),
+  );
+
+  const stayFacilities = useMemo(() => {
+    if (!profile) return [];
+    if (profile.facilities && profile.facilities.length > 0) return profile.facilities;
+    if (propertyData?.facilities && propertyData.facilities.length > 0) return propertyData.facilities;
+    if (isStay) {
+      return [
+        {
+          name: "Rooftop Plunge Pool",
+          hours: "6:00 AM – 10:00 PM",
+          floor: "Level 7",
+          details: "Heated water, panoramic harbour & city skyline views",
+          icon: "Waves",
+        },
+        {
+          name: "Fitness Centre & Sauna",
+          hours: "24 Hours (Keycard Access)",
+          floor: "Level 2",
+          details: "Technogym cardio, free weights & eucalyptus sauna",
+          icon: "Dumbbell",
+        },
+        {
+          name: "The Cellar Lounge & Bar",
+          hours: "4:00 PM – 11:30 PM",
+          floor: "Ground Floor",
+          details: "Curated local wines, artisan spirits & craft cocktails",
+          icon: "Wine",
+        },
+        {
+          name: "Luggage Storage",
+          hours: "24/7 Front Desk",
+          floor: "Lobby",
+          details: "Complimentary secure luggage holding pre-checkin & post-checkout",
+          icon: "Luggage",
+        },
+        {
+          name: "Guest Laundry & Steamer",
+          hours: "7:00 AM – 9:00 PM",
+          floor: "Level 3",
+          details: "Self-service washers & dryers, dry cleaning on request",
+          icon: "Shirt",
+        },
+      ];
+    }
+    return [];
+  }, [profile, propertyData, isStay]);
+
   if (!profile && !tried) {
     return (
       <div className="mx-auto max-w-lg px-4 py-8" aria-label="Loading profile" role="status">
@@ -467,69 +530,10 @@ export function BioPublicPage() {
     bio.availabilityStatus || (bio.openNow === true ? "available" : bio.openNow === false ? "offline" : "available");
   const statusInfo = AVAILABILITY_STATUSES[statusKey] || AVAILABILITY_STATUSES.available;
 
-  // Stay / Hotel & Facility Resolutions
-  const propertyData = useMemo(() => {
-    if (bio.propertyId) return getCachedProperty(bio.propertyId);
-    if (bio.handle === "harbour-hotel" || bio.handle === "harbour-rocks-hotel") return CURRENT_PROPERTY;
-    return getCachedProperty(bio.handle);
-  }, [bio.propertyId, bio.handle]);
-
-  const isStay =
-    bio.category === "stay" ||
-    Boolean(bio.propertyId) ||
-    Boolean(propertyData) ||
-    (bio.categoryTag && /stay|hotel|accommodation|hostel|resort|lodge|motel|inn/i.test(bio.categoryTag)) ||
-    (bio.facilities && bio.facilities.length > 0);
-
   const stayCheckIn = bio.checkIn || propertyData?.checkIn || "2:00 PM";
   const stayCheckOut = bio.checkOut || propertyData?.checkOut || "10:00 AM";
   const stayWifiSpeed = propertyData?.wifi?.speed || "250 Mbps High-Speed Fibre";
   const stayTargetId = propertyData?.id || bio.propertyId || bio.handle;
-
-  const stayFacilities = useMemo(() => {
-    if (bio.facilities && bio.facilities.length > 0) return bio.facilities;
-    if (propertyData?.facilities && propertyData.facilities.length > 0) return propertyData.facilities;
-    if (isStay) {
-      return [
-        {
-          name: "Rooftop Plunge Pool",
-          hours: "6:00 AM – 10:00 PM",
-          floor: "Level 7",
-          details: "Heated water, panoramic harbour & city skyline views",
-          icon: "Waves",
-        },
-        {
-          name: "Fitness Centre & Sauna",
-          hours: "24 Hours (Keycard Access)",
-          floor: "Level 2",
-          details: "Technogym cardio, free weights & eucalyptus sauna",
-          icon: "Dumbbell",
-        },
-        {
-          name: "The Cellar Lounge & Bar",
-          hours: "4:00 PM – 11:30 PM",
-          floor: "Ground Floor",
-          details: "Curated local wines, artisan spirits & craft cocktails",
-          icon: "Wine",
-        },
-        {
-          name: "Luggage Storage",
-          hours: "24/7 Front Desk",
-          floor: "Lobby",
-          details: "Complimentary secure luggage holding pre-checkin & post-checkout",
-          icon: "Luggage",
-        },
-        {
-          name: "Guest Laundry & Steamer",
-          hours: "7:00 AM – 9:00 PM",
-          floor: "Level 3",
-          details: "Self-service washers & dryers, dry cleaning on request",
-          icon: "Shirt",
-        },
-      ];
-    }
-    return [];
-  }, [bio.facilities, propertyData, isStay]);
 
   const handleQuickCopy = async () => {
     void triggerHaptic("light");
