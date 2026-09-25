@@ -144,6 +144,14 @@ export function BioCatchUpModal({
 
   const handleLaunch = () => {
     if (!requireUser("Sign in to propose a catch-up, meeting, or hangout.")) return;
+    // Re-check at click time so a stale render cannot bypass the hard block.
+    const liveConflict = checkTimeConflict(date, time, myPlans, listCatchUps());
+    if (liveConflict.hasConflict) {
+      toast.error(
+        `That time overlaps “${liveConflict.conflictingTitle}” at ${liveConflict.conflictingTime}. Pick another slot.`,
+      );
+      return;
+    }
     const place = venue.trim() || city;
     setIsSubmitting(true);
     try {
@@ -255,7 +263,8 @@ export function BioCatchUpModal({
               </div>
               <p className="mt-1 text-amber-900/90 dark:text-amber-200/90 leading-relaxed">
                 You already have <strong className="font-semibold">&ldquo;{conflict.conflictingTitle}&rdquo;</strong> scheduled at{" "}
-                <strong className="font-semibold">{conflict.conflictingTime}</strong> on this date.
+                <strong className="font-semibold">{conflict.conflictingTime}</strong> on this date. Propose is blocked until you pick
+                another slot.
               </p>
               <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
                 <span className="text-[11px] font-medium text-amber-800/80">Available slots:</span>
@@ -387,9 +396,14 @@ export function BioCatchUpModal({
         </div>
 
         <div className="space-y-3 border-t border-line bg-card/60 p-5">
-          <Button className="h-12 w-full gap-2 rounded-full font-bold shadow-md" onClick={handleLaunch} disabled={isSubmitting}>
+          <Button
+            className="h-12 w-full gap-2 rounded-full font-bold shadow-md"
+            onClick={handleLaunch}
+            disabled={isSubmitting || conflict.hasConflict}
+            title={conflict.hasConflict ? "Pick a free time slot before proposing" : undefined}
+          >
             <Zap size={16} />
-            Create Plan &amp; Propose
+            {conflict.hasConflict ? "Pick a free time first" : "Create Plan & Propose"}
           </Button>
           <div className="flex items-center justify-between gap-2">
             <button
