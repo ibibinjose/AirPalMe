@@ -75,10 +75,11 @@ const PERSONAL_CATEGORY_PRESETS = [
 
 // Business Profile Category Presets
 const BUSINESS_CATEGORY_PRESETS = [
-  { id: "Local Business", label: "Local Business 🏪" },
+  { id: "Stay & Accommodation", label: "Stay & Hotel 🏢" },
+  { id: "Boutique Hotel", label: "Boutique Hotel 🏨" },
   { id: "Food & Drink", label: "Food & Drink ☕" },
   { id: "Restaurant & Bar", label: "Restaurant & Bar 🍽️" },
-  { id: "Stay & Accommodation", label: "Stay Host 🏡" },
+  { id: "Local Business", label: "Local Business 🏪" },
   { id: "Boutique & Retail", label: "Boutique & Retail 🛍️" },
   { id: "Beauty & Wellness", label: "Beauty & Wellness 💈" },
   { id: "Music & Venue", label: "Events & Venue 🎭" },
@@ -97,6 +98,8 @@ const PERSONAL_CTA_PRESETS = [
 
 // Business Action Button Presets
 const BUSINESS_CTA_PRESETS = [
+  "View Digital Compendium",
+  "Book Direct",
   "Order Online",
   "Book Table",
   "View Menu",

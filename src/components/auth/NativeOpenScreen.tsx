@@ -53,7 +53,6 @@ export function NativeOpenScreen() {
               }}
             />
             <Button
-              variant="ghost"
               className="w-full"
               disabled={busy}
               onClick={() => {

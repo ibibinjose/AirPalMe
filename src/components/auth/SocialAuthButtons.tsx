@@ -9,6 +9,9 @@ import type { SocialProvider } from "@/lib/social-auth";
 import { useAuth } from "@/contexts/AuthContext";
 import { BiometricAuthButton } from "./BiometricAuthButton";
 
+// Social Login is disabled/hidden for now per user request
+export const SHOW_SOCIAL_AUTH = false;
+
 export function SocialAuthButtons({
   busy,
   onSocial,
@@ -46,31 +49,39 @@ export function SocialAuthButtons({
     }
   }
 
+  // If social login is hidden and no biometrics enrolled, render nothing
+  const showBio = showBiometrics && hasEnrolledBiometrics;
+  if (!SHOW_SOCIAL_AUTH && !showBio) {
+    return null;
+  }
+
   return (
     <div className="space-y-2">
-      {showBiometrics && hasEnrolledBiometrics && (
-        <BiometricAuthButton variant="social" />
+      {showBio && <BiometricAuthButton variant="social" />}
+      {SHOW_SOCIAL_AUTH && (
+        <>
+          <button
+            type="button"
+            disabled={locked}
+            onClick={() => void go("google")}
+            className={cn(
+              "flex h-12 w-full items-center justify-center gap-2 rounded-full bg-card text-sm font-semibold ring-1 ring-line transition hover:bg-paper active:scale-[0.99] disabled:opacity-60 shadow-2xs",
+            )}
+          >
+            <GoogleMark />
+            {pending === "google" ? "Continuing with Google…" : "Continue with Google"}
+          </button>
+          <button
+            type="button"
+            disabled={locked}
+            onClick={() => void go("apple")}
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-white transition hover:bg-neutral-800 active:scale-[0.99] disabled:opacity-60 shadow-2xs"
+          >
+            <AppleMark />
+            {pending === "apple" ? "Continuing with Apple…" : "Continue with Apple"}
+          </button>
+        </>
       )}
-      <button
-        type="button"
-        disabled={locked}
-        onClick={() => void go("google")}
-        className={cn(
-          "flex h-12 w-full items-center justify-center gap-2 rounded-full bg-card text-sm font-semibold ring-1 ring-line transition hover:bg-paper active:scale-[0.99] disabled:opacity-60 shadow-2xs",
-        )}
-      >
-        <GoogleMark />
-        {pending === "google" ? "Continuing with Google…" : "Continue with Google"}
-      </button>
-      <button
-        type="button"
-        disabled={locked}
-        onClick={() => void go("apple")}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-white transition hover:bg-neutral-800 active:scale-[0.99] disabled:opacity-60 shadow-2xs"
-      >
-        <AppleMark />
-        {pending === "apple" ? "Continuing with Apple…" : "Continue with Apple"}
-      </button>
     </div>
   );
 }
@@ -107,6 +118,7 @@ function AppleMark() {
 }
 
 export function SocialAuthDivider() {
+  if (!SHOW_SOCIAL_AUTH) return null;
   return (
     <div className="my-4 flex items-center gap-3">
       <span className="h-px flex-1 bg-line" />

@@ -40,6 +40,8 @@ import { demoModeActive, track, trackContentAction, trackFirstValue } from "@/li
 import { DemoBadge } from "@/components/ui/DemoBadge";
 import { isDuplicateSubmission, submissionFingerprint } from "@shared/abuse";
 import { triggerHaptic } from "@/lib/native";
+import { StayCompendium } from "@/components/stay/StayCompendium";
+import { AirPalAiReceptionist } from "@/components/stay/AirPalAiReceptionist";
 
 export function ConciergePage() {
   const { session, roomLabel, property, loadingProperty, marker } = useStay();
@@ -71,6 +73,7 @@ export function ConciergePage() {
   const [orderQty, setOrderQty] = useState<Record<string, number>>({});
   const [orderRoom, setOrderRoom] = useState("");
   const [ordering, setOrdering] = useState(false);
+  const [viewMode, setViewMode] = useState<"compendium" | "concierge">("compendium");
 
   const hasStay =
     session.kind === "stay" || session.kind === "campus" || Boolean(roomLabel) || Boolean(session.propertyId);
@@ -209,25 +212,58 @@ export function ConciergePage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-12 md:px-6">
-      <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
-        {/* Left Column: Header Banner, AirPal Mate Priority, Room details & Quick Action Tiles (5 cols) */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
-            {property.heroImage && <img src={property.heroImage} alt="" className="h-48 w-full object-cover" />}
-            <div className="hero-scrim absolute inset-0" />
-            <div className="absolute inset-x-0 bottom-0 p-5">
-              <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-slate-950 border border-line shadow-xs mb-1.5">
-                {roomLabel ? `Room ${roomLabel}` : property.city || property.destination || "AirPal Stay Concierge"}
-              </span>
-              <h1 className="font-display text-2xl font-extrabold text-white">{property.name || t("scanRoom")}</h1>
-              {property.tagline ? <p className="mt-1 text-xs text-white/80">{property.tagline}</p> : null}
-              {demoModeActive() && (
-                <div className="mt-2">
-                  <DemoBadge />
-                </div>
-              )}
+      {/* View Mode Switcher */}
+      <div className="mb-5 flex items-center justify-center">
+        <div className="flex rounded-full bg-paper p-1 ring-1 ring-line shadow-xs">
+          <button
+            type="button"
+            onClick={() => {
+              setViewMode("compendium");
+              void triggerHaptic("light");
+            }}
+            className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-black transition ${
+              viewMode === "compendium" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink"
+            }`}
+          >
+            <span>📖 Digital Compendium</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setViewMode("concierge");
+              void triggerHaptic("light");
+            }}
+            className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-black transition ${
+              viewMode === "concierge" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink"
+            }`}
+          >
+            <span>🗺️ Stay &amp; Guide</span>
+          </button>
+        </div>
+      </div>
+
+      {viewMode === "compendium" ? (
+        <StayCompendium />
+      ) : (
+        <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
+          {/* Left Column: Header Banner, AirPal Mate Priority, Room details & Quick Action Tiles (5 cols) */}
+          <div className="lg:col-span-5 space-y-4">
+            <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
+              {property.heroImage && <img src={property.heroImage} alt="" className="h-48 w-full object-cover" />}
+              <div className="hero-scrim absolute inset-0" />
+              <div className="absolute inset-x-0 bottom-0 p-5">
+                <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-slate-950 border border-line shadow-xs mb-1.5">
+                  {roomLabel ? `Room ${roomLabel}` : property.city || property.destination || "AirPal Stay Concierge"}
+                </span>
+                <h1 className="font-display text-2xl font-extrabold text-white">{property.name || t("scanRoom")}</h1>
+                {property.tagline ? <p className="mt-1 text-xs text-white/80">{property.tagline}</p> : null}
+                {demoModeActive() && (
+                  <div className="mt-2">
+                    <DemoBadge />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
           <div className="relative overflow-hidden rounded-3xl ring-1 ring-white/10 bg-gradient-to-br from-brand via-[#1c08d4] to-[#0d027a] p-4 text-white shadow-md flex items-center justify-between gap-3">
             <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-amber-400/20 blur-xl pointer-events-none" />
@@ -382,6 +418,10 @@ export function ConciergePage() {
           </div>
         </div>
       </div>
+      )}
+
+      {/* 24/7 AI Receptionist: AirPal AI */}
+      <AirPalAiReceptionist />
 
       {/* Sheets */}
       <Sheet open={sheet === "wifi"} onClose={() => setSheet(null)} title={t("wifi")}>

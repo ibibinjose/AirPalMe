@@ -142,6 +142,9 @@ export function profileFromDoc(id: string, data: Record<string, unknown>): BioPr
     customStatus: data.customStatus ? String(data.customStatus) : undefined,
     customStatusEmoji: data.customStatusEmoji ? String(data.customStatusEmoji) : undefined,
     zooHunt: data.zooHunt === true ? true : undefined,
+    checkIn: data.checkIn ? String(data.checkIn) : undefined,
+    checkOut: data.checkOut ? String(data.checkOut) : undefined,
+    facilities: Array.isArray(data.facilities) ? (data.facilities as any) : undefined,
   };
 }
 

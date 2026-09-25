@@ -3,29 +3,42 @@ import { useLocation, useRoute, Link } from "wouter";
 import { toast } from "sonner";
 import {
   ArrowLeft,
+  Building2,
   Calendar,
   Check,
   ChevronRight,
+  Clock,
   Coffee,
   ContactRound,
   Copy,
+  DoorOpen,
+  Dumbbell,
   Edit3,
   Globe,
   HeartHandshake,
+  KeyRound,
+  Luggage,
   MapPin,
   MessageCircle,
   Navigation,
   Phone,
   QrCode,
   Share2,
+  Shirt,
   Sparkles,
   Ticket,
   UserPlus,
   Users,
+  Utensils,
+  Waves,
+  Wifi,
+  Wine,
   X,
 } from "lucide-react";
 import type { BioCatalogItem } from "@shared/bio";
 import { BUSINESS_CATEGORIES } from "@shared/business";
+import { CURRENT_PROPERTY } from "@shared/airpal-data";
+import { getCachedProperty } from "@/lib/properties";
 import { FollowButton, LikeButton } from "@/components/social/SocialButtons";
 import { openVCardContact, upsertPerson } from "@/lib/people";
 import { BrandMark } from "@/components/brand/BrandMark";
@@ -116,6 +129,45 @@ function BizCircle({
       <span className={caption}>{label}</span>
     </button>
   );
+}
+
+/** Dynamic Lucide icon resolution for hotel & venue facilities */
+function FacilityIcon({ name, icon }: { name: string; icon?: string }) {
+  const norm = `${icon || ""} ${name || ""}`.toLowerCase();
+  if (norm.includes("pool") || norm.includes("waves") || norm.includes("swim")) {
+    return <Waves size={18} className="text-sky-500" />;
+  }
+  if (norm.includes("gym") || norm.includes("fitness") || norm.includes("dumbbell") || norm.includes("workout")) {
+    return <Dumbbell size={18} className="text-amber-500" />;
+  }
+  if (norm.includes("bar") || norm.includes("wine") || norm.includes("cocktail") || norm.includes("drink")) {
+    return <Wine size={18} className="text-rose-500" />;
+  }
+  if (norm.includes("luggage") || norm.includes("bag") || norm.includes("storage")) {
+    return <Luggage size={18} className="text-emerald-500" />;
+  }
+  if (norm.includes("laundry") || norm.includes("shirt") || norm.includes("clean") || norm.includes("wash")) {
+    return <Shirt size={18} className="text-indigo-500" />;
+  }
+  if (
+    norm.includes("dining") ||
+    norm.includes("food") ||
+    norm.includes("restaurant") ||
+    norm.includes("eat") ||
+    norm.includes("breakfast")
+  ) {
+    return <Utensils size={18} className="text-orange-500" />;
+  }
+  if (norm.includes("wifi") || norm.includes("internet")) {
+    return <Wifi size={18} className="text-cyan-500" />;
+  }
+  if (norm.includes("coffee") || norm.includes("cafe")) {
+    return <Coffee size={18} className="text-amber-600" />;
+  }
+  if (norm.includes("spa") || norm.includes("sauna") || norm.includes("massage") || norm.includes("wellness")) {
+    return <Sparkles size={18} className="text-fuchsia-500" />;
+  }
+  return <Building2 size={18} className="text-brand" />;
 }
 
 export function BioPublicPage() {
@@ -409,6 +461,70 @@ export function BioPublicPage() {
     bio.availabilityStatus || (bio.openNow === true ? "available" : bio.openNow === false ? "offline" : "available");
   const statusInfo = AVAILABILITY_STATUSES[statusKey] || AVAILABILITY_STATUSES.available;
 
+  // Stay / Hotel & Facility Resolutions
+  const propertyData = useMemo(() => {
+    if (bio.propertyId) return getCachedProperty(bio.propertyId);
+    if (bio.handle === "harbour-hotel" || bio.handle === "harbour-rocks-hotel") return CURRENT_PROPERTY;
+    return getCachedProperty(bio.handle);
+  }, [bio.propertyId, bio.handle]);
+
+  const isStay =
+    bio.category === "stay" ||
+    Boolean(bio.propertyId) ||
+    Boolean(propertyData) ||
+    (bio.categoryTag && /stay|hotel|accommodation|hostel|resort|lodge|motel|inn/i.test(bio.categoryTag)) ||
+    (bio.facilities && bio.facilities.length > 0);
+
+  const stayCheckIn = bio.checkIn || propertyData?.checkIn || "2:00 PM";
+  const stayCheckOut = bio.checkOut || propertyData?.checkOut || "10:00 AM";
+  const stayWifiSpeed = propertyData?.wifi?.speed || "250 Mbps High-Speed Fibre";
+  const stayTargetId = propertyData?.id || bio.propertyId || bio.handle;
+
+  const stayFacilities = useMemo(() => {
+    if (bio.facilities && bio.facilities.length > 0) return bio.facilities;
+    if (propertyData?.facilities && propertyData.facilities.length > 0) return propertyData.facilities;
+    if (isStay) {
+      return [
+        {
+          name: "Rooftop Plunge Pool",
+          hours: "6:00 AM – 10:00 PM",
+          floor: "Level 7",
+          details: "Heated water, panoramic harbour & city skyline views",
+          icon: "Waves",
+        },
+        {
+          name: "Fitness Centre & Sauna",
+          hours: "24 Hours (Keycard Access)",
+          floor: "Level 2",
+          details: "Technogym cardio, free weights & eucalyptus sauna",
+          icon: "Dumbbell",
+        },
+        {
+          name: "The Cellar Lounge & Bar",
+          hours: "4:00 PM – 11:30 PM",
+          floor: "Ground Floor",
+          details: "Curated local wines, artisan spirits & craft cocktails",
+          icon: "Wine",
+        },
+        {
+          name: "Luggage Storage",
+          hours: "24/7 Front Desk",
+          floor: "Lobby",
+          details: "Complimentary secure luggage holding pre-checkin & post-checkout",
+          icon: "Luggage",
+        },
+        {
+          name: "Guest Laundry & Steamer",
+          hours: "7:00 AM – 9:00 PM",
+          floor: "Level 3",
+          details: "Self-service washers & dryers, dry cleaning on request",
+          icon: "Shirt",
+        },
+      ];
+    }
+    return [];
+  }, [bio.facilities, propertyData, isStay]);
+
   const handleQuickCopy = async () => {
     void triggerHaptic("light");
     try {
@@ -645,8 +761,10 @@ export function BioPublicPage() {
                   {bio.city}
                 </span>
               )}
-              {bio.kind === "business" && bio.category && (
-                <span>· {BUSINESS_CATEGORIES.find((c) => c.id === bio.category)?.label}</span>
+              {(bio.kind === "business" || isStay) && bio.category && (
+                <span>
+                  · {bio.category === "stay" ? "🏢 Stay & Accommodation" : (BUSINESS_CATEGORIES.find((c) => c.id === bio.category)?.label || "Business")}
+                </span>
               )}
               {bio.languages && <span>· {bio.languages}</span>}
             </div>
@@ -770,8 +888,8 @@ export function BioPublicPage() {
             )}
           </div>
 
-          {/* Business profile specific overview & actions */}
-          {bio.kind === "business" && (
+          {/* Business & Stay profile specific overview, facilities & actions */}
+          {(bio.kind === "business" || isStay) && (
             <div className="mt-6">
               <div className="flex items-center justify-between">
                 <p className="text-[14px] font-semibold">
@@ -780,6 +898,12 @@ export function BioPublicPage() {
                   </span>
                   {bio.hours && <span className="text-mute font-normal"> · {bio.hours}</span>}
                 </p>
+                {isStay && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold text-brand">
+                    <Sparkles size={11} />
+                    Verified Stay
+                  </span>
+                )}
               </div>
 
               {/* Section Tabs */}
@@ -795,6 +919,24 @@ export function BioPublicPage() {
                 >
                   Overview
                 </button>
+                {isStay && (
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("bio-stay")?.scrollIntoView({ behavior: "smooth" })}
+                    className="h-9 shrink-0 rounded-full bg-brand/10 px-4 text-xs font-bold text-brand ring-1 ring-brand/30 transition hover:bg-brand/15 active:scale-95"
+                  >
+                    📖 Stay &amp; AI
+                  </button>
+                )}
+                {isStay && stayFacilities.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("bio-facilities")?.scrollIntoView({ behavior: "smooth" })}
+                    className="h-9 shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
+                  >
+                    🏢 Facilities
+                  </button>
+                )}
                 {liveOffer && (
                   <button
                     type="button"
@@ -835,6 +977,14 @@ export function BioPublicPage() {
 
               {/* Action Circles */}
               <div className="mt-4 flex gap-3 overflow-x-auto pb-1 no-scrollbar" aria-label="Contact actions">
+                {propertyData?.bookingUrl ? (
+                  <BizCircle
+                    label="Book Direct"
+                    Icon={KeyRound}
+                    href={propertyData.bookingUrl}
+                    onClick={() => recordTap(bio.handle, "book")}
+                  />
+                ) : null}
                 {tel && (
                   <BizCircle label="Call" Icon={Phone} href={tel} onClick={() => recordTap(bio.handle, "call")} />
                 )}
@@ -871,6 +1021,143 @@ export function BioPublicPage() {
                   }}
                 />
               </div>
+
+              {/* Stay / Hotel Companion & Facilities Deck */}
+              {isStay && (
+                <div id="bio-stay" className="mt-5 scroll-mt-24 space-y-4">
+                  {/* Digital Compendium & 24/7 AirPal AI Concierge Hero Banner */}
+                  <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-[#1805db]/10 via-card to-paper p-5 ring-1 ring-brand/30 shadow-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-brand">
+                        <Sparkles size={11} />
+                        Digital Compendium &amp; Concierge
+                      </span>
+                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/15 rounded-full px-2.5 py-0.5">
+                        24/7 Live
+                      </span>
+                    </div>
+
+                    <h3 className="font-display mt-2.5 text-lg sm:text-xl font-bold text-ink">
+                      Room Companion &amp; 24/7 AirPal AI
+                    </h3>
+                    <p className="mt-1 text-xs sm:text-sm text-mute leading-relaxed">
+                      Everything for your stay in one scan: in-room dining, Wi-Fi 1-tap connect, room service, express check-in/out, house rules, and 24/7 AI Receptionist.
+                    </p>
+
+                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <Link
+                        href={`/stay/${stayTargetId}`}
+                        className="flex h-11 items-center justify-center gap-2 rounded-full bg-brand px-5 text-xs font-bold text-white shadow-xs transition hover:brightness-110 active:scale-95"
+                      >
+                        <DoorOpen size={15} />
+                        <span>Open Digital Compendium</span>
+                      </Link>
+                      <Link
+                        href={`/stay/${stayTargetId}?tab=receptionist`}
+                        className="flex h-11 items-center justify-center gap-2 rounded-full bg-paper px-5 text-xs font-bold text-ink ring-1 ring-line/80 shadow-2xs transition hover:bg-paper/80 active:scale-95"
+                      >
+                        <Sparkles size={14} className="text-gold" />
+                        <span>Ask AirPal AI 24/7</span>
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Stay Key Information & Policies Strip */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <div className="rounded-2xl bg-paper/70 p-3.5 ring-1 ring-line/80 shadow-2xs">
+                      <div className="flex items-center gap-1.5 text-mute text-[10px] font-bold uppercase tracking-wider">
+                        <Clock size={12} className="text-brand" />
+                        <span>Check-In</span>
+                      </div>
+                      <p className="mt-1 font-display text-sm sm:text-base font-bold text-ink">{stayCheckIn}</p>
+                      <p className="text-[10px] text-mute mt-0.5">Digital keycard ready</p>
+                    </div>
+
+                    <div className="rounded-2xl bg-paper/70 p-3.5 ring-1 ring-line/80 shadow-2xs">
+                      <div className="flex items-center gap-1.5 text-mute text-[10px] font-bold uppercase tracking-wider">
+                        <Clock size={12} className="text-amber-600" />
+                        <span>Check-Out</span>
+                      </div>
+                      <p className="mt-1 font-display text-sm sm:text-base font-bold text-ink">{stayCheckOut}</p>
+                      <p className="text-[10px] text-mute mt-0.5">Express folio checkout</p>
+                    </div>
+
+                    <div className="rounded-2xl bg-paper/70 p-3.5 ring-1 ring-line/80 shadow-2xs">
+                      <div className="flex items-center gap-1.5 text-mute text-[10px] font-bold uppercase tracking-wider">
+                        <Wifi size={12} className="text-cyan-600" />
+                        <span>Guest Wi-Fi</span>
+                      </div>
+                      <p className="mt-1 font-display text-xs sm:text-sm font-bold text-ink truncate">Fibre Speed</p>
+                      <p className="text-[10px] text-mute mt-0.5 truncate">{stayWifiSpeed}</p>
+                    </div>
+
+                    <div className="rounded-2xl bg-paper/70 p-3.5 ring-1 ring-line/80 shadow-2xs">
+                      <div className="flex items-center gap-1.5 text-mute text-[10px] font-bold uppercase tracking-wider">
+                        <Sparkles size={12} className="text-gold" />
+                        <span>Front Desk</span>
+                      </div>
+                      <p className="mt-1 font-display text-xs sm:text-sm font-bold text-ink">24/7 AI &amp; Staff</p>
+                      <p className="text-[10px] text-mute mt-0.5">Instant escalation</p>
+                    </div>
+                  </div>
+
+                  {/* 🏢 Hotel Facilities & Amenities Grid */}
+                  {stayFacilities.length > 0 && (
+                    <div id="bio-facilities" className="scroll-mt-24 rounded-3xl bg-paper/60 p-5 ring-1 ring-line/80 shadow-2xs">
+                      <div className="flex items-center justify-between mb-3.5">
+                        <div>
+                          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand">
+                            🏢 Hotel Facilities
+                          </span>
+                          <h4 className="font-display text-base sm:text-lg font-bold text-ink mt-0.5">
+                            Amenities &amp; Guest Services
+                          </h4>
+                        </div>
+                        <span className="text-[10px] font-bold text-mute uppercase tracking-wider">
+                          {stayFacilities.length} Facilities
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {stayFacilities.map((fac, idx) => (
+                          <div
+                            key={fac.id || fac.name || idx}
+                            className="group flex flex-col justify-between rounded-2xl bg-card p-4 ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/30 hover:shadow-xs"
+                          >
+                            <div>
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex items-center gap-2.5">
+                                  <span className="grid h-9 w-9 place-items-center rounded-xl bg-paper ring-1 ring-line/70">
+                                    <FacilityIcon name={fac.name} icon={fac.icon} />
+                                  </span>
+                                  <div>
+                                    <p className="font-bold text-xs sm:text-sm text-ink group-hover:text-brand transition-colors">
+                                      {fac.name}
+                                    </p>
+                                    {fac.floor && (
+                                      <p className="text-[11px] text-mute font-medium">{fac.floor}</p>
+                                    )}
+                                  </div>
+                                </div>
+                                {fac.hours && (
+                                  <span className="shrink-0 text-[10px] font-semibold text-ink/75 bg-paper rounded-full px-2.5 py-0.5 ring-1 ring-line/60">
+                                    {fac.hours}
+                                  </span>
+                                )}
+                              </div>
+                              {(fac.details || fac.description) && (
+                                <p className="mt-2.5 text-xs text-mute leading-relaxed line-clamp-2">
+                                  {fac.details || fac.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Business Location & Trading Hours Schedule Card */}
               {(bio.city || bio.hours || bio.phone) && (

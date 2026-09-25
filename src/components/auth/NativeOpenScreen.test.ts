@@ -25,8 +25,8 @@ describe("NativeOpenScreen", () => {
     expect(html).toContain("data-testid=\"native-open-screen\"");
     expect(html).toContain("AirPal");
     expect(html).toContain("Life Made Easy.");
-    expect(html).toContain("Continue with Google");
-    expect(html).toContain("Continue with Apple");
+    expect(html).not.toContain("Continue with Google");
+    expect(html).not.toContain("Continue with Apple");
     expect(html).toContain("Sign in with email or phone");
     expect(html).toContain("Create a free account");
   });

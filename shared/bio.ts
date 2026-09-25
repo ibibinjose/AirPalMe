@@ -1,5 +1,6 @@
 import type { BusinessCategoryId } from "./business";
 import type { Geo } from "./nearby";
+import type { FacilityItem } from "./airpal-data";
 
 export const HANDLE_MIN = 3;
 export const HANDLE_MAX = 30;
@@ -269,6 +270,12 @@ export type BioProfile = {
   primaryCta?: string;
   /** Opt in to Air Zoo hunts and a collectible sticker on the shop QR. */
   zooHunt?: boolean;
+  /** Stay check-in time (e.g. 2:00 PM) */
+  checkIn?: string;
+  /** Stay check-out time (e.g. 10:00 AM) */
+  checkOut?: string;
+  /** Stay & hotel facilities / amenities list */
+  facilities?: FacilityItem[];
 };
 
 export function normalizeHandle(raw: string) {

@@ -144,6 +144,7 @@ export function AppRoutes() {
         </Route>
         <Route path="/companion" component={CompanionPage} />
         <Route path="/g/:id" component={StayPage} />
+        <Route path="/stay/:id" component={StayPage} />
         <Route path="/DemoHotel" component={DemoHotelPage} />
         <Route path="/demohotel">
           <Redirect to="/DemoHotel" />

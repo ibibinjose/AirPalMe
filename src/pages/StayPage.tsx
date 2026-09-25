@@ -6,7 +6,9 @@ import { noteQrContext } from "@/lib/analytics";
 import { ConciergePage } from "./ConciergePage";
 
 export function StayPage() {
-  const [, params] = useRoute("/g/:id");
+  const [, paramsG] = useRoute("/g/:id");
+  const [, paramsStay] = useRoute("/stay/:id");
+  const propertyId = paramsG?.id || paramsStay?.id;
   const search = useSearch();
   const { setSession } = useStay();
   const { openAnswers, openContact, openChecklist } = useStayUi();
@@ -17,17 +19,17 @@ export function StayPage() {
     const inDate = inRaw ? new Date(inRaw) : null;
     setSession({
       kind: "stay",
-      propertyId: params?.id,
+      propertyId,
       roomToken: qs.get("r") || undefined,
       room: qs.get("room") || undefined,
       ...(inDate && !Number.isNaN(inDate.getTime()) ? { checkInAt: inDate.toISOString() } : {}),
     });
-    if (params?.id) noteQrContext(`stay:${params.id}`, { propertyId: params.id, source: "stay" });
+    if (propertyId) noteQrContext(`stay:${propertyId}`, { propertyId, source: "stay" });
     const open = qs.get("open");
     if (open === "answers") openAnswers();
     if (open === "host") openContact();
     if (open === "checklist" || open === "leave") openChecklist();
-  }, [openAnswers, openChecklist, openContact, params?.id, search, setSession]);
+  }, [openAnswers, openChecklist, openContact, propertyId, search, setSession]);
 
   return <ConciergePage />;
 }
