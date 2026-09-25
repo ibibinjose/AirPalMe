@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { ArrowLeft, ContactRound, Plus, Sparkles, Trash2, UserRound, Users } from "lucide-react";
@@ -9,7 +9,7 @@ import { PageLoading } from "@/components/ui/PageLoading";
 import { useAuth } from "@/contexts/AuthContext";
 import { listPeople, openVCardContact, removePerson, upsertPerson, type PersonMet } from "@/lib/people";
 import { listMemories, memoriesWithPerson } from "@/lib/memories";
-import { listMyCatchUpReminders, removeCatchUp, type CatchUpItem } from "@/lib/catchup";
+import { listMyCatchUpReminders, removeCatchUp, subscribeMyCatchUps, type CatchUpItem } from "@/lib/catchup";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { bioPath } from "@shared/bio";
 import { fieldInput } from "@/components/forms/ValidField";
@@ -33,6 +33,13 @@ export function PeoplePage() {
   const [name, setName] = useState("");
   const [handle, setHandle] = useState("");
   const [whereMet, setWhereMet] = useState("");
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    return subscribeMyCatchUps(user.uid, (rows) => {
+      setCatchUps(rows.filter((item) => Boolean(item.isReminderOnly)));
+    });
+  }, [user?.uid]);
 
   if (!authReady) {
     return <PageLoading />;

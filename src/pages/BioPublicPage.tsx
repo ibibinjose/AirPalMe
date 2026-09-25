@@ -327,51 +327,13 @@ export function BioPublicPage() {
         (profile.facilities && profile.facilities.length > 0)),
   );
 
+  // Harbour demo facilities come from CURRENT_PROPERTY via propertyData — never invent them for other stays.
   const stayFacilities = useMemo(() => {
     if (!profile) return [];
     if (profile.facilities && profile.facilities.length > 0) return profile.facilities;
     if (propertyData?.facilities && propertyData.facilities.length > 0) return propertyData.facilities;
-    if (isStay) {
-      return [
-        {
-          name: "Rooftop Plunge Pool",
-          hours: "6:00 AM – 10:00 PM",
-          floor: "Level 7",
-          details: "Heated water, panoramic harbour & city skyline views",
-          icon: "Waves",
-        },
-        {
-          name: "Fitness Centre & Sauna",
-          hours: "24 Hours (Keycard Access)",
-          floor: "Level 2",
-          details: "Technogym cardio, free weights & eucalyptus sauna",
-          icon: "Dumbbell",
-        },
-        {
-          name: "The Cellar Lounge & Bar",
-          hours: "4:00 PM – 11:30 PM",
-          floor: "Ground Floor",
-          details: "Curated local wines, artisan spirits & craft cocktails",
-          icon: "Wine",
-        },
-        {
-          name: "Luggage Storage",
-          hours: "24/7 Front Desk",
-          floor: "Lobby",
-          details: "Complimentary secure luggage holding pre-checkin & post-checkout",
-          icon: "Luggage",
-        },
-        {
-          name: "Guest Laundry & Steamer",
-          hours: "7:00 AM – 9:00 PM",
-          floor: "Level 3",
-          details: "Self-service washers & dryers, dry cleaning on request",
-          icon: "Shirt",
-        },
-      ];
-    }
     return [];
-  }, [profile, propertyData, isStay]);
+  }, [profile, propertyData]);
 
   if (!profile && !tried) {
     return (
@@ -1438,7 +1400,8 @@ export function BioPublicPage() {
                       name: bio.name,
                       photo: avatar,
                       city: bio.city,
-                    });
+                      requesterUid: user?.uid,
+});
                     toast[next ? "success" : "info"](
                       next ? `Saved a reminder to catch up with ${bio.name}` : `Removed reminder for ${bio.name}`,
                     );

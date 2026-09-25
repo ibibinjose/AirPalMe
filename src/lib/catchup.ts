@@ -1,4 +1,13 @@
-import { collection, doc, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import type { PlanType } from "@shared/plan";
 import { getFirebaseDb, isFirebaseConfigured } from "./firebase";
 
@@ -21,8 +30,13 @@ export interface CatchUpItem {
   status: "pending" | "accepted" | "scheduled" | "dismissed";
 }
 
-const STORAGE_KEY = "airpal:catchups:v1";
+/** Legacy device-local key — read once to migrate, never written again. */
+const LEGACY_STORAGE_KEY = "airpal:catchups:v1";
+const MIGRATED_FLAG_KEY = "airpal:catchups:migrated:v2";
+
+/** In-memory mirror of remote (and offline fallback when Firebase is off). */
 let memory: CatchUpItem[] = [];
+const migratedUids = new Set<string>();
 
 function storage(): Storage | null {
   try {
@@ -40,38 +54,106 @@ function normalizeHandle(handle: string): string {
   return handle.trim().replace(/^@/, "").toLowerCase();
 }
 
-export function listCatchUps(): CatchUpItem[] {
+function readLegacyLocal(): CatchUpItem[] {
   try {
-    const raw = storage()?.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        memory = parsed;
-        return parsed;
-      }
-    }
+    const raw = storage()?.getItem(LEGACY_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as CatchUpItem[]) : [];
   } catch {
-    /* use memory */
+    return [];
   }
-  return memory;
 }
 
-function persist(items: CatchUpItem[]): void {
-  memory = items;
+function clearLegacyLocal(): void {
   try {
-    storage()?.setItem(STORAGE_KEY, JSON.stringify(items));
+    storage()?.removeItem(LEGACY_STORAGE_KEY);
   } catch {
     /* private browsing */
   }
 }
 
-function syncRemote(item: CatchUpItem) {
-  if (!isFirebaseConfigured) return;
+function upsertMemory(item: CatchUpItem): void {
+  const idx = memory.findIndex((row) => row.id === item.id);
+  if (idx >= 0) {
+    memory = [...memory.slice(0, idx), item, ...memory.slice(idx + 1)];
+  } else {
+    memory = [item, ...memory];
+  }
+}
+
+function removeFromMemory(id: string): void {
+  memory = memory.filter((item) => item.id !== id);
+}
+
+function mergeRemoteForRequester(uid: string, rows: CatchUpItem[]): void {
+  memory = [...memory.filter((item) => item.requesterUid !== uid), ...rows];
+}
+
+function mergeRemoteForOwner(ownerUid: string, rows: CatchUpItem[]): void {
+  memory = [...memory.filter((item) => item.targetOwnerUid !== ownerUid), ...rows];
+}
+
+async function writeRemote(item: CatchUpItem): Promise<void> {
+  if (!isFirebaseConfigured || !item.requesterUid) return;
   const db = getFirebaseDb();
   if (!db) return;
-  void setDoc(doc(db, "catchups", item.id), omitUndefined(item as unknown as Record<string, unknown>), {
+  await setDoc(doc(db, "catchups", item.id), omitUndefined(item as unknown as Record<string, unknown>), {
     merge: true,
-  }).catch(() => undefined);
+  });
+}
+
+function syncRemote(item: CatchUpItem): void {
+  void writeRemote(item).catch(() => undefined);
+}
+
+/**
+ * One-shot: push legacy localStorage rows that belong to this uid into Firestore,
+ * then drop the device-local store so conflict checks are no longer per-browser.
+ */
+function migrateLegacyForUid(uid: string): void {
+  if (!uid || migratedUids.has(uid)) return;
+  migratedUids.add(uid);
+  try {
+    if (storage()?.getItem(`${MIGRATED_FLAG_KEY}:${uid}`) === "1") return;
+  } catch {
+    /* continue */
+  }
+
+  const legacy = readLegacyLocal();
+  if (legacy.length === 0) {
+    try {
+      storage()?.setItem(`${MIGRATED_FLAG_KEY}:${uid}`, "1");
+    } catch {
+      /* ignore */
+    }
+    return;
+  }
+
+  for (const row of legacy) {
+    const belongs =
+      row.requesterUid === uid || (!row.requesterUid && Boolean(row.isReminderOnly));
+    if (!belongs) continue;
+    const item: CatchUpItem = {
+      ...row,
+      requesterUid: row.requesterUid || uid,
+      targetHandle: normalizeHandle(row.targetHandle),
+    };
+    upsertMemory(item);
+    syncRemote(item);
+  }
+
+  clearLegacyLocal();
+  try {
+    storage()?.setItem(`${MIGRATED_FLAG_KEY}:${uid}`, "1");
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Sync snapshot of the in-memory mirror (tests / offline). Prefer subscribe* for live UI. */
+export function listCatchUps(): CatchUpItem[] {
+  return memory;
 }
 
 /** Incoming proposals for a public bio (owner inbox). */
@@ -96,22 +178,33 @@ export function toggleCatchUpReminder(target: {
   name: string;
   photo?: string;
   city?: string;
+  /** Required for Firestore create rules; memory-only when omitted (tests / offline). */
+  requesterUid?: string;
 }): boolean {
   const items = listCatchUps();
   const norm = normalizeHandle(target.handle);
   const existingIdx = items.findIndex(
-    (i) => normalizeHandle(i.targetHandle) === norm && Boolean(i.isReminderOnly) && i.status !== "dismissed",
+    (i) =>
+      normalizeHandle(i.targetHandle) === norm &&
+      Boolean(i.isReminderOnly) &&
+      i.status !== "dismissed" &&
+      (!target.requesterUid || !i.requesterUid || i.requesterUid === target.requesterUid),
   );
 
   if (existingIdx >= 0) {
-    items.splice(existingIdx, 1);
-    persist(items);
+    const existing = items[existingIdx]!;
+    removeFromMemory(existing.id);
+    if (isFirebaseConfigured && existing.requesterUid) {
+      const db = getFirebaseDb();
+      if (db) void deleteDoc(doc(db, "catchups", existing.id)).catch(() => undefined);
+    }
     return false;
   }
 
   const newItem: CatchUpItem = {
     id: `cup-${Date.now()}-${Math.floor(Math.random() * 1e4)}`,
     targetHandle: norm,
+    requesterUid: target.requesterUid,
     requesterName: target.name,
     requesterPhoto: target.photo,
     venue: target.city,
@@ -121,7 +214,8 @@ export function toggleCatchUpReminder(target: {
     status: "pending",
   };
 
-  persist([newItem, ...items]);
+  upsertMemory(newItem);
+  syncRemote(newItem);
   return true;
 }
 
@@ -139,7 +233,6 @@ export function recordCatchUpInterest(input: {
   notes?: string;
   planId?: string;
 }): CatchUpItem {
-  const items = listCatchUps();
   const norm = normalizeHandle(input.targetHandle);
 
   const item: CatchUpItem = {
@@ -161,35 +254,87 @@ export function recordCatchUpInterest(input: {
     status: "pending",
   };
 
-  persist([item, ...items]);
-  if (input.requesterUid) syncRemote(item);
+  upsertMemory(item);
+  syncRemote(item);
   return item;
 }
 
+/** Live proposals where this account is the requester (for conflict checks + reminders). */
+export function subscribeMyCatchUps(uid: string, onRows: (rows: CatchUpItem[]) => void): () => void {
+  if (!uid) {
+    onRows([]);
+    return () => undefined;
+  }
+
+  migrateLegacyForUid(uid);
+
+  if (!isFirebaseConfigured) {
+    onRows(listCatchUps().filter((i) => i.requesterUid === uid && i.status !== "dismissed"));
+    return () => undefined;
+  }
+
+  const db = getFirebaseDb();
+  if (!db) {
+    onRows(listCatchUps().filter((i) => i.requesterUid === uid && i.status !== "dismissed"));
+    return () => undefined;
+  }
+
+  const q = query(collection(db, "catchups"), where("requesterUid", "==", uid));
+  return onSnapshot(
+    q,
+    (snap) => {
+      const rows = snap.docs.map((d) => {
+        const data = d.data() as CatchUpItem;
+        return { ...data, id: data.id || d.id };
+      });
+      mergeRemoteForRequester(uid, rows);
+      onRows(rows.filter((i) => i.status !== "dismissed"));
+    },
+    () => {
+      onRows(listCatchUps().filter((i) => i.requesterUid === uid && i.status !== "dismissed"));
+    },
+  );
+}
+
 export function subscribeCatchUpsForOwner(ownerUid: string, onRows: (rows: CatchUpItem[]) => void): () => void {
-  if (!ownerUid || !isFirebaseConfigured) {
+  if (!ownerUid) {
+    onRows([]);
+    return () => undefined;
+  }
+
+  if (!isFirebaseConfigured) {
     onRows(listCatchUps().filter((i) => i.targetOwnerUid === ownerUid && i.status !== "dismissed"));
     return () => undefined;
   }
+
   const db = getFirebaseDb();
   if (!db) {
     onRows([]);
     return () => undefined;
   }
+
   const q = query(collection(db, "catchups"), where("targetOwnerUid", "==", ownerUid));
   return onSnapshot(
     q,
     (snap) => {
-      const rows = snap.docs.map((d) => d.data() as CatchUpItem).filter((i) => i.status !== "dismissed");
-      onRows(rows);
+      const rows = snap.docs.map((d) => {
+        const data = d.data() as CatchUpItem;
+        return { ...data, id: data.id || d.id };
+      });
+      mergeRemoteForOwner(ownerUid, rows);
+      onRows(rows.filter((i) => i.status !== "dismissed"));
     },
-    () => onRows(listCatchUpsForHandle("")),
+    () => onRows(listCatchUps().filter((i) => i.targetOwnerUid === ownerUid && i.status !== "dismissed")),
   );
 }
 
 export function updateCatchUpStatus(id: string, status: "pending" | "accepted" | "scheduled" | "dismissed"): void {
-  const items = listCatchUps().map((item) => (item.id === id ? { ...item, status } : item));
-  persist(items);
+  const existing = listCatchUps().find((item) => item.id === id);
+  const next = existing ? { ...existing, status } : undefined;
+  if (next) upsertMemory(next);
+  else {
+    memory = listCatchUps().map((item) => (item.id === id ? { ...item, status } : item));
+  }
   if (!isFirebaseConfigured) return;
   const db = getFirebaseDb();
   if (!db) return;
@@ -197,8 +342,11 @@ export function updateCatchUpStatus(id: string, status: "pending" | "accepted" |
 }
 
 export function removeCatchUp(id: string): void {
-  const items = listCatchUps().filter((item) => item.id !== id);
-  persist(items);
+  removeFromMemory(id);
+  if (!isFirebaseConfigured) return;
+  const db = getFirebaseDb();
+  if (!db) return;
+  void deleteDoc(doc(db, "catchups", id)).catch(() => undefined);
 }
 
 export interface TimeConflict {
@@ -220,7 +368,6 @@ export function checkTimeConflict(
   const [th, tm] = time.split(":").map(Number);
   const targetMinutes = (th || 0) * 60 + (tm || 0);
 
-  // Check existing user plans
   for (const p of existingPlans) {
     if (p.date === date && p.time) {
       const [ph, pm] = p.time.split(":").map(Number);
@@ -236,9 +383,9 @@ export function checkTimeConflict(
     }
   }
 
-  // Check existing catch-ups & meetings
   for (const c of existingCatchups) {
-    if (c.date === date && c.time && c.status !== "dismissed") {
+    if (c.date && c.time && c.status !== "dismissed" && !c.isReminderOnly) {
+      if (c.date !== date) continue;
       const [ch, cm] = c.time.split(":").map(Number);
       const catchupMinutes = (ch || 0) * 60 + (cm || 0);
       if (Math.abs(targetMinutes - catchupMinutes) < 60) {
@@ -255,3 +402,8 @@ export function checkTimeConflict(
   return { hasConflict: false };
 }
 
+/** Test helper — clear the in-memory mirror between cases. */
+export function __resetCatchUpMemoryForTests(): void {
+  memory = [];
+  migratedUids.clear();
+}

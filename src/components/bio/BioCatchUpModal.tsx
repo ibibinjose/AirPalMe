@@ -25,7 +25,8 @@ import {
   toggleCatchUpReminder,
   hasCatchUpReminder,
   checkTimeConflict,
-  listCatchUps,
+  subscribeMyCatchUps,
+  type CatchUpItem,
 } from "@/lib/catchup";
 import { toZonedDateStr } from "@/lib/local-time";
 import { triggerHaptic } from "@/lib/native";
@@ -71,6 +72,15 @@ export function BioCatchUpModal({
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRemembered, setIsRemembered] = useState(() => hasCatchUpReminder(handle));
+  const [myCatchups, setMyCatchups] = useState<CatchUpItem[]>([]);
+
+  useEffect(() => {
+    if (!user?.uid) {
+      setMyCatchups([]);
+      return;
+    }
+    return subscribeMyCatchUps(user.uid, setMyCatchups);
+  }, [user?.uid]);
 
   useEffect(() => {
     if (!open) return;
@@ -129,13 +139,13 @@ export function BioCatchUpModal({
   const currentOption = typeOptions.find((o) => o.type === selectedType) || typeOptions[0]!;
 
   // Double-booking collision detection against user's plans and existing meetups
-  const conflict = checkTimeConflict(date, time, myPlans, listCatchUps());
+  const conflict = checkTimeConflict(date, time, myPlans, myCatchups);
 
   if (!open) return null;
 
   const handleToggleReminder = () => {
     void triggerHaptic("light");
-    const nextState = toggleCatchUpReminder({ handle, name, photo: avatar, city });
+    const nextState = toggleCatchUpReminder({ handle, name, photo: avatar, city, requesterUid: user?.uid });
     setIsRemembered(nextState);
     toast[nextState ? "success" : "info"](
       nextState ? `Saved a reminder to catch up with ${name}` : `Removed reminder for ${name}`,
@@ -145,7 +155,7 @@ export function BioCatchUpModal({
   const handleLaunch = () => {
     if (!requireUser("Sign in to propose a catch-up, meeting, or hangout.")) return;
     // Re-check at click time so a stale render cannot bypass the hard block.
-    const liveConflict = checkTimeConflict(date, time, myPlans, listCatchUps());
+    const liveConflict = checkTimeConflict(date, time, myPlans, myCatchups);
     if (liveConflict.hasConflict) {
       toast.error(
         `That time overlaps “${liveConflict.conflictingTitle}” at ${liveConflict.conflictingTime}. Pick another slot.`,

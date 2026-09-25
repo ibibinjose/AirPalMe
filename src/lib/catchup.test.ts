@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
+  __resetCatchUpMemoryForTests,
   checkTimeConflict,
   hasCatchUpReminder,
   listCatchUpsForHandle,
@@ -8,6 +9,10 @@ import {
 } from "./catchup";
 
 describe("catch-up proposals", () => {
+  beforeEach(() => {
+    __resetCatchUpMemoryForTests();
+  });
+
   it("records a 1-on-1 coffee against a handle", () => {
     const item = recordCatchUpInterest({
       targetHandle: "xyz",
@@ -26,16 +31,20 @@ describe("catch-up proposals", () => {
   });
 
   it("toggles a reminder for a handle", () => {
-    const on = toggleCatchUpReminder({ handle: "xyz-rem", name: "Xyz" });
+    const on = toggleCatchUpReminder({ handle: "xyz-rem", name: "Xyz", requesterUid: "u1" });
     expect(on).toBe(true);
     expect(hasCatchUpReminder("xyz-rem")).toBe(true);
-    const off = toggleCatchUpReminder({ handle: "xyz-rem", name: "Xyz" });
+    const off = toggleCatchUpReminder({ handle: "xyz-rem", name: "Xyz", requesterUid: "u1" });
     expect(off).toBe(false);
     expect(hasCatchUpReminder("xyz-rem")).toBe(false);
   });
 });
 
 describe("checkTimeConflict", () => {
+  beforeEach(() => {
+    __resetCatchUpMemoryForTests();
+  });
+
   it("flags a plan within 60 minutes on the same date", () => {
     const result = checkTimeConflict(
       "2026-09-25",
@@ -55,6 +64,23 @@ describe("checkTimeConflict", () => {
       [{ date: "2026-09-25", time: "16:00", title: "Later plan", type: "Plan" }],
       [],
     );
+    expect(result.hasConflict).toBe(false);
+  });
+
+  it("ignores reminder-only catch-ups when checking conflicts", () => {
+    const result = checkTimeConflict("2026-09-25", "14:00", [], [
+      {
+        id: "r1",
+        targetHandle: "xyz",
+        requesterName: "Sam",
+        type: "catchup",
+        date: "2026-09-25",
+        time: "14:00",
+        createdAt: new Date().toISOString(),
+        isReminderOnly: true,
+        status: "pending",
+      },
+    ]);
     expect(result.hasConflict).toBe(false);
   });
 });
