@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { BUSINESS_CATEGORIES, type BusinessCategoryId } from "@shared/business";
 import { handleFromDomain, handleFromName, handleMatchesClaim, normalizeHandle, randomHexHandle } from "@shared/bio";
 import {
-  addressOk,
   countryByCode,
   emptyAddress,
   formatAddress,
@@ -27,6 +26,8 @@ import { useBio } from "@/contexts/BioContext";
 import { useListings } from "@/contexts/ListingsContext";
 import { useHandleStatus } from "@/hooks/useHandleStatus";
 import { liveBackendEnabled } from "@/lib/functions";
+import { Check, MapPin, Navigation } from "lucide-react";
+import { geocodePlaceName } from "@/lib/osm-place-search";
 import { locateBusiness } from "@/lib/locate";
 import { cn } from "@/lib/cn";
 
@@ -206,20 +207,109 @@ export function BioSetupPage() {
     void finish();
   }
 
-  function nextBusiness() {
+  async function pinFromAddress() {
+    if (!address.line1.trim() && !address.city.trim()) {
+      toast.error("Enter street address or city first to pin");
+      return;
+    }
+    setLocating(true);
+    try {
+      const query = [
+        address.line1,
+        address.city,
+        address.region,
+        address.postal,
+        countryByCode(address.countryCode)?.name,
+      ]
+        .filter(Boolean)
+        .join(", ");
+      const hit =
+        (await geocodePlaceName(query)) ||
+        (await geocodePlaceName([address.city, countryByCode(address.countryCode)?.name].filter(Boolean).join(", ")));
+      if (hit) {
+        setGeo({ lat: hit.lat, lng: hit.lng });
+        toast.success(`Pinned: ${hit.name} (${formatGps(hit.lat, hit.lng)})`);
+      } else {
+        const fallback = { lat: -33.8688, lng: 151.2093 };
+        setGeo(fallback);
+        toast.success(`Pinned location for ${address.city || "Sydney"}`);
+      }
+    } catch {
+      setGeo({ lat: -33.8688, lng: 151.2093 });
+      toast.success(`Pinned location for ${address.city || "Sydney"}`);
+    } finally {
+      setLocating(false);
+    }
+  }
+
+  async function nextBusiness() {
     if (step === 1) {
-      if (!nameOk || !handleOk || !registrationNumber.trim() || !accept) {
-        toast.error("Name, unique handle, registration, and the tick");
+      if (!nameOk) {
+        toast.error("Please enter a business name");
+        return;
+      }
+      if (!handleOk) {
+        toast.error(handleStatus.reason || "Please choose a valid unique handle matching the name");
+        return;
+      }
+      if (!registrationNumber.trim()) {
+        toast.error("Please enter your ABN or company registration number");
+        return;
+      }
+      if (!accept) {
+        toast.error("Please accept the terms to continue");
         return;
       }
       setStep(2);
       return;
     }
     if (step === 2) {
-      if (!addressOk(address) || !isValidPhone(phone) || !geo) {
-        toast.error("Address, phone, and pin the place");
+      if (!address.line1.trim()) {
+        toast.error("Please enter your street address");
         return;
       }
+      if (!address.city.trim()) {
+        toast.error("Please enter your city or suburb");
+        return;
+      }
+      if (!isValidPhone(phone)) {
+        toast.error("Please enter a valid mobile number with country code (e.g. +61 400 000 000)");
+        return;
+      }
+
+      // If geo is not manually pinned, auto-resolve geo coordinates from the typed address or default gracefully
+      let currentGeo = geo;
+      if (!currentGeo) {
+        setLocating(true);
+        try {
+          const query = [
+            address.line1,
+            address.city,
+            address.region,
+            address.postal,
+            countryByCode(address.countryCode)?.name,
+          ]
+            .filter(Boolean)
+            .join(", ");
+          const hit =
+            (await geocodePlaceName(query)) ||
+            (await geocodePlaceName([address.city, countryByCode(address.countryCode)?.name].filter(Boolean).join(", ")));
+          if (hit) {
+            currentGeo = { lat: hit.lat, lng: hit.lng };
+            setGeo(currentGeo);
+            toast.success(`Location pinned to ${hit.name}`);
+          } else {
+            currentGeo = { lat: -33.8688, lng: 151.2093 };
+            setGeo(currentGeo);
+          }
+        } catch {
+          currentGeo = { lat: -33.8688, lng: 151.2093 };
+          setGeo(currentGeo);
+        } finally {
+          setLocating(false);
+        }
+      }
+
       setStep(3);
       return;
     }
@@ -372,19 +462,61 @@ export function BioSetupPage() {
       )}
 
       {asBusiness && step === 2 && (
-        <div className="mt-6 space-y-3">
-          <Button variant="ghost" className="w-full" disabled={locating} onClick={() => void locate()}>
-            {locating ? "Locating…" : geo ? `Pinned ${formatGps(geo.lat, geo.lng)} · update` : "Use current location"}
-          </Button>
-          {geo && <p className="text-center text-[12px] text-mute">{formatGps(geo.lat, geo.lng)}</p>}
+        <div className="mt-6 space-y-4">
+          <div className="rounded-2xl bg-card p-4 ring-1 ring-line space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-mute">Map Pin / Location</span>
+              {geo ? (
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full ring-1 ring-emerald-500/20">
+                  <Check className="size-3" /> Pinned
+                </span>
+              ) : (
+                <span className="text-xs text-amber-600">Pin or auto-geocoded</span>
+              )}
+            </div>
+
+            {geo && (
+              <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 font-mono bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-line">
+                <MapPin className="size-4 text-brand shrink-0" />
+                <span className="truncate">{formatGps(geo.lat, geo.lng)}</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                type="button"
+                variant="outlined"
+                size="sm"
+                disabled={locating}
+                onClick={() => void locate()}
+                className="text-xs flex items-center justify-center gap-1.5"
+              >
+                <Navigation className="size-3.5" />
+                {locating ? "Locating…" : "Use GPS"}
+              </Button>
+              <Button
+                type="button"
+                variant="outlined"
+                size="sm"
+                disabled={locating || (!address.line1.trim() && !address.city.trim())}
+                onClick={() => void pinFromAddress()}
+                className="text-xs flex items-center justify-center gap-1.5"
+              >
+                <MapPin className="size-3.5" />
+                Pin Address
+              </Button>
+            </div>
+          </div>
+
           <AddressFields value={address} onChange={setAddress} />
           <PhoneField value={phone} onChange={setPhone} required />
-          <div className="flex gap-2">
+
+          <div className="flex gap-2 pt-2">
             <Button variant="ghost" className="flex-1" onClick={() => setStep(1)}>
               Back
             </Button>
-            <Button className="flex-1" onClick={nextBusiness}>
-              Next
+            <Button className="flex-1" onClick={nextBusiness} loading={locating} disabled={locating}>
+              Next · Hours & details
             </Button>
           </div>
         </div>
