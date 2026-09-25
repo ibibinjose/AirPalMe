@@ -14,8 +14,8 @@ import {
   Footprints,
   HeartHandshake,
 } from "lucide-react";
-import { activePlaces, placesForLocation, toursForPrecinct } from "@/lib/catalog";
-import { hrefForPlace } from "@/lib/bio-handle";
+import { activePlaces, placeByHandle, placesForLocation, toursForPrecinct } from "@/lib/catalog";
+import { hrefForPlace, handleOfPlace, resolvePublicBio } from "@/lib/bio-handle";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { cityMatches } from "@/lib/remote-events";
 import { EVENT_NEAR_M, locatedNear } from "@/lib/location-scope";
@@ -25,6 +25,10 @@ import { isTicketed } from "@shared/plan";
 import type { PublicMate } from "@shared/companion";
 import { loadPublicMatesRemote } from "@/lib/companion-remote";
 import { loadTours } from "@/lib/tours-store";
+import { bioPath, bioKindLabel, type BioProfile } from "@shared/bio";
+import { fetchPublicBio, loadBios } from "@/lib/bio-store";
+import { listPeople } from "@/lib/people";
+import { profileMatchesSearch, searchNeedle } from "@/lib/search-query";
 import { useEvents } from "@/contexts/EventsContext";
 import { useListings } from "@/contexts/ListingsContext";
 import { usePlans } from "@/contexts/PlanContext";
@@ -91,6 +95,7 @@ export function GlobalSearchModal() {
   const { here, city, usingGps } = useLocalNow();
   const [liveExperiences, setLiveExperiences] = useState<Campaign[]>([]);
   const [publicMates, setPublicMates] = useState<PublicMate[]>([]);
+  const [handleBio, setHandleBio] = useState<BioProfile | null>(null);
   const [recent, setRecent] = useState<RecentItem[]>([]);
 
   useScrollLock(open);
@@ -107,6 +112,30 @@ export function GlobalSearchModal() {
       .then(setPublicMates)
       .catch(() => undefined);
   }, [open]);
+
+  // Exact @handle → public profile (handles/{handle} get). Without this, People search never finds bios.
+  useEffect(() => {
+    if (!open) {
+      setHandleBio(null);
+      return;
+    }
+    const needle = searchNeedle(query);
+    if (!needle.looksLikeHandle) {
+      setHandleBio(null);
+      return;
+    }
+    let cancelled = false;
+    void fetchPublicBio(needle.handle)
+      .then((bio) => {
+        if (!cancelled) setHandleBio(bio);
+      })
+      .catch(() => {
+        if (!cancelled) setHandleBio(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, query]);
 
   // Keyboard shortcut (Cmd+K / Ctrl+K) and custom event listener
   useEffect(() => {
@@ -144,19 +173,97 @@ export function GlobalSearchModal() {
 
   // Generate indexed search results
   const results = useMemo<SearchResultItem[]>(() => {
-    const q = query.trim().toLowerCase();
+    const needle = searchNeedle(query);
+    const q = needle.text.replace(/^@+/, "");
     const items: SearchResultItem[] = [];
+    const seenPerson = new Set<string>();
 
     // Empty query renders the Recent + Explore panel instead of results.
-    if (!q) return items;
+    if (!needle.text) return items;
+
+    function pushPerson(item: SearchResultItem) {
+      if (seenPerson.has(item.id)) return;
+      seenPerson.add(item.id);
+      items.push(item);
+    }
+
+    // 0. People / bios by @handle (local cache + remote exact hit + saved contacts)
+    if (handleBio && profileMatchesSearch(handleBio, needle)) {
+      pushPerson({
+        id: `bio-${handleBio.id || handleBio.handle}`,
+        category: "person",
+        title: handleBio.name || `@${handleBio.handle}`,
+        subtitle: `@${handleBio.handle}${handleBio.shortWhy ? ` · ${handleBio.shortWhy}` : ""}`,
+        badge: bioKindLabel(handleBio.kind),
+        href: bioPath(handleBio.handle),
+        icon: HeartHandshake,
+      });
+    }
+    for (const bio of loadBios()) {
+      if (!profileMatchesSearch(bio, needle)) continue;
+      pushPerson({
+        id: `bio-${bio.id || bio.handle}`,
+        category: "person",
+        title: bio.name || `@${bio.handle}`,
+        subtitle: `@${bio.handle}${bio.shortWhy ? ` · ${bio.shortWhy}` : ""}`,
+        badge: bioKindLabel(bio.kind),
+        href: bioPath(bio.handle),
+        icon: HeartHandshake,
+      });
+    }
+    if (needle.looksLikeHandle) {
+      const resolved = resolvePublicBio(needle.handle, (h) => loadBios().find((b) => b.handle === h));
+      if (resolved) {
+        pushPerson({
+          id: `bio-${resolved.id || resolved.handle}`,
+          category: "person",
+          title: resolved.name || `@${resolved.handle}`,
+          subtitle: `@${resolved.handle}${resolved.shortWhy ? ` · ${resolved.shortWhy}` : ""}`,
+          badge: bioKindLabel(resolved.kind),
+          href: bioPath(resolved.handle),
+          icon: HeartHandshake,
+        });
+      } else {
+        const place = placeByHandle(needle.handle);
+        if (place) {
+          items.push({
+            id: `place-handle-${place.id}`,
+            category: "place",
+            title: place.name,
+            subtitle: place.shortWhy || place.address || place.category,
+            badge: place.category,
+            href: hrefForPlace(place),
+            icon: MapPin,
+          });
+        }
+      }
+    }
+    for (const person of listPeople()) {
+      const handle = (person.handle || "").toLowerCase();
+      if (!q) continue;
+      if (!(handle && (handle === needle.handle || handle.includes(q))) && !person.name.toLowerCase().includes(q)) {
+        continue;
+      }
+      pushPerson({
+        id: `met-${person.id}`,
+        category: "person",
+        title: person.name,
+        subtitle: person.handle ? `@${person.handle}` : person.whereMet || "People you met",
+        badge: "Met",
+        href: person.handle ? bioPath(person.handle) : "/me/people",
+        icon: HeartHandshake,
+      });
+    }
 
     // 1. Match Places (live listings only — empty DB means no place results)
     for (const p of placesForLocation(activePlaces(), here, city, usingGps)) {
+      const placeHandle = handleOfPlace(p) || "";
       if (
         p.name.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q) ||
         p.shortWhy.toLowerCase().includes(q) ||
-        (p.address && p.address.toLowerCase().includes(q))
+        (p.address && p.address.toLowerCase().includes(q)) ||
+        (placeHandle && (placeHandle === needle.handle || placeHandle.includes(q)))
       ) {
         items.push({
           id: `place-${p.id}`,
@@ -365,6 +472,7 @@ export function GlobalSearchModal() {
     activeCategory,
     liveExperiences,
     publicMates,
+    handleBio,
     here,
     city,
     usingGps,
