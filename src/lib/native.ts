@@ -44,17 +44,19 @@ export function getNativePlatform(): "ios" | "android" | "web" {
   return "web";
 }
 
+export type HapticStyle = "light" | "medium" | "heavy" | "success" | "warning" | "error" | "selection";
+
 /**
  * Trigger subtle, tactile haptic feedback on native devices.
  * Gracefully degrades to a silent no-op or web vibration.
  */
 export async function triggerHaptic(
-  style: "light" | "medium" | "heavy" | "success" | "warning" | "error" = "light",
+  style: HapticStyle = "light",
 ): Promise<void> {
   if (!isNativeApp()) {
     if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
       try {
-        if (style === "light") navigator.vibrate(10);
+        if (style === "light" || style === "selection") navigator.vibrate(10);
         else if (style === "medium") navigator.vibrate(20);
         else if (style === "heavy") navigator.vibrate(35);
         else if (style === "success") navigator.vibrate([15, 30, 25]);
@@ -68,6 +70,9 @@ export async function triggerHaptic(
 
   try {
     switch (style) {
+      case "selection":
+        await Haptics.selectionChanged();
+        break;
       case "light":
         await Haptics.impact({ style: ImpactStyle.Light });
         break;
@@ -88,8 +93,19 @@ export async function triggerHaptic(
         break;
     }
   } catch {
-    /* ignore native haptics failure */
+    try {
+      await Haptics.impact({ style: ImpactStyle.Light });
+    } catch {
+      /* ignore native haptics failure */
+    }
   }
+}
+
+/**
+ * Trigger selection haptics on list item selection, tab switches, and filter chips.
+ */
+export async function triggerHapticSelection(): Promise<void> {
+  return triggerHaptic("selection");
 }
 
 /**

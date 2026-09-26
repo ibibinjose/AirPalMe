@@ -144,84 +144,96 @@ export function AirPalChatView({
 
       {/* Message Stream */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 no-scrollbar">
-        {messages.map((msg) => {
-          const isMe = msg.senderUid === currentUser.uid;
-          const isAi = msg.isAi || msg.senderUid === "airpal-ai";
+        {messages.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center text-center p-6">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-paper ring-1 ring-line text-brand">
+              <Bot size={24} />
+            </div>
+            <p className="mt-3 font-display text-sm font-bold text-ink">Start the conversation</p>
+            <p className="mt-1 text-xs text-mute max-w-xs">
+              Say hello or ask questions about plans, places, and recommendations.
+            </p>
+          </div>
+        ) : (
+          messages.map((msg) => {
+            const isMe = msg.senderUid === currentUser.uid;
+            const isAi = msg.isAi || msg.senderUid === "airpal-ai";
 
-          return (
-            <div
-              key={msg.id}
-              className={cn("flex flex-col", isMe ? "items-end" : "items-start")}
-            >
+            return (
               <div
-                className={cn(
-                  "flex items-end gap-2 max-w-[85%] sm:max-w-[75%]",
-                  isMe ? "flex-row-reverse" : "flex-row",
-                )}
+                key={msg.id}
+                className={cn("flex flex-col", isMe ? "items-end" : "items-start")}
               >
-                {!isMe && (
-                  <div className="h-7 w-7 overflow-hidden rounded-full ring-1 ring-line/60 bg-paper shrink-0 mb-1">
-                    {isAi ? (
-                      <div className="grid h-full w-full place-items-center bg-[#1805db] text-white">
-                        <Bot size={14} />
-                      </div>
-                    ) : msg.senderPhoto ? (
-                      <Photo src={msg.senderPhoto} className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="grid h-full w-full place-items-center bg-ink text-white font-bold text-xs">
-                        {msg.senderName[0]}
-                      </div>
-                    )}
-                  </div>
-                )}
-
                 <div
                   className={cn(
-                    "rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed shadow-2xs break-words",
-                    isMe
-                      ? "bg-brand text-white rounded-br-xs"
-                      : isAi
-                        ? "bg-paper ring-1 ring-brand/30 text-ink rounded-bl-xs shadow-xs"
-                        : "bg-paper ring-1 ring-line/80 text-ink rounded-bl-xs",
+                    "flex items-end gap-2 max-w-[85%] sm:max-w-[75%]",
+                    isMe ? "flex-row-reverse" : "flex-row",
                   )}
                 >
                   {!isMe && (
-                    <div className="flex items-center gap-1.5 mb-1">
-                      <span className="text-[11px] font-bold text-ink/75">{msg.senderName}</span>
-                      {isAi && (
-                        <span className="text-[9px] font-extrabold uppercase tracking-wider text-brand bg-brand/10 px-1.5 py-0.2 rounded-full">
-                          AI
-                        </span>
+                    <div className="h-7 w-7 overflow-hidden rounded-full ring-1 ring-line/60 bg-paper shrink-0 mb-1">
+                      {isAi ? (
+                        <div className="grid h-full w-full place-items-center bg-[#1805db] text-white">
+                          <Bot size={14} />
+                        </div>
+                      ) : msg.senderPhoto ? (
+                        <Photo src={msg.senderPhoto} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="grid h-full w-full place-items-center bg-ink text-white font-bold text-xs">
+                          {msg.senderName[0]}
+                        </div>
                       )}
                     </div>
                   )}
 
-                  <p className="whitespace-pre-line">{msg.text}</p>
+                  <div
+                    className={cn(
+                      "rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed shadow-2xs break-words",
+                      isMe
+                        ? "bg-brand text-white rounded-br-xs"
+                        : isAi
+                          ? "bg-paper ring-1 ring-brand/30 text-ink rounded-bl-xs shadow-xs"
+                          : "bg-paper ring-1 ring-line/80 text-ink rounded-bl-xs",
+                    )}
+                  >
+                    {!isMe && (
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-[11px] font-bold text-ink/75">{msg.senderName}</span>
+                        {isAi && (
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-brand bg-brand/10 px-1.5 py-0.2 rounded-full">
+                            AI
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    <p className="whitespace-pre-line">{msg.text}</p>
+                  </div>
                 </div>
+
+                {/* Action Chips for AI Suggestions */}
+                {msg.suggestedActions && msg.suggestedActions.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1.5 pl-9 max-w-sm">
+                    {msg.suggestedActions.map((act, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => handleAction(act.action, act.payload)}
+                        className="inline-flex items-center gap-1 rounded-full bg-brand/10 hover:bg-brand/20 text-brand px-3 py-1 text-[11px] font-semibold ring-1 ring-brand/20 transition active:scale-95"
+                      >
+                        <span>{act.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <span className="text-[10px] text-mute/70 mt-1 px-1">
+                  {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </span>
               </div>
-
-              {/* Action Chips for AI Suggestions */}
-              {msg.suggestedActions && msg.suggestedActions.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-1.5 pl-9 max-w-sm">
-                  {msg.suggestedActions.map((act, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => handleAction(act.action, act.payload)}
-                      className="inline-flex items-center gap-1 rounded-full bg-brand/10 hover:bg-brand/20 text-brand px-3 py-1 text-[11px] font-semibold ring-1 ring-brand/20 transition active:scale-95"
-                    >
-                      <span>{act.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              <span className="text-[10px] text-mute/70 mt-1 px-1">
-                {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-              </span>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
         <div ref={bottomRef} />
       </div>
 

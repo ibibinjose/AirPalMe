@@ -9,7 +9,6 @@ import {
   MapPin,
   Plane,
   Plus,
-  QrCode,
   Search,
   ShieldCheck,
   Sparkles,
@@ -26,8 +25,6 @@ import { formatPlanDate } from "@shared/plan";
 import { Photo } from "@/components/ui/Photo";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
-import { DoorChooser } from "@/components/home/DoorChooser";
-import { loadDoor, saveDoor } from "@/lib/door";
 import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
 import { triggerHaptic } from "@/lib/native";
 import { loadPublicMatesRemote } from "@/lib/companion-remote";
@@ -131,7 +128,6 @@ export function HomePage() {
   const { city, here, today, now } = useLocalNow();
   const { version } = useListings();
   const [around, setAround] = useState<AroundFilter>("events");
-  const [door, setDoor] = useState(() => loadDoor());
   const [publicMates, setPublicMates] = useState<PublicMate[]>([]);
 
   useEffect(() => {
@@ -180,17 +176,6 @@ export function HomePage() {
   );
 
   const forYou = useMemo(() => publicPlans.slice(0, 3), [publicPlans]);
-
-  if (!door) {
-    return (
-      <DoorChooser
-        onPick={(id) => {
-          saveDoor(id);
-          setDoor(id);
-        }}
-      />
-    );
-  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 md:px-6">
@@ -261,9 +246,9 @@ export function HomePage() {
                 void triggerHaptic("medium");
                 nav("/mate");
               }}
-              className="h-11 rounded-full px-5 font-bold shadow-[0_6px_20px_rgba(24,5,219,0.35)]"
+              className="h-11 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(24,5,219,0.35)]"
             >
-              <Users size={16} className="mr-1.5" />
+              <Users size={16} className="mr-2" />
               Find a Mate
             </Button>
             <Button
@@ -273,22 +258,10 @@ export function HomePage() {
                 void triggerHaptic("light");
                 nav("/plan/new");
               }}
-              className="h-11 rounded-full px-5 bg-white/15 text-white ring-1 ring-white/30 hover:bg-white/25 font-semibold"
+              className="h-11 rounded-full px-5 bg-white/15 text-white ring-1 ring-white/30 hover:bg-white/25 font-semibold backdrop-blur-md"
             >
               <Plus size={16} className="mr-1.5" />
-              Make a Plan
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                void triggerHaptic("light");
-                nav("/scan");
-              }}
-              className="h-11 rounded-full px-4 bg-white/15 text-white ring-1 ring-white/30 hover:bg-white/25"
-              title="Scan QR / NFC"
-            >
-              <QrCode size={16} />
+              Plan a Hangout
             </Button>
           </div>
         </div>
@@ -317,22 +290,19 @@ export function HomePage() {
                   void triggerHaptic("light");
                   nav(v.href);
                 }}
-                className={cn(
-                  "group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-card p-3.5 text-left ring-1 ring-line/80 shadow-xs transition-all hover:shadow-md hover:ring-brand/30 active:scale-[0.98] cursor-pointer",
-                )}
+                className="group relative flex flex-col justify-between rounded-2xl bg-card p-4 text-left ring-1 ring-line/80 shadow-xs transition hover:shadow-md hover:ring-brand/30 active:scale-[0.98] cursor-pointer"
               >
-                <div className={cn("absolute inset-0 bg-gradient-to-br opacity-60 transition-opacity group-hover:opacity-100", v.gradient)} />
-                <div className="relative z-10 flex items-start justify-between">
-                  <div className={cn("grid h-9 w-9 place-items-center rounded-xl shadow-xs", v.iconBg)}>
+                <div className="flex items-center justify-between">
+                  <div className={cn("grid h-10 w-10 place-items-center rounded-xl shadow-xs transition group-hover:scale-105", v.iconBg)}>
                     <Icon size={18} />
                   </div>
                   {v.badge && (
-                    <span className="rounded-full bg-paper px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-mute ring-1 ring-line">
+                    <span className="text-[10px] font-bold text-mute">
                       {v.badge}
                     </span>
                   )}
                 </div>
-                <div className="relative z-10 mt-4">
+                <div className="mt-4">
                   <p className="font-display text-[15px] font-bold text-ink leading-snug group-hover:text-brand transition-colors">
                     {v.label}
                   </p>
@@ -487,16 +457,9 @@ export function HomePage() {
                       </p>
                     </div>
                   </div>
-                  <div className="mt-2.5 flex flex-wrap gap-1">
-                    {(m.interests || ["Events", "Coffee", "Walks"]).slice(0, 2).map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full bg-paper px-2 py-0.5 text-[10px] font-medium text-mute ring-1 ring-line"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                  <p className="mt-2 text-[11px] text-mute font-medium truncate">
+                    {(m.interests || ["Events", "Coffee", "Walks"]).slice(0, 3).join(" · ")}
+                  </p>
                 </CardShell>
               ))
             ) : (
@@ -732,10 +695,18 @@ export function HomePage() {
           <p className="text-xs text-mute mt-1 max-w-xl leading-relaxed">
             Verified identity badges, safe public meetup guidelines, transparent pricing with Stripe protection, and 24/7 incident support.
           </p>
-          <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-semibold text-ink/70">
-            <span className="rounded-full bg-paper px-2.5 py-1 ring-1 ring-line">✓ Identity Verified Mates</span>
-            <span className="rounded-full bg-paper px-2.5 py-1 ring-1 ring-line">✓ Stripe Secure Payments</span>
-            <span className="rounded-full bg-paper px-2.5 py-1 ring-1 ring-line">✓ Public Meetup Safety</span>
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-mute font-medium">
+            <span className="flex items-center gap-1.5 text-ink font-semibold">
+              <span className="text-emerald-600 font-bold">✓</span> Identity Verified Mates
+            </span>
+            <span aria-hidden="true" className="text-line select-none hidden sm:inline">·</span>
+            <span className="flex items-center gap-1.5 text-ink font-semibold">
+              <span className="text-emerald-600 font-bold">✓</span> Stripe Secure Payments
+            </span>
+            <span aria-hidden="true" className="text-line select-none hidden sm:inline">·</span>
+            <span className="flex items-center gap-1.5 text-ink font-semibold">
+              <span className="text-emerald-600 font-bold">✓</span> Public Meetup Safety
+            </span>
           </div>
         </div>
       </section>

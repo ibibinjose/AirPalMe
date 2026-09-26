@@ -4,8 +4,8 @@ import {
   arrayUnion,
   collection,
   doc,
-  getDocs,
   limit,
+  onSnapshot,
   orderBy,
   query,
   serverTimestamp,
@@ -43,7 +43,6 @@ export function ChatBox({
   useEffect(() => {
     const db = getFirebaseDb();
     if (!db) return;
-    let cancelled = false;
     setLoadError(false);
     // Ensure the chat shell exists so both parties share one thread.
     if (!readOnly) {
@@ -53,9 +52,16 @@ export function ChatBox({
         { merge: true },
       ).catch(() => undefined);
     }
-    void getDocs(query(collection(db, "request_chats", requestId, "messages"), orderBy("createdAt", "asc"), limit(100)))
-      .then((snap) => {
-        if (cancelled) return;
+
+    const q = query(
+      collection(db, "request_chats", requestId, "messages"),
+      orderBy("createdAt", "asc"),
+      limit(100),
+    );
+
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
         const list = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ChatMessage, "id">) }));
         setMessages(list);
         // Read state: mark others' messages seen.
@@ -68,12 +74,14 @@ export function ChatBox({
             }
           }
         }
-      })
-      .catch(() => {
-        if (!cancelled) setLoadError(true);
-      });
+      },
+      () => {
+        setLoadError(true);
+      },
+    );
+
     return () => {
-      cancelled = true;
+      unsub();
     };
   }, [requestId, readOnly, user, reloadKey]);
 

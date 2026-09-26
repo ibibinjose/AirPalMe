@@ -181,6 +181,9 @@ export function AppRoutes() {
         <Route path="/me/zoo" component={ZooPage} />
         <Route path="/me/memories" component={MemoryWallPage} />
         <Route path="/me/people" component={PeoplePage} />
+        <Route path="/inbox" component={InboxPage} />
+        <Route path="/chat" component={InboxPage} />
+        <Route path="/messages" component={InboxPage} />
         <Route path="/me/inbox" component={InboxPage} />
         <Route path="/me/tickets" component={MyTicketsPage} />
         <Route path="/circle" component={CirclePage} />

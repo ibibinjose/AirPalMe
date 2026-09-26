@@ -137,6 +137,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
 
   const handleCardClick = () => {
     if (onSelect) {
+      void triggerHaptic("light");
       void track("calendar_event_open", { eventId: event.id, name: event.title, action: "card_click" });
       onSelect(event);
     }

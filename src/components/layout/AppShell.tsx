@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, useReducedMotion } from "framer-motion";
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { TabBar } from "./TabBar";
 import { TopNav } from "./TopNav";
 import { LocalNowBar } from "./LocalNowBar";
@@ -26,8 +26,9 @@ import { cn } from "@/lib/cn";
 import { enterEase, takeShellEnter } from "@/lib/motion";
 import { parseAtHandle } from "@shared/bio";
 import { shouldShowFooter } from "@/lib/footer-rules";
-import { isNativeApp } from "@/lib/native";
+import { isNativeApp, triggerHaptic } from "@/lib/native";
 import { SiteFooter } from "./SiteFooter";
+import { CreateFab, openGlobalCreate } from "@/components/design-system/CreateFab";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useDataReload } from "@/hooks/useDataReload";
 import { PullToRefreshContainer } from "./PullToRefreshContainer";
@@ -116,6 +117,18 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <button
                       type="button"
+                      onClick={() => {
+                        void triggerHaptic("medium");
+                        openGlobalCreate();
+                      }}
+                      className="grid h-9 w-9 touch-manipulation place-items-center rounded-full text-brand bg-brand/10 hover:bg-brand/20 ring-1 ring-brand/25 transition cursor-pointer"
+                      aria-label="Create something new"
+                      title="Create (+)"
+                    >
+                      <Plus size={16} strokeWidth={2.5} />
+                    </button>
+                    <button
+                      type="button"
                       onClick={openGlobalSearch}
                       className="grid h-9 w-9 touch-manipulation place-items-center rounded-full text-mute hover:bg-card hover:text-ink ring-1 ring-line transition"
                       aria-label="Search"
@@ -164,6 +177,18 @@ export function AppShell({ children }: { children: ReactNode }) {
                   <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <button
                       type="button"
+                      onClick={() => {
+                        void triggerHaptic("medium");
+                        openGlobalCreate();
+                      }}
+                      className="grid h-10 w-10 touch-manipulation place-items-center rounded-full text-brand bg-brand/10 hover:bg-brand/20 ring-1 ring-brand/25 transition cursor-pointer"
+                      aria-label="Create something new"
+                      title="Create (+)"
+                    >
+                      <Plus size={18} strokeWidth={2.5} />
+                    </button>
+                    <button
+                      type="button"
                       onClick={openGlobalSearch}
                       className="grid h-10 w-10 touch-manipulation place-items-center rounded-full text-mute hover:bg-card hover:text-ink ring-1 ring-line transition"
                       aria-label="Search"
@@ -188,6 +213,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             </PullToRefreshContainer>
           </main>
           {!workspace && !isPlanDetail && <TabBar path={path} enter={play} />}
+          <CreateFab />
           <PresencePublisher />
           <DeviceMirror />
           <GuestStayTools />

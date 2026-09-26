@@ -454,23 +454,28 @@ export function PlanHubPage() {
         {/* Search and Category Filters */}
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-mute" />
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-mute pointer-events-none" />
             <input
               type="search"
+              inputMode="search"
+              enterKeyHint="search"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search plans by title, city, or stops…"
               aria-label="Search plans"
-              className="h-11 w-full rounded-2xl bg-card pl-11 pr-9 text-sm text-ink ring-1 ring-line outline-none placeholder:text-mute focus:ring-2 focus:ring-brand/30"
+              className="h-12 sm:h-11 w-full rounded-2xl bg-card pl-11 pr-11 text-[16px] sm:text-sm text-ink ring-1 ring-line outline-none placeholder:text-mute focus:ring-2 focus:ring-brand/30 shadow-xs"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-mute hover:text-ink p-1"
+                className="absolute right-1 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center text-mute hover:text-ink active:scale-95 cursor-pointer"
                 aria-label="Clear search"
               >
-                <X size={14} />
+                <X size={15} />
               </button>
             )}
           </div>

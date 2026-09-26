@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { collection, doc, getDoc, getDocs, limit, orderBy, query, runTransaction, updateDoc, where } from "firebase/firestore";
-import { ArrowRight, BadgeCheck, CalendarDays, MessageSquare, ShieldCheck, Sparkles, Star, Users } from "lucide-react";
+import { ArrowRight, BadgeCheck, CalendarDays, MessageSquare, Search, ShieldCheck, Sparkles, Star, Users, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Photo } from "@/components/ui/Photo";
 import { useAuth } from "@/contexts/AuthContext";
@@ -57,6 +57,21 @@ export function MatePage() {
   const [bookingBusy, setBookingBusy] = useState(false);
   const [activeChatConv, setActiveChatConv] = useState<UniversalConversation | null>(null);
   const [chatModalOpen, setChatModalOpen] = useState(false);
+  const [mateQuery, setMateQuery] = useState("");
+
+  const filteredMates = useMemo(() => {
+    if (!mateQuery.trim()) return publicMates;
+    const q = mateQuery.trim().toLowerCase();
+    return publicMates.filter(
+      (m) =>
+        m.firstName.toLowerCase().includes(q) ||
+        (m.suburb && m.suburb.toLowerCase().includes(q)) ||
+        (m.city && m.city.toLowerCase().includes(q)) ||
+        m.interests.some((i) => i.toLowerCase().includes(q)) ||
+        m.activities.some((a) => a.toLowerCase().includes(q)) ||
+        (m.introduction && m.introduction.toLowerCase().includes(q)),
+    );
+  }, [publicMates, mateQuery]);
 
   function openMateChat(m: PublicMate) {
     const conv = createConversationRecord({
@@ -518,7 +533,7 @@ export function MatePage() {
 
         {/* Right Column: Approved Mates Showcase, Use Cases & Host Onboarding (5 cols) */}
         <div className="mt-6 lg:mt-0 lg:col-span-5 space-y-6">
-          {user && publicMates.length > 0 && (
+          {publicMates.length > 0 && (
             <section className="rounded-3xl border border-line bg-card p-5 shadow-xs">
               <div className="flex items-center justify-between">
                 <div>
@@ -528,60 +543,101 @@ export function MatePage() {
                   </p>
                 </div>
                 <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold text-brand">
-                  {publicMates.length} Active
+                  {filteredMates.length} Active
                 </span>
               </div>
-              <ul className="mt-4 space-y-3">
-                {publicMates.slice(0, 8).map((m) => (
-                  <li key={m.uid} className="rounded-2xl bg-paper p-3.5 ring-1 ring-line transition hover:shadow-xs">
-                    <div className="flex items-start gap-3">
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-card ring-1 ring-line">
-                        <Photo src={m.photo || "/media/harbour.jpg"} className="h-full w-full object-cover" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-1">
-                          <div className="flex items-center gap-1 min-w-0">
-                            <p className="font-display text-sm font-bold truncate text-ink">{m.firstName}</p>
-                            <BadgeCheck size={14} className="text-brand shrink-0" />
-                          </div>
-                          <span className="text-[11px] font-semibold text-mute shrink-0">
-                            {m.suburb || m.city || "Sydney"}
-                          </span>
+
+              {/* Mobile, iOS and Android friendly search bar */}
+              <div className="relative mt-3.5">
+                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute pointer-events-none" />
+                <input
+                  type="search"
+                  inputMode="search"
+                  enterKeyHint="search"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  value={mateQuery}
+                  onChange={(e) => setMateQuery(e.target.value)}
+                  placeholder="Search mates by name, suburb, or interests…"
+                  aria-label="Search mates"
+                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-10 text-[16px] sm:text-xs text-ink placeholder:text-mute ring-1 ring-line outline-none transition focus:bg-card focus:ring-2 focus:ring-brand focus:border-brand shadow-xs"
+                />
+                {mateQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setMateQuery("")}
+                    aria-label="Clear search"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center text-mute hover:text-ink active:scale-95 cursor-pointer"
+                  >
+                    <X size={15} />
+                  </button>
+                )}
+              </div>
+
+              {filteredMates.length === 0 ? (
+                <div className="mt-4 rounded-2xl bg-paper/60 p-4 text-center">
+                  <p className="text-xs font-semibold text-ink">No mates found for &ldquo;{mateQuery}&rdquo;</p>
+                  <p className="mt-0.5 text-[11px] text-mute">Try searching a different interest, hobby or suburb.</p>
+                  <button
+                    type="button"
+                    onClick={() => setMateQuery("")}
+                    className="mt-2 text-xs font-semibold text-brand hover:underline cursor-pointer"
+                  >
+                    Clear search
+                  </button>
+                </div>
+              ) : (
+                <ul className="mt-4 space-y-3">
+                  {filteredMates.slice(0, 8).map((m) => (
+                    <li key={m.uid} className="rounded-2xl bg-paper p-3.5 ring-1 ring-line transition hover:shadow-xs">
+                      <div className="flex items-start gap-3">
+                        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-card ring-1 ring-line">
+                          <Photo src={m.photo || "/media/harbour.jpg"} className="h-full w-full object-cover" />
                         </div>
-                        <p className="mt-1 text-[12px] text-mute line-clamp-2 leading-relaxed">
-                          {m.introduction || "Approved local AirPal Mate for outings and experiences."}
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {mateDiscoverReasons(m, requests?.[0]).map((reason) => (
-                            <span
-                              key={reason}
-                              className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-medium text-brand"
-                            >
-                              {reason}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-1">
+                            <div className="flex items-center gap-1 min-w-0">
+                              <p className="font-display text-sm font-bold truncate text-ink">{m.firstName}</p>
+                              <BadgeCheck size={14} className="text-brand shrink-0" />
+                            </div>
+                            <span className="text-[11px] font-semibold text-mute shrink-0">
+                              {m.suburb || m.city || "Sydney"}
                             </span>
-                          ))}
-                        </div>
-                        <div className="mt-3 flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => openMateChat(m)}
-                            className="inline-flex items-center gap-1 rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white hover:bg-brand-ink transition active:scale-95 cursor-pointer"
-                          >
-                            <MessageSquare size={13} />
-                            Chat
-                          </button>
-                          <Link
-                            href={`/mate/request?preferredMate=${m.uid}&name=${encodeURIComponent(m.firstName)}`}
-                            className="inline-flex items-center gap-1 rounded-full bg-card px-3 py-1 text-xs font-semibold text-ink ring-1 ring-line hover:bg-line/40 transition active:scale-95 cursor-pointer"
-                          >
-                            Pick for Request
-                          </Link>
+                          </div>
+                          <p className="mt-1 text-[12px] text-mute line-clamp-2 leading-relaxed">
+                            {m.introduction || "Approved local AirPal Mate for outings and experiences."}
+                          </p>
+                          <div className="mt-2 text-[11px] text-mute flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                            {mateDiscoverReasons(m, requests?.[0]).map((reason, idx, arr) => (
+                              <span key={reason} className="inline-flex items-center gap-1.5">
+                                <span className="text-brand font-medium">{reason}</span>
+                                {idx < arr.length - 1 && <span aria-hidden="true" className="text-line select-none">·</span>}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="mt-3 flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => openMateChat(m)}
+                              className="inline-flex items-center gap-1 rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white hover:bg-brand-ink transition active:scale-95 cursor-pointer"
+                            >
+                              <MessageSquare size={13} />
+                              Chat
+                            </button>
+                            <Link
+                              href={`/mate/request?preferredMate=${m.uid}&name=${encodeURIComponent(m.firstName)}`}
+                              className="inline-flex items-center gap-1 rounded-full bg-card px-3 py-1 text-xs font-semibold text-ink ring-1 ring-line hover:bg-line/40 transition active:scale-95 cursor-pointer"
+                            >
+                              Pick for Request
+                            </Link>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
           )}
 

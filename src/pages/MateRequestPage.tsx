@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { cn } from "@/lib/cn";
+import { triggerHaptic } from "@/lib/native";
 import { createSubmitGuard } from "@/lib/submit-guard";
 import { MATE_USE_CASES, emptyMateRequest, isUseCase, mateRequestValid } from "@shared/mate-request";
 
@@ -84,8 +85,10 @@ export function MateRequestPage() {
         createdAt: now,
         updatedAt: now,
       });
+      void triggerHaptic("success");
       setSent(true);
     } catch (e) {
+      void triggerHaptic("error");
       guardRef.current.release();
       setError(e instanceof Error ? e.message : "Couldn't file your request. Try again.");
     } finally {

@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { createItemsFor, hasPartnerProfile, type CreateItem } from "@shared/create";
+import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
 const ICONS: Record<string, typeof Users> = {
@@ -53,7 +54,13 @@ function CreateCard({ item, locked, signedIn }: { item: CreateItem; locked?: boo
   const cls =
     "flex w-full items-center gap-3 rounded-3xl bg-card p-4 text-left ring-1 ring-line shadow-xs transition active:scale-[0.99] hover:ring-brand/40";
   return (
-    <Link href={href} className={cls}>
+    <Link
+      href={href}
+      onClick={() => {
+        void triggerHaptic("light");
+      }}
+      className={cls}
+    >
       {body}
     </Link>
   );

@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { Ticket } from "lucide-react";
 import { formatPlanDate, type HangoutPlan } from "@shared/plan";
 import { Photo } from "@/components/ui/Photo";
+import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
 function countdown(date: string, time: string): string {
@@ -33,6 +34,9 @@ export function PlanGridCard({ plan, dimmed = false }: { plan: HangoutPlan; dimm
     <Link
       href={`/plan/${plan.id}`}
       aria-label={plan.title}
+      onClick={() => {
+        void triggerHaptic("light");
+      }}
       className={cn(
         "group block text-left transition active:scale-[0.98]",
         dimmed && "opacity-80",

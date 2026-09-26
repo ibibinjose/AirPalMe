@@ -13,6 +13,7 @@ import {
   Compass,
   Footprints,
   HeartHandshake,
+  Hotel,
 } from "lucide-react";
 import { activePlaces, placeByHandle, placesForLocation, toursForPrecinct } from "@/lib/catalog";
 import { hrefForPlace, handleOfPlace, resolvePublicBio } from "@/lib/bio-handle";
@@ -32,7 +33,7 @@ import { profileMatchesSearch, searchNeedle } from "@/lib/search-query";
 import { useEvents } from "@/contexts/EventsContext";
 import { useListings } from "@/contexts/ListingsContext";
 import { usePlans } from "@/contexts/PlanContext";
-import { triggerHaptic } from "@/lib/native";
+import { triggerHaptic, triggerHapticSelection } from "@/lib/native";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { cn } from "@/lib/cn";
 
@@ -178,8 +179,122 @@ export function GlobalSearchModal() {
     const items: SearchResultItem[] = [];
     const seenPerson = new Set<string>();
 
-    // Empty query renders the Recent + Explore panel instead of results.
-    if (!needle.text) return items;
+    // Empty query: when 'all', render Recent + Explore; when specific category, show recommendations.
+    if (!needle.text) {
+      if (activeCategory === "all") return items;
+
+      if (activeCategory === "people") {
+        for (const m of publicMates.slice(0, 10)) {
+          items.push({
+            id: `mate-${m.uid}`,
+            category: "person",
+            title: m.firstName,
+            subtitle: [m.suburb || m.city, m.interests[0]].filter(Boolean).join(" · ") || "Approved Mate",
+            badge: "Mate",
+            href: "/mate",
+            icon: HeartHandshake,
+          });
+        }
+        return items;
+      }
+      if (activeCategory === "places") {
+        for (const p of placesForLocation(activePlaces(), here, city, usingGps).slice(0, 10)) {
+          items.push({
+            id: `place-${p.id}`,
+            category: "place",
+            title: p.name,
+            subtitle: p.shortWhy || p.address || p.category,
+            badge: p.category,
+            href: hrefForPlace(p),
+            icon: MapPin,
+          });
+        }
+        return items;
+      }
+      if (activeCategory === "events") {
+        for (const e of calendarEvents.filter((ev) => cityMatches(ev.city, city)).slice(0, 10)) {
+          items.push({
+            id: `event-${e.id}`,
+            category: "event",
+            title: e.title,
+            subtitle: `${e.timeLabel} · ${e.venue}`,
+            badge: e.categoryLabel,
+            href: `/calendar?event=${e.id}`,
+            icon: CalendarDays,
+          });
+        }
+        return items;
+      }
+      if (activeCategory === "experiences") {
+        for (const c of liveExperiences.slice(0, 10)) {
+          items.push({
+            id: `experience-${c.id}`,
+            category: "experience",
+            title: c.title,
+            subtitle: `${c.businessName} · ${c.suburb} · ${c.date}`,
+            badge: c.priceCents > 0 ? aud(c.priceCents) : "Free",
+            href: "/experiences",
+            icon: Sparkles,
+          });
+        }
+        return items;
+      }
+      if (activeCategory === "stay") {
+        items.push({
+          id: "stay-concierge",
+          category: "stay",
+          title: "Stay Concierge",
+          subtitle: "Digital compendium, Wi-Fi & checkout",
+          badge: "Concierge",
+          href: "/concierge",
+          icon: Sparkles,
+        });
+        const stays = placesForLocation(activePlaces(), here, city, usingGps).filter(
+          (p) => p.category.toLowerCase().includes("stay") || p.category.toLowerCase().includes("hotel"),
+        );
+        for (const p of stays.slice(0, 8)) {
+          items.push({
+            id: `stay-place-${p.id}`,
+            category: "stay",
+            title: p.name,
+            subtitle: p.shortWhy || p.address || "Boutique stay",
+            badge: "Stay",
+            href: hrefForPlace(p),
+            icon: Hotel,
+          });
+        }
+        return items;
+      }
+      if (activeCategory === "plan") {
+        items.push({
+          id: "plan-create",
+          category: "plan",
+          title: "Create a Plan",
+          subtitle: "Invite friends, family, or mates with RSVP",
+          badge: "New Plan",
+          href: "/plan/new",
+          icon: Users,
+        });
+        const openPlans = plans.filter(
+          (p) =>
+            p.isPublic &&
+            p.status === "open" &&
+            locatedNear({ geo: p.geo, city: p.city || p.destination }, here, city, usingGps, EVENT_NEAR_M),
+        );
+        for (const p of openPlans.slice(0, 8)) {
+          items.push({
+            id: `plan-${p.id}`,
+            category: "plan",
+            title: p.title,
+            subtitle: `${p.destination || p.city} · ${p.date}`,
+            badge: isTicketed(p) ? `$${p.pricePerPerson}` : p.isExperience ? "Free" : "Plan",
+            href: `/plan/${p.id}`,
+            icon: Users,
+          });
+        }
+        return items;
+      }
+    }
 
     function pushPerson(item: SearchResultItem) {
       if (seenPerson.has(item.id)) return;
@@ -459,7 +574,17 @@ export function GlobalSearchModal() {
     if (activeCategory === "people") return items.filter((i) => i.category === "person");
     if (activeCategory === "places") return items.filter((i) => i.category === "place");
     if (activeCategory === "events") return items.filter((i) => i.category === "event");
-    if (activeCategory === "stay") return items.filter((i) => i.category === "stay");
+    if (activeCategory === "stay") {
+      return items.filter(
+        (i) =>
+          i.category === "stay" ||
+          (i.category === "place" &&
+            (i.badge?.toLowerCase().includes("stay") ||
+              i.badge?.toLowerCase().includes("hotel") ||
+              i.subtitle.toLowerCase().includes("hotel") ||
+              i.subtitle.toLowerCase().includes("stay"))),
+      );
+    }
     if (activeCategory === "plan") return items.filter((i) => i.category === "plan");
     if (activeCategory === "experiences") return items.filter((i) => i.category === "experience");
 
@@ -482,9 +607,11 @@ export function GlobalSearchModal() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
+      void triggerHapticSelection();
       setSelectedIndex((prev) => (prev + 1) % Math.max(1, results.length));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
+      void triggerHapticSelection();
       setSelectedIndex((prev) => (prev - 1 + results.length) % Math.max(1, results.length));
     } else if (e.key === "Enter" && results[selectedIndex]) {
       e.preventDefault();
@@ -509,10 +636,10 @@ export function GlobalSearchModal() {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-3 pt-4 sm:p-6 sm:pt-20 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-2.5 pt-3 sm:p-6 sm:pt-20 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200">
       <button
         type="button"
-        className="fixed inset-0 bg-ink/60 backdrop-blur-md transition-opacity"
+        className="fixed inset-0 bg-ink/60 backdrop-blur-md transition-opacity cursor-pointer"
         aria-label="Close search"
         onClick={() => setOpen(false)}
       />
@@ -521,13 +648,19 @@ export function GlobalSearchModal() {
         role="dialog"
         aria-modal="true"
         aria-label="Search AirPal"
-        className="relative w-full max-w-xl overflow-hidden rounded-3xl bg-card shadow-2xl ring-1 ring-line/80 safe-bottom"
+        className="relative w-full max-w-2xl overflow-hidden rounded-2xl sm:rounded-3xl bg-card shadow-2xl ring-1 ring-line/80 safe-bottom"
       >
-        <div className="flex items-center gap-3 border-b border-line px-4 py-3.5">
-          <Search size={20} className="shrink-0 text-gold" aria-hidden />
+        <div className="flex h-14 sm:h-13 items-center gap-2.5 sm:gap-3 border-b border-line px-3.5 py-2 sm:px-4 sm:py-3">
+          <Search size={20} className="shrink-0 text-brand" aria-hidden />
           <input
             ref={inputRef}
             type="search"
+            inputMode="search"
+            enterKeyHint="search"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            autoComplete="off"
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -536,46 +669,57 @@ export function GlobalSearchModal() {
             onKeyDown={handleKeyDown}
             placeholder="Search people, places, events, stays, plans…"
             aria-label="Search people, places, events, stays, plans"
-            className="w-full bg-transparent text-[15px] font-medium text-ink placeholder:text-mute focus:outline-none"
+            className="min-h-[44px] w-full bg-transparent text-[16px] sm:text-[15px] font-medium text-ink placeholder:text-mute focus:outline-none"
           />
           {query && (
             <button
               type="button"
-              onClick={() => setQuery("")}
+              onClick={() => {
+                setQuery("");
+                inputRef.current?.focus();
+              }}
               aria-label="Clear search"
-              className="grid h-11 w-11 -m-2 place-items-center rounded-full text-mute hover:bg-paper hover:text-ink"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-mute hover:bg-paper hover:text-ink active:scale-95 cursor-pointer"
             >
-              <X size={14} />
+              <X size={16} />
             </button>
           )}
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="flex min-h-[44px] shrink-0 items-center px-2 py-1.5 text-xs font-semibold text-brand active:scale-95 sm:hidden cursor-pointer"
+          >
+            Cancel
+          </button>
           <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-line bg-paper px-2 py-0.5 text-[10px] font-semibold text-mute">
             ESC
           </kbd>
         </div>
 
         {/* Category Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto border-b border-line/60 bg-paper/40 px-3 py-2 no-scrollbar">
+        <div className="no-scrollbar touch-pan-x flex items-center gap-1.5 overflow-x-auto border-b border-line/60 bg-paper/40 px-3 py-2">
           {(
             [
               { id: "all", label: "All" },
-              { id: "people", label: "People" },
+              { id: "people", label: "People & Mates" },
               { id: "places", label: "Places" },
               { id: "events", label: "Events" },
               { id: "experiences", label: "Experiences" },
-              { id: "stay", label: "Stay Tools" },
-              { id: "plan", label: "Mates Plan" },
+              { id: "stay", label: "Stays" },
+              { id: "plan", label: "Plans" },
             ] as const
           ).map((c) => (
             <button
               key={c.id}
               onClick={() => {
+                void triggerHapticSelection();
                 setActiveCategory(c.id);
                 setSelectedIndex(0);
               }}
               className={cn(
-                "h-11 rounded-full px-4 text-xs font-medium transition whitespace-nowrap",
+                "flex h-10 shrink-0 items-center rounded-full px-4 text-xs font-semibold transition whitespace-nowrap active:scale-95 min-h-[40px] cursor-pointer",
                 activeCategory === c.id
-                  ? "bg-brand text-white"
+                  ? "bg-brand text-white shadow-xs"
                   : "bg-paper text-mute hover:bg-line hover:text-ink ring-1 ring-line",
               )}
             >

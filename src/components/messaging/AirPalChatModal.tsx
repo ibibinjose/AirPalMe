@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { X } from "lucide-react";
 import { AirPalChatView } from "./AirPalChatView";
 import type { UniversalConversation } from "@shared/messaging";
@@ -15,6 +16,15 @@ export function AirPalChatModal({
   propertyContext?: any;
   onActionClick?: (action: string, payload?: any) => void;
 }) {
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
+
   if (!open || !conversation) return null;
 
   return (

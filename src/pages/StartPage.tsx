@@ -8,6 +8,7 @@ import {
   BedDouble,
   Building2,
   CalendarDays,
+  Check,
   CheckCircle2,
   Eye,
   EyeOff,
@@ -25,7 +26,9 @@ import {
   Users,
 } from "lucide-react";
 import { authErrorMessage } from "@shared/auth-email";
-import { isEmail } from "@shared/validate";
+import { normalizeHandle } from "@shared/bio";
+import { isEmail, passwordIssues } from "@shared/validate";
+import { useHandleStatus } from "@/hooks/useHandleStatus";
 import { Button } from "@/components/ui/Button";
 import { ValidField, fieldInput } from "@/components/forms/ValidField";
 import { VerifyEmailBanner } from "@/components/auth/VerifyEmailBanner";
@@ -34,7 +37,7 @@ import { PhoneLogin } from "@/components/auth/PhoneLogin";
 import { SignupFlow } from "@/components/auth/SignupFlow";
 import { SocialAuthButtons, SocialAuthDivider } from "@/components/auth/SocialAuthButtons";
 import { PhoneField } from "@/components/forms/PhoneField";
-import { isNativeApp, triggerHaptic } from "@/lib/native";
+import { isNativeApp } from "@/lib/native";
 import { useVirtualKeyboard } from "@/lib/keyboard";
 import { phonePasswordNeedsSms, phoneReady } from "@shared/phone-auth";
 import { MeAvatar } from "@/components/auth/MeAvatar";
@@ -124,6 +127,7 @@ export function StartPage() {
 
   const {
     login,
+    register,
     loginWithPhonePassword,
     loginWithSocial,
     user,
@@ -132,9 +136,11 @@ export function StartPage() {
     logout,
     hasEnrolledBiometrics,
   } = useAuth();
-  const { mine, business, biosReady } = useBio();
+  const { mine, business, biosReady, createProfile } = useBio();
   const { keyboardHeight } = useVirtualKeyboard();
   const [pendingGo, setPendingGo] = useState(false);
+
+  const LAST_EMAIL_KEY = "airpal.last_signin_email";
 
   // Mode resolution
   const initialMode: AuthMode =
@@ -151,9 +157,17 @@ export function StartPage() {
   const [method, setMethod] = useState<AuthMethod>(initialMethod);
 
   // Form inputs
-  const [email, setEmail] = useState(emailParam);
+  const [email, setEmail] = useState(() => emailParam || (typeof window !== "undefined" ? localStorage.getItem(LAST_EMAIL_KEY) || "" : ""));
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  // Email Signup Specific inputs
+  const [signupName, setSignupName] = useState("");
+  const [signupHandle, setSignupHandle] = useState("");
+  const [handleManual, setHandleManual] = useState(false);
+  const [signupAdultConfirmed, setSignupAdultConfirmed] = useState(true);
+  const handleStatus = useHandleStatus(signupHandle);
+  const handleOk = handleStatus.ok;
 
   // UI state
   const [busy, setBusy] = useState(false);
@@ -164,6 +178,23 @@ export function StartPage() {
   const [inlineError, setInlineError] = useState<{ message: string; code?: string } | null>(null);
 
   const emailOk = isEmail(email);
+  const passOk = passwordIssues(password).length === 0;
+
+  const passwordStrength = useMemo(() => {
+    if (!password) return { label: "", score: 0, color: "bg-line" };
+    if (password.length < 6) return { label: "Too short", score: 1, color: "bg-red-500" };
+    let score = 0;
+    if (password.length >= 8) score += 1;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score += 1;
+    else if (/[a-zA-Z]/.test(password)) score += 0.5;
+    if (/[0-9]/.test(password)) score += 1;
+    if (/[^a-zA-Z0-9]/.test(password)) score += 1;
+
+    if (score <= 1.5) return { label: "Weak", score: 1, color: "bg-red-500" };
+    if (score <= 2.5) return { label: "Fair", score: 2, color: "bg-amber-500" };
+    if (score <= 3.5) return { label: "Good", score: 3, color: "bg-blue-500" };
+    return { label: "Strong", score: 4, color: "bg-emerald-500" };
+  }, [password]);
 
   // Invite attribution: keep the inviter's code across the flow, show who
   // invited, and record the join once the account exists.
@@ -319,6 +350,79 @@ export function StartPage() {
     nav(`/start?${p.toString()}`);
   }
 
+  function handleNameChange(val: string) {
+    setSignupName(val);
+    if (!handleManual) {
+      const clean = val.toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (clean.length >= 2) {
+        setSignupHandle(clean.slice(0, 20));
+      }
+    }
+  }
+
+  function handleHandleChange(val: string) {
+    setHandleManual(true);
+    setSignupHandle(normalizeHandle(val));
+  }
+
+  async function handleEmailSignup(e: FormEvent) {
+    e.preventDefault();
+    setInlineError(null);
+
+    const nameClean = signupName.trim();
+    if (!nameClean || nameClean.length < 2) {
+      setInlineError({ message: "Please enter your full name (at least 2 characters)." });
+      return;
+    }
+    if (!emailOk) {
+      setInlineError({ message: "Please enter a valid email address." });
+      return;
+    }
+    if (!handleOk) {
+      setInlineError({ message: handleStatus.reason || "Please choose a valid available @handle." });
+      return;
+    }
+    if (!passOk) {
+      setInlineError({ message: "Password must be at least 8 characters with letters and numbers." });
+      return;
+    }
+    if (!signupAdultConfirmed) {
+      setInlineError({ message: "Please confirm you are 18 years or older to join AirPal." });
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const cleanEmail = email.trim();
+      localStorage.setItem(LAST_EMAIL_KEY, cleanEmail);
+      await register(cleanEmail, nameClean, { password });
+
+      try {
+        const h = normalizeHandle(signupHandle);
+        await createProfile({
+          handle: h,
+          name: nameClean,
+          city: "Sydney",
+          shortWhy: "On AirPal",
+          kind: "person",
+        });
+      } catch {
+        /* profile may already be initialized */
+      }
+
+      toast.success("Account created! Welcome to AirPal.");
+      setPendingGo(true);
+    } catch (err: unknown) {
+      const errObj = err as { code?: string; message?: string };
+      const code = errObj?.code || "";
+      const msg = authErrorMessage(err, "Account creation failed");
+      setInlineError({ message: msg, code });
+      toast.error(msg);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setInlineError(null);
@@ -344,7 +448,9 @@ export function StartPage() {
       return;
     }
 
-    if (mode === "signup") return;
+    if (mode === "signup") {
+      return handleEmailSignup(e);
+    }
 
     if (mode === "signin" && method === "phone" && phoneLoginMode === "password") {
       if (!phoneReady(signInPhone)) {
@@ -373,7 +479,9 @@ export function StartPage() {
         toast.success("Signed in successfully!");
         setPendingGo(true);
       } else {
-        await login(email.trim(), password);
+        const cleanEmail = email.trim();
+        localStorage.setItem(LAST_EMAIL_KEY, cleanEmail);
+        await login(cleanEmail, password);
         toast.success("Signed in successfully!");
         setPendingGo(true);
       }
@@ -408,12 +516,10 @@ export function StartPage() {
             <MeAvatar faceClassName="h-16 w-16 text-xl" />
           </div>
           <h1 className="font-display mt-4 text-2xl font-semibold">{user.displayName || "Your Account"}</h1>
-          <p className="text-sm text-mute">{user.email || user.phone || "Signed in"}</p>
-          {mine?.handle && (
-            <span className="mt-2 inline-block rounded-full bg-brand/10 px-3 py-0.5 text-xs font-medium text-brand">
-              @{mine.handle}
-            </span>
-          )}
+          {mine?.handle ? (
+            <p className="mt-0.5 text-xs font-bold text-brand">@{mine.handle}</p>
+          ) : null}
+          <p className="text-xs text-mute mt-1">{user.email || user.phone || "Signed in"}</p>
 
           {next && (
             <div className="mt-5 rounded-2xl bg-amber-500/10 p-3 text-left ring-1 ring-amber-500/20">
@@ -772,33 +878,31 @@ export function StartPage() {
               </button>
             </div>
 
-            {mode === "signin" && (
-              <div className="mt-4 flex items-center justify-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => switchMethod("email")}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-medium transition",
-                    method === "email" ? "bg-brand/10 text-brand ring-1 ring-brand/30" : "text-mute hover:text-ink",
-                  )}
-                >
-                  <Mail size={13} />
-                  <span>Email</span>
-                </button>
-                <span className="text-xs text-line">|</span>
-                <button
-                  type="button"
-                  onClick={() => switchMethod("phone")}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-medium transition",
-                    method === "phone" ? "bg-brand/10 text-brand ring-1 ring-brand/30" : "text-mute hover:text-ink",
-                  )}
-                >
-                  <Phone size={13} />
-                  <span>Mobile</span>
-                </button>
-              </div>
-            )}
+            {/* Method selector for Email vs Mobile SMS */}
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => switchMethod("email")}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition cursor-pointer",
+                  method === "email" ? "bg-brand text-white shadow-xs" : "bg-paper text-mute hover:text-ink ring-1 ring-line/80",
+                )}
+              >
+                <Mail size={13} />
+                <span>Email</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => switchMethod("phone")}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition cursor-pointer",
+                  method === "phone" ? "bg-brand text-white shadow-xs" : "bg-paper text-mute hover:text-ink ring-1 ring-line/80",
+                )}
+              >
+                <Phone size={13} />
+                <span>Mobile SMS</span>
+              </button>
+            </div>
 
             {/* Inline Actionable Error Banner */}
             {inlineError && (
@@ -811,7 +915,7 @@ export function StartPage() {
                       <button
                         type="button"
                         onClick={() => switchMode("signin")}
-                        className="mt-1 font-semibold text-brand underline block"
+                        className="mt-1 font-semibold text-brand underline block cursor-pointer"
                       >
                         Sign in with this email instead →
                       </button>
@@ -820,7 +924,7 @@ export function StartPage() {
                       <button
                         type="button"
                         onClick={() => switchMode("reset")}
-                        className="mt-1 font-semibold text-brand underline block"
+                        className="mt-1 font-semibold text-brand underline block cursor-pointer"
                       >
                         Forgot your password? Reset it here →
                       </button>
@@ -853,99 +957,254 @@ export function StartPage() {
               <SocialAuthDivider />
             </div>
 
-            {mode === "signup" ? (
-              <div className="mt-1">
-                <SignupFlow
-                  onDone={() => {
-                    setPhoneSignup(false);
-                    setPendingGo(true);
-                  }}
-                />
-              </div>
-            ) : method === "phone" ? (
-              <div className="mt-4">
-                <div className="mb-3 flex justify-center gap-1 rounded-full bg-paper p-1 ring-1 ring-line">
-                  <button
-                    type="button"
-                    onClick={() => setPhoneLoginMode("password")}
-                    className={cn(
-                      "rounded-full px-3 py-1 text-xs font-semibold",
-                      phoneLoginMode === "password" ? "bg-brand text-white" : "text-mute",
-                    )}
-                  >
-                    Password
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPhoneLoginMode("sms")}
-                    className={cn(
-                      "rounded-full px-3 py-1 text-xs font-semibold",
-                      phoneLoginMode === "sms" ? "bg-brand text-white" : "text-mute",
-                    )}
-                  >
-                    SMS code
-                  </button>
-                </div>
-                {phoneLoginMode === "sms" ? (
-                  <PhoneLogin
-                    onBegin={() => setPhoneSignup(true)}
+            {method === "phone" ? (
+              mode === "signup" ? (
+                <div className="mt-2">
+                  <SignupFlow
                     onDone={() => {
                       setPhoneSignup(false);
                       setPendingGo(true);
                     }}
-                    onNeedAccount={() => {
-                      setPhoneSignup(true);
-                      switchMode("signup");
-                    }}
                   />
-                ) : (
-                  <form onSubmit={onSubmit} className="space-y-3.5">
-                    <ValidField label="Mobile number" ok={phoneReady(signInPhone)}>
-                      <PhoneField value={signInPhone} onChange={setSignInPhone} />
-                    </ValidField>
-                    <ValidField label="Password" ok={Boolean(password)}>
-                      <div className="relative">
-                        <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="••••••••"
-                          autoComplete="current-password"
-                          enterKeyHint="go"
-                          onFocus={nudgeIntoView}
-                          className={cn(fieldInput, "pl-10 pr-10", KEYBOARD_SAFE_INPUT)}
-                        />
+                </div>
+              ) : (
+                <div className="mt-4">
+                  <div className="mb-3 flex justify-center gap-1 rounded-full bg-paper p-1 ring-1 ring-line">
+                    <button
+                      type="button"
+                      onClick={() => setPhoneLoginMode("password")}
+                      className={cn(
+                        "rounded-full px-3 py-1 text-xs font-semibold cursor-pointer",
+                        phoneLoginMode === "password" ? "bg-brand text-white" : "text-mute",
+                      )}
+                    >
+                      Password
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPhoneLoginMode("sms")}
+                      className={cn(
+                        "rounded-full px-3 py-1 text-xs font-semibold cursor-pointer",
+                        phoneLoginMode === "sms" ? "bg-brand text-white" : "text-mute",
+                      )}
+                    >
+                      SMS code
+                    </button>
+                  </div>
+                  {phoneLoginMode === "sms" ? (
+                    <PhoneLogin
+                      onBegin={() => setPhoneSignup(true)}
+                      onDone={() => {
+                        setPhoneSignup(false);
+                        setPendingGo(true);
+                      }}
+                      onNeedAccount={() => {
+                        setPhoneSignup(true);
+                        switchMode("signup");
+                      }}
+                    />
+                  ) : (
+                    <form onSubmit={onSubmit} className="space-y-3.5">
+                      <ValidField label="Mobile number" ok={phoneReady(signInPhone)}>
+                        <PhoneField value={signInPhone} onChange={setSignInPhone} />
+                      </ValidField>
+                      <ValidField label="Password" ok={Boolean(password)}>
+                        <div className="relative">
+                          <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="••••••••"
+                            autoComplete="current-password"
+                            enterKeyHint="go"
+                            onFocus={nudgeIntoView}
+                            className={cn(fieldInput, "pl-10 pr-10", KEYBOARD_SAFE_INPUT)}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-mute hover:text-ink cursor-pointer"
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                          >
+                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                          </button>
+                        </div>
+                      </ValidField>
+                      <div className="flex justify-end">
                         <button
                           type="button"
-                          onClick={() => setShowPassword((prev) => !prev)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-mute hover:text-ink"
-                          aria-label={showPassword ? "Hide password" : "Show password"}
+                          onClick={() => switchMode("reset")}
+                          className="text-xs font-medium text-brand hover:underline cursor-pointer"
                         >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                          Forgot password?
                         </button>
                       </div>
-                    </ValidField>
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => switchMode("reset")}
-                        className="text-xs font-medium text-brand hover:underline"
-                      >
-                        Forgot password?
-                      </button>
+                      <Button type="submit" className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(24,5,219,0.3)]" disabled={busy} loading={busy}>
+                        {busy ? "Signing in…" : "Sign In"}
+                      </Button>
+                      <p className="text-center text-[12px] text-mute">
+                        SMS code always works if phone + password isn&apos;t set up yet.
+                      </p>
+                    </form>
+                  )}
+                </div>
+              )
+            ) : mode === "signup" ? (
+              /* Enhanced Direct Email Signup */
+              <form onSubmit={handleEmailSignup} className="mt-4 space-y-3.5">
+                <ValidField
+                  label="Full Name"
+                  ok={signupName.trim().length >= 2}
+                  error={signupName && signupName.trim().length < 2 ? "Please enter at least 2 characters" : null}
+                >
+                  <div className="relative">
+                    <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
+                    <input
+                      type="text"
+                      value={signupName}
+                      onChange={(e) => handleNameChange(e.target.value)}
+                      placeholder="Alex Rivera"
+                      autoComplete="name"
+                      onFocus={nudgeIntoView}
+                      className={cn(fieldInput, "pl-10", KEYBOARD_SAFE_INPUT)}
+                      required
+                    />
+                  </div>
+                </ValidField>
+
+                <ValidField
+                  label="Email Address"
+                  ok={emailOk}
+                  error={email && !emailOk ? "Please enter a valid email address" : null}
+                >
+                  <div className="relative">
+                    <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
+                    <input
+                      type="email"
+                      inputMode="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@domain.com"
+                      autoComplete="email"
+                      onFocus={nudgeIntoView}
+                      className={cn(fieldInput, "pl-10", KEYBOARD_SAFE_INPUT)}
+                      required
+                    />
+                  </div>
+                </ValidField>
+
+                <ValidField
+                  label="Personal @handle"
+                  ok={handleOk}
+                  error={signupHandle && !handleStatus.checking && !handleOk ? handleStatus.reason || "Handle unavailable" : null}
+                  hint={handleStatus.checking ? "Checking availability…" : handleOk ? `@${signupHandle} is available!` : "Unique handle for your AirPal profile"}
+                >
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-mute">@</span>
+                    <input
+                      type="text"
+                      value={signupHandle}
+                      onChange={(e) => handleHandleChange(e.target.value)}
+                      placeholder="alex"
+                      autoComplete="username"
+                      autoCapitalize="none"
+                      onFocus={nudgeIntoView}
+                      className={cn(fieldInput, "pl-8 pr-9", KEYBOARD_SAFE_INPUT)}
+                      required
+                    />
+                    {handleOk && (
+                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-500">
+                        <Check size={16} strokeWidth={2.5} />
+                      </span>
+                    )}
+                  </div>
+                </ValidField>
+
+                <ValidField
+                  label="Create Password"
+                  ok={passOk}
+                  error={password && !passOk ? "At least 8 chars with letters & numbers" : null}
+                >
+                  <div className="relative">
+                    <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="At least 8 characters"
+                      autoComplete="new-password"
+                      onFocus={nudgeIntoView}
+                      className={cn(fieldInput, "pl-10 pr-10", KEYBOARD_SAFE_INPUT)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-mute hover:text-ink cursor-pointer"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </ValidField>
+
+                {/* Password Strength Indicator */}
+                {password.length > 0 && (
+                  <div className="space-y-1.5 pt-0.5">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-mute font-medium">Password Strength</span>
+                      <span className={cn("font-bold", passwordStrength.score >= 3 ? "text-emerald-600 dark:text-emerald-400" : passwordStrength.score === 2 ? "text-amber-500" : "text-red-500")}>
+                        {passwordStrength.label}
+                      </span>
                     </div>
-                    <Button type="submit" className="w-full" disabled={busy} loading={busy}>
-                      {busy ? "Signing in…" : "Sign in"}
-                    </Button>
-                    <p className="text-center text-[12px] text-mute">
-                      SMS code always works if phone + password isn&apos;t set up yet.
-                    </p>
-                  </form>
+                    <div className="flex gap-1.5 h-1.5">
+                      {[1, 2, 3, 4].map((bar) => (
+                        <div
+                          key={bar}
+                          className={cn(
+                            "flex-1 rounded-full transition-all duration-300",
+                            bar <= passwordStrength.score ? passwordStrength.color : "bg-line/50",
+                          )}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 )}
-              </div>
+
+                {/* Age & Terms Confirmation */}
+                <label className="flex items-start gap-2.5 pt-1 text-left cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={signupAdultConfirmed}
+                    onChange={(e) => setSignupAdultConfirmed(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-line text-brand focus:ring-brand cursor-pointer"
+                  />
+                  <span className="text-xs text-mute leading-snug">
+                    I confirm I am 18 years or older and agree to the{" "}
+                    <Link href="/terms" className="font-semibold text-brand hover:underline">
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="/privacy" className="font-semibold text-brand hover:underline">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </span>
+                </label>
+
+                <Button
+                  type="submit"
+                  className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(24,5,219,0.3)] mt-2"
+                  disabled={busy || !emailOk || !passOk || !handleOk || signupName.trim().length < 2 || !signupAdultConfirmed}
+                  loading={busy}
+                >
+                  {busy ? "Creating account…" : "Create My AirPal Account"}
+                </Button>
+              </form>
             ) : (
-              <form onSubmit={onSubmit} className="mt-5 space-y-3.5">
+              /* Enhanced Direct Email Sign In */
+              <form onSubmit={onSubmit} className="mt-4 space-y-3.5">
                 <ValidField label="Email Address" ok={emailOk} error={email && !emailOk ? "Enter a valid email" : null}>
                   <div className="relative">
                     <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
@@ -960,9 +1219,11 @@ export function StartPage() {
                       onFocus={nudgeIntoView}
                       placeholder="you@domain.com"
                       className={cn(fieldInput, "pl-10", KEYBOARD_SAFE_INPUT)}
+                      required
                     />
                   </div>
                 </ValidField>
+
                 <ValidField label="Password" ok={Boolean(password)} error={null}>
                   <div className="relative">
                     <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
@@ -975,69 +1236,40 @@ export function StartPage() {
                       enterKeyHint="go"
                       onFocus={nudgeIntoView}
                       className={cn(fieldInput, "pl-10 pr-10", KEYBOARD_SAFE_INPUT)}
+                      required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-mute hover:text-ink focus:outline-none"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-mute hover:text-ink cursor-pointer"
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
                 </ValidField>
-                <div className="flex justify-end">
+
+                <div className="flex items-center justify-between text-xs">
+                  <label className="flex items-center gap-1.5 text-mute cursor-pointer">
+                    <input
+                      type="checkbox"
+                      defaultChecked
+                      className="h-3.5 w-3.5 rounded border-line text-brand focus:ring-brand cursor-pointer"
+                    />
+                    <span>Remember me</span>
+                  </label>
                   <button
                     type="button"
                     onClick={() => switchMode("reset")}
-                    className="text-xs font-medium text-brand hover:underline"
+                    className="font-semibold text-brand hover:underline cursor-pointer"
                   >
                     Forgot password?
                   </button>
                 </div>
-                <Button type="submit" className="w-full mt-2" disabled={busy} loading={busy}>
+
+                <Button type="submit" className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(24,5,219,0.3)] mt-2" disabled={busy || !emailOk || !password} loading={busy}>
                   {busy ? "Signing in…" : "Sign In"}
                 </Button>
-
-                {/* Social Sign In Options */}
-                <div className="mt-5">
-                  <div className="relative flex items-center justify-center my-3">
-                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-line/60" /></div>
-                    <span className="relative bg-card px-3 text-[11px] font-medium text-mute uppercase tracking-wider">or continue with</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2.5 mt-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        void triggerHaptic("light");
-                        toast.info("Google Sign-In ready for launch");
-                      }}
-                      className="flex items-center justify-center gap-2 h-10 px-3 rounded-2xl bg-card border border-line hover:bg-paper text-xs font-medium text-ink transition active:scale-[0.98]"
-                    >
-                      <svg className="w-4 h-4" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                      </svg>
-                      <span>Google</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        void triggerHaptic("light");
-                        toast.info("Apple Sign-In ready for launch");
-                      }}
-                      className="flex items-center justify-center gap-2 h-10 px-3 rounded-2xl bg-card border border-line hover:bg-paper text-xs font-medium text-ink transition active:scale-[0.98]"
-                    >
-                      <svg className="w-4 h-4 fill-current text-ink" viewBox="0 0 24 24">
-                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97.02c.11.13.23.28.34.44.75 1.02.73 2.25.7 2.37-1.05.08-2.31-.58-2.99-1.37-.12-.14-.24-.31-.34-.48-.71-1.05-.67-2.22-.67-2.26 1.15.02 2.3.67 2.96 1.3z"/>
-                      </svg>
-                      <span>Apple</span>
-                    </button>
-                  </div>
-                </div>
               </form>
             )}
 

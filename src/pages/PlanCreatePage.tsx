@@ -343,12 +343,15 @@ export function PlanCreatePage() {
           .filter((p) => invite.has(p.handle))
           .map((p) => ({ id: `h-${p.handle}`, name: p.name, handle: p.handle })),
       });
-      if (created?.id) nav(`/plan/${created.id}?share=true`);
-      else {
+      if (created?.id) {
+        void triggerHaptic("success");
+        nav(`/plan/${created.id}?share=true`);
+      } else {
         guardRef.current.release();
         setBusy(false);
       }
     } catch (err) {
+      void triggerHaptic("error");
       guardRef.current.release();
       setBusy(false);
       toast.error(err instanceof Error ? err.message : "Couldn’t create the plan");

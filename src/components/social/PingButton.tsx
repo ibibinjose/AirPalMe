@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { createSubmitGuard } from "@/lib/submit-guard";
+import { triggerHaptic } from "@/lib/native";
 import { isOpenPing, type PingStatus } from "@shared/ping";
 
 /**
@@ -78,8 +79,10 @@ export function PingButton({ toUid, toHandle, toName }: { toUid: string; toHandl
         updatedAt: now,
       });
       setOpenPing(true);
+      void triggerHaptic("success");
       toast.success(`Pinged ${toName} — we'll tell you when they ping back.`);
     } catch (err) {
+      void triggerHaptic("error");
       guardRef.current.release();
       toast.error(err instanceof Error ? err.message : "Couldn't send the ping.");
     } finally {

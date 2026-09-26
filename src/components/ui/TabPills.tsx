@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { triggerHapticSelection } from "@/lib/native";
 
 export type TabPillItem<T extends string> = {
   id: T;
@@ -41,7 +42,10 @@ export function TabPills<T extends string>({
             <button
               key={item.id}
               type="button"
-              onClick={() => onChange(item.id)}
+              onClick={() => {
+                void triggerHapticSelection();
+                onChange(item.id);
+              }}
               aria-pressed={on}
               className={cn(
                 "flex h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full px-3 text-sm transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
@@ -75,7 +79,10 @@ export function TabPills<T extends string>({
           <button
             key={item.id}
             type="button"
-            onClick={() => onChange(item.id)}
+            onClick={() => {
+              void triggerHapticSelection();
+              onChange(item.id);
+            }}
             aria-pressed={on}
             className={cn(
               "flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2.5 text-[13px] font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",

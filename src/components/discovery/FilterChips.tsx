@@ -1,6 +1,7 @@
 import { DISCOVER_CHIPS } from "@/lib/catalog";
 import { cn } from "@/lib/cn";
 import { useLocale } from "@/contexts/LocaleContext";
+import { triggerHapticSelection } from "@/lib/native";
 
 export function FilterChips({ value, onChange }: { value: string; onChange: (id: string) => void }) {
   const { t } = useLocale();
@@ -10,7 +11,10 @@ export function FilterChips({ value, onChange }: { value: string; onChange: (id:
         <button
           key={chip.id}
           type="button"
-          onClick={() => onChange(chip.id)}
+          onClick={() => {
+            void triggerHapticSelection();
+            onChange(chip.id);
+          }}
           aria-pressed={value === chip.id}
           className={cn(
             "h-9 shrink-0 rounded-full px-4 text-sm font-medium",

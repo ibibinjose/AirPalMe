@@ -290,20 +290,25 @@ export function ExplorePage() {
 
       {/* Search Field */}
       <div className="relative mt-5">
-        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand" />
+        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand pointer-events-none" />
         <input
           type="search"
+          inputMode="search"
+          enterKeyHint="search"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={`Search places, events, or experiences in ${effectiveCity}…`}
           aria-label="Search explore"
-          className="h-12 w-full rounded-2xl bg-card pl-11 pr-10 text-sm text-ink ring-1 ring-line outline-none placeholder:text-mute focus:ring-2 focus:ring-brand/30 shadow-xs"
+          className="h-12 w-full rounded-2xl bg-card pl-11 pr-11 text-[16px] sm:text-sm text-ink ring-1 ring-line outline-none placeholder:text-mute focus:ring-2 focus:ring-brand/30 shadow-xs"
         />
         {searchQuery && (
           <button
             type="button"
             onClick={() => setSearchQuery("")}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-mute hover:text-ink"
+            className="absolute right-1 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center text-mute hover:text-ink active:scale-95 cursor-pointer"
             aria-label="Clear search"
           >
             <X size={16} />
@@ -589,16 +594,9 @@ export function ExplorePage() {
                           )}
 
                           {p.facilities && p.facilities.length > 0 && (
-                            <div className="flex flex-wrap gap-1">
-                              {p.facilities.slice(0, 4).map((f) => (
-                                <span
-                                  key={f.id}
-                                  className="rounded-full bg-paper px-2 py-0.5 text-[10px] font-medium text-mute ring-1 ring-line"
-                                >
-                                  {f.name}
-                                </span>
-                              ))}
-                            </div>
+                            <p className="text-xs text-mute font-medium truncate">
+                              {p.facilities.slice(0, 4).map((f) => f.name).join(" · ")}
+                            </p>
                           )}
 
                           <div className="flex items-center gap-2 pt-1 border-t border-line/60">
