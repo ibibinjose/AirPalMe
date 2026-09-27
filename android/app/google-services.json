@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "265455282950",
+    "project_id": "airpalme-app",
+    "storage_bucket": "airpalme-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:265455282950:android:7d2912e4e8acf156cacc87",
+        "android_client_info": {
+          "package_name": "me.airpal.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "265455282950-f8qb57385m18l1tj4c85r1tcj4hjr233.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.airpal.app",
+            "certificate_hash": ""
+          }
+        },
+        {
+          "client_id": "265455282950-b4qn7ecibbumqo052lkf6j587so1tg5i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxXP-0LbZ8U0iDWWsMiGm4V-k7Vyyi9yY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "265455282950-b4qn7ecibbumqo052lkf6j587so1tg5i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
