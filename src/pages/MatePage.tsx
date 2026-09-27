@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { collection, doc, getDoc, getDocs, limit, orderBy, query, runTransaction, updateDoc, where } from "firebase/firestore";
-import { ArrowRight, BadgeCheck, CalendarDays, MessageSquare, Search, ShieldCheck, Sparkles, Star, Users, X } from "lucide-react";
+import { ArrowRight, BadgeCheck, CalendarDays, MessageSquare, ShieldCheck, Sparkles, Star, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Photo } from "@/components/ui/Photo";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,6 +26,8 @@ import {
 } from "@shared/mate-request";
 import { mateDiscoverReasons, type PublicMate } from "@shared/companion";
 import { loadPublicMatesRemote } from "@/lib/companion-remote";
+import { SearchBar } from "@/components/search/SearchBar";
+import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
 
 const STEPS = [
   { title: "Tell us the plan", body: "What, when, where — and what kind of Mate you want along." },
@@ -246,9 +248,8 @@ export function MatePage() {
           <h1 className="font-display mt-2 text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.05] tracking-tight text-ink">
             Go with your Mate, Friends &amp; Family.
           </h1>
-          <p className="mt-3 max-w-md text-[14px] sm:text-[15px] leading-relaxed text-mute font-medium">
-            Got plans or a night out but need a companion or local guide? Go solo, bring your crew, or find an approved
-            AirPal Mate to join you.
+          <p className="mt-2 max-w-md text-[14px] sm:text-[15px] text-mute font-medium">
+            Find verified local companions to join your outing.
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <Button size="lg" className="rounded-full bg-brand font-semibold text-white shadow-md hover:bg-brand-ink" onClick={() => nav("/mate/request")}>
@@ -537,9 +538,9 @@ export function MatePage() {
             <section className="rounded-3xl border border-line bg-card p-5 shadow-xs">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-display text-base font-bold">Approved Mates</h2>
+                  <h2 className="font-display text-base font-bold text-ink">Approved Mates</h2>
                   <p className="mt-0.5 text-[12px] text-mute">
-                    Verified locals reviewed by AirPal — reasons, not a mystery score.
+                    Verified local companions.
                   </p>
                 </div>
                 <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold text-brand">
@@ -548,44 +549,40 @@ export function MatePage() {
               </div>
 
               {/* Mobile, iOS and Android friendly search bar */}
-              <div className="relative mt-3.5">
-                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute pointer-events-none" />
-                <input
-                  type="search"
-                  inputMode="search"
-                  enterKeyHint="search"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  spellCheck={false}
+              <div className="mt-3.5">
+                <SearchBar
                   value={mateQuery}
-                  onChange={(e) => setMateQuery(e.target.value)}
+                  onChange={setMateQuery}
+                  sizeVariant="md"
+                  variant="paper"
                   placeholder="Search mates by name, suburb, or interests…"
                   aria-label="Search mates"
-                  className="h-11 w-full rounded-2xl bg-paper pl-10 pr-10 text-[16px] sm:text-xs text-ink placeholder:text-mute ring-1 ring-line outline-none transition focus:bg-card focus:ring-2 focus:ring-brand focus:border-brand shadow-xs"
+                  showFullSearchAction={Boolean(mateQuery.trim())}
+                  fullSearchLabel="Full Search"
+                  onFullSearch={(q) => openGlobalSearch({ query: q, category: "people" })}
                 />
-                {mateQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setMateQuery("")}
-                    aria-label="Clear search"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center text-mute hover:text-ink active:scale-95 cursor-pointer"
-                  >
-                    <X size={15} />
-                  </button>
-                )}
               </div>
 
               {filteredMates.length === 0 ? (
                 <div className="mt-4 rounded-2xl bg-paper/60 p-4 text-center">
                   <p className="text-xs font-semibold text-ink">No mates found for &ldquo;{mateQuery}&rdquo;</p>
                   <p className="mt-0.5 text-[11px] text-mute">Try searching a different interest, hobby or suburb.</p>
-                  <button
-                    type="button"
-                    onClick={() => setMateQuery("")}
-                    className="mt-2 text-xs font-semibold text-brand hover:underline cursor-pointer"
-                  >
-                    Clear search
-                  </button>
+                  <div className="mt-3 flex items-center justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setMateQuery("")}
+                      className="rounded-full bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card cursor-pointer"
+                    >
+                      Clear search
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openGlobalSearch({ query: mateQuery })}
+                      className="rounded-full bg-brand px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-brand-ink cursor-pointer"
+                    >
+                      Search all AirPal
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <ul className="mt-4 space-y-3">

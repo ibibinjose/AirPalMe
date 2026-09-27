@@ -49,7 +49,6 @@ const CREATE_OPTIONS: CreateOption[] = [
     href: "/mate/request",
     icon: Users,
     colorClass: "bg-emerald-500/10 text-emerald-600 ring-emerald-500/20",
-    badge: "MVP Priority",
   },
   {
     id: "event",

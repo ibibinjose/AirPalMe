@@ -11,18 +11,17 @@ import {
   Megaphone,
   Navigation,
   QrCode,
-  Search,
   Share2,
   Sparkles,
   Trophy,
   UserCheck,
   UserPlus,
   Users,
-  X,
   Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { doc, getDoc } from "firebase/firestore";
+import { SearchBar } from "@/components/search/SearchBar";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { BioStatusModal } from "@/components/bio/BioStatusModal";
 import { BioCatchUpModal } from "@/components/bio/BioCatchUpModal";
@@ -312,11 +311,10 @@ export function CirclePage() {
               </span>
             </div>
             <h1 className="font-display mt-1.5 text-2xl font-bold tracking-tight text-ink sm:text-3xl">
-              Your Social &amp; Plans Circle
+              Social &amp; Plans Circle
             </h1>
-            <p className="mt-1 max-w-xl text-sm leading-relaxed text-mute">
-              Bring your friends, followers, and mates together in one place. Broadcast live updates, share locations,
-              and plan meetups seamlessly.
+            <p className="mt-0.5 max-w-lg text-xs sm:text-sm text-mute">
+              Friends, colleagues and mates connected in one place.
             </p>
           </div>
 
@@ -503,25 +501,16 @@ export function CirclePage() {
                 </span>
               </div>
 
-              {/* Search Bar */}
-              <div className="relative flex-1 sm:max-w-xs">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-mute" />
-                <input
+              {/* Search Bar: Mobile & iOS friendly */}
+              <div className="flex-1 sm:max-w-xs">
+                <SearchBar
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={setQuery}
+                  sizeVariant="sm"
+                  variant="paper"
                   placeholder="Search by name, handle, city…"
-                  className="h-9 w-full rounded-full bg-paper pl-8 pr-8 text-xs text-ink outline-none ring-1 ring-line focus:ring-brand"
+                  aria-label="Search circle"
                 />
-                {query && (
-                  <button
-                    type="button"
-                    onClick={() => setQuery("")}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-mute hover:text-ink"
-                    aria-label="Clear search"
-                  >
-                    <X size={13} />
-                  </button>
-                )}
               </div>
             </div>
 

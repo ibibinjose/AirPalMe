@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search } from "@/components/icons";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { ProfileMenu } from "@/components/auth/ProfileMenu";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
@@ -76,7 +76,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
               void triggerHaptic("light");
               openGlobalSearch();
             }}
-            className="flex h-9 items-center gap-2 rounded-full bg-card/80 px-3.5 text-xs font-medium text-mute ring-1 ring-line/80 hover:text-ink hover:bg-card hover:ring-brand/30 transition-all shadow-xs lg:h-10 cursor-pointer"
+            className="flex h-10 sm:h-9 min-h-[44px] sm:min-h-0 items-center gap-2 rounded-full bg-card/80 px-3 sm:px-3.5 text-xs font-medium text-mute ring-1 ring-line/80 hover:text-ink hover:bg-card hover:ring-brand/30 transition-all shadow-xs lg:h-10 cursor-pointer touch-manipulation"
             title="Search AirPal (⌘K)"
             aria-label="Search"
           >

@@ -1173,5 +1173,23 @@ match /dining_orders/{orderId} {
         || resource.data.targetOwnerUid == request.auth.uid
       );
     }
+
+    // Log search queries for relevance tracking, analytics, and query intent
+    match /search_queries/{queryId} {
+      allow create: if request.resource.data.query is string
+        && request.resource.data.query.size() >= 2
+        && request.resource.data.query.size() <= 120;
+      allow read: if true;
+      allow update, delete: if platformAdmin();
+    }
+
+    // Aggregated popular search terms (publicly readable for relevance improvements & suggestions)
+    match /popular_searches/{termId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.term is string
+        && request.resource.data.term.size() >= 2
+        && request.resource.data.term.size() <= 120;
+      allow delete: if platformAdmin();
+    }
   }
 }

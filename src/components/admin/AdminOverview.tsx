@@ -3,13 +3,14 @@ import { collection, getCountFromServer, getDocs, limit, orderBy, query, where }
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { aud } from "@shared/campaign";
 
-export type AdminTab = "overview" | "marketplace" | "mates" | "experiences" | "safety" | "studio" | "system" | "audit";
+export type AdminTab = "overview" | "marketplace" | "mates" | "experiences" | "search" | "safety" | "studio" | "system" | "audit";
 
 export const ADMIN_TABS: { id: AdminTab; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "marketplace", label: "Marketplace" },
   { id: "mates", label: "Mates" },
   { id: "experiences", label: "Experiences" },
+  { id: "search", label: "Search" },
   { id: "safety", label: "Safety" },
   { id: "studio", label: "Studio" },
   { id: "system", label: "System" },
@@ -51,7 +52,7 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
     let cancelled = false;
     void (async () => {
       try {
-        const [open, matched, completed, bPending, bConfirmed, bDone, cPending, cLive, sNew, wNew, audits] =
+        const [open, matched, completed, bPending, bConfirmed, bDone, cPending, cLive, sNew, wNew, audits, searchQueries] =
           await Promise.all([
             countIn("mate_requests", "status", "open"),
             countIn("mate_requests", "status", "matched"),
@@ -64,6 +65,7 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
             countIn("safety_reports", "status", "new"),
             countIn("studio_walkthroughs", "status", "new"),
             countAll("admin_audits"),
+            countAll("popular_searches"),
           ]);
         // GMV over recent bookings — indicative only, pre-Stripe.
         let gmv = 0;
@@ -89,6 +91,7 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
           { label: "Live Experiences", value: String(cLive), hint: "bookable in Sydney", tab: "experiences", badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
           { label: "Safety Triage", value: String(sNew), hint: "unresolved incidents", tab: "safety", badgeClass: "bg-red-500/10 text-red-600 dark:text-red-400", urgent: sNew > 0 },
           { label: "Studio Leads", value: String(wNew), hint: "partner inquiries", tab: "studio", badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+          { label: "Search Queries", value: String(searchQueries), hint: "top queries tracked", tab: "search", badgeClass: "bg-brand/10 text-brand" },
           { label: "Audit Logs", value: String(audits), hint: "immutable trail", tab: "audit", badgeClass: "bg-zinc-500/10 text-zinc-600 dark:text-zinc-400" },
         ]);
       } catch {

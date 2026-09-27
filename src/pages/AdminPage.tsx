@@ -22,6 +22,7 @@ import { SafetyInboxAdmin } from "@/components/admin/SafetyInboxAdmin";
 import { CampaignInboxAdmin } from "@/components/admin/CampaignInboxAdmin";
 import { FestivalAdmin } from "@/components/admin/FestivalAdmin";
 import { AuditTrailAdmin } from "@/components/admin/AuditTrailAdmin";
+import { SearchQueriesDashboardTab } from "@/components/admin/SearchQueriesDashboardTab";
 import { ADMIN_TABS, AdminOverview, type AdminTab } from "@/components/admin/AdminOverview";
 import { AIRPAL_CLUB_ID } from "@/contexts/ClubContext";
 import { seedDatabase } from "@/lib/seed-database";
@@ -525,6 +526,7 @@ export function AdminPage() {
             </div>
           )}
           {tab === "safety" && <SafetyInboxAdmin />}
+          {tab === "search" && <SearchQueriesDashboardTab />}
           {tab === "experiences" && (
             <div className="space-y-6">
               <CampaignInboxAdmin />

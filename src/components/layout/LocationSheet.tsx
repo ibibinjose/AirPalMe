@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import {
   Navigation,
   Building2,
-  Search,
   Check,
   Globe2,
   X,
@@ -22,6 +21,7 @@ import { shareCurrentLocation } from "@/lib/share";
 import { cn } from "@/lib/cn";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocation } from "wouter";
+import { SearchBar } from "@/components/search/SearchBar";
 
 type RegionFilter = "all" | "india" | "uae" | "europe" | "northamerica" | "australia" | "international";
 
@@ -292,25 +292,16 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
               <span className="text-[11px] font-bold text-mute">{filteredCities.length} cities</span>
             </div>
 
-            {/* Search Bar */}
-            <div className="relative mb-2.5">
-              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute" />
-              <input
-                type="text"
+            {/* Search Bar: Mobile, iOS and Android friendly */}
+            <div className="mb-2.5">
+              <SearchBar
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={setSearch}
+                sizeVariant="sm"
+                variant="paper"
                 placeholder="Search any city (Bengaluru, Kochi, London…)"
-                className="h-10 w-full rounded-2xl bg-paper pl-9 pr-8 text-xs font-medium text-ink placeholder:text-mute ring-1 ring-line outline-none transition focus:bg-card focus:ring-2 focus:ring-brand shadow-xs"
+                aria-label="Search city"
               />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-mute hover:text-ink cursor-pointer"
-                >
-                  <X size={14} />
-                </button>
-              )}
             </div>
 
             {/* Region Tabs */}

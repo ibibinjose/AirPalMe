@@ -61,17 +61,17 @@ const VERTICALS = [
   {
     id: "mate",
     label: "AirPal Mate",
-    sub: "Find someone to go with you",
+    sub: "Find someone to go with",
     href: "/mate",
     icon: Users,
     gradient: "from-blue-600/15 via-indigo-500/10 to-transparent",
     iconBg: "bg-brand text-white",
-    badge: "MVP Priority",
+    badge: "Connect",
   },
   {
     id: "experiences",
     label: "Experiences",
-    sub: "Food, culture, art & music",
+    sub: "Food, art & culture",
     href: "/experiences",
     icon: Sparkles,
     gradient: "from-amber-500/15 via-orange-500/10 to-transparent",
@@ -80,8 +80,8 @@ const VERTICALS = [
   },
   {
     id: "stay",
-    label: "Stays & Places",
-    sub: "Hotels, hostels & retreats",
+    label: "Stays",
+    sub: "Hotels & boutique rooms",
     href: "/explore",
     icon: Hotel,
     gradient: "from-emerald-500/15 via-teal-500/10 to-transparent",
@@ -91,27 +91,27 @@ const VERTICALS = [
   {
     id: "events",
     label: "What's On",
-    sub: "Daily discovery & nightlife",
+    sub: "Live gigs & events",
     href: "/calendar",
     icon: CalendarDays,
     gradient: "from-rose-500/15 via-pink-500/10 to-transparent",
     iconBg: "bg-rose-600 text-white",
-    badge: "Live Daily",
+    badge: "Live",
   },
   {
     id: "trips",
-    label: "Plan & Travel",
-    sub: "Itineraries & group hangouts",
+    label: "Trips",
+    sub: "Plans & itineraries",
     href: "/plan",
     icon: Plane,
     gradient: "from-purple-500/15 via-violet-500/10 to-transparent",
     iconBg: "bg-purple-600 text-white",
-    badge: "Collaborate",
+    badge: "Trips",
   },
   {
     id: "perks",
-    label: "Perks & Drops",
-    sub: "Giveaways, fashion & rewards",
+    label: "Perks",
+    sub: "Rewards & drops",
     href: "/giveaways",
     icon: Gift,
     gradient: "from-yellow-500/15 via-amber-500/10 to-transparent",
@@ -196,23 +196,23 @@ export function HomePage() {
             </span>
           </div>
 
-          <h1 className="font-display mt-3 text-[32px] sm:text-[42px] font-bold leading-[1.05] tracking-tight text-white max-w-2xl">
+          <h1 className="font-display mt-3 text-[30px] sm:text-[40px] font-bold leading-[1.05] tracking-tight text-white max-w-2xl">
             What do you want to do?
           </h1>
-          <p className="mt-1.5 text-sm sm:text-base font-medium text-white/85 max-w-xl">
-            AirPal.me — Life Made Easy. Find mates, discover experiences, explore stays, and make real plans.
+          <p className="mt-1 text-sm sm:text-base font-medium text-white/90 max-w-lg">
+            Find mates, places, and experiences.
           </p>
 
           {/* Quick Search Trigger */}
-          <div className="mt-5">
+          <div className="mt-4">
             <button
               type="button"
-              onClick={openGlobalSearch}
-              className="flex w-full items-center justify-between rounded-2xl bg-card/90 px-4 py-3.5 text-left text-sm font-medium text-mute ring-1 ring-line/80 shadow-md backdrop-blur-md hover:bg-card hover:text-ink transition cursor-pointer"
+              onClick={() => openGlobalSearch()}
+              className="flex w-full min-h-[48px] items-center justify-between rounded-2xl bg-card/90 px-4 py-3 text-left text-sm font-medium text-mute ring-1 ring-line/80 shadow-md backdrop-blur-md hover:bg-card hover:text-ink transition cursor-pointer touch-manipulation active:scale-[0.99]"
             >
               <span className="flex items-center gap-2.5">
                 <Search size={18} className="text-brand" />
-                <span>Search mates, places, events, food or trips…</span>
+                <span>Search mates, places, events, or trips…</span>
               </span>
               <kbd className="hidden rounded bg-paper/90 px-2 py-0.5 text-xs font-semibold text-mute ring-1 ring-line sm:inline-block">
                 ⌘K
@@ -270,10 +270,7 @@ export function HomePage() {
       {/* Six Marketplace Pillars Grid */}
       <section aria-label="Explore AirPal Verticals" className="mt-8">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-display text-xl font-bold tracking-tight">Life Made Easy</h2>
-            <p className="text-xs text-mute mt-0.5">Everything you need across people, places, and experiences.</p>
-          </div>
+          <h2 className="font-display text-xl font-bold tracking-tight text-ink">Life Made Easy</h2>
           <Link href="/explore" className="text-xs font-bold text-brand hover:underline">
             View All →
           </Link>
@@ -369,8 +366,8 @@ export function HomePage() {
                   <Plane size={14} /> Ready for your next outing?
                 </div>
                 <h3 className="font-display text-lg font-bold mt-1 text-ink">Plan a hangout or trip</h3>
-                <p className="text-xs text-mute mt-1">
-                  Keep your destinations, times, and mates connected on one shared live itinerary.
+                <p className="text-xs text-mute mt-0.5">
+                  Live itineraries with friends &amp; mates.
                 </p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -417,9 +414,7 @@ export function HomePage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-line/60 pb-4">
             <div>
               <p className="font-display text-base font-bold text-ink">Going somewhere? Don&apos;t go alone.</p>
-              <p className="text-xs text-mute mt-0.5">
-                Connect with verified local mates for dinners, events, workouts, or exploring the city safely.
-              </p>
+              <p className="text-xs text-mute mt-0.5">Verified local companions.</p>
             </div>
             <Button
               size="sm"
@@ -526,11 +521,11 @@ export function HomePage() {
             <div className="flex items-start justify-between">
               <div>
                 <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
-                  Social Circles & Moments
+                  Social Circles
                 </span>
                 <p className="font-display text-lg font-bold mt-2 text-ink">Communities Around Movement</p>
                 <p className="mt-1 text-sm text-mute max-w-xl">
-                  Connect with foodies, travellers, and locals planning things together — life made easy, not another endless feed.
+                  Connect and plan activities with locals.
                 </p>
               </div>
               <ArrowCta />
@@ -693,7 +688,7 @@ export function HomePage() {
             <h3 className="font-display text-base font-bold text-ink">AirPal Trust & Safety</h3>
           </div>
           <p className="text-xs text-mute mt-1 max-w-xl leading-relaxed">
-            Verified identity badges, safe public meetup guidelines, transparent pricing with Stripe protection, and 24/7 incident support.
+            Verified identity badges, safe public meetups, and Stripe payment protection.
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-mute font-medium">
             <span className="flex items-center gap-1.5 text-ink font-semibold">

@@ -7,7 +7,6 @@ import {
   Clock,
   MapPin,
   Plus,
-  Search,
   SlidersHorizontal,
   Sparkles,
   Store,
@@ -25,6 +24,7 @@ import { triggerHaptic } from "@/lib/native";
 import { toast } from "sonner";
 import { cn } from "@/lib/cn";
 import { PROMOTION_CATEGORIES, type Promotion } from "@shared/promotions";
+import { SearchBar } from "@/components/search/SearchBar";
 
 export function PromotionsPage() {
   const { user, isAdmin } = useAuth();
@@ -169,24 +169,15 @@ export function PromotionsPage() {
         </p>
 
         {/* Search Bar */}
-        <div className="mt-5 flex items-center gap-2 rounded-2xl bg-paper/90 px-3.5 py-2 ring-1 ring-line focus-within:ring-2 focus-within:ring-brand shadow-2xs backdrop-blur-sm">
-          <Search size={16} className="text-mute shrink-0" />
-          <input
-            type="text"
+        <div className="mt-5">
+          <SearchBar
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search deals by venue, dish, discount % or location..."
-            className="w-full bg-transparent text-xs sm:text-sm text-ink outline-none"
+            onChange={setSearch}
+            sizeVariant="md"
+            variant="paper"
+            placeholder="Search deals by venue, dish, discount % or location…"
+            aria-label="Search deals"
           />
-          {search && (
-            <button
-              type="button"
-              onClick={() => setSearch("")}
-              className="text-xs font-semibold text-mute hover:text-ink shrink-0 px-1"
-            >
-              Clear
-            </button>
-          )}
         </div>
       </div>
 

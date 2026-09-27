@@ -3,14 +3,12 @@ import { useLocation } from "wouter";
 import {
   Compass,
   Plus,
-  Search,
   Sparkles,
   MapPin,
   Calendar,
   Clock,
   Share2,
   ArrowRight,
-  X,
   Coffee,
   Utensils,
   Wine,
@@ -28,6 +26,8 @@ import { useLocalNow } from "@/hooks/useLocalNow";
 import { EVENT_NEAR_M, locatedNear } from "@/lib/location-scope";
 import { triggerHaptic, shareNative } from "@/lib/native";
 import { Photo } from "@/components/ui/Photo";
+import { SearchBar } from "@/components/search/SearchBar";
+import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
 import { cn } from "@/lib/cn";
 import { toast } from "sonner";
 
@@ -236,10 +236,10 @@ export function PlanHubPage() {
             )}
           </div>
           <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-ink md:text-4xl">
-            Plans & Invites
+            Plans &amp; Invites
           </h1>
-          <p className="mt-1 text-sm text-mute">
-            Coordinate hangouts, invite mates, and explore shared itineraries.
+          <p className="mt-0.5 text-xs text-mute font-medium">
+            Shared itineraries with mates &amp; friends.
           </p>
         </div>
 
@@ -453,31 +453,18 @@ export function PlanHubPage() {
 
         {/* Search and Category Filters */}
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
-            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-mute pointer-events-none" />
-            <input
-              type="search"
-              inputMode="search"
-              enterKeyHint="search"
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
+          <div className="flex-1">
+            <SearchBar
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={setSearchQuery}
+              sizeVariant="md"
+              variant="card"
               placeholder="Search plans by title, city, or stops…"
               aria-label="Search plans"
-              className="h-12 sm:h-11 w-full rounded-2xl bg-card pl-11 pr-11 text-[16px] sm:text-sm text-ink ring-1 ring-line outline-none placeholder:text-mute focus:ring-2 focus:ring-brand/30 shadow-xs"
+              showFullSearchAction={Boolean(searchQuery.trim())}
+              fullSearchLabel="Full Search"
+              onFullSearch={(q) => openGlobalSearch({ query: q, category: "plan" })}
             />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="absolute right-1 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center text-mute hover:text-ink active:scale-95 cursor-pointer"
-                aria-label="Clear search"
-              >
-                <X size={15} />
-              </button>
-            )}
           </div>
 
           <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1">

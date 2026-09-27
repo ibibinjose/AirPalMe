@@ -6,8 +6,6 @@ import {
   Map as MapIcon,
   MapPin,
   SlidersHorizontal,
-  Search,
-  X,
   Sparkles,
   ArrowRight,
   Compass,
@@ -24,6 +22,8 @@ import {
 import { usePlans } from "@/contexts/PlanContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { toast } from "sonner";
+import { SearchBar } from "@/components/search/SearchBar";
+import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
 import { useLocalNow } from "@/contexts/LocalNowContext";
 import { useListings } from "@/contexts/ListingsContext";
 import { discoverPlaces } from "@/lib/catalog";
@@ -235,7 +235,7 @@ export function ExplorePage() {
             Explore {effectiveCity}
           </h1>
           <p className="mt-1 text-sm text-mute">
-            Discover local places, upcoming events, and curated experiences.
+            Places, events, and experiences.
           </p>
         </div>
 
@@ -289,31 +289,18 @@ export function ExplorePage() {
       </header>
 
       {/* Search Field */}
-      <div className="relative mt-5">
-        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand pointer-events-none" />
-        <input
-          type="search"
-          inputMode="search"
-          enterKeyHint="search"
-          autoCapitalize="none"
-          autoCorrect="off"
-          spellCheck={false}
+      <div className="mt-5">
+        <SearchBar
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={setSearchQuery}
+          sizeVariant="md"
+          variant="card"
           placeholder={`Search places, events, or experiences in ${effectiveCity}…`}
           aria-label="Search explore"
-          className="h-12 w-full rounded-2xl bg-card pl-11 pr-11 text-[16px] sm:text-sm text-ink ring-1 ring-line outline-none placeholder:text-mute focus:ring-2 focus:ring-brand/30 shadow-xs"
+          showFullSearchAction={Boolean(searchQuery.trim())}
+          fullSearchLabel="Full Search"
+          onFullSearch={(q) => openGlobalSearch({ query: q, category: "places" })}
         />
-        {searchQuery && (
-          <button
-            type="button"
-            onClick={() => setSearchQuery("")}
-            className="absolute right-1 top-1/2 -translate-y-1/2 flex h-11 w-11 items-center justify-center text-mute hover:text-ink active:scale-95 cursor-pointer"
-            aria-label="Clear search"
-          >
-            <X size={16} />
-          </button>
-        )}
       </div>
 
       {/* Categories Pill Scroller */}
@@ -518,9 +505,9 @@ export function ExplorePage() {
 
                 <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs flex flex-col justify-between">
                   <div>
-                    <h3 className="font-display text-xl font-bold text-ink">Digital Compendium & Concierge</h3>
-                    <p className="mt-1 text-xs text-mute">
-                      One scan replaces binders and PDFs. 1-tap door PIN, Wi-Fi, in-room dining, and 24/7 AI receptionist.
+                    <h3 className="font-display text-xl font-bold text-ink">Digital Compendium &amp; Concierge</h3>
+                    <p className="mt-0.5 text-xs text-mute">
+                      1-tap door PIN, Wi-Fi, dining, and stay services.
                     </p>
                   </div>
                   <div className="mt-4 flex items-center gap-2">
@@ -541,7 +528,7 @@ export function ExplorePage() {
                       <span>Verified Stays in {effectiveCity}</span>
                     </h2>
                     <p className="text-xs text-mute mt-0.5">
-                      Hotels and boutique retreats powered by AirPal Digital Compendium.
+                      Hotels &amp; boutique retreats
                     </p>
                   </div>
                 </div>

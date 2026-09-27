@@ -1,4 +1,4 @@
-import { AtSign, CalendarDays, Compass, Home, Inbox } from "lucide-react";
+import { AtSign, CalendarDays, Compass, Home, Inbox } from "@/components/icons";
 import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";

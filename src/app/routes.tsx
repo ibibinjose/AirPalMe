@@ -58,6 +58,10 @@ const BioPublicPage = lazy(() => import("@/pages/BioPublicPage").then((m) => ({ 
 const BioSetupPage = lazy(() => import("@/pages/BioSetupPage").then((m) => ({ default: m.BioSetupPage })));
 const BioEditPage = lazy(() => import("@/pages/BioEditPage").then((m) => ({ default: m.BioEditPage })));
 const BioRecoverPage = lazy(() => import("@/pages/BioRecoverPage").then((m) => ({ default: m.BioRecoverPage })));
+const SearchPage = lazy(() => import("@/pages/SearchPage").then((m) => ({ default: m.SearchPage })));
+const SearchAnalyticsPage = lazy(() =>
+  import("@/pages/SearchAnalyticsPage").then((m) => ({ default: m.SearchAnalyticsPage })),
+);
 const CampusPage = lazy(() => import("@/pages/CampusPage").then((m) => ({ default: m.CampusPage })));
 const AdminPage = lazy(() => import("@/pages/AdminPage").then((m) => ({ default: m.AdminPage })));
 const GiveawaysPage = lazy(() => import("@/pages/GiveawaysPage").then((m) => ({ default: m.GiveawaysPage })));
@@ -126,6 +130,11 @@ export function AppRoutes() {
     <Suspense fallback={<RouteFallback />}>
       <Switch>
         <Route path="/" component={HomePage} />
+        <Route path="/search/analytics" component={SearchAnalyticsPage} />
+        <Route path="/admin/search-analytics">
+          <Redirect to="/search/analytics" />
+        </Route>
+        <Route path="/search" component={SearchPage} />
         <Route path="/mate" component={MatePage} />
         <Route path="/mate/request" component={MateRequestPage} />
         <Route path="/explore" component={ExplorePage} />
