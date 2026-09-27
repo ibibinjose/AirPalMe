@@ -3,7 +3,7 @@ import { defineSecret } from "firebase-functions/params";
 import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
 import Stripe from "stripe";
 import type { HangoutPlan, PlanAttendee } from "../../shared/plan";
-import { isSoldOut, spotsLeft } from "../../shared/plan";
+import { isSoldOut, normalizePlusOnes, spotsLeft } from "../../shared/plan";
 import {
   DEFAULT_FEE_CONFIG,
   balanceDueCents,
@@ -190,10 +190,12 @@ async function applyPaidTicketToPlan(booking: Booking, spots: number, guestName:
     const plan = snap.data() as HangoutPlan;
     const qty = Math.max(1, Math.floor(spots || booking.spots || 1));
     const nextBooked = Math.max(0, Number(plan.spotsBooked || 0)) + qty;
+    const party = normalizePlusOnes(qty - 1);
     const guestAttendee: PlanAttendee = {
       id: booking.customerUid,
       name: guestName || "Guest",
       status: "going",
+      plusOnes: party > 0 ? party : undefined,
       notes: `Ticket ×${qty}`,
       respondedAt: now,
     };
@@ -479,11 +481,13 @@ export const createExperienceCheckoutSession = onCall(STRIPE_CALLABLE, async (re
       createdAt: now,
     });
 
+  const sandboxParty = normalizePlusOnes(Number(spots) - 1);
   const guestAttendee: PlanAttendee = {
     id: uid,
     name: data.guestName || request.auth?.token?.name || "You",
     status: "going",
     isAnonymous: Boolean(request.auth?.token?.firebase?.sign_in_provider === "anonymous"),
+    plusOnes: sandboxParty > 0 ? sandboxParty : undefined,
     notes: `Booked ${spots} spot${spots > 1 ? "s" : ""} (${isDeposit ? "Deposit Paid" : "Paid in Full"})`,
     respondedAt: now,
   };

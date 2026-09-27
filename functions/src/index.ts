@@ -33,6 +33,8 @@ export {
   addPlanStopRemote,
   votePlanStop,
   votePlanStopRemote,
+  voteDateOption,
+  voteDateOptionRemote,
   postPlanComment,
   postPlanCommentRemote,
   completePlan,
@@ -76,6 +78,7 @@ export {
   seedPromotionDemo,
 } from "./promotions";
 export { createBroadcast, reviewBroadcast } from "./notifications";
+export { sendPlanBroadcast, sendPlanReminders, onPlanUpdated, inviteToPlan } from "./plan-notify";
 export { shareHere, stopHere } from "./here";
 export { startWave, waveAt, stopWave } from "./wave";
 export {

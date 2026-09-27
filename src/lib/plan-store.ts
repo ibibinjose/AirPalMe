@@ -330,6 +330,27 @@ export function voteStopInPlan(planId: string, stopId: string, userId: string): 
   return savePlan(updatedPlan);
 }
 
+/** Date-poll votes ride the plan doc (`dateOptions`); guests vote through the callable (rules keep direct writes host-only). */
+export function votePlanDateOption(
+  planId: string,
+  optionId: string,
+  userId: string,
+  syncRemote = true,
+): HangoutPlan | undefined {
+  const plan = getPlan(planId);
+  if (!plan || !plan.dateOptions?.some((o) => o.id === optionId)) return undefined;
+
+  const nextOptions = plan.dateOptions.map((o) => {
+    if (o.id !== optionId) return o;
+    const voters = new Set(o.voterUids || []);
+    if (voters.has(userId)) voters.delete(userId);
+    else voters.add(userId);
+    return { ...o, voterUids: Array.from(voters), votes: voters.size };
+  });
+
+  return savePlan({ ...plan, dateOptions: nextOptions }, syncRemote);
+}
+
 export const PLAN_COMMENT_MAX = 500;
 
 /** Crew discussion stays on the plan doc (`comments`) so rules §plans stay the single gate. */

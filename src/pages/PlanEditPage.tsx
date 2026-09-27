@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
 import { ArrowLeft, Calendar, Check, Clock, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { PLAN_THEMES, PLAN_TYPES, type PlanTheme, type PlanType } from "@shared/plan";
+import { PLAN_THEMES, PLAN_TYPES, isPlanManager, type PlanTheme, type PlanType } from "@shared/plan";
 import { usePlans } from "@/contexts/PlanContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { PLAN_TYPE_ICONS } from "@/components/plan/planTypeIcons";
@@ -74,7 +74,7 @@ export function PlanEditPage() {
     return <NotFoundPage />;
   }
 
-  const isHost = !plan.creator.uid || plan.creator.uid === user.uid;
+  const isHost = !plan.creator.uid || isPlanManager(plan, user?.uid);
 
   if (!isHost) {
     return (

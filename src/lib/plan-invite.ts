@@ -26,3 +26,21 @@ export function shouldAutoOpenInviteRsvp(input: InviteAutoRsvpInput): boolean {
 export function localTodayStr(now = new Date()): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
+
+export interface GuestRsvpInput {
+  /** True inside the native iOS/Android shell, where an account is required. */
+  isNative: boolean;
+  /** True when the guest already has a signed-in AirPal account. */
+  hasAccount: boolean;
+}
+
+/**
+ * Zero-friction RSVP gate (P0 plan layer): a guest with no account may RSVP
+ * straight from an invite link on the website, where an anonymous Firebase
+ * session satisfies the signed-in write rules. Native apps stay account-gated
+ * per the shipped auth freeze, and signed-in users take the normal path.
+ */
+export function canRsvpAsGuest(input: GuestRsvpInput): boolean {
+  if (input.hasAccount) return false;
+  return !input.isNative;
+}

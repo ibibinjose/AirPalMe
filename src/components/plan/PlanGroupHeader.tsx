@@ -1,32 +1,44 @@
 import { useMemo, useState } from "react";
 import { CheckCircle2, Crown, HelpCircle, MessageCircle, Sparkles, UserPlus, X } from "lucide-react";
 import type { HangoutPlan } from "@shared/plan";
+import { guestListDisplay, visibleAttendees } from "@shared/plan-notify";
 import { cn } from "@/lib/cn";
 
 export function PlanGroupHeader({
   plan,
   onInvite,
   onRsvp,
+  viewerUid,
+  viewerIsHost,
 }: {
   plan: HangoutPlan;
   onInvite?: () => void;
   onRsvp?: () => void;
+  viewerUid?: string | null;
+  viewerIsHost?: boolean;
 }) {
   const [showMemberModal, setShowMemberModal] = useState(false);
 
-  const going = useMemo(() => plan.attendees.filter((a) => a.status === "going"), [plan.attendees]);
-  const maybe = useMemo(() => plan.attendees.filter((a) => a.status === "maybe"), [plan.attendees]);
+  // Who's-going privacy: host sees all, guests see the redacted list.
+  const attendees = useMemo(
+    () => visibleAttendees(plan, { uid: viewerUid, isHost: viewerIsHost }),
+    [plan, viewerUid, viewerIsHost],
+  );
+  const showCount = viewerIsHost || guestListDisplay(plan).showCount;
+
+  const going = useMemo(() => attendees.filter((a) => a.status === "going"), [attendees]);
+  const maybe = useMemo(() => attendees.filter((a) => a.status === "maybe"), [attendees]);
 
   // WhatsApp-style names preview: "Alex (Host), Sam, Chloe, Liam..."
   const memberNamesPreview = useMemo(() => {
-    const names = plan.attendees.map((a) => {
+    const names = attendees.map((a) => {
       const isCreator = a.id === plan.creator.uid || a.name === plan.creator.name;
       return `${a.name}${isCreator ? " (Host)" : ""}`;
     });
     if (names.length === 0) return "Group chat for this plan";
     if (names.length <= 3) return names.join(", ");
     return `${names.slice(0, 3).join(", ")} +${names.length - 3} more`;
-  }, [plan.attendees, plan.creator]);
+  }, [attendees, plan.creator]);
 
   return (
     <>
@@ -47,7 +59,7 @@ export function PlanGroupHeader({
           <div className="flex items-center gap-3.5 min-w-0">
             {/* Avatar Stack / Cluster */}
             <div className="relative flex -space-x-3 shrink-0">
-              {plan.attendees.slice(0, 4).map((att, i) => {
+              {attendees.slice(0, 4).map((att, i) => {
                 const isCreator = att.id === plan.creator.uid || att.name === plan.creator.name;
                 return (
                   <div
@@ -91,9 +103,9 @@ export function PlanGroupHeader({
                   </div>
                 );
               })}
-              {plan.attendees.length > 4 && (
+              {showCount && attendees.length > 4 && (
                 <div className="grid h-11 w-11 place-items-center rounded-full bg-paper text-[11px] font-bold text-ink ring-2 ring-card shadow-sm z-0">
-                  +{plan.attendees.length - 4}
+                  +{attendees.length - 4}
                 </div>
               )}
             </div>
@@ -106,7 +118,9 @@ export function PlanGroupHeader({
                   <span>Occasion Group</span>
                 </span>
                 <span className="text-[11px] text-mute font-mono">
-                  {going.length} going{maybe.length > 0 ? ` · ${maybe.length} maybe` : ""}
+                  {showCount
+                    ? `${going.length} going${maybe.length > 0 ? ` · ${maybe.length} maybe` : ""}`
+                    : "Guest list private"}
                 </span>
               </div>
               <h3 className="truncate font-display text-base font-bold text-ink mt-0.5 group-hover:text-brand transition">
@@ -155,7 +169,9 @@ export function PlanGroupHeader({
                   Group Participants
                 </span>
                 <h3 className="font-display text-xl font-bold text-ink">{plan.title}</h3>
-                <p className="text-xs text-mute mt-0.5">{plan.attendees.length} members in this occasion group</p>
+                <p className="text-xs text-mute mt-0.5">
+                  {showCount ? `${attendees.length} members in this occasion group` : "Guest list private"}
+                </p>
               </div>
               <button
                 type="button"
@@ -168,7 +184,7 @@ export function PlanGroupHeader({
 
             {/* Member list */}
             <div className="space-y-2 pt-2">
-              {plan.attendees.map((att) => {
+              {attendees.map((att) => {
                 const isCreator = att.id === plan.creator.uid || att.name === plan.creator.name;
                 return (
                   <div

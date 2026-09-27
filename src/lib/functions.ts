@@ -21,6 +21,8 @@ import type {
   AddPlanStopResponse,
   VotePlanStopRequest,
   VotePlanStopResponse,
+  VoteDateOptionRequest,
+  VoteDateOptionResponse,
   PostPlanCommentRequest,
   PostPlanCommentResponse,
   CompletePlanRequest,
@@ -28,6 +30,12 @@ import type {
   GetPlanByInviteCodeRequest,
   GetPlanByInviteCodeResponse,
 } from "@shared/plan";
+import type {
+  InviteToPlanRequest,
+  InviteToPlanResponse,
+  SendPlanBroadcastRequest,
+  SendPlanBroadcastResponse,
+} from "@shared/plan-notify";
 import { getFirebaseFunctions, isFirebaseConfigured } from "./firebase";
 
 export function liveBackendEnabled() {
@@ -345,6 +353,10 @@ export function votePlanStopRemote(data: VotePlanStopRequest) {
 }
 export const votePlanStopRemoteCall = votePlanStopRemote;
 
+export function voteDateOptionRemote(data: VoteDateOptionRequest) {
+  return callFunction<VoteDateOptionRequest, VoteDateOptionResponse>(CALLABLES.voteDateOption, data);
+}
+
 export function postPlanCommentRemote(data: PostPlanCommentRequest) {
   return callFunction<PostPlanCommentRequest, PostPlanCommentResponse>(CALLABLES.postPlanComment, data);
 }
@@ -359,6 +371,14 @@ export function getPlanByInviteCodeRemote(data: GetPlanByInviteCodeRequest) {
   return callFunction<GetPlanByInviteCodeRequest, GetPlanByInviteCodeResponse>(CALLABLES.getPlanByInviteCode, data);
 }
 export const getPlanByInviteCodeRemoteCall = getPlanByInviteCodeRemote;
+
+export function sendPlanBroadcastRemote(data: SendPlanBroadcastRequest) {
+  return callFunction<SendPlanBroadcastRequest, SendPlanBroadcastResponse>(CALLABLES.sendPlanBroadcast, data);
+}
+
+export function inviteToPlanRemote(data: InviteToPlanRequest) {
+  return callFunction<InviteToPlanRequest, InviteToPlanResponse>(CALLABLES.inviteToPlan, data);
+}
 
 export function createExperienceCheckoutSessionRemote(data: {
   planId: string;

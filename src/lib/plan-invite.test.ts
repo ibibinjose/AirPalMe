@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { localTodayStr, shouldAutoOpenInviteRsvp } from "./plan-invite";
+import { canRsvpAsGuest, localTodayStr, shouldAutoOpenInviteRsvp } from "./plan-invite";
 
 const base = {
   arrivedViaInvite: true,
@@ -30,5 +30,20 @@ describe("invite auto-RSVP", () => {
 
   it("formats local today as YYYY-MM-DD", () => {
     expect(localTodayStr(new Date(2026, 8, 16))).toBe("2026-09-16");
+  });
+});
+
+describe("zero-friction guest RSVP gate", () => {
+  it("lets website guests RSVP without an account", () => {
+    expect(canRsvpAsGuest({ isNative: false, hasAccount: false })).toBe(true);
+  });
+
+  it("keeps native guests account-gated per the auth freeze", () => {
+    expect(canRsvpAsGuest({ isNative: true, hasAccount: false })).toBe(false);
+  });
+
+  it("sends signed-in users down the normal path, not the guest path", () => {
+    expect(canRsvpAsGuest({ isNative: false, hasAccount: true })).toBe(false);
+    expect(canRsvpAsGuest({ isNative: true, hasAccount: true })).toBe(false);
   });
 });

@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { HangoutPlan, PlanStop, PlanType, PlanTheme } from "@shared/plan";
+import { attendeeSeats, formatDateOption, headcountTaken, isPlanManager, isTicketed, normalizeAnswer, normalizePlusOnes, setAttendeeCheckedIn, validDateOption, waitlistQueue } from "@shared/plan";
+import { goingFits, resolveRsvpStatus } from "@shared/plan-notify";
 import type { Geo } from "@shared/nearby";
 import { completePlan as storeCompletePlan,
   loadPlans,
@@ -15,6 +17,7 @@ import { completePlan as storeCompletePlan,
   removeStopFromPlan,
   reorderStopsInPlan,
   voteStopInPlan,
+  votePlanDateOption,
   addCommentToPlan,
   notifyStopChange,
   togglePlanSubscription,
@@ -22,13 +25,14 @@ import { completePlan as storeCompletePlan,
   getPlanGoogleCalendarUrl,
 } from "@/lib/plan-store";
 import { useAuth } from "./AuthContext";
-import { completePlanRemoteCall } from "@/lib/functions";
+import { completePlanRemoteCall, liveBackendEnabled, voteDateOptionRemote } from "@/lib/functions";
 import { trackContentAction } from "@/lib/analytics";
-import { isFirebaseConfigured } from "@/lib/firebase";
+import { ensureAnonymousSession, isFirebaseConfigured } from "@/lib/firebase";
 import { currencyForCity } from "@/lib/cities";
 import { useBio } from "./BioContext";
 import { toast } from "sonner";
-import { triggerHaptic } from "@/lib/native";
+import { isNativeApp, triggerHaptic } from "@/lib/native";
+import { canRsvpAsGuest } from "@/lib/plan-invite";
 
 import type {
   ExperienceCategory,
@@ -95,7 +99,19 @@ interface PlanContextValue {
     status: "going" | "maybe" | "declined",
     guestName?: string,
     notes?: string,
+    plusOnes?: number,
+    answers?: Record<string, string>,
+  ) => Promise<HangoutPlan | undefined>;
+  reviewRsvp: (
+    planId: string,
+    attendeeId: string,
+    decision: "approve" | "decline",
   ) => HangoutPlan | undefined;
+  toggleCheckIn: (planId: string, attendeeId: string) => HangoutPlan | undefined;
+  proposeDateOption: (planId: string, input: { date: string; time?: string }) => HangoutPlan | undefined;
+  lockDateOption: (planId: string, optionId: string) => HangoutPlan | undefined;
+  reopenDatePoll: (planId: string) => HangoutPlan | undefined;
+  voteDateOption: (planId: string, optionId: string) => Promise<HangoutPlan | undefined>;
   addStop: (
     planId: string,
     stop: {
@@ -324,10 +340,32 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const rsvpPlan = useCallback(
-    (planId: string, status: "going" | "maybe" | "declined", guestName?: string, notes?: string) => {
-      if (!requireUser("Sign in to RSVP to plans.")) return undefined;
+    async (
+      planId: string,
+      status: "going" | "maybe" | "declined",
+      guestName?: string,
+      notes?: string,
+      plusOnes?: number,
+      answers?: Record<string, string>,
+    ) => {
+      // Zero-friction guest RSVP: website guests answer from the invite link on
+      // an anonymous Firebase session (satisfies the signed-in write rules;
+      // tighter anonymous rate limits apply server-side). Native stays
+      // account-gated per the shipped auth freeze.
+      let anonUid: string | null = null;
+      if (!user) {
+        if (canRsvpAsGuest({ isNative: isNativeApp(), hasAccount: false })) {
+          anonUid = await ensureAnonymousSession();
+          if (!anonUid && !requireUser("Sign in to RSVP to plans.")) return undefined;
+        } else if (!requireUser("Sign in to RSVP to plans.")) {
+          return undefined;
+        }
+      }
       const attendeeId =
-        user?.uid || (typeof window !== "undefined" && localStorage.getItem("airpal.anon.id")) || `anon-${Date.now()}`;
+        user?.uid ||
+        anonUid ||
+        (typeof window !== "undefined" && localStorage.getItem("airpal.anon.id")) ||
+        `anon-${Date.now()}`;
 
       if (typeof window !== "undefined" && !localStorage.getItem("airpal.anon.id")) {
         localStorage.setItem("airpal.anon.id", attendeeId);
@@ -344,24 +382,248 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("airpal.guest.name", guestName.trim());
       }
 
+      const seats = normalizePlusOnes(plusOnes);
+      const current = storeGetPlan(planId);
+
+      // Where the tap lands: approval-gated plans park newcomers as pending,
+      // full plans park them on the waitlist. Ticketed bookings always land
+      // going — Stripe spots govern those, not this guard.
+      const resolved =
+        current && !isTicketed(current) && status === "going"
+          ? resolveRsvpStatus(current, attendeeId, status, seats)
+          : status;
+
+      // Growing your party trims to fit instead of bouncing or re-queueing.
+      let finalSeats = seats;
+      if (resolved === "going" && current && !isTicketed(current)) {
+        const cap = Math.floor(Number(current.capacity));
+        if (Number.isFinite(cap) && cap > 0) {
+          const existing = current.attendees.find((a) => a.id === attendeeId);
+          const room = Math.max(
+            0,
+            cap - (headcountTaken(current) - attendeeSeats(existing)) - 1,
+          );
+          if (seats > room) {
+            finalSeats = room;
+            toast.message(
+              room > 0
+                ? `Only room for a party of ${room + 1} — trimmed to fit.`
+                : "This plan is full — your RSVP stays as is.",
+            );
+          }
+        }
+      }
+
+      // Answers survive only for live questions, cleaned per type.
+      const cleanAnswers: Record<string, string> = {};
+      for (const q of current?.guestQuestions || []) {
+        const v = normalizeAnswer(q, answers?.[q.id]);
+        if (v) cleanAnswers[q.id] = v;
+      }
+
       const updated = respondToPlan(planId, {
         id: attendeeId,
         name,
         handle: mine?.handle,
-        status,
+        status: resolved,
+        plusOnes:
+          finalSeats > 0 && (resolved === "going" || resolved === "waitlisted" || resolved === "pending")
+            ? finalSeats
+            : undefined,
+        answers: Object.keys(cleanAnswers).length ? cleanAnswers : undefined,
         notes,
         isAnonymous: !user,
       });
 
       if (updated) {
         void triggerHaptic("success");
-        if (status === "going") toast.success(`You're in for "${updated.title}"! 🎉`);
-        else if (status === "maybe") toast.info(`Marked as maybe for "${updated.title}"`);
+        if (resolved === "going") toast.success(`You're in for "${updated.title}"! 🎉`);
+        else if (resolved === "pending") toast.message("Request sent — the host approves every guest.");
+        else if (resolved === "waitlisted" && current) {
+          const position = waitlistQueue(current).length + 1;
+          toast.message(`This plan is full — you're #${position} on the waitlist.`);
+        } else if (resolved === "maybe") toast.info(`Marked as maybe for "${updated.title}"`);
         else toast.message("RSVP updated");
       }
       return updated;
     },
     [user, mine, requireUser],
+  );
+
+  const reviewRsvp = useCallback(
+    (planId: string, attendeeId: string, decision: "approve" | "decline") => {
+      const current = storeGetPlan(planId);
+      if (!current) return undefined;
+      if (!isPlanManager(current, user?.uid)) {
+        toast.error("Only the host can review requests.");
+        return undefined;
+      }
+      const target = current.attendees.find((a) => a.id === attendeeId);
+      if (!target || target.status !== "pending") return undefined;
+      const nextStatus =
+        decision === "decline" ? "declined" : goingFits(current, attendeeId, target.plusOnes) ? "going" : "waitlisted";
+      const updated = savePlan({
+        ...current,
+        attendees: current.attendees.map((a) =>
+          a.id === attendeeId ? { ...a, status: nextStatus, respondedAt: new Date().toISOString() } : a,
+        ),
+      });
+      if (updated) {
+        setPlans([...loadPlans()]);
+        if (nextStatus === "going") toast.success(`${target.name} is in! 🎉`);
+        else if (nextStatus === "waitlisted") toast.message("No seats left — moved to the waitlist.");
+        else toast.message(`${target.name} was declined.`);
+      }
+      return updated;
+    },
+    [user],
+  );
+
+  // Host door check: flip one going guest's checked-in flag. Creator-only
+  // write, no toast (rapid taps at the door) — the count tells the story.
+  const toggleCheckIn = useCallback(
+    (planId: string, attendeeId: string) => {
+      const current = storeGetPlan(planId);
+      if (!current) return undefined;
+      if (!isPlanManager(current, user?.uid)) {
+        toast.error("Only the host can check people in.");
+        return undefined;
+      }
+      const target = current.attendees.find((a) => a.id === attendeeId);
+      if (!target || target.status !== "going") return undefined;
+      const updated = savePlan({
+        ...current,
+        attendees: setAttendeeCheckedIn(current.attendees, attendeeId, !target.checkedIn),
+      });
+      if (updated) {
+        setPlans([...loadPlans()]);
+        void triggerHaptic("light");
+      }
+      return updated;
+    },
+    [user],
+  );
+
+  const proposeDateOption = useCallback(
+    (planId: string, input: { date: string; time?: string }) => {
+      const current = storeGetPlan(planId);
+      if (!current) return undefined;
+      if (!isPlanManager(current, user?.uid)) {
+        toast.error("Only the host can propose dates.");
+        return undefined;
+      }
+      const date = String(input.date || "").trim();
+      const time = String(input.time || "").trim();
+      const errors = validDateOption({ date, time });
+      if (errors.length) {
+        toast.error(errors[0]!);
+        return undefined;
+      }
+      if ((current.dateOptions || []).some((o) => o.date === date && String(o.time || "") === time)) {
+        toast.message("That date is already on the poll.");
+        return undefined;
+      }
+      if (!user) return undefined;
+      const updated = savePlan({
+        ...current,
+        dateOptions: [
+          ...(current.dateOptions || []),
+          {
+            id: `dateopt-${Date.now().toString(36)}`,
+            date,
+            time: time || undefined,
+            votes: 0,
+            voterUids: [],
+            addedByUid: user.uid,
+            addedByName: user.displayName || mine?.name || "Host",
+          },
+        ],
+        // A fresh option reopens the question.
+        datePollLocked: false,
+      });
+      if (updated) {
+        setPlans([...loadPlans()]);
+        toast.success("Date option added — votes decide.");
+      }
+      return updated;
+    },
+    [user, mine],
+  );
+
+  const lockDateOption = useCallback(
+    (planId: string, optionId: string) => {
+      const current = storeGetPlan(planId);
+      if (!current) return undefined;
+      if (!isPlanManager(current, user?.uid)) {
+        toast.error("Only the host can lock the date.");
+        return undefined;
+      }
+      const opt = (current.dateOptions || []).find((o) => o.id === optionId);
+      if (!opt) return undefined;
+      const time = String(opt.time || "").trim() || current.time;
+      const updated = savePlan({
+        ...current,
+        date: opt.date,
+        time,
+        datetime: `${opt.date}T${time}:00`,
+        datePollLocked: true,
+      });
+      if (updated) {
+        setPlans([...loadPlans()]);
+        toast.success(`Locked in ${formatDateOption(opt)} — tell the crew!`);
+      }
+      return updated;
+    },
+    [user],
+  );
+
+  const reopenDatePoll = useCallback(
+    (planId: string) => {
+      const current = storeGetPlan(planId);
+      if (!current) return undefined;
+      if (!isPlanManager(current, user?.uid)) {
+        toast.error("Only the host can reopen the poll.");
+        return undefined;
+      }
+      const updated = savePlan({ ...current, datePollLocked: false });
+      if (updated) {
+        setPlans([...loadPlans()]);
+        toast.message("Date poll reopened.");
+      }
+      return updated;
+    },
+    [user],
+  );
+
+  const voteDateOption = useCallback(
+    async (planId: string, optionId: string) => {
+      if (!requireUser("Sign in to vote on dates.")) return undefined;
+      const uid =
+        user?.uid || (typeof window !== "undefined" && localStorage.getItem("airpal.anon.id")) || "guest";
+      if (liveBackendEnabled()) {
+        try {
+          await voteDateOptionRemote({ planId, optionId });
+        } catch (err) {
+          toast.error(err instanceof Error ? err.message : "Could not vote");
+          return undefined;
+        }
+        // Server owns the count; mirror it locally without a direct write
+        // (rules keep dateOptions host-only) until sync converges.
+        const updated = votePlanDateOption(planId, optionId, uid, false);
+        if (updated) {
+          setPlans([...loadPlans()]);
+          void triggerHaptic("light");
+        }
+        return updated;
+      }
+      const updated = votePlanDateOption(planId, optionId, uid, true);
+      if (updated) {
+        setPlans([...loadPlans()]);
+        void triggerHaptic("light");
+      }
+      return updated;
+    },
+    [user, requireUser],
   );
 
   const addStop = useCallback(
@@ -528,6 +790,12 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         completePlan,
         deletePlan,
         rsvpPlan,
+        reviewRsvp,
+        toggleCheckIn,
+        proposeDateOption,
+        lockDateOption,
+        reopenDatePoll,
+        voteDateOption,
         addStop,
         updateStop,
         removeStop,

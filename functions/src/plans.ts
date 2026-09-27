@@ -9,6 +9,8 @@ import type {
   AddPlanStopResponse,
   VotePlanStopRequest,
   VotePlanStopResponse,
+  VoteDateOptionRequest,
+  VoteDateOptionResponse,
   PostPlanCommentRequest,
   PostPlanCommentResponse,
   CompletePlanRequest,
@@ -20,7 +22,7 @@ import type {
   PlanComment,
   PlanStop,
 } from "../../shared/plan";
-import { canCompletePlanStatus, randomInviteCode } from "../../shared/plan";
+import { canCompletePlanStatus, isPlanManager, randomInviteCode } from "../../shared/plan";
 import { CALLABLE, db, isPlatformAdmin, requireAuth } from "./admin";
 import { enforceRateLimit, isAnonymousAuth, noteAppCheck } from "./abuse";
 import type { AccessClaims } from "../../shared/airpal-security";
@@ -35,6 +37,8 @@ export type {
   AddPlanStopResponse,
   VotePlanStopRequest,
   VotePlanStopResponse,
+  VoteDateOptionRequest,
+  VoteDateOptionResponse,
   PostPlanCommentRequest,
   PostPlanCommentResponse,
   CompletePlanRequest,
@@ -324,9 +328,9 @@ export const completePlanRemote = onCall(CALLABLE, async (request) => {
 
   const claims = request.auth?.token as AccessClaims | undefined;
   const admin = isPlatformAdmin(claims);
-  const isCreator = plan.creator?.uid === uid;
+  const manages = isPlanManager(plan, uid);
   const wentAlong = (plan.attendees || []).some((a) => a.id === uid && a.status === "going");
-  if (!isCreator && !wentAlong && !admin) {
+  if (!manages && !wentAlong && !admin) {
     throw new HttpsError("permission-denied", "Only the host, someone who went, or an admin can complete this plan.");
   }
   if (plan.status === "completed") {
@@ -370,6 +374,42 @@ export const completePlanRemote = onCall(CALLABLE, async (request) => {
   return { ok: true, planId, status: "completed", completedAt: now } as CompletePlanResponse;
 });
 
+/**
+ * Date-poll votes from any signed-in guest (anonymous included). Direct
+ * Firestore writes to `dateOptions` stay host-only per rules, so guests vote
+ * through here: authenticated, rate-limited like RSVPs, toggle semantics.
+ */
+export const voteDateOptionRemote = onCall(CALLABLE, async (request) => {
+  await noteAppCheck(request, "voteDateOptionRemote");
+  const uid = requireAuth(request.auth?.uid);
+  await enforceRateLimit(uid, "planRsvp", isAnonymousAuth(request));
+
+  const data = (request.data || {}) as VoteDateOptionRequest;
+  const planId = String(data.planId || "").trim();
+  const optionId = String(data.optionId || "").trim();
+  if (!planId || !optionId) throw new HttpsError("invalid-argument", "planId and optionId are required.");
+
+  const planRef = db.collection("plans").doc(planId);
+  const planSnap = await planRef.get();
+  if (!planSnap.exists) throw new HttpsError("not-found", "Plan not found.");
+  const plan = planSnap.data() as HangoutPlan;
+  if (plan.datePollLocked) throw new HttpsError("failed-precondition", "The date is locked in.");
+
+  const option = (plan.dateOptions || []).find((o) => o.id === optionId);
+  if (!option) throw new HttpsError("not-found", "Date option not found.");
+
+  const voters = new Set(option.voterUids || []);
+  if (voters.has(uid)) voters.delete(uid);
+  else voters.add(uid);
+
+  const nextOptions = (plan.dateOptions || []).map((o) =>
+    o.id === optionId ? { ...o, voterUids: Array.from(voters), votes: voters.size } : o,
+  );
+  await planRef.update({ dateOptions: nextOptions, updatedAt: new Date().toISOString() });
+
+  return { ok: true, votes: voters.size, voted: voters.has(uid) } as VoteDateOptionResponse;
+});
+
 export const getPlanByInviteCode = onCall(CALLABLE, async (request) => {
   await noteAppCheck(request, "getPlanByInviteCode");
   const data = (request.data || {}) as GetPlanByInviteCodeRequest;
@@ -391,5 +431,6 @@ export const createPlan = createPlanRemote;
 export const rsvpPlan = rsvpPlanRemote;
 export const addPlanStop = addPlanStopRemote;
 export const votePlanStop = votePlanStopRemote;
+export const voteDateOption = voteDateOptionRemote;
 export const postPlanComment = postPlanCommentRemote;
 export const completePlan = completePlanRemote;
