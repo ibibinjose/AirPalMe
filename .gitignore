@@ -6,6 +6,7 @@
 dist/
 build/
 *.dist
+.firebase/
 
 # Native shells (generated locally with `npx cap add`)
 ios/App/Pods/

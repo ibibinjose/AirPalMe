@@ -22,11 +22,8 @@ import {
   Search,
   RefreshCw,
   TrendingUp,
-  MapPin,
   Sparkles,
   ArrowUpRight,
-  SlidersHorizontal,
-  ChevronRight,
   Filter,
 } from "lucide-react";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
@@ -189,7 +186,7 @@ export function SearchQueriesDashboardTab() {
   const { startDate, endDate, daysSpan } = useMemo(() => {
     const end = new Date();
     end.setHours(23, 59, 59, 999);
-    let start = new Date();
+    const start = new Date();
 
     if (datePreset === "7d") {
       start.setDate(end.getDate() - 7);

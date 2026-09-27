@@ -40,7 +40,6 @@ import { useSearchQueryLogger } from "@/hooks/useSearchQueryLogger";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 import { toast } from "sonner";
-import { SearchQueriesDashboardTab } from "@/components/admin/SearchQueriesDashboardTab";
 
 interface PopularItem {
   id: string;

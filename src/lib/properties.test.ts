@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   fetchProperty,
   getCachedProperty,
@@ -10,6 +10,11 @@ import {
 } from "./properties";
 import { buildHostProperty } from "@shared/host-property";
 import { askLocal } from "./ask";
+
+vi.mock("./functions", () => ({
+  liveBackendEnabled: () => false,
+  updatePropertyWifiRemote: vi.fn().mockResolvedValue(undefined),
+}));
 
 const storageMap = new Map<string, string>();
 const mockStorage = {
