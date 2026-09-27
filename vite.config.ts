@@ -110,8 +110,10 @@ export default defineConfig({
           }
           if (id.includes("firebase")) return "vendor-firebase-core";
           if (id.includes("/react/") || id.includes("/react-dom/") || id.includes("/scheduler/")) return "vendor-react";
-          if (id.includes("leaflet")) return "vendor-maps";
+          if (id.includes("leaflet") || id.includes("@vis.gl/react-google-maps")) return "vendor-maps";
+          if (id.includes("recharts") || id.includes("d3-") || id.includes("victory-vendor") || id.includes("decimal.js-light")) return "vendor-charts";
           if (id.includes("qrcode") || id.includes("jsqr")) return "vendor-qr";
+          if (id.includes("@capacitor/")) return "vendor-capacitor";
           if (id.includes("wouter")) return "vendor-router";
           if (id.includes("lucide-react")) return "vendor-icons";
           if (id.includes("framer-motion")) return "vendor-motion";

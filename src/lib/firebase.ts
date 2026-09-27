@@ -9,7 +9,14 @@ import {
   signInAnonymously,
   type Auth,
 } from "firebase/auth";
-import { connectFirestoreEmulator, getFirestore, type Firestore } from "firebase/firestore";
+import {
+  connectFirestoreEmulator,
+  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  type Firestore,
+} from "firebase/firestore";
 import { connectStorageEmulator, getStorage, type FirebaseStorage } from "firebase/storage";
 import { connectFunctionsEmulator, getFunctions, type Functions } from "firebase/functions";
 import type { Analytics } from "firebase/analytics";
@@ -73,13 +80,15 @@ async function connectAppCheck(firebaseApp: FirebaseApp) {
   const siteKey = import.meta.env.VITE_FIREBASE_APPCHECK_SITE_KEY;
   if (!siteKey) return;
   try {
-    const { initializeAppCheck, ReCaptchaV3Provider } = await import("firebase/app-check");
+    const { initializeAppCheck, ReCaptchaV3Provider, ReCaptchaEnterpriseProvider } = await import("firebase/app-check");
     if (import.meta.env.DEV) {
       const debug = import.meta.env.VITE_FIREBASE_APPCHECK_DEBUG_TOKEN;
       Object.assign(self, { FIREBASE_APPCHECK_DEBUG_TOKEN: debug || true });
     }
+    const isEnterprise = import.meta.env.VITE_FIREBASE_APPCHECK_ENTERPRISE === "true";
+    const provider = isEnterprise ? new ReCaptchaEnterpriseProvider(siteKey) : new ReCaptchaV3Provider(siteKey);
     initializeAppCheck(firebaseApp, {
-      provider: new ReCaptchaV3Provider(siteKey),
+      provider,
       isTokenAutoRefreshEnabled: true,
     });
     appCheckReady = true;
@@ -126,7 +135,19 @@ export function getFirebaseDb(): Firestore | null {
   const firebaseApp = getFirebaseApp();
   if (!firebaseApp) return null;
   if (!db) {
-    db = getFirestore(firebaseApp);
+    if (typeof window !== "undefined") {
+      try {
+        db = initializeFirestore(firebaseApp, {
+          localCache: persistentLocalCache({
+            tabManager: persistentMultipleTabManager(),
+          }),
+        });
+      } catch {
+        db = getFirestore(firebaseApp);
+      }
+    } else {
+      db = getFirestore(firebaseApp);
+    }
     if (shouldUseEmulators() && !emulators.firestore) {
       connectFirestoreEmulator(db, "127.0.0.1", 8080);
       emulators.firestore = true;
