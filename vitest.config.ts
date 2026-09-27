@@ -13,18 +13,9 @@ export default defineConfig({
     environment: "node",
   },
   resolve: {
-    alias: [
-      { find: "@capacitor-firebase/authentication", replacement: path.resolve(import.meta.dirname, "src/shims/capacitor/authentication.ts") },
-      { find: "@capacitor/core", replacement: path.resolve(import.meta.dirname, "src/shims/capacitor/core.ts") },
-      { find: "@capacitor/app", replacement: path.resolve(import.meta.dirname, "src/shims/capacitor/app.ts") },
-      { find: "@capacitor/status-bar", replacement: path.resolve(import.meta.dirname, "src/shims/capacitor/status-bar.ts") },
-      { find: "@capacitor/splash-screen", replacement: path.resolve(import.meta.dirname, "src/shims/capacitor/splash-screen.ts") },
-      { find: "@capacitor/haptics", replacement: path.resolve(import.meta.dirname, "src/shims/capacitor/haptics.ts") },
-      { find: "@capacitor/share", replacement: path.resolve(import.meta.dirname, "src/shims/capacitor/share.ts") },
-      { find: "@capacitor/keyboard", replacement: path.resolve(import.meta.dirname, "src/shims/capacitor/keyboard.ts") },
-      { find: "@capacitor/geolocation", replacement: path.resolve(import.meta.dirname, "src/shims/capacitor/geolocation.ts") },
-      { find: "@", replacement: path.resolve(import.meta.dirname, "src") },
-      { find: "@shared", replacement: path.resolve(import.meta.dirname, "shared") },
-    ],
+    alias: {
+      "@": path.resolve(import.meta.dirname, "src"),
+      "@shared": path.resolve(import.meta.dirname, "shared"),
+    },
   },
 });
