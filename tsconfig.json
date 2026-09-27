@@ -17,7 +17,16 @@
     "types": ["node", "vite/client"],
     "paths": {
       "@/*": ["./src/*"],
-      "@shared/*": ["./shared/*"]
+      "@shared/*": ["./shared/*"],
+      "@capacitor-firebase/authentication": ["./src/shims/capacitor/authentication.ts"],
+      "@capacitor/core": ["./src/shims/capacitor/core.ts"],
+      "@capacitor/app": ["./src/shims/capacitor/app.ts"],
+      "@capacitor/status-bar": ["./src/shims/capacitor/status-bar.ts"],
+      "@capacitor/splash-screen": ["./src/shims/capacitor/splash-screen.ts"],
+      "@capacitor/haptics": ["./src/shims/capacitor/haptics.ts"],
+      "@capacitor/share": ["./src/shims/capacitor/share.ts"],
+      "@capacitor/keyboard": ["./src/shims/capacitor/keyboard.ts"],
+      "@capacitor/geolocation": ["./src/shims/capacitor/geolocation.ts"]
     }
   }
 }
