@@ -1,9 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { HangoutPlan, PlanStop, PlanType, PlanTheme } from "@shared/plan";
-import { attendeeSeats, formatDateOption, headcountTaken, isPlanManager, isTicketed, normalizeAnswer, normalizePlusOnes, setAttendeeCheckedIn, validDateOption, waitlistQueue } from "@shared/plan";
+import { attendeeSeats, canCancelPlanStatus, formatDateOption, headcountTaken, isPlanManager, isTicketed, normalizeAnswer, normalizePlusOnes, normalizeRating, normalizeReview, setAttendeeCheckedIn, validDateOption, waitlistQueue } from "@shared/plan";
 import { goingFits, resolveRsvpStatus } from "@shared/plan-notify";
 import type { Geo } from "@shared/nearby";
 import { completePlan as storeCompletePlan,
+  cancelPlan as storeCancelPlan,
   loadPlans,
   subscribePlans,
   savePlan,
@@ -94,6 +95,8 @@ interface PlanContextValue {
   updatePlan: (planId: string, patch: Partial<HangoutPlan>) => HangoutPlan | undefined;
   completePlan: (planId: string) => Promise<HangoutPlan | undefined>;
   deletePlan: (planId: string) => boolean;
+  cancelPlan: (planId: string, reason?: string) => HangoutPlan | undefined;
+  submitPlanReview: (planId: string, input: { rating?: unknown; review?: unknown }) => HangoutPlan | undefined;
   rsvpPlan: (
     planId: string,
     status: "going" | "maybe" | "declined",
@@ -129,8 +132,8 @@ interface PlanContextValue {
   updateStop: (planId: string, stopId: string, patch: Partial<Omit<PlanStop, "id">>) => HangoutPlan | undefined;
   removeStop: (planId: string, stopId: string) => HangoutPlan | undefined;
   reorderStops: (planId: string, fromIndex: number, toIndex: number) => HangoutPlan | undefined;
-  voteStop: (planId: string, stopId: string) => HangoutPlan | undefined;
-  addComment: (planId: string, text: string, photoUrl?: string) => HangoutPlan | undefined;
+  voteStop: (planId: string, stopId: string) => Promise<HangoutPlan | undefined>;
+  addComment: (planId: string, text: string, photoUrl?: string) => Promise<HangoutPlan | undefined>;
   followPlan: (planId: string, emailOrId?: string) => boolean;
   exportIcs: (plan: HangoutPlan) => void;
   openGoogleCalendar: (plan: HangoutPlan) => void;
@@ -339,6 +342,47 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     return success;
   }, []);
 
+  // Host cancellation: the plan stays visible as cancelled (history + trust),
+  // and the going crew is notified through the plan-update trigger.
+  const cancelPlan = useCallback(
+    (planId: string, reason?: string) => {
+      const current = storeGetPlan(planId);
+      if (!current) return undefined;
+      if (!isPlanManager(current, user?.uid)) {
+        toast.error("Only the host can cancel this plan.");
+        return undefined;
+      }
+      if (!canCancelPlanStatus(current.status)) {
+        toast.message("This plan can't be cancelled.");
+        return undefined;
+      }
+      const updated = storeCancelPlan(planId, reason);
+      if (updated) {
+        setPlans([...loadPlans()]);
+        toast.success("Plan cancelled — the crew is notified.");
+      }
+      return updated;
+    },
+    [user],
+  );
+
+  // Zero-friction guests: website visitors without an account act on an
+  // anonymous Firebase session (satisfies signed-in write rules; tighter
+  // anonymous rate limits apply server-side). Native stays account-gated per
+  // the shipped auth freeze. Returns the acting uid, or null after prompting.
+  const ensureGuestUid = useCallback(
+    async (reason: string): Promise<string | null> => {
+      if (user?.uid) return user.uid;
+      if (canRsvpAsGuest({ isNative: isNativeApp(), hasAccount: false })) {
+        const anonUid = await ensureAnonymousSession();
+        if (anonUid) return anonUid;
+      }
+      requireUser(reason);
+      return null;
+    },
+    [user, requireUser],
+  );
+
   const rsvpPlan = useCallback(
     async (
       planId: string,
@@ -348,19 +392,9 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       plusOnes?: number,
       answers?: Record<string, string>,
     ) => {
-      // Zero-friction guest RSVP: website guests answer from the invite link on
-      // an anonymous Firebase session (satisfies the signed-in write rules;
-      // tighter anonymous rate limits apply server-side). Native stays
-      // account-gated per the shipped auth freeze.
-      let anonUid: string | null = null;
-      if (!user) {
-        if (canRsvpAsGuest({ isNative: isNativeApp(), hasAccount: false })) {
-          anonUid = await ensureAnonymousSession();
-          if (!anonUid && !requireUser("Sign in to RSVP to plans.")) return undefined;
-        } else if (!requireUser("Sign in to RSVP to plans.")) {
-          return undefined;
-        }
-      }
+      const guestUid = await ensureGuestUid("Sign in to RSVP to plans.");
+      if (!guestUid) return undefined;
+      const anonUid = guestUid === user?.uid ? null : guestUid;
       const attendeeId =
         user?.uid ||
         anonUid ||
@@ -473,6 +507,49 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         if (nextStatus === "going") toast.success(`${target.name} is in! 🎉`);
         else if (nextStatus === "waitlisted") toast.message("No seats left — moved to the waitlist.");
         else toast.message(`${target.name} was declined.`);
+      }
+      return updated;
+    },
+    [user],
+  );
+
+  // Post-experience review: only someone going on a completed plan, stars
+  // required, words optional. One row per guest — re-submits overwrite.
+  const submitPlanReview = useCallback(
+    (planId: string, input: { rating?: unknown; review?: unknown }) => {
+      const current = storeGetPlan(planId);
+      if (!current) return undefined;
+      if (current.status !== "completed") {
+        toast.message("Reviews open once the plan is completed.");
+        return undefined;
+      }
+      const attendeeId =
+        user?.uid || (typeof window !== "undefined" && localStorage.getItem("airpal.anon.id")) || null;
+      const existing = (current.attendees || []).find((a) => a.id === attendeeId);
+      if (!attendeeId || !existing || existing.status !== "going") {
+        toast.message("Only the crew who went can review.");
+        return undefined;
+      }
+      const rating = normalizeRating(input.rating);
+      if (rating === undefined) {
+        toast.message("Tap a star rating first.");
+        return undefined;
+      }
+      const updated = respondToPlan(planId, {
+        id: attendeeId,
+        name: existing.name,
+        handle: existing.handle,
+        status: "going",
+        plusOnes: existing.plusOnes,
+        answers: existing.answers,
+        rating,
+        review: normalizeReview(input.review),
+        notes: existing.notes,
+        isAnonymous: !user,
+      });
+      if (updated) {
+        setPlans([...loadPlans()]);
+        toast.success("Thanks — your review is in!");
       }
       return updated;
     },
@@ -597,9 +674,8 @@ export function PlanProvider({ children }: { children: ReactNode }) {
 
   const voteDateOption = useCallback(
     async (planId: string, optionId: string) => {
-      if (!requireUser("Sign in to vote on dates.")) return undefined;
-      const uid =
-        user?.uid || (typeof window !== "undefined" && localStorage.getItem("airpal.anon.id")) || "guest";
+      const uid = await ensureGuestUid("Sign in to vote on dates.");
+      if (!uid) return undefined;
       if (liveBackendEnabled()) {
         try {
           await voteDateOptionRemote({ planId, optionId });
@@ -623,7 +699,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       }
       return updated;
     },
-    [user, requireUser],
+    [ensureGuestUid],
   );
 
   const addStop = useCallback(
@@ -707,26 +783,24 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   );
 
   const voteStop = useCallback(
-    (planId: string, stopId: string) => {
-      if (!requireUser("Sign in to vote on stops.")) return undefined;
-      const uid =
-        user?.uid || (typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null) || "guest";
+    async (planId: string, stopId: string) => {
+      const uid = await ensureGuestUid("Sign in to vote on stops.");
+      if (!uid) return undefined;
       const updated = voteStopInPlan(planId, stopId, uid);
       if (updated) {
         void triggerHaptic("light");
       }
       return updated;
     },
-    [user, requireUser],
+    [ensureGuestUid],
   );
 
   const addComment = useCallback(
-    (planId: string, text: string, photoUrl?: string) => {
+    async (planId: string, text: string, photoUrl?: string) => {
       if (!text.trim()) return undefined;
-      if (!requireUser("Sign in to post in crew discussions.")) return undefined;
+      const authorId = await ensureGuestUid("Sign in to post in crew discussions.");
+      if (!authorId) return undefined;
       const authorName = user?.displayName || mine?.name || "Mate";
-      const authorId =
-        user?.uid || (typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null) || "guest";
       const updated = addCommentToPlan(planId, {
         authorId,
         authorName,
@@ -740,7 +814,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       }
       return updated;
     },
-    [user, mine],
+    [user, mine, ensureGuestUid],
   );
 
   const followPlan = useCallback(
@@ -789,6 +863,8 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         updatePlan,
         completePlan,
         deletePlan,
+        cancelPlan,
+        submitPlanReview,
         rsvpPlan,
         reviewRsvp,
         toggleCheckIn,

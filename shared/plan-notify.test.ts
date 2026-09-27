@@ -114,6 +114,7 @@ describe("guest-list visibility", () => {
     expect(list[2]!.avatar).toBeUndefined();
     expect(list[2]!.notes).toBeUndefined();
     expect(list[2]!.answers).toBeUndefined();
+    expect(list[2]!.review).toBeUndefined();
     expect(list[1]!.answers).toEqual({ q1: "Vego" });
     expect(list.map((a) => a.status)).toEqual(["going", "going", "going"]);
   });

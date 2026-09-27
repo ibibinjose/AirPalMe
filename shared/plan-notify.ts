@@ -134,7 +134,7 @@ export function visibleAttendees(
     if (viewer?.uid && a.id === viewer.uid) return a;
     if (plan.creator?.uid && a.id === plan.creator.uid) return a;
     if (plan.creator?.name && a.name === plan.creator.name) return a;
-    return { ...a, name: "Guest", handle: undefined, avatar: undefined, notes: undefined, answers: undefined };
+    return { ...a, name: "Guest", handle: undefined, avatar: undefined, notes: undefined, answers: undefined, review: undefined };
   });
 }
 

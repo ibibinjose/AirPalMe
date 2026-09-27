@@ -59,6 +59,10 @@ export interface PlanAttendee {
   /** Host-confirmed attendance: this person showed up. */
   checkedIn?: boolean;
   checkedInAt?: string;
+  /** Post-experience rating (1–5) from someone who went. */
+  rating?: number;
+  /** Post-experience words (host-visible). */
+  review?: string;
   notes?: string;
   respondedAt: string;
 }
@@ -266,6 +270,8 @@ export interface HangoutPlan {
   guestQuestions?: PlanGuestQuestion[];
   /** Co-hosts: attendee uids with full host powers (manage, broadcast, check in). */
   coHostUids?: string[];
+  /** Why the host cancelled, shown to the crew. */
+  cancelReason?: string;
   /** "When works?" candidates. The host locks one into date/time. */
   dateOptions?: PlanDateOption[];
   /** True once the host locks a date option in. */
@@ -609,6 +615,35 @@ export function pastCrew(
   return Array.from(byId.values())
     .sort((a, b) => b.sharedPlans - a.sharedPlans || b.lastSeen.localeCompare(a.lastSeen))
     .slice(0, limit);
+}
+
+export const PLAN_REVIEW_MAX = 500;
+
+/** Star rating 1–5, or undefined when blank/invalid. */
+export function normalizeRating(n: unknown): number | undefined {
+  const v = Math.floor(Number(n));
+  if (!Number.isFinite(v) || v < 1 || v > 5) return undefined;
+  return v;
+}
+
+/** Review words, trimmed and clamped — blank becomes undefined. */
+export function normalizeReview(text: unknown): string | undefined {
+  const v = String(text || "").trim().slice(0, PLAN_REVIEW_MAX);
+  return v || undefined;
+}
+
+/** Aggregate stars across going attendees who rated: average + count. */
+export function planRatingSummary(plan: Pick<HangoutPlan, "attendees">): {
+  average: number;
+  count: number;
+} {
+  const ratings = (plan.attendees || [])
+    .filter((a) => a?.status === "going")
+    .map((a) => normalizeRating(a?.rating))
+    .filter((r): r is number => r !== undefined);
+  if (!ratings.length) return { average: 0, count: 0 };
+  const sum = ratings.reduce((n, r) => n + r, 0);
+  return { average: Math.round((sum / ratings.length) * 10) / 10, count: ratings.length };
 }
 
 /** How many showed (host-confirmed), regardless of RSVP status. */
@@ -1965,6 +2000,13 @@ export const COMPLETABLE_PLAN_STATUSES: readonly PlanStatus[] = ["open", "confir
 
 export function canCompletePlanStatus(status: PlanStatus): boolean {
   return COMPLETABLE_PLAN_STATUSES.includes(status);
+}
+
+/** Only a live plan can be cancelled — drafts, completed, and already-cancelled plans cannot. */
+export const CANCELLABLE_PLAN_STATUSES: readonly PlanStatus[] = ["open", "confirmed"];
+
+export function canCancelPlanStatus(status: PlanStatus): boolean {
+  return CANCELLABLE_PLAN_STATUSES.includes(status);
 }
 
 export interface GetPlanByInviteCodeRequest {

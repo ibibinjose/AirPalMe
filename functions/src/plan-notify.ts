@@ -134,7 +134,26 @@ export const onPlanUpdated = onDocumentUpdated("plans/{planId}", async (event) =
   const before = event.data?.before.data() as HangoutPlan | undefined;
   const after = event.data?.after.data() as HangoutPlan | undefined;
   if (!before || !after || !event.data) return;
-  if (after.status === "completed" || after.status === "cancelled") return;
+  if (after.status === "completed") return;
+  // Fresh cancellations notify the going crew once (with the host's reason),
+  // then stop — no promotions or transitions on a dead plan.
+  if (after.status === "cancelled") {
+    if (before.status !== "cancelled") {
+      const recipients = planBroadcastRecipients(after);
+      if (recipients.length) {
+        const reason = String(after.cancelReason || "").trim();
+        await fanOut({
+          uids: recipients,
+          kind: "announcement",
+          title: `Cancelled: ${after.title}`,
+          body: reason ? `The host cancelled this plan — ${reason}` : "The host cancelled this plan.",
+          promotionId: "",
+          href: `/invite/${after.inviteCode}`,
+        });
+      }
+    }
+    return;
+  }
 
   let finalAttendees = after.attendees || [];
   const promote = nextPromotions(after);

@@ -13,6 +13,7 @@ import {
   PLAN_CAPACITY_MAX,
   attendeeSeats,
   buildStopChangeMessage,
+  canCancelPlanStatus,
   canCompletePlanStatus,
   checkedInCount,
   choiceAnswerCounts,
@@ -26,10 +27,14 @@ import {
   normalizeAnswer,
   normalizeCapacity,
   normalizePlusOnes,
+  normalizeRating,
+  normalizeReview,
   pastCrew,
+  planRatingSummary,
   pendingRequests,
-  reorderStops,
   planPhotos,
+  PLAN_REVIEW_MAX,
+  reorderStops,
   setAttendeeCheckedIn,
   spotsLeft,
   stopChangeRecipients,
@@ -227,6 +232,14 @@ describe("waitlist and approval queues", () => {
     expect(waitlistPosition(plan, "w2")).toBe(2);
     expect(waitlistPosition(plan, "g1")).toBeNull();
   });
+
+  it("gates cancellation to live plans", () => {
+    expect(canCancelPlanStatus("open")).toBe(true);
+    expect(canCancelPlanStatus("confirmed")).toBe(true);
+    expect(canCancelPlanStatus("completed")).toBe(false);
+    expect(canCancelPlanStatus("cancelled")).toBe(false);
+    expect(canCancelPlanStatus("draft")).toBe(false);
+  });
 });
 
 describe("check-in", () => {
@@ -325,6 +338,33 @@ describe("shared album", () => {
   it("stays empty without photos", () => {
     expect(planPhotos({ comments: [] })).toEqual([]);
     expect(planPhotos({})).toEqual([]);
+  });
+});
+
+describe("post-experience reviews", () => {
+  it("normalizes stars and words", () => {
+    expect(normalizeRating(5)).toBe(5);
+    expect(normalizeRating(0)).toBeUndefined();
+    expect(normalizeRating(6)).toBeUndefined();
+    expect(normalizeRating("abc")).toBeUndefined();
+    expect(normalizeReview("  Great night  ")).toBe("Great night");
+    expect(normalizeReview("   ")).toBeUndefined();
+    expect(normalizeReview("x".repeat(999))).toHaveLength(PLAN_REVIEW_MAX);
+  });
+
+  it("averages going ratings only", () => {
+    const at = (status: "going" | "maybe", rating?: number) => ({
+      id: `${status}-${rating}`,
+      name: "X",
+      status,
+      rating,
+      respondedAt: "2026-09-01T00:00:00Z",
+    });
+    expect(planRatingSummary({ attendees: [at("going", 5), at("going", 4), at("maybe", 5), at("going")] })).toEqual({
+      average: 4.5,
+      count: 2,
+    });
+    expect(planRatingSummary({ attendees: [] })).toEqual({ average: 0, count: 0 });
   });
 });
 

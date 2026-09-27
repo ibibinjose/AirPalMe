@@ -15,6 +15,7 @@ import {
   updateStopInPlan,
   voteStopInPlan,
   completePlan,
+  cancelPlan,
 } from "./plan-store";
 import type { HangoutPlan } from "@shared/plan";
 
@@ -163,6 +164,22 @@ describe("plan store", () => {
     expect(comments[0]?.text).toBe("See everyone at 7!");
   });
 
+  it("lets anonymous-session guests vote and post like members", () => {
+    const plan = fixture();
+    addStopToPlan(plan.id, { name: "First" });
+    const stopId = getPlan(plan.id)?.stops[0]?.id ?? "";
+    // Firebase anonymous uids (no linked account) participate fully.
+    voteStopInPlan(plan.id, stopId, "firebaseAnonUid123");
+    expect(getPlan(plan.id)?.stops[0]?.votes).toBe(1);
+    expect(getPlan(plan.id)?.stops[0]?.voterUids).toContain("firebaseAnonUid123");
+    addCommentToPlan(plan.id, {
+      authorId: "firebaseAnonUid123",
+      authorName: "Guest Mate",
+      text: "Can't wait!",
+    });
+    expect(getPlan(plan.id)?.comments ?? []).toHaveLength(1);
+  });
+
   it("rejects empty or oversized crew comments", () => {
     const plan = fixture();
     expect(
@@ -230,5 +247,38 @@ describe("completePlan", () => {
     const done = completePlan(plan.id);
     expect(done?.status).toBe("completed");
     expect(completePlan(plan.id)?.status).toBe("completed");
+  });
+});
+
+describe("rsvp history preservation", () => {
+  it("keeps ratings, reviews, and check-ins across RSVP edits", () => {
+    const plan = fixture();
+    respondToPlan(plan.id, { id: "u9", name: "Sam", status: "going", rating: 5, review: "Loved it", checkedIn: true, checkedInAt: "2026-09-20T10:00:00Z" });
+    const edited = respondToPlan(plan.id, { id: "u9", name: "Sam", status: "maybe" });
+    expect(edited?.attendees.find((a) => a.id === "u9")).toMatchObject({
+      status: "maybe",
+      rating: 5,
+      review: "Loved it",
+      checkedIn: true,
+    });
+  });
+});
+
+describe("cancelPlan", () => {
+  it("flips a live plan to cancelled with the crew reason", () => {
+    const plan = fixture();
+    const cancelled = cancelPlan(plan.id, "  Venue closed  ");
+    expect(cancelled?.status).toBe("cancelled");
+    expect(cancelled?.cancelReason).toBe("Venue closed");
+    expect(getPlan(plan.id)?.status).toBe("cancelled");
+  });
+
+  it("leaves finished plans alone and clears blank reasons", () => {
+    const plan = fixture();
+    completePlan(plan.id);
+    expect(cancelPlan(plan.id)?.status).toBe("completed");
+    const open = fixture();
+    expect(cancelPlan(open.id)?.cancelReason).toBeUndefined();
+    expect(cancelPlan("no-such-plan")).toBeUndefined();
   });
 });

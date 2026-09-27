@@ -41,6 +41,7 @@ import { PlanBroadcastSheet } from "@/components/plan/PlanBroadcastSheet";
 import { PlanDatePoll } from "@/components/plan/PlanDatePoll";
 import { PlanQuestionManager } from "@/components/plan/PlanQuestionManager";
 import { PlanAlbum } from "@/components/plan/PlanAlbum";
+import { PlanReviewPrompt } from "@/components/plan/PlanReviewPrompt";
 import { PlanGroupHeader } from "@/components/plan/PlanGroupHeader";
 import { PlanDiscussionWall } from "@/components/plan/PlanDiscussionWall";
 import { SafetyMenu } from "@/components/safety/SafetyMenu";
@@ -54,6 +55,7 @@ import { pendingRequests, waitlistPosition } from "@shared/plan";
 import { choiceAnswerCounts, textAnswers } from "@shared/plan";
 import { checkedInCount } from "@shared/plan";
 import { PLAN_COHOSTS_MAX, coHostAttendees } from "@shared/plan";
+import { planRatingSummary } from "@shared/plan";
 import { ExperienceReviews } from "@/components/plan/ExperienceReviews";
 import { TicketPass } from "@/components/plan/TicketPass";
 import { TicketSalesPanel } from "@/components/plan/TicketSalesPanel";
@@ -85,6 +87,7 @@ export function PlanDetailPage() {
     fetchPlan,
     rsvpPlan,
     reviewRsvp,
+    submitPlanReview,
     toggleCheckIn,
     proposeDateOption,
     lockDateOption,
@@ -230,6 +233,11 @@ export function PlanDetailPage() {
   const rsvpSheetStatus =
     userAttendee?.status === "maybe" || userAttendee?.status === "declined" ? userAttendee.status : "going";
   const pendingList = useMemo(() => (plan ? pendingRequests(plan) : []), [plan]);
+  const ratingSummary = useMemo(() => planRatingSummary(plan ?? { attendees: [] }), [plan]);
+  const crewReviews = useMemo(
+    () => (plan ? plan.attendees.filter((a) => a.status === "going" && (a.rating || a.review)) : []),
+    [plan],
+  );
   const cohostRows = useMemo(() => (plan ? coHostAttendees(plan) : []), [plan]);
   const eligibleCohosts = useMemo(() => {
     if (!plan) return [];
@@ -593,7 +601,28 @@ export function PlanDetailPage() {
       {plan.status === "completed" && (
         <div className="mt-4 flex items-center gap-2 rounded-2xl bg-emerald-500/10 px-4 py-3 text-[13px] font-medium text-emerald-800 ring-1 ring-emerald-500/20 dark:text-emerald-200">
           <CheckCircle2 size={16} className="shrink-0" />
-          Experience completed
+          <span>
+            Experience completed
+            {ratingSummary.count > 0 && (
+              <span className="font-semibold">
+                {" "}
+                · ★ {ratingSummary.average} ({ratingSummary.count} rating{ratingSummary.count === 1 ? "" : "s"})
+              </span>
+            )}
+          </span>
+        </div>
+      )}
+
+      {plan.status === "completed" &&
+        userAttendee?.status === "going" &&
+        userAttendee.rating === undefined && (
+          <PlanReviewPrompt onSubmit={(input) => submitPlanReview(plan.id, input)} />
+        )}
+
+      {plan.status === "cancelled" && (
+        <div className="mt-4 rounded-2xl bg-paper px-4 py-3 ring-1 ring-line">
+          <p className="text-[13px] font-semibold text-ink">This plan was cancelled</p>
+          {plan.cancelReason && <p className="mt-0.5 text-[13px] text-mute">{plan.cancelReason}</p>}
         </div>
       )}
 
@@ -1093,7 +1122,7 @@ export function PlanDetailPage() {
               reorderStops(plan.id, fromIdx, toIdx);
             }}
             onVoteStop={(stopId) => {
-              voteStop(plan.id, stopId);
+              void voteStop(plan.id, stopId);
             }}
           />
         )}
@@ -1315,6 +1344,27 @@ export function PlanDetailPage() {
         </div>
       )}
 
+      {/* Host Controls: crew reviews */}
+      {isHost && crewReviews.length > 0 && (
+        <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Crew reviews</span>
+          <h2 className="font-display text-xl font-bold text-ink">
+            ★ {ratingSummary.average} · {ratingSummary.count} rating{ratingSummary.count === 1 ? "" : "s"}
+          </h2>
+          <ul className="mt-4 space-y-2">
+            {crewReviews.map((att) => (
+              <li key={att.id} className="rounded-2xl bg-paper px-3.5 py-2.5 ring-1 ring-line">
+                <p className="text-xs font-semibold text-ink">
+                  {att.name}
+                  {att.rating !== undefined && <span className="text-mute font-normal"> · ★ {att.rating}</span>}
+                </p>
+                {att.review && <p className="mt-0.5 text-[13px] leading-5 text-ink/80">{att.review}</p>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Attendees Guest List */}
       <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
         <div className="flex items-center justify-between">
@@ -1443,7 +1493,7 @@ export function PlanDetailPage() {
         <PlanDiscussionWall
           plan={plan}
           onPostComment={(text, photoUrl) => {
-            addComment(plan.id, text, photoUrl);
+            void addComment(plan.id, text, photoUrl);
           }}
         />
       </div>
