@@ -12,6 +12,7 @@ import {
   type BioProfile,
 } from "@shared/bio";
 import type { BusinessCategoryId } from "@shared/business";
+import { STAR_TIERS } from "@shared/stars";
 import { getFirebaseDb } from "./firebase";
 
 const KEY = "airpal.bios.v1";
@@ -100,6 +101,7 @@ export function profileFromDoc(id: string, data: Record<string, unknown>): BioPr
         })) satisfies BioLink[])
     : [];
   const offer = data.offer as { badge?: string; detail?: string } | null | undefined;
+  const starTierRaw = typeof data.starTier === "string" ? data.starTier : "";
   return {
     id,
     handle: normalizeHandle(String(data.handle || "")),
@@ -116,6 +118,7 @@ export function profileFromDoc(id: string, data: Record<string, unknown>): BioPr
     cover: data.cover ? String(data.cover) : undefined,
     geo: Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : undefined,
     offer: offer?.badge ? { badge: String(offer.badge), detail: String(offer.detail || "") } : undefined,
+    starTier: STAR_TIERS.some((t) => t.name === starTierRaw) ? starTierRaw : undefined,
     products: sanitizeCatalog("product", data.products),
     services: sanitizeCatalog("service", data.services),
     deals: sanitizeCatalog("deal", data.deals),

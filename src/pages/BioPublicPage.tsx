@@ -755,6 +755,14 @@ export function BioPublicPage() {
                   {bio.categoryTag}
                 </span>
               )}
+              {bio.kind === "person" && bio.starTier && (
+                <span
+                  className="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-gold"
+                  title={`AirPal ${bio.starTier} — earned by bringing mates to real experiences`}
+                >
+                  <span aria-hidden>★</span> {bio.starTier}
+                </span>
+              )}
             </div>
 
             {/* Handle & Subtitle */}

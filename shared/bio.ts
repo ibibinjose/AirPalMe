@@ -266,6 +266,11 @@ export type BioProfile = {
   languages?: string;
   /** Vibe or category tag badge */
   categoryTag?: string;
+  /**
+   * Earned Stars tier name (e.g. "Rising Mate"). Coarse status signal only —
+   * never a balance. Server-written when Stars vest; clients must not set it.
+   */
+  starTier?: string;
   /** Customized primary CTA label */
   primaryCta?: string;
   /** Opt in to Air Zoo hunts and a collectible sticker on the shop QR. */

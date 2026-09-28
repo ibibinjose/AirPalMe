@@ -1,5 +1,6 @@
 import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { normalizeHandle } from "@shared/bio";
+import type { StarLedgerEntry } from "@shared/stars";
 import { getFirebaseDb } from "./firebase";
 import { fetchPublicBio } from "./bio-store";
 import { publicSiteOrigin, toPublicUrl } from "./public-origin";
@@ -12,6 +13,8 @@ export interface AppReferral {
   inviteeUid: string;
   inviteeLabel: string;
   createdAt: string;
+  /** Set once the invitee's first completed experience vests stars. */
+  rewardedAt?: string;
 }
 
 /** Keep the inviter's handle across the signup flow (redirects can drop query params). */
@@ -96,6 +99,18 @@ export async function recordAppInvite(input: {
 export interface InviteOverview {
   invitedBy: AppReferral | null;
   joined: AppReferral[];
+}
+
+/** Lifetime stars: sum of my own ledger rows (server-written, one per vesting). */
+export async function fetchStarBalance(myUid: string): Promise<number> {
+  const db = getFirebaseDb();
+  if (!db || !myUid) return 0;
+  try {
+    const snap = await getDocs(query(collection(db, "star_ledger"), where("uid", "==", myUid)));
+    return snap.docs.reduce((n, d) => n + Math.max(0, Number((d.data() as StarLedgerEntry).stars) || 0), 0);
+  } catch {
+    return 0;
+  }
 }
 
 /** Who invited me, and who joined with my code (newest first). */

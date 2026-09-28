@@ -23,6 +23,13 @@ import type {
   PlanStop,
 } from "../../shared/plan";
 import { canCompletePlanStatus, isPlanManager, randomInviteCode } from "../../shared/plan";
+import {
+  REFERRAL_INVITEE_STARS,
+  REFERRAL_INVITER_STARS,
+  computeReferralReward,
+  tierForBalance,
+  type StarLedgerEntry,
+} from "../../shared/stars";
 import { CALLABLE, db, isPlatformAdmin, requireAuth } from "./admin";
 import { enforceRateLimit, isAnonymousAuth, noteAppCheck } from "./abuse";
 import type { AccessClaims } from "../../shared/airpal-security";
@@ -371,8 +378,72 @@ export const completePlanRemote = onCall(CALLABLE, async (request) => {
     },
   });
 
+  // Referral stars vest on first completed experiences — never fail the
+  // completion itself if rewards hit trouble.
+  try {
+    await vestReferralStars(uid, now);
+  } catch (err) {
+    console.error("vestReferralStars failed", err);
+  }
+
   return { ok: true, planId, status: "completed", completedAt: now } as CompletePlanResponse;
 });
+
+/**
+ * First-completion referral payout: the invitee's referral row pays both
+ * sides once (100 inviter / 50 invitee), inside one transaction so a
+ * double-complete race can't double-pay.
+ */
+export async function vestReferralStars(completerUid: string, now = new Date().toISOString()): Promise<boolean> {
+  const ref = db.collection("referrals").doc(completerUid);
+  const snap = await ref.get();
+  if (computeReferralReward(snap.exists ? snap.data() : null, completerUid) === null) return false;
+
+  return db.runTransaction(async (tx) => {
+    const fresh = await tx.get(ref);
+    const reward = computeReferralReward(fresh.exists ? fresh.data() : null, completerUid);
+    if (!reward) return false;
+    const ledger = db.collection("star_ledger");
+    const inviterEntry: StarLedgerEntry = {
+      uid: reward.inviterUid,
+      stars: REFERRAL_INVITER_STARS,
+      reason: "referral_inviter",
+      refId: completerUid,
+      createdAt: now,
+    };
+    const inviteeEntry: StarLedgerEntry = {
+      uid: reward.inviteeUid,
+      stars: REFERRAL_INVITEE_STARS,
+      reason: "referral_invitee",
+      refId: completerUid,
+      createdAt: now,
+    };
+    tx.set(ledger.doc(), inviterEntry);
+    tx.set(ledger.doc(), inviteeEntry);
+    tx.update(ref, { rewardedAt: now });
+    // Stamp the earned tier name onto each earner's person profiles so public
+    // bios can show a coarse status badge. Tier only — never a balance, and
+    // person profiles only (businesses don't earn Stars).
+    for (const [uid, newlyVested] of [
+      [reward.inviterUid, REFERRAL_INVITER_STARS],
+      [reward.inviteeUid, REFERRAL_INVITEE_STARS],
+    ] as const) {
+      const prior = await tx.get(db.collection("star_ledger").where("uid", "==", uid));
+      let balance = newlyVested;
+      prior.forEach((doc) => {
+        balance += Number(doc.data()?.stars) || 0;
+      });
+      const tierName = tierForBalance(balance).name;
+      const profiles = await tx.get(db.collection("profiles").where("ownerUid", "==", uid));
+      profiles.forEach((doc) => {
+        if (doc.data()?.kind === "person" && doc.data()?.starTier !== tierName) {
+          tx.update(doc.ref, { starTier: tierName });
+        }
+      });
+    }
+    return true;
+  });
+}
 
 /**
  * Date-poll votes from any signed-in guest (anonymous included). Direct

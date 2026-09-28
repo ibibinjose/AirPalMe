@@ -152,6 +152,13 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Star ledger: server-written on first completed experiences (see
+    // completePlanRemote). Clients read only their own rows, never write.
+    match /star_ledger/{entryId} {
+      allow get, list: if signedIn() && resource.data.uid == request.auth.uid;
+      allow create, update, delete: if false;
+    }
+
     match /events/{eventId} {
       allow get, list: if resource.data.status in ['live', 'ended']
         || (signedIn() && resource.data.organiserUid == request.auth.uid)
