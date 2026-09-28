@@ -2017,3 +2017,15 @@ export interface GetPlanByInviteCodeResponse {
   ok: true;
   plan: HangoutPlan;
 }
+
+/**
+ * Public proof counters for the home hero. Aggregates only — no plan bodies,
+ * no names — so guests can see the loop is alive without reading anyone's plans.
+ */
+export interface ExperienceProofResponse {
+  ok: true;
+  /** Plans with status completed (all cities; Sydney beachhead dominates). */
+  completed: number;
+  /** Plans currently open or confirmed and joinable. */
+  live: number;
+}

@@ -17,6 +17,7 @@ import type {
   CompletePlanResponse,
   GetPlanByInviteCodeRequest,
   GetPlanByInviteCodeResponse,
+  ExperienceProofResponse,
   HangoutPlan,
   PlanAttendee,
   PlanComment,
@@ -52,6 +53,7 @@ export type {
   CompletePlanResponse,
   GetPlanByInviteCodeRequest,
   GetPlanByInviteCodeResponse,
+  ExperienceProofResponse,
 };
 
 export const createPlanRemote = onCall(CALLABLE, async (request) => {
@@ -496,6 +498,25 @@ export const getPlanByInviteCode = onCall(CALLABLE, async (request) => {
 
   return { ok: true, plan: snap.docs[0]!.data() };
 });
+
+/**
+ * Public proof counters: how many plans completed, how many live now.
+ * No auth needed — aggregates only, never plan bodies or names.
+ */
+export const getExperienceProofRemote = onCall(CALLABLE, async (request) => {
+  await noteAppCheck(request, "getExperienceProofRemote");
+  const [completedSnap, liveSnap] = await Promise.all([
+    db.collection("plans").where("status", "==", "completed").count().get(),
+    db.collection("plans").where("status", "in", ["open", "confirmed"]).count().get(),
+  ]);
+  return {
+    ok: true,
+    completed: completedSnap.data().count,
+    live: liveSnap.data().count,
+  } as ExperienceProofResponse;
+});
+
+export const getExperienceProof = getExperienceProofRemote;
 
 // Canonical domain-named exports (mirrors *Remote for API consistency)
 export const createPlan = createPlanRemote;

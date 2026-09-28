@@ -40,6 +40,8 @@ export {
   completePlan,
   completePlanRemote,
   getPlanByInviteCode,
+  getExperienceProof,
+  getExperienceProofRemote,
 } from "./plans";
 export { createManagedProduct, createManagedCheckoutSession } from "./managed-payments";
 export { placeDiningOrder, updateDiningOrderStatus } from "./dining";

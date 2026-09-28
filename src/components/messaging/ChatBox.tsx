@@ -13,11 +13,40 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { Send, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { messageValid, type ChatMessage } from "@shared/messaging";
 import { SafetyMenu } from "@/components/safety/SafetyMenu";
+
+const PENDING_MESSAGE_KEY = "airpal:pending-message:v1";
+
+interface PendingMessage {
+  requestId: string;
+  draft: string;
+}
+
+function stashPendingMessage(row: PendingMessage): void {
+  try {
+    sessionStorage.setItem(PENDING_MESSAGE_KEY, JSON.stringify(row));
+  } catch {
+    /* private mode: best-effort */
+  }
+}
+
+function takePendingMessage(requestId: string): string | null {
+  try {
+    const raw = sessionStorage.getItem(PENDING_MESSAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<PendingMessage>;
+    if (parsed.requestId !== requestId || typeof parsed.draft !== "string" || !parsed.draft.trim()) return null;
+    sessionStorage.removeItem(PENDING_MESSAGE_KEY);
+    return parsed.draft.slice(0, 1000);
+  } catch {
+    return null;
+  }
+}
 
 /** Match conversation: tied to one mate_request, parties only. */
 export function ChatBox({
@@ -89,10 +118,23 @@ export function ChatBox({
     bottomRef.current?.scrollIntoView({ block: "nearest" });
   }, [messages.length]);
 
+  // Restore a guest's unsent message after they finish signing in.
+  useEffect(() => {
+    if (!user || readOnly) return;
+    const kept = takePendingMessage(requestId);
+    if (kept) {
+      setDraft(kept);
+      toast.success("Signed in — your message is ready to send.");
+    }
+  }, [user, requestId, readOnly]);
+
   async function send() {
     setError(null);
     if (readOnly) return;
-    if (!requireUser("Sign in to message your Mate.")) return;
+    if (!requireUser("Sign in to send your message — it's kept and ready when you return.")) {
+      if (draft.trim()) stashPendingMessage({ requestId, draft: draft.trim().slice(0, 1000) });
+      return;
+    }
     if (!user || !messageValid(user.uid, draft)) return;
     const db = getFirebaseDb();
     if (!db || !isFirebaseConfigured) {

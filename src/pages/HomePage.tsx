@@ -29,6 +29,7 @@ import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
 import { triggerHaptic } from "@/lib/native";
 import { loadPublicMatesRemote } from "@/lib/companion-remote";
 import type { PublicMate } from "@shared/companion";
+import { getExperienceProofRemote } from "@/lib/functions";
 import {
   ArrowCta,
   AvatarStack,
@@ -129,6 +130,7 @@ export function HomePage() {
   const { version } = useListings();
   const [around, setAround] = useState<AroundFilter>("events");
   const [publicMates, setPublicMates] = useState<PublicMate[]>([]);
+  const [completedCount, setCompletedCount] = useState(0);
 
   useEffect(() => {
     loadPublicMatesRemote()
@@ -138,6 +140,19 @@ export function HomePage() {
         }
       })
       .catch(() => undefined);
+  }, []);
+
+  // Proof the loop is alive: real completed-plan count, shown only when nonzero.
+  useEffect(() => {
+    let cancelled = false;
+    getExperienceProofRemote()
+      .then((proof) => {
+        if (!cancelled && proof?.ok) setCompletedCount(Math.max(0, Number(proof.completed) || 0));
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const firstName = useMemo(() => {
@@ -190,6 +205,7 @@ export function HomePage() {
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md ring-1 ring-white/30">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
               {city || "Sydney"} · Live
+              {completedCount > 0 && <> · {completedCount.toLocaleString("en-AU")} completed</>}
             </span>
             <span className="text-xs font-medium text-white/80">
               {greeting}, {firstName}

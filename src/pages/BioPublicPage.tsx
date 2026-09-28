@@ -710,7 +710,16 @@ export function BioPublicPage() {
                 <Button
                   size="sm"
                   className="rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-sm hover:brightness-110 active:scale-95"
-                  onClick={() => nav(`/bio/setup?handle=${bio.handle}`)}
+                  onClick={() =>
+                    nav(
+                      `/bio/setup?handle=${bio.handle}${bio.kind === "business" || isStay ? "&kind=business" : ""}`,
+                    )
+                  }
+                  title={
+                    bio.kind === "business" || isStay
+                      ? "Claim this place as its owner — business verification applies"
+                      : `Claim @${bio.handle} as your personal handle`
+                  }
                 >
                   Claim @{bio.handle}
                 </Button>

@@ -19,6 +19,7 @@ import {
 } from "@/lib/promotions";
 import { targetHref, type Promotion } from "@shared/promotions";
 import { toPublicUrl } from "@/lib/public-origin";
+import { clearPendingIntent, peekPendingIntent } from "@/lib/pending-intent";
 
 export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }) {
   const { id } = useParams<{ id: string }>();
@@ -96,8 +97,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
       .catch(() => undefined);
   }, [user, id, promo]);
 
-  async function enter() {
-    if (!requireUser("Sign in to enter this giveaway.")) return;
+  async function doEnter() {
     if (!id) return;
     setEntering(true);
     try {
@@ -119,8 +119,15 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
     }
   }
 
-  async function redeem() {
-    if (!requireUser("Sign in to redeem member offers.")) return;
+  async function enter() {
+    if (
+      !requireUser("Sign in to enter this giveaway — your spot is saved when you return.", id ? { kind: "enter-promotion", id } : undefined)
+    )
+      return;
+    await doEnter();
+  }
+
+  async function doRedeem() {
     if (!id) return;
     setRedeeming(true);
     try {
@@ -133,6 +140,28 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
       setRedeeming(false);
     }
   }
+
+  async function redeem() {
+    if (
+      !requireUser("Sign in to redeem this offer — it's saved for you when you return.", id ? { kind: "redeem-promotion", id } : undefined)
+    )
+      return;
+    await doRedeem();
+  }
+
+  // Resume a guest's saved entry after they finish signing in.
+  useEffect(() => {
+    if (!user || !promo || !id) return;
+    const intent = peekPendingIntent();
+    if (!intent || intent.id !== id) return;
+    if (intent.kind === "enter-promotion" && promo.kind === "giveaway" && !reference) {
+      clearPendingIntent();
+      void doEnter();
+    } else if (intent.kind === "redeem-promotion" && promo.kind === "promotion" && !redeemCode) {
+      clearPendingIntent();
+      void doRedeem();
+    }
+  }, [user, promo, id]);
 
   async function share() {
     const url = toPublicUrl(`${window.location.pathname}${user ? `?ref=${user.uid}` : ""}`);

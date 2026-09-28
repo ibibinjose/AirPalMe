@@ -78,6 +78,7 @@ export const CALLABLES = {
   completePlan: "completePlanRemote",
   completePlanRemote: "completePlanRemote",
   getPlanByInviteCode: "getPlanByInviteCode",
+  getExperienceProof: "getExperienceProof",
   sendPlanBroadcast: "sendPlanBroadcast",
   inviteToPlan: "inviteToPlan",
   confirmExperienceBooking: "confirmExperienceBookingRemote",

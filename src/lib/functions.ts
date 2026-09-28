@@ -29,6 +29,7 @@ import type {
   CompletePlanResponse,
   GetPlanByInviteCodeRequest,
   GetPlanByInviteCodeResponse,
+  ExperienceProofResponse,
 } from "@shared/plan";
 import type {
   InviteToPlanRequest,
@@ -371,6 +372,10 @@ export function getPlanByInviteCodeRemote(data: GetPlanByInviteCodeRequest) {
   return callFunction<GetPlanByInviteCodeRequest, GetPlanByInviteCodeResponse>(CALLABLES.getPlanByInviteCode, data);
 }
 export const getPlanByInviteCodeRemoteCall = getPlanByInviteCodeRemote;
+
+export function getExperienceProofRemote() {
+  return callFunction<Record<string, never>, ExperienceProofResponse>(CALLABLES.getExperienceProof, {});
+}
 
 export function sendPlanBroadcastRemote(data: SendPlanBroadcastRequest) {
   return callFunction<SendPlanBroadcastRequest, SendPlanBroadcastResponse>(CALLABLES.sendPlanBroadcast, data);

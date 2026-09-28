@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { HangoutPlan, PlanStop, PlanType, PlanTheme } from "@shared/plan";
 import { attendeeSeats, canCancelPlanStatus, formatDateOption, headcountTaken, isPlanManager, isTicketed, normalizeAnswer, normalizePlusOnes, normalizeRating, normalizeReview, setAttendeeCheckedIn, validDateOption, waitlistQueue } from "@shared/plan";
 import { goingFits, resolveRsvpStatus } from "@shared/plan-notify";
@@ -179,6 +179,38 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   const getPlan = useCallback((idOrCode: string) => {
     return storeGetPlan(idOrCode);
   }, []);
+
+  // Guest → member upgrade happens on the same device (StartPage returns to
+  // `next`), and sign-in links the anonymous auth account, so the uid is
+  // preserved. Adopt this account's anonymous RSVP rows: real name, handle,
+  // member flag. Cross-device guests keep their anonymous seat (disclosed).
+  const adoptRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!user?.uid) return;
+    if (adoptRef.current === user.uid) return;
+    adoptRef.current = user.uid;
+    let adopted = 0;
+    for (const plan of loadPlans()) {
+      if (!plan.attendees.some((a) => a.id === user.uid && a.isAnonymous)) continue;
+      const attendees = plan.attendees.map((a) =>
+        a.id === user.uid && a.isAnonymous
+          ? {
+              ...a,
+              name: a.name && a.name !== "Guest Mate" ? a.name : user.displayName || a.name,
+              handle: mine?.handle ?? a.handle,
+              isAnonymous: false,
+            }
+          : a,
+      );
+      savePlan({ ...plan, attendees });
+      adopted += 1;
+    }
+    if (adopted > 0) {
+      toast.success(
+        adopted === 1 ? "Your RSVP is now saved to your account." : `${adopted} RSVPs saved to your account.`,
+      );
+    }
+  }, [user?.uid, mine?.handle]);
 
   const fetchPlan = useCallback(async (idOrCode: string) => {
     return await fetchRemotePlan(idOrCode);

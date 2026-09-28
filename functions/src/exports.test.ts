@@ -55,6 +55,8 @@ const CALLABLES = [
   "voteDateOptionRemote",
   "postPlanCommentRemote",
   "getPlanByInviteCode",
+  "getExperienceProof",
+  "getExperienceProofRemote",
   "sendPlanBroadcast",
   "sendPlanReminders",
   "onPlanUpdated",
