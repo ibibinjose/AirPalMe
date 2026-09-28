@@ -53,6 +53,7 @@ import { BioKindIcon } from "@/components/bio/BioKindBadge";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { AirPalChatModal } from "@/components/messaging/AirPalChatModal";
 import { createConversationRecord } from "@/lib/chat-store";
+import { inviteLinkFor } from "@/lib/app-invites";
 import type { UniversalConversation } from "@shared/messaging";
 import {
   listCatchUpsForHandle,
@@ -190,6 +191,7 @@ export function BioPublicPage() {
   const [catchUpInitialType, setCatchUpInitialType] = useState<PlanType>("catchup");
   const [catchUpsList, setCatchUpsList] = useState<CatchUpItem[]>([]);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
   const [chatModalOpen, setChatModalOpen] = useState(false);
   const [chatConversation, setChatConversation] = useState<UniversalConversation | null>(null);
   const { stalls, getEvent } = useEvents();
@@ -506,6 +508,38 @@ export function BioPublicPage() {
       setTimeout(() => setCopiedLink(false), 2000);
     } catch {
       toast.message(share);
+    }
+  };
+
+  const handleCopyInviteCode = async () => {
+    void triggerHaptic("light");
+    try {
+      await navigator.clipboard.writeText(`@${bio.handle}`);
+      setCopiedCode(true);
+      toast.success("Invite code copied!");
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch {
+      toast.message(`@${bio.handle}`);
+    }
+  };
+
+  const handleShareInvite = async () => {
+    void triggerHaptic("light");
+    const url = inviteLinkFor(bio.handle);
+    const text = `Join me on AirPal — use my code @${bio.handle}.`;
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({ title: `Join ${bio.name} on AirPal`, text, url });
+        return;
+      } catch {
+        /* user dismissed — fall through to clipboard */
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      toast.success("Invite link copied!");
+    } catch {
+      toast.message(url);
     }
   };
 
@@ -910,6 +944,44 @@ export function BioPublicPage() {
               </div>
             )}
           </div>
+
+          {/* Invite code — every bio carries its owner's code so any visitor can join under them */}
+          {bio.ownerUid && (
+            <div className="mt-3 rounded-2xl bg-gold/10 p-3.5 ring-1 ring-gold/30 shadow-2xs">
+              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gold">
+                <Ticket size={13} aria-hidden />
+                {isOwner ? "Your invite code" : `Join with ${bio.name.split(" ")[0]}'s code`}
+              </p>
+              <div className="mt-2 flex items-center gap-2">
+                <code className="min-w-0 flex-1 truncate rounded-xl bg-card px-3 py-2 text-sm font-bold text-ink ring-1 ring-line/70">
+                  @{bio.handle}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => void handleCopyInviteCode()}
+                  className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl bg-card px-3 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:bg-paper active:scale-95"
+                  aria-label="Copy invite code"
+                >
+                  {copiedCode ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} className="text-mute" />}
+                  {copiedCode ? "Copied" : "Copy"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleShareInvite()}
+                  className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95"
+                  aria-label="Share invite link"
+                >
+                  <Share2 size={14} />
+                  Invite
+                </button>
+              </div>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-mute">
+                {isOwner
+                  ? "Share your code — you both earn Stars when your mate completes their first experience."
+                  : "Use this code when you join — you both earn Stars when you complete your first experience."}
+              </p>
+            </div>
+          )}
 
           {/* Business & Stay profile specific overview, facilities & actions */}
           {(bio.kind === "business" || isStay) && (

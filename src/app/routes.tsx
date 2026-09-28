@@ -28,6 +28,7 @@ const OrganiserEventPage = lazy(() =>
 
 const MePage = lazy(() => import("@/pages/MePage").then((m) => ({ default: m.MePage })));
 const MyTicketsPage = lazy(() => import("@/pages/MyTicketsPage").then((m) => ({ default: m.MyTicketsPage })));
+const RewardsPage = lazy(() => import("@/pages/RewardsPage").then((m) => ({ default: m.RewardsPage })));
 const InboxPage = lazy(() => import("@/pages/InboxPage").then((m) => ({ default: m.InboxPage })));
 const ZooPage = lazy(() => import("@/pages/ZooPage").then((m) => ({ default: m.ZooPage })));
 const MemoryWallPage = lazy(() => import("@/pages/MemoryWallPage").then((m) => ({ default: m.MemoryWallPage })));
@@ -195,6 +196,7 @@ export function AppRoutes() {
         <Route path="/messages" component={InboxPage} />
         <Route path="/me/inbox" component={InboxPage} />
         <Route path="/me/tickets" component={MyTicketsPage} />
+        <Route path="/me/rewards" component={RewardsPage} />
         <Route path="/circle" component={CirclePage} />
         <Route path="/me" component={MePage} />
         <Route path="/settings" component={SettingsPage} />

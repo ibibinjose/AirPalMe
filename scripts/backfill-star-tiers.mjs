@@ -1,3 +1,4 @@
+/* global fetch, URLSearchParams */
 /**
  * One-off backfill: stamp earned Stars tier names onto person profiles.
  *
