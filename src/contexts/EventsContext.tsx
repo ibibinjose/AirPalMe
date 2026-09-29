@@ -613,6 +613,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
                     registrationUrl: stamped.registrationUrl,
                     registrationNote: stamped.registrationNote,
                     speakers: stamped.speakers,
+                    demo: stamped.demo,
                   })
               : undefined,
         });
@@ -668,6 +669,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
                     registrationUrl: stamped.registrationUrl,
                     registrationNote: stamped.registrationNote,
                     speakers: stamped.speakers,
+                    demo: stamped.demo,
                   })
               : undefined,
         });

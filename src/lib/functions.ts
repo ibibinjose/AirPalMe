@@ -141,6 +141,7 @@ export function upsertBusinessListingRemote(data: {
   website?: string;
   plan?: string;
   abnOrTaxId?: string;
+  demo?: boolean;
 }) {
   return callFunction<typeof data, { listingId: string; placeId: string }>(CALLABLES.upsertBusinessListing, data);
 }
@@ -188,6 +189,7 @@ export function upsertEventRemote(data: {
   registrationUrl?: string;
   registrationNote?: string;
   speakers?: { name: string; role?: string }[];
+  demo?: boolean;
 }) {
   return callFunction<typeof data, { eventId: string }>(CALLABLES.upsertEvent, data);
 }
@@ -545,6 +547,41 @@ export function createConnectLoginLinkRemote() {
   return callFunction<Record<string, never>, { ok: boolean; url: string }>(CALLABLES.createConnectLoginLink, {});
 }
 
+export function teardownDemoBusinessRemote() {
+  return callFunction<Record<string, never>, { deleted: Record<string, number> }>(
+    CALLABLES.teardownDemoBusiness,
+    {},
+  );
+}
+
+export function verifyTicketRemote(data: { ticketId: string }) {
+  return callFunction<
+    typeof data,
+    {
+      ticketId: string;
+      eventId: string;
+      eventName: string;
+      title: string;
+      date: string;
+      time: string;
+      spots: number;
+      paymentStatus: string;
+      displayPaid: boolean;
+      status: string;
+      valid: boolean;
+      reason: string | null;
+      admittedAt: string | null;
+    }
+  >(CALLABLES.verifyTicket, data);
+}
+
+export function admitTicketRemote(data: { ticketId: string }) {
+  return callFunction<typeof data, { ticketId: string; admittedAt: string; already: boolean }>(
+    CALLABLES.admitTicket,
+    data,
+  );
+}
+
 export function releaseHeldPayoutsRemote() {
   return callFunction<
     Record<string, never>,
@@ -621,6 +658,10 @@ export function claimFreeVenuePresenceRemote(data: ClaimFreeVenuePresenceRequest
 
 export function getPulseByTokenRemote(data: { publicToken: string }) {
   return callFunction<typeof data, import("@shared/pulse").PulsePublicDto>(CALLABLES.getPulseByToken, data);
+}
+
+export function getBioPulseRemote(data: { propertyId: string }) {
+  return callFunction<typeof data, import("@shared/pulse").BioPulseResult>(CALLABLES.getBioPulse, data);
 }
 
 export function submitPulseResponseRemote(data: {

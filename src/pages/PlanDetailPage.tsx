@@ -47,6 +47,8 @@ import { PlanGroupHeader } from "@/components/plan/PlanGroupHeader";
 import { PlanDiscussionWall } from "@/components/plan/PlanDiscussionWall";
 import { SafetyMenu } from "@/components/safety/SafetyMenu";
 import { PaymentCanceledNotice } from "@/components/booking/PaymentCanceledNotice";
+import { TicketGatePanel } from "@/components/booking/TicketGatePanel";
+import { ticketIdFromSearch } from "@shared/booking";
 import { ItineraryStopsManager } from "@/components/plan/ItineraryStopsManager";
 import { ExperienceBookingModal } from "@/components/plan/ExperienceBookingModal";
 import { HereCheckIn } from "@/components/circle/HereCheckIn";
@@ -109,6 +111,8 @@ export function PlanDetailPage() {
     deletePlan,
   } = usePlans();
   const { user } = useAuth();
+  // Gate-scan QR landings (?ticket=). Guests never fire it; the panel hides on denial.
+  const ticketId = user ? ticketIdFromSearch(search) : null;
 
   const [localPlan, setLocalPlan] = useState<HangoutPlan | undefined>(() => getPlan(targetId));
   const [loading, setLoading] = useState(!localPlan);
@@ -339,6 +343,11 @@ export function PlanDetailPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 md:py-10 pb-32">
       <PaymentCanceledNotice />
+      {ticketId && (
+        <div className="mx-auto max-w-lg">
+          <TicketGatePanel ticketId={ticketId} />
+        </div>
+      )}
       {/* Top Floating Controls */}
       <div className="flex items-center justify-between gap-3 mb-6">
         <button

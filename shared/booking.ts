@@ -77,6 +77,9 @@ export interface Booking {
   stayCheckOut?: string;
   stayGuests?: number;
   stayRoomTypeId?: string;
+  /** Gate admission: ISO time + staffer who scanned. Set by admitTicket only. */
+  admittedAt?: string;
+  admittedByUid?: string;
 }
 
 export interface BookingInput {
@@ -128,6 +131,59 @@ export function bookingDisplayPaid(b: Pick<Booking, "paymentStatus" | "priceCent
  */
 export function hasCanceledParam(search: string): boolean {
   return /(^|[?&])canceled=(1|true)(&|$)/.test(search);
+}
+
+/** One path-safe ticket segment — the single shape QR landings accept. */
+export function isTicketId(value: unknown): value is string {
+  return typeof value === "string" && /^[\w-]{1,128}$/.test(value);
+}
+
+/**
+ * Gate-scan ticket id from a QR landing (`/e/:id?ticket=:bookingId`).
+ * Strict: one path-safe segment, nothing else — the server re-checks.
+ */
+export function ticketIdFromSearch(search: string): string | null {
+  const m = /(^|[?&])ticket=([^&]*)(&|$)/.exec(search);
+  if (!m) return null;
+  const id = decodeURIComponent(m[2] || "").trim();
+  return isTicketId(id) ? id : null;
+}
+
+export const TICKET_ADMIT_REASONS = ["unpaid", "cancelled", "refunded", "disputed", "completed"] as const;
+export type TicketAdmitReason = (typeof TICKET_ADMIT_REASONS)[number];
+
+export type TicketAdmitCheck = { valid: true } | { valid: false; reason: TicketAdmitReason };
+
+/**
+ * Gate rule, shared by client copy and server enforcement: paid (or free)
+ * and still open. Cancelled/refunded/disputed/completed bookings never
+ * admit — the gate shows the reason instead of a button.
+ */
+export function ticketAdmitCheck(
+  b: Pick<Booking, "paymentStatus" | "priceCents" | "status">,
+): TicketAdmitCheck {
+  if (b.status === "cancelled") return { valid: false, reason: "cancelled" };
+  if (b.status === "refunded") return { valid: false, reason: "refunded" };
+  if (b.status === "disputed") return { valid: false, reason: "disputed" };
+  if (b.status === "completed") return { valid: false, reason: "completed" };
+  if (!bookingDisplayPaid(b)) return { valid: false, reason: "unpaid" };
+  return { valid: true };
+}
+
+/** Gate-staff wording for each refusal. */
+export function ticketAdmitReasonLabel(reason: TicketAdmitReason): string {
+  switch (reason) {
+    case "unpaid":
+      return "Not paid — collect payment before entry.";
+    case "cancelled":
+      return "Booking was cancelled — no entry.";
+    case "refunded":
+      return "Booking was refunded — no entry.";
+    case "disputed":
+      return "Booking is under dispute — check with the organiser.";
+    case "completed":
+      return "Already fulfilled — no re-entry on this ticket.";
+  }
 }
 
 /**

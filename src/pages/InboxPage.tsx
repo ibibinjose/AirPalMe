@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
 import { enableWebPush, markNotificationRead, pushPrefEnabled } from "@/lib/notifications";
 import { cn } from "@/lib/cn";
-import type { PromotionNotification } from "@shared/promotions";
+import { isUpdateNoteKind, type PromotionNotification } from "@shared/promotions";
 import { toast } from "sonner";
 import { subscribeConversations, createConversationRecord, getLocalConversations } from "@/lib/chat-store";
 import type { UniversalConversation, ConversationType } from "@shared/messaging";
@@ -33,13 +33,46 @@ function ConversationTypeIcon({ type }: { type: ConversationType }) {
   }
 }
 
+function NotificationRows({
+  rows,
+  onOpen,
+}: {
+  rows: PromotionNotification[];
+  onOpen: (n: PromotionNotification) => void;
+}) {
+  return (
+    <ul className="mt-4 overflow-hidden rounded-[24px] bg-card ring-1 ring-line/80 shadow-xs">
+      {rows.map((n, i) => (
+        <li key={n.id} className={cn(i > 0 && "border-t border-line/70")}>
+          <button
+            type="button"
+            onClick={() => void onOpen(n)}
+            className="flex w-full gap-3 px-4 py-3.5 text-left transition hover:bg-paper/60 active:bg-paper"
+          >
+            <span
+              className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", n.read ? "bg-transparent" : "bg-brand")}
+              aria-hidden
+            />
+            <span className="min-w-0 flex-1">
+              <span className={cn("block text-[15px] leading-5", n.read ? "text-ink" : "font-bold text-ink")}>
+                {n.title}
+              </span>
+              <span className="mt-0.5 line-clamp-2 block text-[13px] leading-5 text-mute">{n.body}</span>
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function InboxPage() {
   const { user, authReady } = useAuth();
   const [, nav] = useLocation();
   const { myPlans } = usePlans();
   const [notes, setNotes] = useState<PromotionNotification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [segment, setSegment] = useState<"messages" | "pings" | "activity">("messages");
+  const [segment, setSegment] = useState<"messages" | "updates" | "pings" | "activity">("messages");
 
   // Universal Chat State
   const [universalChats, setUniversalChats] = useState<UniversalConversation[]>([]);
@@ -99,9 +132,12 @@ export function InboxPage() {
   }
 
   const getUnread = (c: UniversalConversation) => (user ? c.unreadCount?.[user.uid] || 0 : 0);
-  const unreadNotes = notes.filter((n) => !n.read).length;
+  const updateNotes = useMemo(() => notes.filter((n) => isUpdateNoteKind(n.kind)), [notes]);
+  const activityNotes = useMemo(() => notes.filter((n) => !isUpdateNoteKind(n.kind)), [notes]);
+  const unreadUpdates = updateNotes.filter((n) => !n.read).length;
+  const unreadActivity = activityNotes.filter((n) => !n.read).length;
   const unreadChats = universalChats.reduce((sum, c) => sum + getUnread(c), 0);
-  const totalUnread = unreadNotes + unreadChats;
+  const totalUnread = unreadUpdates + unreadActivity + unreadChats;
 
   async function openNote(n: PromotionNotification) {
     if (!n.read) {
@@ -167,8 +203,9 @@ export function InboxPage() {
           onChange={setSegment}
           options={[
             { id: "messages", label: unreadChats ? `Messages (${unreadChats})` : "Messages" },
+            { id: "updates", label: unreadUpdates ? `Updates (${unreadUpdates})` : "Updates" },
             { id: "pings", label: "Pings" },
-            { id: "activity", label: unreadNotes ? `Activity (${unreadNotes})` : "Activity" },
+            { id: "activity", label: unreadActivity ? `Activity (${unreadActivity})` : "Activity" },
           ]}
         />
       </div>
@@ -341,7 +378,7 @@ export function InboxPage() {
             See activity &amp; notifications →
           </button>
         </div>
-      ) : (
+      ) : segment === "activity" ? (
         <>
           <p className="mt-4 text-[13px] font-semibold text-mute">Activity</p>
 
@@ -352,46 +389,46 @@ export function InboxPage() {
               className="mt-3 w-full rounded-[20px] bg-brand/10 px-4 py-3.5 text-left ring-1 ring-brand/20 transition hover:bg-brand/15 active:scale-95"
             >
               <span className="block text-[15px] font-semibold text-brand">Turn on alerts</span>
-              <span className="block text-[13px] text-mute">Circle announcements, messages, and plan updates.</span>
+              <span className="block text-[13px] text-mute">Giveaways, rewards, messages, and plan updates.</span>
             </button>
           )}
 
-          {notes.length === 0 ? (
+          {activityNotes.length === 0 ? (
             <div className="mt-10 text-center">
               <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-paper text-mute ring-1 ring-line">
                 <Bell size={22} className="text-brand" />
               </span>
               <p className="font-display mt-4 text-xl font-bold text-ink">Nothing yet</p>
               <p className="mx-auto mt-1 max-w-xs text-[14px] leading-relaxed text-mute">
-                When someone in your Circle announces or a plan updates, it lands here.
+                When a giveaway or reward updates, it lands here.
               </p>
-              <Link href="/circle" className="mt-5 inline-block text-[14px] font-bold text-brand hover:underline">
-                Open Circle
+              <Link
+                href="/giveaways"
+                className="mt-5 inline-block text-[14px] font-bold text-brand hover:underline"
+              >
+                Browse giveaways
               </Link>
             </div>
           ) : (
-            <ul className="mt-4 overflow-hidden rounded-[24px] bg-card ring-1 ring-line/80 shadow-xs">
-              {notes.map((n, i) => (
-                <li key={n.id} className={cn(i > 0 && "border-t border-line/70")}>
-                  <button
-                    type="button"
-                    onClick={() => void openNote(n)}
-                    className="flex w-full gap-3 px-4 py-3.5 text-left transition hover:bg-paper/60 active:bg-paper"
-                  >
-                    <span
-                      className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", n.read ? "bg-transparent" : "bg-brand")}
-                      aria-hidden
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className={cn("block text-[15px] leading-5", n.read ? "text-ink" : "font-bold text-ink")}>
-                        {n.title}
-                      </span>
-                      <span className="mt-0.5 line-clamp-2 block text-[13px] leading-5 text-mute">{n.body}</span>
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <NotificationRows rows={activityNotes} onOpen={openNote} />
+          )}
+        </>
+      ) : (
+        <>
+          <p className="mt-4 text-[13px] font-semibold text-mute">Updates from AirPal</p>
+
+          {updateNotes.length === 0 ? (
+            <div className="mt-10 text-center">
+              <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-paper text-mute ring-1 ring-line">
+                <Sparkles size={22} className="text-brand" />
+              </span>
+              <p className="font-display mt-4 text-xl font-bold text-ink">No updates yet</p>
+              <p className="mx-auto mt-1 max-w-xs text-[14px] leading-relaxed text-mute">
+                News from AirPal — features, safety notices, city launches — lands here.
+              </p>
+            </div>
+          ) : (
+            <NotificationRows rows={updateNotes} onOpen={openNote} />
           )}
         </>
       )}

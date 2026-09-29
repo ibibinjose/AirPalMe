@@ -7,6 +7,11 @@ const DEFAULT_DESCRIPTION = "Life Made Easy. People, places, things and experien
  * pages (plans, events, bios) override these with their own setShareMeta. */
 const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> = [
   {
+    match: /^\/[Dd]emo(\/|$)/,
+    title: "AirPal.me in five minutes · Showcase tour",
+    description: "Walk the full AirPal loop — mates, plans, stays, events, business — every stop live.",
+  },
+  {
     match: /^\/mate(\/|$)/,
     title: "AirPal Mate · Find someone to go with you",
     description:

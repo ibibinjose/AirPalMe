@@ -49,6 +49,7 @@ import { BioCatalogSection } from "@/components/bio/BioCatalog";
 import { BioShareModal } from "@/components/bio/BioShareModal";
 import { BioCatchUpModal } from "@/components/bio/BioCatchUpModal";
 import { BioStatusModal } from "@/components/bio/BioStatusModal";
+import { BioPulseRate } from "@/components/bio/BioPulseRate";
 import { BioKindIcon } from "@/components/bio/BioKindBadge";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { AirPalChatModal } from "@/components/messaging/AirPalChatModal";
@@ -1827,6 +1828,8 @@ export function BioPublicPage() {
               <p className="text-center text-[11px] text-mute">Includes AirPal Club perks and priority invites.</p>
             </form>
           )}
+
+          {bio.propertyId ? <BioPulseRate propertyId={bio.propertyId} /> : null}
 
           {/* Brand Footer & Viral @handle CTA */}
           <footer className="mt-10 flex flex-col items-center justify-center gap-2 border-t border-line/60 pt-6 text-center">

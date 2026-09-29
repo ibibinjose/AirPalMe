@@ -345,6 +345,13 @@ export const NOTIFICATION_KINDS = [
 ] as const;
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 
+/** Kinds routed to the Inbox Updates segment (AirPal + circle announcements). */
+export const UPDATE_NOTE_KINDS = ["announcement"] as const;
+
+export function isUpdateNoteKind(kind: string): boolean {
+  return (UPDATE_NOTE_KINDS as readonly string[]).includes(kind);
+}
+
 export interface PromotionNotification {
   id: string;
   uid: string;

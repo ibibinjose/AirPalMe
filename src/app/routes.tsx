@@ -20,6 +20,7 @@ const ScanPage = lazy(() => import("@/pages/ScanPage").then((m) => ({ default: m
 const WavePage = lazy(() => import("@/pages/WavePage").then((m) => ({ default: m.WavePage })));
 const PlacePage = lazy(() => import("@/pages/PlacePage").then((m) => ({ default: m.PlacePage })));
 const EventPage = lazy(() => import("@/pages/EventPage").then((m) => ({ default: m.EventPage })));
+const TicketPage = lazy(() => import("@/pages/TicketPage").then((m) => ({ default: m.TicketPage })));
 const CalendarPage = lazy(() => import("@/pages/CalendarPage").then((m) => ({ default: m.CalendarPage })));
 const StallPage = lazy(() => import("@/pages/StallPage").then((m) => ({ default: m.StallPage })));
 const OrganiserEventPage = lazy(() =>
@@ -37,6 +38,7 @@ const SettingsPage = lazy(() => import("@/pages/SettingsPage").then((m) => ({ de
 const MarkerPage = lazy(() => import("@/pages/MarkerPage").then((m) => ({ default: m.MarkerPage })));
 const StayPage = lazy(() => import("@/pages/StayPage").then((m) => ({ default: m.StayPage })));
 const DemoHotelPage = lazy(() => import("@/pages/DemoHotelPage").then((m) => ({ default: m.DemoHotelPage })));
+const DemoPage = lazy(() => import("@/pages/DemoPage").then((m) => ({ default: m.DemoPage })));
 const HostPage = lazy(() => import("@/pages/HostPage").then((m) => ({ default: m.HostPage })));
 const HostPulsePage = lazy(() => import("@/pages/HostPulsePage").then((m) => ({ default: m.HostPulsePage })));
 const PulseHubPage = lazy(() => import("@/pages/PulseHubPage").then((m) => ({ default: m.PulseHubPage })));
@@ -162,6 +164,10 @@ export function AppRoutes() {
         <Route path="/demohotel">
           <Redirect to="/DemoHotel" />
         </Route>
+        <Route path="/Demo" component={DemoPage} />
+        <Route path="/demo">
+          <Redirect to="/Demo" />
+        </Route>
         <Route path="/q/:city/:handle" component={MarkerPage} />
         <Route path="/q/:a" component={MarkerPage} />
         <Route path="/q">
@@ -170,6 +176,7 @@ export function AppRoutes() {
         <Route path="/p/:id" component={PlacePage} />
         <Route path="/e/:eventId/s/:stallId" component={StallPage} />
         <Route path="/e/:id" component={EventPage} />
+        <Route path="/ticket/:id" component={TicketPage} />
         <Route path="/f/new" component={FestivalCreatePage} />
         <Route path="/f/:slug" component={FestivalPage} />
         <Route path="/calendar" component={CalendarPage} />

@@ -15,12 +15,12 @@ interface Props {
   showActions?: boolean;
 }
 
-/** Gate-scan URL for the ticket QR. Events resolve to the session page. */
+/** Gate-scan URL for the ticket QR. Events and plans resolve to their session page; everything else gets the dedicated gate page. */
 export function ticketQrHref(booking: Booking & { id: string }): string {
   const origin = publicSiteOrigin();
   if (booking.eventId) return `${origin}/e/${booking.eventId}?ticket=${booking.id}`;
   if (booking.planId) return `${origin}/plan/${booking.planId}?ticket=${booking.id}`;
-  return `${origin}/experiences?ticket=${booking.id}`;
+  return `${origin}/ticket/${booking.id}`;
 }
 
 /**

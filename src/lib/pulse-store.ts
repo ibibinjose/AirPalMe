@@ -4,6 +4,7 @@ import { getFirebaseDb } from "./firebase";
 import {
   acknowledgePulseIssueRemote,
   createPulseRemote,
+  getBioPulseRemote,
   getPulseByTokenRemote,
   liveBackendEnabled,
   publishPulseRemote,
@@ -81,6 +82,11 @@ export function pulseIssueFromDoc(id: string, data: Record<string, unknown>): Pu
 export async function fetchPulseByToken(publicToken: string) {
   if (!liveBackendEnabled()) throw new Error("Pulse needs a live connection.");
   return getPulseByTokenRemote({ publicToken });
+}
+
+export async function fetchBioPulse(propertyId: string) {
+  if (!liveBackendEnabled()) return { found: false as const };
+  return getBioPulseRemote({ propertyId });
 }
 
 export async function submitPulse(input: Parameters<typeof submitPulseResponseRemote>[0]) {

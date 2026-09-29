@@ -23,6 +23,76 @@
         }
       },
       {
+        "source": "/e/**",
+        "function": {
+          "functionId": "shareMeta",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/p/**",
+        "function": {
+          "functionId": "shareMeta",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/pulse/**",
+        "function": {
+          "functionId": "shareMeta",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/invite/**",
+        "function": {
+          "functionId": "shareMeta",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/plan/**",
+        "function": {
+          "functionId": "shareMeta",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/@**",
+        "function": {
+          "functionId": "shareMeta",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/stay/**",
+        "function": {
+          "functionId": "shareMeta",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/g/**",
+        "function": {
+          "functionId": "shareMeta",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/DemoHotel",
+        "function": {
+          "functionId": "shareMeta",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/Demo",
+        "function": {
+          "functionId": "shareMeta",
+          "region": "us-central1"
+        }
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

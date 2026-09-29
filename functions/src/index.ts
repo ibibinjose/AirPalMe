@@ -80,11 +80,15 @@ export {
   seedPromotionDemo,
 } from "./promotions";
 export { createBroadcast, reviewBroadcast } from "./notifications";
+export { teardownDemoBusiness } from "./demo";
+export { verifyTicket, admitTicket } from "./gate";
+export { shareMeta } from "./share-meta";
 export { sendPlanBroadcast, sendPlanReminders, onPlanUpdated, inviteToPlan } from "./plan-notify";
 export { shareHere, stopHere } from "./here";
 export { startWave, waveAt, stopWave } from "./wave";
 export {
   getPulseByToken,
+  getBioPulse,
   submitPulseResponse,
   createPulse,
   publishPulse,

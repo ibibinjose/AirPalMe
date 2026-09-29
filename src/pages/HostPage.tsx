@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -17,6 +17,7 @@ import { buildMarkerUrl } from "@shared/airpal-urls";
 import { propertyKindLabel, type HostPropertyKind } from "@shared/host-property";
 import type { DiningOrder, MenuItem, PropertyInfo, StaffTicket } from "@shared/airpal-data";
 import { authErrorMessage } from "@shared/auth-email";
+import { DEMO_BUSINESS, DEMO_PROPERTY_ID, isDemoModeSearch } from "@shared/demo-business";
 import { track } from "@/lib/analytics";
 import { HostActivationChecklist } from "@/components/host/HostActivationChecklist";
 import { HostPlaceForm } from "@/components/host/HostPlaceForm";
@@ -149,7 +150,14 @@ export function HostPage() {
   }, [property.roomStatuses]);
 
   const hasOwn = Boolean(user?.propertyIds?.length);
-  const showCreate = Boolean(user) && !hasOwn && !isHost && !isAdmin;
+  const demoMode = isAdmin && isDemoModeSearch(useSearch());
+  const showCreate = (Boolean(user) && !hasOwn && !isHost && !isAdmin) || demoMode;
+
+  useEffect(() => {
+    if (!demoMode) return;
+    setNewPropName((v) => v || DEMO_BUSINESS.name);
+    setNewPropCity((v) => v || DEMO_BUSINESS.city);
+  }, [demoMode]);
 
   async function onCreateProperty(e: FormEvent) {
     e.preventDefault();
@@ -163,6 +171,8 @@ export function HostPage() {
         propertyName: newPropName.trim(),
         kind: newPropKind,
         city: newPropCity.trim() || "Sydney",
+        demo: demoMode || undefined,
+        propertyId: demoMode ? DEMO_PROPERTY_ID : undefined,
       });
       toast.success("Place listed");
     } catch (err) {

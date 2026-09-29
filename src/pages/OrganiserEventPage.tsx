@@ -1,5 +1,5 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { useLocation } from "wouter";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { motion, useReducedMotion } from "framer-motion";
 import {
@@ -36,6 +36,7 @@ import {
   type StallRecord,
 } from "@shared/event";
 import { bioPath } from "@shared/bio";
+import { DEMO_BUSINESS, DEMO_EVENT_ID, isDemoModeSearch } from "@shared/demo-business";
 import { Button } from "@/components/ui/Button";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { publicSiteOrigin } from "@/lib/public-origin";
@@ -108,9 +109,13 @@ function formatWhen(iso?: string) {
 
 export function OrganiserEventPage() {
   const [, nav] = useLocation();
-  const { user, authReady } = useAuth();
+  const { user, authReady, isAdmin } = useAuth();
   const { mine, business } = useBio();
   const { myEvent, stallsFor, upsertEvent, importCsv, upsertStall, confirmEventSchedule } = useEvents();
+  const demoMode = Boolean(isAdmin) && isDemoModeSearch(useSearch());
+  // Demo runs always take the create path — never edit the admin's local draft.
+  const viewEvent = demoMode ? null : myEvent;
+  const demoPrefilled = useRef(false);
   const reduce = useReducedMotion();
   const [tab, setTab] = useState<"today" | "stalls" | "print" | "settings">("today");
 
@@ -165,11 +170,22 @@ export function OrganiserEventPage() {
   const [creating, setCreating] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const stalls = myEvent ? stallsFor(myEvent.id) : [];
-  const feedback = myEvent ? ratingsForEvent(myEvent.id) : [];
+  const stalls = viewEvent ? stallsFor(viewEvent.id) : [];
+  const feedback = viewEvent ? ratingsForEvent(viewEvent.id) : [];
 
   useEffect(() => {
-    if (!myEvent) {
+    if (!viewEvent) {
+      if (demoMode && !demoPrefilled.current) {
+        demoPrefilled.current = true;
+        setName(DEMO_BUSINESS.eventName);
+        setFlavour("event_space");
+        setCity(DEMO_BUSINESS.city);
+        setVenue(DEMO_BUSINESS.venue);
+        setAddress(DEMO_BUSINESS.address);
+        setDescription(DEMO_BUSINESS.eventShortWhy);
+        setShortWhy(DEMO_BUSINESS.eventShortWhy);
+        setGeo({ ...DEMO_BUSINESS.geo });
+      }
       if (business?.handle) {
         setHostType("business");
         setHostName(business.name);
@@ -181,6 +197,7 @@ export function OrganiserEventPage() {
       }
       return;
     }
+    if (!myEvent) return;
     setName(myEvent.name);
     setFlavour(myEvent.flavour);
     setCity(myEvent.city || "Sydney");
@@ -213,7 +230,7 @@ export function OrganiserEventPage() {
     });
     const origin = publicSiteOrigin();
     void makeQrDataUrl(`${origin}${myEvent.gatePath}`).then(setQr);
-  }, [myEvent, business, mine]);
+  }, [viewEvent, business, mine, demoMode]);
 
   function addCollaborator(handleRaw: string) {
     const clean = handleRaw.trim().replace(/^@+/, "").toLowerCase();
@@ -257,6 +274,7 @@ export function OrganiserEventPage() {
     try {
       const cleanHostHandle = hostHandle.trim().replace(/^@+/, "").toLowerCase() || undefined;
       await upsertEvent({
+        ...(demoMode ? { id: DEMO_EVENT_ID, demo: true as const } : {}),
         name: trimmed,
         flavour,
         city: city.trim() || "Sydney",
@@ -416,7 +434,7 @@ export function OrganiserEventPage() {
   }
 
   // EVENT CREATION FLOW
-  if (!myEvent) {
+  if (!viewEvent) {
     return (
       <div className="relative isolate overflow-hidden min-h-[85vh]">
         <div
@@ -907,7 +925,8 @@ export function OrganiserEventPage() {
     );
   }
 
-  // ACTIVE EVENT MANAGEMENT WORKSPACE
+  // ACTIVE EVENT MANAGEMENT WORKSPACE (unreachable in demo mode: demo always renders create).
+  if (!myEvent) return null;
   const whenLabel = [formatWhen(myEvent.startsAt), formatWhen(myEvent.endsAt)].filter(Boolean).join(" → ");
 
   return (

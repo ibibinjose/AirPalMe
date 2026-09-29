@@ -168,6 +168,11 @@ export type PulsePublicDto = {
   status: "live";
 };
 
+/** Bio-page rate card: the property's currently live Pulse, if any. */
+export type BioPulseResult =
+  | { found: false }
+  | { found: true; publicToken: string; title: string; propertyName: string };
+
 export type PulseSubmitPayload = {
   publicToken: string;
   answers: PulseAnswer[];

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useRoute, useLocation } from "wouter";
+import { useRoute, useLocation, useSearch } from "wouter";
 import { Check, ChevronDown, Heart, MapPin, Plus, Share2, Sparkles, Star, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { StickyAction } from "@/components/design-system/companions";
@@ -25,10 +25,17 @@ import { PageLoading } from "@/components/ui/PageLoading";
 import { NotFoundPage } from "./NotFoundPage";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { HereCheckIn } from "@/components/circle/HereCheckIn";
+import { TicketGatePanel } from "@/components/booking/TicketGatePanel";
+import { ticketIdFromSearch } from "@shared/booking";
 
 export function EventPage() {
   const [, params] = useRoute("/e/:id");
   const id = params?.id || "";
+  const search = useSearch();
+  const { user } = useAuth();
+  // Gate-scan QR landings (?ticket=). Guests never fire it; non-entitled
+  // signed-in viewers get a silent denial and the plain event page.
+  const ticketId = user ? ticketIdFromSearch(search) : null;
   const {
     getEvent: getExpo,
     calendarEvents,
@@ -80,14 +87,27 @@ export function EventPage() {
     return <PageLoading />;
   }
 
-  if (expo) return <ExpoDirectoryPage event={expo} />;
-
-  if (calEv) return <CalendarEventDetailView event={calEv} />;
-
-  if (near) return <NearbyEventDetailView event={near} />;
-
-  if (directEv) return <CalendarEventDetailView event={directEv} />;
-  return <NotFoundPage />;
+  const body = expo ? (
+    <ExpoDirectoryPage event={expo} />
+  ) : calEv ? (
+    <CalendarEventDetailView event={calEv} />
+  ) : near ? (
+    <NearbyEventDetailView event={near} />
+  ) : directEv ? (
+    <CalendarEventDetailView event={directEv} />
+  ) : (
+    <NotFoundPage />
+  );
+  return (
+    <>
+      {ticketId && (
+        <div className="mx-auto max-w-lg px-4 pt-4">
+          <TicketGatePanel ticketId={ticketId} />
+        </div>
+      )}
+      {body}
+    </>
+  );
 }
 
 function CalendarEventDetailView({ event }: { event: CalendarEvent }) {

@@ -18,6 +18,7 @@ const NAV_EXPLORE = [
   { href: "/guide", label: "Tours" },
   { href: "/concierge", label: "Stay" },
   { href: "/DemoHotel", label: "Live demo" },
+  { href: "/Demo", label: "Showcase tour" },
 ];
 
 const NAV_HOSPITALITY = [

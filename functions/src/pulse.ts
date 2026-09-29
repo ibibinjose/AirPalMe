@@ -140,6 +140,49 @@ export const getPulseByToken = onCall(CALLABLE, async (request) => {
   return dto;
 });
 
+/**
+ * Bio-page rate card: resolve the property's currently live Pulse. Anonymous
+ * OK — the token is the same capability the printed QR carries, and misses
+ * are indistinguishable from inactive so the endpoint is not an oracle.
+ */
+export const getBioPulse = onCall(CALLABLE, async (request) => {
+  await noteAppCheck(request, "getBioPulse");
+  const propertyId = String((request.data || {}).propertyId || "").trim();
+  if (!propertyId) throw new HttpsError("invalid-argument", "propertyId is required.");
+  await enforceRateLimit(
+    request.auth?.uid || `bio:${propertyId}`,
+    "pulse_scan",
+    !request.auth?.uid || isAnonymousAuth(request),
+  );
+
+  const depSnap = await db
+    .collection("properties")
+    .doc(propertyId)
+    .collection("pulseDeployments")
+    .where("active", "==", true)
+    .limit(1)
+    .get();
+  if (depSnap.empty) return { found: false as const };
+  const dep = depSnap.docs[0]!.data() || {};
+  const publicToken = String(dep.publicToken || "");
+  const pulseId = String(dep.pulseId || "");
+  if (!publicToken || !isPulsePublicToken(publicToken) || !pulseId) return { found: false as const };
+  const [propSnap, pulseSnap] = await Promise.all([
+    db.collection("properties").doc(propertyId).get(),
+    db.collection("properties").doc(propertyId).collection("pulses").doc(pulseId).get(),
+  ]);
+  if (!pulseSnap.exists || pulseSnap.data()?.status !== "live") return { found: false as const };
+  const pulse = pulseSnap.data() || {};
+  return {
+    found: true as const,
+    publicToken,
+    title: String(
+      (pulse.branding as { title?: string } | undefined)?.title || pulse.name || "How is your stay?",
+    ).slice(0, 80),
+    propertyName: String(propSnap.data()?.name || "AirPal stay"),
+  };
+});
+
 /** Anonymous OK — rate-limited. Writes response (+ issue when rules say so). */
 export const submitPulseResponse = onCall(CALLABLE, async (request) => {
   await noteAppCheck(request, "submitPulseResponse");

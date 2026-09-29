@@ -1,4 +1,5 @@
 import type { UserRole } from "./airpal-data";
+import type { TicketAdmitReason } from "./booking";
 
 export type PropertyMemberRole = "host_admin" | "staff";
 
@@ -91,6 +92,7 @@ export const CALLABLES = {
   waveAt: "waveAt",
   stopWave: "stopWave",
   getPulseByToken: "getPulseByToken",
+  getBioPulse: "getBioPulse",
   submitPulseResponse: "submitPulseResponse",
   createPulse: "createPulse",
   publishPulse: "publishPulse",
@@ -98,7 +100,42 @@ export const CALLABLES = {
   resolvePulseIssue: "resolvePulseIssue",
   setPulseStatus: "setPulseStatus",
   recordPulseFollowup: "recordPulseFollowup",
+  teardownDemoBusiness: "teardownDemoBusiness",
+  verifyTicket: "verifyTicket",
+  admitTicket: "admitTicket",
 } as const;
+
+export type TeardownDemoBusinessResponse = {
+  deleted: Record<string, number>;
+};
+
+/** Gate scan: read-only ticket check. Organiser, provider, or admin only. */
+export type VerifyTicketRequest = { ticketId: string };
+
+export type VerifyTicketResponse = {
+  ticketId: string;
+  eventId: string;
+  eventName: string;
+  title: string;
+  date: string;
+  time: string;
+  spots: number;
+  paymentStatus: string;
+  displayPaid: boolean;
+  status: string;
+  valid: boolean;
+  reason: TicketAdmitReason | null;
+  admittedAt: string | null;
+};
+
+/** Gate scan: admit a verified ticket. Idempotent — double scans return the first admission. */
+export type AdmitTicketRequest = { ticketId: string };
+
+export type AdmitTicketResponse = {
+  ticketId: string;
+  admittedAt: string;
+  already: boolean;
+};
 
 export type CompleteAccountSignupRequest = {
   handle: string;
@@ -158,6 +195,12 @@ export type CompleteRegistrationRequest = {
   breakfastPrice?: string;
   /** Demo-business build. Honored for platform admins only (server-enforced). */
   demo?: boolean;
+  /**
+   * Requested property id. Honored only for demo builds (platform admins)
+   * with a valid `demo-` id — otherwise the server mints one. Lets the
+   * /Demo showcase rebuild the same docs idempotently.
+   */
+  propertyId?: string;
 };
 
 export type CompleteRegistrationResponse = {
@@ -273,6 +316,8 @@ export type ClaimFreeVenuePresenceRequest = {
   heroImage?: string;
   plan?: string;
   abnOrTaxId?: string;
+  /** Demo-business build. Honored for platform admins only (server-enforced). */
+  demo?: boolean;
 };
 
 export type ClaimFreeVenuePresenceResponse = {

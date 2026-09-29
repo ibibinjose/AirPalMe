@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useSearch } from "wouter";
 import { collection, endAt, getDocs, limit, orderBy, query, startAt } from "firebase/firestore";
 import {
   ArrowLeft,
@@ -35,6 +35,8 @@ import {
   type OnboardStepId,
 } from "@shared/business-onboarding";
 import { BUSINESS_CATEGORIES, isBusinessCategory, placeCategoryFor } from "@shared/business";
+import { DEMO_BUSINESS, DEMO_LISTING_ID, isDemoModeSearch } from "@shared/demo-business";
+import { isDemoContent } from "@shared/content-meta";
 import { bioLinksFromGooglePlace, mergeBioLinks } from "@shared/google-place";
 import { NAMES } from "@shared/names";
 import { GooglePlaceImportCard } from "@/components/business/GooglePlaceImport";
@@ -87,7 +89,7 @@ function Stepper({ step }: { step: number }) {
 
 export function BusinessOnboardPage() {
   const [, nav] = useLocation();
-  const { user, authReady, requireUser } = useAuth();
+  const { user, authReady, requireUser, isAdmin } = useAuth();
   const { setSelectedListingId } = useListings();
   const { business, updateProfile } = useBio();
   const [step, setStep] = useState(0);
@@ -101,6 +103,28 @@ export function BusinessOnboardPage() {
   const guardRef = useRef(createSubmitGuard());
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [changeListing, setChangeListing] = useState(false);
+  const demoMode = Boolean(isAdmin) && isDemoModeSearch(useSearch());
+  const demoPrefilled = useRef(false);
+
+  useEffect(() => {
+    if (!demoMode || demoPrefilled.current) return;
+    demoPrefilled.current = true;
+    setDraft((d) => ({
+      ...d,
+      venue: { ...d.venue, mode: "unlisted", venueName: DEMO_BUSINESS.name },
+      address: DEMO_BUSINESS.address,
+      category: "stay",
+      shortWhy: DEMO_BUSINESS.shortWhy,
+      hours: DEMO_BUSINESS.hours,
+      geo: { ...DEMO_BUSINESS.geo },
+      owner: {
+        ...d.owner,
+        name: user?.displayName || d.owner.name,
+        email: user?.email || d.owner.email,
+        phone: DEMO_BUSINESS.phone,
+      },
+    }));
+  }, [demoMode, user]);
 
   const stepId: OnboardStepId = ONBOARD_STEPS[step]!.id;
 
@@ -120,11 +144,13 @@ export function BusinessOnboardPage() {
       );
       const snap = await getDocs(q);
       setResults(
-        snap.docs.map((d) => ({
-          id: d.id,
-          name: String(d.data()?.name || d.id),
-          address: String(d.data()?.address || ""),
-        })),
+        snap.docs
+          .filter((d) => !isDemoContent({ demo: d.data()?.demo }))
+          .map((d) => ({
+            id: d.id,
+            name: String(d.data()?.name || d.id),
+            address: String(d.data()?.address || ""),
+          })),
       );
     } catch {
       setResults([]);
@@ -202,10 +228,13 @@ export function BusinessOnboardPage() {
           heroImage: draft.heroImage || undefined,
           plan,
           abnOrTaxId: draft.owner.abnOrTaxId.trim() || undefined,
+          demo: demoMode,
         });
         placeId = res.placeId;
         try {
           const listing = await upsertBusinessListingRemote({
+            listingId: demoMode ? DEMO_LISTING_ID : undefined,
+            demo: demoMode,
             name: draft.venue.venueName.trim(),
             category: draft.category,
             address: draft.address.trim(),
@@ -223,7 +252,8 @@ export function BusinessOnboardPage() {
           listingId = listing.listingId;
           placeId = listing.placeId;
           if (listingId) setSelectedListingId(listingId);
-          if (business?.handle) {
+          // Demo runs never touch the admin's real business bio.
+          if (business?.handle && !demoMode) {
             const imported = bioLinksFromGooglePlace({
               placeId: draft.googlePlaceId,
               name: draft.venue.venueName,

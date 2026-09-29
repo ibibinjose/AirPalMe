@@ -4,6 +4,7 @@ import {
   canPublish,
   currentWeekId,
   foundingPoolState,
+  isUpdateNoteKind,
   legalGateSatisfied,
   offerTargetValid,
   ownerCanTransition,
@@ -27,6 +28,16 @@ describe("promotion transitions", () => {
     expect(adminCanTransition("live", "live")).toBe(false);
     expect(adminCanTransition("archived", "live")).toBe(false);
     expect(adminCanTransition("archived", "draft")).toBe(true);
+  });
+});
+
+describe("update-note kinds", () => {
+  it("routes announcements to Updates, promos to Activity", () => {
+    expect(isUpdateNoteKind("announcement")).toBe(true);
+    expect(isUpdateNoteKind("giveaway_launched")).toBe(false);
+    expect(isUpdateNoteKind("winner_selected")).toBe(false);
+    expect(isUpdateNoteKind("here")).toBe(false);
+    expect(isUpdateNoteKind("")).toBe(false);
   });
 });
 

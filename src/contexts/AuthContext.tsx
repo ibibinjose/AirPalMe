@@ -98,6 +98,10 @@ type AuthValue = {
     propertyName: string;
     kind?: HostPropertyKind;
     city?: string;
+    /** Demo-business build. Honored for platform admins only (server-enforced). */
+    demo?: boolean;
+    /** Requested property id. Honored for demo builds only (server-enforced). */
+    propertyId?: string;
   }) => Promise<{ propertyId: string }>;
   logout: () => Promise<void>;
   /** In-app account deletion (App Store 5.1.1(v)). */
@@ -467,6 +471,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             propertyName: input.propertyName,
             kind: input.kind || "hotel",
             city: input.city,
+            demo: input.demo,
+            propertyId: input.propertyId,
           });
           propertyId = res.propertyId;
           const auth = getFirebaseAuth();

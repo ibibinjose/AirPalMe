@@ -3,7 +3,17 @@ import { collection, getCountFromServer, getDocs, limit, orderBy, query, where }
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { aud } from "@shared/campaign";
 
-export type AdminTab = "overview" | "marketplace" | "mates" | "experiences" | "search" | "safety" | "studio" | "system" | "audit";
+export type AdminTab =
+  | "overview"
+  | "marketplace"
+  | "mates"
+  | "experiences"
+  | "search"
+  | "safety"
+  | "studio"
+  | "system"
+  | "audit"
+  | "demo";
 
 export const ADMIN_TABS: { id: AdminTab; label: string }[] = [
   { id: "overview", label: "Overview" },
@@ -15,6 +25,7 @@ export const ADMIN_TABS: { id: AdminTab; label: string }[] = [
   { id: "studio", label: "Studio" },
   { id: "system", label: "System" },
   { id: "audit", label: "Audit" },
+  { id: "demo", label: "Demo" },
 ];
 
 interface Kpi {

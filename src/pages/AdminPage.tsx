@@ -15,6 +15,7 @@ import { bioPath } from "@shared/bio";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { GuestListPanel } from "@/components/club/GuestListPanel";
 import { CompanionAdmin } from "@/components/admin/CompanionAdmin";
+import { DemoAdmin } from "@/components/admin/DemoAdmin";
 import { MateRequestsAdmin } from "@/components/admin/MateRequestsAdmin";
 import { StudioInboxAdmin } from "@/components/admin/StudioInboxAdmin";
 import { PartnerLeadsAdmin } from "@/components/admin/PartnerLeadsAdmin";
@@ -534,6 +535,7 @@ export function AdminPage() {
             </div>
           )}
           {tab === "audit" && <AuditTrailAdmin />}
+          {tab === "demo" && <DemoAdmin />}
         </div>
       )}
 

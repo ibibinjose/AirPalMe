@@ -20,7 +20,8 @@ import {
   type CompleteRegistrationRequest,
   type PropertyMemberRole,
 } from "../../shared/airpal-security";
-import { DEMO_ID_PREFIX, demoFlagAllowed } from "../../shared/content-meta";
+import { demoFlagAllowed } from "../../shared/content-meta";
+import { DEMO_PROPERTY_ID, DEMO_PROPERTY_MARKER_ID, isDemoDocId } from "../../shared/demo-business";
 import { enforceRateLimit, noteAppCheck } from "./abuse";
 import { writeAuthoritativeEvent } from "./analytics";
 import { writeAudit } from "./abuse";
@@ -49,14 +50,19 @@ export const completeRegistration = onCall(CALLABLE, async (request) => {
   }> {
     const kind = parseHostPropertyKind(data.kind);
     const demo = demoFlagAllowed(isPlatformAdmin((request.auth?.token || {}) as AccessClaims), data.demo);
-    const propertyId = demo ? `${DEMO_ID_PREFIX}${generatePropertyId()}` : generatePropertyId();
+    const requestedPropertyId = String(data.propertyId || "").trim();
+    const propertyId = demo
+      ? isDemoDocId(requestedPropertyId)
+        ? requestedPropertyId
+        : DEMO_PROPERTY_ID
+      : generatePropertyId();
     const handle = slugifyHandle(propertyName);
     const cityRaw = String(data.city || "").trim() || "Your city";
     const citySlug = slugifyCity(cityRaw);
     const geoLat = Number(data.geoLat);
     const geoLng = Number(data.geoLng);
     const geo = Number.isFinite(geoLat) && Number.isFinite(geoLng) ? { lat: geoLat, lng: geoLng } : undefined;
-    const lobbyMarkerId = demo ? `${DEMO_ID_PREFIX}${generateMarkerId()}` : generateMarkerId();
+    const lobbyMarkerId = demo ? DEMO_PROPERTY_MARKER_ID : generateMarkerId();
     const { roomTokens, defaultRoomNumber, defaultRoomToken } = buildDefaultRoomTokens(kind, data.roomsCount);
     const property = buildHostProperty({
       propertyName,
@@ -118,6 +124,18 @@ export const completeRegistration = onCall(CALLABLE, async (request) => {
       byNumber,
       updatedAt: FieldValue.serverTimestamp(),
     });
+    if (demo) {
+      // Rebuilds mint fresh room tokens — clear stale qrCodes first so old
+      // room scans stop resolving. Real properties never hit this path.
+      const stale = await db.collection("properties").doc(property.id).collection("qrCodes").get();
+      if (!stale.empty) {
+        const sweep = db.batch();
+        stale.docs.forEach((d) => {
+          sweep.delete(d.ref);
+        });
+        await sweep.commit();
+      }
+    }
     // Public get-by-id room token docs (avoid guessing from room number alone).
     const batch = db.batch();
     for (const [token, number] of Object.entries(roomTokens)) {
