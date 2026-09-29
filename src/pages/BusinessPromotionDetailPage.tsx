@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "wouter";
 import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -109,8 +109,11 @@ export function BusinessPromotionDetailPage() {
   const set = (k: string, v: string) => setDraft((d) => ({ ...d, [k]: v }));
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/business/promotions" className="flex items-center gap-1 text-[13px] font-medium text-mute">
+    <div className="mx-auto max-w-2xl px-4 py-8 pb-28">
+      <Link
+        href="/business/promotions"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={14} /> Your promotions
       </Link>
       <div className="mt-4 flex items-center gap-2">
@@ -135,7 +138,9 @@ export function BusinessPromotionDetailPage() {
       </div>
 
       {promo.winnerNote && (
-        <p className="mt-3 rounded-2xl border-2 border-gold bg-card p-3 text-sm font-semibold">🏆 {promo.winnerNote}</p>
+        <p className="mt-3 flex items-center gap-2 rounded-2xl border-2 border-gold bg-card p-3 text-sm font-semibold">
+          <Trophy size={16} className="shrink-0 text-gold" /> {promo.winnerNote}
+        </p>
       )}
 
       {(promo.status === "live" || promo.status === "paused") && (
@@ -144,7 +149,7 @@ export function BusinessPromotionDetailPage() {
             <button
               type="button"
               onClick={() => setAnnounce((a) => ({ ...a, open: true }))}
-              className="w-full rounded-xl bg-brand px-4 py-2.5 text-sm font-bold text-white"
+              className="w-full rounded-xl bg-brand px-4 py-2.5 min-h-[44px] text-sm font-bold text-white transition hover:bg-brand-ink active:scale-[0.99]"
             >
               Message entrants
             </button>
@@ -171,7 +176,7 @@ export function BusinessPromotionDetailPage() {
                 <button
                   type="button"
                   onClick={() => setAnnounce({ title: "", body: "", open: false })}
-                  className="flex-1 rounded-xl ring-1 ring-line/15 px-4 py-2 text-sm font-bold"
+                  className="flex-1 rounded-xl ring-1 ring-line px-4 py-2 min-h-[44px] text-sm font-bold transition hover:bg-paper active:scale-[0.99]"
                 >
                   Cancel
                 </button>
@@ -196,7 +201,7 @@ export function BusinessPromotionDetailPage() {
                       setBusy(false);
                     }
                   }}
-                  className="flex-1 rounded-xl bg-brand px-4 py-2 text-sm font-bold text-white disabled:opacity-50"
+                  className="flex-1 rounded-xl bg-brand px-4 py-2 min-h-[44px] text-sm font-bold text-white transition hover:bg-brand-ink active:scale-[0.99] disabled:opacity-50"
                 >
                   Submit for approval
                 </button>

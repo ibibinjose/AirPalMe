@@ -182,13 +182,16 @@ export function PulsePublicPage() {
       ? (current.options as [string, string])
       : null;
 
+  // Per-pulse cover wins; property hero is the fallback for older pulses.
+  const headerImage = pulse.imageUrl || pulse.propertyHeroImage;
+
   return (
     <div className="mx-auto min-h-[100dvh] max-w-md px-4 pb-28 pt-6">
-      {pulse.propertyHeroImage ? (
+      {headerImage ? (
         <div>
           <div className="relative h-40 overflow-hidden rounded-[28px] ring-1 ring-line">
             <img
-              src={pulse.propertyHeroImage}
+              src={headerImage}
               alt=""
               className="h-full w-full object-cover"
               loading="eager"

@@ -180,6 +180,25 @@ describe("shareMeta", () => {
     expect(res.body).toContain('<meta property="og:image" content="https://airpal.me/h.jpg">');
   });
 
+  it("prefers the pulse cover image in pulse cards", async () => {
+    fakes.docs["pulseTokens/tok-2"] = {
+      active: true,
+      propertyId: "prop-2",
+      deploymentId: "dep-2",
+      pulseId: "pu-2",
+    };
+    fakes.docs["properties/prop-2"] = { name: "Harbour Hotel", heroImage: "/h.jpg" };
+    fakes.docs["properties/prop-2/pulseDeployments/dep-2"] = { active: true };
+    fakes.docs["properties/prop-2/pulses/pu-2"] = {
+      status: "live",
+      name: "Dinner check",
+      branding: { title: "How was dinner?", imageUrl: "https://cdn/pulse-cover.jpg" },
+      questions: [{}, {}],
+    };
+    const res = await run("/pulse/tok-2", BOT_UA);
+    expect(res.body).toContain('<meta property="og:image" content="https://cdn/pulse-cover.jpg">');
+  });
+
   it("serves generic cards for inactive pulse tokens (no oracle)", async () => {
     fakes.docs["pulseTokens/tok-9"] = { active: false };
     const res = await run("/pulse/tok-9", BOT_UA);

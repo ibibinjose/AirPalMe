@@ -81,6 +81,7 @@ async function resolvePulseCard(token: string, origin: string): Promise<ShareCar
       title: str(branding.title) || str(pulse?.name),
       name: str(pulse?.name),
       propertyName: str(property?.name),
+      imageUrl: str(branding.imageUrl),
       propertyHeroImage: property?.heroImage,
       questions: pulse?.questions,
     },

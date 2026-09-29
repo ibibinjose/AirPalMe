@@ -124,7 +124,7 @@ export function shareCardFor(
             .join(" · "),
           200,
         ),
-        image: imageOf(doc.propertyHeroImage),
+        image: imageOf(doc.imageUrl, doc.propertyHeroImage),
       };
     }
     case "plan":

@@ -317,7 +317,7 @@ export function BioSetupPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 py-8">
+    <div className="mx-auto max-w-md px-4 py-8 pb-28">
       <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">
         {asBusiness ? "Host" : "AirPal.Me/@"}
       </p>
@@ -333,9 +333,10 @@ export function BioSetupPage() {
           {([1, 2, 3] as const).map((n) => (
             <span
               key={n}
+              aria-current={step === n ? "step" : undefined}
               className={cn(
-                "h-8 flex-1 rounded-full text-center text-sm leading-8",
-                step === n ? "bg-brand text-white" : "bg-white ring-1 ring-line",
+                "h-11 flex-1 rounded-full text-center text-sm font-semibold leading-[44px]",
+                step === n ? "bg-brand text-white shadow-xs" : "bg-card ring-1 ring-line",
               )}
             >
               {n}
@@ -371,7 +372,11 @@ export function BioSetupPage() {
           >
             <input value={handle} onChange={(e) => setHandle(e.target.value)} className={fieldInput} />
           </ValidField>
-          <button type="button" className="text-[12px] text-brand" onClick={() => setHandle(randomHexHandle(8))}>
+          <button
+            type="button"
+            className="inline-flex min-h-[44px] items-center text-[12px] font-semibold text-brand"
+            onClick={() => setHandle(randomHexHandle(8))}
+          >
             Use a hexadecimal id
           </button>
           {!user && (
@@ -446,8 +451,13 @@ export function BioSetupPage() {
           <ValidField label="Trade mark (optional)">
             <input value={trademark} onChange={(e) => setTrademark(e.target.value)} className={fieldInput} />
           </ValidField>
-          <label className="flex items-start gap-3 rounded-2xl bg-card px-4 py-3 text-sm ring-1 ring-line">
-            <input type="checkbox" className="mt-1" checked={accept} onChange={(e) => setAccept(e.target.checked)} />
+          <label className="flex cursor-pointer items-start gap-3 rounded-2xl bg-card px-4 py-3 text-sm ring-1 ring-line">
+            <input
+              type="checkbox"
+              className="mt-0.5 h-5 w-5 shrink-0 accent-brand"
+              checked={accept}
+              onChange={(e) => setAccept(e.target.checked)}
+            />
             <span>
               Registered business, I’m authorised, and this handle may move to the name / mark / domain owner.{" "}
               <Link href="/terms" className="text-brand">
@@ -530,9 +540,10 @@ export function BioSetupPage() {
                 key={c.id}
                 type="button"
                 onClick={() => setCategory(c.id)}
+                aria-pressed={category === c.id}
                 className={cn(
-                  "h-9 rounded-full px-3 text-sm",
-                  category === c.id ? "bg-brand text-white" : "bg-white ring-1 ring-line",
+                  "inline-flex min-h-[44px] items-center rounded-full px-4 text-sm transition active:scale-95",
+                  category === c.id ? "bg-brand text-white shadow-xs" : "bg-card ring-1 ring-line",
                 )}
               >
                 {c.label}

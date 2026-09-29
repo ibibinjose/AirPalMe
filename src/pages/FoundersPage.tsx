@@ -95,7 +95,7 @@ const PRIZES: PrizeItem[] = [
     line: "Every member in the 100K pool keeps their permanent Gold Founder badge and member number forever — proof that you were here from day one when AirPal was born.",
     bullets: ["Permanent Gold Founder profile badge", "Your personal founder number forever", "2× bonus referral points stacking", "VIP early access to new feature drops"],
     icon: BadgeCheck,
-    color: "from-purple-500/10 to-pink-500/5 border-purple-200 text-purple-900",
+    color: "from-brand/10 to-brand/5 border-brand/20 text-brand",
   },
 ];
 
@@ -241,7 +241,7 @@ export function FoundersPage() {
       <div className="relative z-10 border-b border-slate-200/80 bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 text-xs font-semibold text-slate-700">
           <div className="flex items-center gap-2">
-            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 motion-safe:animate-pulse" />
             <span className="font-bold tracking-wide text-slate-800">AIRPAL FOUNDERS CLUB · AUSTRALIA</span>
           </div>
           <div className="flex items-center gap-3 text-slate-500">
@@ -341,7 +341,7 @@ export function FoundersPage() {
                 <div className="mt-3.5 flex items-center justify-between text-xs text-slate-500 font-medium">
                   <span>✨ 100% Free · No Card Required</span>
                   <span className="inline-flex items-center gap-1.5 font-bold text-emerald-600">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden />
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 motion-safe:animate-pulse" aria-hidden />
                     {live ? "Live Pool Active" : "Enrollment Active"}
                   </span>
                 </div>
@@ -420,7 +420,7 @@ export function FoundersPage() {
                     <button
                       type="button"
                       onClick={shareNative}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-1.5 text-xs font-bold text-slate-800 shadow-2xs transition hover:bg-slate-100"
+                      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 text-xs font-bold text-slate-800 shadow-2xs transition hover:bg-slate-100"
                     >
                       <Share2 size={13} />
                       <span>Share Pass</span>
@@ -707,7 +707,7 @@ export function FoundersPage() {
                         href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Join me as an AirPal founding member — free entry into the July carry-on + Sydney weekend giveaway: ${myLink}`)}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-500 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-600 shadow-sm"
+                        className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl bg-emerald-500 px-3 text-xs font-bold text-white transition hover:bg-emerald-600 shadow-sm"
                       >
                         <MessageCircle size={14} />
                         <span>WhatsApp</span>
@@ -716,7 +716,7 @@ export function FoundersPage() {
                         href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Claimed my AirPal founder pass! First 100K get free entry into the July carry-on + Sydney weekend giveaway: `)}&url=${encodeURIComponent(myLink)}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center justify-center gap-1.5 rounded-xl bg-black px-3 py-2.5 text-xs font-bold text-white transition hover:bg-slate-900 shadow-sm"
+                        className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl bg-black px-3 text-xs font-bold text-white transition hover:bg-slate-900 shadow-sm"
                       >
                         <span>Post to 𝕏</span>
                       </a>
@@ -779,6 +779,7 @@ export function FoundersPage() {
                   <button
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? null : i)}
+                    aria-expanded={isOpen}
                     className="flex w-full items-center justify-between p-5 text-left text-sm sm:text-base font-bold text-slate-900 hover:text-brand transition"
                   >
                     <span>{faq.q}</span>

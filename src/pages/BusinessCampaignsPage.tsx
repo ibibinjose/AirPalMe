@@ -21,7 +21,7 @@ import {
 } from "@shared/campaign";
 
 const inputCls =
-  "mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm outline-none placeholder:text-mute focus:border-brand";
+  "mt-1 min-h-[48px] w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none placeholder:text-mute focus:border-brand";
 
 interface BookingRow {
   id: string;
@@ -164,8 +164,11 @@ export function BusinessCampaignsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/studio" className="flex items-center gap-1 text-[13px] font-medium text-mute">
+    <div className="mx-auto max-w-2xl px-4 py-8 pb-28">
+      <Link
+        href="/studio"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={14} /> Studio
       </Link>
       <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">AirPal Studio · B2B</p>
@@ -189,7 +192,10 @@ export function BusinessCampaignsPage() {
             Your place, offers, and bookings stay free. Become a Partner on your business page to file campaigns
             that fill seats.
           </p>
-          <Link href="/business" className="mt-3 inline-block rounded-full bg-ink px-5 py-2.5 text-[14px] font-semibold text-white">
+          <Link
+            href="/business"
+            className="mt-3 inline-flex min-h-[44px] items-center rounded-full bg-ink px-5 text-[14px] font-semibold text-white transition hover:opacity-90 active:scale-[0.99]"
+          >
             Open Partner on /business
           </Link>
         </div>
@@ -314,7 +320,11 @@ export function BusinessCampaignsPage() {
               />
             </label>
           </div>
-          {error && <p className="rounded-xl bg-paper p-3 text-[13px] text-mute ring-1 ring-line">{error}</p>}
+          {error && (
+            <p role="alert" className="rounded-xl bg-red-500/10 p-3 text-[13px] font-medium text-red-700 ring-1 ring-red-500/20 dark:text-red-300">
+              {error}
+            </p>
+          )}
           <Button className="w-full" disabled={sending} loading={sending} onClick={() => void create()}>
             <Megaphone size={15} /> File campaign
           </Button>
@@ -334,13 +344,15 @@ export function BusinessCampaignsPage() {
             const seats = (roster[c.id] || []).length;
             const fill = fillRate(seats, c.capacity);
             return (
-              <li key={c.id} className="rounded-2xl border border-line bg-card p-4">
+              <li key={c.id} className="rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs">
                 <button
+                  type="button"
                   onClick={() => {
                     setOpenId(openId === c.id ? null : c.id);
                     void loadRoster(c);
                   }}
-                  className="flex w-full items-center gap-2 text-left"
+                  aria-expanded={openId === c.id}
+                  className="flex min-h-[44px] w-full items-center gap-2 text-left"
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[15px] font-semibold">{c.title}</span>

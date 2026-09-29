@@ -107,7 +107,7 @@ function RoleHero({
       <button
         type="button"
         onClick={() => document.getElementById("auth-card")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-        className="mt-3 text-xs font-semibold text-brand hover:underline"
+        className="mt-3 inline-flex min-h-[44px] items-center px-2 text-xs font-semibold text-brand hover:underline"
       >
         {cta}
       </button>
@@ -299,8 +299,8 @@ export function StartPage() {
         title: "Sign in to AirPal Club",
         signupTitle: "Join AirPal Club",
         desc: "Unlock member invites, guest list perks, and save favourite stalls & events.",
-        color: "text-purple-600 dark:text-purple-400",
-        bg: "bg-purple-500/10",
+        color: "text-brand",
+        bg: "bg-brand/10",
       };
     }
     return {
@@ -636,7 +636,7 @@ export function StartPage() {
                 key={c.to}
                 type="button"
                 onClick={() => nav(c.to)}
-                className="rounded-2xl ring-1 ring-line bg-card p-3 transition hover:-translate-y-0.5 active:scale-[0.98]"
+                className="rounded-2xl ring-1 ring-line bg-card p-3 text-left transition-shadow hover:shadow-sm active:scale-[0.98]"
               >
                 <span className={cn("grid h-8 w-8 place-items-center rounded-xl", c.tint)}>
                   <c.icon size={16} strokeWidth={2.2} />
@@ -649,7 +649,7 @@ export function StartPage() {
           <button
             type="button"
             onClick={() => nav("/")}
-            className="mt-3 text-xs font-semibold text-brand hover:underline"
+            className="mt-3 inline-flex min-h-[44px] items-center px-2 text-xs font-semibold text-brand hover:underline"
           >
             Browse first, join later →
           </button>
@@ -859,8 +859,9 @@ export function StartPage() {
               <button
                 type="button"
                 onClick={() => switchMode("signin")}
+                aria-pressed={mode === "signin"}
                 className={cn(
-                  "flex-1 rounded-full py-2 text-center text-xs font-semibold transition",
+                  "flex-1 rounded-full min-h-[44px] text-center text-xs font-semibold transition",
                   mode === "signin" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
                 )}
               >
@@ -869,8 +870,9 @@ export function StartPage() {
               <button
                 type="button"
                 onClick={() => switchMode("signup")}
+                aria-pressed={mode === "signup"}
                 className={cn(
-                  "flex-1 rounded-full py-2 text-center text-xs font-semibold transition",
+                  "flex-1 rounded-full min-h-[44px] text-center text-xs font-semibold transition",
                   mode === "signup" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
                 )}
               >
@@ -883,8 +885,9 @@ export function StartPage() {
               <button
                 type="button"
                 onClick={() => switchMethod("email")}
+                aria-pressed={method === "email"}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition cursor-pointer",
+                  "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition cursor-pointer",
                   method === "email" ? "bg-brand text-white shadow-xs" : "bg-paper text-mute hover:text-ink ring-1 ring-line/80",
                 )}
               >
@@ -894,8 +897,9 @@ export function StartPage() {
               <button
                 type="button"
                 onClick={() => switchMethod("phone")}
+                aria-pressed={method === "phone"}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold transition cursor-pointer",
+                  "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition cursor-pointer",
                   method === "phone" ? "bg-brand text-white shadow-xs" : "bg-paper text-mute hover:text-ink ring-1 ring-line/80",
                 )}
               >
@@ -973,8 +977,9 @@ export function StartPage() {
                     <button
                       type="button"
                       onClick={() => setPhoneLoginMode("password")}
+                      aria-pressed={phoneLoginMode === "password"}
                       className={cn(
-                        "rounded-full px-3 py-1 text-xs font-semibold cursor-pointer",
+                        "inline-flex min-h-[40px] items-center rounded-full px-4 text-xs font-semibold cursor-pointer",
                         phoneLoginMode === "password" ? "bg-brand text-white" : "text-mute",
                       )}
                     >
@@ -983,8 +988,9 @@ export function StartPage() {
                     <button
                       type="button"
                       onClick={() => setPhoneLoginMode("sms")}
+                      aria-pressed={phoneLoginMode === "sms"}
                       className={cn(
-                        "rounded-full px-3 py-1 text-xs font-semibold cursor-pointer",
+                        "inline-flex min-h-[40px] items-center rounded-full px-4 text-xs font-semibold cursor-pointer",
                         phoneLoginMode === "sms" ? "bg-brand text-white" : "text-mute",
                       )}
                     >

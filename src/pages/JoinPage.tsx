@@ -19,7 +19,7 @@ export function JoinPage() {
   const hasPlace = Boolean(business);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 md:py-12">
+    <div className="mx-auto max-w-3xl px-4 py-8 pb-28 md:py-12">
       <header>
         <h1 className="font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">Join AirPal</h1>
         <p className="mt-3 text-base leading-relaxed text-mute">
@@ -28,7 +28,7 @@ export function JoinPage() {
       </header>
 
       {user && (
-        <p className="mt-6 rounded-2xl border border-line bg-card px-4 py-3 text-sm">
+        <p className="mt-6 rounded-2xl bg-card px-4 py-3 text-sm ring-1 ring-line shadow-xs">
           Signed in{mine?.handle ? ` as @${mine.handle}` : user.displayName ? ` as ${user.displayName}` : ""}.
           {hasPlace ? " Your business profile is live." : " You can stay a user, or add a business profile below."}
         </p>
@@ -112,7 +112,11 @@ export function JoinPage() {
       </section>
 
       <p className="mt-6 text-center text-sm text-mute">
-        <button type="button" className="font-semibold text-brand hover:underline" onClick={() => nav("/")}>
+        <button
+          type="button"
+          className="inline-flex min-h-[44px] items-center font-semibold text-brand hover:underline"
+          onClick={() => nav("/")}
+        >
           <Compass size={14} className="mr-1 inline" />
           Browse as a guest
         </button>

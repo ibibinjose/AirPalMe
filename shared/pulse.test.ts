@@ -11,6 +11,7 @@ import {
   issueSummaryFromAnswers,
   PULSE_TEMPLATES,
   primaryScoreFromAnswers,
+  pulseImageUrlOk,
   pulseResponsesToCsv,
   resolvePulseStatusTransition,
   stayDuringStayTemplate,
@@ -386,6 +387,25 @@ describe("swipe answers", () => {
     expect(swipeChoiceForOffset(SWIPE_CHOOSE_THRESHOLD_PX - 1)).toBeNull();
     expect(swipeChoiceForOffset(-(SWIPE_CHOOSE_THRESHOLD_PX - 1))).toBeNull();
     expect(swipeChoiceForOffset(Number.NaN)).toBeNull();
+  });
+});
+
+describe("pulse cover images", () => {
+  it("accepts https URLs with surrounding whitespace trimmed by callers", () => {
+    expect(pulseImageUrlOk("https://firebasestorage.googleapis.com/v0/b/x/o/y.jpg")).toBe(true);
+  });
+
+  it("rejects non-https, oversized, and non-string values", () => {
+    expect(pulseImageUrlOk("http://example.com/x.jpg")).toBe(false);
+    expect(pulseImageUrlOk("javascript:alert(1)")).toBe(false);
+    expect(pulseImageUrlOk("data:image/png;base64,xx")).toBe(false);
+    expect(pulseImageUrlOk("not a url")).toBe(false);
+    expect(pulseImageUrlOk("")).toBe(false);
+    expect(pulseImageUrlOk("   ")).toBe(false);
+    expect(pulseImageUrlOk(null)).toBe(false);
+    expect(pulseImageUrlOk(undefined)).toBe(false);
+    expect(pulseImageUrlOk(42)).toBe(false);
+    expect(pulseImageUrlOk(`https://example.com/${"x".repeat(2048)}.jpg`)).toBe(false);
   });
 });
 

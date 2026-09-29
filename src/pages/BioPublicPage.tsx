@@ -113,7 +113,7 @@ function BizCircle({
   onClick?: () => void;
 }) {
   const circle =
-    "grid h-12 w-12 sm:h-14 sm:w-14 place-items-center rounded-2xl sm:rounded-full bg-card text-brand ring-1 ring-line/80 shadow-xs transition-transform duration-150 hover:scale-105 active:scale-95";
+    "grid h-12 w-12 sm:h-14 sm:w-14 place-items-center rounded-2xl sm:rounded-full bg-card text-brand ring-1 ring-line/80 shadow-xs transition-shadow duration-150 hover:shadow-md active:scale-95";
   const wrap = "flex min-w-[56px] sm:min-w-[64px] touch-manipulation flex-col items-center gap-1.5 group";
   const caption = "text-[11px] sm:text-xs font-semibold text-ink/90 group-hover:text-brand transition-colors";
 
@@ -342,27 +342,27 @@ export function BioPublicPage() {
     return (
       <div className="mx-auto max-w-lg px-4 py-8" aria-label="Loading profile" role="status">
         <div className="overflow-hidden rounded-3xl bg-card ring-1 ring-line/70 shadow-xs">
-          <div className="h-44 w-full animate-pulse bg-paper sm:h-52" />
+          <div className="h-44 w-full motion-safe:animate-pulse bg-paper sm:h-52" />
           <div className="p-5">
             <div className="flex items-end justify-between">
-              <div className="-mt-14 h-24 w-24 sm:h-28 sm:w-28 animate-pulse rounded-full bg-paper ring-4 ring-card shadow-md" />
-              <div className="mb-1 h-8 w-24 animate-pulse rounded-full bg-paper" />
+              <div className="-mt-14 h-24 w-24 sm:h-28 sm:w-28 motion-safe:animate-pulse rounded-full bg-paper ring-4 ring-card shadow-md" />
+              <div className="mb-1 h-8 w-24 motion-safe:animate-pulse rounded-full bg-paper" />
             </div>
             <div className="mt-4 space-y-2.5">
-              <div className="h-7 w-48 animate-pulse rounded-lg bg-paper" />
-              <div className="h-4 w-24 animate-pulse rounded-md bg-paper" />
-              <div className="h-4 w-full animate-pulse rounded-md bg-paper" />
-              <div className="h-4 w-3/4 animate-pulse rounded-md bg-paper" />
+              <div className="h-7 w-48 motion-safe:animate-pulse rounded-lg bg-paper" />
+              <div className="h-4 w-24 motion-safe:animate-pulse rounded-md bg-paper" />
+              <div className="h-4 w-full motion-safe:animate-pulse rounded-md bg-paper" />
+              <div className="h-4 w-3/4 motion-safe:animate-pulse rounded-md bg-paper" />
             </div>
             <div className="mt-5 flex gap-2">
-              <div className="h-10 flex-1 animate-pulse rounded-full bg-paper" />
-              <div className="h-10 flex-1 animate-pulse rounded-full bg-paper" />
-              <div className="h-10 w-16 animate-pulse rounded-full bg-paper" />
+              <div className="h-10 flex-1 motion-safe:animate-pulse rounded-full bg-paper" />
+              <div className="h-10 flex-1 motion-safe:animate-pulse rounded-full bg-paper" />
+              <div className="h-10 w-16 motion-safe:animate-pulse rounded-full bg-paper" />
             </div>
             <div className="mt-3 grid grid-cols-3 gap-2">
-              <div className="h-12 animate-pulse rounded-2xl bg-paper" />
-              <div className="h-12 animate-pulse rounded-2xl bg-paper" />
-              <div className="h-12 animate-pulse rounded-2xl bg-paper" />
+              <div className="h-12 motion-safe:animate-pulse rounded-2xl bg-paper" />
+              <div className="h-12 motion-safe:animate-pulse rounded-2xl bg-paper" />
+              <div className="h-12 motion-safe:animate-pulse rounded-2xl bg-paper" />
             </div>
           </div>
         </div>
@@ -385,7 +385,7 @@ export function BioPublicPage() {
             <div className="mt-6 flex flex-col gap-2.5">
               <Button
                 size="lg"
-                className="w-full gap-2 rounded-full bg-brand font-semibold text-white shadow-md hover:brightness-110"
+                className="w-full gap-2 rounded-full bg-brand font-semibold text-white shadow-md hover:bg-brand-ink"
                 onClick={() => nav(`/bio/setup?handle=${handle}`)}
               >
                 Claim @{handle}
@@ -589,8 +589,6 @@ export function BioPublicPage() {
           ) : (
             <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-[#121829] via-[#1c2438] to-[#0f1424] sm:h-60">
               <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#1805db_1.5px,transparent_1.5px)] [background-size:20px_20px]" />
-              <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand/20 blur-3xl pointer-events-none" />
-              <div className="absolute -left-16 -bottom-16 h-48 w-48 rounded-full bg-amber-500/15 blur-3xl pointer-events-none" />
             </div>
           )}
 
@@ -609,7 +607,7 @@ export function BioPublicPage() {
                     nav("/");
                   }
                 }}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-ink/75 transition hover:bg-black/5 hover:text-ink active:scale-95"
+                className="flex h-11 w-11 items-center justify-center rounded-full text-ink/75 transition hover:bg-black/5 hover:text-ink active:scale-95"
                 aria-label="Go back"
                 title="Go back"
               >
@@ -623,7 +621,7 @@ export function BioPublicPage() {
                   e.stopPropagation();
                   nav("/");
                 }}
-                className="flex h-8 items-center rounded-full px-2 transition hover:bg-black/5 active:scale-95"
+                className="flex h-11 items-center rounded-full px-3 transition hover:bg-black/5 active:scale-95"
                 aria-label="AirPal Home"
                 title="AirPal Home"
               >
@@ -636,7 +634,7 @@ export function BioPublicPage() {
               <button
                 type="button"
                 onClick={handleQuickCopy}
-                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-white/90 px-3 text-xs font-semibold text-ink shadow-sm ring-1 ring-black/10 backdrop-blur-md transition hover:bg-white active:scale-95"
+                className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full bg-white/90 px-4 text-xs font-semibold text-ink shadow-sm ring-1 ring-black/10 backdrop-blur-md transition hover:bg-white active:scale-95"
                 title="Copy profile link"
                 aria-label="Copy profile link"
               >
@@ -687,7 +685,7 @@ export function BioPublicPage() {
                 title={statusInfo.label}
               >
                 {statusKey === "available" && (
-                  <span className="absolute h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+                  <span className="absolute h-full w-full rounded-full bg-emerald-400 opacity-75 motion-safe:animate-ping" />
                 )}
                 <BioKindIcon kind={bio.kind} className="h-5 w-5 ring-0" />
               </span>
@@ -710,7 +708,7 @@ export function BioPublicPage() {
               ) : unclaimed ? (
                 <Button
                   size="sm"
-                  className="rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-sm hover:brightness-110 active:scale-95"
+                  className="rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-sm hover:bg-brand-ink active:scale-95"
                   onClick={() =>
                     nav(
                       `/bio/setup?handle=${bio.handle}${bio.kind === "business" || isStay ? "&kind=business" : ""}`,
@@ -728,7 +726,7 @@ export function BioPublicPage() {
                 <div className="flex items-center gap-1.5">
                   <Button
                     size="sm"
-                    className="gap-1.5 rounded-full bg-brand px-3.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 active:scale-95"
+                    className="gap-1.5 rounded-full bg-brand px-3.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-ink active:scale-95"
                     onClick={() => {
                       if (!requireUser("Sign in to keep the people you meet in one place.")) return;
                       upsertPerson({
@@ -821,7 +819,7 @@ export function BioPublicPage() {
               )}
               {(bio.kind === "business" || isStay) && bio.category && (
                 <span>
-                  · {bio.category === "stay" ? "🏢 Stay & Accommodation" : (BUSINESS_CATEGORIES.find((c) => c.id === bio.category)?.label || "Business")}
+                  · {bio.category === "stay" ? "Stay & Accommodation" : (BUSINESS_CATEGORIES.find((c) => c.id === bio.category)?.label || "Business")}
                 </span>
               )}
               {bio.languages && <span>· {bio.languages}</span>}
@@ -833,7 +831,7 @@ export function BioPublicPage() {
                 type="button"
                 onClick={() => isOwner && setStatusModalOpen(true)}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-full px-3.5 py-1 text-xs font-semibold border transition-all duration-200 shadow-2xs",
+                  "inline-flex min-h-[44px] items-center gap-2 rounded-full px-4 text-xs font-semibold border transition-all duration-200 shadow-2xs",
                   statusInfo.badgeBg,
                   statusInfo.textColor,
                   isOwner ? "cursor-pointer hover:brightness-95 active:scale-95" : "cursor-default",
@@ -969,7 +967,7 @@ export function BioPublicPage() {
                 <button
                   type="button"
                   onClick={() => void handleCopyInviteCode()}
-                  className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl bg-card px-3 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:bg-paper active:scale-95"
+                  className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:bg-paper active:scale-95"
                   aria-label="Copy invite code"
                 >
                   {copiedCode ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} className="text-mute" />}
@@ -978,7 +976,7 @@ export function BioPublicPage() {
                 <button
                   type="button"
                   onClick={() => void handleShareInvite()}
-                  className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95"
+                  className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3.5 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95"
                   aria-label="Share invite link"
                 >
                   <Share2 size={14} />
@@ -1020,7 +1018,7 @@ export function BioPublicPage() {
                 <button
                   type="button"
                   onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                  className="h-9 shrink-0 rounded-full bg-ink px-4 text-xs font-semibold text-white transition active:scale-95"
+                  className="min-h-[44px] shrink-0 rounded-full bg-ink px-4 text-xs font-semibold text-white transition active:scale-95"
                 >
                   Overview
                 </button>
@@ -1028,25 +1026,25 @@ export function BioPublicPage() {
                   <button
                     type="button"
                     onClick={() => document.getElementById("bio-stay")?.scrollIntoView({ behavior: "smooth" })}
-                    className="h-9 shrink-0 rounded-full bg-brand/10 px-4 text-xs font-bold text-brand ring-1 ring-brand/30 transition hover:bg-brand/15 active:scale-95"
+                    className="min-h-[44px] shrink-0 rounded-full bg-brand/10 px-4 text-xs font-bold text-brand ring-1 ring-brand/30 transition hover:bg-brand/15 active:scale-95"
                   >
-                    📖 Stay &amp; AI
+                    Stay &amp; AI
                   </button>
                 )}
                 {isStay && stayFacilities.length > 0 && (
                   <button
                     type="button"
                     onClick={() => document.getElementById("bio-facilities")?.scrollIntoView({ behavior: "smooth" })}
-                    className="h-9 shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
+                    className="min-h-[44px] shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
                   >
-                    🏢 Facilities
+                    Facilities
                   </button>
                 )}
                 {liveOffer && (
                   <button
                     type="button"
                     onClick={() => document.getElementById("bio-offers")?.scrollIntoView({ behavior: "smooth" })}
-                    className="h-9 shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
+                    className="min-h-[44px] shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
                   >
                     Offers
                   </button>
@@ -1055,7 +1053,7 @@ export function BioPublicPage() {
                   <button
                     type="button"
                     onClick={() => document.getElementById("bio-products")?.scrollIntoView({ behavior: "smooth" })}
-                    className="h-9 shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
+                    className="min-h-[44px] shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
                   >
                     Products
                   </button>
@@ -1064,7 +1062,7 @@ export function BioPublicPage() {
                   <button
                     type="button"
                     onClick={() => document.getElementById("bio-services")?.scrollIntoView({ behavior: "smooth" })}
-                    className="h-9 shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
+                    className="min-h-[44px] shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
                   >
                     Services
                   </button>
@@ -1073,7 +1071,7 @@ export function BioPublicPage() {
                   <button
                     type="button"
                     onClick={() => document.getElementById("bio-about")?.scrollIntoView({ behavior: "smooth" })}
-                    className="h-9 shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
+                    className="min-h-[44px] shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
                   >
                     About
                   </button>
@@ -1157,7 +1155,7 @@ export function BioPublicPage() {
                     <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <Link
                         href={`/stay/${stayTargetId}`}
-                        className="flex h-11 items-center justify-center gap-2 rounded-full bg-brand px-5 text-xs font-bold text-white shadow-xs transition hover:brightness-110 active:scale-95"
+                        className="flex h-11 items-center justify-center gap-2 rounded-full bg-brand px-5 text-xs font-bold text-white shadow-xs transition hover:bg-brand-ink active:scale-95"
                       >
                         <DoorOpen size={15} />
                         <span>Open Digital Compendium</span>
@@ -1431,10 +1429,10 @@ export function BioPublicPage() {
                               </div>
                               <p className="text-[11px] text-mute truncate mt-0.5">
                                 {item.type === "meeting"
-                                  ? "📅 Meeting"
+                                  ? "Meeting"
                                   : item.type === "nightout"
-                                    ? "👥 Hangout"
-                                    : "☕ Catch Up"}
+                                    ? "Hangout"
+                                    : "Catch Up"}
                                 {item.date && ` · ${item.date}`}
                                 {item.time && ` @ ${item.time}`}
                                 {item.venue && ` · ${item.venue}`}
@@ -1449,12 +1447,12 @@ export function BioPublicPage() {
                               size="sm"
                               variant="ghost"
                               label="Sync to Phone"
-                              buttonClassName="h-8 px-2.5 text-[11px] rounded-full border border-line"
+                              buttonClassName="min-h-[44px] px-4 text-xs rounded-full border border-line"
                             />
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="h-8 w-8 p-0 rounded-full text-mute hover:text-ink hover:bg-black/5"
+                              className="h-11 w-11 p-0 rounded-full text-mute hover:text-ink hover:bg-black/5"
                               onClick={() => {
                                 updateCatchUpStatus(item.id, "dismissed");
                                 setCatchUpsList((prev) => prev.filter((i) => i.id !== item.id));
@@ -1498,14 +1496,14 @@ export function BioPublicPage() {
                     setCatchUpsList(listCatchUpsForHandle(bio.handle));
                   }}
                   className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold ring-1 transition cursor-pointer active:scale-95",
+                    "inline-flex min-h-[40px] items-center gap-1.5 rounded-full px-3.5 text-[11px] font-semibold ring-1 transition cursor-pointer active:scale-95",
                     hasCatchUpReminder(bio.handle)
                       ? "bg-amber-500/15 text-amber-800 ring-amber-500/40 font-bold"
                       : "bg-card text-mute ring-line hover:text-ink hover:bg-paper",
                   )}
                   title={hasCatchUpReminder(bio.handle) ? "Catch-up reminder active" : "Set a reminder to catch up"}
                 >
-                  <span className={cn("h-1.5 w-1.5 rounded-full", hasCatchUpReminder(bio.handle) ? "bg-amber-500 animate-pulse" : "bg-mute/50")} />
+                  <span className={cn("h-1.5 w-1.5 rounded-full", hasCatchUpReminder(bio.handle) ? "bg-amber-500 motion-safe:animate-pulse" : "bg-mute/50")} />
                   <span>{hasCatchUpReminder(bio.handle) ? "Reminder on ✓" : "Remind me"}</span>
                 </button>
               </div>
@@ -1651,12 +1649,12 @@ export function BioPublicPage() {
                           size="sm"
                           variant="ghost"
                           label="Sync"
-                          buttonClassName="h-8 px-2.5 text-[11px] rounded-full border border-line"
+                          buttonClassName="min-h-[44px] px-4 text-xs rounded-full border border-line"
                         />
                         <button
                           type="button"
                           onClick={() => nav(`/e/${s.eventId}`)}
-                          className="p-1 text-mute hover:text-ink"
+                          className="grid h-11 w-11 place-items-center rounded-full text-mute hover:text-ink hover:bg-black/5"
                           aria-label="View event"
                         >
                           <ChevronRight size={18} />
@@ -1682,7 +1680,7 @@ export function BioPublicPage() {
               <h3 className="font-display mt-2.5 text-lg sm:text-xl font-bold leading-snug text-ink">{liveOffer.title}</h3>
               <p className="mt-1 text-xs sm:text-sm leading-relaxed text-mute">{liveOffer.detail}</p>
               <Button
-                className="mt-4 w-full gap-2 rounded-full bg-brand text-white shadow-sm hover:brightness-110 active:scale-[0.98]"
+                className="mt-4 w-full gap-2 rounded-full bg-brand text-white shadow-sm hover:bg-brand-ink active:scale-[0.98]"
                 onClick={() =>
                   onClaimDeal({
                     id: "live-offer",

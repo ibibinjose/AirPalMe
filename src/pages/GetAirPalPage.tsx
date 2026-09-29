@@ -91,7 +91,7 @@ const VERTICALS = [
     badge: "Brand campaigns first",
     description: "Brand campaigns and exclusive drops. Rentals open with partner brands — no peer-to-peer store until trust proves out.",
     icon: Shirt,
-    color: "bg-purple-500/10 text-purple-600 border-purple-500/20",
+    color: "bg-brand/10 text-brand border-brand/20",
   },
   {
     title: "AirPal Daily",
@@ -147,17 +147,12 @@ export function GetAirPalPage() {
   }
 
   return (
-    <div className="relative mx-auto max-w-4xl overflow-hidden px-4 py-8 md:px-6">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-32 left-1/2 h-[380px] w-[720px] -translate-x-1/2 rounded-full opacity-20 blur-3xl"
-        style={{ background: "linear-gradient(90deg,#d4af37,#2563eb)" }}
-      />
+    <div className="relative mx-auto max-w-4xl overflow-hidden px-4 py-8 pb-28 md:px-6">
       {/* Top Header Navigation */}
       <div className="relative flex items-center justify-between">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-mute transition hover:text-ink"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-sm font-semibold text-ink ring-1 ring-line transition hover:bg-paper"
         >
           <ArrowLeft size={16} /> Back to Discover
         </Link>
@@ -265,8 +260,9 @@ export function GetAirPalPage() {
             <button
               type="button"
               onClick={() => setActiveTab("ios")}
-              className={`rounded-lg px-3 py-1 text-xs font-bold transition ${
-                activeTab === "ios" ? "bg-brand text-white" : "text-mute hover:text-ink"
+              aria-pressed={activeTab === "ios"}
+              className={`inline-flex min-h-[44px] items-center rounded-lg px-4 text-xs font-bold transition ${
+                activeTab === "ios" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink"
               }`}
             >
               iPhone (Safari)
@@ -274,8 +270,9 @@ export function GetAirPalPage() {
             <button
               type="button"
               onClick={() => setActiveTab("android")}
-              className={`rounded-lg px-3 py-1 text-xs font-bold transition ${
-                activeTab === "android" ? "bg-brand text-white" : "text-mute hover:text-ink"
+              aria-pressed={activeTab === "android"}
+              className={`inline-flex min-h-[44px] items-center rounded-lg px-4 text-xs font-bold transition ${
+                activeTab === "android" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink"
               }`}
             >
               Android (Chrome)

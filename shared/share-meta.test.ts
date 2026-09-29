@@ -81,6 +81,21 @@ describe("share meta", () => {
     expect(card.image).toBe(`https://airpal.me${SHARE_DEFAULTS.image}`);
   });
 
+  it("prefers the pulse cover image over the property hero", () => {
+    const card = shareCardFor(
+      "pulse",
+      {
+        title: "How was dinner?",
+        propertyName: "Harbour Hotel",
+        imageUrl: "https://cdn/pulse-cover.jpg",
+        propertyHeroImage: "https://cdn/property-hero.jpg",
+        questions: [{}],
+      },
+      ORIGIN,
+    );
+    expect(card.image).toBe("https://cdn/pulse-cover.jpg");
+  });
+
   it("cards bios with handle and avatar", () => {
     const card = shareCardFor(
       "bio",

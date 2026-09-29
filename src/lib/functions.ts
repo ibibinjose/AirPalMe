@@ -679,7 +679,13 @@ export function submitPulseResponseRemote(data: {
   >(CALLABLES.submitPulseResponse, data);
 }
 
-export function createPulseRemote(data: { propertyId: string; template?: string; name?: string; title?: string }) {
+export function createPulseRemote(data: {
+  propertyId: string;
+  template?: string;
+  name?: string;
+  title?: string;
+  imageUrl?: string;
+}) {
   return callFunction<typeof data, { pulseId: string; status: "draft" }>(CALLABLES.createPulse, data);
 }
 

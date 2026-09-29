@@ -11,6 +11,7 @@ import {
   isPulsePublicToken,
   isValidClientKey,
   issueSummaryFromAnswers,
+  pulseImageUrlOk,
   PULSE_TEMPLATES,
   resolvePulseStatusTransition,
   scoreBucket,
@@ -117,6 +118,7 @@ export const getPulseByToken = onCall(CALLABLE, async (request) => {
     publicToken,
     name: String(pulse.name || "Pulse"),
     title: String((pulse.branding as { title?: string } | undefined)?.title || pulse.name || "How is your stay?"),
+    imageUrl: String((pulse.branding as { imageUrl?: string } | undefined)?.imageUrl || ""),
     questions: Array.isArray(pulse.questions) ? pulse.questions : [],
     logic: Array.isArray(pulse.logic) ? pulse.logic : [],
     status: "live",
@@ -377,8 +379,16 @@ export const createPulse = onCall(CALLABLE, async (request) => {
   const pulseId = `pulse_${Date.now().toString(36)}_${createPublicToken().slice(-6)}`;
   const draftName = typeof data.name === "string" && data.name.trim() ? data.name.trim().slice(0, 80) : undefined;
   const draft = createPulseTemplate(template, propertyId, uid, draftName);
-  if (typeof data.title === "string" && data.title.trim()) {
-    draft.branding = { title: data.title.trim().slice(0, 80) };
+  const customTitle = typeof data.title === "string" && data.title.trim() ? data.title.trim().slice(0, 80) : "";
+  const customImage = typeof data.imageUrl === "string" ? data.imageUrl.trim() : "";
+  if (customImage && !pulseImageUrlOk(customImage)) {
+    throw new HttpsError("invalid-argument", "Cover image must be an https URL.");
+  }
+  if (customTitle || customImage) {
+    draft.branding = {
+      title: customTitle || draft.branding?.title,
+      ...(customImage ? { imageUrl: customImage } : {}),
+    };
   }
 
   await db

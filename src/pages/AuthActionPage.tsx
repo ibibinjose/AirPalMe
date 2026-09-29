@@ -94,7 +94,7 @@ export function AuthActionPage() {
         : "Confirm email";
 
   return (
-    <div className="mx-auto max-w-md px-4 py-8">
+    <div className="mx-auto max-w-md px-4 py-8 pb-28">
       <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Account</p>
       <h1 className="font-display mt-1 text-3xl font-semibold">{title}</h1>
 
@@ -102,7 +102,7 @@ export function AuthActionPage() {
 
       {phase === "error" && (
         <>
-          <p className="mt-4 text-sm text-mute">{message}</p>
+          <p role="alert" className="mt-4 rounded-xl bg-red-500/10 p-3 text-sm font-medium text-red-700 ring-1 ring-red-500/20 dark:text-red-300">{message}</p>
           <div className="mt-6 space-y-2">
             <Button className="w-full" onClick={() => nav("/start?tab=reset")}>
               Request a new link

@@ -95,8 +95,11 @@ export function NotificationsAdminPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/admin" className="flex items-center gap-1 text-[13px] font-medium text-mute">
+    <div className="mx-auto max-w-2xl px-4 py-8 pb-28">
+      <Link
+        href="/admin"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={14} /> Admin
       </Link>
       <h1 className="font-display mt-4 flex items-center gap-2 text-2xl font-bold">
@@ -120,7 +123,7 @@ export function NotificationsAdminPage() {
             onChange={(e) => setTitle(e.target.value)}
             maxLength={80}
             placeholder="What's new in Sydney"
-            className="mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
+            className="mt-1 min-h-[48px] w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none placeholder:text-mute focus:border-brand"
           />
         </label>
         <label className="mt-2 block">
@@ -131,7 +134,7 @@ export function NotificationsAdminPage() {
             rows={3}
             maxLength={500}
             placeholder="One or two sentences. Link target below."
-            className="mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
+            className="mt-1 w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none placeholder:text-mute focus:border-brand"
           />
         </label>
         <label className="mt-2 block">
@@ -140,7 +143,7 @@ export function NotificationsAdminPage() {
             value={href}
             onChange={(e) => setHref(e.target.value)}
             placeholder="/"
-            className="mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
+            className="mt-1 min-h-[48px] w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none placeholder:text-mute focus:border-brand"
           />
         </label>
         <Button className="mt-3 w-full" disabled={!title.trim() || !body.trim() || busy !== null} onClick={() => void compose()}>
@@ -170,7 +173,7 @@ export function NotificationsAdminPage() {
                   type="button"
                   disabled={busy === b.id + "approve"}
                   onClick={() => review(b, "approve")}
-                  className="flex-1 rounded-xl bg-brand px-3 py-2 text-xs font-bold text-white disabled:opacity-50"
+                  className="flex-1 rounded-xl bg-brand px-3 py-2 min-h-[44px] text-xs font-bold text-white transition hover:bg-brand-ink active:scale-[0.99] disabled:opacity-50"
                 >
                   Approve & send
                 </button>
@@ -178,7 +181,7 @@ export function NotificationsAdminPage() {
                   type="button"
                   disabled={busy === b.id + "reject"}
                   onClick={() => review(b, "reject")}
-                  className="flex-1 rounded-xl ring-1 ring-line/15 px-3 py-2 text-xs font-bold disabled:opacity-50"
+                  className="flex-1 rounded-xl ring-1 ring-line px-3 py-2 min-h-[44px] text-xs font-bold transition hover:bg-paper active:scale-[0.99] disabled:opacity-50"
                 >
                   Reject
                 </button>

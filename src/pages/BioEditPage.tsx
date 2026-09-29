@@ -442,7 +442,7 @@ export function BioEditPage() {
         {/* Live Badge Top Right */}
         <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5">
           <span className="inline-flex items-center gap-1 rounded-full bg-black/65 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-md shadow-xs">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="h-2 w-2 rounded-full bg-emerald-400 motion-safe:animate-pulse" />
             LIVE PREVIEW
           </span>
         </div>
@@ -615,7 +615,7 @@ export function BioEditPage() {
   );
 
   return (
-    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pb-24 pb-safe pt-4">
+    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pb-28 pb-safe pt-4">
       {/* Top Header Navigation */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
         <div className="flex items-center gap-3">
@@ -877,8 +877,9 @@ export function BioEditPage() {
                         key={cat.id}
                         type="button"
                         onClick={() => setCategoryTag(cat.id)}
+                        aria-pressed={categoryTag === cat.id}
                         className={cn(
-                          "h-8 rounded-full px-3 text-xs font-medium transition active:scale-95",
+                          "inline-flex min-h-[44px] items-center rounded-full px-4 text-xs font-medium transition active:scale-95",
                           categoryTag === cat.id
                             ? isBusiness
                               ? "bg-amber-600 text-white shadow-xs"
@@ -984,8 +985,9 @@ export function BioEditPage() {
                         key={cta}
                         type="button"
                         onClick={() => setPrimaryCta(cta)}
+                        aria-pressed={primaryCta === cta}
                         className={cn(
-                          "h-8 rounded-full px-3 text-xs font-medium transition active:scale-95",
+                          "inline-flex min-h-[44px] items-center rounded-full px-4 text-xs font-medium transition active:scale-95",
                           primaryCta === cta
                             ? isBusiness
                               ? "bg-amber-600 text-white shadow-xs"
@@ -1129,8 +1131,9 @@ export function BioEditPage() {
                               setType(t.id);
                               setHref("");
                             }}
+                            aria-pressed={type === t.id}
                             className={cn(
-                              "h-9 rounded-full px-3.5 text-xs font-semibold transition active:scale-95",
+                              "inline-flex min-h-[44px] items-center rounded-full px-4 text-xs font-semibold transition active:scale-95",
                               type === t.id
                                 ? isBusiness
                                   ? "bg-amber-600 text-white shadow-xs"
@@ -1157,8 +1160,9 @@ export function BioEditPage() {
                               setType(t.id);
                               setHref("");
                             }}
+                            aria-pressed={type === t.id}
                             className={cn(
-                              "h-9 rounded-full px-3.5 text-xs font-semibold transition active:scale-95",
+                              "inline-flex min-h-[44px] items-center rounded-full px-4 text-xs font-semibold transition active:scale-95",
                               type === t.id
                                 ? isBusiness
                                   ? "bg-amber-600 text-white shadow-xs"
@@ -1226,7 +1230,7 @@ export function BioEditPage() {
                         className="h-12 flex-1 bg-transparent px-3 text-sm outline-none placeholder:text-mute/60"
                       />
 
-                      <Button type="submit" size="sm" className="m-1.5 h-9 shrink-0 px-4 font-semibold">
+                      <Button type="submit" size="sm" className="m-1.5 min-h-[44px] shrink-0 px-4 font-semibold">
                         Add Link
                       </Button>
                     </div>
