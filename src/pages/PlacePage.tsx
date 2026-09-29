@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useRoute, useLocation } from "wouter";
 import { ArrowLeft, Plus, Share2 } from "lucide-react";
 import { getPlace, withWalk } from "@/lib/catalog";
+import { getListedPlaceById } from "@/lib/listings";
 import { shareContent } from "@/lib/share";
 import { handleOfPlace } from "@/lib/bio-handle";
 import { bioPath } from "@shared/bio";
@@ -32,7 +33,7 @@ export function PlacePage() {
   const { now, timeZone, here } = useLocalNow();
   const { t } = useLocale();
   const [tripOpen, setTripOpen] = useState(false);
-  const place = getPlace(params?.id || "");
+  const place = getPlace(params?.id || "") || getListedPlaceById(params?.id || "");
   if (!place && !remoteLoaded) {
     return <PageLoading />;
   }

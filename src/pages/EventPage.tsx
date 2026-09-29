@@ -29,7 +29,16 @@ import { HereCheckIn } from "@/components/circle/HereCheckIn";
 export function EventPage() {
   const [, params] = useRoute("/e/:id");
   const id = params?.id || "";
-  const { getEvent: getExpo, calendarEvents, remoteNearby, remoteLoaded, fetchRemoteStalls } = useEvents();
+  const {
+    getEvent: getExpo,
+    calendarEvents,
+    remoteNearby,
+    remoteLoaded,
+    fetchRemoteStalls,
+    fetchRemoteEvent,
+  } = useEvents();
+  const [directEv, setDirectEv] = useState<CalendarEvent | null>(null);
+  const [directDone, setDirectDone] = useState(false);
 
   useEffect(() => {
     if (id) void fetchRemoteStalls(id);
@@ -40,16 +49,34 @@ export function EventPage() {
   // Migrated curated events live in Firestore, not in the bundle.
   const near = remoteNearby.find((e) => e.id === id);
 
+  // Direct by-id fallback for deep links the list fetch skipped (demo docs).
+  // Renders the exact same detail view as live content.
+  useEffect(() => {
+    setDirectEv(null);
+    setDirectDone(false);
+    if (!id || expo || calEv || near || !remoteLoaded) return;
+    let alive = true;
+    void fetchRemoteEvent(id).then((base) => {
+      if (!alive) return;
+      if (base) setDirectEv(base);
+      setDirectDone(true);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [id, expo, calEv, near, remoteLoaded, fetchRemoteEvent]);
+
   // A context_view with loadStatus "ok" already fired for /e/:id — pair it
   // with context_load_failed when nothing resolves, or the miss reads as a hit.
   const loadFailed = useRef("");
   useEffect(() => {
-    if (!remoteLoaded || expo || calEv || near || !id || loadFailed.current === id) return;
+    if (!remoteLoaded || !directDone || expo || calEv || near || directEv || !id || loadFailed.current === id)
+      return;
     loadFailed.current = id;
     void track("context_load_failed", { contextType: "event", contextId: id, errorClass: "not_found" });
-  }, [remoteLoaded, expo, calEv, near, id]);
+  }, [remoteLoaded, directDone, expo, calEv, near, directEv, id]);
 
-  if (!remoteLoaded) {
+  if (!remoteLoaded || (!expo && !calEv && !near && !directEv && !directDone)) {
     return <PageLoading />;
   }
 
@@ -58,6 +85,8 @@ export function EventPage() {
   if (calEv) return <CalendarEventDetailView event={calEv} />;
 
   if (near) return <NearbyEventDetailView event={near} />;
+
+  if (directEv) return <CalendarEventDetailView event={directEv} />;
   return <NotFoundPage />;
 }
 

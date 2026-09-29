@@ -51,6 +51,26 @@ export function listedPlaces(): NearbyPlace[] {
     .map(listingToPlace);
 }
 
+/**
+ * By-id lookup over the raw cache, bypassing discovery filters. Detail
+ * pages fall back to this so direct links — including demo docs — resolve
+ * through the exact same view as live content. Predicate mirrors
+ * catalog.getPlace.
+ */
+export function getListedPlaceById(id: string): NearbyPlace | undefined {
+  const norm = id.trim().toLowerCase();
+  const withoutList = norm.replace(/^list-/, "");
+  return getCachedListings()
+    .map(listingToPlace)
+    .find(
+      (p) =>
+        p.id.toLowerCase() === norm ||
+        p.handle?.toLowerCase() === norm ||
+        p.id.toLowerCase() === withoutList ||
+        p.id.toLowerCase() === `pl-${withoutList}`,
+    );
+}
+
 export function upsertCachedListing(listing: BusinessListing) {
   const rows = getCachedListings();
   const next = [listing, ...rows.filter((row) => row.id !== listing.id && row.placeId !== listing.placeId)];
