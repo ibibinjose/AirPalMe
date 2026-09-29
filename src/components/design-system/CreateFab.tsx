@@ -30,9 +30,15 @@ interface CreateOption {
   icon: typeof CalendarPlus;
   colorClass: string;
   badge?: string;
+  group: "you" | "business";
 }
 
-const CREATE_OPTIONS: CreateOption[] = [
+export const CREATE_GROUPS = [
+  { id: "you", label: "For you" },
+  { id: "business", label: "For business" },
+] as const;
+
+export const CREATE_OPTIONS: CreateOption[] = [
   {
     id: "plan",
     title: "Make a Plan",
@@ -41,6 +47,7 @@ const CREATE_OPTIONS: CreateOption[] = [
     icon: CalendarPlus,
     colorClass: "bg-brand/10 text-brand ring-brand/20",
     badge: "Popular",
+    group: "you",
   },
   {
     id: "mate",
@@ -49,6 +56,7 @@ const CREATE_OPTIONS: CreateOption[] = [
     href: "/mate/request",
     icon: Users,
     colorClass: "bg-emerald-500/10 text-emerald-600 ring-emerald-500/20",
+    group: "you",
   },
   {
     id: "event",
@@ -57,6 +65,7 @@ const CREATE_OPTIONS: CreateOption[] = [
     href: "/event/new",
     icon: Ticket,
     colorClass: "bg-amber-500/10 text-amber-600 ring-amber-500/20",
+    group: "business",
   },
   {
     id: "pulse",
@@ -65,6 +74,7 @@ const CREATE_OPTIONS: CreateOption[] = [
     href: "/pulse",
     icon: Sparkles,
     colorClass: "bg-rose-500/10 text-rose-600 ring-rose-500/20",
+    group: "business",
   },
   {
     id: "scan",
@@ -73,6 +83,7 @@ const CREATE_OPTIONS: CreateOption[] = [
     href: "/scan",
     icon: QrCode,
     colorClass: "bg-purple-500/10 text-purple-600 ring-purple-500/20",
+    group: "you",
   },
   {
     id: "partner",
@@ -81,6 +92,7 @@ const CREATE_OPTIONS: CreateOption[] = [
     href: "/create",
     icon: Building2,
     colorClass: "bg-slate-500/10 text-slate-700 ring-slate-500/20",
+    group: "business",
   },
 ];
 
@@ -229,43 +241,52 @@ export function CreateFab() {
 
               {/* Action Cards List */}
               <div className="mt-4 grid gap-2.5">
-                {CREATE_OPTIONS.map((opt) => {
-                  const Icon = opt.icon;
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => handleSelect(opt.href)}
-                      className="group flex w-full items-center gap-3.5 rounded-2xl bg-paper/60 p-3.5 text-left ring-1 ring-line/70 transition-all duration-150 hover:bg-card hover:ring-brand/40 hover:shadow-xs active:scale-[0.99] cursor-pointer"
-                    >
-                      <span
-                        className={cn(
-                          "grid h-11 w-11 shrink-0 place-items-center rounded-xl ring-1 transition-transform group-hover:scale-105",
-                          opt.colorClass,
-                        )}
-                      >
-                        <Icon size={20} strokeWidth={2} />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-display text-base font-bold text-ink group-hover:text-brand transition-colors">
-                            {opt.title}
-                          </span>
-                          {opt.badge && (
-                            <span className="text-[11px] font-bold text-brand">
-                              · {opt.badge}
+                {CREATE_GROUPS.map((group) => (
+                  <div key={group.id}>
+                    <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-mute">
+                      {group.label}
+                    </p>
+                    <div className="grid gap-2.5">
+                      {CREATE_OPTIONS.filter((opt) => opt.group === group.id).map((opt) => {
+                        const Icon = opt.icon;
+                        return (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => handleSelect(opt.href)}
+                            className="group flex w-full items-center gap-3.5 rounded-2xl bg-paper/60 p-3.5 text-left ring-1 ring-line/70 transition-all duration-150 hover:bg-card hover:ring-brand/40 hover:shadow-xs active:scale-[0.99] cursor-pointer"
+                          >
+                            <span
+                              className={cn(
+                                "grid h-11 w-11 shrink-0 place-items-center rounded-xl ring-1 transition-transform group-hover:scale-105",
+                                opt.colorClass,
+                              )}
+                            >
+                              <Icon size={20} strokeWidth={2} />
                             </span>
-                          )}
-                        </div>
-                        <p className="text-xs text-mute truncate mt-0.5">{opt.subtitle}</p>
-                      </div>
-                      <ChevronRight
-                        size={16}
-                        className="text-mute/60 group-hover:text-brand group-hover:translate-x-0.5 transition-all shrink-0"
-                      />
-                    </button>
-                  );
-                })}
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-display text-base font-bold text-ink group-hover:text-brand transition-colors">
+                                  {opt.title}
+                                </span>
+                                {opt.badge && (
+                                  <span className="text-[11px] font-bold text-brand">
+                                    · {opt.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-mute truncate mt-0.5">{opt.subtitle}</p>
+                            </div>
+                            <ChevronRight
+                              size={16}
+                              className="text-mute/60 group-hover:text-brand group-hover:translate-x-0.5 transition-all shrink-0"
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
 
               {/* Footer Hub Link */}

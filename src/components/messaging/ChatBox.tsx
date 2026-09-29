@@ -106,7 +106,8 @@ export function ChatBox({
         // Read state: mark others' messages seen.
         if (!readOnly && user && db) {
           for (const m of list) {
-            if (m.senderUid !== user.uid && !m.readBy.includes(user.uid)) {
+            const readBy = Array.isArray(m.readBy) ? m.readBy : [];
+            if (m.senderUid !== user.uid && !readBy.includes(user.uid)) {
               void updateDoc(doc(db, "request_chats", requestId, "messages", m.id), {
                 readBy: arrayUnion(user.uid),
               }).catch(() => undefined);
@@ -177,8 +178,13 @@ export function ChatBox({
         },
       ]);
       setDraft("");
-    } catch {
-      setError("Couldn't send. Check your connection and try again.");
+    } catch (err) {
+      const code = (err as { code?: string } | null)?.code || "";
+      setError(
+        code === "permission-denied"
+          ? "You can't message here anymore — this match may have ended."
+          : "Couldn't send. Check your connection and try again.",
+      );
     } finally {
       setBusy(false);
     }
@@ -228,6 +234,8 @@ export function ChatBox({
         )}
         {messages.map((m) => {
           const mine = user ? m.senderUid === user.uid : false;
+          const readBy = Array.isArray(m.readBy) ? m.readBy : [];
+          const stamp = typeof m.createdAt === "string" ? m.createdAt.slice(11, 16) : "";
           return (
             <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
               <div
@@ -237,7 +245,7 @@ export function ChatBox({
               >
                 <p>{m.text}</p>
                 <p className={`mt-0.5 text-[10px] ${mine ? "text-white/70" : "text-mute"}`}>
-                  {m.createdAt.slice(11, 16)} {mine && m.readBy.length > 1 ? "· seen" : ""}
+                  {stamp} {mine && readBy.length > 1 ? "· seen" : ""}
                 </p>
               </div>
             </div>

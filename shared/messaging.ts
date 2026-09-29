@@ -45,6 +45,9 @@ export interface UniversalConversation {
   isAiEnabled?: boolean;
 }
 
+/** Local delivery state. Absent = legacy cached message, treated as sent. */
+export type ChatMessageSync = "local" | "sent" | "failed";
+
 export interface UniversalChatMessage {
   id: string;
   conversationId: string;
@@ -57,6 +60,7 @@ export interface UniversalChatMessage {
   readBy: string[];
   createdAt: string;
   updatedAt?: string;
+  sync?: ChatMessageSync;
 }
 
 export const MESSAGE_MAX = 1000;

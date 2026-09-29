@@ -158,3 +158,8 @@ export async function markNotificationRead(id: string) {
     /* offline or already read */
   }
 }
+
+/** Bulk mark-read for inbox segments. Each write is idempotent; failures stay unread. */
+export async function markAllNotificationsRead(ids: string[]) {
+  await Promise.all(ids.map((id) => markNotificationRead(id)));
+}

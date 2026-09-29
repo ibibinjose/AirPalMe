@@ -1,5 +1,5 @@
 import {
-  addDoc,
+  arrayUnion,
   collection,
   doc,
   limit,
@@ -12,32 +12,167 @@ import {
   where,
 } from "firebase/firestore";
 import { getFirebaseDb, isFirebaseConfigured } from "./firebase";
+import { askAirPalRemote } from "./functions";
 import type {
   ChatParticipant,
   ConversationType,
   UniversalChatMessage,
   UniversalConversation,
 } from "@shared/messaging";
-import { messageValid } from "@shared/messaging";
+import { MESSAGE_MAX, messageValid } from "@shared/messaging";
 import { getCachedProperty } from "./properties";
 import { CURRENT_PROPERTY } from "@shared/airpal-data";
 
 const CONV_CACHE_KEY = "airpal.universal_conversations.v1";
 const MSG_CACHE_KEY = "airpal.universal_messages.v1";
 
-function readLocal<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return fallback;
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
+/** Send failure with a machine-readable code so views show honest errors. */
+export class ChatSendError extends Error {
+  code: "invalid" | "offline" | "denied" | "unknown";
+  constructor(code: "invalid" | "offline" | "denied" | "unknown", message: string) {
+    super(message);
+    this.code = code;
   }
 }
 
-function writeLocal<T>(key: string, data: T): void {
+export function sendErrorText(code: ChatSendError["code"]): string {
+  switch (code) {
+    case "invalid":
+      return `Write something first — messages run 1 to ${MESSAGE_MAX} characters.`;
+    case "offline":
+      return "Couldn't reach AirPal — your message is kept here. Tap to retry.";
+    case "denied":
+      return "Sign in to sync this chat across devices.";
+    case "unknown":
+      return "Couldn't send. Check your connection and try again.";
+  }
+}
+
+function sendErrorCode(err: unknown): ChatSendError["code"] {
+  const code = (err as { code?: string } | null)?.code || "";
+  if (code === "permission-denied" || code === "functions/permission-denied") return "denied";
+  if (code === "unavailable" || code === "functions/unavailable") return "offline";
+  return "unknown";
+}
+
+// ---------------------------------------------------------------------------
+// Guarded storage: validates shapes, self-heals corrupt keys, and falls back
+// to memory when localStorage is missing (SSR/tests) or blocked (private mode).
+// ---------------------------------------------------------------------------
+
+type StorageBackend = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+
+const memoryBackend = new Map<string, string>();
+
+function backend(): StorageBackend {
   try {
-    localStorage.setItem(key, JSON.stringify(data));
+    if (typeof localStorage !== "undefined") {
+      localStorage.getItem("__airpal_probe");
+      return localStorage;
+    }
+  } catch {
+    /* fall through to memory */
+  }
+  return {
+    getItem: (k) => (memoryBackend.has(k) ? memoryBackend.get(k)! : null),
+    setItem: (k, v) => {
+      memoryBackend.set(k, v);
+    },
+    removeItem: (k) => {
+      memoryBackend.delete(k);
+    },
+  };
+}
+
+/** Test-only: clear the memory fallback so chat tests start clean. */
+export function __resetChatMemoryForTests(): void {
+  memoryBackend.clear();
+}
+
+/** Test-only: seed raw storage to prove corrupt-cache recovery. */
+export function __seedChatMemoryForTests(key: string, raw: string): void {
+  memoryBackend.set(key, raw);
+}
+
+function isMessageLike(value: unknown): value is UniversalChatMessage {
+  if (!value || typeof value !== "object") return false;
+  const m = value as Record<string, unknown>;
+  return (
+    typeof m.id === "string" &&
+    typeof m.conversationId === "string" &&
+    typeof m.senderUid === "string" &&
+    typeof m.text === "string"
+  );
+}
+
+/** Coerce unknown JSON to a message list; drops malformed rows, never throws. */
+export function asMessageList(value: unknown): UniversalChatMessage[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter(isMessageLike);
+}
+
+/** Coerce unknown JSON to a conversation map; drops malformed rows. */
+export function asConvMap(value: unknown): Record<string, UniversalConversation> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const out: Record<string, UniversalConversation> = {};
+  for (const [id, conv] of Object.entries(value as Record<string, unknown>)) {
+    if (conv && typeof conv === "object" && typeof (conv as { id?: unknown }).id === "string") {
+      out[id] = conv as UniversalConversation;
+    }
+  }
+  return out;
+}
+
+function readConvs(): Record<string, UniversalConversation> {
+  try {
+    const raw = backend().getItem(CONV_CACHE_KEY);
+    if (!raw) return {};
+    return asConvMap(JSON.parse(raw));
+  } catch {
+    try {
+      backend().removeItem(CONV_CACHE_KEY);
+    } catch {
+      /* ignore */
+    }
+    return {};
+  }
+}
+
+function readMsgs(convId: string): UniversalChatMessage[] {
+  try {
+    const raw = backend().getItem(MSG_CACHE_KEY);
+    if (!raw) return [];
+    const all = JSON.parse(raw) as Record<string, unknown>;
+    if (!all || typeof all !== "object" || Array.isArray(all)) return [];
+    return asMessageList(all[convId]);
+  } catch {
+    return [];
+  }
+}
+
+function writeMsgs(convId: string, list: UniversalChatMessage[]): void {
+  try {
+    const store = backend();
+    let all: Record<string, unknown> = {};
+    try {
+      const raw = store.getItem(MSG_CACHE_KEY);
+      const parsed: unknown = raw ? JSON.parse(raw) : {};
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        all = parsed as Record<string, unknown>;
+      }
+    } catch {
+      all = {};
+    }
+    all[convId] = list;
+    store.setItem(MSG_CACHE_KEY, JSON.stringify(all));
+  } catch {
+    /* quota: session continues in memory listeners */
+  }
+}
+
+function writeConvs(all: Record<string, UniversalConversation>): void {
+  try {
+    backend().setItem(CONV_CACHE_KEY, JSON.stringify(all));
   } catch {
     /* ignore storage quota */
   }
@@ -98,8 +233,9 @@ function getInitialGreeting(type: ConversationType, title: string, targetId?: st
 
 /** Get all locally stored conversations synchronously */
 export function getLocalConversations(): UniversalConversation[] {
-  const allConvs = readLocal<Record<string, UniversalConversation>>(CONV_CACHE_KEY, {});
-  return Object.values(allConvs).sort((a, b) => (b.lastMessageAt || "").localeCompare(a.lastMessageAt || ""));
+  return Object.values(readConvs()).sort((a, b) =>
+    (b.lastMessageAt || "").localeCompare(a.lastMessageAt || ""),
+  );
 }
 
 /** Synchronously create or retrieve conversation record */
@@ -129,7 +265,7 @@ export function createConversationRecord({
   peerPhoto?: string;
 }): UniversalConversation {
   const convId = buildConversationId(type, targetId, userUid, peerUid);
-  const allConvs = readLocal<Record<string, UniversalConversation>>(CONV_CACHE_KEY, {});
+  const allConvs = readConvs();
   if (allConvs[convId]) return allConvs[convId];
 
   const participants: ChatParticipant[] = [
@@ -172,7 +308,7 @@ export function createConversationRecord({
   };
 
   allConvs[convId] = conv;
-  writeLocal(CONV_CACHE_KEY, allConvs);
+  writeConvs(allConvs);
   notifyConvListeners();
 
   return conv;
@@ -222,7 +358,7 @@ export async function getOrCreateConversation({
     });
   }
 
-  const allConvs = readLocal<Record<string, UniversalConversation>>(CONV_CACHE_KEY, {});
+  const allConvs = readConvs();
   const existing = allConvs[convId];
 
   const now = new Date().toISOString();
@@ -245,12 +381,11 @@ export async function getOrCreateConversation({
   };
 
   allConvs[convId] = conv;
-  writeLocal(CONV_CACHE_KEY, allConvs);
+  writeConvs(allConvs);
   notifyConvListeners();
 
   // If new, seed the first welcome message in message cache
-  const allMsgs = readLocal<Record<string, UniversalChatMessage[]>>(MSG_CACHE_KEY, {});
-  if (!allMsgs[convId] || allMsgs[convId].length === 0) {
+  if (readMsgs(convId).length === 0) {
     const welcomeMsg: UniversalChatMessage = {
       id: `welcome-${Date.now()}`,
       conversationId: convId,
@@ -276,13 +411,13 @@ export async function getOrCreateConversation({
             : undefined,
       readBy: [currentUser.uid],
       createdAt: now,
+      sync: "local",
     };
-    allMsgs[convId] = [welcomeMsg];
-    writeLocal(MSG_CACHE_KEY, allMsgs);
-    notifyMsgListeners(convId, allMsgs[convId]);
+    writeMsgs(convId, [welcomeMsg]);
+    notifyMsgListeners(convId, [welcomeMsg]);
   }
 
-  // Sync to Firestore in background
+  // Sync to Firestore in background (best effort — guests stay local-only).
   const db = getFirebaseDb();
   if (db && isFirebaseConfigured) {
     void setDoc(
@@ -298,23 +433,57 @@ export async function getOrCreateConversation({
   return conv;
 }
 
-/** Send a universal chat message with optional AI auto-response */
+function newMessageId(): string {
+  return `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function updateConvSummary(
+  conversationId: string,
+  patch: Partial<UniversalConversation>,
+): UniversalConversation | null {
+  const allConvs = readConvs();
+  const conv = allConvs[conversationId];
+  if (!conv) return null;
+  const next = { ...conv, ...patch };
+  allConvs[conversationId] = next;
+  writeConvs(allConvs);
+  notifyConvListeners();
+  return next;
+}
+
+function upsertLocalMessage(msg: UniversalChatMessage): UniversalChatMessage[] {
+  const list = readMsgs(msg.conversationId);
+  const idx = list.findIndex((m) => m.id === msg.id);
+  const next = idx >= 0 ? list.map((m, i) => (i === idx ? msg : m)) : [...list, msg];
+  next.sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || ""));
+  writeMsgs(msg.conversationId, next);
+  notifyMsgListeners(msg.conversationId, next);
+  return next;
+}
+
+/**
+ * Send a message. The local echo always lands first (when valid) so the UI
+ * never eats input; Firestore sync is awaited for signed-in members and its
+ * outcome is stamped on the message (sent / failed) instead of vanishing.
+ * Guests stay local-only — no doomed writes, no fake errors.
+ */
 export async function sendUniversalMessage(
   conversationId: string,
   text: string,
   sender: { uid: string; name: string; photo?: string },
   options?: {
     isAi?: boolean;
-    propertyContext?: any;
+    /** Signed-in members sync; guests stay local-only. Defaults to true. */
+    sync?: boolean;
   },
 ): Promise<UniversalChatMessage> {
   if (!messageValid(sender.uid, text)) {
-    throw new Error("Invalid message content");
+    throw new ChatSendError("invalid", sendErrorText("invalid"));
   }
 
   const now = new Date().toISOString();
-  const newMsg: UniversalChatMessage = {
-    id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+  const msg: UniversalChatMessage = {
+    id: newMessageId(),
     conversationId,
     senderUid: sender.uid,
     senderName: sender.name,
@@ -323,139 +492,254 @@ export async function sendUniversalMessage(
     isAi: options?.isAi || false,
     readBy: [sender.uid],
     createdAt: now,
+    sync: "local",
   };
-
-  // 1. Update local messages cache
-  const allMsgs = readLocal<Record<string, UniversalChatMessage[]>>(MSG_CACHE_KEY, {});
-  const currentList = allMsgs[conversationId] || [];
-  const updatedList = [...currentList, newMsg];
-  allMsgs[conversationId] = updatedList;
-  writeLocal(MSG_CACHE_KEY, allMsgs);
-  notifyMsgListeners(conversationId, updatedList);
-
-  // 2. Update local conversation summary
-  const allConvs = readLocal<Record<string, UniversalConversation>>(CONV_CACHE_KEY, {});
-  const conv = allConvs[conversationId];
-  if (conv) {
-    conv.lastMessage = newMsg.text;
-    conv.lastSenderUid = sender.uid;
-    conv.lastMessageAt = now;
-    conv.updatedAt = now;
-    allConvs[conversationId] = conv;
-    writeLocal(CONV_CACHE_KEY, allConvs);
-    notifyConvListeners();
-  }
-
-  // 3. Firestore persistence
-  const db = getFirebaseDb();
-  if (db && isFirebaseConfigured) {
-    void addDoc(collection(db, "conversations", conversationId, "messages"), {
-      ...newMsg,
-      createdAt: now,
-      serverTime: serverTimestamp(),
-    }).catch(() => undefined);
-
-    void updateDoc(doc(db, "conversations", conversationId), {
-      lastMessage: newMsg.text,
-      lastSenderUid: sender.uid,
-      lastMessageAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    }).catch(() => undefined);
-  }
-
-  // 4. Trigger AirPal AI intelligent reply if applicable
-  if (conv && (conv.type === "ai" || conv.isAiEnabled || conv.type === "stay")) {
-    const isAiTarget = conv.type === "ai" || text.toLowerCase().includes("@airpal") || conv.type === "stay";
-    if (isAiTarget && sender.uid !== "airpal-ai") {
-      void triggerAirPalAiReply(conversationId, text, options?.propertyContext);
+  upsertLocalMessage(msg);
+  {
+    const conv = readConvs()[conversationId];
+    const unreadCount = { ...(conv?.unreadCount || {}) };
+    for (const uid of conv?.participantUids || []) {
+      if (uid !== sender.uid && uid !== "airpal-ai") unreadCount[uid] = (unreadCount[uid] || 0) + 1;
     }
+    updateConvSummary(conversationId, {
+      lastMessage: msg.text,
+      lastSenderUid: sender.uid,
+      lastMessageAt: now,
+      updatedAt: now,
+      unreadCount,
+    });
   }
 
-  return newMsg;
+  const db = getFirebaseDb();
+  if (!db || !isFirebaseConfigured || options?.sync === false) return msg;
+
+  try {
+    await setDoc(doc(db, "conversations", conversationId, "messages", msg.id), {
+      id: msg.id,
+      conversationId,
+      senderUid: sender.uid,
+      senderName: sender.name,
+      senderPhoto: sender.photo || null,
+      text: msg.text,
+      isAi: false,
+      readBy: [sender.uid],
+      createdAt: now,
+    });
+    const summary = readConvs()[conversationId];
+    try {
+      await updateDoc(doc(db, "conversations", conversationId), {
+        lastMessage: msg.text,
+        lastSenderUid: sender.uid,
+        lastMessageAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        ...(summary?.unreadCount ? { unreadCount: summary.unreadCount } : {}),
+      });
+    } catch {
+      // Shell may not exist remotely yet — recreate it from the cached shape.
+      const conv = readConvs()[conversationId];
+      if (conv) {
+        await setDoc(
+          doc(db, "conversations", conversationId),
+          {
+            ...conv,
+            lastMessage: msg.text,
+            lastSenderUid: sender.uid,
+            lastMessageAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true },
+        );
+      }
+    }
+  } catch (err) {
+    const code = sendErrorCode(err);
+    upsertLocalMessage({ ...msg, sync: "failed" });
+    throw new ChatSendError(code, sendErrorText(code));
+  }
+  const sent = { ...msg, sync: "sent" as const };
+  upsertLocalMessage(sent);
+  return sent;
 }
 
-/** AirPal AI intelligent response generator */
-async function triggerAirPalAiReply(conversationId: string, userText: string, propertyContext?: any) {
-  // Realistic instant AI typing delay
-  await new Promise((resolve) => setTimeout(resolve, 600));
-
-  const lower = userText.toLowerCase();
-  let aiText = "";
-  let suggestedActions: UniversalChatMessage["suggestedActions"] = undefined;
-
-  const prop = propertyContext || CURRENT_PROPERTY;
-
-  if (lower.includes("wifi") || lower.includes("wi-fi") || lower.includes("password") || lower.includes("internet")) {
-    aiText = `Here are the Wi-Fi details for ${prop.name}:\n• Network: ${prop.wifi?.network || "Guest_HighSpeed"}\n• Speed: ${prop.wifi?.speed || "250 Mbps Fibre"}\n• Password: Tap below to copy or connect automatically!`;
-    suggestedActions = [
-      { label: "📋 Copy Wi-Fi Details", action: "copy_wifi" },
-      { label: "🛎️ Contact Front Desk", action: "contact_desk" },
-    ];
-  } else if (lower.includes("towel") || lower.includes("pillow") || lower.includes("clean") || lower.includes("housekeep")) {
-    aiText = `I've noted your request for housekeeping! I'll dispatch a priority ticket directly to our housekeeping team right away.`;
-    suggestedActions = [
-      { label: "✅ Confirm Request", action: "confirm_towels" },
-      { label: "📦 In-Room Dining", action: "open_dining" },
-    ];
-  } else if (lower.includes("food") || lower.includes("dinner") || lower.includes("eat") || lower.includes("menu") || lower.includes("breakfast") || lower.includes("hungry")) {
-    aiText = `You can order directly to your room from our In-Room Dining menu, or explore curated restaurants in The Rocks & Sydney Harbour! Breakfast is served daily from 6:30 AM – 10:30 AM in the Ground Floor Atrium.`;
-    suggestedActions = [
-      { label: "🍽️ View Dining Menu", action: "open_dining" },
-      { label: "☕ Specialty Cafés Nearby", action: "nearby_coffee" },
-    ];
-  } else if (lower.includes("pool") || lower.includes("gym") || lower.includes("sauna") || lower.includes("facility") || lower.includes("facilities")) {
-    aiText = `Here are our main amenities at ${prop.name}:\n• Rooftop Plunge Pool: Level 7 (6:00 AM – 10:00 PM)\n• Fitness Centre & Sauna: Level 2 (24 Hours with Keycard)\n• The Rocks Cellar Bar: Ground Floor (4:00 PM – 11:30 PM)\n• Luggage Storage: Lobby (24/7 Front Desk)`;
-    suggestedActions = [
-      { label: "🏊 View Pool Details", action: "pool" },
-      { label: "🏋️ View Gym Details", action: "gym" },
-    ];
-  } else if (lower.includes("checkout") || lower.includes("check out") || lower.includes("leave")) {
-    aiText = `Standard check-out is at 10:00 AM. You can use our Express Check-Out in the digital compendium to review your folio, book a taxi, and store your luggage complimentary at the lobby front desk!`;
-    suggestedActions = [
-      { label: "🕒 Request Late Checkout", action: "late_checkout" },
-      { label: "🧳 Luggage Storage", action: "luggage" },
-    ];
-  } else {
-    aiText = `Got it! I'm on it. Whether you need in-room assistance, curated recommendations around Sydney, or want to connect with a local AirPal mate, I'm here 24/7 to make it easy.`;
-    suggestedActions = [
-      { label: "📖 Digital Compendium", action: "compendium" },
-      { label: "🗺️ Explore Guide", action: "guide" },
-      { label: "🤝 Find an AirPal Mate", action: "mate" },
-    ];
+/** Retry a failed message. No-op for anything already sent or local-only. */
+export async function retryMessage(conversationId: string, messageId: string): Promise<void> {
+  const msg = readMsgs(conversationId).find((m) => m.id === messageId);
+  if (!msg || msg.sync !== "failed") return;
+  const db = getFirebaseDb();
+  if (!db || !isFirebaseConfigured) {
+    throw new ChatSendError("offline", sendErrorText("offline"));
   }
+  try {
+    await setDoc(doc(db, "conversations", conversationId, "messages", msg.id), {
+      id: msg.id,
+      conversationId,
+      senderUid: msg.senderUid,
+      senderName: msg.senderName,
+      senderPhoto: msg.senderPhoto || null,
+      text: msg.text,
+      isAi: false,
+      readBy: msg.readBy,
+      createdAt: msg.createdAt,
+    });
+    upsertLocalMessage({ ...msg, sync: "sent" });
+  } catch (err) {
+    const code = sendErrorCode(err);
+    throw new ChatSendError(code, sendErrorText(code));
+  }
+}
 
+/**
+ * Mark a conversation read by uid: local state plus best-effort remote
+ * readBy unions (rules allow readBy-only updates). Never throws — read
+ * state must not break the chat.
+ */
+export function markConversationRead(conversationId: string, uid: string): void {
+  if (!uid) return;
+  const list = readMsgs(conversationId);
+  let changed = false;
+  const next = list.map((m) => {
+    if (m.senderUid !== uid && !m.readBy.includes(uid)) {
+      changed = true;
+      return { ...m, readBy: [...m.readBy, uid] };
+    }
+    return m;
+  });
+  if (changed) {
+    writeMsgs(conversationId, next);
+    notifyMsgListeners(conversationId, next);
+  }
+  const db = getFirebaseDb();
+  if (!db || !isFirebaseConfigured) return;
+  for (const m of list) {
+    if (m.senderUid !== uid && !m.readBy.includes(uid) && !m.id.startsWith("welcome-")) {
+      void updateDoc(doc(db, "conversations", conversationId, "messages", m.id), {
+        readBy: arrayUnion(uid),
+      }).catch(() => undefined);
+    }
+  }
+  const allConvs = readConvs();
+  const conv = allConvs[conversationId];
+  if (conv?.unreadCount?.[uid]) {
+    updateConvSummary(conversationId, { unreadCount: { ...conv.unreadCount, [uid]: 0 } });
+  }
+}
+
+/**
+ * Merge remote snapshots over local state. Union by id (remote wins ties),
+ * legacy local echoes that match a server copy by content collapse into it,
+ * local-only and failed rows always survive. Sorted oldest-first.
+ */
+export function mergeMessages(
+  local: UniversalChatMessage[],
+  remote: UniversalChatMessage[],
+): UniversalChatMessage[] {
+  const byId: Record<string, UniversalChatMessage> = {};
+  for (const m of local) {
+    if (m && m.id) byId[m.id] = m;
+  }
+  const remoteKeys: Record<string, boolean> = {};
+  for (const m of remote) {
+    if (m && m.id) remoteKeys[`${m.senderUid}|${m.text}|${m.createdAt}`] = true;
+  }
+  // Legacy echoes (client random ids) collapse into their server copies.
+  for (const id of Object.keys(byId)) {
+    const m = byId[id];
+    if (m.sync !== "failed" && remoteKeys[`${m.senderUid}|${m.text}|${m.createdAt}`]) {
+      const serverCopy = remote.find(
+        (r) => r.senderUid === m.senderUid && r.text === m.text && r.createdAt === m.createdAt,
+      );
+      if (serverCopy && serverCopy.id !== id) delete byId[id];
+    }
+  }
+  for (const m of remote) {
+    if (m && m.id) byId[m.id] = m;
+  }
+  return Object.keys(byId)
+    .map((id) => byId[id])
+    .sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || ""));
+}
+
+function appendAiMessage(
+  conversationId: string,
+  text: string,
+  suggestedActions?: UniversalChatMessage["suggestedActions"],
+): UniversalChatMessage {
+  // Rules pin senderUid to the caller, so assistant replies are local-only by
+  // necessity — merge keeps them across snapshots.
   const now = new Date().toISOString();
-  const aiMsg: UniversalChatMessage = {
-    id: `ai-${Date.now()}`,
+  const msg: UniversalChatMessage = {
+    id: `ai-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     conversationId,
     senderUid: "airpal-ai",
     senderName: "AirPal AI",
     senderPhoto: AIRPAL_AI_PARTICIPANT.photo,
-    text: aiText,
+    text,
     isAi: true,
     suggestedActions,
     readBy: [],
     createdAt: now,
+    sync: "local",
   };
+  upsertLocalMessage(msg);
+  updateConvSummary(conversationId, {
+    lastMessage: text,
+    lastSenderUid: "airpal-ai",
+    lastMessageAt: now,
+    updatedAt: now,
+  });
+  return msg;
+}
 
-  const allMsgs = readLocal<Record<string, UniversalChatMessage[]>>(MSG_CACHE_KEY, {});
-  const currentList = allMsgs[conversationId] || [];
-  const updatedList = [...currentList, aiMsg];
-  allMsgs[conversationId] = updatedList;
-  writeLocal(MSG_CACHE_KEY, allMsgs);
-  notifyMsgListeners(conversationId, updatedList);
+/**
+ * Assistant reply for a user message. Stay chats ask the live property
+ * endpoint; anything else gets honest local guidance (never invented facts).
+ * Returns null for chats the assistant should stay out of. Never throws —
+ * endpoint failures become an honest assistant message.
+ */
+export async function requestAiReply(
+  conv: UniversalConversation,
+  userText: string,
+): Promise<UniversalChatMessage | null> {
+  const wantsAi = conv.type === "ai" || conv.type === "stay" || userText.toLowerCase().includes("@airpal");
+  if (!wantsAi) return null;
+  await new Promise((resolve) => setTimeout(resolve, 350));
 
-  const allConvs = readLocal<Record<string, UniversalConversation>>(CONV_CACHE_KEY, {});
-  const conv = allConvs[conversationId];
-  if (conv) {
-    conv.lastMessage = aiMsg.text;
-    conv.lastSenderUid = "airpal-ai";
-    conv.lastMessageAt = now;
-    conv.updatedAt = now;
-    allConvs[conversationId] = conv;
-    writeLocal(CONV_CACHE_KEY, allConvs);
-    notifyConvListeners();
+  const propertyId = conv.type === "stay" ? (conv.targetId || "").trim() : "";
+  if (propertyId) {
+    try {
+      const res = await askAirPalRemote({ propertyId, question: userText.trim().slice(0, 1000) });
+      const title = String(res.title || "").trim();
+      const body = String(res.body || "").trim();
+      return appendAiMessage(conv.id, [title, body].filter(Boolean).join("\n\n") || body, [
+        { label: "🛎️ Contact Front Desk", action: "contact_desk" },
+      ]);
+    } catch {
+      return appendAiMessage(
+        conv.id,
+        "I couldn't reach live answers right now. Try again in a bit — or ask the front desk and they'll sort you out.",
+        [{ label: "🛎️ Contact Front Desk", action: "contact_desk" }],
+      );
+    }
   }
+
+  if (conv.type === "stay") {
+    return appendAiMessage(
+      conv.id,
+      "I'm AirPal AI. This stay chat isn't linked to live hotel answers right now — the front desk can help with anything urgent.",
+      [{ label: "🛎️ Contact Front Desk", action: "contact_desk" }],
+    );
+  }
+  if (conv.type === "ai" || userText.toLowerCase().includes("@airpal")) {
+    return appendAiMessage(
+      conv.id,
+      "I'm AirPal AI. Open your stay chat and I can answer from live hotel knowledge — rooms, Wi-Fi, dining, facilities. Here, I can point you at the good stuff.",
+      [
+        { label: "🗺️ Explore Near Me", action: "guide" },
+        { label: "🤝 Find an AirPal Mate", action: "mate" },
+      ],
+    );
+  }
+  return null;
 }
 
 /** Subscribe to all active conversations for a user */
@@ -464,7 +748,7 @@ export function subscribeConversations(
   callback: (convs: UniversalConversation[]) => void,
 ): () => void {
   const getList = () => {
-    const allConvs = readLocal<Record<string, UniversalConversation>>(CONV_CACHE_KEY, {});
+    const allConvs = readConvs();
     const list = Object.values(allConvs)
       .filter((c) => !userUid || c.participantUids.includes(userUid) || c.type === "ai" || c.type === "stay")
       .sort((a, b) => (b.lastMessageAt || "").localeCompare(a.lastMessageAt || ""));
@@ -479,25 +763,27 @@ export function subscribeConversations(
   let unsubFirestore: (() => void) | undefined;
   const db = getFirebaseDb();
   if (db && isFirebaseConfigured && userUid) {
-    try {
-      const q = query(
-        collection(db, "conversations"),
-        where("participantUids", "array-contains", userUid),
-        orderBy("lastMessageAt", "desc"),
-        limit(50),
-      );
-      unsubFirestore = onSnapshot(q, (snap) => {
+    const q = query(
+      collection(db, "conversations"),
+      where("participantUids", "array-contains", userUid),
+      orderBy("lastMessageAt", "desc"),
+      limit(50),
+    );
+    unsubFirestore = onSnapshot(
+      q,
+      (snap) => {
         const remoteConvs = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<UniversalConversation, "id">) }));
-        const allConvs = readLocal<Record<string, UniversalConversation>>(CONV_CACHE_KEY, {});
+        const allConvs = readConvs();
         remoteConvs.forEach((rc) => {
           allConvs[rc.id] = rc;
         });
-        writeLocal(CONV_CACHE_KEY, allConvs);
+        writeConvs(allConvs);
         callback(getList());
-      });
-    } catch {
-      /* fallback to local listener */
-    }
+      },
+      () => {
+        /* index/permission hiccup: local cache keeps the inbox alive */
+      },
+    );
   }
 
   return () => {
@@ -512,8 +798,8 @@ export function subscribeMessages(
   callback: (msgs: UniversalChatMessage[]) => void,
 ): () => void {
   const getMsgs = () => {
-    const allMsgs = readLocal<Record<string, UniversalChatMessage[]>>(MSG_CACHE_KEY, {});
-    return (allMsgs[conversationId] || []).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    const list = readMsgs(conversationId);
+    return [...list].sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || ""));
   };
 
   callback(getMsgs());
@@ -528,24 +814,25 @@ export function subscribeMessages(
   let unsubFirestore: (() => void) | undefined;
   const db = getFirebaseDb();
   if (db && isFirebaseConfigured && conversationId) {
-    try {
-      const q = query(
-        collection(db, "conversations", conversationId, "messages"),
-        orderBy("createdAt", "asc"),
-        limit(100),
-      );
-      unsubFirestore = onSnapshot(q, (snap) => {
-        const remoteMsgs = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<UniversalChatMessage, "id">) }));
-        if (remoteMsgs.length > 0) {
-          const allMsgs = readLocal<Record<string, UniversalChatMessage[]>>(MSG_CACHE_KEY, {});
-          allMsgs[conversationId] = remoteMsgs;
-          writeLocal(MSG_CACHE_KEY, allMsgs);
-          callback(remoteMsgs);
-        }
-      });
-    } catch {
-      /* fallback */
-    }
+    const q = query(
+      collection(db, "conversations", conversationId, "messages"),
+      orderBy("createdAt", "asc"),
+      limit(100),
+    );
+    unsubFirestore = onSnapshot(
+      q,
+      (snap) => {
+        const remoteMsgs = asMessageList(
+          snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<UniversalChatMessage, "id">) })),
+        );
+        const merged = mergeMessages(readMsgs(conversationId), remoteMsgs);
+        writeMsgs(conversationId, merged);
+        callback(merged);
+      },
+      () => {
+        /* offline/denied: local messages keep the thread alive */
+      },
+    );
   }
 
   return () => {

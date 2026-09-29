@@ -54,12 +54,12 @@ const FILTERS: { id: ExploreFilter; label: string; icon?: typeof Compass }[] = [
   { id: "all", label: "All" },
   { id: "nearby", label: "Nearby" },
   { id: "events", label: "Events" },
+  { id: "experiences", label: "Experiences" },
   { id: "places", label: "Places" },
   { id: "food", label: "Food & Drinks" },
-  { id: "experiences", label: "Experiences" },
+  { id: "people", label: "Mates" },
   { id: "communities", label: "Communities" },
   { id: "travel", label: "Travel & Stays" },
-  { id: "people", label: "Mates" },
 ];
 
 const CURATED_JOURNEYS = [
@@ -487,6 +487,15 @@ export function ExplorePage() {
           {/* Travel & Stays Showcase */}
           {showTravel && (
             <div className="space-y-6">
+              <div>
+                <h2 className="font-display text-xl font-bold text-ink flex items-center gap-2">
+                  <Hotel size={18} className="text-brand" />
+                  <span>Travel & Stays in {effectiveCity}</span>
+                </h2>
+                <p className="text-xs text-mute mt-0.5">
+                  Trip plans, stay concierge, and verified places to stay
+                </p>
+              </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs flex flex-col justify-between">
                   <div>
@@ -526,11 +535,15 @@ export function ExplorePage() {
                     <h2 className="font-display text-xl font-bold text-ink flex items-center gap-2">
                       <Hotel size={18} className="text-brand" />
                       <span>Verified Stays in {effectiveCity}</span>
+                      <span className="text-xs font-semibold text-mute">({harbourStaySeeds().length})</span>
                     </h2>
                     <p className="text-xs text-mute mt-0.5">
                       Hotels &amp; boutique retreats
                     </p>
                   </div>
+                  <Link href="/concierge" className="text-xs font-bold text-brand hover:underline shrink-0">
+                    All Stays →
+                  </Link>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">

@@ -8,9 +8,10 @@ import { usePlans } from "@/contexts/PlanContext";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
-import { enableWebPush, markNotificationRead, pushPrefEnabled } from "@/lib/notifications";
+import { enableWebPush, markAllNotificationsRead, markNotificationRead, pushPrefEnabled } from "@/lib/notifications";
 import { cn } from "@/lib/cn";
 import { isUpdateNoteKind, type PromotionNotification } from "@shared/promotions";
+import { relativeAgo, smartChatTime } from "@shared/time-ago";
 import { toast } from "sonner";
 import { subscribeConversations, createConversationRecord, getLocalConversations } from "@/lib/chat-store";
 import type { UniversalConversation, ConversationType } from "@shared/messaging";
@@ -42,26 +43,32 @@ function NotificationRows({
 }) {
   return (
     <ul className="mt-4 overflow-hidden rounded-[24px] bg-card ring-1 ring-line/80 shadow-xs">
-      {rows.map((n, i) => (
-        <li key={n.id} className={cn(i > 0 && "border-t border-line/70")}>
-          <button
-            type="button"
-            onClick={() => void onOpen(n)}
-            className="flex w-full gap-3 px-4 py-3.5 text-left transition hover:bg-paper/60 active:bg-paper"
-          >
-            <span
-              className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", n.read ? "bg-transparent" : "bg-brand")}
-              aria-hidden
-            />
-            <span className="min-w-0 flex-1">
-              <span className={cn("block text-[15px] leading-5", n.read ? "text-ink" : "font-bold text-ink")}>
-                {n.title}
+      {rows.map((n, i) => {
+        const when = relativeAgo(n.at);
+        return (
+          <li key={n.id} className={cn(i > 0 && "border-t border-line/70")}>
+            <button
+              type="button"
+              onClick={() => void onOpen(n)}
+              className="flex w-full gap-3 px-4 py-3.5 text-left transition hover:bg-paper/60 active:bg-paper"
+            >
+              <span
+                className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", n.read ? "bg-transparent" : "bg-brand")}
+                aria-hidden
+              />
+              <span className="min-w-0 flex-1">
+                <span className={cn("block text-[15px] leading-5", n.read ? "text-ink" : "font-bold text-ink")}>
+                  {n.title}
+                </span>
+                <span className="mt-0.5 line-clamp-2 block text-[13px] leading-5 text-mute">{n.body}</span>
               </span>
-              <span className="mt-0.5 line-clamp-2 block text-[13px] leading-5 text-mute">{n.body}</span>
-            </span>
-          </button>
-        </li>
-      ))}
+              {when ? (
+                <span className="shrink-0 pt-0.5 text-[11px] font-medium text-mute">{when}</span>
+              ) : null}
+            </button>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -73,6 +80,7 @@ export function InboxPage() {
   const [notes, setNotes] = useState<PromotionNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [segment, setSegment] = useState<"messages" | "updates" | "pings" | "activity">("messages");
+  const [markingAll, setMarkingAll] = useState(false);
 
   // Universal Chat State
   const [universalChats, setUniversalChats] = useState<UniversalConversation[]>([]);
@@ -87,6 +95,10 @@ export function InboxPage() {
         .slice(0, 10),
     [myPlans],
   );
+  // All hooks stay above the early returns — anything below breaks hook order
+  // between the loading render and the loaded render.
+  const updateNotes = useMemo(() => notes.filter((n) => isUpdateNoteKind(n.kind)), [notes]);
+  const activityNotes = useMemo(() => notes.filter((n) => !isUpdateNoteKind(n.kind)), [notes]);
 
   // Subscribe to real-time Universal Chat conversations
   useEffect(() => {
@@ -132,8 +144,6 @@ export function InboxPage() {
   }
 
   const getUnread = (c: UniversalConversation) => (user ? c.unreadCount?.[user.uid] || 0 : 0);
-  const updateNotes = useMemo(() => notes.filter((n) => isUpdateNoteKind(n.kind)), [notes]);
-  const activityNotes = useMemo(() => notes.filter((n) => !isUpdateNoteKind(n.kind)), [notes]);
   const unreadUpdates = updateNotes.filter((n) => !n.read).length;
   const unreadActivity = activityNotes.filter((n) => !n.read).length;
   const unreadChats = universalChats.reduce((sum, c) => sum + getUnread(c), 0);
@@ -145,6 +155,19 @@ export function InboxPage() {
       setNotes((rows) => rows.map((row) => (row.id === n.id ? { ...row, read: true } : row)));
     }
     nav(n.href || "/circle");
+  }
+
+  async function markSegmentRead(rows: PromotionNotification[]) {
+    const unreadIds = rows.filter((n) => !n.read).map((n) => n.id);
+    if (unreadIds.length === 0 || markingAll) return;
+    setMarkingAll(true);
+    try {
+      await markAllNotificationsRead(unreadIds);
+      const done = new Set(unreadIds);
+      setNotes((cur) => cur.map((row) => (done.has(row.id) ? { ...row, read: true } : row)));
+    } finally {
+      setMarkingAll(false);
+    }
   }
 
   async function enablePush() {
@@ -258,11 +281,11 @@ export function InboxPage() {
                             <p className={cn("truncate text-[15px]", hasUnread ? "font-bold text-ink" : "font-semibold text-ink")}>
                               {conv.title}
                             </p>
-                            {conv.updatedAt && (
+                            {conv.updatedAt && smartChatTime(conv.updatedAt) ? (
                               <span className="shrink-0 text-[11px] text-mute font-medium">
-                                {new Date(conv.updatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                {smartChatTime(conv.updatedAt)}
                               </span>
-                            )}
+                            ) : null}
                           </div>
                           <p className={cn("mt-0.5 line-clamp-1 text-[13px]", hasUnread ? "font-semibold text-brand" : "text-mute")}>
                             {conv.lastMessage || "Start conversation"}
@@ -284,61 +307,58 @@ export function InboxPage() {
           )}
 
           {/* Trip Plans Collaboration Chats */}
-          <div>
-            <div className="flex items-center justify-between mb-2 px-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-mute">Trip Plans Chats</span>
-              <span className="text-[11px] font-medium text-mute">{tripConversations.length} trips</span>
-            </div>
-
-            {tripConversations.length === 0 && universalChats.length === 0 ? (
-              <div className="text-center rounded-[24px] bg-card ring-1 ring-line/80 px-4 py-10 shadow-xs">
-                <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-paper text-mute ring-1 ring-line">
-                  <MessageCircle size={22} className="text-brand" />
-                </span>
-                <p className="font-display mt-4 text-xl font-bold text-ink">No conversations yet</p>
-                <p className="mx-auto mt-1 max-w-xs text-[14px] leading-relaxed text-mute">
-                  Start an AirPal AI chat, message your stay front desk, or invite mates to a trip.
-                </p>
-                <div className="mt-5 flex justify-center gap-3">
-                  <button
-                    type="button"
-                    onClick={handleStartAiChat}
-                    className="rounded-full bg-brand px-4 py-2 text-xs font-bold text-white shadow-xs active:scale-95"
-                  >
-                    Chat with AirPal AI
-                  </button>
-                  <Link href="/plan/new" className="rounded-full bg-paper px-4 py-2 text-xs font-bold text-ink ring-1 ring-line hover:bg-card active:scale-95">
-                    Plan a Trip
-                  </Link>
-                </div>
+          {tripConversations.length > 0 ? (
+            <div>
+              <div className="flex items-center justify-between mb-2 px-1">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-mute">Trip Plans Chats</span>
+                <span className="text-[11px] font-medium text-mute">{tripConversations.length} trips</span>
               </div>
-            ) : (
-              tripConversations.length > 0 && (
-                <ul className="overflow-hidden rounded-[24px] bg-card ring-1 ring-line/80 shadow-xs">
-                  {tripConversations.map((p, i) => (
-                    <li key={p.id} className={cn(i > 0 && "border-t border-line/70")}>
-                      <button
-                        type="button"
-                        onClick={() => nav(`/plan/${p.id}`)}
-                        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition hover:bg-paper/60 active:bg-paper"
-                      >
-                        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 font-display text-[15px] font-bold text-brand ring-1 ring-brand/20">
-                          {p.title.trim()[0]?.toUpperCase() || "•"}
+              <ul className="overflow-hidden rounded-[24px] bg-card ring-1 ring-line/80 shadow-xs">
+                {tripConversations.map((p, i) => (
+                  <li key={p.id} className={cn(i > 0 && "border-t border-line/70")}>
+                    <button
+                      type="button"
+                      onClick={() => nav(`/plan/${p.id}`)}
+                      className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition hover:bg-paper/60 active:bg-paper"
+                    >
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 font-display text-[15px] font-bold text-brand ring-1 ring-brand/20">
+                        {p.title.trim()[0]?.toUpperCase() || "•"}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[15px] font-semibold text-ink">{p.title}</span>
+                        <span className="mt-0.5 block truncate text-[13px] text-mute">
+                          {p.destination || p.city || "Trip chat"}
+                          {p.attendees?.length ? ` · ${p.attendees.length} going` : ""}
                         </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[15px] font-semibold text-ink">{p.title}</span>
-                          <span className="mt-0.5 block truncate text-[13px] text-mute">
-                            {p.destination || p.city || "Trip chat"}
-                            {p.attendees?.length ? ` · ${p.attendees.length} going` : ""}
-                          </span>
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )
-            )}
-          </div>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : universalChats.length === 0 ? (
+            <div className="text-center rounded-[24px] bg-card ring-1 ring-line/80 px-4 py-10 shadow-xs">
+              <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-paper text-mute ring-1 ring-line">
+                <MessageCircle size={22} className="text-brand" />
+              </span>
+              <p className="font-display mt-4 text-xl font-bold text-ink">No conversations yet</p>
+              <p className="mx-auto mt-1 max-w-xs text-[14px] leading-relaxed text-mute">
+                Start an AirPal AI chat, message your stay front desk, or invite mates to a trip.
+              </p>
+              <div className="mt-5 flex justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleStartAiChat}
+                  className="rounded-full bg-brand px-4 py-2 text-xs font-bold text-white shadow-xs active:scale-95"
+                >
+                  Chat with AirPal AI
+                </button>
+                <Link href="/plan/new" className="rounded-full bg-paper px-4 py-2 text-xs font-bold text-ink ring-1 ring-line hover:bg-card active:scale-95">
+                  Plan a Trip
+                </Link>
+              </div>
+            </div>
+          ) : null}
 
           {/* Have an invite code form */}
           <form
@@ -380,7 +400,19 @@ export function InboxPage() {
         </div>
       ) : segment === "activity" ? (
         <>
-          <p className="mt-4 text-[13px] font-semibold text-mute">Activity</p>
+          <div className="mt-4 flex items-center justify-between">
+            <p className="text-[13px] font-semibold text-mute">Activity</p>
+            {activityNotes.length > 0 && (
+              <button
+                type="button"
+                disabled={markingAll || unreadActivity === 0}
+                onClick={() => void markSegmentRead(activityNotes)}
+                className="text-[13px] font-bold text-brand disabled:opacity-40"
+              >
+                {markingAll ? "Marking…" : "Mark all read"}
+              </button>
+            )}
+          </div>
 
           {!pushPrefEnabled() && (
             <button
@@ -415,7 +447,19 @@ export function InboxPage() {
         </>
       ) : (
         <>
-          <p className="mt-4 text-[13px] font-semibold text-mute">Updates from AirPal</p>
+          <div className="mt-4 flex items-center justify-between">
+            <p className="text-[13px] font-semibold text-mute">Updates from AirPal</p>
+            {updateNotes.length > 0 && (
+              <button
+                type="button"
+                disabled={markingAll || unreadUpdates === 0}
+                onClick={() => void markSegmentRead(updateNotes)}
+                className="text-[13px] font-bold text-brand disabled:opacity-40"
+              >
+                {markingAll ? "Marking…" : "Mark all read"}
+              </button>
+            )}
+          </div>
 
           {updateNotes.length === 0 ? (
             <div className="mt-10 text-center">
