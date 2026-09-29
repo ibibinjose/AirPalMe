@@ -95,7 +95,7 @@ export function StayBlocksPanel({ propertyId }: { propertyId: string }) {
             className="mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm outline-none focus:border-brand"
           />
         </label>
-        <Button className="h-10 px-4 text-xs" disabled={busy || !isStayDay(day)} loading={busy} onClick={() => void block()}>
+        <Button className="h-11 px-4 text-xs" disabled={busy || !isStayDay(day)} loading={busy} onClick={() => void block()}>
           Block
         </Button>
       </div>
@@ -108,7 +108,7 @@ export function StayBlocksPanel({ propertyId }: { propertyId: string }) {
                 title={`Unblock ${d}`}
                 disabled={busy}
                 onClick={() => void unblock(d)}
-                className="rounded-full bg-paper px-3 py-1.5 text-xs font-medium ring-1 ring-line transition hover:ring-red-400 active:scale-95"
+                className="inline-flex min-h-[44px] items-center rounded-full bg-paper px-4 text-xs font-medium ring-1 ring-line transition hover:ring-red-400 active:scale-95"
               >
                 {d} ×
               </button>

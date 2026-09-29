@@ -3,7 +3,7 @@ import { getMessaging, getToken, isSupported, onMessage } from "firebase/messagi
 import { doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import type { CreateBroadcastRequest, ReviewBroadcastRequest } from "@shared/notifications";
 import { getFirebaseApp, getFirebaseAuth, getFirebaseDb, getFirebaseFunctions } from "./firebase";
-import { isNativeApp } from "./native";
+import { isNativeApp } from "./platform";
 
 async function callNotify<Req, Res>(name: string, data: Req): Promise<Res> {
   const functions = getFirebaseFunctions();

@@ -1,4 +1,3 @@
-import { Capacitor } from "@capacitor/core";
 import { StatusBar, Style } from "@capacitor/status-bar";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
@@ -28,21 +27,9 @@ export function unregisterModalBackHandler(): void {
   modalCloseHandler = null;
 }
 
-/**
- * Returns true if the application is running inside a Capacitor native iOS or Android shell.
- */
-export function isNativeApp(): boolean {
-  return Capacitor.isNativePlatform();
-}
-
-/**
- * Returns the platform name: 'ios', 'android', or 'web'.
- */
-export function getNativePlatform(): "ios" | "android" | "web" {
-  const p = Capacitor.getPlatform();
-  if (p === "ios" || p === "android") return p;
-  return "web";
-}
+/** Re-exported from platform.ts so existing importers keep working. */
+import { getNativePlatform, isNativeApp } from "./platform";
+export { getNativePlatform, isNativeApp };
 
 export type HapticStyle = "light" | "medium" | "heavy" | "success" | "warning" | "error" | "selection";
 
