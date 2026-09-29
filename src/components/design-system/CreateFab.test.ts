@@ -12,6 +12,11 @@ function fabHtml() {
   );
 }
 
+function fabHtmlAt(path: string) {
+  const hook = (): [string, (to: string) => void] => [path, () => undefined];
+  return renderToStaticMarkup(createElement(Router, { hook }, createElement(CreateFab)));
+}
+
 describe("CreateFab", () => {
   it("renders floating action button on standard routes", () => {
     const html = fabHtml();
@@ -20,5 +25,10 @@ describe("CreateFab", () => {
 
   it("exports openGlobalCreate utility", () => {
     expect(typeof openGlobalCreate).toBe("function");
+  });
+
+  it("hides on the event organizer door (/event/new redirects there)", () => {
+    expect(fabHtmlAt("/event")).not.toContain("Create something new");
+    expect(fabHtmlAt("/event/new")).not.toContain("Create something new");
   });
 });

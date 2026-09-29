@@ -67,18 +67,26 @@ export function isUseCase(id: string): id is MateUseCaseId {
   return MATE_USE_CASES.some((c) => c.id === id);
 }
 
-export function mateRequestValid(input: MateRequestInput): boolean {
-  return (
-    isUseCase(input.useCase) &&
-    input.what.trim().length >= 4 &&
-    /^\d{4}-\d{2}-\d{2}$/.test(input.date) &&
-    input.suburb.trim().length >= 2 &&
-    Number.isFinite(input.partySize) &&
-    input.partySize >= 1 &&
-    input.partySize <= 20 &&
-    Number.isFinite(input.budget) &&
-    input.budget >= 0
-  );
+export function mateRequestValid(input: MateRequestInput, today?: string): boolean {
+  if (
+    !(
+      isUseCase(input.useCase) &&
+      input.what.trim().length >= 4 &&
+      /^\d{4}-\d{2}-\d{2}$/.test(input.date) &&
+      input.suburb.trim().length >= 2 &&
+      Number.isFinite(input.partySize) &&
+      input.partySize >= 1 &&
+      input.partySize <= 20 &&
+      Number.isFinite(input.budget) &&
+      input.budget >= 0
+    )
+  ) {
+    return false;
+  }
+  // Past-date guard: callers pass the zoned today (LocalNow). YYYY-MM-DD
+  // compares lexicographically; absent/malformed today keeps legacy behavior.
+  if (today && /^\d{4}-\d{2}-\d{2}$/.test(today) && input.date < today) return false;
+  return true;
 }
 
 export const MATE_REQUEST_STATUSES: MateRequestStatus[] = ["open", "matched", "completed", "cancelled"];
@@ -114,6 +122,23 @@ export function canAcceptRequest(
   if (request.ownerUid === mateUid) return "You can't accept your own request.";
   if (request.status !== "open") return "This request is no longer open.";
   return null;
+}
+
+/**
+ * Request → Plan handoff: prefill the plan form from a filed request.
+ * The plan form validates date/time itself; blanks are omitted here.
+ */
+export function mateRequestPlanHref(input: Pick<MateRequestInput, "what" | "suburb" | "date" | "time">): string {
+  const parts: string[] = [];
+  const title = input.what.trim();
+  const dest = input.suburb.trim();
+  const date = input.date.trim();
+  const time = input.time.trim();
+  if (title) parts.push(`title=${encodeURIComponent(title)}`);
+  if (dest) parts.push(`dest=${encodeURIComponent(dest)}`);
+  if (date) parts.push(`date=${encodeURIComponent(date)}`);
+  if (time) parts.push(`time=${encodeURIComponent(time)}`);
+  return parts.length ? `/plan/new?${parts.join("&")}` : "/plan/new";
 }
 
 /** Understandable match reasons — never a mystery score (AGENTS.md §5). */

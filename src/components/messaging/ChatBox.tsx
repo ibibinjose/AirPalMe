@@ -17,7 +17,13 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
-import { messageValid, type ChatMessage } from "@shared/messaging";
+import { triggerHaptic } from "@/lib/native";
+import {
+  messageValid,
+  type ChatMessage,
+  type MatchChatAction,
+  type MatchChatActionId,
+} from "@shared/messaging";
 import { SafetyMenu } from "@/components/safety/SafetyMenu";
 
 const PENDING_MESSAGE_KEY = "airpal:pending-message:v1";
@@ -54,11 +60,15 @@ export function ChatBox({
   readOnly = false,
   peerUid,
   peerName,
+  actions,
+  onAction,
 }: {
   requestId: string;
   readOnly?: boolean;
   peerUid?: string;
   peerName?: string;
+  actions?: MatchChatAction[];
+  onAction?: (id: MatchChatActionId) => void;
 }) {
   const { user, requireUser } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -183,6 +193,23 @@ export function ChatBox({
       {peerUid && peerName && user && (
         <div className="mb-2">
           <SafetyMenu targetUid={peerUid} targetName={peerName} planId={requestId} />
+        </div>
+      )}
+      {actions && actions.length > 0 && (
+        <div className="mb-2 flex flex-wrap gap-1.5" role="group" aria-label="Next steps">
+          {actions.map((a) => (
+            <button
+              key={a.id}
+              type="button"
+              onClick={() => {
+                void triggerHaptic("light");
+                onAction?.(a.id);
+              }}
+              className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-[11px] font-semibold text-brand ring-1 ring-brand/20 transition hover:bg-brand/20 active:scale-95"
+            >
+              <span>{a.label}</span>
+            </button>
+          ))}
         </div>
       )}
       <div className="max-h-64 space-y-2 overflow-y-auto pr-1" role="log" aria-label="Match conversation">

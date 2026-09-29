@@ -281,6 +281,17 @@ async function transferProviderShare(booking: Booking): Promise<{
   return { payoutStatus: "transferred", transferId: transfer.id, stripeAccountId: accountId };
 }
 
+/**
+ * Stay checkout returns land on /concierge directly: /stay redirects
+ * there and wouter drops the query, which would lose booked/canceled.
+ */
+export function stayCheckoutReturnUrls(origin: string, bookingId: string): { success: string; cancel: string } {
+  return {
+    success: `${origin}/concierge?booked=${bookingId}`,
+    cancel: `${origin}/concierge?canceled=true`,
+  };
+}
+
 function checkoutReturnUrls(origin: string, booking: Booking, bookingId: string): { success: string; cancel: string } {
   if (booking.planId) {
     return {
@@ -847,6 +858,7 @@ export const createStayCheckoutSession = onCall(STRIPE_CALLABLE, async (request)
   const now = new Date().toISOString();
   const origin = headerOrigin(request);
   const bookingId = `bk-${Date.now().toString(36)}-${randomBytes(4).toString("hex")}`;
+  const returns = stayCheckoutReturnUrls(origin, bookingId);
   const stripe = makeStripe();
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
@@ -868,8 +880,8 @@ export const createStayCheckoutSession = onCall(STRIPE_CALLABLE, async (request)
         },
       },
     ],
-    success_url: `${origin}/stay?booked=${bookingId}`,
-    cancel_url: `${origin}/stay?canceled=true`,
+    success_url: returns.success,
+    cancel_url: returns.cancel,
     metadata: {
       bookingId,
       propertyId,

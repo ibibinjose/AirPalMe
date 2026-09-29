@@ -11,8 +11,10 @@ import {
   Utensils,
   Wifi,
 } from "lucide-react";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { Button } from "@/components/ui/Button";
+import { TicketPass } from "@/components/plan/TicketPass";
+import { PaymentCanceledNotice } from "@/components/booking/PaymentCanceledNotice";
 import { Sheet } from "@/components/ui/Sheet";
 import { PlaceCard } from "@/components/discovery/PlaceCard";
 import { LocalFavorites } from "@/components/stay/LocalFavorites";
@@ -51,6 +53,7 @@ export function ConciergePage() {
   const { now, timeZone, city } = useLocalNow();
   const { calendarEvents, remoteNearby } = useEvents();
   const [, nav] = useLocation();
+  const bookedId = new URLSearchParams(useSearch()).get("booked") || "";
 
   // Tonight around the guest, for Ask answers — live DB data only.
   const tonightForAsk = useMemo(() => {
@@ -212,6 +215,8 @@ export function ConciergePage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-12 md:px-6">
+      <PaymentCanceledNotice />
+      {bookedId ? <TicketPass bookingId={bookedId} /> : null}
       {/* View Mode Switcher */}
       <div className="mb-5 flex items-center justify-center">
         <div className="flex rounded-full bg-paper p-1 ring-1 ring-line shadow-xs">

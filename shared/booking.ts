@@ -117,6 +117,19 @@ export function paymentStatusForPrice(priceCents: number): PaymentStatus {
   return priceCents <= 0 ? "paid" : "unpaid";
 }
 
+/** Display-paid: Stripe-confirmed, or free (nothing to collect). */
+export function bookingDisplayPaid(b: Pick<Booking, "paymentStatus" | "priceCents">): boolean {
+  return b.paymentStatus === "paid" || b.priceCents <= 0;
+}
+
+/**
+ * Stripe cancel-return detection. cancel_url spellings vary by checkout
+ * (`?canceled=1` vs `?canceled=true`); both mean "no charge made".
+ */
+export function hasCanceledParam(search: string): boolean {
+  return /(^|[?&])canceled=(1|true)(&|$)/.test(search);
+}
+
 /**
  * C1 — the stored fee must equal the admin config quote. The server stamps
  * `feeCents` at checkout; this guard lets tests and the client verify the

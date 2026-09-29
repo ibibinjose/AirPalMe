@@ -15,6 +15,32 @@ test.describe("AirPal loop proof (P0)", () => {
     await expect(mateCta.first().or(mateHeading.first())).toBeVisible();
   });
 
+  test("home hero CTA deep-links straight to the Mate request form", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("domcontentloaded");
+    await page.locator("header").getByRole("button", { name: /find a mate/i }).click();
+    await expect(page).toHaveURL(/\/mate\/request/);
+  });
+
+  test("canceled mate checkout shows a no-charge notice", async ({ page }) => {
+    await page.goto("/mate?canceled=1");
+    await page.waitForLoadState("domcontentloaded");
+    await expect(page.getByText(/payment canceled/i)).toBeVisible();
+    await expect(page.getByText(/not charged/i)).toBeVisible();
+  });
+
+  test("canceled plan checkout shows a no-charge notice", async ({ page }) => {
+    await page.goto("/plan/plan-rocks-night-out?canceled=1");
+    await page.waitForLoadState("domcontentloaded");
+    await expect(page.getByText(/payment canceled/i)).toBeVisible();
+  });
+
+  test("canceled stay checkout shows a no-charge notice on concierge", async ({ page }) => {
+    await page.goto("/concierge?canceled=true");
+    await page.waitForLoadState("domcontentloaded");
+    await expect(page.getByText(/payment canceled/i)).toBeVisible();
+  });
+
   test("mate demand surface renders its request entry", async ({ page }) => {
     await page.goto("/mate");
     await page.waitForLoadState("domcontentloaded");

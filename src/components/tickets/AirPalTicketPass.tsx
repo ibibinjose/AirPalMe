@@ -6,7 +6,7 @@ import { openAppleWalletPass, ticketWalletPassUrl } from "@/lib/wallet";
 import { makeQrDataUrl } from "@/lib/qr";
 import { publicSiteOrigin } from "@/lib/public-origin";
 import { shareNative } from "@/lib/native";
-import type { Booking } from "@shared/booking";
+import { bookingDisplayPaid, type Booking } from "@shared/booking";
 
 interface Props {
   booking: Booking & { id: string };
@@ -30,7 +30,7 @@ export function ticketQrHref(booking: Booking & { id: string }): string {
  */
 export function AirPalTicketPass({ booking, guestName, hostName, showActions = true }: Props) {
   const [qr, setQr] = useState("");
-  const paid = booking.paymentStatus === "paid" || booking.priceCents <= 0;
+  const paid = bookingDisplayPaid(booking);
 
   useEffect(() => {
     let cancelled = false;

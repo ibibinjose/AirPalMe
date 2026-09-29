@@ -1,7 +1,6 @@
 /**
- * Companion tabs: Explore / Plan / Scan / Inbox / Me.
- * Home is accessed via the top BrandMark / App icon.
- * Scan is the centerpiece tab for QR / Wave / NFC interaction.
+ * Shipped dock (CANON §3): Home / Explore / Trips / Inbox / Me.
+ * "scan" is a path bucket, not a tab — Scan lives behind + Create.
  */
 export type GuestTab = "home" | "explore" | "trips" | "scan" | "inbox" | "me";
 

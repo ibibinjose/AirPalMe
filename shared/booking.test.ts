@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   balanceDueCents,
+  bookingDisplayPaid,
   bookingFeesMatch,
   bookingValid,
   canRefundPaid,
@@ -12,6 +13,7 @@ import {
   canRetryPayout,
   checkoutPaymentCollected,
   DEFAULT_FEE_CONFIG,
+  hasCanceledParam,
   isBookingStatus,
   paymentStatusForPrice,
   payoutStatusAfterGuestPaid,
@@ -207,6 +209,23 @@ describe("booking engine", () => {
     expect(providerShareCents({ priceCents: 8000, feeCents: NaN })).toBe(
       quoteFees(8000).providerCents,
     );
+  });
+
+  it("detects Stripe cancel returns in both param spellings", () => {
+    expect(hasCanceledParam("?canceled=1")).toBe(true);
+    expect(hasCanceledParam("?canceled=true")).toBe(true);
+    expect(hasCanceledParam("?booked=b1&canceled=1")).toBe(true);
+    expect(hasCanceledParam("")).toBe(false);
+    expect(hasCanceledParam("?canceled=0")).toBe(false);
+    expect(hasCanceledParam("?canceled=")).toBe(false);
+    expect(hasCanceledParam("?booked=b1")).toBe(false);
+  });
+
+  it("treats Stripe-paid and free bookings as display-paid", () => {
+    expect(bookingDisplayPaid({ paymentStatus: "paid", priceCents: 8000 })).toBe(true);
+    expect(bookingDisplayPaid({ paymentStatus: "unpaid", priceCents: 0 })).toBe(true);
+    expect(bookingDisplayPaid({ paymentStatus: "unpaid", priceCents: 8000 })).toBe(false);
+    expect(bookingDisplayPaid({ paymentStatus: "deferred", priceCents: 8000 })).toBe(false);
   });
 
   it("scopes business inbox to the owning provider", () => {

@@ -4,38 +4,27 @@ import { addDoc, collection } from "firebase/firestore";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocalNow } from "@/hooks/useLocalNow";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { cn } from "@/lib/cn";
 import { triggerHaptic } from "@/lib/native";
 import { createSubmitGuard } from "@/lib/submit-guard";
-import { MATE_USE_CASES, emptyMateRequest, isUseCase, mateRequestValid } from "@shared/mate-request";
+import {
+  MATE_USE_CASES,
+  emptyMateRequest,
+  isUseCase,
+  mateRequestPlanHref,
+  mateRequestValid,
+} from "@shared/mate-request";
 
 const inputCls =
   "mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm outline-none placeholder:text-mute focus:border-brand";
-
-function localToday(): string {
-  let timeZone: string | undefined;
-  try {
-    timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  } catch {
-    timeZone = undefined;
-  }
-  try {
-    return new Intl.DateTimeFormat("en-CA", {
-      ...(timeZone ? { timeZone } : {}),
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-  } catch {
-    return "";
-  }
-}
 
 export function MateRequestPage() {
   const params = new URLSearchParams(useSearch());
   const [, nav] = useLocation();
   const { user, authReady, requireUser } = useAuth();
+  const { today } = useLocalNow();
   const preferredMateUid = params.get("preferredMate") || "";
   const preferredMateName = params.get("name") || "";
 
@@ -58,7 +47,7 @@ export function MateRequestPage() {
   async function submit() {
     setError(null);
     if (!requireUser("Sign in to request a Mate.")) return;
-    if (!user || !mateRequestValid(form)) return;
+    if (!user || !mateRequestValid(form, today)) return;
     const db = getFirebaseDb();
     if (!db || !isFirebaseConfigured) {
       setError("Connect Firebase first — requests are filed through the live backend.");
@@ -112,8 +101,8 @@ export function MateRequestPage() {
         </p>
         <div className="mt-6 flex flex-col gap-2">
           <Button onClick={() => nav("/mate")}>Back to Mate</Button>
-          <Button variant="ghost" onClick={() => nav("/")}>
-            Browse meanwhile
+          <Button variant="ghost" onClick={() => nav(mateRequestPlanHref(form))}>
+            Make a Plan
           </Button>
         </div>
       </div>
@@ -186,7 +175,7 @@ export function MateRequestPage() {
               <span className="text-[13px] font-semibold">Date</span>
               <input
                 type="date"
-                min={localToday() || undefined}
+                min={today || undefined}
                 value={form.date}
                 onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
                 className={inputCls}
@@ -252,7 +241,7 @@ export function MateRequestPage() {
         <Button
           className="mt-4 w-full"
           size="lg"
-          disabled={!mateRequestValid(form) || sending}
+          disabled={!mateRequestValid(form, today) || sending}
           loading={sending}
           onClick={() => void submit()}
         >

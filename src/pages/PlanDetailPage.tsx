@@ -24,6 +24,7 @@ import {
   ShieldCheck,
   Sparkles,
   Trash2,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
@@ -45,6 +46,7 @@ import { PlanReviewPrompt } from "@/components/plan/PlanReviewPrompt";
 import { PlanGroupHeader } from "@/components/plan/PlanGroupHeader";
 import { PlanDiscussionWall } from "@/components/plan/PlanDiscussionWall";
 import { SafetyMenu } from "@/components/safety/SafetyMenu";
+import { PaymentCanceledNotice } from "@/components/booking/PaymentCanceledNotice";
 import { ItineraryStopsManager } from "@/components/plan/ItineraryStopsManager";
 import { ExperienceBookingModal } from "@/components/plan/ExperienceBookingModal";
 import { HereCheckIn } from "@/components/circle/HereCheckIn";
@@ -336,6 +338,7 @@ export function PlanDetailPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 md:py-10 pb-32">
+      <PaymentCanceledNotice />
       {/* Top Floating Controls */}
       <div className="flex items-center justify-between gap-3 mb-6">
         <button
@@ -806,6 +809,27 @@ export function PlanDetailPage() {
 
       </>
       )}
+
+      {/* Going alone? Find an AirPal (§11 key CTA: Plan → Mate loop) */}
+      <button
+        type="button"
+        onClick={() => {
+          void triggerHaptic("light");
+          nav("/mate/request");
+        }}
+        className="mt-4 flex w-full cursor-pointer items-center gap-3 rounded-3xl bg-card p-4 text-left ring-1 ring-line shadow-xs transition hover:ring-brand/30 active:scale-[0.99]"
+      >
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
+          <Users size={20} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-bold text-ink">Going alone? Find an AirPal</span>
+          <span className="block truncate text-xs text-mute">Get matched with someone to go with you</span>
+        </span>
+        <span className="shrink-0 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-bold text-brand">
+          Find a Mate
+        </span>
+      </button>
 
       <HereCheckIn placeName={plan.destination} planId={plan.id} />
 

@@ -35,7 +35,7 @@ vi.mock("firebase-functions/v2/https", () => ({
   onRequest: vi.fn((_opts: unknown, handler: unknown) => handler),
 }));
 
-import { sandboxBookingsAllowed, stripeLiveConfigured } from "./stripe";
+import { sandboxBookingsAllowed, stayCheckoutReturnUrls, stripeLiveConfigured } from "./stripe";
 
 describe("sandboxBookingsAllowed", () => {
   afterEach(() => {
@@ -53,6 +53,15 @@ describe("sandboxBookingsAllowed", () => {
     delete process.env.ALLOW_SANDBOX_BOOKINGS;
     process.env.FUNCTIONS_EMULATOR = "true";
     expect(sandboxBookingsAllowed()).toBe(true);
+  });
+});
+
+describe("stayCheckoutReturnUrls", () => {
+  it("lands on /concierge so booked/canceled survive (no /stay redirect)", () => {
+    expect(stayCheckoutReturnUrls("https://airpal.me", "b1")).toEqual({
+      success: "https://airpal.me/concierge?booked=b1",
+      cancel: "https://airpal.me/concierge?canceled=true",
+    });
   });
 });
 

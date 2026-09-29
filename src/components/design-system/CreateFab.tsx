@@ -88,7 +88,7 @@ const CREATE_OPTIONS: CreateOption[] = [
 const HIDE_FAB_ROUTES = [
   /^\/plan\/new/,
   /^\/plan\/[^/]+\/edit/,
-  /^\/event\/new/,
+  /^\/event(\/|$)/,
   /^\/mate\/request/,
   /^\/bio\/setup/,
   /^\/bio\/edit/,

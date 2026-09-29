@@ -23,6 +23,8 @@ import {
   hasOpenDatePoll,
   headcountLeft,
   headcountTaken,
+  initialPlanDate,
+  initialPlanTime,
   isPlanManager,
   normalizeAnswer,
   normalizeCapacity,
@@ -459,6 +461,23 @@ describe("trip itinerary", () => {
     expect(hasTripItinerary({ type: "escape", multiDaySchedule: [day(1, "Coast")] })).toBe(true);
     expect(hasTripItinerary({ type: "trip", multiDaySchedule: [] })).toBe(false);
     expect(hasTripItinerary({ type: "nightout", multiDaySchedule: [day(1, "City")] })).toBe(false);
+  });
+});
+
+describe("plan form date/time prefill", () => {
+  it("honors a valid future date param, else today", () => {
+    expect(initialPlanDate("2026-10-04", "2026-10-03")).toBe("2026-10-04");
+    expect(initialPlanDate("2026-10-03", "2026-10-03")).toBe("2026-10-03");
+    expect(initialPlanDate("2026-10-02", "2026-10-03")).toBe("2026-10-03");
+    expect(initialPlanDate("tomorrow", "2026-10-03")).toBe("2026-10-03");
+    expect(initialPlanDate(null, "2026-10-03")).toBe("2026-10-03");
+  });
+
+  it("honors a valid time param, else the fallback", () => {
+    expect(initialPlanTime("19:30", "18:00")).toBe("19:30");
+    expect(initialPlanTime("7pm", "18:00")).toBe("18:00");
+    expect(initialPlanTime("25:00", "18:00")).toBe("18:00");
+    expect(initialPlanTime(null, "18:00")).toBe("18:00");
   });
 });
 

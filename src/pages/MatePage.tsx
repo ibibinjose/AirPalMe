@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { collection, doc, getDoc, getDocs, limit, orderBy, query, runTransaction, updateDoc, where } from "firebase/firestore";
@@ -10,8 +10,10 @@ import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { ChatBox } from "@/components/messaging/ChatBox";
 import { AirPalChatModal } from "@/components/messaging/AirPalChatModal";
 import { createConversationRecord } from "@/lib/chat-store";
-import type { UniversalConversation } from "@shared/messaging";
+import { matchChatActions, type UniversalConversation } from "@shared/messaging";
 import { BookingsSection, createBookingForRequest } from "@/components/booking/BookingsSection";
+import { PaymentCanceledNotice } from "@/components/booking/PaymentCanceledNotice";
+import { createSubmitGuard } from "@/lib/submit-guard";
 import { createBookingCheckoutSessionRemote } from "@/lib/functions";
 import { TicketPass } from "@/components/plan/TicketPass";
 import { PayoutSetupCard } from "@/components/connect/PayoutSetupCard";
@@ -57,6 +59,10 @@ export function MatePage() {
   const [chatFor, setChatFor] = useState<string | null>(null);
   const [booked, setBooked] = useState<Record<string, boolean>>({});
   const [bookingBusy, setBookingBusy] = useState(false);
+  // Synchronous double-tap guard: `bookingBusy` only disables the button after
+  // a re-render, so chip + button (or a fast double-tap) could file two
+  // bookings for the same match.
+  const bookGuardRef = useRef(createSubmitGuard());
   const [activeChatConv, setActiveChatConv] = useState<UniversalConversation | null>(null);
   const [chatModalOpen, setChatModalOpen] = useState(false);
   const [mateQuery, setMateQuery] = useState("");
@@ -93,6 +99,7 @@ export function MatePage() {
 
   async function book(r: MateRequest) {
     if (!user || !r.matchedMateUid) return;
+    if (!bookGuardRef.current.tryAcquire()) return;
     setBookingBusy(true);
     try {
       const priceCents = Math.round(Math.max(0, r.budget) * 100);
@@ -119,6 +126,7 @@ export function MatePage() {
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn’t start payment.");
     } finally {
+      bookGuardRef.current.release();
       setBookingBusy(false);
     }
   }
@@ -241,6 +249,7 @@ export function MatePage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 md:px-6">
+      <PaymentCanceledNotice />
       <div className="lg:grid lg:grid-cols-12 lg:gap-8">
         {/* Left Column: Hero, Request Actions, Assigned Jobs & Request History (7 cols) */}
         <div className="lg:col-span-7">
@@ -463,6 +472,16 @@ export function MatePage() {
                             requestId={r.id}
                             peerUid={r.matchedMateUid}
                             peerName={r.matchedMateName || "Your Mate"}
+                            actions={matchChatActions({
+                              viewerIsCustomer: true,
+                              matched: r.status === "matched",
+                              booked: Boolean(booked[r.id]),
+                              budget: r.budget,
+                            })}
+                            onAction={(id) => {
+                              if (id === "book") void book(r);
+                              else nav("/plan/new");
+                            }}
                           />
                         </span>
                       )}

@@ -13,6 +13,7 @@ import { trackContentAction } from "@/lib/analytics";
 import { createBookingForCampaign } from "@/components/booking/BookingsSection";
 import { createBookingCheckoutSessionRemote } from "@/lib/functions";
 import { TicketPass } from "@/components/plan/TicketPass";
+import { PaymentCanceledNotice } from "@/components/booking/PaymentCanceledNotice";
 import { EventTile } from "@/components/event/EventTile";
 import { aud, type Campaign } from "@shared/campaign";
 import { cn } from "@/lib/cn";
@@ -108,6 +109,7 @@ export function ExperiencesPage() {
           <Plus size={16} /> Create
         </Button>
       </div>
+      <PaymentCanceledNotice />
       {bookedId ? <TicketPass bookingId={bookedId} /> : null}
 
       {loading && livePlans.length === 0 ? (

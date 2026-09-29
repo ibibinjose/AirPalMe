@@ -2029,3 +2029,18 @@ export interface ExperienceProofResponse {
   /** Plans currently open or confirmed and joinable. */
   live: number;
 }
+
+/**
+ * Plan-form `?date=` prefill. Valid YYYY-MM-DD on/after the zoned today
+ * wins; anything else falls back to today (never a past or malformed date).
+ */
+export function initialPlanDate(param: string | null, today: string): string {
+  if (param && /^\d{4}-\d{2}-\d{2}$/.test(param) && param >= today) return param;
+  return today;
+}
+
+/** Plan-form `?time=` prefill. Valid 24h HH:MM wins, else the fallback. */
+export function initialPlanTime(param: string | null, fallback: string): string {
+  if (param && /^([01]\d|2[0-3]):[0-5]\d$/.test(param)) return param;
+  return fallback;
+}

@@ -37,7 +37,7 @@ import { toZonedDateStr, zonedWeekdayIndex } from "@/lib/local-time";
 import { listPeople } from "@/lib/people";
 import { circleHandles } from "@/lib/circle";
 import { triggerHaptic } from "@/lib/native";
-import { PLAN_TYPES, formatPlanDate, type PlanType } from "@shared/plan";
+import { PLAN_TYPES, formatPlanDate, initialPlanDate, initialPlanTime, type PlanType } from "@shared/plan";
 import { cn } from "@/lib/cn";
 import { PlaceAddressField, type PickedPlace } from "@/components/forms/PlaceAddressField";
 import type { Geo } from "@shared/nearby";
@@ -232,8 +232,10 @@ export function PlanCreatePage() {
     }
     return "";
   });
-  const [date, setDate] = useState(today || toZonedDateStr(new Date()));
-  const [time, setTime] = useState(() => (solvedIntent ? timeForSlot(solvedIntent.timeSlot) : "18:00"));
+  const [date, setDate] = useState(initialPlanDate(params.get("date"), today || toZonedDateStr(new Date())));
+  const [time, setTime] = useState(() =>
+    initialPlanTime(params.get("time"), solvedIntent ? timeForSlot(solvedIntent.timeSlot) : "18:00"),
+  );
   const [place, setPlace] = useState(
     params.get("dest") || params.get("destination") || solvedIntent?.suburb || city || "The Rocks, Sydney",
   );

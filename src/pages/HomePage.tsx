@@ -260,7 +260,7 @@ export function HomePage() {
               size="sm"
               onClick={() => {
                 void triggerHaptic("medium");
-                nav("/mate");
+                nav("/mate/request");
               }}
               className="h-11 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(24,5,219,0.35)]"
             >
