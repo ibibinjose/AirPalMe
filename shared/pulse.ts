@@ -158,6 +158,8 @@ export type PulseIssue = {
 export type PulsePublicDto = {
   propertyId: string;
   propertyName: string;
+  /** Property hero image for the branded header ("" when none). */
+  propertyHeroImage: string;
   pulseId: string;
   deploymentId: string;
   publicToken: string;
@@ -167,6 +169,20 @@ export type PulsePublicDto = {
   logic: PulseLogicRule[];
   status: "live";
 };
+
+/** Fling distance that commits a swipe answer (px, either direction). */
+export const SWIPE_CHOOSE_THRESHOLD_PX = 90;
+
+/**
+ * Which side a drag offset commits to, if any. Positive x = right.
+ * Shared so the card and its tests agree on the threshold.
+ */
+export function swipeChoiceForOffset(offsetX: number): "left" | "right" | null {
+  if (!Number.isFinite(offsetX)) return null;
+  if (offsetX >= SWIPE_CHOOSE_THRESHOLD_PX) return "right";
+  if (offsetX <= -SWIPE_CHOOSE_THRESHOLD_PX) return "left";
+  return null;
+}
 
 /** Bio-page rate card: the property's currently live Pulse, if any. */
 export type BioPulseResult =

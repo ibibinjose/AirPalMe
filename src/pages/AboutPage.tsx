@@ -3,10 +3,13 @@ import {
   Activity,
   ArrowRight,
   AtSign,
+  BedDouble,
+  BellRing,
   Building2,
   CalendarDays,
   Compass,
   HeartHandshake,
+  History,
   Mail,
   MapPin,
   ShieldCheck,
@@ -78,6 +81,39 @@ const VERTICALS = [
     cta: "Claim Your @handle",
     badge: "Link-in-Bio",
     accent: "from-pink-600 to-rose-700",
+  },
+];
+
+const STAY_GUEST_POINTS = [
+  {
+    icon: BedDouble,
+    title: "Your stay, in your pocket",
+    desc: "Check in, find your way around, and get answers without queuing at a front desk. Everything you need for your stay, from Wi-Fi details to house rules to local tips, is in one app, ready when you are.",
+  },
+  {
+    icon: BellRing,
+    title: "Request anything, instantly",
+    desc: "Order housekeeping, report a maintenance issue, book a facility, or ask for a late checkout in a few taps. Track each request from submitted to done, so you never have to wonder whether anyone saw it.",
+  },
+  {
+    icon: Compass,
+    title: "Discover your surroundings",
+    desc: "Find the best nearby cafés, sights, transport, and hidden gems, recommended by your host and by fellow guests. Explore the campus or the neighbourhood like a local from your first day.",
+  },
+  {
+    icon: Users,
+    title: "Connect with your community",
+    desc: "Whether you're a traveller sharing a hotel or a student living in a residential college, meet the people around you. Join house events, follow announcements, and build real friendships with your pals under the same roof.",
+  },
+  {
+    icon: CalendarDays,
+    title: "Events & experiences",
+    desc: "Discover dinners, tours, workshops, socials, and college events happening during your stay. Hosts can create and list events directly in the app and bring their community together.",
+  },
+  {
+    icon: History,
+    title: "Your stay, remembered",
+    desc: "Every stay adds to your history: places you've been, events you joined, and people you met. Come back and pick up right where you left off.",
   },
 ];
 
@@ -198,6 +234,65 @@ export function AboutPage() {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* AirPal Stay: guest companion + host OS */}
+      <div className="mt-12">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-gold">AirPal Stay</p>
+        <h2 className="font-display mt-1 text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+          The guest companion — and the operating system behind it.
+        </h2>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-mute sm:text-base">
+          AirPal.Me is the guest companion for hotels and residential colleges, and the operating
+          system for the people who run them. Guests get one place for everything about their stay.
+          Hosts get one place to run it.
+        </p>
+
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {STAY_GUEST_POINTS.map((pt) => {
+            const Icon = pt.icon;
+            return (
+              <div
+                key={pt.title}
+                className="rounded-[28px] bg-card p-5 ring-1 ring-line/80 shadow-xs"
+              >
+                <span className="grid h-10 w-10 place-items-center rounded-2xl bg-brand/10 text-brand ring-1 ring-brand/20">
+                  <Icon size={20} strokeWidth={2} />
+                </span>
+                <h3 className="font-display mt-4 text-base font-bold text-ink">{pt.title}</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-mute sm:text-[13px]">{pt.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 rounded-[28px] bg-ink p-6 text-white sm:p-8">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-gold">For Hosts</p>
+          <h3 className="font-display mt-1 text-xl font-bold tracking-tight sm:text-2xl">
+            Run everything from one place.
+          </h3>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/70">
+            Manage guest requests, send announcements, coordinate staff, publish local
+            recommendations, and see what guests need most. One dashboard replaces the scattered
+            messages, notice boards, and spreadsheets.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2.5">
+            <Link
+              href="/join"
+              onClick={() => void triggerHaptic("light")}
+              className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-6 text-sm font-bold text-ink transition hover:bg-white/90 active:scale-[0.98]"
+            >
+              List your property <ArrowRight size={16} />
+            </Link>
+            <Link
+              href="/host"
+              onClick={() => void triggerHaptic("light")}
+              className="inline-flex h-11 items-center rounded-full px-6 text-sm font-bold text-white ring-1 ring-white/30 transition hover:bg-white/10 active:scale-[0.98]"
+            >
+              Open host workspace
+            </Link>
+          </div>
         </div>
       </div>
 

@@ -14,6 +14,8 @@ import {
   pulseResponsesToCsv,
   resolvePulseStatusTransition,
   stayDuringStayTemplate,
+  swipeChoiceForOffset,
+  SWIPE_CHOOSE_THRESHOLD_PX,
   validatePulseFollowup,
   validatePulseSubmitPayload,
   visibleQuestions,
@@ -368,6 +370,22 @@ describe("all business and individual pulse templates", () => {
     const tmpl = createPulseTemplate("general_csat", "prop_gen_123", "usr_owner", "Creator Feedback");
     expect(tmpl.template).toBe("general_csat");
     expect(tmpl.questions.some((q) => q.id === "q_general")).toBe(true);
+  });
+});
+
+describe("swipe answers", () => {
+  it("commits past the threshold in either direction", () => {
+    expect(swipeChoiceForOffset(SWIPE_CHOOSE_THRESHOLD_PX)).toBe("right");
+    expect(swipeChoiceForOffset(200)).toBe("right");
+    expect(swipeChoiceForOffset(-SWIPE_CHOOSE_THRESHOLD_PX)).toBe("left");
+    expect(swipeChoiceForOffset(-200)).toBe("left");
+  });
+
+  it("springs back inside the threshold", () => {
+    expect(swipeChoiceForOffset(0)).toBeNull();
+    expect(swipeChoiceForOffset(SWIPE_CHOOSE_THRESHOLD_PX - 1)).toBeNull();
+    expect(swipeChoiceForOffset(-(SWIPE_CHOOSE_THRESHOLD_PX - 1))).toBeNull();
+    expect(swipeChoiceForOffset(Number.NaN)).toBeNull();
   });
 });
 

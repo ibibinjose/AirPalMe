@@ -111,6 +111,7 @@ export const getPulseByToken = onCall(CALLABLE, async (request) => {
   const dto: PulsePublicDto = {
     propertyId,
     propertyName: String(propSnap.data()?.name || "AirPal stay"),
+    propertyHeroImage: String(propSnap.data()?.heroImage || ""),
     pulseId,
     deploymentId,
     publicToken,
