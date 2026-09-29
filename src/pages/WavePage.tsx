@@ -49,7 +49,7 @@ export function WavePage() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 py-10 text-center">
+    <div className="mx-auto max-w-md px-4 py-10 pb-28 text-center">
       <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-brand/10 text-brand">
         <Hand size={24} />
       </span>
@@ -63,7 +63,11 @@ export function WavePage() {
       <Button className="mt-6 w-full" disabled={busy || !session} loading={busy} onClick={() => void wave()}>
         Wave back
       </Button>
-      <button type="button" className="mt-4 text-[15px] font-medium text-mute" onClick={() => nav("/scan")}>
+      <button
+        type="button"
+        className="mt-4 inline-flex min-h-[48px] items-center justify-center px-4 text-[15px] font-medium text-mute hover:text-ink"
+        onClick={() => nav("/scan")}
+      >
         Back to Scan
       </button>
     </div>

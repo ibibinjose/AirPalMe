@@ -36,11 +36,11 @@ export function StallPage() {
     stall.handle || loadBios().find((p) => p.stallId === stall.id)?.handle || handleFromPlaceId(stall.id) || undefined;
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-10">
+    <div className="mx-auto max-w-lg px-4 pb-28">
       <div className="flex items-center justify-between pt-4">
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-mute hover:text-ink transition"
+          className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-medium text-mute hover:text-ink transition"
           onClick={() => {
             if (document.referrer && document.referrer.includes(window.location.host)) {
               window.history.back();

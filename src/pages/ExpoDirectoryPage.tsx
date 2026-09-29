@@ -159,7 +159,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
                 <button
                   type="button"
                   onClick={() => nav(bioPath(event.hostHandle!))}
-                  className="shrink-0 inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-xs font-semibold text-brand hover:bg-brand hover:text-white transition"
+                  className="shrink-0 inline-flex min-h-[44px] items-center gap-1 rounded-full bg-brand/10 px-3.5 text-xs font-semibold text-brand hover:bg-brand hover:text-white transition"
                 >
                   <span>@{event.hostHandle}</span>
                   <ExternalLink size={11} />
@@ -179,7 +179,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
                     key={handle}
                     type="button"
                     onClick={() => nav(bioPath(handle))}
-                    className="inline-flex items-center gap-1 rounded-full bg-paper px-2.5 py-1 text-xs font-semibold text-ink border border-line hover:border-brand hover:text-brand transition shadow-2xs group"
+                    className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-paper px-3.5 text-xs font-semibold text-ink border border-line hover:border-brand hover:text-brand transition shadow-2xs group"
                   >
                     <span className="text-mute group-hover:text-brand">@</span>
                     <span>{handle}</span>
@@ -224,7 +224,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
         <button
           onClick={() => setChip("all")}
           className={cn(
-            "h-9 shrink-0 rounded-full px-4 text-xs font-semibold transition active:scale-95",
+            "h-11 shrink-0 rounded-full px-4 text-xs font-semibold transition active:scale-95",
             chip === "all" ? "bg-brand text-white shadow-xs" : "bg-card ring-1 ring-line text-mute hover:text-ink",
           )}
         >
@@ -235,7 +235,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
             key={c.id}
             onClick={() => setChip(c.id)}
             className={cn(
-              "h-9 shrink-0 rounded-full px-4 text-xs font-semibold transition active:scale-95",
+              "h-11 shrink-0 rounded-full px-4 text-xs font-semibold transition active:scale-95",
               chip === c.id ? "bg-brand text-white shadow-xs" : "bg-card ring-1 ring-line text-mute hover:text-ink",
             )}
           >
@@ -256,7 +256,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
                 <button
                   type="button"
                   onClick={() => nav(`/e/${event.id}/s/${s.stallId}`)}
-                  className="flex w-full items-center justify-between gap-2 rounded-xl bg-card px-3 py-2 text-left ring-1 ring-line"
+                  className="flex w-full items-center justify-between gap-2 rounded-xl bg-card px-3 py-3 text-left ring-1 ring-line"
                 >
                   <span className="min-w-0 text-[13px]">
                     <span className="font-semibold text-ink">{s.name}</span>

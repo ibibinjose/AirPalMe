@@ -29,7 +29,7 @@ export function TicketPage() {
     );
   }
   return (
-    <div className="mx-auto max-w-lg px-4 py-6">
+    <div className="mx-auto max-w-lg px-4 py-6 pb-28">
       <TicketGatePanel ticketId={id} deniedMessage="Only this event's organiser can verify tickets." />
     </div>
   );

@@ -84,7 +84,7 @@ function Chip({
       title={label}
       aria-pressed={selected}
       className={cn(
-        "inline-flex min-h-[42px] touch-manipulation items-center gap-1.5 rounded-full px-4 text-[13px] font-medium transition duration-200 active:scale-[0.97] ring-1",
+        "inline-flex min-h-[44px] touch-manipulation items-center gap-1.5 rounded-full px-4 text-[13px] font-medium transition duration-200 active:scale-[0.97] ring-1",
         selected
           ? "bg-brand text-white ring-brand shadow-sm"
           : "bg-paper/80 text-mute ring-line hover:text-ink hover:ring-brand/25",
@@ -221,15 +221,6 @@ export function CompanionPage() {
   return (
     <div className="relative isolate overflow-hidden">
       <div
-        aria-hidden
-        className="pointer-events-none absolute -left-24 top-[-8rem] h-72 w-72 rounded-full bg-brand/10 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-16 top-40 h-64 w-64 rounded-full bg-gold/15 blur-3xl"
-      />
-
-      <div
         className={cn(
           "relative mx-auto px-4 pb-28",
           showForm || submitted ? "max-w-2xl py-5 md:py-8" : "max-w-5xl py-5 md:py-8",
@@ -273,8 +264,9 @@ export function CompanionPage() {
                       onClick={() => {
                         if (s.id < step || errorsForStep(step).length === 0) setStep(s.id);
                       }}
+                      aria-current={on ? "step" : undefined}
                       className={cn(
-                        "flex w-full items-center justify-center gap-1.5 rounded-full px-2 py-2 text-[12px] font-semibold transition duration-200",
+                        "flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-full px-2 text-[12px] font-semibold transition duration-200",
                         on
                           ? "bg-brand text-white shadow-sm"
                           : done

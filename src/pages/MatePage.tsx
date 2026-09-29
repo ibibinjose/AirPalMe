@@ -248,7 +248,7 @@ export function MatePage() {
   }, [user, reloadKey]);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 md:px-6">
+    <div className="mx-auto max-w-5xl px-4 py-8 pb-28 md:px-6">
       <PaymentCanceledNotice />
       <div className="lg:grid lg:grid-cols-12 lg:gap-8">
         {/* Left Column: Hero, Request Actions, Assigned Jobs & Request History (7 cols) */}
@@ -272,7 +272,7 @@ export function MatePage() {
           </div>
 
       {user && assigned.length > 0 && (
-        <section className="mt-6 rounded-2xl border border-line bg-card p-4">
+        <section className="mt-6 rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
           <h2 className="font-display text-base font-bold">Assigned to you</h2>
           <p className="mt-1 text-[13px] text-mute">Chat, then confirm the booking when you&apos;re both in.</p>
           <ul className="mt-2 divide-y divide-line">
@@ -316,16 +316,16 @@ export function MatePage() {
                     <span className="mt-1 block text-xs text-mute">You rated this {r.mateRating}/5</span>
                   ) : ratingFor === r.id ? (
                     <span className="mt-2 block rounded-xl bg-paper p-3 ring-1 ring-line">
-                      <span className="flex gap-1" role="radiogroup" aria-label="Rate this guest">
+                      <span className="flex gap-0.5" role="radiogroup" aria-label="Rate this guest">
                         {[1, 2, 3, 4, 5].map((n) => (
                           <button
                             key={n}
                             type="button"
                             onClick={() => setStars(n)}
-                            className="p-0.5"
+                            className="grid h-11 w-11 place-items-center"
                             aria-label={`${n} stars`}
                           >
-                            <Star size={20} className={n <= stars ? "text-gold" : "text-line"} fill="currentColor" />
+                            <Star size={22} className={n <= stars ? "text-gold" : "text-line"} fill="currentColor" />
                           </button>
                         ))}
                       </span>
@@ -370,7 +370,7 @@ export function MatePage() {
       )}
 
       {user && isApprovedMate && (
-        <section className="mt-6 rounded-2xl border border-line bg-card p-4">
+        <section className="mt-6 rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
           <h2 className="font-display text-base font-bold">Open requests</h2>
           <p className="mt-1 text-[13px] text-mute">Accept one that fits — they&apos;ll see why you matched.</p>
           {openJobs.length === 0 ? (
@@ -394,7 +394,7 @@ export function MatePage() {
                     type="button"
                     disabled={acceptBusy === r.id}
                     onClick={() => void acceptRequest(r)}
-                    className="mt-2 rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white disabled:opacity-50"
+                    className="mt-2 inline-flex min-h-[44px] items-center rounded-full bg-brand px-4 text-xs font-semibold text-white disabled:opacity-50"
                   >
                     {acceptBusy === r.id ? "Accepting…" : "Accept this request"}
                   </button>
@@ -410,13 +410,13 @@ export function MatePage() {
       {user && <BookingsSection />}
 
       {user && loadError && (
-        <div className="mt-6 rounded-2xl ring-1 ring-line bg-card p-4 text-center">
+        <div className="mt-6 rounded-3xl bg-card p-5 text-center ring-1 ring-line shadow-xs">
           <p className="text-sm font-semibold">Couldn’t load Mate requests</p>
           <p className="mt-1 text-[13px] text-mute">Check your connection and try again.</p>
           <button
             type="button"
             onClick={() => setReloadKey((k) => k + 1)}
-            className="mt-3 rounded-full bg-brand px-4 py-2 text-xs font-semibold text-white"
+            className="mt-3 inline-flex min-h-[44px] items-center rounded-full bg-brand px-5 text-xs font-semibold text-white"
           >
             Retry
           </button>
@@ -424,7 +424,7 @@ export function MatePage() {
       )}
 
       {user && requests !== null && !loadError && (
-        <section className="mt-6 rounded-2xl border border-line bg-card p-4">
+        <section className="mt-6 rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
           <h2 className="font-display text-base font-bold">Your requests</h2>
           {!isFirebaseConfigured || requests.length === 0 ? (
             <p className="mt-1 text-[13px] text-mute">No requests yet — your first one takes under a minute.</p>
@@ -460,7 +460,7 @@ export function MatePage() {
                             <button
                               onClick={() => void book(r)}
                               disabled={bookingBusy}
-                              className="rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white disabled:opacity-50"
+                              className="inline-flex min-h-[44px] items-center rounded-full bg-brand px-4 text-xs font-semibold text-white disabled:opacity-50"
                             >
                               {r.budget > 0 ? `Book · about $${r.budget}` : "Book · free"}
                             </button>
@@ -495,7 +495,7 @@ export function MatePage() {
                       </span>
                     ) : ratingFor === r.id ? (
                       <span className="mt-2 block rounded-xl bg-paper p-3 ring-1 ring-line">
-                        <span className="flex gap-1" role="radiogroup" aria-label="Rate this experience">
+                        <span className="flex gap-0.5" role="radiogroup" aria-label="Rate this experience">
                           {[1, 2, 3, 4, 5].map((n) => (
                             <button
                               key={n}
@@ -503,9 +503,9 @@ export function MatePage() {
                               aria-checked={stars === n}
                               aria-label={`${n} star${n > 1 ? "s" : ""}`}
                               onClick={() => setStars(n)}
-                              className="p-0.5"
+                              className="grid h-11 w-11 place-items-center"
                             >
-                              <Star size={20} className={n <= stars ? "text-gold" : "text-line"} fill="currentColor" />
+                              <Star size={22} className={n <= stars ? "text-gold" : "text-line"} fill="currentColor" />
                             </button>
                           ))}
                         </span>
@@ -636,14 +636,14 @@ export function MatePage() {
                             <button
                               type="button"
                               onClick={() => openMateChat(m)}
-                              className="inline-flex items-center gap-1 rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white hover:bg-brand-ink transition active:scale-95 cursor-pointer"
+                              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand px-4 text-xs font-semibold text-white hover:bg-brand-ink transition active:scale-95 cursor-pointer"
                             >
                               <MessageSquare size={13} />
                               Chat
                             </button>
                             <Link
                               href={`/mate/request?preferredMate=${m.uid}&name=${encodeURIComponent(m.firstName)}`}
-                              className="inline-flex items-center gap-1 rounded-full bg-card px-3 py-1 text-xs font-semibold text-ink ring-1 ring-line hover:bg-line/40 transition active:scale-95 cursor-pointer"
+                              className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-card px-4 text-xs font-semibold text-ink ring-1 ring-line hover:bg-line/40 transition active:scale-95 cursor-pointer"
                             >
                               Pick for Request
                             </Link>

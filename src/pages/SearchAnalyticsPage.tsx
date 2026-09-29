@@ -295,7 +295,7 @@ export function SearchAnalyticsPage() {
             <button
               type="button"
               onClick={() => nav("/search")}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-mute hover:text-brand transition cursor-pointer mb-1.5"
+              className="mb-1.5 inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition cursor-pointer"
             >
               <ArrowLeft size={14} />
               <span>Back to Search</span>
@@ -310,7 +310,7 @@ export function SearchAnalyticsPage() {
             </div>
             <p className="mt-1 text-xs sm:text-sm text-mute">
               Real-time Firestore query analytics to track trending terms, user intent, and search relevance.
-              {loading && <span className="ml-2 inline-block text-xs font-semibold text-brand animate-pulse">Syncing...</span>}
+              {loading && <span className="ml-2 inline-block text-xs font-semibold text-brand motion-safe:animate-pulse">Syncing...</span>}
               {!loading && queryLogs.length > 0 && (
                 <span className="ml-2 text-xs font-semibold text-emerald-600">
                   · {queryLogs.length} recent sessions logged
@@ -413,7 +413,7 @@ export function SearchAnalyticsPage() {
                   setFilterCategory(cat.id);
                 }}
                 className={cn(
-                  "rounded-full px-3 py-1 text-xs font-semibold transition active:scale-95 cursor-pointer touch-manipulation",
+                  "inline-flex min-h-[44px] items-center rounded-full px-4 text-xs font-semibold transition active:scale-95 cursor-pointer touch-manipulation",
                   filterCategory === cat.id
                     ? "bg-brand text-white shadow-xs"
                     : "bg-paper text-mute hover:text-ink ring-1 ring-line",
@@ -438,7 +438,7 @@ export function SearchAnalyticsPage() {
                   setTimeRange(t.id as "7d" | "30d" | "all");
                 }}
                 className={cn(
-                  "rounded-lg px-2.5 py-1 text-xs font-medium transition cursor-pointer",
+                  "inline-flex min-h-[40px] items-center rounded-lg px-3 text-xs font-medium transition cursor-pointer",
                   timeRange === t.id
                     ? "bg-card text-ink font-bold shadow-xs"
                     : "text-mute hover:text-ink",

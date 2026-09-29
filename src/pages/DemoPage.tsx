@@ -119,7 +119,7 @@ function DemoBusinessStatus() {
                 Live
               </span>
             ) : state === "checking" ? (
-              <span className="animate-pulse rounded-full bg-paper px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-mute ring-1 ring-line">
+              <span className="motion-safe:animate-pulse rounded-full bg-paper px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-mute ring-1 ring-line">
                 Checking…
               </span>
             ) : (
@@ -185,7 +185,7 @@ function DemoBusinessStatus() {
  */
 export function DemoPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-16 pt-8 md:pt-12">
+    <div className="mx-auto max-w-3xl px-4 pb-28 pt-8 md:pt-12">
       <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand">Showcase tour</p>
       <h1 className="font-display mt-2 text-4xl font-bold tracking-tight text-ink md:text-5xl">
         AirPal.me in five minutes
@@ -210,7 +210,7 @@ export function DemoPage() {
       <div className="mt-4 flex flex-wrap gap-2.5">
         <Link
           href="/"
-          className="inline-flex h-11 items-center gap-2 rounded-full bg-brand px-6 text-sm font-bold text-white shadow-[0_6px_20px_rgba(24,5,219,0.35)] transition hover:brightness-110 active:scale-[0.98]"
+          className="inline-flex h-11 items-center gap-2 rounded-full bg-brand px-6 text-sm font-bold text-white shadow-[0_6px_20px_rgba(24,5,219,0.35)] transition hover:bg-brand-ink active:scale-[0.98]"
         >
           Start exploring <ArrowRight size={16} />
         </Link>

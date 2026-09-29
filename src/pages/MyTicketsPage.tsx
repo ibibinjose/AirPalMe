@@ -40,8 +40,11 @@ export function MyTicketsPage() {
   if (tickets === undefined) return <PageLoading />;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-24 pt-4 md:px-6 md:pt-6">
-      <Link href="/me" className="no-print inline-flex items-center gap-1.5 text-[13px] font-medium text-mute">
+    <div className="mx-auto max-w-2xl px-4 pb-28 pt-4 md:px-6 md:pt-6">
+      <Link
+        href="/me"
+        className="no-print inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={15} /> Me
       </Link>
       <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand">AirPal Wallet</p>
@@ -54,7 +57,7 @@ export function MyTicketsPage() {
           <p className="mx-auto mt-1 max-w-sm text-[14px] text-mute">
             Ticketed events and experiences you book will live here — ready to scan, save, and share.
           </p>
-          <Link href="/explore" className="no-print mt-4 inline-block rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white">
+          <Link href="/explore" className="no-print mt-4 inline-flex min-h-[44px] items-center rounded-full bg-brand px-5 text-sm font-semibold text-white">
             Find something on
           </Link>
         </div>

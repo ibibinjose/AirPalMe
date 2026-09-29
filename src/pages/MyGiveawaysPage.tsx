@@ -81,8 +81,11 @@ export function MyGiveawaysPage() {
   const unread = notes.filter((n) => !n.read).length;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/me" className="flex items-center gap-1 text-[13px] font-medium text-mute">
+    <div className="mx-auto max-w-2xl px-4 py-8 pb-28">
+      <Link
+        href="/me"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={14} /> You
       </Link>
       <h1 className="font-display mt-4 text-2xl font-bold">My giveaways</h1>
@@ -141,7 +144,7 @@ export function MyGiveawaysPage() {
             <button
               type="button"
               onClick={toggleOptOut}
-              className="mt-3 text-xs font-semibold text-brand hover:underline"
+              className="mt-3 inline-flex min-h-[44px] items-center text-xs font-semibold text-brand hover:underline"
             >
               {optOut ? "Turn marketing notifications on" : "Turn marketing notifications off"}
             </button>
@@ -169,7 +172,10 @@ export function MyGiveawaysPage() {
                         {new Date(e.createdAt).toLocaleDateString()} · {e.status}
                       </p>
                     </div>
-                    <Link href={`/giveaways/${e.promotionId}`} className="text-xs font-bold text-brand hover:underline">
+                    <Link
+                      href={`/giveaways/${e.promotionId}`}
+                      className="inline-flex min-h-[44px] items-center px-2 text-xs font-bold text-brand hover:underline"
+                    >
                       View
                     </Link>
                   </div>

@@ -427,43 +427,47 @@ export function PlanCreatePage() {
             const isClickable = i <= step;
 
             return (
-              <li
-                key={s.label}
-                className={cn(
-                  "flex flex-1 items-center gap-2 rounded-xl p-2 transition-all duration-200",
-                  current ? "bg-card shadow-xs ring-1 ring-brand/30" : "",
-                  isClickable ? "cursor-pointer" : "opacity-60 cursor-default",
-                )}
-                onClick={() => {
-                  if (isClickable && i !== step) {
-                    void triggerHaptic("light");
-                    setStep(i as 0 | 1 | 2);
-                  }
-                }}
-              >
-                <span
+              <li key={s.label} className="flex flex-1" aria-current={current ? "step" : undefined}>
+                <button
+                  type="button"
+                  disabled={!isClickable || i === step}
+                  onClick={() => {
+                    if (isClickable && i !== step) {
+                      void triggerHaptic("light");
+                      setStep(i as 0 | 1 | 2);
+                    }
+                  }}
                   className={cn(
-                    "grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-bold transition-all duration-200",
-                    done
-                      ? "bg-emerald-500 text-white shadow-2xs"
-                      : current
-                        ? "bg-brand text-white shadow-sm ring-2 ring-brand/25"
-                        : "bg-paper text-mute ring-1 ring-line/80",
+                    "flex flex-1 items-center gap-2 rounded-xl p-2 text-left transition-shadow duration-200",
+                    current ? "bg-card shadow-xs ring-1 ring-brand/30" : "",
+                    isClickable && i !== step ? "cursor-pointer hover:bg-card/70" : "cursor-default",
+                    !isClickable && "opacity-60",
                   )}
                 >
-                  {done ? <Check size={14} strokeWidth={3} /> : s.num}
-                </span>
-                <div className="min-w-0">
                   <span
                     className={cn(
-                      "block truncate text-xs font-bold",
-                      current ? "text-brand" : done ? "text-ink" : "text-mute",
+                      "grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-bold transition-colors duration-200",
+                      done
+                        ? "bg-emerald-500 text-white shadow-2xs"
+                        : current
+                          ? "bg-brand text-white shadow-sm ring-2 ring-brand/25"
+                          : "bg-paper text-mute ring-1 ring-line/80",
                     )}
                   >
-                    {s.label}
+                    {done ? <Check size={14} strokeWidth={3} /> : s.num}
                   </span>
-                  <span className="hidden xs:block truncate text-[10px] text-mute">{s.hint}</span>
-                </div>
+                  <span className="min-w-0">
+                    <span
+                      className={cn(
+                        "block truncate text-xs font-bold",
+                        current ? "text-brand" : done ? "text-ink" : "text-mute",
+                      )}
+                    >
+                      {s.label}
+                    </span>
+                    <span className="hidden truncate text-[10px] text-mute xs:block">{s.hint}</span>
+                  </span>
+                </button>
               </li>
             );
           })}
@@ -501,7 +505,7 @@ export function PlanCreatePage() {
                   type="button"
                   onClick={() => pickType(t.id)}
                   className={cn(
-                    "group relative flex flex-col justify-between rounded-3xl border border-line/80 bg-gradient-to-br p-4 sm:p-5 text-left shadow-xs transition-all duration-200 hover:shadow-md hover:scale-[1.01] active:scale-[0.99] cursor-pointer",
+                    "group relative flex flex-col justify-between rounded-3xl border border-line/80 bg-gradient-to-br p-4 sm:p-5 text-left shadow-xs transition-shadow duration-200 hover:shadow-md active:scale-[0.99] cursor-pointer",
                     t.bgGrad,
                   )}
                 >
@@ -509,7 +513,7 @@ export function PlanCreatePage() {
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <span
                         className={cn(
-                          "grid h-12 w-12 shrink-0 place-items-center rounded-2xl transition-transform duration-200 group-hover:scale-110 ring-1 ring-black/5 shadow-2xs",
+                          "grid h-12 w-12 shrink-0 place-items-center rounded-2xl ring-1 ring-black/5 shadow-2xs",
                           t.iconBg,
                         )}
                       >
@@ -546,10 +550,10 @@ export function PlanCreatePage() {
                 void triggerHaptic("medium");
                 nav("/event/new");
               }}
-              className="group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-3xl border border-brand/35 bg-gradient-to-r from-brand/15 via-brand/5 to-gold/20 p-5 text-left shadow-xs transition-all duration-200 hover:border-brand hover:shadow-md hover:brightness-105 active:scale-[0.99] cursor-pointer"
+              className="group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-3xl border border-brand/35 bg-gradient-to-r from-brand/15 via-brand/5 to-gold/20 p-5 text-left shadow-xs transition-shadow duration-200 hover:border-brand hover:shadow-md active:scale-[0.99] cursor-pointer"
             >
               <div className="flex items-center gap-4 min-w-0">
-                <span className="grid h-13 w-13 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-md ring-4 ring-brand/20 transition-transform group-hover:scale-105">
+                <span className="grid h-13 w-13 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-md ring-4 ring-brand/20">
                   <Ticket size={24} className="rotate-[-10deg]" />
                 </span>
                 <div className="min-w-0">
@@ -578,7 +582,7 @@ export function PlanCreatePage() {
       {solvedIntent && (
         <div className="mt-4 rounded-2xl bg-gradient-to-br from-brand/10 via-brand/5 to-transparent p-4 ring-1 ring-brand/20 shadow-xs">
           <div className="flex items-center gap-2 text-brand">
-            <Sparkles size={16} className="shrink-0 animate-pulse" />
+            <Sparkles size={16} className="shrink-0 motion-safe:animate-pulse" />
             <span className="text-xs font-bold uppercase tracking-wider">AirPal Brain Plan</span>
           </div>
           <p className="mt-1 text-sm font-semibold text-ink">
@@ -861,17 +865,19 @@ export function PlanCreatePage() {
             </div>
           </section>
 
-          {/* Next Button */}
-          <Button
-            className="h-13 w-full gap-2 rounded-2xl text-sm font-bold shadow-md active:scale-98"
-            onClick={() => {
-              void triggerHaptic("medium");
-              setStep(2);
-            }}
-          >
-            <span>Continue to Invites</span>
-            <ArrowRight size={16} />
-          </Button>
+          {/* Next Button — sticky so the long details form keeps its way forward */}
+          <div className="sticky bottom-24 z-10 rounded-2xl bg-card/95 p-2 ring-1 ring-line shadow-md backdrop-blur">
+            <Button
+              className="h-13 w-full gap-2 rounded-2xl text-sm font-bold shadow-md active:scale-98"
+              onClick={() => {
+                void triggerHaptic("medium");
+                setStep(2);
+              }}
+            >
+              <span>Continue to Invites</span>
+              <ArrowRight size={16} />
+            </Button>
+          </div>
         </div>
       )}
 

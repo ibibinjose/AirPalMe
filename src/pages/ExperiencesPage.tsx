@@ -97,7 +97,10 @@ export function ExperiencesPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 pb-28">
-      <Link href="/" className="flex items-center gap-1 text-[13px] font-medium text-mute">
+      <Link
+        href="/"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={14} /> Explore
       </Link>
       <div className="mt-3 flex flex-wrap items-end justify-between gap-3">

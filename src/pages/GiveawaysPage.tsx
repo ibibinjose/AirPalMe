@@ -25,7 +25,7 @@ function Card({ p, featured }: { p: Promotion; featured?: boolean }) {
     <Link
       href={`/giveaways/${p.id}`}
       className={cn(
-        "block overflow-hidden rounded-3xl ring-1 ring-line bg-card shadow-sm transition-transform hover:-translate-y-0.5",
+        "block overflow-hidden rounded-3xl ring-1 ring-line bg-card shadow-sm transition-shadow hover:shadow-md",
         featured && "border-gold",
       )}
     >
@@ -74,7 +74,7 @@ function Card({ p, featured }: { p: Promotion; featured?: boolean }) {
         <div className="mt-3">
           <span
             className={cn(
-              "inline-block rounded-xl px-4 py-2 text-sm font-bold",
+              "inline-flex min-h-[44px] items-center rounded-xl px-4 text-sm font-bold",
               closed ? "bg-ink/10 text-mute" : "bg-brand text-white",
             )}
           >
@@ -147,8 +147,11 @@ export function GiveawaysPage() {
   const winners = filtered.filter((p) => p.status === "closed");
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/" className="flex items-center gap-1 text-[13px] font-medium text-mute">
+    <div className="mx-auto max-w-2xl px-4 py-8 pb-28">
+      <Link
+        href="/"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={14} /> Explore
       </Link>
       <p className="mt-4 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
@@ -165,9 +168,10 @@ export function GiveawaysPage() {
             key={c}
             type="button"
             onClick={() => setCategory(c)}
+            aria-pressed={category === c}
             className={cn(
-              "shrink-0 rounded-full border-2 px-3 py-1 text-xs font-semibold",
-              category === c ? "border-brand bg-brand text-white" : "border-ink/15 bg-card",
+              "inline-flex min-h-[44px] shrink-0 items-center rounded-full px-4 text-xs font-semibold ring-1 transition active:scale-95",
+              category === c ? "bg-brand text-white ring-brand shadow-xs" : "bg-card text-ink ring-line hover:bg-paper",
             )}
           >
             {c}

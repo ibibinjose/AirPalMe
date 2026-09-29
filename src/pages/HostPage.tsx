@@ -1,7 +1,18 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
-import { ExternalLink } from "lucide-react";
+import {
+  Bell,
+  BellOff,
+  BellRing,
+  Clock,
+  ExternalLink,
+  Headphones,
+  Siren,
+  Sparkles,
+  UtensilsCrossed,
+  Wrench,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { TabPills } from "@/components/ui/TabPills";
 import { ValidField, fieldInput } from "@/components/forms/ValidField";
@@ -34,12 +45,15 @@ import { playResolutionChime, stopTicketAlarm } from "@/lib/ticket-alert-sound";
 
 type Tab = "today" | "facilities" | "dining" | "rooms" | "place" | "print";
 
-const TICKET_CATEGORIES: Record<StaffTicket["category"], { label: string; icon: string; badgeClass: string }> = {
-  reception: { label: "Reception", icon: "🛎️", badgeClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
-  housekeeping: { label: "Housekeeping", icon: "✨", badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-  maintenance: { label: "Maintenance", icon: "🔧", badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-  dining: { label: "Dining", icon: "🍽️", badgeClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
-  late_checkout: { label: "Late Checkout", icon: "⏰", badgeClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400" },
+const TICKET_CATEGORIES: Record<
+  StaffTicket["category"],
+  { label: string; icon: typeof BellRing; badgeClass: string }
+> = {
+  reception: { label: "Reception", icon: BellRing, badgeClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
+  housekeeping: { label: "Housekeeping", icon: Sparkles, badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+  maintenance: { label: "Maintenance", icon: Wrench, badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+  dining: { label: "Dining", icon: UtensilsCrossed, badgeClass: "bg-brand/10 text-brand" },
+  late_checkout: { label: "Late Checkout", icon: Clock, badgeClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400" },
 };
 
 function timeAgo(isoString?: string): string {
@@ -255,16 +269,7 @@ export function HostPage() {
 
   return (
     <div className="relative isolate overflow-hidden">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-24 top-[-6rem] h-64 w-64 rounded-full bg-brand/10 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-16 top-32 h-56 w-56 rounded-full bg-gold/15 blur-3xl"
-      />
-
-      <div className="relative mx-auto max-w-3xl px-4 pb-16">
+      <div className="relative mx-auto max-w-3xl px-4 pb-28">
         {user.emailVerified === false && <VerifyEmailBanner email={user.email} onSend={sendVerificationEmail} />}
 
         <header className="flex flex-col gap-3 pt-5 sm:flex-row sm:items-end sm:justify-between">
@@ -284,7 +289,7 @@ export function HostPage() {
           </div>
           <Button
             variant="ghost"
-            className="h-10"
+            className="h-11"
             onClick={() => nav(`/g/${property.id}`)}
             disabled={!property.id || property.id === "unknown"}
           >
@@ -295,17 +300,17 @@ export function HostPage() {
         <div className="mt-4 flex flex-wrap gap-2">
           <Button
             variant="ghost"
-            className="h-8 px-3 text-xs"
+            className="h-11 px-4 text-xs"
             onClick={() => nav(partnerAccountPath({ signedIn: true, hasPlace: Boolean(business) }))}
           >
             {business ? NAMES.yourPlace : NAMES.partnerAccount}
           </Button>
-          <Button variant="ghost" className="h-8 px-3 text-xs" onClick={() => nav("/event")}>
+          <Button variant="ghost" className="h-11 px-4 text-xs" onClick={() => nav("/event")}>
             Event
           </Button>
           <Button
             variant="ghost"
-            className="h-8 px-3 text-xs text-brand font-semibold"
+            className="h-11 px-4 text-xs text-brand font-semibold"
             onClick={() => nav(`/stay/${property.id}`)}
           >
             Preview Guest Stay →
@@ -352,7 +357,11 @@ export function HostPage() {
               <section className="mt-4 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm">
                 <div className="flex items-center justify-between">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Room types</p>
-                  <button type="button" className="text-xs font-medium text-brand" onClick={() => setTab("rooms")}>
+                  <button
+                    type="button"
+                    className="inline-flex min-h-[44px] items-center px-1 text-xs font-medium text-brand"
+                    onClick={() => setTab("rooms")}
+                  >
                     Manage rooms →
                   </button>
                 </div>
@@ -377,7 +386,7 @@ export function HostPage() {
               >
                 <span>
                   <span className="block text-sm font-bold flex items-center gap-1.5">
-                    <span>🎧</span> Open Universal Help Desk
+                    <Headphones size={15} /> Open Universal Help Desk
                   </span>
                   <span className="block text-xs text-white/80">Unified desk for Stays, Dining & Events</span>
                 </span>
@@ -404,7 +413,7 @@ export function HostPage() {
                   <div className="flex items-center gap-2">
                     <h2 className="font-display text-lg font-semibold tracking-tight">Guest Tickets</h2>
                     {openTicketCount(tickets) > 0 ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-semibold text-red-600 dark:text-red-400 animate-pulse">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-semibold text-red-600 dark:text-red-400 motion-safe:animate-pulse">
                         {openTicketCount(tickets)} open
                       </span>
                     ) : (
@@ -422,7 +431,7 @@ export function HostPage() {
                   {openTicketCount(tickets) > 1 && (
                     <button
                       type="button"
-                      className="rounded-full bg-brand/10 px-3 py-1.5 text-xs font-semibold text-brand hover:bg-brand/15 transition"
+                      className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-brand/10 px-4 text-xs font-semibold text-brand hover:bg-brand/15 transition"
                       onClick={() => {
                         const openOnes = tickets.filter((t) => t.status !== "resolved");
                         void (async () => {
@@ -438,7 +447,7 @@ export function HostPage() {
                   )}
                   <button
                     type="button"
-                    className="rounded-full ring-1 ring-line bg-paper px-3 py-1.5 text-xs font-medium text-mute hover:text-ink transition"
+                    className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full ring-1 ring-line bg-paper px-4 text-xs font-medium text-mute hover:text-ink transition"
                     onClick={() => {
                       void enableHostTicketPush().then((state) => {
                         setAlertsOn(state === "granted");
@@ -448,7 +457,15 @@ export function HostPage() {
                       });
                     }}
                   >
-                    {alertsOn ? "🔔 Alerts On" : "🔕 Enable Alerts"}
+                    {alertsOn ? (
+                      <>
+                        <Bell size={13} /> Alerts On
+                      </>
+                    ) : (
+                      <>
+                        <BellOff size={13} /> Enable Alerts
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -458,7 +475,8 @@ export function HostPage() {
                 <button
                   type="button"
                   onClick={() => setTicketTab("active")}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                  aria-pressed={ticketTab === "active"}
+                  className={`inline-flex min-h-[44px] items-center rounded-full px-4 text-xs font-semibold transition ${
                     ticketTab === "active"
                       ? "bg-brand text-white shadow-xs"
                       : "text-mute hover:text-ink hover:bg-paper"
@@ -469,7 +487,8 @@ export function HostPage() {
                 <button
                   type="button"
                   onClick={() => setTicketTab("resolved")}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                  aria-pressed={ticketTab === "resolved"}
+                  className={`inline-flex min-h-[44px] items-center rounded-full px-4 text-xs font-semibold transition ${
                     ticketTab === "resolved"
                       ? "bg-brand text-white shadow-xs"
                       : "text-mute hover:text-ink hover:bg-paper"
@@ -483,7 +502,7 @@ export function HostPage() {
                 {ticketTab === "active" ? (
                   tickets.filter((t) => t.status !== "resolved").length === 0 ? (
                     <li className="rounded-2xl bg-paper/60 p-6 text-center text-sm text-mute ring-1 ring-line">
-                      🎉 No open guest requests. Front desk is fully caught up.
+                      No open guest requests. Front desk is fully caught up.
                     </li>
                   ) : (
                     tickets
@@ -498,14 +517,14 @@ export function HostPage() {
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2">
                                 <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ${catMeta.badgeClass}`}>
-                                  <span>{catMeta.icon}</span> {catMeta.label}
+                                  <catMeta.icon size={12} /> {catMeta.label}
                                 </span>
                                 <span className="text-xs font-semibold text-ink">
                                   Room {t.roomNumber}
                                 </span>
                                 {t.urgency === "urgent" && (
                                   <span className="inline-flex items-center gap-1 rounded-md bg-red-500/15 px-2 py-0.5 text-[11px] font-bold text-red-600 dark:text-red-400">
-                                    🚨 Urgent
+                                    <Siren size={11} /> Urgent
                                   </span>
                                 )}
                                 <span className="text-[11px] text-mute">{timeAgo(t.createdAt)}</span>
@@ -517,7 +536,7 @@ export function HostPage() {
                             <div className="flex shrink-0 items-center gap-2 sm:self-center">
                               <button
                                 type="button"
-                                className="flex items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 active:scale-95 transition"
+                                className="flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 active:scale-95 transition"
                                 onClick={() => {
                                   void (async () => {
                                     stopTicketAlarm();
@@ -557,8 +576,8 @@ export function HostPage() {
                           >
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className="text-xs font-medium text-ink/70">
-                                  {catMeta.icon} Room {t.roomNumber}
+                                <span className="inline-flex items-center gap-1 text-xs font-medium text-ink/70">
+                                  <catMeta.icon size={12} /> Room {t.roomNumber}
                                 </span>
                                 <span className="text-[11px] text-mute">
                                   Resolved {t.resolvedAt ? timeAgo(t.resolvedAt) : "recently"}
@@ -604,7 +623,8 @@ export function HostPage() {
                 <button
                   type="button"
                   onClick={() => setOrderTab("active")}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                  aria-pressed={orderTab === "active"}
+                  className={`inline-flex min-h-[44px] items-center rounded-full px-4 text-xs font-semibold transition ${
                     orderTab === "active"
                       ? "bg-brand text-white shadow-xs"
                       : "text-mute hover:text-ink hover:bg-paper"
@@ -615,7 +635,8 @@ export function HostPage() {
                 <button
                   type="button"
                   onClick={() => setOrderTab("history")}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                  aria-pressed={orderTab === "history"}
+                  className={`inline-flex min-h-[44px] items-center rounded-full px-4 text-xs font-semibold transition ${
                     orderTab === "history"
                       ? "bg-brand text-white shadow-xs"
                       : "text-mute hover:text-ink hover:bg-paper"
@@ -693,7 +714,7 @@ export function HostPage() {
                             <div className="mt-3.5 flex items-center justify-end gap-2 border-t border-line/60 pt-2.5">
                               <button
                                 type="button"
-                                className="rounded-full px-3 py-1.5 text-xs text-mute hover:text-red-600 transition"
+                                className="inline-flex min-h-[44px] items-center rounded-full px-4 text-xs text-mute hover:text-red-600 transition"
                                 onClick={() => {
                                   void updateDiningOrderStatusRemote({
                                     propertyId: property.id,
@@ -710,7 +731,7 @@ export function HostPage() {
                               </button>
                               <button
                                 type="button"
-                                className="rounded-full bg-brand px-4 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 active:scale-95 transition"
+                                className="inline-flex min-h-[44px] items-center rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 active:scale-95 transition"
                                 onClick={() => {
                                   void (async () => {
                                     if (next === "delivered") {

@@ -541,10 +541,10 @@ function CalendarPageContent() {
                     <button
                       type="button"
                       onClick={() => setFilter("all")}
-                      className="hover:text-ink/60 cursor-pointer"
+                      className="grid h-7 w-7 place-items-center rounded-full hover:bg-line/60 hover:text-ink/60 cursor-pointer"
                       aria-label="Remove status filter"
                     >
-                      <X size={11} />
+                      <X size={12} />
                     </button>
                   </span>
                 )}
@@ -554,10 +554,10 @@ function CalendarPageContent() {
                     <button
                       type="button"
                       onClick={() => setCategory("all")}
-                      className="hover:text-ink/60 cursor-pointer"
+                      className="grid h-7 w-7 place-items-center rounded-full hover:bg-line/60 hover:text-ink/60 cursor-pointer"
                       aria-label="Remove category filter"
                     >
-                      <X size={11} />
+                      <X size={12} />
                     </button>
                   </span>
                 )}
@@ -568,10 +568,10 @@ function CalendarPageContent() {
                     <button
                       type="button"
                       onClick={() => setSearchQuery("")}
-                      className="hover:text-brand-ink cursor-pointer"
+                      className="grid h-7 w-7 place-items-center rounded-full hover:bg-brand/15 hover:text-brand-ink cursor-pointer"
                       aria-label="Clear search text"
                     >
-                      <X size={11} />
+                      <X size={12} />
                     </button>
                   </span>
                 )}
@@ -587,7 +587,7 @@ function CalendarPageContent() {
                   setCategory("all");
                   setSearchQuery("");
                 }}
-                className="text-[11px] font-semibold text-brand hover:underline cursor-pointer"
+                className="inline-flex min-h-[44px] items-center px-1 text-[11px] font-semibold text-brand hover:underline cursor-pointer"
               >
                 Clear all
               </button>
@@ -609,7 +609,7 @@ function CalendarPageContent() {
                   <button
                     type="button"
                     onClick={handleExportSelectedDay}
-                    className="inline-flex items-center gap-1 rounded-full bg-card px-2.5 py-1 text-[11px] font-medium text-ink ring-1 ring-line hover:bg-paper transition"
+                    className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-card px-3.5 text-[11px] font-medium text-ink ring-1 ring-line hover:bg-paper transition"
                   >
                     <Download size={11} />
                     <span>Save Day (.ics)</span>
@@ -618,7 +618,7 @@ function CalendarPageContent() {
                 <button
                   type="button"
                   onClick={() => setSelectedDate(undefined)}
-                  className="rounded-full bg-card px-2.5 py-1 text-[11px] font-medium text-ink ring-1 ring-line hover:bg-paper transition"
+                  className="inline-flex min-h-[44px] items-center rounded-full bg-card px-3.5 text-[11px] font-medium text-ink ring-1 ring-line hover:bg-paper transition"
                 >
                   Show full month
                 </button>
@@ -741,7 +741,7 @@ function CalendarPageContent() {
                         <button
                           type="button"
                           onClick={() => setFilter("all")}
-                          className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-ink transition"
+                          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand px-5 text-xs font-semibold text-white shadow-sm hover:bg-brand-ink transition"
                         >
                           <span>Show All Events</span>
                         </button>
@@ -750,7 +750,7 @@ function CalendarPageContent() {
                         <button
                           type="button"
                           onClick={() => setSelectedDate(undefined)}
-                          className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3.5 py-2 text-xs font-medium text-ink ring-1 ring-line hover:bg-line transition"
+                          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-paper px-4 text-xs font-medium text-ink ring-1 ring-line hover:bg-line transition"
                         >
                           <span>Clear date filter</span>
                         </button>
@@ -762,7 +762,7 @@ function CalendarPageContent() {
                             setCategory("all");
                             setSearchQuery("");
                           }}
-                          className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3.5 py-2 text-xs font-medium text-ink ring-1 ring-line hover:bg-line transition"
+                          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-paper px-4 text-xs font-medium text-ink ring-1 ring-line hover:bg-line transition"
                         >
                           <span>Reset search & filters</span>
                         </button>

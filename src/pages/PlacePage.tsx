@@ -74,7 +74,7 @@ export function PlacePage() {
               }
             }}
             aria-label="Go back"
-            className="grid h-10 w-10 place-items-center rounded-full bg-paper/85 backdrop-blur-md text-ink shadow-md hover:bg-paper transition ring-1 ring-line/50"
+            className="grid h-11 w-11 place-items-center rounded-full bg-paper/85 backdrop-blur-md text-ink shadow-md hover:bg-paper transition ring-1 ring-line/50"
           >
             <ArrowLeft size={18} />
           </button>
@@ -82,7 +82,7 @@ export function PlacePage() {
             type="button"
             onClick={onShare}
             aria-label="Share place"
-            className="grid h-10 w-10 place-items-center rounded-full bg-paper/85 backdrop-blur-md text-ink shadow-md hover:bg-paper transition ring-1 ring-line/50"
+            className="grid h-11 w-11 place-items-center rounded-full bg-paper/85 backdrop-blur-md text-ink shadow-md hover:bg-paper transition ring-1 ring-line/50"
           >
             <Share2 size={16} />
           </button>
@@ -174,7 +174,7 @@ export function PlacePage() {
         </button>
         <button
           type="button"
-          className="mt-4 w-full cursor-pointer text-[14px] font-semibold text-brand"
+          className="mt-4 inline-flex min-h-[48px] w-full cursor-pointer items-center justify-center text-[14px] font-semibold text-brand"
           onClick={() => nav("/explore")}
         >
           Explore more →

@@ -47,8 +47,11 @@ export function RewardsPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-24 pt-4 md:px-6 md:pt-6">
-      <Link href="/me" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-mute">
+    <div className="mx-auto max-w-2xl px-4 pb-28 pt-4 md:px-6 md:pt-6">
+      <Link
+        href="/me"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={15} /> Me
       </Link>
       <p className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand">
@@ -58,7 +61,7 @@ export function RewardsPage() {
       <p className="mt-1 text-sm text-mute">Platform offers for you — plus Stars for bringing your mates.</p>
 
       {/* Duty 1: platform Rewards (admin posts these at /admin/promotions) */}
-      <section aria-label="Platform rewards" className="mt-4 rounded-3xl border border-line bg-card p-5">
+      <section aria-label="Platform rewards" className="mt-4 rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
         <h2 className="flex items-center gap-1.5 font-display text-lg font-bold text-ink">
           <BadgePercent size={18} className="text-brand" aria-hidden /> Rewards from AirPal
         </h2>
@@ -91,14 +94,14 @@ export function RewardsPage() {
         </div>
         <Link
           href="/promotions"
-          className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-brand hover:underline"
+          className="mt-3 inline-flex min-h-[44px] items-center gap-1 text-[13px] font-semibold text-brand hover:underline"
         >
           Browse all offers <ChevronRight size={14} aria-hidden />
         </Link>
       </section>
 
       {/* Duty 2: referral — invite code and Stars */}
-      <section aria-label="Referral" className="mt-4 rounded-3xl border border-line bg-card p-5">
+      <section aria-label="Referral" className="mt-4 rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
         <h2 className="flex items-center gap-1.5 font-display text-lg font-bold text-ink">
           <Users size={18} className="text-brand" aria-hidden /> Refer a mate, earn Stars
         </h2>
@@ -109,7 +112,7 @@ export function RewardsPage() {
               <p className="mt-1 text-xs text-mute">Your invites and tiers stay on your account.</p>
               <Link
                 href={`/start?next=${encodeURIComponent("/me/rewards")}`}
-                className="mt-4 inline-flex h-10 items-center rounded-full bg-brand px-5 text-sm font-semibold text-white transition hover:brightness-110 active:scale-95"
+                className="mt-4 inline-flex min-h-[44px] items-center rounded-full bg-brand px-5 text-sm font-semibold text-white transition hover:bg-brand-ink active:scale-95"
               >
                 Sign in / Create account
               </Link>

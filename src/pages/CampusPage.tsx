@@ -57,7 +57,7 @@ export function CampusPage() {
   const CAMPUS = campus;
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-10">
+    <div className="mx-auto max-w-lg px-4 pb-28">
       <div className="flex items-center gap-3 pt-3">
         <button
           type="button"
@@ -66,7 +66,7 @@ export function CampusPage() {
             else nav("/");
           }}
           aria-label="Go back"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full ring-1 ring-line bg-card transition hover:ring-brand/40 active:scale-95"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full ring-1 ring-line bg-card transition hover:ring-brand/40 active:scale-95"
         >
           <ArrowLeft size={16} />
         </button>
@@ -77,8 +77,10 @@ export function CampusPage() {
         {(["today", "campus", "help"] as const).map((t) => (
           <button
             key={t}
+            type="button"
             onClick={() => setTab(t)}
-            className={`h-9 rounded-full px-4 text-sm capitalize ${tab === t ? "bg-brand text-white" : "bg-white ring-1 ring-line"}`}
+            aria-pressed={tab === t}
+            className={`h-11 rounded-full px-4 text-sm capitalize transition active:scale-95 ${tab === t ? "bg-brand text-white shadow-xs" : "bg-card ring-1 ring-line"}`}
           >
             {t}
           </button>
@@ -143,7 +145,7 @@ export function CampusPage() {
           {CAMPUS.security && (
             <a
               href={`tel:${CAMPUS.security}`}
-              className="flex h-11 items-center justify-center rounded-full bg-white ring-1 ring-line"
+              className="flex h-11 items-center justify-center rounded-full bg-card text-sm font-semibold ring-1 ring-line transition hover:bg-paper active:scale-[0.99]"
             >
               Security
             </a>

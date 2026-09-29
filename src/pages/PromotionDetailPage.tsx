@@ -196,18 +196,18 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
   const art = promoArtFor(promo.category, promo.heroImage);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-2xl px-4 py-8 pb-28">
+      <div className="flex items-center justify-between gap-3">
         <Link
           href={kind === "giveaway" ? "/giveaways" : "/promotions"}
-          className="flex items-center gap-1 text-[13px] font-medium text-mute"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
         >
           <ArrowLeft size={14} /> {kind === "giveaway" ? "Giveaways" : "Promotions"}
         </Link>
         <button
           type="button"
           onClick={share}
-          className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand hover:underline"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-brand ring-1 ring-line hover:bg-paper"
         >
           <Share2 size={14} /> Share
         </button>
@@ -293,7 +293,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
 
       <div className="mt-4">
         {reference ? (
-          <div className="rounded-2xl border-2 border-emerald-600 bg-emerald-50 p-4 text-center">
+          <div className="rounded-2xl border-2 border-emerald-600/50 bg-emerald-500/10 p-4 text-center">
             <ConfettiBurst fireKey={celebrate} />
             <AirPalMascot className="mx-auto h-28 w-auto" />
             <CheckCircle2 size={28} className="mx-auto mt-2 text-emerald-600" />
@@ -319,7 +319,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="Promotional code"
-                className="w-full rounded-2xl ring-1 ring-line bg-card p-3 text-sm font-semibold"
+                className="min-h-[48px] w-full rounded-2xl ring-1 ring-line bg-card px-4 py-3 text-sm font-semibold outline-none placeholder:font-normal placeholder:text-mute focus:ring-2 focus:ring-brand"
                 aria-label="Promotional code"
               />
             )}
@@ -348,7 +348,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
               <Link
                 key={r.id}
                 href={`/${r.kind === "giveaway" ? "giveaways" : "promotions"}/${r.id}`}
-                className="flex items-center gap-3 rounded-2xl ring-1 ring-line/15 bg-card p-3"
+                className="flex items-center gap-3 rounded-2xl ring-1 ring-line bg-card p-3 transition hover:bg-paper active:scale-[0.99]"
               >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-bold">{r.title}</span>

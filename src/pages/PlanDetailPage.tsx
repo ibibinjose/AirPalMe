@@ -310,17 +310,8 @@ export function PlanDetailPage() {
     [plan],
   );
 
-  if (loading) {
-    return <PageLoading />;
-  }
-
-  if (!plan) {
-    return <NotFoundPage />;
-  }
-
-  const goingAttendees = guestList.filter((a) => a.status === "going");
-  const maybeAttendees = guestList.filter((a) => a.status === "maybe");
-
+  // Above the early returns: hooks must run in the same order on every render,
+  // including the loading → loaded transition on cold invite-link opens.
   const brainHealth = useMemo(() => {
     if (!plan) return null;
     return evaluatePlanHealth({
@@ -332,6 +323,17 @@ export function PlanDetailPage() {
       isCompleted: plan.status === "completed",
     });
   }, [plan]);
+
+  if (loading) {
+    return <PageLoading />;
+  }
+
+  if (!plan) {
+    return <NotFoundPage />;
+  }
+
+  const goingAttendees = guestList.filter((a) => a.status === "going");
+  const maybeAttendees = guestList.filter((a) => a.status === "maybe");
 
   const handleDeletePlan = () => {
     if (window.confirm("Are you sure you want to delete this plan?")) {
@@ -348,25 +350,25 @@ export function PlanDetailPage() {
           <TicketGatePanel ticketId={ticketId} />
         </div>
       )}
-      {/* Top Floating Controls */}
-      <div className="flex items-center justify-between gap-3 mb-6">
+      {/* Top Floating Controls — scrolls sideways on narrow phones so nothing clips */}
+      <div className="flex items-center gap-3 mb-6">
         <button
           type="button"
           onClick={() => {
             if (window.history.length > 1) window.history.back();
             else nav("/plan");
           }}
-          className="grid h-10 w-10 place-items-center rounded-full bg-card ring-1 ring-line text-ink hover:bg-paper transition"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-card ring-1 ring-line text-ink hover:bg-paper transition"
           aria-label="Go back"
         >
           <ArrowLeft size={18} />
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="no-scrollbar flex min-w-0 flex-1 items-center justify-end gap-2 overflow-x-auto py-0.5">
           {isHost && (
             <Link
               href={`/plan/${plan.id}/edit`}
-              className="inline-flex h-10 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
+              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
             >
               <Pencil size={13} />
               <span className="hidden sm:inline">Edit Plan</span>
@@ -379,7 +381,7 @@ export function PlanDetailPage() {
               onClick={() => setBroadcastOpen(true)}
               aria-label="Message everyone going"
               title="Message everyone going"
-              className="inline-flex h-10 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
+              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
             >
               <Megaphone size={13} />
               <span className="hidden sm:inline">Message going</span>
@@ -391,7 +393,7 @@ export function PlanDetailPage() {
             onClick={() => followPlan(plan.id)}
             aria-label={isSubscribed ? "Following event" : "Follow event"}
             className={cn(
-              "inline-flex h-10 items-center gap-1.5 rounded-full px-3.5 text-xs font-medium ring-1 transition",
+              "inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-xs font-medium ring-1 transition",
               isSubscribed
                 ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 ring-amber-500/30"
                 : "bg-card text-ink ring-line hover:bg-paper",
@@ -406,7 +408,7 @@ export function PlanDetailPage() {
             size="sm"
             variant="ghost"
             onClick={() => setQrModalOpen(true)}
-            className="gap-1.5 rounded-full h-10 px-3 text-xs font-semibold ring-1 ring-line bg-card hover:bg-line/40 text-ink shadow-xs"
+            className="gap-1.5 rounded-full h-10 px-3 text-xs font-semibold ring-1 ring-line bg-card hover:bg-line/40 text-ink shadow-xs shrink-0"
             title="In-person Dynamic QR Code"
           >
             <QrCode size={14} />
@@ -416,7 +418,7 @@ export function PlanDetailPage() {
           <Button
             size="sm"
             onClick={() => setShareOpen(true)}
-            className="gap-1.5 rounded-full h-10 px-4 text-xs font-semibold shadow-sm"
+            className="gap-1.5 rounded-full h-10 px-4 text-xs font-semibold shadow-sm shrink-0"
           >
             <Share2 size={14} />
             <span>Invite Mates</span>
@@ -642,7 +644,7 @@ export function PlanDetailPage() {
         <div className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs">
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1.5 text-xs font-bold text-brand uppercase tracking-wider">
-              <Sparkles size={14} className="animate-pulse" />
+              <Sparkles size={14} className="motion-safe:animate-pulse" />
               AirPal Brain · Experience Readiness
             </span>
             <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-bold text-brand">
@@ -663,7 +665,7 @@ export function PlanDetailPage() {
         </div>
       )}
 
-      <div className="mt-6">
+      <div className="sticky top-0 z-20 -mx-4 mt-6 bg-paper/95 px-4 py-2 backdrop-blur">
         <SegmentedControl
           label="Plan sections"
           value={detailTab}

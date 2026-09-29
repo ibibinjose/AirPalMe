@@ -33,13 +33,13 @@ export function ZooPage() {
   const offers = zooOffers(state, hunts);
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-10">
+    <div className="mx-auto max-w-lg px-4 pb-28">
       <div className="flex items-center gap-3 pt-4">
         <button
           type="button"
           onClick={() => nav("/me")}
           aria-label="Back to profile"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full ring-1 ring-line bg-card transition hover:ring-brand/40 active:scale-95"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full ring-1 ring-line bg-card transition hover:ring-brand/40 active:scale-95"
         >
           <ArrowLeft size={16} />
         </button>
@@ -63,9 +63,10 @@ export function ZooPage() {
             key={id}
             type="button"
             onClick={() => setTab(id)}
+            aria-pressed={tab === id}
             className={cn(
-              "h-9 shrink-0 rounded-full px-4 text-sm capitalize",
-              tab === id ? "bg-brand text-white" : "bg-white ring-1 ring-line",
+              "h-11 shrink-0 rounded-full px-4 text-sm capitalize transition active:scale-95",
+              tab === id ? "bg-brand text-white shadow-xs" : "bg-card ring-1 ring-line",
             )}
           >
             {id === "offers" ? "Offers & deals" : id === "shops" ? "Shops" : id === "hunts" ? "Hunts" : "Stickers"}
@@ -122,7 +123,11 @@ export function ZooPage() {
               <p className="text-[12px] text-gold">{row.badge}</p>
               <p className="font-medium">{row.name}</p>
               <p className="mt-1 text-sm text-mute">{row.detail}</p>
-              <button type="button" className="mt-2 text-sm text-brand" onClick={() => nav(bioPath(row.handle))}>
+              <button
+                type="button"
+                className="mt-2 inline-flex min-h-[44px] items-center text-sm font-semibold text-brand"
+                onClick={() => nav(bioPath(row.handle))}
+              >
                 @{row.handle}
               </button>
             </li>

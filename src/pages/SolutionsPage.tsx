@@ -7,7 +7,7 @@ export function SolutionsPage() {
   const [, nav] = useLocation();
   const { t } = useLocale();
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-10 md:px-6">
+    <div className="mx-auto max-w-5xl px-4 pb-28 md:px-6">
       <header className="py-6 md:py-10">
         <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-gold">{t("solutionsKicker")}</p>
         <h1 className="font-display mt-2 text-4xl font-semibold md:text-5xl whitespace-pre-line">
@@ -19,8 +19,10 @@ export function SolutionsPage() {
         {SOLUTIONS.map((s) => (
           <button
             key={s.id}
+            type="button"
             onClick={() => nav(`/solutions/${s.id}`)}
-            className="relative min-h-[220px] overflow-hidden rounded-[28px] text-left md:min-h-[280px]"
+            aria-label={t(`sol.${s.id}`)}
+            className="relative min-h-[220px] overflow-hidden rounded-[28px] text-left ring-brand transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-paper md:min-h-[280px]"
           >
             <Photo src={s.image} className="absolute inset-0 h-full w-full object-cover" />
             <div className="hero-scrim absolute inset-0" />

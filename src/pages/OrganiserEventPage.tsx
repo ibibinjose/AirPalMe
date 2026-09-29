@@ -437,14 +437,6 @@ export function OrganiserEventPage() {
   if (!viewEvent) {
     return (
       <div className="relative isolate overflow-hidden min-h-[85vh]">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -left-20 top-[-6rem] h-64 w-64 rounded-full bg-brand/10 blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-16 top-24 h-56 w-56 rounded-full bg-gold/15 blur-3xl"
-        />
         <motion.div
           className="relative mx-auto max-w-2xl px-4 py-8 pb-24"
           initial={reduce ? false : "hidden"}
@@ -1011,8 +1003,8 @@ export function OrganiserEventPage() {
           </div>
         </div>
 
-        {/* Tab Navigation Pill Bar */}
-        <div className="mt-5 flex rounded-2xl bg-paper p-1.5 ring-1 ring-line shadow-xs">
+        {/* Tab Navigation Pill Bar — sticky so long manage views keep their sections */}
+        <div className="sticky top-2 z-20 mt-5 flex rounded-2xl bg-paper p-1.5 ring-1 ring-line shadow-xs">
           {(
             [
               { id: "today", label: "Overview", icon: LayoutGrid, count: undefined },

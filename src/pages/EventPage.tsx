@@ -201,7 +201,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
         <button
           type="button"
           onClick={() => nav("/calendar")}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-mute hover:text-ink transition"
+          className="inline-flex min-h-[44px] items-center gap-1.5 text-xs font-medium text-mute hover:text-ink transition"
         >
           <ArrowLeft size={14} />
           <span>Calendar</span>
@@ -209,10 +209,11 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
         <button
           type="button"
           onClick={handleShare}
-          className="grid h-8 w-8 place-items-center rounded-full bg-card ring-1 ring-line text-mute hover:text-ink transition"
+          aria-label="Share event"
+          className="grid h-11 w-11 place-items-center rounded-full bg-card ring-1 ring-line text-mute hover:text-ink transition"
           title="Share"
         >
-          <Share2 size={14} />
+          <Share2 size={16} />
         </button>
       </div>
 
@@ -424,7 +425,7 @@ function NearbyEventDetailView({ event: ev }: { event: NearbyEvent }) {
     });
   }, [ev.id, ev.title, ev.insiderTip, ev.detail, ev.heroImage]);
   return (
-    <div className="mx-auto max-w-lg pb-10">
+    <div className="mx-auto max-w-lg pb-28">
       {ev.heroImage && (
         <img src={ev.heroImage} alt="" referrerPolicy="no-referrer" className="h-72 w-full object-cover" />
       )}

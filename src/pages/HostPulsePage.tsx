@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { useAuth } from "@/contexts/AuthContext";
@@ -163,7 +164,7 @@ export function HostPulsePage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-16 pt-6">
+    <div className="mx-auto max-w-3xl px-4 pb-28 pt-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">AirPal Pulse</p>
@@ -171,7 +172,7 @@ export function HostPulsePage() {
           <p className="mt-1 text-sm text-mute">Capture → alert → resolve. Real responses only — no fake totals.</p>
         </div>
         <Button variant="ghost" onClick={() => nav("/host")}>
-          ← Host
+          <ArrowLeft size={15} /> Host
         </Button>
       </div>
 
@@ -276,7 +277,7 @@ export function HostPulsePage() {
                 {issue.status === "open" && (
                   <button
                     type="button"
-                    className="text-sm text-brand"
+                    className="inline-flex min-h-[44px] items-center rounded-full bg-card px-4 text-sm font-semibold text-ink ring-1 ring-line transition hover:bg-paper active:scale-95"
                     onClick={() => {
                       void acknowledgePulseIssue(workspaceId!, issue.id)
                         .then(() => {
@@ -294,14 +295,14 @@ export function HostPulsePage() {
                   </button>
                 )}
                 <input
-                  className="h-9 min-w-[160px] flex-1 rounded-full border border-line bg-paper px-3 text-sm outline-none focus:border-brand"
+                  className="h-11 min-w-[160px] flex-1 rounded-full border border-line bg-paper px-4 text-sm outline-none focus:border-brand"
                   placeholder="Resolution note"
                   value={noteByIssue[issue.id] || ""}
                   onChange={(e) => setNoteByIssue((m) => ({ ...m, [issue.id]: e.target.value }))}
                 />
                 <button
                   type="button"
-                  className="text-sm text-brand"
+                  className="inline-flex min-h-[44px] items-center rounded-full bg-brand px-4 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-ink active:scale-95"
                   onClick={() => {
                     void resolvePulseIssue(workspaceId!, issue.id, noteByIssue[issue.id])
                       .then(() => {
@@ -345,7 +346,7 @@ export function HostPulsePage() {
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <select
                       aria-label="Follow-up score"
-                      className="h-9 rounded-full border border-line bg-paper px-3 text-sm outline-none focus:border-brand"
+                      className="h-11 rounded-full border border-line bg-paper px-4 text-sm outline-none focus:border-brand"
                       value={followupScoreByIssue[issue.id] || ""}
                       onChange={(e) => setFollowupScoreByIssue((m) => ({ ...m, [issue.id]: e.target.value }))}
                     >
@@ -357,12 +358,16 @@ export function HostPulsePage() {
                       ))}
                     </select>
                     <input
-                      className="h-9 min-w-[160px] flex-1 rounded-full border border-line bg-paper px-3 text-sm outline-none focus:border-brand"
+                      className="h-11 min-w-[160px] flex-1 rounded-full border border-line bg-paper px-4 text-sm outline-none focus:border-brand"
                       placeholder="Follow-up note (optional)"
                       value={followupNoteByIssue[issue.id] || ""}
                       onChange={(e) => setFollowupNoteByIssue((m) => ({ ...m, [issue.id]: e.target.value }))}
                     />
-                    <button type="button" className="text-sm text-brand" onClick={() => onRecordFollowup(issue.id)}>
+                    <button
+                      type="button"
+                      className="inline-flex min-h-[44px] items-center rounded-full bg-brand px-4 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-ink active:scale-95"
+                      onClick={() => onRecordFollowup(issue.id)}
+                    >
                       Record follow-up
                     </button>
                   </div>
@@ -375,7 +380,12 @@ export function HostPulsePage() {
 
       <div className="mt-8 mb-2 flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold text-mute">Responses{responses.length ? ` · ${responses.length}` : ""}</h2>
-        <button type="button" className="text-xs font-medium text-brand" onClick={downloadCsv} disabled={!responses.length}>
+        <button
+          type="button"
+          className="inline-flex min-h-[44px] items-center rounded-full bg-card px-4 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-paper active:scale-95 disabled:opacity-50"
+          onClick={downloadCsv}
+          disabled={!responses.length}
+        >
           Export CSV
         </button>
       </div>

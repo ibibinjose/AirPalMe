@@ -51,51 +51,45 @@ const CATEGORIES: { id: Category; label: string }[] = [
 const QUICK_STARTERS = [
   {
     icon: Coffee,
-    emoji: "☕",
     label: "Coffee Catchup",
     desc: "Quick coffee & chat",
     type: "catchup" as const,
-    color: "from-amber-500/15 to-amber-700/10 text-amber-700 dark:text-amber-300",
+    color: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
   },
   {
     icon: Utensils,
-    emoji: "🍽️",
     label: "Family Brunch",
     desc: "Weekend feast together",
     type: "lunch" as const,
-    color: "from-orange-500/15 to-orange-700/10 text-orange-700 dark:text-orange-300",
+    color: "bg-orange-500/15 text-orange-700 dark:text-orange-300",
   },
   {
     icon: Wine,
-    emoji: "🍸",
     label: "Night Out",
     desc: "Drinks, music & vibes",
     type: "nightout" as const,
-    color: "from-purple-500/15 to-purple-700/10 text-purple-700 dark:text-purple-300",
+    color: "bg-brand/10 text-brand",
   },
   {
     icon: Footprints,
-    emoji: "🏃",
     label: "Walk & Talk",
     desc: "Scenic trail or park walk",
     type: "walk" as const,
-    color: "from-emerald-500/15 to-emerald-700/10 text-emerald-700 dark:text-emerald-300",
+    color: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
   },
   {
     icon: Car,
-    emoji: "🚗",
     label: "Road Trip",
     desc: "Weekend getaway drive",
     type: "trip" as const,
-    color: "from-blue-500/15 to-blue-700/10 text-blue-700 dark:text-blue-300",
+    color: "bg-blue-500/15 text-blue-700 dark:text-blue-300",
   },
   {
     icon: PartyPopper,
-    emoji: "🎉",
     label: "Celebration",
     desc: "Birthday or milestone",
     type: "birthday" as const,
-    color: "from-rose-500/15 to-rose-700/10 text-rose-700 dark:text-rose-300",
+    color: "bg-rose-500/15 text-rose-700 dark:text-rose-300",
   },
 ];
 
@@ -230,7 +224,7 @@ export function PlanHubPage() {
             </span>
             {activeMyPlans.length > 0 && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 motion-safe:animate-pulse" />
                 {activeMyPlans.length} upcoming
               </span>
             )}
@@ -281,7 +275,7 @@ export function PlanHubPage() {
                 <Photo
                   src={nextUpcomingPlan.heroImage}
                   alt={nextUpcomingPlan.title}
-                  className="h-full w-full object-cover transition duration-500 hover:scale-105"
+                  className="h-full w-full object-cover"
                 />
               </div>
             )}
@@ -378,18 +372,18 @@ export function PlanHubPage() {
               key={starter.label}
               type="button"
               onClick={() => handleStarterClick(starter)}
-              className="group flex w-44 shrink-0 flex-col justify-between rounded-2xl bg-card p-3.5 text-left ring-1 ring-line transition-all duration-200 hover:-translate-y-0.5 hover:ring-brand/30 hover:shadow-sm active:scale-95"
+              className="group flex w-44 shrink-0 flex-col justify-between rounded-2xl bg-card p-3.5 text-left ring-1 ring-line transition-shadow duration-200 hover:ring-brand/30 hover:shadow-sm active:scale-95"
             >
               <div className="flex items-center justify-between">
-                <span className="text-2xl">{starter.emoji}</span>
                 <span
                   className={cn(
-                    "flex h-7 w-7 items-center justify-center rounded-xl bg-linear-to-br transition group-hover:scale-110",
+                    "flex h-10 w-10 items-center justify-center rounded-xl",
                     starter.color,
                   )}
                 >
-                  <starter.icon size={15} />
+                  <starter.icon size={19} />
                 </span>
+                <ArrowRight size={15} className="text-mute opacity-0 transition-opacity group-hover:opacity-100" />
               </div>
               <div className="mt-3">
                 <span className="block truncate text-sm font-bold text-ink">
@@ -404,8 +398,8 @@ export function PlanHubPage() {
         </div>
       </div>
 
-      {/* Tab Navigation & Search */}
-      <div className="mt-8">
+      {/* Tab Navigation & Search — sticky so long lists keep their filters */}
+      <div className="sticky top-0 z-20 -mx-4 mt-8 bg-paper/95 px-4 pt-3 backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
             {TABS.map((t) => {
@@ -452,7 +446,7 @@ export function PlanHubPage() {
         </div>
 
         {/* Search and Category Filters */}
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="mt-4 flex flex-col gap-3 pb-3 sm:flex-row sm:items-center">
           <div className="flex-1">
             <SearchBar
               value={searchQuery}

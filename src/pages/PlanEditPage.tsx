@@ -153,6 +153,7 @@ export function PlanEditPage() {
       <form onSubmit={handleSubmit} className="mt-8 space-y-6">
         {/* Occasion format */}
         <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs space-y-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-gold">01 · Occasion</p>
           <label className="font-display text-base font-semibold text-ink block">Occasion Format</label>
 
           <div>
@@ -220,6 +221,7 @@ export function PlanEditPage() {
 
         {/* Details & Destination */}
         <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs space-y-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-gold">02 · Details</p>
           <label className="font-display text-base font-semibold text-ink block">Basic Information</label>
 
           <div>
@@ -299,7 +301,8 @@ export function PlanEditPage() {
           </div>
         </div>
 
-        <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+        <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs space-y-3">
+          <p className="text-xs font-bold uppercase tracking-wider text-gold">03 · Photo</p>
           <ImageField
             kind="square"
             folder="listings"
@@ -311,7 +314,8 @@ export function PlanEditPage() {
 
         {/* VIP Theme */}
         <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-          <label className="font-display text-base font-semibold text-ink block">Invitation Card Theme</label>
+          <p className="text-xs font-bold uppercase tracking-wider text-gold">04 · Theme</p>
+          <label className="font-display text-base font-semibold text-ink block mt-1">Invitation Card Theme</label>
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {(Object.keys(PLAN_THEMES) as PlanTheme[]).map((tKey) => {
               const th = PLAN_THEMES[tKey];
@@ -341,7 +345,8 @@ export function PlanEditPage() {
 
         {/* Itinerary Stops Section */}
         <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-          <div className="flex items-center justify-between gap-3 mb-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-gold">05 · Stops</p>
+          <div className="flex items-center justify-between gap-3 mb-4 mt-1">
             <div>
               <label className="font-display text-base font-semibold text-ink block">Itinerary Stops & Schedule</label>
               <p className="text-xs text-mute mt-0.5">Add, edit, or reorder the stops and venues for this gathering</p>
@@ -381,8 +386,8 @@ export function PlanEditPage() {
           />
         </div>
 
-        {/* Submit */}
-        <div className="pt-2 flex gap-3">
+        {/* Submit — sticky so save is always in reach on the long form */}
+        <div className="sticky bottom-24 z-10 flex gap-3 rounded-2xl bg-card/95 p-2 ring-1 ring-line shadow-md backdrop-blur">
           <Button
             type="button"
             variant="ghost"

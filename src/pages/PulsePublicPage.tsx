@@ -183,7 +183,7 @@ export function PulsePublicPage() {
       : null;
 
   return (
-    <div className="mx-auto min-h-[100dvh] max-w-md px-4 pb-10 pt-6">
+    <div className="mx-auto min-h-[100dvh] max-w-md px-4 pb-28 pt-6">
       {pulse.propertyHeroImage ? (
         <div>
           <div className="relative h-40 overflow-hidden rounded-[28px] ring-1 ring-line">
@@ -362,7 +362,7 @@ export function PulsePublicPage() {
                       key={n}
                       type="button"
                       onClick={() => chooseAndAdvance(current, n)}
-                      className={`h-10 rounded-xl text-sm font-medium ring-1 ${
+                      className={`h-11 rounded-xl text-sm font-medium ring-1 ${
                         selected ? "bg-ink text-white ring-ink" : "bg-card ring-line"
                       }`}
                     >
