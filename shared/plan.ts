@@ -249,6 +249,8 @@ export interface HangoutPlan {
   inviteCode: string; // 6-char unique short code
   /** Public plans appear on the live map and nearby feed; private stay invite-only. */
   isPublic?: boolean;
+  /** Demo-business marker: filtered from guest discovery, `demo-` ids skip KPIs. */
+  demo?: boolean;
   /** Dropped pin for the meeting point. Absent = shown as a city-area pin. */
   geo?: Geo;
   /** Interest tags used for nearby matching. */

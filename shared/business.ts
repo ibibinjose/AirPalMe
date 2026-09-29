@@ -60,6 +60,8 @@ export type BusinessListing = {
   logoUrl?: string;
   /** presence | featured | partner — Featured is server-clamped to domain or ABN proof. */
   plan?: "presence" | "featured" | "partner";
+  /** Demo-business marker: filtered from guest discovery, `demo-` ids skip KPIs. */
+  demo?: boolean;
 };
 
 export const DEFAULT_LISTING_GEO: Geo = { lat: -33.85955, lng: 151.20715 };

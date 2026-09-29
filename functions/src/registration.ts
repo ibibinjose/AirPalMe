@@ -20,6 +20,7 @@ import {
   type CompleteRegistrationRequest,
   type PropertyMemberRole,
 } from "../../shared/airpal-security";
+import { DEMO_ID_PREFIX, demoFlagAllowed } from "../../shared/content-meta";
 import { enforceRateLimit, noteAppCheck } from "./abuse";
 import { writeAuthoritativeEvent } from "./analytics";
 import { writeAudit } from "./abuse";
@@ -47,14 +48,15 @@ export const completeRegistration = onCall(CALLABLE, async (request) => {
     city: string;
   }> {
     const kind = parseHostPropertyKind(data.kind);
-    const propertyId = generatePropertyId();
+    const demo = demoFlagAllowed(isPlatformAdmin((request.auth?.token || {}) as AccessClaims), data.demo);
+    const propertyId = demo ? `${DEMO_ID_PREFIX}${generatePropertyId()}` : generatePropertyId();
     const handle = slugifyHandle(propertyName);
     const cityRaw = String(data.city || "").trim() || "Your city";
     const citySlug = slugifyCity(cityRaw);
     const geoLat = Number(data.geoLat);
     const geoLng = Number(data.geoLng);
     const geo = Number.isFinite(geoLat) && Number.isFinite(geoLng) ? { lat: geoLat, lng: geoLng } : undefined;
-    const lobbyMarkerId = generateMarkerId();
+    const lobbyMarkerId = demo ? `${DEMO_ID_PREFIX}${generateMarkerId()}` : generateMarkerId();
     const { roomTokens, defaultRoomNumber, defaultRoomToken } = buildDefaultRoomTokens(kind, data.roomsCount);
     const property = buildHostProperty({
       propertyName,
@@ -95,6 +97,7 @@ export const completeRegistration = onCall(CALLABLE, async (request) => {
       .doc(property.id)
       .set({
         ...publicProperty,
+        ...(demo ? { demo: true as const } : {}),
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
       });
@@ -154,6 +157,7 @@ export const completeRegistration = onCall(CALLABLE, async (request) => {
         state: property.state || "",
         country: property.country || "",
         countryCode: property.countryCode || "",
+        ...(demo ? { demo: true as const } : {}),
         createdAt: FieldValue.serverTimestamp(),
       });
     return {

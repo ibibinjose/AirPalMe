@@ -99,6 +99,13 @@ describe("context helpers", () => {
     expect(isSeedContextId("harbour-hotel")).toBe(true);
     expect(isSeedContextId("prop_live_1")).toBe(false);
   });
+
+  it("treats demo- ids as seed contexts so demo never enters KPIs", () => {
+    expect(isSeedContextId("demo-harbour-stay")).toBe(true);
+    expect(isSeedContextId("stay:demo-harbour-stay")).toBe(true);
+    expect(isSeedContextId("demo")).toBe(false);
+    expect(isSeedContextId(undefined)).toBe(false);
+  });
 });
 
 describe("winnable loop (scan QR → first value in 60s)", () => {

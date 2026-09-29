@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { contentNeedsReview, isContentLive, stampContentMeta } from "./content-meta";
+import {
+  contentNeedsReview,
+  DEMO_ID_PREFIX,
+  demoDocId,
+  demoFlagAllowed,
+  isContentLive,
+  isDemoContent,
+  stampContentMeta,
+} from "./content-meta";
 
 describe("content meta", () => {
   it("stamps owner, review, and timestamps without clobbering createdAt", () => {
@@ -20,6 +28,28 @@ describe("content meta", () => {
     expect(isContentLive({ status: "active", reviewStatus: "rejected" })).toBe(false);
     expect(isContentLive({ status: "active", expiresAt: "2020-01-01T00:00:00.000Z" })).toBe(false);
     expect(isContentLive({ status: "active", expiresAt: "2099-01-01T00:00:00.000Z" })).toBe(true);
+  });
+
+  it("flags demo content only on an explicit true", () => {
+    expect(isDemoContent({ demo: true })).toBe(true);
+    expect(isDemoContent({})).toBe(false);
+    expect(isDemoContent({ demo: false })).toBe(false);
+    expect(isDemoContent({ demo: "true" })).toBe(false);
+    expect(isDemoContent({ demo: 1 })).toBe(false);
+  });
+
+  it("builds demo- ids that seed-context detection already excludes", () => {
+    expect(DEMO_ID_PREFIX).toBe("demo-");
+    expect(demoDocId("list", "a1b2c3d4")).toBe("demo-list-a1b2c3d4");
+    expect(demoDocId("evt", "e5f6a7b8")).toBe("demo-evt-e5f6a7b8");
+  });
+
+  it("allows the demo flag for platform admins only", () => {
+    expect(demoFlagAllowed(true, true)).toBe(true);
+    expect(demoFlagAllowed(false, true)).toBe(false);
+    expect(demoFlagAllowed(true, false)).toBe(false);
+    expect(demoFlagAllowed(true, "true")).toBe(false);
+    expect(demoFlagAllowed(true, undefined)).toBe(false);
   });
 
   it("marks unverified or pending content as needing review", () => {

@@ -156,6 +156,8 @@ export type CompleteRegistrationRequest = {
   breakfastLocation?: string;
   breakfastType?: string;
   breakfastPrice?: string;
+  /** Demo-business build. Honored for platform admins only (server-enforced). */
+  demo?: boolean;
 };
 
 export type CompleteRegistrationResponse = {
@@ -298,6 +300,8 @@ export type UpsertBusinessListingRequest = {
   website?: string;
   plan?: string;
   abnOrTaxId?: string;
+  /** Demo-business build. Honored for platform admins only (server-enforced). */
+  demo?: boolean;
 };
 
 export type UpsertBusinessDealRequest = {
@@ -328,6 +332,8 @@ export type UpsertEventRequest = {
   registrationUrl?: string;
   registrationNote?: string;
   speakers?: { name: string; role?: string; handle?: string }[];
+  /** Demo-business build. Honored for platform admins only (server-enforced). */
+  demo?: boolean;
 };
 
 export type UpsertEventStallRequest = {

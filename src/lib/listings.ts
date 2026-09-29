@@ -1,5 +1,5 @@
 import { DEFAULT_LISTING_GEO, DEFAULT_PRECINCT_ID, listingToPlace, type BusinessListing } from "@shared/business";
-import { isContentLive, stampContentMeta } from "@shared/content-meta";
+import { isContentLive, isDemoContent, stampContentMeta } from "@shared/content-meta";
 import type { NearbyPlace } from "@shared/nearby";
 
 const KEY = "airpal.listings.v1";
@@ -47,7 +47,7 @@ export function getCachedListings() {
 
 export function listedPlaces(): NearbyPlace[] {
   return getCachedListings()
-    .filter((row) => isContentLive(row))
+    .filter((row) => isContentLive(row) && !isDemoContent(row))
     .map(listingToPlace);
 }
 

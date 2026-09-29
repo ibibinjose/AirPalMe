@@ -242,6 +242,7 @@ export function isBackendState(value: string): value is BackendState {
 export function isSeedContextId(contextId: string | undefined): boolean {
   if (!contextId) return false;
   const bare = contextId.includes(":") ? contextId.split(":")[1] || contextId : contextId;
+  if (bare.startsWith("demo-")) return true;
   return SEED_CONTEXT_IDS.has(contextId) || SEED_CONTEXT_IDS.has(bare);
 }
 

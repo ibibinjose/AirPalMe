@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { HangoutPlan, PlanStop, PlanType, PlanTheme } from "@shared/plan";
+import { isDemoContent } from "@shared/content-meta";
 import { attendeeSeats, canCancelPlanStatus, formatDateOption, headcountTaken, isPlanManager, isTicketed, normalizeAnswer, normalizePlusOnes, normalizeRating, normalizeReview, setAttendeeCheckedIn, validDateOption, waitlistQueue } from "@shared/plan";
 import { goingFits, resolveRsvpStatus } from "@shared/plan-notify";
 import type { Geo } from "@shared/nearby";
@@ -173,7 +174,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   }, [plans, user]);
 
   const publicPlans = useMemo(() => {
-    return plans.filter((p) => p.isPublic && p.status !== "cancelled");
+    return plans.filter((p) => p.isPublic && p.status !== "cancelled" && !isDemoContent(p));
   }, [plans]);
 
   const getPlan = useCallback((idOrCode: string) => {

@@ -84,6 +84,8 @@ export type EventRecord = {
   updatedAt?: string;
   expiresAt?: string;
   scheduleVerifiedAt?: string;
+  /** Demo-business marker: filtered from guest discovery, `demo-` ids skip KPIs. */
+  demo?: boolean;
 };
 
 export type StallRecord = {

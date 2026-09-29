@@ -3,18 +3,23 @@ import { FieldValue, GeoPoint } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { DEFAULT_PRECINCT_ID, isBusinessCategory, placeCategoryFor } from "../../shared/business";
 import { clampBusinessPlan } from "../../shared/business-onboarding";
-import { stampContentMeta } from "../../shared/content-meta";
+import { demoFlagAllowed, stampContentMeta } from "../../shared/content-meta";
 import { emailMatchesWebsite } from "../../shared/google-place";
-import type { UpsertBusinessDealRequest, UpsertBusinessListingRequest } from "../../shared/airpal-security";
+import type {
+  AccessClaims,
+  UpsertBusinessDealRequest,
+  UpsertBusinessListingRequest,
+} from "../../shared/airpal-security";
 import { enforceRateLimit, noteAppCheck, writeAudit } from "./abuse";
 import { writeAuthoritativeEvent } from "./analytics";
-import { CALLABLE, auth, db, requireAccount } from "./admin";
+import { CALLABLE, auth, db, isPlatformAdmin, requireAccount } from "./admin";
 
 export const upsertBusinessListing = onCall(CALLABLE, async (request) => {
   await noteAppCheck(request, "upsertBusinessListing");
   const uid = requireAccount(request, "Create an email account to list a place.");
   await enforceRateLimit(uid, "listingWrite", false);
   const data = (request.data || {}) as UpsertBusinessListingRequest;
+  const demo = demoFlagAllowed(isPlatformAdmin((request.auth?.token || {}) as AccessClaims), data.demo);
   const name = String(data.name || "").trim();
   const address = String(data.address || "").trim();
   const shortWhy = String(data.shortWhy || "").trim();
@@ -92,6 +97,7 @@ export const upsertBusinessListing = onCall(CALLABLE, async (request) => {
     expiresAt: meta.expiresAt || null,
     mapsPlaceId: String(data.mapsPlaceId || "").trim() || String(previous?.mapsPlaceId || "") || null,
     website: website || null,
+    ...(demo ? { demo: true as const } : {}),
   };
 
   await db.collection("listings").doc(listingId).set(listing, { merge: true });
@@ -120,6 +126,7 @@ export const upsertBusinessListing = onCall(CALLABLE, async (request) => {
         website: listing.website,
         phone: listing.phone,
         updatedAt: FieldValue.serverTimestamp(),
+        ...(demo ? { demo: true as const } : {}),
       },
       { merge: true },
     );
