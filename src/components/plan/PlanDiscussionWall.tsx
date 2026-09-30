@@ -11,9 +11,9 @@ import { cn } from "@/lib/cn";
 
 const TOPICS = [
   { id: "Meetup", label: "Meetup spot", icon: MapPin, color: "#2b7cd3" },
-  { id: "Carpool", label: "Carpool", icon: Car, color: "#2fa866" },
-  { id: "Tables", label: "Tables", icon: Ticket, color: "#d99a17" },
-  { id: "Photos", label: "Photos", icon: Camera, color: "#e86a33" },
+  { id: "Carpool", label: "Carpool", icon: Car, color: "#15803d" },
+  { id: "Tables", label: "Tables", icon: Ticket, color: "#b45309" },
+  { id: "Photos", label: "Photos", icon: Camera, color: "#c2410c" },
 ] as const;
 
 function topicOf(text: string): string | null {

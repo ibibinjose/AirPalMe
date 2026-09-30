@@ -43,10 +43,10 @@ import { cn } from "@/lib/cn";
 type AroundFilter = "events" | "food" | "places" | "community";
 
 const AROUND: { id: AroundFilter; label: string; color: string }[] = [
-  { id: "events", label: "Events & Shows", color: "#e86a33" },
-  { id: "food", label: "Dining & Drinks", color: "#d99a17" },
+  { id: "events", label: "Events & Shows", color: "#c2410c" },
+  { id: "food", label: "Dining & Drinks", color: "#b45309" },
   { id: "places", label: "Places & Stays", color: "#2b7cd3" },
-  { id: "community", label: "Community Hub", color: "#2fa866" },
+  { id: "community", label: "Community Hub", color: "#15803d" },
 ];
 
 const QUICK_PROMPTS = [
