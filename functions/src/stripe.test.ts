@@ -35,7 +35,12 @@ vi.mock("firebase-functions/v2/https", () => ({
   onRequest: vi.fn((_opts: unknown, handler: unknown) => handler),
 }));
 
-import { sandboxBookingsAllowed, stayCheckoutReturnUrls, stripeLiveConfigured } from "./stripe";
+import {
+  assertChargeableAmount,
+  sandboxBookingsAllowed,
+  stayCheckoutReturnUrls,
+  stripeLiveConfigured,
+} from "./stripe";
 
 describe("sandboxBookingsAllowed", () => {
   afterEach(() => {
@@ -80,5 +85,19 @@ describe("stripeLiveConfigured", () => {
   it("is on for a real-looking secret", () => {
     process.env.STRIPE_SECRET_KEY = "rk_test_not_a_real_key";
     expect(stripeLiveConfigured()).toBe(true);
+  });
+});
+
+describe("assertChargeableAmount", () => {
+  it("accepts finite positive totals", () => {
+    expect(() => assertChargeableAmount(49.99)).not.toThrow();
+  });
+
+  it("rejects zero, negative, and non-finite totals", () => {
+    for (const bad of [0, -10, Number.NaN, Number.POSITIVE_INFINITY]) {
+      expect(() => assertChargeableAmount(bad)).toThrowError(
+        expect.objectContaining({ code: "failed-precondition" }),
+      );
+    }
   });
 });

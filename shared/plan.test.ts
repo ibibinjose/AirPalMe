@@ -29,6 +29,12 @@ import {
   normalizeAnswer,
   normalizeCapacity,
   normalizePlusOnes,
+  clampExperienceMoney,
+  clampExperienceCapacity,
+  sanitizeCurrencyCode,
+  sanitizeDepositConfig,
+  sanitizePricingTiers,
+  EXPERIENCE_TIERS_MAX,
   normalizeRating,
   normalizeReview,
   pastCrew,
@@ -488,5 +494,56 @@ describe("plan completion guard", () => {
     expect(canCompletePlanStatus("draft")).toBe(false);
     expect(canCompletePlanStatus("completed")).toBe(false);
     expect(canCompletePlanStatus("cancelled")).toBe(false);
+  });
+});
+
+describe("experience pricing sanitizer", () => {
+  it("clamps money to finite non-negative capped dollars", () => {
+    expect(clampExperienceMoney(49.99)).toBe(49.99);
+    expect(clampExperienceMoney(-50)).toBe(0);
+    expect(clampExperienceMoney(Number.NaN)).toBe(0);
+    expect(clampExperienceMoney(undefined)).toBe(0);
+    expect(clampExperienceMoney(2_000_000)).toBe(1_000_000);
+  });
+
+  it("clamps capacity with a fallback", () => {
+    expect(clampExperienceCapacity(30)).toBe(30);
+    expect(clampExperienceCapacity(-4)).toBe(20);
+    expect(clampExperienceCapacity(undefined)).toBe(20);
+    expect(clampExperienceCapacity(0, 10)).toBe(10);
+    expect(clampExperienceCapacity(500_000)).toBe(100_000);
+  });
+
+  it("normalizes currency codes with an AUD fallback", () => {
+    expect(sanitizeCurrencyCode("aud")).toBe("AUD");
+    expect(sanitizeCurrencyCode("USD")).toBe("USD");
+    expect(sanitizeCurrencyCode("bogus")).toBe("AUD");
+    expect(sanitizeCurrencyCode(undefined)).toBe("AUD");
+  });
+
+  it("sanitizes pricing tiers and caps the count", () => {
+    expect(sanitizePricingTiers(undefined)).toBeUndefined();
+    expect(sanitizePricingTiers([])).toBeUndefined();
+    const tiers = sanitizePricingTiers([
+      { id: "vip", name: "VIP", price: -10, capacity: 5 },
+      { id: "", name: "", price: 25.5, capacity: 0 },
+    ])!;
+    expect(tiers).toHaveLength(2);
+    expect(tiers[0]!.price).toBe(0);
+    expect(tiers[0]!.capacity).toBe(5);
+    expect(tiers[1]!.price).toBe(25.5);
+    expect(tiers[1]!.capacity).toBe(20);
+    const many = sanitizePricingTiers(
+      Array.from({ length: EXPERIENCE_TIERS_MAX + 5 }, (_, i) => ({ id: `t${i}`, name: `T${i}`, price: 1, capacity: 1 })),
+    )!;
+    expect(many).toHaveLength(EXPERIENCE_TIERS_MAX);
+  });
+
+  it("sanitizes deposit configs", () => {
+    expect(sanitizeDepositConfig(undefined)).toBeUndefined();
+    expect(sanitizeDepositConfig(null)).toBeUndefined();
+    const cfg = sanitizeDepositConfig({ depositAmount: -20, depositPercentage: 150 })!;
+    expect(cfg.depositAmount).toBe(0);
+    expect(cfg.depositPercentage).toBe(100);
   });
 });

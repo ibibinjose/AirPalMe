@@ -157,6 +157,6 @@ export const updateDiningOrderStatus = onCall(CALLABLE, async (request) => {
   if (!NEXT_STATUS[current]?.includes(status)) {
     throw new HttpsError("failed-precondition", `Cannot move an order from ${current} to ${status || "?"}.`);
   }
-  await ref.set({ status, updatedAt: new Date().toISOString() }, { merge: true });
+  await ref.set({ status, updatedBy: uid, updatedAt: new Date().toISOString() }, { merge: true });
   return { ok: true as const, orderId, status };
 });

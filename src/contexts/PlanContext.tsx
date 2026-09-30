@@ -135,7 +135,7 @@ interface PlanContextValue {
   reorderStops: (planId: string, fromIndex: number, toIndex: number) => HangoutPlan | undefined;
   voteStop: (planId: string, stopId: string) => Promise<HangoutPlan | undefined>;
   addComment: (planId: string, text: string, photoUrl?: string) => Promise<HangoutPlan | undefined>;
-  followPlan: (planId: string, emailOrId?: string) => boolean;
+  followPlan: (planId: string) => boolean;
   exportIcs: (plan: HangoutPlan) => void;
   openGoogleCalendar: (plan: HangoutPlan) => void;
 }
@@ -279,7 +279,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
             })),
         ],
         comments: [],
-        subscribers: user?.email ? [user.email] : [],
+        subscribers: user?.uid ? [user.uid] : [],
         inviteCode: Math.random().toString(36).slice(2, 8).toUpperCase(),
         status: "open",
         isPublic: input.isPublic ?? true,
@@ -851,14 +851,14 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   );
 
   const followPlan = useCallback(
-    (planId: string, emailOrId?: string) => {
+    (planId: string) => {
       if (!requireUser("Sign in to follow plans.")) return false;
       let anonId = typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null;
       if (!anonId && typeof window !== "undefined") {
         anonId = `anon-${Date.now()}`;
         localStorage.setItem("airpal.anon.id", anonId);
       }
-      const subscriber = emailOrId || user?.email || user?.uid || anonId || "anonymous-follower";
+      const subscriber = user?.uid || anonId || "anonymous-follower";
 
       const res = togglePlanSubscription(planId, subscriber);
       if (res) {

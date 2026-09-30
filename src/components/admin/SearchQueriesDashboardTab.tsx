@@ -27,6 +27,7 @@ import {
   Filter,
 } from "lucide-react";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
+import { toZonedDateStr } from "@/lib/local-time";
 import { Button } from "@/components/ui/Button";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
@@ -85,10 +86,10 @@ export function SearchQueriesDashboardTab() {
   const [customStartDate, setCustomStartDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() - 30);
-    return d.toISOString().slice(0, 10);
+    return toZonedDateStr(d);
   });
   const [customEndDate, setCustomEndDate] = useState(() => {
-    return new Date().toISOString().slice(0, 10);
+    return toZonedDateStr(new Date());
   });
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [chartOrientation, setChartOrientation] = useState<"vertical" | "horizontal">("horizontal");

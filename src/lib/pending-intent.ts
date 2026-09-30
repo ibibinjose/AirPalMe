@@ -1,3 +1,5 @@
+import { safeSessionStorage } from "./safe-storage";
+
 export type PendingIntentKind =
   | "like-event"
   | "going-event"
@@ -13,14 +15,6 @@ export interface PendingIntent {
 }
 
 const KEY = "airpal:pending-intent:v1";
-
-function storage(): Storage | null {
-  try {
-    return typeof sessionStorage !== "undefined" ? sessionStorage : null;
-  } catch {
-    return null;
-  }
-}
 
 const KINDS: PendingIntentKind[] = [
   "like-event",
@@ -45,7 +39,7 @@ function valid(intent: unknown): intent is PendingIntent {
 
 export function savePendingIntent(intent: PendingIntent): void {
   try {
-    storage()?.setItem(KEY, JSON.stringify(intent));
+    safeSessionStorage()?.setItem(KEY, JSON.stringify(intent));
   } catch {
     /* private mode: intent is best-effort */
   }
@@ -53,7 +47,7 @@ export function savePendingIntent(intent: PendingIntent): void {
 
 export function peekPendingIntent(): PendingIntent | null {
   try {
-    const raw = storage()?.getItem(KEY);
+    const raw = safeSessionStorage()?.getItem(KEY);
     if (!raw) return null;
     const parsed: unknown = JSON.parse(raw);
     return valid(parsed) ? parsed : null;
@@ -64,7 +58,7 @@ export function peekPendingIntent(): PendingIntent | null {
 
 export function clearPendingIntent(): void {
   try {
-    storage()?.removeItem(KEY);
+    safeSessionStorage()?.removeItem(KEY);
   } catch {
     /* ignore */
   }

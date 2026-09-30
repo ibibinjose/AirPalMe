@@ -315,7 +315,7 @@ export function MePage() {
                 <button
                   type="button"
                   onClick={handleCopyBioLink}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-full bg-paper px-3 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card active:scale-95 shrink-0 self-start sm:self-auto cursor-pointer"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-paper px-3 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card active:scale-95 shrink-0 self-start sm:self-auto cursor-pointer"
                   title="Copy your Meet & Hangout link"
                 >
                   {copiedBioLink ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} className="text-mute" />}

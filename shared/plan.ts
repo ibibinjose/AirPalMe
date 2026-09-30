@@ -245,7 +245,7 @@ export interface HangoutPlan {
   stops: PlanStop[];
   attendees: PlanAttendee[];
   comments?: PlanComment[];
-  subscribers: string[]; // emails or user IDs following the plan
+  subscribers: string[]; // user IDs following the plan (legacy rows may hold emails)
   inviteCode: string; // 6-char unique short code
   /** Public plans appear on the live map and nearby feed; private stay invite-only. */
   isPublic?: boolean;
@@ -352,6 +352,59 @@ export function normalizeCapacity(n: unknown): number | undefined {
   const v = Math.floor(Number(n));
   if (!Number.isFinite(v) || v <= 0) return undefined;
   return Math.min(PLAN_CAPACITY_MAX, Math.max(1, v));
+}
+
+/** Experience money guardrails (dollars): finite, non-negative, capped. */
+export const EXPERIENCE_PRICE_MAX = 1000000;
+export const EXPERIENCE_CAPACITY_MAX = 100000;
+export const EXPERIENCE_TIERS_MAX = 20;
+
+export function clampExperienceMoney(n: unknown): number {
+  const v = Number(n || 0);
+  if (!Number.isFinite(v) || v <= 0) return 0;
+  return Math.min(EXPERIENCE_PRICE_MAX, Math.round(v * 100) / 100);
+}
+
+export function clampExperienceCapacity(n: unknown, fallback = 20): number {
+  const v = Math.floor(Number(n || 0));
+  if (!Number.isFinite(v) || v <= 0) return fallback;
+  return Math.min(EXPERIENCE_CAPACITY_MAX, v);
+}
+
+export function sanitizeCurrencyCode(n: unknown): string {
+  const code = String(n || "AUD").trim().toUpperCase();
+  return /^[A-Z]{3}$/.test(code) ? code : "AUD";
+}
+
+export function sanitizePricingTiers(tiers: unknown): PlanPricingTier[] | undefined {
+  if (!Array.isArray(tiers)) return undefined;
+  const clean = tiers.slice(0, EXPERIENCE_TIERS_MAX).map((row, i) => {
+    const t = (row || {}) as Partial<PlanPricingTier>;
+    return {
+      id: String(t.id || `tier-${i + 1}`),
+      name: String(t.name || `Tier ${i + 1}`).slice(0, 80),
+      description: t.description ? String(t.description).slice(0, 280) : undefined,
+      price: clampExperienceMoney(t.price),
+      capacity: clampExperienceCapacity(t.capacity),
+      spotsBooked: 0,
+      depositAmount: t.depositAmount === undefined ? undefined : clampExperienceMoney(t.depositAmount),
+    } as PlanPricingTier;
+  });
+  return clean.length ? clean : undefined;
+}
+
+export function sanitizeDepositConfig(config: unknown): PlanDepositConfig | undefined {
+  if (!config || typeof config !== "object") return undefined;
+  const c = config as Partial<PlanDepositConfig>;
+  const pct = Number(c.depositPercentage);
+  return {
+    depositAmount: clampExperienceMoney(c.depositAmount),
+    depositPercentage: Number.isFinite(pct) ? Math.min(100, Math.max(0, pct)) : undefined,
+    balanceDueDate: c.balanceDueDate ? String(c.balanceDueDate).slice(0, 20) : undefined,
+    balanceDueDaysBefore: c.balanceDueDaysBefore === undefined ? undefined : Math.max(0, Math.floor(Number(c.balanceDueDaysBefore)) || 0),
+    dueDateDaysBefore: c.dueDateDaysBefore === undefined ? undefined : Math.max(0, Math.floor(Number(c.dueDateDaysBefore)) || 0),
+    balanceDueDescription: c.balanceDueDescription ? String(c.balanceDueDescription).slice(0, 280) : undefined,
+  };
 }
 
 /** One "when works?" candidate. Votes decide; the host locks one in. */

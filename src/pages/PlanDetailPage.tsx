@@ -281,9 +281,13 @@ export function PlanDetailPage() {
 
   const isSubscribed = useMemo(() => {
     if (!plan) return false;
-    const id =
-      user?.email || user?.uid || (typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null);
-    return Boolean(id && plan.subscribers.includes(id));
+    const ids = [
+      user?.uid,
+      // Legacy rows may hold the email instead of the uid.
+      user?.email,
+      typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null,
+    ].filter(Boolean) as string[];
+    return ids.some((id) => plan.subscribers.includes(id));
   }, [plan, user]);
 
   const stopPins: MapPin[] = useMemo(
@@ -767,7 +771,7 @@ export function PlanDetailPage() {
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
               userAttendee?.status === "going"
-                ? "bg-emerald-500 text-white shadow-xs"
+                ? "bg-emerald-700 text-white shadow-xs"
                 : "bg-paper text-ink/80 hover:bg-emerald-500/10 hover:text-emerald-600 ring-1 ring-line",
             )}
           >
@@ -785,7 +789,7 @@ export function PlanDetailPage() {
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
               userAttendee?.status === "maybe"
-                ? "bg-amber-500 text-white shadow-xs"
+                ? "bg-amber-700 text-white shadow-xs"
                 : "bg-paper text-ink/80 hover:bg-amber-500/10 hover:text-amber-600 ring-1 ring-line",
             )}
           >
@@ -864,7 +868,7 @@ export function PlanDetailPage() {
             <Button
               onClick={() => setBookingOpen(true)}
               disabled={soldOut}
-              className="gap-2 rounded-2xl h-11 px-5 font-bold shadow-lg bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700"
+              className="gap-2 rounded-2xl h-11 px-5 font-bold shadow-lg bg-amber-700 text-white hover:bg-amber-800"
             >
               <CreditCard size={16} />
               <span>{soldOut ? "Sold out" : ticketed ? "Buy ticket" : "Book spot"}</span>

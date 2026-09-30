@@ -23,7 +23,16 @@ import type {
   PlanComment,
   PlanStop,
 } from "../../shared/plan";
-import { canCompletePlanStatus, isPlanManager, randomInviteCode } from "../../shared/plan";
+import {
+  canCompletePlanStatus,
+  clampExperienceCapacity,
+  clampExperienceMoney,
+  isPlanManager,
+  randomInviteCode,
+  sanitizeCurrencyCode,
+  sanitizeDepositConfig,
+  sanitizePricingTiers,
+} from "../../shared/plan";
 import {
   REFERRAL_INVITEE_STARS,
   REFERRAL_INVITER_STARS,
@@ -119,7 +128,7 @@ export const createPlanRemote = onCall(CALLABLE, async (request) => {
     stops,
     attendees: [initialAttendee],
     comments: [],
-    subscribers: authUser?.email ? [String(authUser.email).toLowerCase()] : [],
+    subscribers: [uid],
     inviteCode,
     isPublic: Boolean(data.isPublic ?? true),
     interests: (data.interests || []).map((t) => String(t).toLowerCase()),
@@ -133,16 +142,23 @@ export const createPlanRemote = onCall(CALLABLE, async (request) => {
     durationMode: data.isExperience ? data.durationMode : undefined,
     endDate: data.isExperience ? data.endDate : undefined,
     pricingModel: data.isExperience ? data.pricingModel : undefined,
-    pricePerPerson: data.isExperience ? Number(data.pricePerPerson || 0) : undefined,
-    currency: data.isExperience ? String(data.currency || "AUD") : undefined,
-    capacity: data.isExperience ? Number(data.capacity || 20) : undefined,
-    depositConfig: data.isExperience ? data.depositConfig : undefined,
-    pricingTiers: data.isExperience ? data.pricingTiers : undefined,
+    pricePerPerson: data.isExperience ? clampExperienceMoney(data.pricePerPerson) : undefined,
+    currency: data.isExperience ? sanitizeCurrencyCode(data.currency) : undefined,
+    capacity: data.isExperience ? clampExperienceCapacity(data.capacity) : undefined,
+    depositConfig: data.isExperience ? sanitizeDepositConfig(data.depositConfig) : undefined,
+    pricingTiers: data.isExperience ? sanitizePricingTiers(data.pricingTiers) : undefined,
     inclusions: data.isExperience ? data.inclusions : undefined,
     bookingPolicy: data.isExperience ? data.bookingPolicy : undefined,
   };
 
-  await db.collection("plans").doc(planId).set(planDoc);
+  const planRef = db.collection("plans").doc(planId);
+  const existingSnap = await planRef.get();
+  if (existingSnap.exists) {
+    const existing = existingSnap.data() as HangoutPlan;
+    if (existing.creator?.uid === uid) return { ok: true, plan: existing };
+    throw new HttpsError("already-exists", "That plan id is taken.");
+  }
+  await planRef.set(planDoc);
   return { ok: true, plan: planDoc };
 });
 

@@ -541,7 +541,7 @@ function CalendarPageContent() {
                     <button
                       type="button"
                       onClick={() => setFilter("all")}
-                      className="grid h-7 w-7 place-items-center rounded-full hover:bg-line/60 hover:text-ink/60 cursor-pointer"
+                      className="grid h-7 w-7 -m-2 p-2 place-items-center rounded-full hover:bg-line/60 hover:text-ink/60 cursor-pointer"
                       aria-label="Remove status filter"
                     >
                       <X size={12} />
@@ -554,7 +554,7 @@ function CalendarPageContent() {
                     <button
                       type="button"
                       onClick={() => setCategory("all")}
-                      className="grid h-7 w-7 place-items-center rounded-full hover:bg-line/60 hover:text-ink/60 cursor-pointer"
+                      className="grid h-7 w-7 -m-2 p-2 place-items-center rounded-full hover:bg-line/60 hover:text-ink/60 cursor-pointer"
                       aria-label="Remove category filter"
                     >
                       <X size={12} />
@@ -568,7 +568,7 @@ function CalendarPageContent() {
                     <button
                       type="button"
                       onClick={() => setSearchQuery("")}
-                      className="grid h-7 w-7 place-items-center rounded-full hover:bg-brand/15 hover:text-brand-ink cursor-pointer"
+                      className="grid h-7 w-7 -m-2 p-2 place-items-center rounded-full hover:bg-brand/15 hover:text-brand-ink cursor-pointer"
                       aria-label="Clear search text"
                     >
                       <X size={12} />

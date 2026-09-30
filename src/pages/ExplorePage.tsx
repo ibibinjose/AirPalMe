@@ -603,7 +603,7 @@ export function ExplorePage() {
                             <Button
                               size="sm"
                               onClick={() => nav(`/stay/${p.id}`)}
-                              className="h-9 flex-1 rounded-full text-xs font-bold"
+                              className="min-h-[44px] flex-1 rounded-full text-xs font-bold"
                             >
                               Digital Compendium
                             </Button>
@@ -611,7 +611,7 @@ export function ExplorePage() {
                               size="sm"
                               variant="ghost"
                               onClick={() => nav(`/concierge?p=${p.id}`)}
-                              className="h-9 flex-1 rounded-full text-xs font-semibold ring-1 ring-line"
+                              className="min-h-[44px] flex-1 rounded-full text-xs font-semibold ring-1 ring-line"
                             >
                               AI Concierge
                             </Button>

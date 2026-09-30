@@ -259,7 +259,9 @@ export function PromotionsPage() {
             {search ? `No deals found matching "${search}"` : "No active deals in this category yet"}
           </h2>
           <p className="mt-1 text-xs text-mute max-w-sm mx-auto">
-            Be the first business to publish an offer or seed Sydney sample deals to explore.
+            {isAdmin
+              ? "Be the first business to publish an offer or seed Sydney sample deals to explore."
+              : "Be the first business to publish an offer."}
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
@@ -270,16 +272,18 @@ export function PromotionsPage() {
               </Button>
             </Link>
 
-            <Button
-              variant="outlined"
-              size="sm"
-              onClick={() => void handleSeedDemo()}
-              disabled={seeding}
-              className="gap-1.5 rounded-full px-4"
-            >
-              {seeding ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="text-gold" />}
-              <span>Seed Sample Deals</span>
-            </Button>
+            {isAdmin && (
+              <Button
+                variant="outlined"
+                size="sm"
+                onClick={() => void handleSeedDemo()}
+                disabled={seeding}
+                className="gap-1.5 rounded-full px-4"
+              >
+                {seeding ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="text-gold" />}
+                <span>Seed Sample Deals</span>
+              </Button>
+            )}
           </div>
         </div>
       ) : (

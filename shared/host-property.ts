@@ -231,8 +231,10 @@ export function buildHostProperty(input: CreateHostPropertyInput): PropertyInfo 
 
 /** Strip secrets from a property before writing the public Firestore doc. */
 export function toPublicPropertyDoc(property: PropertyInfo): PropertyInfo {
+  const rest = { ...property };
+  delete rest.ownerEmail;
   return {
-    ...property,
+    ...rest,
     wifi: {
       network: property.wifi?.network || "",
       password: "",

@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import type { PlanType } from "@shared/plan";
 import { getFirebaseDb, isFirebaseConfigured } from "./firebase";
+import { safeLocalStorage } from "./safe-storage";
 
 export interface CatchUpItem {
   id: string;
@@ -38,14 +39,6 @@ const MIGRATED_FLAG_KEY = "airpal:catchups:migrated:v2";
 let memory: CatchUpItem[] = [];
 const migratedUids = new Set<string>();
 
-function storage(): Storage | null {
-  try {
-    return typeof localStorage !== "undefined" ? localStorage : null;
-  } catch {
-    return null;
-  }
-}
-
 function omitUndefined<T extends Record<string, unknown>>(row: T): T {
   return Object.fromEntries(Object.entries(row).filter(([, v]) => v !== undefined)) as T;
 }
@@ -56,7 +49,7 @@ function normalizeHandle(handle: string): string {
 
 function readLegacyLocal(): CatchUpItem[] {
   try {
-    const raw = storage()?.getItem(LEGACY_STORAGE_KEY);
+    const raw = safeLocalStorage()?.getItem(LEGACY_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? (parsed as CatchUpItem[]) : [];
@@ -67,7 +60,7 @@ function readLegacyLocal(): CatchUpItem[] {
 
 function clearLegacyLocal(): void {
   try {
-    storage()?.removeItem(LEGACY_STORAGE_KEY);
+    safeLocalStorage()?.removeItem(LEGACY_STORAGE_KEY);
   } catch {
     /* private browsing */
   }
@@ -115,7 +108,7 @@ function migrateLegacyForUid(uid: string): void {
   if (!uid || migratedUids.has(uid)) return;
   migratedUids.add(uid);
   try {
-    if (storage()?.getItem(`${MIGRATED_FLAG_KEY}:${uid}`) === "1") return;
+    if (safeLocalStorage()?.getItem(`${MIGRATED_FLAG_KEY}:${uid}`) === "1") return;
   } catch {
     /* continue */
   }
@@ -123,7 +116,7 @@ function migrateLegacyForUid(uid: string): void {
   const legacy = readLegacyLocal();
   if (legacy.length === 0) {
     try {
-      storage()?.setItem(`${MIGRATED_FLAG_KEY}:${uid}`, "1");
+      safeLocalStorage()?.setItem(`${MIGRATED_FLAG_KEY}:${uid}`, "1");
     } catch {
       /* ignore */
     }
@@ -145,7 +138,7 @@ function migrateLegacyForUid(uid: string): void {
 
   clearLegacyLocal();
   try {
-    storage()?.setItem(`${MIGRATED_FLAG_KEY}:${uid}`, "1");
+    safeLocalStorage()?.setItem(`${MIGRATED_FLAG_KEY}:${uid}`, "1");
   } catch {
     /* ignore */
   }

@@ -311,6 +311,13 @@ function checkoutReturnUrls(origin: string, booking: Booking, bookingId: string)
   };
 }
 
+/** Checkout totals must be finite positive dollars before a Stripe session exists. */
+export function assertChargeableAmount(totalAmount: number): void {
+  if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
+    throw new HttpsError("failed-precondition", "This experience has no chargeable amount.");
+  }
+}
+
 export const createExperienceCheckoutSession = onCall(STRIPE_CALLABLE, async (request) => {
   await noteAppCheck(request, "createExperienceCheckoutSession");
   const uid = requireAuth(request.auth?.uid);
@@ -350,6 +357,7 @@ export const createExperienceCheckoutSession = onCall(STRIPE_CALLABLE, async (re
   }
 
   const totalAmount = unitAmount * spots;
+  assertChargeableAmount(totalAmount);
   if (isSoldOut(plan) || (spotsLeft(plan) !== null && spots > (spotsLeft(plan) || 0))) {
     throw new HttpsError("failed-precondition", "Those tickets are sold out.");
   }
@@ -1284,6 +1292,7 @@ export const completePaidBooking = onCall(STRIPE_CALLABLE, async (request) => {
 
   await ref.update({
     status: "completed",
+    completedBy: uid,
     payoutStatus: paidOut.payoutStatus,
     stripeTransferId: paidOut.transferId || booking.stripeTransferId || "",
     stripeAccountId: paidOut.stripeAccountId || booking.stripeAccountId || "",
@@ -1352,6 +1361,7 @@ export const refundPaidBooking = onCall(STRIPE_CALLABLE, async (request) => {
     payoutStatus: "reversed",
     status: "refunded",
     cancelReason: "Refunded by provider",
+    refundedBy: uid,
     updatedAt: now,
   });
   return { ok: true, status: "refunded", bookingId };

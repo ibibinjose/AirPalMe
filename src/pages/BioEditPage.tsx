@@ -1100,7 +1100,7 @@ export function BioEditPage() {
                 type="submit"
                 className={cn(
                   "h-12 w-full text-base font-semibold shadow-md gap-2",
-                  isBusiness && "bg-amber-600 hover:bg-amber-700 text-white",
+                  isBusiness && "bg-amber-700 hover:bg-amber-800 text-white",
                 )}
               >
                 <Check size={18} />
@@ -1352,7 +1352,7 @@ export function BioEditPage() {
                   <Button
                     className={cn(
                       "h-11 font-semibold gap-2 shadow-sm",
-                      isBusiness && "bg-amber-600 hover:bg-amber-700 text-white",
+                      isBusiness && "bg-amber-700 hover:bg-amber-800 text-white",
                     )}
                     onClick={() => {
                       if (navigator.share) {

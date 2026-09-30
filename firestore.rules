@@ -327,7 +327,8 @@ match /dining_orders/{orderId} {
           && propertyExists(propertyId)
           && request.resource.data.propertyId == propertyId
           && request.resource.data.kind in ['upsell', 'experience', 'dining']
-          && request.resource.data.amount is number;
+          && request.resource.data.amount is number
+          && request.resource.data.amount >= 0;
         allow update, delete: if manages(propertyId);
       }
 
@@ -478,7 +479,8 @@ match /dining_orders/{orderId} {
       allow update: if signedIn() && (
         platformAdmin() ||
         (resource.data.ownerUid == request.auth.uid
-          && request.resource.data.ownerUid == request.auth.uid)
+          && request.resource.data.ownerUid == request.auth.uid
+          && request.resource.data.status == resource.data.status)
       );
       allow delete: if signedIn() && (
         resource.data.ownerUid == request.auth.uid ||
@@ -619,7 +621,11 @@ match /dining_orders/{orderId} {
         && request.resource.data.customerUid == request.auth.uid
         && request.resource.data.status == 'pending'
         && request.resource.data.paymentStatus in ['deferred', 'unpaid', 'paid']
-        && (request.resource.data.priceCents <= 0 || request.resource.data.paymentStatus != 'paid')
+        && request.resource.data.priceCents is number
+        && request.resource.data.priceCents >= 0
+        && (request.resource.data.priceCents == 0 || request.resource.data.paymentStatus != 'paid')
+        && (!request.resource.data.keys().hasAny(['feeCents'])
+          || (request.resource.data.feeCents is number && request.resource.data.feeCents >= 0))
         && request.resource.data.keys().hasAny(['updatedAt']);
       allow read: if signedIn() && (
         resource.data.customerUid == request.auth.uid ||
@@ -633,6 +639,7 @@ match /dining_orders/{orderId} {
             resource.data.customerUid == request.auth.uid
             || resource.data.providerUid == request.auth.uid
           )
+          && resource.data.status in ['pending', 'confirmed', 'in_progress']
           && request.resource.data.customerUid == resource.data.customerUid
           && request.resource.data.providerUid == resource.data.providerUid
           && request.resource.data.priceCents == resource.data.priceCents
@@ -822,11 +829,15 @@ match /dining_orders/{orderId} {
       allow create: if signedIn()
         && !isAnonymous()
         && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.status == 'open'
         && request.resource.data.keys().hasAny(['updatedAt']);
       allow update: if signedIn() && (
         platformAdmin() ||
         (resource.data.ownerUid == request.auth.uid
-          && request.resource.data.ownerUid == request.auth.uid) ||
+          && request.resource.data.ownerUid == request.auth.uid
+          && resource.data.status == 'completed'
+          && request.resource.data.status == 'completed'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'reviewText', 'updatedAt'])) ||
         (approvedMate()
           && resource.data.status == 'open'
           && request.resource.data.status == 'matched'
@@ -925,9 +936,9 @@ match /dining_orders/{orderId} {
       allow delete: if platformAdmin();
     }
 
-    // Share-by-id: anyone with the link can get a trip; listing the collection is blocked.
+    // Share-by-id: anyone signed in with the link can get a trip; listing the collection is blocked.
     match /trips/{tripId} {
-      allow get: if true;
+      allow get: if signedIn();
       allow list: if false;
       allow create: if signedIn()
         && request.resource.data.id == tripId
