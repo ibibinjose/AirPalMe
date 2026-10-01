@@ -56,6 +56,7 @@ const QUICK_PROMPTS = [
   { label: "🏨 Boutique Stays", href: "/explore" },
   { label: "🗺️ Plan a Trip", href: "/plan/new" },
   { label: "🎁 Giveaways", href: "/giveaways" },
+  { label: "🎂 Birthday freebies", href: "/birthday-freebies/au" },
 ];
 
 const VERTICALS = [
@@ -111,9 +112,9 @@ const VERTICALS = [
   },
   {
     id: "perks",
-    label: "Perks",
-    sub: "Rewards & drops",
-    href: "/giveaways",
+    label: "Perks & Drops",
+    sub: "Birthday freebies, giveaways & rewards",
+    href: "/birthday-freebies/au",
     icon: Gift,
     gradient: "from-yellow-500/15 via-amber-500/10 to-transparent",
     iconBg: "bg-yellow-600 text-white",

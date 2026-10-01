@@ -3,6 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { normalizeHandle } from "../../shared/bio";
 import { resolveFirebaseWebApiKey, toE164 } from "../../shared/phone-auth";
 import { isAdultBirthDate, sydneyToday } from "../../shared/validate";
+import { monthFromBirthDate } from "../../shared/birthday-freebies";
 import { CALLABLE, auth, db, requireAccount } from "./admin";
 import { enforceRateLimit, isAnonymousAuth, noteAppCheck } from "./abuse";
 
@@ -28,12 +29,22 @@ export const completeAccountSignup = onCall(CALLABLE, async (request) => {
   if (!handle || name.length < 2 || !email.includes("@")) {
     throw new HttpsError("invalid-argument", "Handle, name, and email are required.");
   }
-  // Age gate: accounts are 18+. The birth date itself is never stored —
-  // only the verified-adult flag, so there is no DOB honeypot to leak.
-  const birthDate = String((request.data as { birthDate?: string })?.birthDate || "").trim();
+  // Age gate: accounts are 18+. Full DOB is not stored — only birthdayMonth
+  // (1–12) for freebies, plus adultConsent / adultConfirmed flags.
+  const payload = request.data as { birthDate?: string; adultConsent?: boolean };
+  const birthDate = String(payload?.birthDate || "").trim();
+  const adultConsent = payload?.adultConsent === true;
+  if (!adultConsent) {
+    throw new HttpsError("failed-precondition", "Confirm you are 18 years of age or older.");
+  }
   if (!isAdultBirthDate(birthDate, sydneyToday())) {
     throw new HttpsError("failed-precondition", "AirPal accounts are for people 18 or older.");
   }
+  const birthdayMonth = monthFromBirthDate(birthDate);
+  if (!birthdayMonth) {
+    throw new HttpsError("invalid-argument", "Enter a valid date of birth.");
+  }
+  const consentAt = new Date().toISOString();
   await db
     .collection("users")
     .doc(uid)
@@ -49,6 +60,9 @@ export const completeAccountSignup = onCall(CALLABLE, async (request) => {
         phoneVerified: true,
         adultConfirmed: true,
         adultConfirmedAt: FieldValue.serverTimestamp(),
+        adultConsent: true,
+        adultConsentAt: consentAt,
+        birthdayMonth,
         updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true },

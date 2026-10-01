@@ -98,3 +98,10 @@ export {
   recordPulseFollowup,
   onPulseIssueCreated,
 } from "./pulse";
+export {
+  createBirthdayOffer,
+  updateBirthdayOffer,
+  listBirthdayOffers,
+  adminSetBirthdayOfferStatus,
+  seedBirthdayFreebies,
+} from "./birthday-freebies";

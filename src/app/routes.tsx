@@ -87,6 +87,15 @@ const BusinessPromotionNewPage = lazy(() =>
 const BusinessPromotionDetailPage = lazy(() =>
   import("@/pages/BusinessPromotionDetailPage").then((m) => ({ default: m.BusinessPromotionDetailPage })),
 );
+const BirthdayFreebiesPage = lazy(() =>
+  import("@/pages/BirthdayFreebiesPage").then((m) => ({ default: m.BirthdayFreebiesPage })),
+);
+const BusinessBirthdayOffersPage = lazy(() =>
+  import("@/pages/BusinessBirthdayOffersPage").then((m) => ({ default: m.BusinessBirthdayOffersPage })),
+);
+const AdminBirthdayOffersPage = lazy(() =>
+  import("@/pages/AdminBirthdayOffersPage").then((m) => ({ default: m.AdminBirthdayOffersPage })),
+);
 const MyGiveawaysPage = lazy(() => import("@/pages/MyGiveawaysPage").then((m) => ({ default: m.MyGiveawaysPage })));
 const NotificationsAdminPage = lazy(() =>
   import("@/pages/NotificationsAdminPage").then((m) => ({ default: m.NotificationsAdminPage })),
@@ -253,6 +262,12 @@ export function AppRoutes() {
         <Route path="/business/promotions/new" component={BusinessPromotionNewPage} />
         <Route path="/business/promotions/:id" component={BusinessPromotionDetailPage} />
         <Route path="/business/promotions" component={BusinessPromotionsPage} />
+        <Route path="/business/birthday-offers/new" component={BusinessBirthdayOffersPage} />
+        <Route path="/business/birthday-offers/:id" component={BusinessBirthdayOffersPage} />
+        <Route path="/business/birthday-offers" component={BusinessBirthdayOffersPage} />
+        <Route path="/admin/birthday-offers" component={AdminBirthdayOffersPage} />
+        <Route path="/birthday-freebies/:region" component={BirthdayFreebiesPage} />
+        <Route path="/birthday-freebies" component={BirthdayFreebiesPage} />
         <Route path="/me/giveaways" component={MyGiveawaysPage} />
         <Route path="/admin/notifications" component={NotificationsAdminPage} />
         <Route path="/giveaways/:id">

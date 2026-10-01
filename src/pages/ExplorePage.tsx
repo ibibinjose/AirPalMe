@@ -237,6 +237,12 @@ export function ExplorePage() {
           <p className="mt-1 text-sm text-mute">
             Places, events, and experiences.
           </p>
+          <Link
+            href="/birthday-freebies/au"
+            className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-pink-500/10 px-3 py-1 text-xs font-semibold text-pink-700 ring-1 ring-pink-500/20 hover:bg-pink-500/15"
+          >
+            🎂 Birthday freebies this month
+          </Link>
         </div>
 
         {/* View Switcher and Filter Toggle */}

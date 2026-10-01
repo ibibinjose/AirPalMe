@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Building2, ClipboardList, Gift, Sparkles, ChevronRight, PlusCircle, Tag, Ticket } from "lucide-react";
+import { Building2, Cake, ClipboardList, Gift, Sparkles, ChevronRight, PlusCircle, Tag, Ticket } from "lucide-react";
 import { TabPills } from "@/components/ui/TabPills";
 
 export type BusinessRoleDomain = "venue" | "bookings" | "experiences" | "promotions" | "onboard";
@@ -69,6 +69,9 @@ export function BusinessNavHub({
           </Link>
           <Link href="/business/campaigns" className="inline-flex items-center gap-1 text-ink/75 hover:text-brand hover:underline">
             <Sparkles size={13} /> Experiences
+          </Link>
+          <Link href="/business/birthday-offers" className="inline-flex items-center gap-1 text-ink/75 hover:text-brand hover:underline">
+            <Cake size={14} /> Birthday offers
           </Link>
           <Link href="/business/promotions" className="inline-flex items-center gap-1 text-ink/75 hover:text-brand hover:underline">
             <Gift size={13} /> Promotions

@@ -28,7 +28,7 @@ import { ADMIN_TABS, AdminOverview, type AdminTab } from "@/components/admin/Adm
 import { AIRPAL_CLUB_ID } from "@/contexts/ClubContext";
 import { seedDatabase } from "@/lib/seed-database";
 import { toast } from "sonner";
-import {
+import { Cake,
   Activity,
   ArrowLeft,
   ArrowUpRight,
@@ -293,6 +293,23 @@ export function AdminPage() {
                 <p className="mt-1 text-xs text-mute">Review submission queue, campaign rules, and select winners.</p>
               </div>
               <span className="mt-4 text-[11px] font-semibold text-brand">Open Promotion Manager →</span>
+            </Link>
+
+            <Link
+              href="/admin/birthday-offers"
+              className="group flex flex-col justify-between rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs transition hover:bg-paper hover:ring-brand/40"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-pink-500/10 text-pink-600 dark:text-pink-400">
+                    <Cake className="h-5 w-5" />
+                  </span>
+                  <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand" />
+                </div>
+                <h3 className="font-display mt-3 text-sm font-bold text-ink">Birthday Freebies</h3>
+                <p className="mt-1 text-xs text-mute">Curate regional birthday rewards and set offers live for Mate meetups.</p>
+              </div>
+              <span className="mt-4 text-[11px] font-semibold text-brand">Open Birthday Catalog →</span>
             </Link>
 
             <Link
