@@ -41,7 +41,7 @@ import { GooglePlaceImportCard } from "@/components/business/GooglePlaceImport";
 import { bioLinksFromGooglePlace, mergeBioLinks } from "@shared/google-place";
 import { NAMES } from "@shared/names";
 import { WaveHostCard } from "@/components/wave/WaveHostCard";
-import {
+import { Cake,
   Activity,
   AlertTriangle,
   ArrowRight,
@@ -385,6 +385,10 @@ export function BusinessPage() {
             <Link href="/business/promotions" className="inline-flex items-center gap-1.5 font-semibold text-ink/80 hover:text-brand hover:underline">
               <Gift className="h-3.5 w-3.5 text-amber-500" />
               <span>Promotions & Giveaways</span>
+            </Link>
+            <Link href="/business/birthday-offers" className="inline-flex items-center gap-1.5 font-semibold text-ink/80 hover:text-brand hover:underline">
+              <Cake className="h-4 w-4" />
+              <span>Birthday month offers</span>
             </Link>
           </div>
           <Link href="/bio/edit" className="inline-flex items-center gap-1 font-semibold text-mute hover:text-ink">

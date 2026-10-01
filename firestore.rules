@@ -550,6 +550,14 @@ match /dining_orders/{orderId} {
       allow write: if false;
     }
 
+    // Birthday month freebies: public read for live; writes only via callables.
+    match /birthday_offers/{offerId} {
+      allow get, list: if resource.data.status == 'live'
+        || (signedIn() && resource.data.ownerUid == request.auth.uid)
+        || platformAdmin();
+      allow write: if false;
+    }
+
     match /rewards/{uid} {
       allow get: if signedIn() && (uid == request.auth.uid || platformAdmin());
       allow write: if false;

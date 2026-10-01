@@ -38,6 +38,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [birthDate, setBirthDate] = useState("");
+  const [adultConsent, setAdultConsent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [enableBiometrics, setEnableBiometrics] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -51,6 +52,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
   const emailOk = isEmail(email);
   const passOk = passwordOk(password);
   const adultOk = isAdultBirthDate(birthDate.trim());
+  const consentOk = adultConsent === true;
 
   useEffect(() => () => resetPhoneLogin(), []);
   useEffect(() => {
@@ -117,6 +119,10 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
       toast.error("AirPal accounts are for people 18 or older");
       return;
     }
+    if (!consentOk) {
+      toast.error("Confirm you are 18 years of age or older");
+      return;
+    }
     if (!nameOk || !emailOk || !passOk) {
       toast.error("Add your name, email, and a strong password");
       return;
@@ -138,7 +144,13 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
         });
       }
       try {
-        await completeAccount({ handle: h, name: name.trim(), email: email.trim(), birthDate: birthDate.trim() });
+        await completeAccount({
+          handle: h,
+          name: name.trim(),
+          email: email.trim(),
+          birthDate: birthDate.trim(),
+          adultConsent: true,
+        });
       } catch {
         /* local profile already saved */
       }
@@ -371,6 +383,23 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
                 />
               </div>
             </ValidField>
+
+            <label className="flex items-start gap-2.5 rounded-2xl bg-paper p-3 ring-1 ring-line cursor-pointer">
+              <input
+                type="checkbox"
+                checked={adultConsent}
+                onChange={(e) => setAdultConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded text-brand focus:ring-brand accent-[#1805db]"
+                aria-required
+              />
+              <span className="text-xs leading-relaxed text-ink">
+                <span className="font-bold">I confirm I am 18 years of age or older</span>
+                <span className="block text-[11px] text-mute mt-0.5">
+                  Required — AirPal is for adults. Meeting people in person needs an Adult 18+ confirmation.
+                </span>
+              </span>
+            </label>
+
             {biometricsSupported && (
               <label className="flex items-center gap-2.5 rounded-2xl bg-brand/5 p-3 ring-1 ring-brand/20 cursor-pointer transition hover:bg-brand/10">
                 <input
@@ -397,7 +426,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
             <Button
               type="submit"
               className="w-full"
-              disabled={busy || !nameOk || !emailOk || !passOk || !adultOk}
+              disabled={busy || !nameOk || !emailOk || !passOk || !adultOk || !consentOk}
               loading={busy}
             >
               {busy ? "Creating account…" : "Create account"}

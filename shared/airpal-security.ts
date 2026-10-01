@@ -93,14 +93,21 @@ export const CALLABLES = {
   resolvePulseIssue: "resolvePulseIssue",
   setPulseStatus: "setPulseStatus",
   recordPulseFollowup: "recordPulseFollowup",
+  createBirthdayOffer: "createBirthdayOffer",
+  updateBirthdayOffer: "updateBirthdayOffer",
+  listBirthdayOffers: "listBirthdayOffers",
+  adminSetBirthdayOfferStatus: "adminSetBirthdayOfferStatus",
+  seedBirthdayFreebies: "seedBirthdayFreebies",
 } as const;
 
 export type CompleteAccountSignupRequest = {
   handle: string;
   name: string;
   email: string;
-  /** YYYY-MM-DD birth date. Server verifies 18+ and stores only a boolean. */
+  /** YYYY-MM-DD birth date. Server verifies 18+; stores birthdayMonth only (not full DOB). */
   birthDate: string;
+  /** Explicit Adult 18+ checkbox consent. Required. */
+  adultConsent: boolean;
 };
 
 export type LoginWithPhonePasswordRequest = {

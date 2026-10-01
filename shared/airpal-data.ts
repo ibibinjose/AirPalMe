@@ -177,6 +177,12 @@ export interface UserProfile {
   phone?: string;
   phoneVerified?: boolean;
   photoURL?: string;
+  /** Birthday month 1–12 derived from DOB at signup (full DOB not stored). */
+  birthdayMonth?: number;
+  /** Explicit Adult 18+ consent at signup. */
+  adultConsent?: boolean;
+  adultConsentAt?: string;
+  adultConfirmed?: boolean;
 }
 
 export interface MenuItem {
