@@ -9,6 +9,7 @@ import {
   Sun,
 } from "lucide-react";
 import { authErrorMessage } from "@shared/auth-email";
+import { BIRTHDAY_REGIONS, isBirthdayRegionCode, type BirthdayRegionCode } from "@shared/birthday-freebies";
 import { Button } from "@/components/ui/Button";
 import { MeAvatar } from "@/components/auth/MeAvatar";
 import { AccountContacts } from "@/components/auth/AccountContacts";
@@ -19,6 +20,7 @@ import { useBio } from "@/contexts/BioContext";
 import { useLocalNow } from "@/contexts/LocalNowContext";
 import { ChangeHandleForm } from "@/components/bio/ChangeHandleForm";
 import { partnerAccountPath } from "@/lib/partner-account";
+import { friendlyBirthdayError, setBirthdayAlertPrefsRemote } from "@/lib/birthday-freebies";
 import { NAMES } from "@shared/names";
 import { triggerHaptic } from "@/lib/native";
 import { getThemePreference, setThemePreference, type ThemeMode } from "@/lib/theme";
@@ -27,13 +29,44 @@ import { cn } from "@/lib/cn";
 
 export function SettingsPage() {
   const [, nav] = useLocation();
-  const { user, logout, deleteAccount, sendVerificationEmail, requestPasswordReset } = useAuth();
+  const { user, logout, deleteAccount, sendVerificationEmail, requestPasswordReset, refreshUser } = useAuth();
   const { mine, business } = useBio();
   const { city, usingGps, chooseLocation, shareLocation, setShareLocation } = useLocalNow();
 
   const [resetBusy, setResetBusy] = useState(false);
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [alertsEnabled, setAlertsEnabled] = useState(true);
+  const [alertsRegion, setAlertsRegion] = useState<BirthdayRegionCode>("au");
+  const [alertsBusy, setAlertsBusy] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    setAlertsEnabled(user.birthdayAlertsEnabled !== false);
+    const region = String(user.birthdayAlertsRegion || "au").toLowerCase();
+    setAlertsRegion(isBirthdayRegionCode(region) ? region : "au");
+  }, [user?.uid, user?.birthdayAlertsEnabled, user?.birthdayAlertsRegion]);
+
+  async function saveAlertPrefs(next: { enabled?: boolean; region?: BirthdayRegionCode }) {
+    if (!user) return;
+    const enabled = next.enabled ?? alertsEnabled;
+    const region = next.region ?? alertsRegion;
+    setAlertsBusy(true);
+    try {
+      await setBirthdayAlertPrefsRemote({
+        birthdayAlertsEnabled: enabled,
+        birthdayAlertsRegion: region,
+      });
+      setAlertsEnabled(enabled);
+      setAlertsRegion(region);
+      await refreshUser?.();
+      toast.success("Birthday alert preferences saved.");
+    } catch (err) {
+      toast.error(friendlyBirthdayError(err));
+    } finally {
+      setAlertsBusy(false);
+    }
+  }
 
   const [theme, setTheme] = useState<ThemeMode>(() => getThemePreference());
   const [notifInvites, setNotifInvites] = useState(() => {
@@ -136,7 +169,6 @@ export function SettingsPage() {
       {user?.email && user.emailVerified === false && (
         <VerifyEmailBanner email={user.email} onSend={sendVerificationEmail} />
       )}
-
       {/* App Appearance / Theme */}
       <section className="mt-8">
         <h2 className="font-display text-xl font-bold">Appearance</h2>
@@ -331,6 +363,73 @@ export function SettingsPage() {
           </div>
         </div>
       </section>
+
+      {user && (
+        <section className="mt-8">
+          <h2 className="font-display text-xl font-bold">Birthday Freebies</h2>
+          <div className="mt-3 rounded-2xl bg-card px-4 py-3 ring-1 ring-line">
+            <div className="flex items-center justify-between gap-3">
+              <span className="min-w-0">
+                <span className="block text-sm font-medium text-ink">Birthday month alerts</span>
+                <span className="block text-[12px] text-mute">
+                  Get a nudge when your freebies are live — Life Made Easy.
+                </span>
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={alertsEnabled}
+                aria-label="Birthday month alerts"
+                disabled={alertsBusy}
+                onClick={() => void saveAlertPrefs({ enabled: !alertsEnabled })}
+                className={`relative h-7 w-12 shrink-0 rounded-full transition disabled:opacity-50 ${
+                  alertsEnabled ? "bg-brand" : "bg-line"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all ${
+                    alertsEnabled ? "left-[22px]" : "left-0.5"
+                  }`}
+                />
+              </button>
+            </div>
+            <label className="mt-3 block border-t border-line/60 pt-3">
+              <span className="text-[12px] text-mute">Freebies region</span>
+              <select
+                className="mt-1.5 w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm disabled:opacity-50"
+                value={alertsRegion}
+                disabled={alertsBusy}
+                onChange={(e) => {
+                  const region = e.target.value as BirthdayRegionCode;
+                  void saveAlertPrefs({ region });
+                }}
+              >
+                {BIRTHDAY_REGIONS.map((r) => (
+                  <option key={r.code} value={r.code}>
+                    {r.flagEmoji ? `${r.flagEmoji} ` : ""}
+                    {r.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {user.birthdayMonth ? (
+              <p className="mt-2 text-[11px] text-mute">
+                Your birthday month is set ({user.birthdayMonth}).{" "}
+                <Link href={`/birthday-freebies/${alertsRegion}`} className="text-brand">
+                  Browse freebies
+                </Link>
+              </p>
+            ) : (
+              <p className="mt-2 text-[11px] text-mute">
+                Add your birthday at signup to unlock month alerts.{" "}
+                <Link href={`/birthday-freebies/${alertsRegion}`} className="text-brand">
+                  Browse freebies
+                </Link>
+              </p>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Workspaces Section */}
       <h2 className="font-display mt-8 text-xl font-bold">Workspace</h2>

@@ -38,6 +38,7 @@ describe("broadcast validation", () => {
 describe("notification routing", () => {
   it("classifies marketing and priority kinds", () => {
     expect(isMarketingKind("promotion_ending_soon")).toBe(true);
+    expect(isMarketingKind("birthday_month")).toBe(true);
     expect(isMarketingKind("entry_confirmed")).toBe(false);
     expect(isPriorityKind("winner_selected")).toBe(true);
     expect(isPriorityKind("announcement")).toBe(false);

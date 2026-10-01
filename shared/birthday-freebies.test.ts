@@ -4,6 +4,9 @@ import {
   offerVisibleFor,
   validateBirthdayOfferDraft,
   isBirthdayRegionCode,
+  shouldAlertBirthdayMonth,
+  shouldAlertBirthdayMidMonth,
+  birthdayAlertsHref,
   BIRTHDAY_REGIONS,
   BIRTHDAY_MONTHS,
 } from "./birthday-freebies";
@@ -90,5 +93,60 @@ describe("regions and months catalogs", () => {
     expect(BIRTHDAY_MONTHS).toHaveLength(12);
     expect(isBirthdayRegionCode("au")).toBe(true);
     expect(isBirthdayRegionCode("xx")).toBe(false);
+  });
+});
+
+describe("shouldAlertBirthdayMonth", () => {
+  const base = {
+    birthdayMonth: 10,
+    adultConsent: true,
+    birthdayAlertsEnabled: true,
+  };
+
+  it("alerts when month matches, adult, enabled, and not yet alerted", () => {
+    // 2026-10-01 00:00 Sydney = 2026-09-30 14:00 UTC
+    const now = new Date("2026-09-30T14:00:00.000Z");
+    expect(shouldAlertBirthdayMonth(base, now)).toBe(true);
+  });
+
+  it("skips wrong month, disabled, non-adult, or already alerted this month", () => {
+    const now = new Date("2026-09-30T14:00:00.000Z"); // Oct in Sydney
+    expect(shouldAlertBirthdayMonth({ ...base, birthdayMonth: 9 }, now)).toBe(false);
+    expect(shouldAlertBirthdayMonth({ ...base, birthdayAlertsEnabled: false }, now)).toBe(false);
+    expect(shouldAlertBirthdayMonth({ ...base, adultConsent: false, adultConfirmed: false }, now)).toBe(false);
+    expect(
+      shouldAlertBirthdayMonth({ ...base, lastBirthdayMonthAlertAt: "2026-10-02T01:00:00.000Z" }, now),
+    ).toBe(false);
+  });
+
+  it("defaults enabled when birthdayAlertsEnabled is unset", () => {
+    const now = new Date("2026-09-30T14:00:00.000Z");
+    const rest = { ...base, birthdayAlertsEnabled: undefined };
+    expect(shouldAlertBirthdayMonth(rest, now)).toBe(true);
+  });
+});
+
+describe("shouldAlertBirthdayMidMonth", () => {
+  it("only on/after Sydney day 15 and once per month", () => {
+    const early = new Date("2026-09-30T14:00:00.000Z"); // Oct 1 Sydney
+    const mid = new Date("2026-10-14T14:00:00.000Z"); // Oct 15 Sydney
+    const user = {
+      birthdayMonth: 10,
+      adultConsent: true,
+      lastBirthdayMonthAlertAt: "2026-10-01T01:00:00.000Z",
+    };
+    expect(shouldAlertBirthdayMidMonth(user, early)).toBe(false);
+    expect(shouldAlertBirthdayMidMonth(user, mid)).toBe(true);
+    expect(
+      shouldAlertBirthdayMidMonth({ ...user, lastBirthdayMidMonthAlertAt: "2026-10-15T01:00:00.000Z" }, mid),
+    ).toBe(false);
+  });
+});
+
+describe("birthdayAlertsHref", () => {
+  it("defaults to au and validates region", () => {
+    expect(birthdayAlertsHref(undefined)).toBe("/birthday-freebies/au");
+    expect(birthdayAlertsHref("IN")).toBe("/birthday-freebies/in");
+    expect(birthdayAlertsHref("zz")).toBe("/birthday-freebies/au");
   });
 });

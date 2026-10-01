@@ -103,3 +103,4 @@ export {
   recordPulseFollowup,
   onPulseIssueCreated,
 } from "./pulse";
+export { setBirthdayAlertPrefs, sendBirthdayMonthAlerts } from "./birthday-freebies";
