@@ -67,7 +67,7 @@ export function SegmentedControl<T extends string>({
           onClick={() => onChange(o.id)}
           className={cn(
             "h-9 flex-1 cursor-pointer touch-manipulation rounded-full px-4 text-[14px] font-semibold whitespace-nowrap transition active:scale-[0.98]",
-            value === o.id ? "bg-brand text-white shadow-[0_6px_14px_-8px_rgba(24,5,219,0.8)]" : "text-mute hover:text-ink",
+            value === o.id ? "bg-brand text-white shadow-[0_6px_14px_-8px_rgba(18,22,20,0.3)]" : "text-mute hover:text-ink",
           )}
         >
           {o.label}
@@ -226,7 +226,7 @@ export function ArrowCta() {
   return (
     <span
       aria-hidden="true"
-      className="grid h-11 w-11 place-items-center rounded-full bg-brand text-white shadow-[0_8px_16px_-8px_rgba(24,5,219,0.8)] transition group-hover:scale-105"
+      className="grid h-11 w-11 place-items-center rounded-full bg-brand text-white shadow-[0_8px_16px_-8px_rgba(18,22,20,0.3)] transition group-hover:scale-105"
     >
       <span className="text-[18px] font-bold leading-none">↗</span>
     </span>

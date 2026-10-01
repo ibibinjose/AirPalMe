@@ -121,7 +121,7 @@ export function AirPalChatView({
           <div className="relative">
             <div className="h-10 w-10 overflow-hidden rounded-full ring-1 ring-line/80 bg-paper shrink-0">
               {conversation.type === "ai" ? (
-                <div className="grid h-full w-full place-items-center bg-gradient-to-br from-[#1805db] to-[#12049e] text-white">
+                <div className="grid h-full w-full place-items-center bg-brand text-white">
                   <Bot size={20} />
                 </div>
               ) : conversation.photo ? (
@@ -203,7 +203,7 @@ export function AirPalChatView({
                   {!isMe && (
                     <div className="h-7 w-7 overflow-hidden rounded-full ring-1 ring-line/60 bg-paper shrink-0 mb-1">
                       {isAi ? (
-                        <div className="grid h-full w-full place-items-center bg-[#1805db] text-white">
+                        <div className="grid h-full w-full place-items-center bg-brand text-white">
                           <Bot size={14} />
                         </div>
                       ) : msg.senderPhoto ? (
@@ -278,7 +278,7 @@ export function AirPalChatView({
         )}
         {thinking && (
           <div className="flex items-center gap-2 pl-1">
-            <div className="grid h-7 w-7 place-items-center rounded-full bg-[#1805db] text-white">
+            <div className="grid h-7 w-7 place-items-center rounded-full bg-brand text-white">
               <Bot size={14} />
             </div>
             <span

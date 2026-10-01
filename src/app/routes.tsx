@@ -22,6 +22,7 @@ const PlacePage = lazy(() => import("@/pages/PlacePage").then((m) => ({ default:
 const EventPage = lazy(() => import("@/pages/EventPage").then((m) => ({ default: m.EventPage })));
 const TicketPage = lazy(() => import("@/pages/TicketPage").then((m) => ({ default: m.TicketPage })));
 const CalendarPage = lazy(() => import("@/pages/CalendarPage").then((m) => ({ default: m.CalendarPage })));
+const EventsPage = lazy(() => import("@/pages/EventsPage").then((m) => ({ default: m.EventsPage })));
 const StallPage = lazy(() => import("@/pages/StallPage").then((m) => ({ default: m.StallPage })));
 const OrganiserEventPage = lazy(() =>
   import("@/pages/OrganiserEventPage").then((m) => ({ default: m.OrganiserEventPage })),
@@ -196,9 +197,7 @@ export function AppRoutes() {
         <Route path="/f/new" component={FestivalCreatePage} />
         <Route path="/f/:slug" component={FestivalPage} />
         <Route path="/calendar" component={CalendarPage} />
-        <Route path="/events">
-          <Redirect to="/calendar" />
-        </Route>
+        <Route path="/events" component={EventsPage} />
         <Route path="/plans">
           <Redirect to="/plan" />
         </Route>

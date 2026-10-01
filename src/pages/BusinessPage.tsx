@@ -759,7 +759,7 @@ export function BusinessPage() {
 
           {/* Partner Visibility Checklist */}
           {!(business?.products?.length || business?.services?.length || business?.deals?.length) && (
-            <section className="rounded-[28px] bg-gradient-to-br from-brand/5 to-purple-500/5 p-5 ring-1 ring-brand/20 shadow-xs">
+            <section className="rounded-[28px] bg-card p-5 ring-1 ring-brand/20 shadow-xs">
               <div className="flex items-center gap-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-brand/10 text-brand">
                   <Sparkles className="h-4 w-4" />

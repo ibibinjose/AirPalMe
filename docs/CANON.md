@@ -34,7 +34,7 @@ Shared types: `shared/`. Callables: `functions/src/` + `src/lib/functions.ts`. P
 
 Gate before ship: `npm run verify`. Native after web build: `npm run cap:sync`.
 
-Marketing routes (`/`, `/about`, `/concierge`, `/plan`, `/mate`, `/experiences`, `/calendar`, `/event`, `/business`, `/solutions`, `/guide`, `/join`, `/partners`, `/trust`, `/alternatives/meetup`, `/alternatives/touch-stay`, `/alternatives/hostfully`, `/alternatives/eventbrite`, `/stay`) are prerendered to static HTML at build time (`node scripts/prerender-routes.mjs`, wired into `npm run build`): per-route title/description/self-referencing canonical plus a static body React wipes on mount. Client-side meta in `src/lib/share-meta.ts` must match the prerender copy in `scripts/prerender-routes.json` (enforced by `src/lib/prerender.test.ts` + `scripts/check-seo.mjs`). Firebase Hosting serves these files statically; all other routes keep the SPA fallback.
+Marketing routes (`/`, `/about`, `/concierge`, `/plan`, `/mate`, `/experiences`, `/calendar`, `/events`, `/event`, `/business`, `/solutions`, `/guide`, `/join`, `/partners`, `/trust`, `/alternatives/meetup`, `/alternatives/touch-stay`, `/alternatives/hostfully`, `/alternatives/eventbrite`, `/stay`) are prerendered to static HTML at build time (`node scripts/prerender-routes.mjs`, wired into `npm run build`): per-route title/description/self-referencing canonical plus a static body React wipes on mount. Client-side meta in `src/lib/share-meta.ts` must match the prerender copy in `scripts/prerender-routes.json` (enforced by `src/lib/prerender.test.ts` + `scripts/check-seo.mjs`). Firebase Hosting serves these files statically; all other routes keep the SPA fallback.
 
 Sydney calendar dates: `toZonedDateStr` / `useLocalNow`. Never `new Date().toISOString().slice(0,10)` for “today”.
 
@@ -115,7 +115,7 @@ Reuse these. Do not add a parallel page for the same job.
 | Stay profile | `/stay/@handle` (listing profile + what's around) |
 | Demo Hotel stay QR showcase (first live listable stay, else Harbour sim) | `/DemoHotel` |
 | Marker / campus | `/q/:id`, `/c/:id` |
-| Calendar / events | `/calendar`, `/e/:id`, `/event` (single organizer door; `/event/new` redirects there; ticketed + free) |
+| Calendar / events | `/calendar` (month/week/day planner), `/events` (all upcoming in Places / Community / Friends), `/e/:id`, `/event` (single organizer door; `/event/new` redirects there; ticketed + free) |
 | Festival program | `/f/:slug` (sessions are `events` with `festivalSlug`; attend/calendar reuse the events engine) |
 | Places / experiences | `/p/:id`, `/experiences` |
 | Public bio & Stay showcase | `/@handle` (links stack, catalog, deals, hotel facilities deck & chat trigger) |

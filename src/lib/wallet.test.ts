@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   ticketWalletPassUrl,
   businessCardWalletPassUrl,
+  googleWalletTicketUrl,
+  googleWalletCardUrl,
   isApplePlatform,
 } from "./wallet";
 
@@ -23,5 +25,10 @@ describe("wallet helper", () => {
 
   it("isApplePlatform returns a boolean", () => {
     expect(typeof isApplePlatform()).toBe("boolean");
+  });
+
+  it("formats Google Wallet save-link URLs for tickets and cards", () => {
+    expect(googleWalletTicketUrl("booking-12345")).toContain("/api/wallet/google/ticket/booking-12345");
+    expect(googleWalletCardUrl("airpalmate")).toContain("/api/wallet/google/card/airpalmate");
   });
 });

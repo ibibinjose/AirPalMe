@@ -71,7 +71,7 @@ export function AirPalMascot({ className }: { className?: string }) {
         x="120"
         y="216"
         textAnchor="middle"
-        fontFamily="Outfit, 'DM Sans', sans-serif"
+        fontFamily="-apple-system, BlinkMacSystemFont, 'SF Pro Rounded', system-ui, sans-serif"
         fontWeight="800"
         fontSize="40"
         fill="#ffffff"

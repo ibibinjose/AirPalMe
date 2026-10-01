@@ -137,10 +137,17 @@
   },
   {
     "path": "/calendar",
-    "title": "Events · AirPal.Me",
-    "description": "What's on near you — upcoming events, experiences and things to do.",
+    "title": "Event calendar · AirPal.Me",
+    "description": "What's on near you — month, week and day views for planning ahead.",
     "heading": "What's on",
     "summary": "What's on near you — upcoming events, experiences and things to do, with month, week and day views."
+  },
+  {
+    "path": "/events",
+    "title": "Events · AirPal.Me",
+    "description": "Every upcoming event in one feed — at places, in the community, or from friends.",
+    "heading": "Events",
+    "summary": "Every upcoming event in one feed — gigs and dinners at places, community markets and expos, and events from friends."
   },
   {
     "path": "/event",

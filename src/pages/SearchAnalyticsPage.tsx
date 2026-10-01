@@ -530,7 +530,7 @@ export function SearchAnalyticsPage() {
 
             <div className="mt-3 flex items-center justify-center gap-4 text-xs text-mute font-medium border-t border-line/60 pt-3">
               <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#1805db]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-brand" />
                 <span>Total Queries</span>
               </span>
               <span className="flex items-center gap-1.5">

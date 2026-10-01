@@ -650,7 +650,7 @@ export function FoundersPage() {
       </section>
 
       {/* Crew Referral Station */}
-      <section id="crew-station" className="relative z-10 py-16 md:py-24 bg-gradient-to-br from-brand via-indigo-600 to-brand text-white">
+      <section id="crew-station" className="relative z-10 py-16 md:py-24 bg-brand text-white">
         <div className="mx-auto max-w-5xl px-5 text-center sm:text-left">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             

@@ -223,7 +223,7 @@ export function StayCompendium() {
             setChatConv(conv);
             setShowChatModal(true);
           }}
-          className="group relative flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-brand via-[#240cf0] to-[#0a0270] hover:brightness-110 px-4 py-3.5 text-center text-sm font-black text-white shadow-md transition active:scale-[0.98]"
+          className="group relative flex w-full items-center justify-center gap-2 rounded-2xl bg-brand hover:brightness-110 px-4 py-3.5 text-center text-sm font-black text-white shadow-md transition active:scale-[0.98]"
         >
           <Sparkles size={18} className="text-amber-300" />
           <span>Chat with Front Desk &amp; AirPal AI</span>

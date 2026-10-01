@@ -87,6 +87,8 @@ export function HostPulsePage() {
   const [noteByIssue, setNoteByIssue] = useState<Record<string, string>>({});
   const [followupScoreByIssue, setFollowupScoreByIssue] = useState<Record<string, string>>({});
   const [followupNoteByIssue, setFollowupNoteByIssue] = useState<Record<string, string>>({});
+  const [pendingByIssue, setPendingByIssue] = useState<Record<string, boolean>>({});
+  const [confirmArchive, setConfirmArchive] = useState(false);
 
   useEffect(() => {
     if (!workspaceId) return;
@@ -256,8 +258,9 @@ export function HostPulsePage() {
   }
 
   function onAcknowledge(issue: PulseIssue) {
-    if (!workspaceId) return;
+    if (!workspaceId || pendingByIssue[issue.id]) return;
     void triggerHaptic("light");
+    setPendingByIssue((m) => ({ ...m, [issue.id]: true }));
     void acknowledgePulseIssue(workspaceId, issue.id)
       .then(() => {
         void track("pulse_issue_acknowledged", {
@@ -267,12 +270,14 @@ export function HostPulsePage() {
         });
         toast.success("Acknowledged");
       })
-      .catch((err) => toast.error(err instanceof Error ? err.message : "Failed"));
+      .catch((err) => toast.error(err instanceof Error ? err.message : "Failed"))
+      .finally(() => setPendingByIssue((m) => ({ ...m, [issue.id]: false })));
   }
 
   function onResolve(issue: PulseIssue) {
-    if (!workspaceId) return;
+    if (!workspaceId || pendingByIssue[issue.id]) return;
     void triggerHaptic("medium");
+    setPendingByIssue((m) => ({ ...m, [issue.id]: true }));
     void resolvePulseIssue(workspaceId, issue.id, noteByIssue[issue.id])
       .then(() => {
         void track("pulse_issue_resolved", {
@@ -282,13 +287,14 @@ export function HostPulsePage() {
         });
         toast.success("Resolved");
       })
-      .catch((err) => toast.error(err instanceof Error ? err.message : "Failed"));
+      .catch((err) => toast.error(err instanceof Error ? err.message : "Failed"))
+      .finally(() => setPendingByIssue((m) => ({ ...m, [issue.id]: false })));
   }
 
   if (!authReady) {
     return (
       <div className="mx-auto flex max-w-md flex-col items-center gap-3 px-4 py-16 text-center">
-        <Loader2 size={28} className="animate-spin text-brand" />
+        <Loader2 size={28} className="text-brand motion-safe:animate-spin" />
         <p className="text-sm font-medium text-mute">Loading Pulse…</p>
       </div>
     );
@@ -350,6 +356,9 @@ export function HostPulsePage() {
                   <img
                     src={qr}
                     alt="Pulse QR code"
+                    width={160}
+                    height={160}
+                    loading="lazy"
                     className="mx-auto h-40 w-40 rounded-2xl bg-white p-2 ring-1 ring-line sm:mx-0"
                   />
                 ) : null}
@@ -360,10 +369,10 @@ export function HostPulsePage() {
                     <button
                       type="button"
                       onClick={() => void onCopyLink()}
-                      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 text-xs font-bold text-ink ring-1 ring-line transition hover:bg-paper active:scale-95"
+                      className="inline-flex min-h-[44px] cursor-pointer touch-manipulation items-center gap-1.5 rounded-full bg-card px-4 text-xs font-bold text-ink ring-1 ring-line transition-colors hover:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-95"
                     >
                       {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
-                      {copied ? "Copied" : "Copy link"}
+                      {copied ? "Copied" : "Copy Link"}
                     </button>
                     <button
                       type="button"
@@ -371,7 +380,7 @@ export function HostPulsePage() {
                         void triggerHaptic("light");
                         if (qrToken) nav(`/pulse/${qrToken}`);
                       }}
-                      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 text-xs font-bold text-ink ring-1 ring-line transition hover:bg-paper active:scale-95"
+                      className="inline-flex min-h-[44px] cursor-pointer touch-manipulation items-center gap-1.5 rounded-full bg-card px-4 text-xs font-bold text-ink ring-1 ring-line transition-colors hover:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-95"
                     >
                       <ExternalLink size={14} />
                       Open
@@ -380,10 +389,10 @@ export function HostPulsePage() {
                       <button
                         type="button"
                         onClick={onDownloadQr}
-                        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 text-xs font-bold text-ink ring-1 ring-line transition hover:bg-paper active:scale-95"
+                        className="inline-flex min-h-[44px] cursor-pointer touch-manipulation items-center gap-1.5 rounded-full bg-card px-4 text-xs font-bold text-ink ring-1 ring-line transition-colors hover:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-95"
                       >
                         <Download size={14} />
-                        QR code
+                        QR Code
                       </button>
                     )}
                   </div>
@@ -423,8 +432,21 @@ export function HostPulsePage() {
                   </Button>
                 )}
                 {(activePulse.status === "live" || activePulse.status === "paused") && (
-                  <Button variant="ghost" loading={busy} onClick={() => void onSetStatus(activePulse.id, "archived")}>
-                    Archive
+                  <Button
+                    variant="ghost"
+                    loading={busy}
+                    onClick={() => {
+                      if (!confirmArchive) {
+                        setConfirmArchive(true);
+                        toast.message("Tap Archive again to confirm — the QR link will stop working.");
+                        setTimeout(() => setConfirmArchive(false), 5000);
+                      } else {
+                        setConfirmArchive(false);
+                        void onSetStatus(activePulse.id, "archived");
+                      }
+                    }}
+                  >
+                    {confirmArchive ? "Confirm Archive" : "Archive"}
                   </Button>
                 )}
               </div>
@@ -438,7 +460,7 @@ export function HostPulsePage() {
               { n: openPulseIssueCount(issues), l: "Open issues" },
             ].map((s) => (
               <div key={s.l} className="rounded-[22px] bg-card/90 p-3 text-center ring-1 ring-line">
-                <p className="font-display text-2xl font-semibold">{s.n}</p>
+                <p className="font-display text-2xl font-semibold tabular-nums">{s.n}</p>
                 <p className="text-[11px] text-mute">{s.l}</p>
               </div>
             ))}
@@ -475,23 +497,32 @@ export function HostPulsePage() {
                     {issue.status === "open" && (
                       <button
                         type="button"
-                        className="inline-flex min-h-[44px] items-center rounded-full bg-card px-4 text-sm font-semibold text-ink ring-1 ring-line transition hover:bg-paper active:scale-95"
+                        disabled={!!pendingByIssue[issue.id]}
+                        className="inline-flex min-h-[44px] cursor-pointer touch-manipulation items-center gap-1.5 rounded-full bg-card px-4 text-sm font-semibold text-ink ring-1 ring-line transition-colors hover:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-95 disabled:opacity-50"
                         onClick={() => onAcknowledge(issue)}
                       >
+                        {pendingByIssue[issue.id] ? <Loader2 size={14} className="motion-safe:animate-spin" /> : null}
                         Acknowledge
                       </button>
                     )}
                     <input
-                      className="h-11 min-w-[160px] flex-1 rounded-full border border-line bg-paper px-4 text-sm outline-none focus:border-brand"
+                      aria-label="Resolution note"
+                      enterKeyHint="send"
+                      className="h-11 min-w-[160px] flex-1 rounded-full border border-line bg-paper px-4 text-base outline-none focus:border-brand sm:text-sm"
                       placeholder="Resolution note"
                       value={noteByIssue[issue.id] || ""}
                       onChange={(e) => setNoteByIssue((m) => ({ ...m, [issue.id]: e.target.value }))}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") onResolve(issue);
+                      }}
                     />
                     <button
                       type="button"
-                      className="inline-flex min-h-[44px] items-center rounded-full bg-brand px-4 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-ink active:scale-95"
+                      disabled={!!pendingByIssue[issue.id]}
+                      className="inline-flex min-h-[44px] cursor-pointer touch-manipulation items-center gap-1.5 rounded-full bg-brand px-4 text-sm font-semibold text-white shadow-xs transition-colors hover:bg-brand-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-95 disabled:opacity-50"
                       onClick={() => onResolve(issue)}
                     >
+                      {pendingByIssue[issue.id] ? <Loader2 size={14} className="motion-safe:animate-spin" /> : null}
                       Resolve
                     </button>
                   </div>
@@ -526,7 +557,7 @@ export function HostPulsePage() {
                       <div className="mt-3 flex flex-wrap items-center gap-2">
                         <select
                           aria-label="Follow-up score"
-                          className="h-11 rounded-full border border-line bg-paper px-4 text-sm outline-none focus:border-brand"
+                          className="h-11 rounded-full border border-line bg-paper px-4 text-base outline-none focus:border-brand sm:text-sm"
                           value={followupScoreByIssue[issue.id] || ""}
                           onChange={(e) => setFollowupScoreByIssue((m) => ({ ...m, [issue.id]: e.target.value }))}
                         >
@@ -538,17 +569,22 @@ export function HostPulsePage() {
                           ))}
                         </select>
                         <input
-                          className="h-11 min-w-[160px] flex-1 rounded-full border border-line bg-paper px-4 text-sm outline-none focus:border-brand"
+                          aria-label="Follow-up note (optional)"
+                          enterKeyHint="send"
+                          className="h-11 min-w-[160px] flex-1 rounded-full border border-line bg-paper px-4 text-base outline-none focus:border-brand sm:text-sm"
                           placeholder="Follow-up note (optional)"
                           value={followupNoteByIssue[issue.id] || ""}
                           onChange={(e) => setFollowupNoteByIssue((m) => ({ ...m, [issue.id]: e.target.value }))}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") onRecordFollowup(issue.id);
+                          }}
                         />
                         <button
                           type="button"
-                          className="inline-flex min-h-[44px] items-center rounded-full bg-brand px-4 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-ink active:scale-95"
+                          className="inline-flex min-h-[44px] cursor-pointer touch-manipulation items-center rounded-full bg-brand px-4 text-sm font-semibold text-white shadow-xs transition-colors hover:bg-brand-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-95"
                           onClick={() => onRecordFollowup(issue.id)}
                         >
-                          Record follow-up
+                          Record Follow-up
                         </button>
                       </div>
                     )}
@@ -564,7 +600,7 @@ export function HostPulsePage() {
             </h2>
             <button
               type="button"
-              className="inline-flex min-h-[44px] items-center rounded-full bg-card px-4 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-paper active:scale-95 disabled:opacity-50"
+              className="inline-flex min-h-[44px] cursor-pointer touch-manipulation items-center rounded-full bg-card px-4 text-xs font-semibold text-ink ring-1 ring-line transition-colors hover:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-95 disabled:opacity-50"
               onClick={() => void onExportCsv()}
               disabled={!responses.length}
             >

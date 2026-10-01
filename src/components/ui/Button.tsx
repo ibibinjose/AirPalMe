@@ -35,7 +35,7 @@ export function Button({
         size === "md" && "h-11 px-5 text-[15px]",
         size === "lg" && "h-12 px-6 text-base",
         variant === "primary" &&
-          "bg-brand text-white shadow-[0_10px_24px_-10px_rgba(24,5,219,0.75)]",
+          "bg-brand text-white shadow-[0_10px_24px_-10px_rgba(18,22,20,0.28)]",
         variant === "ghost" && "bg-card text-ink ring-1 ring-line hover:bg-white",
         variant === "dark" && "bg-brand text-white",
         variant === "gold" && "bg-gold text-white",

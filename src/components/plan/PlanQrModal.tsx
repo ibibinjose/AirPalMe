@@ -177,7 +177,7 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
           <Button
             onClick={onPrintPdf}
             disabled={isPrinting}
-            className="w-full h-11 rounded-2xl text-xs font-bold gap-2 shadow-md bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700"
+            className="w-full h-11 rounded-2xl text-xs font-bold gap-2 shadow-md bg-amber-500 text-white hover:bg-amber-600"
           >
             <Printer size={15} />
             <span>{isPrinting ? "Preparing PDF..." : "Export & Print PDF Trip Guide"}</span>

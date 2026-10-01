@@ -261,8 +261,7 @@ export function ConciergePage() {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-3xl ring-1 ring-white/10 bg-gradient-to-br from-brand via-[#1c08d4] to-[#0d027a] p-4 text-white shadow-md flex items-center justify-between gap-3">
-            <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-amber-400/20 blur-xl pointer-events-none" />
+          <div className="relative overflow-hidden rounded-3xl ring-1 ring-white/10 bg-brand p-4 text-white shadow-md flex items-center justify-between gap-3">
             <div className="relative flex items-center gap-3 min-w-0">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white/15 text-white ring-1 ring-white/25 shadow-inner backdrop-blur-md">
                 <HeartHandshake size={22} className="text-amber-300" />

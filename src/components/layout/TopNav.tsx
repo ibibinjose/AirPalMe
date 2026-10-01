@@ -52,7 +52,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
         className={cn(
           "h-8.5 touch-manipulation rounded-full px-3.5 text-sm font-semibold transition-all duration-200 cursor-pointer",
           isActive
-            ? "bg-brand text-white shadow-[0_4px_12px_-4px_rgba(24,5,219,0.7)]"
+            ? "bg-brand text-white shadow-[0_4px_12px_-4px_rgba(18,22,20,0.25)]"
             : "text-mute hover:bg-paper/80 hover:text-ink",
         )}
       >
@@ -106,7 +106,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
               void triggerHaptic("medium");
               openGlobalCreate();
             }}
-            className="flex h-9 items-center gap-1.5 shrink-0 rounded-full bg-brand px-3.5 text-sm font-semibold text-white shadow-[0_4px_12px_-4px_rgba(24,5,219,0.6)] hover:bg-brand-ink transition active:scale-95 lg:h-10 cursor-pointer"
+            className="flex h-9 items-center gap-1.5 shrink-0 rounded-full bg-brand px-3.5 text-sm font-semibold text-white shadow-[0_4px_12px_-4px_rgba(18,22,20,0.22)] hover:bg-brand-ink transition active:scale-95 lg:h-10 cursor-pointer"
             aria-label="Create something new"
           >
             <Plus size={16} strokeWidth={2.5} />

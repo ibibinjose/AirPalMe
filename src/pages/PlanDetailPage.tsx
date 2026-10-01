@@ -850,7 +850,7 @@ export function PlanDetailPage() {
 
       {/* Experience Showcase & Booking Card (When plan is marked as experience) */}
       {plan.isExperience && (
-        <div className="mt-8 rounded-3xl bg-gradient-to-b from-card via-card to-paper p-6 ring-1 ring-amber-500/30 shadow-md">
+        <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-amber-500/30 shadow-md">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line/60 pb-5">
             <div>
               <div className="flex items-center gap-2">
@@ -1505,7 +1505,7 @@ export function PlanDetailPage() {
       </div>
 
       {/* Live Plan Chat & Copilot Banner */}
-      <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 rounded-3xl bg-gradient-to-r from-brand/10 via-indigo-500/10 to-transparent p-4 ring-1 ring-brand/20">
+      <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 rounded-3xl bg-brand/5 p-4 ring-1 ring-brand/20">
         <div className="flex items-center gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
             <MessageSquare size={18} />

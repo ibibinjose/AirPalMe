@@ -285,7 +285,7 @@ export function PulseHubPage() {
   return (
     <div className="min-h-screen bg-bg text-ink pb-24">
       {/* Hero Header */}
-      <section className="relative overflow-hidden border-b border-line bg-gradient-to-b from-brand/12 via-card/60 to-bg pt-12 pb-14 px-4 sm:px-6">
+      <section className="relative overflow-hidden border-b border-line bg-card pt-12 pb-14 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto text-center space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/15 text-brand text-xs font-semibold ring-1 ring-brand/30 shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-brand" />
@@ -771,7 +771,7 @@ export function PulseHubPage() {
             </div>
 
             <div className="space-y-1.5">
-              <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#1805db]">
+              <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-brand">
                 AirPal Pulse
               </span>
               <h3 className="font-display text-2xl font-extrabold tracking-tight">
@@ -795,7 +795,7 @@ export function PulseHubPage() {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="flex-1 rounded-full bg-[#1805db] text-white py-3 text-xs font-bold shadow-md hover:bg-[#1404be] transition flex items-center justify-center gap-1.5"
+                className="flex-1 rounded-full bg-brand text-white py-3 text-xs font-bold shadow-md hover:bg-brand-ink transition flex items-center justify-center gap-1.5"
               >
                 <Printer size={15} /> Print Standee
               </button>

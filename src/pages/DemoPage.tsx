@@ -210,7 +210,7 @@ export function DemoPage() {
       <div className="mt-4 flex flex-wrap gap-2.5">
         <Link
           href="/"
-          className="inline-flex h-11 items-center gap-2 rounded-full bg-brand px-6 text-sm font-bold text-white shadow-[0_6px_20px_rgba(24,5,219,0.35)] transition hover:bg-brand-ink active:scale-[0.98]"
+          className="inline-flex h-11 items-center gap-2 rounded-full bg-brand px-6 text-sm font-bold text-white shadow-[0_6px_20px_rgba(18,22,20,0.15)] transition hover:bg-brand-ink active:scale-[0.98]"
         >
           Start exploring <ArrowRight size={16} />
         </Link>

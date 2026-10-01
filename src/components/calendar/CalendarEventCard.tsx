@@ -203,7 +203,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
           )}
 
           {/* Error state - show gradient instead */}
-          {imageError && <div className="absolute inset-0 bg-gradient-to-br from-brand/10 via-brand/5 to-paper" />}
+          {imageError && <div className="absolute inset-0 bg-paper" />}
 
           <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
 

@@ -242,7 +242,7 @@ export function PlanHubPage() {
             void triggerHaptic("medium");
             nav("/plan/new");
           }}
-          className="h-12 shrink-0 gap-2 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(24,5,219,0.28)] transition-transform active:scale-95"
+          className="h-12 shrink-0 gap-2 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(18,22,20,0.12)] transition-transform active:scale-95"
         >
           <Plus size={18} strokeWidth={2.5} />
           <span>New Plan</span>
@@ -577,7 +577,7 @@ export function PlanHubPage() {
                     void triggerHaptic("medium");
                     nav("/plan/new");
                   }}
-                  className="h-11 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(24,5,219,0.25)]"
+                  className="h-11 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(18,22,20,0.12)]"
                 >
                   <Plus size={16} strokeWidth={2.5} />
                   <span>Create a Plan</span>

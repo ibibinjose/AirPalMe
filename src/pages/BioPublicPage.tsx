@@ -671,7 +671,7 @@ export function BioPublicPage() {
                 {avatar ? (
                   <Photo src={avatar} className="h-full w-full object-cover" />
                 ) : (
-                  <span className="grid h-full w-full place-items-center bg-gradient-to-br from-ink to-ink/80 font-display text-3xl font-bold text-white">
+                  <span className="grid h-full w-full place-items-center bg-ink font-display text-3xl font-bold text-white">
                     {bio.name[0]}
                   </span>
                 )}
@@ -1136,7 +1136,7 @@ export function BioPublicPage() {
               {isStay && (
                 <div id="bio-stay" className="mt-5 scroll-mt-24 space-y-4">
                   {/* Stay & Guide hero banner */}
-                  <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-[#1805db]/10 via-card to-paper p-5 ring-1 ring-brand/30 shadow-xs">
+                  <div className="overflow-hidden rounded-3xl bg-card p-5 ring-1 ring-brand/30 shadow-xs">
                     <div className="flex items-center justify-between">
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-brand">
                         <Sparkles size={11} />

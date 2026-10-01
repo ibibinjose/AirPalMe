@@ -263,7 +263,7 @@ export function HomePage() {
                 void triggerHaptic("medium");
                 nav("/mate/request");
               }}
-              className="h-11 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(24,5,219,0.35)]"
+              className="h-11 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(18,22,20,0.15)]"
             >
               <Users size={16} className="mr-2" />
               Find a Mate

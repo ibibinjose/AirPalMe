@@ -328,7 +328,7 @@ export function PlanDiscussionWall({
             type="submit"
             size="sm"
             disabled={uploadingPhoto}
-            className="h-11 rounded-2xl px-4 shrink-0 gap-1.5 shadow-[0_6px_20px_rgba(24,5,219,0.35)]"
+            className="h-11 rounded-2xl px-4 shrink-0 gap-1.5 shadow-[0_6px_20px_rgba(18,22,20,0.15)]"
           >
             <Send size={15} />
             <span className="hidden sm:inline">Send</span>

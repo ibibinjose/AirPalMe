@@ -36,8 +36,8 @@ function Card({ p, featured }: { p: Promotion; featured?: boolean }) {
           className={cn(
             "grid h-40 w-full place-items-center",
             featured
-              ? "bg-gradient-to-br from-gold/30 via-amber-100 to-brand/20"
-              : "bg-gradient-to-br from-brand/15 via-sky-100 to-emerald-100",
+              ? "bg-gold/15"
+              : "bg-paper",
           )}
         >
           {closed ? <Trophy size={40} className="text-gold" /> : <Gift size={40} className="text-brand" />}

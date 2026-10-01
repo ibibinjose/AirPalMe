@@ -19,7 +19,7 @@ export interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEl
 
 const BUTTON_VARIANT_MAP = {
   glass: "bg-card/80 backdrop-blur-md ring-1 ring-line/80 text-ink hover:bg-card hover:ring-brand/30 shadow-xs",
-  brand: "bg-brand text-white hover:bg-brand-ink shadow-[0_4px_12px_-4px_rgba(24,5,219,0.6)]",
+  brand: "bg-brand text-white hover:bg-brand-ink shadow-[0_4px_12px_-4px_rgba(18,22,20,0.22)]",
   outline: "bg-card ring-1 ring-line text-ink hover:bg-paper hover:ring-brand/30 shadow-xs",
   ghost: "text-mute hover:text-ink hover:bg-paper/80",
   paper: "bg-paper ring-1 ring-line text-ink hover:bg-card shadow-xs",

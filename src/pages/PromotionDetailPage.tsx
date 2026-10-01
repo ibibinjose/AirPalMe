@@ -216,7 +216,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
       {art ? (
         <img src={art} alt={promo.title} className="mt-4 h-56 w-full rounded-3xl ring-1 ring-line object-cover" />
       ) : (
-        <div className="mt-4 grid h-40 w-full place-items-center rounded-3xl ring-1 ring-line bg-gradient-to-br from-brand/15 via-sky-100 to-emerald-100">
+        <div className="mt-4 grid h-40 w-full place-items-center rounded-3xl ring-1 ring-line bg-paper">
           <Gift size={44} className="text-brand" />
         </div>
       )}

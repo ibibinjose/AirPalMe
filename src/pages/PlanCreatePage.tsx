@@ -550,7 +550,7 @@ export function PlanCreatePage() {
                 void triggerHaptic("medium");
                 nav("/event/new");
               }}
-              className="group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-3xl border border-brand/35 bg-gradient-to-r from-brand/15 via-brand/5 to-gold/20 p-5 text-left shadow-xs transition-shadow duration-200 hover:border-brand hover:shadow-md active:scale-[0.99] cursor-pointer"
+              className="group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-3xl border border-brand/35 bg-brand/10 p-5 text-left shadow-xs transition-shadow duration-200 hover:border-brand hover:shadow-md active:scale-[0.99] cursor-pointer"
             >
               <div className="flex items-center gap-4 min-w-0">
                 <span className="grid h-13 w-13 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-md ring-4 ring-brand/20">
@@ -580,7 +580,7 @@ export function PlanCreatePage() {
 
       {/* Solved Brain Intent Preview */}
       {solvedIntent && (
-        <div className="mt-4 rounded-2xl bg-gradient-to-br from-brand/10 via-brand/5 to-transparent p-4 ring-1 ring-brand/20 shadow-xs">
+        <div className="mt-4 rounded-2xl bg-brand/5 p-4 ring-1 ring-brand/20 shadow-xs">
           <div className="flex items-center gap-2 text-brand">
             <Sparkles size={16} className="shrink-0 motion-safe:animate-pulse" />
             <span className="text-xs font-bold uppercase tracking-wider">AirPal Brain Plan</span>
@@ -1059,7 +1059,7 @@ export function PlanCreatePage() {
           <div className="pt-1">
             <button
               type="button"
-              className="group flex w-full items-center justify-center gap-2 rounded-2xl border border-brand/25 bg-gradient-to-r from-brand/10 to-gold/10 py-3 text-xs font-bold text-brand shadow-2xs transition-all hover:bg-brand/15 hover:border-brand/40 active:scale-[0.99] cursor-pointer"
+              className="group flex w-full items-center justify-center gap-2 rounded-2xl border border-brand/25 bg-brand/10 py-3 text-xs font-bold text-brand shadow-2xs transition-all hover:bg-brand/15 hover:border-brand/40 active:scale-[0.99] cursor-pointer"
               onClick={() => {
                 void triggerHaptic("medium");
                 nav("/event/new");

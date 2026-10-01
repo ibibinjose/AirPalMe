@@ -167,7 +167,7 @@ export function CreateFab() {
             aria-label={open ? "Close create menu" : "Create something new"}
             aria-expanded={open}
             className={cn(
-              "group flex h-13 w-13 items-center justify-center rounded-full text-white shadow-[0_8px_24px_-4px_rgba(24,5,219,0.55)] transition-all duration-200 active:scale-95 cursor-pointer touch-manipulation focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
+              "group flex h-13 w-13 items-center justify-center rounded-full text-white shadow-[0_8px_24px_-4px_rgba(18,22,20,0.2)] transition-all duration-200 active:scale-95 cursor-pointer touch-manipulation focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
               open ? "bg-ink hover:bg-black" : "bg-brand hover:bg-brand-ink",
             )}
           >
@@ -232,7 +232,7 @@ export function CreateFab() {
                     void triggerHaptic("light");
                     setOpen(false);
                   }}
-                  className="rounded-full p-2 text-mute hover:bg-paper hover:text-ink transition cursor-pointer"
+                  className="grid min-h-[44px] min-w-[44px] place-items-center rounded-full text-mute hover:bg-paper hover:text-ink transition cursor-pointer"
                   aria-label="Close"
                 >
                   <X size={18} />

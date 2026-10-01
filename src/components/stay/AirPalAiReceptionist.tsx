@@ -244,7 +244,7 @@ export function AirPalAiReceptionist() {
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:justify-end sm:p-6 bg-black/40 backdrop-blur-xs transition-opacity animate-in fade-in">
           <div className="relative flex flex-col h-[85vh] sm:h-[620px] w-full sm:w-[420px] rounded-t-[32px] sm:rounded-[28px] bg-card ring-1 ring-line shadow-2xl overflow-hidden border border-white/10 animate-in slide-in-from-bottom duration-300">
             {/* Header */}
-            <div className="relative bg-gradient-to-r from-brand via-[#1e07b8] to-[#12048f] p-4 text-white">
+            <div className="relative bg-brand p-4 text-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="relative">

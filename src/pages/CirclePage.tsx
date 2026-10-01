@@ -604,7 +604,7 @@ export function CirclePage() {
                         <button
                           type="button"
                           onClick={() => nav(bioPath(cleanHandle))}
-                          className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-2xl bg-gradient-to-tr from-brand/20 to-purple-500/20 ring-1 ring-line font-display text-base font-bold text-brand group-hover:scale-105 transition-transform"
+                          className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-2xl bg-brand/10 ring-1 ring-line font-display text-base font-bold text-brand group-hover:scale-105 transition-transform"
                         >
                           {row.avatar ? (
                             <img src={row.avatar} alt={row.name} className="h-full w-full object-cover" />
@@ -721,7 +721,7 @@ export function CirclePage() {
 
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-line/80">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-brand to-purple-600 transition-all duration-500"
+                className="h-full rounded-full bg-brand transition-all duration-500"
                 style={{ width: `${Math.round((quest.completed / quest.total) * 100)}%` }}
               />
             </div>

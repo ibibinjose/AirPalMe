@@ -105,7 +105,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
                 {on && (
                   <motion.span
                     layoutId="activeTabBadge"
-                    className="absolute inset-x-1 inset-y-0.5 rounded-full bg-brand shadow-[0_8px_20px_-6px_rgba(24,5,219,0.75)]"
+                    className="absolute inset-x-1 inset-y-0.5 rounded-full bg-brand shadow-[0_8px_20px_-6px_rgba(18,22,20,0.28)]"
                     transition={{ type: "spring", stiffness: 420, damping: 32 }}
                     aria-hidden
                   />

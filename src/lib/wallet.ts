@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { publicSiteOrigin } from "./public-origin";
 import { getNativePlatform } from "./native";
 
@@ -13,10 +14,7 @@ export function isApplePlatform(): boolean {
     (navigator as unknown as { userAgentData?: { platform?: string } }).userAgentData?.platform ||
     navigator.platform ||
     "";
-  return (
-    /iPhone|iPad|iPod|Macintosh/i.test(ua) ||
-    /iPhone|iPad|iPod|Mac/i.test(platform)
-  );
+  return /iPhone|iPad|iPod|Macintosh/i.test(ua) || /iPhone|iPad|iPod|Mac/i.test(platform);
 }
 
 /**
@@ -36,13 +34,73 @@ export function businessCardWalletPassUrl(handle: string): string {
 }
 
 /**
+ * Google Wallet save-link endpoints (answer `{ saveUrl }` JSON — the client
+ * opens the pay.google.com save link, which installs the pass).
+ */
+export function googleWalletTicketUrl(bookingId: string): string {
+  const origin = publicSiteOrigin();
+  return origin + "/api/wallet/google/ticket/" + encodeURIComponent(bookingId);
+}
+
+export function googleWalletCardUrl(handle: string): string {
+  const origin = publicSiteOrigin();
+  return origin + "/api/wallet/google/card/" + encodeURIComponent(handle);
+}
+
+/**
+ * Fetches the signed Google save link and opens it. Honest toasts for the
+ * unconfigured (501) and missing (404) states — never a dead link.
+ */
+export async function openGoogleWalletPass(url: string): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      toast.error(
+        res.status === 501
+          ? "Google Wallet isn't set up yet — ask your host for another ticket option."
+          : res.status === 404
+            ? "This pass is no longer available."
+            : "Couldn't load the Wallet pass — try again.",
+      );
+      return false;
+    }
+    const { saveUrl } = (await res.json()) as { saveUrl?: string };
+    if (!saveUrl) {
+      toast.error("Couldn't load the Wallet pass — try again.");
+      return false;
+    }
+    window.open(saveUrl, "_blank", "noopener,noreferrer");
+    return true;
+  } catch (err) {
+    console.error("Failed to open Google Wallet pass:", err);
+    toast.error("Couldn't load the Wallet pass — try again.");
+    return false;
+  }
+}
+
+/**
  * Opens or downloads the Apple Wallet pass.
  * On iOS/macOS Safari and native iOS Capacitor, navigating directly to a .pkpass
  * URL triggers the native PKAddPassesViewController dialog automatically.
+ *
+ * A HEAD preflight runs first so a missing pass or an unconfigured signer
+ * shows an honest toast instead of downloading an error page as a "pass".
  */
 export async function openAppleWalletPass(url: string, title?: string): Promise<boolean> {
   if (typeof window === "undefined") return false;
   try {
+    const head = await fetch(url, { method: "HEAD" });
+    if (!head.ok) {
+      toast.error(
+        head.status === 501
+          ? "Apple Wallet isn't set up yet — ask your host for another ticket option."
+          : head.status === 404
+            ? "This pass is no longer available."
+            : "Couldn't load the Wallet pass — try again.",
+      );
+      return false;
+    }
     const a = document.createElement("a");
     a.href = url;
     a.rel = "noopener noreferrer";
@@ -54,6 +112,7 @@ export async function openAppleWalletPass(url: string, title?: string): Promise<
     return true;
   } catch (err) {
     console.error("Failed to open Apple Wallet pass:", err);
+    toast.error("Couldn't load the Wallet pass — try again.");
     return false;
   }
 }

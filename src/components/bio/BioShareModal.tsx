@@ -5,7 +5,13 @@ import { makeQrDataUrl } from "@/lib/qr";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { Button } from "@/components/ui/Button";
 import { AppleWalletButton } from "@/components/ui/AppleWalletButton";
-import { businessCardWalletPassUrl, openAppleWalletPass } from "@/lib/wallet";
+import { GoogleWalletButton } from "@/components/ui/GoogleWalletButton";
+import {
+  businessCardWalletPassUrl,
+  googleWalletCardUrl,
+  openAppleWalletPass,
+  openGoogleWalletPass,
+} from "@/lib/wallet";
 
 type BioShareModalProps = {
   open: boolean;
@@ -123,6 +129,12 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
           onClick={() => {
             const passUrl = businessCardWalletPassUrl(handle);
             void openAppleWalletPass(passUrl, "@" + handle + "-AirPal-BusinessCard");
+          }}
+        />
+        <GoogleWalletButton
+          className="mt-2 w-full justify-center"
+          onClick={() => {
+            void openGoogleWalletPass(googleWalletCardUrl(handle));
           }}
         />
 

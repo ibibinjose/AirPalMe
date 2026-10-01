@@ -54,7 +54,7 @@ export function BiometricAuthButton({
         onClick={() => void handleBiometricAuth()}
         disabled={scanning}
         className={cn(
-          "group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-brand/10 via-brand/5 to-brand/10 p-3.5 text-ink ring-1 ring-brand/30 transition-all hover:bg-brand/15 hover:ring-brand/50 active:scale-[0.99] disabled:opacity-60 shadow-xs",
+          "group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-brand/10 p-3.5 text-ink ring-1 ring-brand/30 transition-all hover:bg-brand/15 hover:ring-brand/50 active:scale-[0.99] disabled:opacity-60 shadow-xs",
           className,
         )}
       >

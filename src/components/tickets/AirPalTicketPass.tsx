@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Download, Share2, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { AppleWalletButton } from "@/components/ui/AppleWalletButton";
-import { openAppleWalletPass, ticketWalletPassUrl } from "@/lib/wallet";
+import { GoogleWalletButton } from "@/components/ui/GoogleWalletButton";
+import { googleWalletTicketUrl, openAppleWalletPass, openGoogleWalletPass, ticketWalletPassUrl } from "@/lib/wallet";
 import { makeQrDataUrl } from "@/lib/qr";
 import { publicSiteOrigin } from "@/lib/public-origin";
 import { shareNative } from "@/lib/native";
@@ -115,6 +116,12 @@ export function AirPalTicketPass({ booking, guestName, hostName, showActions = t
             onClick={() => {
               const url = ticketWalletPassUrl(booking.id);
               void openAppleWalletPass(url, "AirPal-Ticket-" + booking.title);
+            }}
+          />
+          <GoogleWalletButton
+            className="w-full justify-center"
+            onClick={() => {
+              void openGoogleWalletPass(googleWalletTicketUrl(booking.id));
             }}
           />
           <div className="flex gap-2">

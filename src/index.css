@@ -2,38 +2,18 @@
 
 /* Self-hosted fonts (OFL-licensed DM Sans + Outfit). No third-party font
  * requests, so no visitor IPs leak to font CDNs. */
-@font-face {
-  font-family: "DM Sans";
-  font-style: normal;
-  font-weight: 400 700;
-  font-display: swap;
-  src: url("/fonts/dm-sans.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "DM Sans";
-  font-style: italic;
-  font-weight: 400 700;
-  font-display: swap;
-  src: url("/fonts/dm-sans-italic.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "Outfit";
-  font-style: normal;
-  font-weight: 500 800;
-  font-display: swap;
-  src: url("/fonts/outfit.woff2") format("woff2");
-}
-
-/* Canon freeze: docs/CANON.md §2. Brand and fonts stay. Paper is mist so cards float. */
+/* Apple-like retheme (human-approved): system font stack everywhere, iOS
+   neutral surfaces, AirPal Blue kept as the single accent. See
+   docs/CANON.md §2 and docs/IOS-DESIGN-GUIDE.md. */
 @theme inline {
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Outfit", "DM Sans", sans-serif;
-  --color-paper: #eef1f6;
-  --color-ink: #121614;
-  --color-mute: #6a726c;
-  --color-line: #e4e7ee;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, ui-sans-serif, system-ui,
+    sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, ui-sans-serif, system-ui,
+    sans-serif;
+  --color-paper: #f2f2f7;
+  --color-ink: #1c1c1e;
+  --color-mute: #636366;
+  --color-line: #e5e5ea;
   --color-card: #ffffff;
   --color-brand: #1805db;
   --color-brand-ink: #0e0394;
@@ -50,8 +30,8 @@
   --color-forest: #1b4332;
   --color-espresso: #4a3728;
   --color-bone: #f5f0e6;
-  --shadow-clay: 0 1px 1px rgba(255, 255, 255, 0.9) inset, 0 1px 2px rgba(18, 22, 20, 0.04),
-    0 16px 36px -18px rgba(24, 5, 219, 0.22);
+  --shadow-clay: 0 1px 1px rgba(255, 255, 255, 0.9) inset, 0 1px 2px rgba(18, 22, 20, 0.05),
+    0 12px 28px -16px rgba(18, 22, 20, 0.18);
 
   /* Material Design 3 (M3) Elevation & Surface Hierarchy */
   --shadow-m3-0: none;
@@ -62,10 +42,10 @@
   --shadow-m3-5: 0 8px 24px 6px rgba(18, 22, 20, 0.14), 0 4px 8px 0 rgba(18, 22, 20, 0.16);
 
   --color-surface-lowest: #ffffff;
-  --color-surface-low: #f7f9fd;
-  --color-surface: #eef1f6;
-  --color-surface-high: #e5ebf4;
-  --color-surface-highest: #dde3ed;
+  --color-surface-low: #f2f2f7;
+  --color-surface: #e9e9ee;
+  --color-surface-high: #e5e5ea;
+  --color-surface-highest: #d1d1d6;
   --color-primary-container: rgba(24, 5, 219, 0.08);
   --color-on-primary-container: #0e0394;
 }
@@ -128,6 +108,8 @@ body {
 button,
 a {
   -webkit-tap-highlight-color: transparent;
+  /* No tap delay / double-tap zoom on rapid taps (safe: panning stays on scroll containers). */
+  touch-action: manipulation;
 }
 button:not(:disabled) {
   cursor: pointer;
@@ -143,6 +125,18 @@ button:not(:disabled) {
   outline: 2px solid var(--color-brand);
   outline-offset: 2px;
   border-radius: 6px;
+}
+
+/* Honor reduced-motion globally: spinners, pulses and transitions go static. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* iOS auto-zooms on focus when inputs are under 16px. Keep mobile form text at 16px. */

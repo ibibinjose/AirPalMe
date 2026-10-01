@@ -80,6 +80,8 @@ const CALLABLES = [
   "verifyTicket",
   "admitTicket",
   "shareMeta",
+  "walletPass",
+  "googleWalletPass",
   "getPulseByToken",
   "getBioPulse",
   "submitPulseResponse",

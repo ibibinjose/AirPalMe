@@ -23,6 +23,20 @@
         }
       },
       {
+        "source": "/api/wallet/google/**",
+        "function": {
+          "functionId": "googleWalletPass",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/api/wallet/**",
+        "function": {
+          "functionId": "walletPass",
+          "region": "us-central1"
+        }
+      },
+      {
         "source": "/e/**",
         "function": {
           "functionId": "shareMeta",

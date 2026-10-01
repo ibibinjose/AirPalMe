@@ -79,7 +79,7 @@ export function BrowseMenu({ path, isHost }: { path: string; isHost: boolean }) 
         className={cn(
           "flex h-8.5 touch-manipulation cursor-pointer items-center gap-1 rounded-full px-3.5 text-sm font-semibold transition-all duration-200",
           active || open
-            ? "bg-brand text-white shadow-[0_4px_12px_-4px_rgba(24,5,219,0.7)]"
+            ? "bg-brand text-white shadow-[0_4px_12px_-4px_rgba(18,22,20,0.25)]"
             : "text-mute hover:bg-paper/80 hover:text-ink",
         )}
       >

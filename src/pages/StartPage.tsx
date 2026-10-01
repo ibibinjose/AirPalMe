@@ -1052,7 +1052,7 @@ export function StartPage() {
                       </div>
                       <Button
                         type="submit"
-                        className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(24,5,219,0.3)]"
+                        className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(18,22,20,0.15)]"
                         disabled={busy}
                         loading={busy}
                       >
@@ -1229,7 +1229,7 @@ export function StartPage() {
 
                 <Button
                   type="submit"
-                  className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(24,5,219,0.3)] mt-2"
+                  className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(18,22,20,0.15)] mt-2"
                   disabled={
                     busy || !emailOk || !passOk || !handleOk || signupName.trim().length < 2 || !signupAdultConfirmed
                   }
@@ -1305,7 +1305,7 @@ export function StartPage() {
 
                 <Button
                   type="submit"
-                  className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(24,5,219,0.3)] mt-2"
+                  className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(18,22,20,0.15)] mt-2"
                   disabled={busy || !emailOk || !password}
                   loading={busy}
                 >

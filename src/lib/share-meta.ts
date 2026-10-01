@@ -28,9 +28,14 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
     description: "Food, culture, fitness, art, music and local experiences near you.",
   },
   {
-    match: /^\/calendar(\/|$)|^\/events(\/|$)/,
+    match: /^\/events(\/|$)/,
     title: "Events · AirPal.Me",
-    description: "What's on near you — upcoming events, experiences and things to do.",
+    description: "Every upcoming event in one feed — at places, in the community, or from friends.",
+  },
+  {
+    match: /^\/calendar(\/|$)/,
+    title: "Event calendar · AirPal.Me",
+    description: "What's on near you — month, week and day views for planning ahead.",
   },
   {
     match: /^\/event(\/|$)/,

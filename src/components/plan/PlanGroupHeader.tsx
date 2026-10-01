@@ -67,11 +67,11 @@ export function PlanGroupHeader({
                     className={cn(
                       "relative grid h-11 w-11 place-items-center rounded-full text-xs font-bold ring-2 ring-card shadow-sm select-none",
                       i === 0
-                        ? "bg-gradient-to-br from-amber-500 to-amber-700 text-white z-40"
+                        ? "bg-amber-600 text-white z-40"
                         : i === 1
-                          ? "bg-gradient-to-br from-emerald-500 to-teal-700 text-white z-30"
+                          ? "bg-emerald-600 text-white z-30"
                           : i === 2
-                            ? "bg-gradient-to-br from-indigo-500 to-purple-700 text-white z-20"
+                            ? "bg-indigo-600 text-white z-20"
                             : "bg-zinc-700 text-white z-10",
                     )}
                     title={`${att.name} (${att.status})`}

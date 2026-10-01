@@ -46,7 +46,7 @@ export function AvatarFace({
         "relative grid place-items-center shrink-0 overflow-hidden rounded-full select-none font-display font-bold leading-none transition-transform duration-200",
         className || NAV_AVATAR,
         user
-          ? "bg-gradient-to-br from-[#1805db] via-[#2815ee] to-[#0e0394] text-white shadow-xs"
+          ? "bg-brand text-white shadow-xs"
           : "bg-paper text-mute ring-1 ring-line/80",
         ring,
       )}
