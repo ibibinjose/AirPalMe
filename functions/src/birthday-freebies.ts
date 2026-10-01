@@ -253,7 +253,7 @@ function filterClientSide(
 }
 
 export const adminSetBirthdayOfferStatus = onCall(CALLABLE, async (request) => {
-  const uid = requireAccount(request);
+  requireAccount(request);
   await noteAppCheck(request, "adminSetBirthdayOfferStatus");
   const claims = (request.auth?.token || {}) as AccessClaims;
   if (!isPlatformAdmin(claims)) {
