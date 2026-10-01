@@ -3,7 +3,7 @@ import { defineSecret } from "firebase-functions/params";
 import { HttpsError, onCall, onRequest } from "firebase-functions/v2/https";
 import Stripe from "stripe";
 import type { HangoutPlan, PlanAttendee } from "../../shared/plan";
-import { isSoldOut, spotsLeft } from "../../shared/plan";
+import { isSoldOut, normalizePlusOnes, spotsLeft } from "../../shared/plan";
 import {
   DEFAULT_FEE_CONFIG,
   balanceDueCents,
@@ -190,10 +190,12 @@ async function applyPaidTicketToPlan(booking: Booking, spots: number, guestName:
     const plan = snap.data() as HangoutPlan;
     const qty = Math.max(1, Math.floor(spots || booking.spots || 1));
     const nextBooked = Math.max(0, Number(plan.spotsBooked || 0)) + qty;
+    const party = normalizePlusOnes(qty - 1);
     const guestAttendee: PlanAttendee = {
       id: booking.customerUid,
       name: guestName || "Guest",
       status: "going",
+      plusOnes: party > 0 ? party : undefined,
       notes: `Ticket ×${qty}`,
       respondedAt: now,
     };
@@ -279,6 +281,17 @@ async function transferProviderShare(booking: Booking): Promise<{
   return { payoutStatus: "transferred", transferId: transfer.id, stripeAccountId: accountId };
 }
 
+/**
+ * Stay checkout returns land on /concierge directly: /stay redirects
+ * there and wouter drops the query, which would lose booked/canceled.
+ */
+export function stayCheckoutReturnUrls(origin: string, bookingId: string): { success: string; cancel: string } {
+  return {
+    success: `${origin}/concierge?booked=${bookingId}`,
+    cancel: `${origin}/concierge?canceled=true`,
+  };
+}
+
 function checkoutReturnUrls(origin: string, booking: Booking, bookingId: string): { success: string; cancel: string } {
   if (booking.planId) {
     return {
@@ -296,6 +309,13 @@ function checkoutReturnUrls(origin: string, booking: Booking, bookingId: string)
     success: `${origin}/mate?booked=${bookingId}`,
     cancel: `${origin}/mate?canceled=1`,
   };
+}
+
+/** Checkout totals must be finite positive dollars before a Stripe session exists. */
+export function assertChargeableAmount(totalAmount: number): void {
+  if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
+    throw new HttpsError("failed-precondition", "This experience has no chargeable amount.");
+  }
 }
 
 export const createExperienceCheckoutSession = onCall(STRIPE_CALLABLE, async (request) => {
@@ -337,6 +357,7 @@ export const createExperienceCheckoutSession = onCall(STRIPE_CALLABLE, async (re
   }
 
   const totalAmount = unitAmount * spots;
+  assertChargeableAmount(totalAmount);
   if (isSoldOut(plan) || (spotsLeft(plan) !== null && spots > (spotsLeft(plan) || 0))) {
     throw new HttpsError("failed-precondition", "Those tickets are sold out.");
   }
@@ -479,11 +500,13 @@ export const createExperienceCheckoutSession = onCall(STRIPE_CALLABLE, async (re
       createdAt: now,
     });
 
+  const sandboxParty = normalizePlusOnes(Number(spots) - 1);
   const guestAttendee: PlanAttendee = {
     id: uid,
     name: data.guestName || request.auth?.token?.name || "You",
     status: "going",
     isAnonymous: Boolean(request.auth?.token?.firebase?.sign_in_provider === "anonymous"),
+    plusOnes: sandboxParty > 0 ? sandboxParty : undefined,
     notes: `Booked ${spots} spot${spots > 1 ? "s" : ""} (${isDeposit ? "Deposit Paid" : "Paid in Full"})`,
     respondedAt: now,
   };
@@ -843,6 +866,7 @@ export const createStayCheckoutSession = onCall(STRIPE_CALLABLE, async (request)
   const now = new Date().toISOString();
   const origin = headerOrigin(request);
   const bookingId = `bk-${Date.now().toString(36)}-${randomBytes(4).toString("hex")}`;
+  const returns = stayCheckoutReturnUrls(origin, bookingId);
   const stripe = makeStripe();
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
@@ -864,8 +888,8 @@ export const createStayCheckoutSession = onCall(STRIPE_CALLABLE, async (request)
         },
       },
     ],
-    success_url: `${origin}/stay?booked=${bookingId}`,
-    cancel_url: `${origin}/stay?canceled=true`,
+    success_url: returns.success,
+    cancel_url: returns.cancel,
     metadata: {
       bookingId,
       propertyId,
@@ -1268,6 +1292,7 @@ export const completePaidBooking = onCall(STRIPE_CALLABLE, async (request) => {
 
   await ref.update({
     status: "completed",
+    completedBy: uid,
     payoutStatus: paidOut.payoutStatus,
     stripeTransferId: paidOut.transferId || booking.stripeTransferId || "",
     stripeAccountId: paidOut.stripeAccountId || booking.stripeAccountId || "",
@@ -1336,6 +1361,7 @@ export const refundPaidBooking = onCall(STRIPE_CALLABLE, async (request) => {
     payoutStatus: "reversed",
     status: "refunded",
     cancelReason: "Refunded by provider",
+    refundedBy: uid,
     updatedAt: now,
   });
   return { ok: true, status: "refunded", bookingId };

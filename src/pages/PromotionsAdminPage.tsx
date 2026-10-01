@@ -146,8 +146,11 @@ export function PromotionsAdminPage() {
   const set = (k: string, v: string | number) => setForm((f) => ({ ...f, [k]: v }));
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/admin" className="flex items-center gap-1 text-[13px] font-medium text-mute">
+    <div className="mx-auto max-w-2xl px-4 py-8 pb-28">
+      <Link
+        href="/admin"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={14} /> Admin
       </Link>
       <div className="mt-4 flex items-center justify-between">
@@ -285,9 +288,10 @@ export function PromotionsAdminPage() {
             key={f}
             type="button"
             onClick={() => setFilter(f)}
+            aria-pressed={filter === f}
             className={cn(
-              "rounded-full border-2 px-3 py-1 text-xs font-semibold capitalize",
-              filter === f ? "border-brand bg-brand text-white" : "border-ink/15 bg-card",
+              "inline-flex min-h-[44px] items-center rounded-full px-4 text-xs font-semibold capitalize ring-1 transition active:scale-95",
+              filter === f ? "bg-brand text-white ring-brand shadow-xs" : "bg-card text-ink ring-line hover:bg-paper",
             )}
           >
             {f} ({f === "queue" ? queue.length : f === "live" ? live.length : rows.length})
@@ -344,7 +348,7 @@ export function PromotionsAdminPage() {
                       type="button"
                       disabled={busy === p.id + d}
                       onClick={() => act(p, d)}
-                      className="rounded-lg border border-line/20 px-2 py-1 text-[11px] font-bold hover:bg-brand hover:text-white disabled:opacity-50"
+                      className="inline-flex min-h-[44px] items-center rounded-lg border border-line px-3.5 text-xs font-bold transition hover:bg-brand hover:text-white active:scale-95 disabled:opacity-50"
                     >
                       {d.replace("_", " ")}
                     </button>
@@ -353,7 +357,7 @@ export function PromotionsAdminPage() {
                   type="button"
                   disabled={busy === p.id + (p.featured ? "unfeature" : "feature")}
                   onClick={() => act(p, p.featured ? "unfeature" : "feature")}
-                  className="inline-flex items-center gap-1 rounded-lg border border-line/20 px-2 py-1 text-[11px] font-bold hover:bg-brand hover:text-white disabled:opacity-50"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-line px-3.5 text-xs font-bold transition hover:bg-brand hover:text-white active:scale-95 disabled:opacity-50"
                 >
                   {p.featured ? <StarOff size={11} /> : <Star size={11} />}
                   {p.featured ? "unfeature" : "feature"}
@@ -362,9 +366,9 @@ export function PromotionsAdminPage() {
                   <button
                     type="button"
                     onClick={() => act(p, "resume")}
-                    className="inline-flex items-center gap-1 rounded-lg border border-line/20 px-2 py-1 text-[11px] font-bold"
+                    className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-line px-3.5 text-xs font-bold transition hover:bg-paper active:scale-95"
                   >
-                    <Play size={11} />
+                    <Play size={12} />
                     resume
                   </button>
                 ) : (
@@ -372,16 +376,16 @@ export function PromotionsAdminPage() {
                     <button
                       type="button"
                       onClick={() => act(p, "pause")}
-                      className="inline-flex items-center gap-1 rounded-lg border border-line/20 px-2 py-1 text-[11px] font-bold"
+                      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-line px-3.5 text-xs font-bold transition hover:bg-paper active:scale-95"
                     >
-                      <Pause size={11} />
+                      <Pause size={12} />
                       pause
                     </button>
                   )
                 )}
                 <Link
                   href={p.kind === "giveaway" ? `/giveaways/${p.id}` : `/promotions/${p.id}`}
-                  className="rounded-lg px-2 py-1 text-[11px] font-bold text-brand hover:underline"
+                  className="inline-flex min-h-[44px] items-center rounded-lg px-2 text-xs font-bold text-brand hover:underline"
                 >
                   view
                 </Link>

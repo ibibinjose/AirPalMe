@@ -3,6 +3,7 @@ import type {
   CreatePromotionRequest,
   DrawWinnersRequest,
   EnterPromotionRequest,
+  EnterPromotionResponse,
   PromotionStatus,
   RedeemPointsRequest,
   ReviewPromotionRequest,
@@ -43,10 +44,7 @@ export function reviewPromotionRemote(data: ReviewPromotionRequest) {
 }
 
 export function enterPromotionRemote(data: EnterPromotionRequest) {
-  return callPromotion<EnterPromotionRequest, { ok: boolean; duplicate: boolean; reference: string }>(
-    "enterPromotion",
-    data,
-  );
+  return callPromotion<EnterPromotionRequest, EnterPromotionResponse>("enterPromotion", data);
 }
 
 export function closeAndDrawRemote(data: DrawWinnersRequest) {

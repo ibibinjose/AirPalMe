@@ -1,4 +1,5 @@
 import { isNativeApp } from "./native";
+import { safeLocalStorage } from "./safe-storage";
 
 export type PersonMet = {
   id: string;
@@ -11,14 +12,6 @@ export type PersonMet = {
 };
 
 const KEY = "airpal:people:v1";
-
-function storage(): Storage | null {
-  try {
-    return typeof localStorage !== "undefined" ? localStorage : null;
-  } catch {
-    return null;
-  }
-}
 
 function clean(row: unknown): PersonMet | null {
   if (!row || typeof row !== "object") return null;
@@ -37,7 +30,7 @@ function clean(row: unknown): PersonMet | null {
 
 export function listPeople(): PersonMet[] {
   try {
-    const raw = storage()?.getItem(KEY);
+    const raw = safeLocalStorage()?.getItem(KEY);
     if (!raw) return [];
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -56,7 +49,7 @@ export function setPeoplePersistHook(fn: (() => void) | null): void {
 
 function persist(people: PersonMet[]): void {
   try {
-    storage()?.setItem(KEY, JSON.stringify(people));
+    safeLocalStorage()?.setItem(KEY, JSON.stringify(people));
   } catch {
     /* private mode: best-effort */
   }

@@ -10,7 +10,7 @@ export function SolutionDetailPage() {
   const s = getSolution(params?.id || "");
   if (!s) return <NotFoundPage />;
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-10 md:px-6">
+    <div className="mx-auto max-w-3xl px-4 pb-28 pt-4 md:px-6 md:pt-6">
       <div className="relative overflow-hidden rounded-[28px]">
         <Photo src={s.image} className="h-72 w-full object-cover md:h-96" />
         <div className="hero-scrim absolute inset-0" />

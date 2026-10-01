@@ -52,7 +52,7 @@ export function GuidePage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-10 md:px-6">
+    <div className="mx-auto max-w-5xl px-4 pb-28 md:px-6">
       <header className="flex items-start justify-between gap-4 py-5">
         <div>
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-gold">{t("guide")}</p>
@@ -65,7 +65,7 @@ export function GuidePage() {
         <button
           type="button"
           onClick={handleShareGuide}
-          className="inline-flex items-center gap-1.5 rounded-full bg-card px-3.5 py-2 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper hover:ring-brand/40 transition active:scale-95 cursor-pointer shadow-xs shrink-0"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper hover:ring-brand/40 transition active:scale-95 cursor-pointer shadow-xs shrink-0"
           title={`Share ${city || "local"} curated guide`}
           aria-label={`Share ${city || "local"} curated guide`}
         >
@@ -130,7 +130,7 @@ export function GuidePage() {
         <button
           type="button"
           onClick={handleShareGuide}
-          className="inline-flex shrink-0 items-center gap-2 rounded-full bg-brand px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand-ink active:scale-95 transition cursor-pointer"
+          className="inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-full bg-brand px-5 text-xs font-semibold text-white shadow-xs hover:bg-brand-ink active:scale-95 transition cursor-pointer"
         >
           <Share2 size={13} />
           <span>{t("share.guide") || "Share Guide"}</span>

@@ -1,10 +1,11 @@
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Search } from "lucide-react";
+import { Plus, Search } from "@/components/icons";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { ProfileMenu } from "@/components/auth/ProfileMenu";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
+import { openGlobalCreate } from "@/components/design-system/CreateFab";
 import { cn } from "@/lib/cn";
 import { enterEase } from "@/lib/motion";
 import { triggerHaptic } from "@/lib/native";
@@ -20,7 +21,7 @@ const LINKS = [
   { href: "/mate", label: "Mate", match: (p: string) => p.startsWith("/mate") },
   { href: "/plan", label: "Plan", match: (p: string) => p.startsWith("/plan") || p.startsWith("/circle") || p.startsWith("/invite") },
   { href: "/pulse", label: "Pulse", match: (p: string) => p.startsWith("/pulse") },
-  { href: "/me/inbox", label: "Inbox", match: (p: string) => p.startsWith("/me/inbox") },
+  { href: "/inbox", label: "Inbox", match: (p: string) => p.startsWith("/inbox") || p.startsWith("/chat") || p.startsWith("/messages") || p.startsWith("/me/inbox") },
 ];
 
 export function TopNav({ path, enter = false }: { path: string; enter?: boolean }) {
@@ -75,7 +76,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
               void triggerHaptic("light");
               openGlobalSearch();
             }}
-            className="flex h-9 items-center gap-2 rounded-full bg-card/80 px-3.5 text-xs font-medium text-mute ring-1 ring-line/80 hover:text-ink hover:bg-card hover:ring-brand/30 transition-all shadow-xs lg:h-10 cursor-pointer"
+            className="flex h-10 sm:h-9 min-h-[44px] sm:min-h-0 items-center gap-2 rounded-full bg-card/80 px-3 sm:px-3.5 text-xs font-medium text-mute ring-1 ring-line/80 hover:text-ink hover:bg-card hover:ring-brand/30 transition-all shadow-xs lg:h-10 cursor-pointer touch-manipulation"
             title="Search AirPal (⌘K)"
             aria-label="Search"
           >
@@ -88,10 +89,23 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
 
           <button
             onClick={() => {
+              void triggerHaptic("medium");
+              openGlobalCreate();
+            }}
+            className="flex h-9 items-center gap-1.5 shrink-0 rounded-full bg-brand px-3.5 text-sm font-semibold text-white shadow-[0_4px_12px_-4px_rgba(24,5,219,0.6)] hover:bg-brand-ink transition active:scale-95 lg:h-10 cursor-pointer"
+            aria-label="Create something new"
+          >
+            <Plus size={16} strokeWidth={2.5} />
+            <span>Create</span>
+          </button>
+
+          <button
+            onClick={() => {
               void triggerHaptic("light");
               nav("/scan");
             }}
-            className="h-9 shrink-0 rounded-full bg-brand px-4 text-sm font-semibold text-white shadow-[0_4px_12px_-4px_rgba(24,5,219,0.6)] hover:bg-brand-ink transition active:scale-95 lg:h-10 cursor-pointer"
+            className="h-9 shrink-0 rounded-full bg-card px-3.5 text-sm font-semibold text-ink ring-1 ring-line hover:bg-paper hover:text-brand transition active:scale-95 lg:h-10 cursor-pointer"
+            title="Scan QR / Room"
           >
             Scan
           </button>

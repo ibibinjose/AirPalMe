@@ -817,6 +817,26 @@ export function BusinessPage() {
               </span>
               <ArrowRight className="h-3.5 w-3.5 text-mute" />
             </Link>
+            <Link
+              href="/event/new"
+              className="flex items-center justify-between rounded-xl bg-paper px-3.5 py-2.5 text-xs font-semibold text-ink transition hover:bg-card hover:ring-1 hover:ring-brand/30"
+            >
+              <span className="flex items-center gap-2">
+                <Plus className="h-4 w-4 text-amber-500" />
+                Host an Event
+              </span>
+              <ArrowRight className="h-3.5 w-3.5 text-mute" />
+            </Link>
+            <Link
+              href="/host"
+              className="flex items-center justify-between rounded-xl bg-paper px-3.5 py-2.5 text-xs font-semibold text-ink transition hover:bg-card hover:ring-1 hover:ring-brand/30"
+            >
+              <span className="flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-emerald-600" />
+                Stay Workspace
+              </span>
+              <ArrowRight className="h-3.5 w-3.5 text-mute" />
+            </Link>
           </section>
         </aside>
       </div>

@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { collection, doc, getDocs, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
 import { clearPendingIntent, peekPendingIntent } from "@/lib/pending-intent";
@@ -15,6 +15,7 @@ import {
   type StallRecord,
   type UserEventState,
 } from "@shared/event";
+import { isDemoContent } from "@shared/content-meta";
 import { computeRescheduledTimes, formatEventTimeRange } from "@/lib/calendar-utils";
 import { docToCalendarBase, docToEventRecord, recordToCalendarBase, toNearbyEvent } from "@/lib/remote-events";
 import type { NearbyEvent } from "@shared/nearby";
@@ -58,6 +59,8 @@ type EventsValue = {
   remoteLoaded: boolean;
   refresh: () => void;
   fetchRemoteStalls: (eventId: string) => Promise<void>;
+  /** Direct by-id read for deep links the list fetch skipped (demo docs). */
+  fetchRemoteEvent: (id: string) => Promise<CalendarEvent | null>;
   upsertEvent: (input: Partial<EventRecord> & Pick<EventRecord, "name" | "flavour">) => Promise<EventRecord>;
   confirmEventSchedule: () => Promise<void>;
   importCsv: (eventId: string, csv: string) => Promise<number>;
@@ -82,6 +85,33 @@ const EventsContext = createContext<EventsValue | undefined>(undefined);
 
 function uidNow() {
   return getFirebaseAuth()?.currentUser?.uid;
+}
+
+/** Overlay device user-state onto a Firestore calendar base (pure, shared). */
+function overlayUserState(
+  base: Omit<CalendarEvent, "isGoing" | "isInterested" | "isLiked">,
+  userStates: Record<string, UserEventState>,
+  savedEvents: SavedEvent[],
+): CalendarEvent {
+  const state = userStates[base.id];
+  const isSaved = savedEvents.some((se) => se.eventId === base.id);
+  const isRescheduled = Boolean(state?.rescheduledDate && state.rescheduledDate !== base.date);
+  const date = state?.rescheduledDate || base.date;
+  const startsAt = state?.rescheduledStartsAt || base.startsAt;
+  const endsAt = state?.rescheduledEndsAt || base.endsAt;
+  const timeLabel = isRescheduled ? formatEventTimeRange(startsAt, endsAt) || base.timeLabel : base.timeLabel;
+  return {
+    ...base,
+    date,
+    startsAt,
+    endsAt,
+    timeLabel,
+    isRescheduled,
+    originalDate: base.date,
+    isGoing: state?.status === "going",
+    isInterested: state?.status === "interested" || (!state?.status && isSaved),
+    isLiked: Boolean(state?.liked),
+  };
 }
 
 export function EventsProvider({ children }: { children: ReactNode }) {
@@ -166,6 +196,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
         const records: EventRecord[] = [];
         for (const row of snap.docs) {
           const data = row.data() as Record<string, unknown>;
+          if (isDemoContent(data)) continue;
           const rec = docToEventRecord(data, row.id);
           if (rec) {
             records.push(rec);
@@ -193,6 +224,23 @@ export function EventsProvider({ children }: { children: ReactNode }) {
       alive = false;
     };
   }, []);
+
+  const fetchRemoteEvent = useCallback(
+    async (id: string) => {
+      const db = getFirebaseDb();
+      if (!db || !id) return null;
+      try {
+        const snap = await getDoc(doc(db, "events", id));
+        if (!snap.exists()) return null;
+        const base = docToCalendarBase(snap.data(), snap.id);
+        if (!base) return null;
+        return overlayUserState(base, userStates, savedEvents);
+      } catch {
+        return null;
+      }
+    },
+    [userStates, savedEvents],
+  );
 
   const fetchRemoteStalls = useCallback(async (eventId: string) => {
     if (!eventId || stallsFetchedRef.current.has(eventId)) return;
@@ -222,27 +270,8 @@ export function EventsProvider({ children }: { children: ReactNode }) {
   );
 
   const calendarEvents = useMemo<CalendarEvent[]>(() => {
-    const overlay = (base: Omit<CalendarEvent, "isGoing" | "isInterested" | "isLiked">): CalendarEvent => {
-      const state = userStates[base.id];
-      const isSaved = savedEvents.some((se) => se.eventId === base.id);
-      const isRescheduled = Boolean(state?.rescheduledDate && state.rescheduledDate !== base.date);
-      const date = state?.rescheduledDate || base.date;
-      const startsAt = state?.rescheduledStartsAt || base.startsAt;
-      const endsAt = state?.rescheduledEndsAt || base.endsAt;
-      const timeLabel = isRescheduled ? formatEventTimeRange(startsAt, endsAt) || base.timeLabel : base.timeLabel;
-      return {
-        ...base,
-        date,
-        startsAt,
-        endsAt,
-        timeLabel,
-        isRescheduled,
-        originalDate: base.date,
-        isGoing: state?.status === "going",
-        isInterested: state?.status === "interested" || (!state?.status && isSaved),
-        isLiked: Boolean(state?.liked),
-      };
-    };
+    const overlay = (base: Omit<CalendarEvent, "isGoing" | "isInterested" | "isLiked">): CalendarEvent =>
+      overlayUserState(base, userStates, savedEvents);
 
     // Firestore `events` docs first (curated + organiser-published), then
     // device-local organiser drafts. Empty DB → empty calendar, honestly.
@@ -480,6 +509,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
       remoteLoaded,
       refresh,
       fetchRemoteStalls,
+      fetchRemoteEvent,
       userStates,
       stallsFor,
       getEvent: (id) => events.find((e) => e.id === id) || remoteRecords.find((e) => e.id === id),
@@ -583,6 +613,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
                     registrationUrl: stamped.registrationUrl,
                     registrationNote: stamped.registrationNote,
                     speakers: stamped.speakers,
+                    demo: stamped.demo,
                   })
               : undefined,
         });
@@ -638,6 +669,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
                     registrationUrl: stamped.registrationUrl,
                     registrationNote: stamped.registrationNote,
                     speakers: stamped.speakers,
+                    demo: stamped.demo,
                   })
               : undefined,
         });
@@ -748,6 +780,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
       remoteNearby,
       remoteLoaded,
       fetchRemoteStalls,
+      fetchRemoteEvent,
       remoteRecords,
       userStates,
       toggleGoing,

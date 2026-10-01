@@ -66,8 +66,11 @@ export function FestivalCreatePage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-24 pt-4 md:px-6 md:pt-6">
-      <Link href="/explore" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-mute">
+    <div className="mx-auto max-w-2xl px-4 pb-28 pt-4 md:px-6 md:pt-6">
+      <Link
+        href="/explore"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={15} /> Explore
       </Link>
       <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand">New festival</p>
@@ -119,7 +122,7 @@ export function FestivalCreatePage() {
           <input value={organizerName} onChange={(e) => setOrganizerName(e.target.value)} className={fieldInput} maxLength={120} />
         </ValidField>
         {errors.length > 0 && (
-          <ul className="rounded-2xl bg-red-50 p-3 text-[13px] text-red-700">
+          <ul role="alert" className="rounded-2xl bg-red-500/10 p-3 text-[13px] font-medium text-red-700 ring-1 ring-red-500/20 dark:text-red-300">
             {errors.map((e) => (
               <li key={e}>· {e}</li>
             ))}

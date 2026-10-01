@@ -11,18 +11,17 @@ import {
   Megaphone,
   Navigation,
   QrCode,
-  Search,
   Share2,
   Sparkles,
   Trophy,
   UserCheck,
   UserPlus,
   Users,
-  X,
   Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { doc, getDoc } from "firebase/firestore";
+import { SearchBar } from "@/components/search/SearchBar";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { BioStatusModal } from "@/components/bio/BioStatusModal";
 import { BioCatchUpModal } from "@/components/bio/BioCatchUpModal";
@@ -298,10 +297,9 @@ export function CirclePage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-20 pt-4 sm:px-6">
-      {/* Top Header Banner with Liquid Glass Effect */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand/10 via-card to-card p-6 ring-1 ring-line shadow-xs">
-        <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand/10 blur-3xl pointer-events-none" />
-        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Top Header Banner */}
+      <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/15 px-2.5 py-0.5 text-[11px] font-bold text-brand uppercase tracking-wider">
@@ -312,11 +310,10 @@ export function CirclePage() {
               </span>
             </div>
             <h1 className="font-display mt-1.5 text-2xl font-bold tracking-tight text-ink sm:text-3xl">
-              Your Social &amp; Plans Circle
+              Social &amp; Plans Circle
             </h1>
-            <p className="mt-1 max-w-xl text-sm leading-relaxed text-mute">
-              Bring your friends, followers, and mates together in one place. Broadcast live updates, share locations,
-              and plan meetups seamlessly.
+            <p className="mt-0.5 max-w-lg text-xs sm:text-sm text-mute">
+              Friends, colleagues and mates connected in one place.
             </p>
           </div>
 
@@ -382,7 +379,7 @@ export function CirclePage() {
               onClick={openAnnounce}
               className="group flex flex-col items-center justify-center gap-2 rounded-2xl bg-card p-3.5 text-center ring-1 ring-line hover:bg-paper hover:ring-brand/40 transition active:scale-[0.99] shadow-2xs"
             >
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand/10 text-brand group-hover:scale-105 transition-transform">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand/10 text-brand">
                 <Megaphone size={18} />
               </span>
               <div>
@@ -396,7 +393,7 @@ export function CirclePage() {
               onClick={() => (mine?.handle ? setStatusOpen(true) : nav("/bio/setup"))}
               className="group flex flex-col items-center justify-center gap-2 rounded-2xl bg-card p-3.5 text-center ring-1 ring-line hover:bg-paper hover:ring-brand/40 transition active:scale-[0.99] shadow-2xs"
             >
-              <span className="relative grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600 group-hover:scale-105 transition-transform">
+              <span className="relative grid h-10 w-10 place-items-center rounded-xl bg-emerald-500/10 text-emerald-600">
                 <span className={cn("h-3 w-3 rounded-full", statusInfo.dotColor)} />
               </span>
               <div>
@@ -413,7 +410,7 @@ export function CirclePage() {
               onClick={() => nav("/plan/new")}
               className="group flex flex-col items-center justify-center gap-2 rounded-2xl bg-card p-3.5 text-center ring-1 ring-line hover:bg-paper hover:ring-brand/40 transition active:scale-[0.99] shadow-2xs"
             >
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-purple-500/10 text-purple-600 group-hover:scale-105 transition-transform">
+              <span className="grid h-10 w-10 place-items-center rounded-xl bg-ink/[0.06] text-ink">
                 <CalendarDays size={18} />
               </span>
               <div>
@@ -433,14 +430,14 @@ export function CirclePage() {
                     myHere ? "bg-emerald-500/15 text-emerald-600" : "bg-brand/10 text-brand",
                   )}
                 >
-                  <Navigation size={18} className={myHere ? "animate-pulse" : ""} />
+                  <Navigation size={18} className={myHere ? "motion-safe:animate-pulse" : ""} />
                 </span>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-bold text-ink">{myHere ? "You’re live at venue" : "Event Space & Presence"}</p>
                     {myHere && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" /> Live
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 motion-safe:animate-ping" /> Live
                       </span>
                     )}
                   </div>
@@ -503,25 +500,16 @@ export function CirclePage() {
                 </span>
               </div>
 
-              {/* Search Bar */}
-              <div className="relative flex-1 sm:max-w-xs">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-mute" />
-                <input
+              {/* Search Bar: Mobile & iOS friendly */}
+              <div className="flex-1 sm:max-w-xs">
+                <SearchBar
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={setQuery}
+                  sizeVariant="sm"
+                  variant="paper"
                   placeholder="Search by name, handle, city…"
-                  className="h-9 w-full rounded-full bg-paper pl-8 pr-8 text-xs text-ink outline-none ring-1 ring-line focus:ring-brand"
+                  aria-label="Search circle"
                 />
-                {query && (
-                  <button
-                    type="button"
-                    onClick={() => setQuery("")}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-mute hover:text-ink"
-                    aria-label="Clear search"
-                  >
-                    <X size={13} />
-                  </button>
-                )}
               </div>
             </div>
 

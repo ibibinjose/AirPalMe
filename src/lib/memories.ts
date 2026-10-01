@@ -1,3 +1,5 @@
+import { safeLocalStorage } from "./safe-storage";
+
 export type Memory = {
   id: string;
   /** Photo src: `idb:` local blob id or a remote https URL. */
@@ -10,14 +12,6 @@ export type Memory = {
 };
 
 const KEY = "airpal:memories:v1";
-
-function storage(): Storage | null {
-  try {
-    return typeof localStorage !== "undefined" ? localStorage : null;
-  } catch {
-    return null;
-  }
-}
 
 function clean(row: unknown): Memory | null {
   if (!row || typeof row !== "object") return null;
@@ -38,7 +32,7 @@ function clean(row: unknown): Memory | null {
 
 export function listMemories(): Memory[] {
   try {
-    const raw = storage()?.getItem(KEY);
+    const raw = safeLocalStorage()?.getItem(KEY);
     if (!raw) return [];
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -57,7 +51,7 @@ export function setMemoriesPersistHook(fn: (() => void) | null): void {
 
 function persist(memories: Memory[]): void {
   try {
-    storage()?.setItem(KEY, JSON.stringify(memories));
+    safeLocalStorage()?.setItem(KEY, JSON.stringify(memories));
   } catch {
     /* private mode or quota: metadata is best-effort, blobs live in IndexedDB */
   }

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Check, HelpCircle, Smartphone, User, X, XCircle } from "lucide-react";
+import { Check, HelpCircle, Minus, Plus, Smartphone, User, Users, X, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { useLocation } from "wouter";
 import { triggerHaptic } from "@/lib/native";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import { PLAN_ANSWER_MAX, PLAN_PLUS_ONES_MAX, normalizeAnswer, normalizePlusOnes, type PlanGuestQuestion } from "@shared/plan";
 import { cn } from "@/lib/cn";
 
 export function PlanRsvpSheet({
@@ -14,12 +15,31 @@ export function PlanRsvpSheet({
   onSubmit,
   currentStatus,
   currentNotes = "",
+  currentPlusOnes = 0,
+  spotsLeft = null,
+  requiresApproval = false,
+  questions = [],
+  currentAnswers = {},
 }: {
   open: boolean;
   onClose: () => void;
-  onSubmit: (status: "going" | "maybe" | "declined", name: string, notes?: string) => void;
+  onSubmit: (
+    status: "going" | "maybe" | "declined",
+    name: string,
+    notes?: string,
+    plusOnes?: number,
+    answers?: Record<string, string>,
+  ) => void;
   currentStatus?: "going" | "maybe" | "declined" | null;
   currentNotes?: string;
+  currentPlusOnes?: number;
+  /** Host headcount spots left (null = no limit). Going queues to the waitlist at 0. */
+  spotsLeft?: number | null;
+  /** Host approves every guest — going taps land as requests. */
+  requiresApproval?: boolean;
+  /** Host questions (diet, transport, vibe). */
+  questions?: PlanGuestQuestion[];
+  currentAnswers?: Record<string, string>;
 }) {
   const { user } = useAuth();
   const { mine } = useBio();
@@ -28,13 +48,19 @@ export function PlanRsvpSheet({
   const [status, setStatus] = useState<"going" | "maybe" | "declined">(currentStatus || "going");
   const [name, setName] = useState("");
   const [notes, setNotes] = useState(currentNotes);
+  const [plusOnes, setPlusOnes] = useState(() => normalizePlusOnes(currentPlusOnes));
+  const [answers, setAnswers] = useState<Record<string, string>>(() => ({ ...currentAnswers }));
+
+  const isFull = spotsLeft !== null && spotsLeft <= 0;
 
   // Reset from the latest RSVP every time the sheet opens (never show a
-  // previous plan's status/notes), prefill the name, lock scroll, Esc closes.
+  // previous plan's status/notes/party), prefill the name, lock scroll, Esc closes.
   useEffect(() => {
     if (!open) return;
     setStatus(currentStatus || "going");
     setNotes(currentNotes);
+    setPlusOnes(normalizePlusOnes(currentPlusOnes));
+    setAnswers({ ...currentAnswers });
     if (user?.displayName) setName(user.displayName);
     else if (mine?.name) setName(mine.name);
     else if (typeof window !== "undefined") {
@@ -48,7 +74,7 @@ export function PlanRsvpSheet({
     return () => {
       window.removeEventListener("keydown", onKey);
     };
-  }, [open, currentStatus, currentNotes, user, mine, onClose]);
+  }, [open, currentStatus, currentNotes, currentPlusOnes, currentAnswers, user, mine, onClose]);
 
   useScrollLock(open);
 
@@ -58,7 +84,18 @@ export function PlanRsvpSheet({
     e.preventDefault();
     void triggerHaptic(status === "going" ? "success" : "medium");
     const finalName = name.trim() || user?.displayName || "Guest Mate";
-    onSubmit(status, finalName, notes.trim() || undefined);
+    const finalAnswers: Record<string, string> = {};
+    for (const q of questions) {
+      const v = normalizeAnswer(q, answers[q.id]);
+      if (v) finalAnswers[q.id] = v;
+    }
+    onSubmit(
+      status,
+      finalName,
+      notes.trim() || undefined,
+      status === "going" ? plusOnes : 0,
+      Object.keys(finalAnswers).length ? finalAnswers : undefined,
+    );
     onClose();
   };
 
@@ -139,6 +176,56 @@ export function PlanRsvpSheet({
             </button>
           </div>
 
+          {/* Party size — going only, counts toward the host guest limit */}
+          {status === "going" && (
+            <div className="flex items-center justify-between gap-3 rounded-2xl bg-paper px-4 py-2.5 ring-1 ring-line">
+              <span className="flex min-w-0 items-center gap-2">
+                <Users size={16} className="shrink-0 text-mute" />
+                <span className="min-w-0">
+                  <span className="block text-xs font-semibold text-ink">
+                    Party{plusOnes > 0 ? ` · you +${plusOnes}` : " · just you"}
+                  </span>
+                  <span className="block truncate text-[11px] text-mute">
+                    {requiresApproval
+                      ? "The host approves every guest"
+                      : isFull
+                        ? "Full — you'll join the waitlist"
+                        : "Bringing mates? They count as spots"}
+                  </span>
+                </span>
+              </span>
+              <span className="flex shrink-0 items-center gap-1">
+                <button
+                  type="button"
+                  aria-label="Fewer plus-ones"
+                  onClick={() => {
+                    void triggerHaptic("light");
+                    setPlusOnes((n) => normalizePlusOnes(n - 1));
+                  }}
+                  disabled={plusOnes <= 0}
+                  className="grid h-11 w-11 place-items-center rounded-full bg-card text-ink ring-1 ring-line transition active:scale-95 disabled:opacity-40"
+                >
+                  <Minus size={16} />
+                </button>
+                <span className="w-6 text-center text-sm font-bold text-ink" aria-live="polite">
+                  {plusOnes}
+                </span>
+                <button
+                  type="button"
+                  aria-label="More plus-ones"
+                  onClick={() => {
+                    void triggerHaptic("light");
+                    setPlusOnes((n) => normalizePlusOnes(n + 1));
+                  }}
+                  disabled={plusOnes >= PLAN_PLUS_ONES_MAX}
+                  className="grid h-11 w-11 place-items-center rounded-full bg-card text-ink ring-1 ring-line transition active:scale-95 disabled:opacity-40"
+                >
+                  <Plus size={16} />
+                </button>
+              </span>
+            </div>
+          )}
+
           {/* Name Input */}
           <div>
             <label className="text-xs font-semibold text-ink/80 block mb-1">Your Name</label>
@@ -166,6 +253,48 @@ export function PlanRsvpSheet({
               className="h-11 w-full rounded-2xl bg-paper px-4 text-sm border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
             />
           </div>
+
+          {/* Host questions */}
+          {questions.map((q) => (
+            <div key={q.id}>
+              <label className="text-xs font-semibold text-ink/80 block mb-1">{q.question}</label>
+              {q.type === "choice" ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {(q.options || []).map((opt) => {
+                    const selected = (answers[q.id] || "") === opt;
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        aria-pressed={selected}
+                        onClick={() => {
+                          void triggerHaptic("light");
+                          setAnswers((prev) => ({ ...prev, [q.id]: selected ? "" : opt }));
+                        }}
+                        className={cn(
+                          "inline-flex min-h-11 items-center rounded-full px-4 text-xs font-semibold transition active:scale-95",
+                          selected
+                            ? "bg-brand text-white shadow-xs"
+                            : "bg-paper text-ink ring-1 ring-line hover:bg-line/40",
+                        )}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <input
+                  type="text"
+                  value={answers[q.id] || ""}
+                  maxLength={PLAN_ANSWER_MAX}
+                  onChange={(e) => setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))}
+                  placeholder="Your answer"
+                  className="h-11 w-full rounded-2xl bg-paper px-4 text-sm border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                />
+              )}
+            </div>
+          ))}
 
           {/* Submit CTA */}
           <Button type="submit" className="w-full h-11 text-sm font-semibold mt-2">

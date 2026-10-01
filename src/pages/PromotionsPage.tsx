@@ -7,7 +7,6 @@ import {
   Clock,
   MapPin,
   Plus,
-  Search,
   SlidersHorizontal,
   Sparkles,
   Store,
@@ -25,6 +24,7 @@ import { triggerHaptic } from "@/lib/native";
 import { toast } from "sonner";
 import { cn } from "@/lib/cn";
 import { PROMOTION_CATEGORIES, type Promotion } from "@shared/promotions";
+import { SearchBar } from "@/components/search/SearchBar";
 
 export function PromotionsPage() {
   const { user, isAdmin } = useAuth();
@@ -106,7 +106,10 @@ export function PromotionsPage() {
     <div className="mx-auto max-w-4xl px-4 py-6 md:py-10 pb-32">
       {/* Top Breadcrumb & Quick Actions Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-mute hover:text-ink transition">
+        <Link
+          href="/"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
+        >
           <ArrowLeft size={14} />
           <span>Home</span>
         </Link>
@@ -115,7 +118,7 @@ export function PromotionsPage() {
         <div className="flex items-center gap-2 flex-wrap">
           <Link
             href="/business/promotions/new"
-            className="inline-flex h-9 items-center gap-1.5 rounded-full bg-brand px-4 text-xs font-bold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand px-4 text-xs font-bold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
           >
             <Plus size={14} />
             <span>Post a Deal</span>
@@ -124,7 +127,7 @@ export function PromotionsPage() {
           {user && (
             <Link
               href="/business/promotions"
-              className="inline-flex h-9 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
             >
               <Store size={14} className="text-brand" />
               <span>My Deals</span>
@@ -134,7 +137,7 @@ export function PromotionsPage() {
           {isAdmin && (
             <Link
               href="/admin/promotions"
-              className="inline-flex h-9 items-center gap-1.5 rounded-full bg-gold/15 px-3.5 text-xs font-bold text-amber-800 dark:text-amber-300 ring-1 ring-gold/30 hover:bg-gold/25 transition"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-gold/15 px-3.5 text-xs font-bold text-amber-800 dark:text-amber-300 ring-1 ring-gold/30 hover:bg-gold/25 transition"
             >
               <ShieldCheck size={14} />
               <span>Admin Queue</span>
@@ -143,7 +146,7 @@ export function PromotionsPage() {
 
           <Link
             href="/giveaways"
-            className="inline-flex h-9 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
           >
             <Sparkles size={14} className="text-gold" />
             <span>Giveaways</span>
@@ -152,7 +155,7 @@ export function PromotionsPage() {
       </div>
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand/10 via-card to-card p-6 md:p-8 ring-1 ring-line shadow-xs">
+      <div className="rounded-3xl bg-card p-6 md:p-8 ring-1 ring-line shadow-xs">
         <div className="flex items-center gap-2">
           <span className="rounded-full bg-brand/15 px-3 py-1 text-xs font-bold text-brand uppercase tracking-wider ring-1 ring-brand/25">
             AirPal Deals & Perks
@@ -169,24 +172,15 @@ export function PromotionsPage() {
         </p>
 
         {/* Search Bar */}
-        <div className="mt-5 flex items-center gap-2 rounded-2xl bg-paper/90 px-3.5 py-2 ring-1 ring-line focus-within:ring-2 focus-within:ring-brand shadow-2xs backdrop-blur-sm">
-          <Search size={16} className="text-mute shrink-0" />
-          <input
-            type="text"
+        <div className="mt-5">
+          <SearchBar
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search deals by venue, dish, discount % or location..."
-            className="w-full bg-transparent text-xs sm:text-sm text-ink outline-none"
+            onChange={setSearch}
+            sizeVariant="md"
+            variant="paper"
+            placeholder="Search deals by venue, dish, discount % or location…"
+            aria-label="Search deals"
           />
-          {search && (
-            <button
-              type="button"
-              onClick={() => setSearch("")}
-              className="text-xs font-semibold text-mute hover:text-ink shrink-0 px-1"
-            >
-              Clear
-            </button>
-          )}
         </div>
       </div>
 
@@ -203,8 +197,9 @@ export function PromotionsPage() {
                   void triggerHaptic("light");
                   setCategory(c);
                 }}
+                aria-pressed={active}
                 className={cn(
-                  "shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition active:scale-95 cursor-pointer ring-1",
+                  "inline-flex min-h-[44px] shrink-0 items-center rounded-full px-4 text-xs font-semibold transition active:scale-95 cursor-pointer ring-1",
                   active
                     ? "bg-brand text-white ring-brand shadow-xs"
                     : "bg-card text-ink ring-line hover:bg-paper",
@@ -235,8 +230,9 @@ export function PromotionsPage() {
                 void triggerHaptic("light");
                 setMechanicFilter(m.id);
               }}
+              aria-pressed={mechanicFilter === m.id}
               className={cn(
-                "rounded-xl px-2.5 py-1 text-xs transition cursor-pointer shrink-0 ring-1",
+                "inline-flex min-h-[40px] shrink-0 items-center rounded-xl px-3 text-xs transition cursor-pointer ring-1",
                 mechanicFilter === m.id
                   ? "bg-ink text-paper ring-ink font-bold"
                   : "bg-paper text-mute ring-line hover:text-ink",
@@ -263,7 +259,9 @@ export function PromotionsPage() {
             {search ? `No deals found matching "${search}"` : "No active deals in this category yet"}
           </h2>
           <p className="mt-1 text-xs text-mute max-w-sm mx-auto">
-            Be the first business to publish an offer or seed Sydney sample deals to explore.
+            {isAdmin
+              ? "Be the first business to publish an offer or seed Sydney sample deals to explore."
+              : "Be the first business to publish an offer."}
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
@@ -274,16 +272,18 @@ export function PromotionsPage() {
               </Button>
             </Link>
 
-            <Button
-              variant="outlined"
-              size="sm"
-              onClick={() => void handleSeedDemo()}
-              disabled={seeding}
-              className="gap-1.5 rounded-full px-4"
-            >
-              {seeding ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="text-gold" />}
-              <span>Seed Sample Deals</span>
-            </Button>
+            {isAdmin && (
+              <Button
+                variant="outlined"
+                size="sm"
+                onClick={() => void handleSeedDemo()}
+                disabled={seeding}
+                className="gap-1.5 rounded-full px-4"
+              >
+                {seeding ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="text-gold" />}
+                <span>Seed Sample Deals</span>
+              </Button>
+            )}
           </div>
         </div>
       ) : (
@@ -303,7 +303,7 @@ export function PromotionsPage() {
                   <img
                     src={coverImage}
                     alt={p.title}
-                    className="h-full w-full object-cover group-hover:scale-105 transition duration-500"
+                    className="h-full w-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-black/20 to-transparent" />
 
@@ -369,7 +369,7 @@ export function PromotionsPage() {
                     {(isOwner || isAdmin) ? (
                       <Link
                         href={isAdmin ? `/admin/promotions/${p.id}` : `/business/promotions/${p.id}`}
-                        className="inline-flex items-center gap-1 rounded-full bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition"
+                        className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition"
                       >
                         <Pencil size={12} />
                         <span>Edit</span>
@@ -380,7 +380,7 @@ export function PromotionsPage() {
 
                     <Link
                       href={`/promotions/${p.id}`}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
+                      className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand px-5 text-xs font-bold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
                     >
                       <Ticket size={13} />
                       <span>Claim Deal</span>

@@ -6,7 +6,7 @@ export function FashionPage() {
   const [, nav] = useLocation();
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 md:px-6">
+    <div className="mx-auto max-w-2xl px-4 py-10 pb-28 md:px-6">
       <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Coming later</p>
       <h1 className="font-display mt-2 text-4xl font-extrabold tracking-tight">AirPal Fashion</h1>
       <p className="mt-3 text-[15px] leading-relaxed text-mute">

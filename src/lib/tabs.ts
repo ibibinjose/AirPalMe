@@ -1,12 +1,11 @@
 /**
- * Companion tabs: Explore / Plan / Scan / Inbox / Me.
- * Home is accessed via the top BrandMark / App icon.
- * Scan is the centerpiece tab for QR / Wave / NFC interaction.
+ * Shipped dock (CANON §3): Home / Explore / Trips / Inbox / Me.
+ * "scan" is a path bucket, not a tab — Scan lives behind + Create.
  */
-export type GuestTab = "explore" | "trips" | "scan" | "inbox" | "me";
+export type GuestTab = "home" | "explore" | "trips" | "scan" | "inbox" | "me";
 
 /** Map a route path to the bottom-tab it belongs to. Pure: safe to unit test. */
-export function tabFromPath(path: string): GuestTab | "home" {
+export function tabFromPath(path: string): GuestTab {
   if (path.startsWith("/scan") || path.startsWith("/w/")) return "scan";
   if (path.startsWith("/me/inbox")) return "inbox";
   if (

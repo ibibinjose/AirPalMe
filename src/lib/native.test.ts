@@ -2,7 +2,8 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { Capacitor } from "@capacitor/core";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { StatusBar } from "@capacitor/status-bar";
-import { hideNativeSplash, initNativeApp } from "./native";
+import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
+import { hideNativeSplash, initNativeApp, triggerHaptic, triggerHapticSelection } from "./native";
 
 vi.mock("@capacitor/core", () => ({
   Capacitor: {
@@ -14,6 +15,24 @@ vi.mock("@capacitor/core", () => ({
 vi.mock("@capacitor/splash-screen", () => ({
   SplashScreen: {
     hide: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock("@capacitor/haptics", () => ({
+  Haptics: {
+    impact: vi.fn().mockResolvedValue(undefined),
+    notification: vi.fn().mockResolvedValue(undefined),
+    selectionChanged: vi.fn().mockResolvedValue(undefined),
+  },
+  ImpactStyle: {
+    Light: "LIGHT",
+    Medium: "MEDIUM",
+    Heavy: "HEAVY",
+  },
+  NotificationType: {
+    Success: "SUCCESS",
+    Warning: "WARNING",
+    Error: "ERROR",
   },
 }));
 
@@ -81,5 +100,62 @@ describe("native splash screen logic", () => {
     await initNativeApp();
 
     expect(SplashScreen.hide).toHaveBeenCalledWith({ fadeOutDuration: 350 });
+  });
+});
+
+describe("native haptics logic", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("triggers light impact by default on native platform", async () => {
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+
+    await triggerHaptic();
+
+    expect(Haptics.impact).toHaveBeenCalledWith({ style: ImpactStyle.Light });
+  });
+
+  it("triggers selectionChanged for selection style on native platform", async () => {
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+
+    await triggerHaptic("selection");
+
+    expect(Haptics.selectionChanged).toHaveBeenCalled();
+  });
+
+  it("triggerHapticSelection invokes selection haptics", async () => {
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+
+    await triggerHapticSelection();
+
+    expect(Haptics.selectionChanged).toHaveBeenCalled();
+  });
+
+  it("triggers notification for success, warning, error on native platform", async () => {
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(true);
+
+    await triggerHaptic("success");
+    expect(Haptics.notification).toHaveBeenCalledWith({ type: NotificationType.Success });
+
+    await triggerHaptic("warning");
+    expect(Haptics.notification).toHaveBeenCalledWith({ type: NotificationType.Warning });
+
+    await triggerHaptic("error");
+    expect(Haptics.notification).toHaveBeenCalledWith({ type: NotificationType.Error });
+  });
+
+  it("falls back to navigator.vibrate when on web platform", async () => {
+    vi.mocked(Capacitor.isNativePlatform).mockReturnValue(false);
+    const vibrateSpy = vi.fn();
+    vi.stubGlobal("navigator", { vibrate: vibrateSpy });
+
+    await triggerHaptic("light");
+    expect(vibrateSpy).toHaveBeenCalledWith(10);
+
+    await triggerHapticSelection();
+    expect(vibrateSpy).toHaveBeenCalledWith(10);
+
+    vi.unstubAllGlobals();
   });
 });

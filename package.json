@@ -29,7 +29,6 @@
     "ci": "npm run ci:install && npm run verify && npm run audit",
     "deploy": "npm run verify && npx -y firebase-tools@latest deploy --project airpalme-app",
     "deploy:hosting": "npm run build && npx -y firebase-tools@latest deploy --only hosting --project airpalme-app",
-    "deploy:rules": "npx -y firebase-tools@latest deploy --only firestore:rules,storage --project airpalme-app",
     "deploy:functions": "npm run functions:build && npx -y firebase-tools@latest deploy --only functions --project airpalme-app",
     "cap:sync": "npm run build && npx cap sync",
     "cap:ios": "npx cap open ios",
@@ -59,6 +58,7 @@
     "qrcode": "^1.5.4",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
+    "recharts": "^3.10.1",
     "sonner": "^2.0.7",
     "wouter": "^3.3.5"
   },

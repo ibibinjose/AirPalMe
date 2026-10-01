@@ -155,12 +155,12 @@ export function MemoryWallPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-10">
+    <div className="mx-auto max-w-lg px-4 pb-28">
       <div className="flex items-center gap-3 pt-4">
         <button
           type="button"
           onClick={() => nav("/me")}
-          className="grid h-9 w-9 place-items-center rounded-full bg-card ring-1 ring-line transition hover:bg-card/80"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-card ring-1 ring-line transition hover:bg-card/80"
           aria-label="Back to profile"
         >
           <ArrowLeft size={16} />
@@ -180,7 +180,7 @@ export function MemoryWallPage() {
         <button
           type="button"
           onClick={() => nav("/me/memories")}
-          className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-card px-3 py-1.5 text-xs font-medium ring-1 ring-line"
+          className="mt-3 inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 text-xs font-medium ring-1 ring-line"
         >
           <Users size={13} />
           With {initialWith} · show all
@@ -307,7 +307,7 @@ export function MemoryWallPage() {
                         key={p}
                         type="button"
                         onClick={() => nav(bioPath(handle))}
-                        className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand hover:bg-brand/15"
+                        className="inline-flex min-h-[40px] items-center rounded-full bg-brand/10 px-3.5 text-xs font-semibold text-brand hover:bg-brand/15"
                       >
                         @{handle}
                       </button>

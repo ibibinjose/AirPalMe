@@ -11,9 +11,12 @@ import {
   issueSummaryFromAnswers,
   PULSE_TEMPLATES,
   primaryScoreFromAnswers,
+  pulseImageUrlOk,
   pulseResponsesToCsv,
   resolvePulseStatusTransition,
   stayDuringStayTemplate,
+  swipeChoiceForOffset,
+  SWIPE_CHOOSE_THRESHOLD_PX,
   validatePulseFollowup,
   validatePulseSubmitPayload,
   visibleQuestions,
@@ -368,6 +371,41 @@ describe("all business and individual pulse templates", () => {
     const tmpl = createPulseTemplate("general_csat", "prop_gen_123", "usr_owner", "Creator Feedback");
     expect(tmpl.template).toBe("general_csat");
     expect(tmpl.questions.some((q) => q.id === "q_general")).toBe(true);
+  });
+});
+
+describe("swipe answers", () => {
+  it("commits past the threshold in either direction", () => {
+    expect(swipeChoiceForOffset(SWIPE_CHOOSE_THRESHOLD_PX)).toBe("right");
+    expect(swipeChoiceForOffset(200)).toBe("right");
+    expect(swipeChoiceForOffset(-SWIPE_CHOOSE_THRESHOLD_PX)).toBe("left");
+    expect(swipeChoiceForOffset(-200)).toBe("left");
+  });
+
+  it("springs back inside the threshold", () => {
+    expect(swipeChoiceForOffset(0)).toBeNull();
+    expect(swipeChoiceForOffset(SWIPE_CHOOSE_THRESHOLD_PX - 1)).toBeNull();
+    expect(swipeChoiceForOffset(-(SWIPE_CHOOSE_THRESHOLD_PX - 1))).toBeNull();
+    expect(swipeChoiceForOffset(Number.NaN)).toBeNull();
+  });
+});
+
+describe("pulse cover images", () => {
+  it("accepts https URLs with surrounding whitespace trimmed by callers", () => {
+    expect(pulseImageUrlOk("https://firebasestorage.googleapis.com/v0/b/x/o/y.jpg")).toBe(true);
+  });
+
+  it("rejects non-https, oversized, and non-string values", () => {
+    expect(pulseImageUrlOk("http://example.com/x.jpg")).toBe(false);
+    expect(pulseImageUrlOk("javascript:alert(1)")).toBe(false);
+    expect(pulseImageUrlOk("data:image/png;base64,xx")).toBe(false);
+    expect(pulseImageUrlOk("not a url")).toBe(false);
+    expect(pulseImageUrlOk("")).toBe(false);
+    expect(pulseImageUrlOk("   ")).toBe(false);
+    expect(pulseImageUrlOk(null)).toBe(false);
+    expect(pulseImageUrlOk(undefined)).toBe(false);
+    expect(pulseImageUrlOk(42)).toBe(false);
+    expect(pulseImageUrlOk(`https://example.com/${"x".repeat(2048)}.jpg`)).toBe(false);
   });
 });
 

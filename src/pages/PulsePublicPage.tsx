@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "wouter";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
+import { SwipeChoice } from "@/components/pulse/SwipeChoice";
 import { ensureAnonymousSession } from "@/lib/firebase";
 import { fetchPulseByToken, submitPulse } from "@/lib/pulse-store";
 import {
@@ -113,6 +114,34 @@ export function PulsePublicPage() {
     void onSubmit();
   }
 
+  const advanceTimer = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (advanceTimer.current !== null) window.clearTimeout(advanceTimer.current);
+    },
+    [],
+  );
+  const goNextRef = useRef(goNext);
+  goNextRef.current = goNext;
+
+  function clearAdvance() {
+    if (advanceTimer.current !== null) {
+      window.clearTimeout(advanceTimer.current);
+      advanceTimer.current = null;
+    }
+  }
+
+  /** Tap-to-answer: select, flash the choice, then glide on. Text stays manual. */
+  function chooseAndAdvance(
+    question: PulseQuestion,
+    value: number | string | boolean,
+    label?: string,
+  ) {
+    setAnswer(question, value, label);
+    clearAdvance();
+    advanceTimer.current = window.setTimeout(() => goNextRef.current(), 380);
+  }
+
   if (loading) {
     return (
       <div className="mx-auto flex min-h-[70vh] max-w-md items-center justify-center px-4 text-sm text-mute">
@@ -148,14 +177,59 @@ export function PulsePublicPage() {
 
   const totalSteps = visible.length + (logic?.askContact ? 1 : 0);
   const progress = totalSteps ? Math.min(1, (step + (showContact ? 1 : 0) + 1) / totalSteps) : 0;
+  const binaryOptions =
+    current?.type === "single_choice" && (current.options || []).length === 2
+      ? (current.options as [string, string])
+      : null;
+
+  // Per-pulse cover wins; property hero is the fallback for older pulses.
+  const headerImage = pulse.imageUrl || pulse.propertyHeroImage;
 
   return (
-    <div className="mx-auto min-h-[100dvh] max-w-md px-4 pb-10 pt-6">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">AirPal Pulse</p>
-      <h1 className="font-display mt-1 text-2xl font-semibold">{pulse.title}</h1>
-      <p className="mt-1 text-sm text-mute">{pulse.propertyName}</p>
+    <div className="mx-auto min-h-[100dvh] max-w-md px-4 pb-28 pt-6">
+      {headerImage ? (
+        <div>
+          <div className="relative h-40 overflow-hidden rounded-[28px] ring-1 ring-line">
+            <img
+              src={headerImage}
+              alt=""
+              className="h-full w-full object-cover"
+              loading="eager"
+            />
+            <div
+              className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-transparent"
+              aria-hidden
+            />
+            <div className="absolute inset-x-0 bottom-0 p-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/80">
+                AirPal Pulse
+              </p>
+              <p className="font-display text-lg font-bold leading-snug text-white">
+                {pulse.propertyName}
+              </p>
+            </div>
+          </div>
+          <h1 className="font-display mt-4 text-2xl font-semibold">{pulse.title}</h1>
+        </div>
+      ) : (
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+            AirPal Pulse
+          </p>
+          <h1 className="font-display mt-1 text-2xl font-semibold">{pulse.title}</h1>
+          <p className="mt-1 text-sm text-mute">{pulse.propertyName}</p>
+        </div>
+      )}
 
-      <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-line">
+      {totalSteps > 0 && (
+        <div className="mt-4 flex items-baseline justify-between">
+          <p className="text-xs font-semibold text-mute">
+            {showContact ? "Last step" : `Question ${Math.min(step + 1, totalSteps)} of ${totalSteps}`}
+          </p>
+          <p className="text-xs font-bold text-ink">{Math.round(progress * 100)}%</p>
+        </div>
+      )}
+      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-line">
         <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${Math.round(progress * 100)}%` }} />
       </div>
 
@@ -200,7 +274,7 @@ export function PulsePublicPage() {
                       key={value}
                       type="button"
                       aria-label={`${value} of 5`}
-                      onClick={() => setAnswer(current, value, emoji)}
+                      onClick={() => chooseAndAdvance(current, value, emoji)}
                       className={`grid h-14 place-items-center rounded-2xl text-2xl ring-1 ${
                         selected ? "bg-ink text-white ring-ink" : "bg-card ring-line"
                       }`}
@@ -212,14 +286,23 @@ export function PulsePublicPage() {
               </div>
             )}
             {current.type === "yes_no" && (
-              <div className="grid grid-cols-2 gap-2">
-                {[true, false].map((v) => {
-                  const selected = answers.find((a) => a.questionId === current.id)?.value === v;
-                  return (
-                    <button
-                      key={String(v)}
-                      type="button"
-                      onClick={() => setAnswer(current, v)}
+              <div>
+                <div className="mb-3">
+                  <SwipeChoice
+                    key={current.id}
+                    leftLabel="No"
+                    rightLabel="Yes"
+                    onChoose={(side) => chooseAndAdvance(current, side === "right")}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {[true, false].map((v) => {
+                    const selected = answers.find((a) => a.questionId === current.id)?.value === v;
+                    return (
+                      <button
+                        key={String(v)}
+                        type="button"
+                        onClick={() => chooseAndAdvance(current, v)}
                       className={`h-12 rounded-full text-sm font-medium ring-1 ${
                         selected ? "bg-ink text-white ring-ink" : "bg-card ring-line"
                       }`}
@@ -228,17 +311,31 @@ export function PulsePublicPage() {
                     </button>
                   );
                 })}
+                </div>
               </div>
             )}
             {current.type === "single_choice" && (
-              <div className="space-y-2">
-                {(current.options || []).map((opt) => {
-                  const selected = answers.find((a) => a.questionId === current.id)?.value === opt;
-                  return (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => setAnswer(current, opt)}
+              <div>
+                {binaryOptions && (
+                  <div className="mb-3">
+                    <SwipeChoice
+                      key={current.id}
+                      leftLabel={binaryOptions[1]}
+                      rightLabel={binaryOptions[0]}
+                      onChoose={(side) =>
+                        chooseAndAdvance(current, binaryOptions[side === "right" ? 0 : 1])
+                      }
+                    />
+                  </div>
+                )}
+                <div className="space-y-2">
+                  {(current.options || []).map((opt) => {
+                    const selected = answers.find((a) => a.questionId === current.id)?.value === opt;
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => chooseAndAdvance(current, opt)}
                       className={`flex w-full items-center rounded-2xl px-4 py-3 text-left text-sm font-medium ring-1 ${
                         selected ? "bg-ink text-white ring-ink" : "bg-card ring-line"
                       }`}
@@ -247,6 +344,7 @@ export function PulsePublicPage() {
                     </button>
                   );
                 })}
+                </div>
               </div>
             )}
             {current.type === "text_short" && (
@@ -266,8 +364,8 @@ export function PulsePublicPage() {
                     <button
                       key={n}
                       type="button"
-                      onClick={() => setAnswer(current, n)}
-                      className={`h-10 rounded-xl text-sm font-medium ring-1 ${
+                      onClick={() => chooseAndAdvance(current, n)}
+                      className={`h-11 rounded-xl text-sm font-medium ring-1 ${
                         selected ? "bg-ink text-white ring-ink" : "bg-card ring-line"
                       }`}
                     >
@@ -281,7 +379,14 @@ export function PulsePublicPage() {
 
           <div className="mt-6 flex gap-2">
             {step > 0 && (
-              <Button variant="ghost" className="flex-1" onClick={() => setStep((s) => Math.max(0, s - 1))}>
+              <Button
+                variant="ghost"
+                className="flex-1"
+                onClick={() => {
+                  clearAdvance();
+                  setStep((s) => Math.max(0, s - 1));
+                }}
+              >
                 Back
               </Button>
             )}
@@ -289,7 +394,10 @@ export function PulsePublicPage() {
               className="flex-1"
               disabled={current.required && !answers.some((a) => a.questionId === current.id)}
               loading={submitting}
-              onClick={goNext}
+              onClick={() => {
+                clearAdvance();
+                goNext();
+              }}
             >
               {step + 1 < visible.length || logic?.askContact ? "Next" : "Send"}
             </Button>

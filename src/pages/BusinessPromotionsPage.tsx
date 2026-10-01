@@ -48,8 +48,11 @@ export function BusinessPromotionsPage() {
   }, [authReady, user, requireUser]);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/business" className="flex items-center gap-1 text-[13px] font-medium text-mute">
+    <div className="mx-auto max-w-2xl px-4 py-8 pb-28">
+      <Link
+        href="/business"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={14} /> Business
       </Link>
       <div className="mt-4 flex items-center justify-between">
@@ -81,7 +84,7 @@ export function BusinessPromotionsPage() {
             <Link
               key={p.id}
               href={`/business/promotions/${p.id}`}
-              className="block rounded-2xl ring-1 ring-line bg-card p-3"
+              className="block rounded-2xl ring-1 ring-line bg-card p-3 transition hover:bg-paper active:scale-[0.99]"
             >
               <div className="flex items-center gap-2">
                 <span

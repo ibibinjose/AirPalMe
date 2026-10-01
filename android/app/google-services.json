@@ -7,7 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:265455282950:android:fa4b8b9a378fd8facacc87",
+        "mobilesdk_app_id": "1:265455282950:android:7d2912e4e8acf156cacc87",
         "android_client_info": {
           "package_name": "me.airpal.app"
         }
@@ -18,40 +18,25 @@
           "client_type": 1,
           "android_info": {
             "package_name": "me.airpal.app",
-            "certificate_hash": "5d4682e2da82346b493a5de69e887d54a2222f80"
+            "certificate_hash": ""
           }
         },
         {
-          "client_id": "265455282950-mnjj3a06b62qtgodbo9bop7t35d3r2j5.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "me.airpal.app",
-            "certificate_hash": "cebb5a9baff6861048fd39feaf22381569d311a3"
-          }
-        },
-        {
-          "client_id": "265455282950-4e6jf2vciakj6kqkslkc8j3etumm3c93.apps.googleusercontent.com",
+          "client_id": "265455282950-b4qn7ecibbumqo052lkf6j587so1tg5i.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAxK9URWXE6UIaHpNQb7VNvyGbg5quRdak"
+          "current_key": "AIzaSyAxXP-0LbZ8U0iDWWsMiGm4V-k7Vyyi9yY"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "265455282950-4e6jf2vciakj6kqkslkc8j3etumm3c93.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
               "client_id": "265455282950-b4qn7ecibbumqo052lkf6j587so1tg5i.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "me.airpal.app"
-              }
+              "client_type": 3
             }
           ]
         }

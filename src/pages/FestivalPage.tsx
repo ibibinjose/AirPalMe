@@ -149,7 +149,7 @@ export function FestivalPage() {
   const dateRange = days.length ? `${days[0]?.label} – ${days[days.length - 1]?.label}` : "";
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-24 pt-4 md:px-6 md:pt-6">
+    <div className="mx-auto max-w-5xl px-4 pb-28 pt-4 md:px-6 md:pt-6">
       <Link href="/explore" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-mute">
         <ArrowLeft size={15} /> Explore
       </Link>

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import { Calendar, CreditCard, MapPin, Sparkles, CheckCircle2, QrCode } from "lucide-react";
 import { type HangoutPlan, PLAN_THEMES, PLAN_TYPES, formatPlanDate, isTicketed, isSoldOut } from "@shared/plan";
+import { guestListDisplay, visibleAttendees } from "@shared/plan-notify";
 import { PLAN_TYPE_ICONS } from "./planTypeIcons";
 import { PlanQrModal } from "./PlanQrModal";
 import { triggerHaptic } from "@/lib/native";
@@ -14,12 +15,16 @@ export function InvitationCard({
   onOpenRsvp,
   onOpenQr,
   onOpenBooking,
+  viewerUid,
+  viewerIsHost,
 }: {
   plan: HangoutPlan;
   userStatus?: "going" | "maybe" | "declined" | null;
   onOpenRsvp?: () => void;
   onOpenQr?: () => void;
   onOpenBooking?: () => void;
+  viewerUid?: string | null;
+  viewerIsHost?: boolean;
 }) {
   const theme = PLAN_THEMES[plan.theme] || PLAN_THEMES.gold;
   const typeInfo = PLAN_TYPES[plan.type] || PLAN_TYPES.custom;
@@ -31,7 +36,13 @@ export function InvitationCard({
     else setShowQrModal(true);
   };
 
-  const goingCount = useMemo(() => plan.attendees.filter((a) => a.status === "going").length, [plan.attendees]);
+  // Who's-going privacy: host sees all, guests see the redacted list.
+  const attendees = useMemo(
+    () => visibleAttendees(plan, { uid: viewerUid, isHost: viewerIsHost }),
+    [plan, viewerUid, viewerIsHost],
+  );
+  const showCount = viewerIsHost || guestListDisplay(plan).showCount;
+  const goingCount = useMemo(() => attendees.filter((a) => a.status === "going").length, [attendees]);
 
   const countdown = useMemo(() => {
     try {
@@ -216,7 +227,7 @@ export function InvitationCard({
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-t border-white/25 pt-4">
           <div className="flex items-center gap-3">
             <div className="flex -space-x-2.5 overflow-hidden">
-              {plan.attendees.slice(0, 5).map((att) => (
+              {attendees.slice(0, 5).map((att) => (
                 <div
                   key={att.id}
                   className={cn(
@@ -246,15 +257,21 @@ export function InvitationCard({
             </div>
             <div className="min-w-0">
               <span className={cn("text-xs font-medium block", theme.onThemeMutedClass)}>
-                <strong className={cn("font-semibold", theme.onThemeClass)}>{goingCount} going</strong>
-                {plan.attendees.length > goingCount ? ` · ${plan.attendees.length - goingCount} maybe` : ""}
+                {showCount ? (
+                  <>
+                    <strong className={cn("font-semibold", theme.onThemeClass)}>{goingCount} going</strong>
+                    {attendees.length > goingCount ? ` · ${attendees.length - goingCount} maybe` : ""}
+                  </>
+                ) : (
+                  "Guest list private"
+                )}
               </span>
               <span className={cn("text-[11px] truncate block max-w-xs", theme.onThemeMutedClass)}>
-                {plan.attendees
+                {attendees
                   .map((a) => a.name)
                   .slice(0, 3)
                   .join(", ")}
-                {plan.attendees.length > 3 ? ` +${plan.attendees.length - 3}` : ""}
+                {showCount && attendees.length > 3 ? ` +${attendees.length - 3}` : ""}
               </span>
             </div>
           </div>

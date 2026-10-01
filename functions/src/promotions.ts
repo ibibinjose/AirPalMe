@@ -455,21 +455,54 @@ export const enterPromotion = onCall(CALLABLE, async (request) => {
   }
 
   const reference = entryReferenceFor(promotionId);
-  await entriesRef.add({
-    promotionId,
-    uid,
-    reference,
-    referrerUid,
-    status: "entered",
-    createdAt: new Date().toISOString(),
-  });
-  await db
-    .collection("promotions")
-    .doc(promotionId)
-    .update({
-      entriesCount: FieldValue.increment(1),
-      updatedAt: new Date().toISOString(),
+  const cap = Math.floor(Number(promo.entriesCap || 0));
+  let founderNumber: number | undefined;
+  let spotsLeft: number | undefined;
+  if (cap > 0) {
+    // Capped founding pool (e.g. first 100,000): the count check, the claim,
+    // and the sequential founder number happen inside one transaction so the
+    // cap can never oversell and every entrant gets a unique number.
+    const claimed = await db.runTransaction(async (tx) => {
+      const live = await tx.get(db.collection("promotions").doc(promotionId));
+      const used = Math.max(0, Math.floor(Number((live.data() as Promotion | undefined)?.entriesCount || 0)));
+      if (used >= cap) {
+        throw new HttpsError("failed-precondition", "This pool is full — entries are closed.");
+      }
+      const number = used + 1;
+      tx.set(entriesRef.doc(), {
+        promotionId,
+        uid,
+        reference,
+        referrerUid,
+        founderNumber: number,
+        status: "entered",
+        createdAt: new Date().toISOString(),
+      });
+      tx.update(db.collection("promotions").doc(promotionId), {
+        entriesCount: FieldValue.increment(1),
+        updatedAt: new Date().toISOString(),
+      });
+      return { founderNumber: number, spotsLeft: cap - number };
     });
+    founderNumber = claimed.founderNumber;
+    spotsLeft = claimed.spotsLeft;
+  } else {
+    await entriesRef.add({
+      promotionId,
+      uid,
+      reference,
+      referrerUid,
+      status: "entered",
+      createdAt: new Date().toISOString(),
+    });
+    await db
+      .collection("promotions")
+      .doc(promotionId)
+      .update({
+        entriesCount: FieldValue.increment(1),
+        updatedAt: new Date().toISOString(),
+      });
+  }
   await grantPoints(uid, ENTRY_POINTS, "giveaway_entry", promotionId);
   await notifyUser(
     uid,
@@ -488,7 +521,12 @@ export const enterPromotion = onCall(CALLABLE, async (request) => {
       promotionId,
     );
   }
-  return { ok: true, duplicate: false, reference };
+  return {
+    ok: true,
+    duplicate: false,
+    reference,
+    ...(founderNumber !== undefined ? { founderNumber, spotsLeft } : {}),
+  };
 });
 
 function maskReference(reference: string): string {

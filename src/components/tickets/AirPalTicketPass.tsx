@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Download, Share2, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { AppleWalletButton } from "@/components/ui/AppleWalletButton";
+import { openAppleWalletPass, ticketWalletPassUrl } from "@/lib/wallet";
 import { makeQrDataUrl } from "@/lib/qr";
 import { publicSiteOrigin } from "@/lib/public-origin";
 import { shareNative } from "@/lib/native";
-import type { Booking } from "@shared/booking";
+import { bookingDisplayPaid, type Booking } from "@shared/booking";
 
 interface Props {
   booking: Booking & { id: string };
@@ -13,12 +15,12 @@ interface Props {
   showActions?: boolean;
 }
 
-/** Gate-scan URL for the ticket QR. Events resolve to the session page. */
+/** Gate-scan URL for the ticket QR. Events and plans resolve to their session page; everything else gets the dedicated gate page. */
 export function ticketQrHref(booking: Booking & { id: string }): string {
   const origin = publicSiteOrigin();
   if (booking.eventId) return `${origin}/e/${booking.eventId}?ticket=${booking.id}`;
   if (booking.planId) return `${origin}/plan/${booking.planId}?ticket=${booking.id}`;
-  return `${origin}/experiences?ticket=${booking.id}`;
+  return `${origin}/ticket/${booking.id}`;
 }
 
 /**
@@ -28,7 +30,7 @@ export function ticketQrHref(booking: Booking & { id: string }): string {
  */
 export function AirPalTicketPass({ booking, guestName, hostName, showActions = true }: Props) {
   const [qr, setQr] = useState("");
-  const paid = booking.paymentStatus === "paid" || booking.priceCents <= 0;
+  const paid = bookingDisplayPaid(booking);
 
   useEffect(() => {
     let cancelled = false;
@@ -107,13 +109,22 @@ export function AirPalTicketPass({ booking, guestName, hostName, showActions = t
       </p>
 
       {showActions && (
-        <div className="no-print flex gap-2 bg-white px-4 py-3">
-          <Button size="sm" variant="ghost" className="flex-1 gap-1.5" onClick={print}>
-            <Download size={15} /> Save PDF
-          </Button>
-          <Button size="sm" variant="ghost" className="flex-1 gap-1.5" onClick={() => void share()}>
-            <Share2 size={15} /> Share
-          </Button>
+        <div className="no-print flex flex-col gap-2 bg-white px-4 py-3">
+          <AppleWalletButton
+            className="w-full justify-center"
+            onClick={() => {
+              const url = ticketWalletPassUrl(booking.id);
+              void openAppleWalletPass(url, "AirPal-Ticket-" + booking.title);
+            }}
+          />
+          <div className="flex gap-2">
+            <Button size="sm" variant="ghost" className="flex-1 gap-1.5" onClick={print}>
+              <Download size={15} /> Save PDF
+            </Button>
+            <Button size="sm" variant="ghost" className="flex-1 gap-1.5" onClick={() => void share()}>
+              <Share2 size={15} /> Share
+            </Button>
+          </div>
         </div>
       )}
     </article>

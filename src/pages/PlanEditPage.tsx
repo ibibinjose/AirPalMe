@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
 import { ArrowLeft, Calendar, Check, Clock, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { PLAN_THEMES, PLAN_TYPES, type PlanTheme, type PlanType } from "@shared/plan";
+import { PLAN_THEMES, PLAN_TYPES, canCancelPlanStatus, isPlanManager, type PlanTheme, type PlanType } from "@shared/plan";
 import { usePlans } from "@/contexts/PlanContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { PLAN_TYPE_ICONS } from "@/components/plan/planTypeIcons";
@@ -20,7 +20,7 @@ export function PlanEditPage() {
   const [, nav] = useLocation();
   const planId = params?.id || "";
 
-  const { getPlan, updatePlan, deletePlan, addStop, updateStop, removeStop, reorderStops } = usePlans();
+  const { getPlan, updatePlan, deletePlan, cancelPlan, addStop, updateStop, removeStop, reorderStops } = usePlans();
   const { user, authReady } = useAuth();
 
   const plan = getPlan(planId);
@@ -74,7 +74,7 @@ export function PlanEditPage() {
     return <NotFoundPage />;
   }
 
-  const isHost = !plan.creator.uid || plan.creator.uid === user.uid;
+  const isHost = !plan.creator.uid || isPlanManager(plan, user?.uid);
 
   if (!isHost) {
     return (
@@ -115,6 +115,13 @@ export function PlanEditPage() {
     }
   };
 
+  const [cancelReason, setCancelReason] = useState("");
+  const handleCancelPlan = () => {
+    if (!window.confirm("Cancel this plan? Everyone going will be notified.")) return;
+    const updated = cancelPlan(plan.id, cancelReason);
+    if (updated) nav(`/plan/${plan.id}`);
+  };
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 md:py-10 pb-28">
       {/* Top Header */}
@@ -146,6 +153,7 @@ export function PlanEditPage() {
       <form onSubmit={handleSubmit} className="mt-8 space-y-6">
         {/* Occasion format */}
         <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs space-y-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-gold">01 · Occasion</p>
           <label className="font-display text-base font-semibold text-ink block">Occasion Format</label>
 
           <div>
@@ -213,6 +221,7 @@ export function PlanEditPage() {
 
         {/* Details & Destination */}
         <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs space-y-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-gold">02 · Details</p>
           <label className="font-display text-base font-semibold text-ink block">Basic Information</label>
 
           <div>
@@ -292,7 +301,8 @@ export function PlanEditPage() {
           </div>
         </div>
 
-        <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+        <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs space-y-3">
+          <p className="text-xs font-bold uppercase tracking-wider text-gold">03 · Photo</p>
           <ImageField
             kind="square"
             folder="listings"
@@ -304,7 +314,8 @@ export function PlanEditPage() {
 
         {/* VIP Theme */}
         <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-          <label className="font-display text-base font-semibold text-ink block">Invitation Card Theme</label>
+          <p className="text-xs font-bold uppercase tracking-wider text-gold">04 · Theme</p>
+          <label className="font-display text-base font-semibold text-ink block mt-1">Invitation Card Theme</label>
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {(Object.keys(PLAN_THEMES) as PlanTheme[]).map((tKey) => {
               const th = PLAN_THEMES[tKey];
@@ -334,7 +345,8 @@ export function PlanEditPage() {
 
         {/* Itinerary Stops Section */}
         <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-          <div className="flex items-center justify-between gap-3 mb-4">
+          <p className="text-xs font-bold uppercase tracking-wider text-gold">05 · Stops</p>
+          <div className="flex items-center justify-between gap-3 mb-4 mt-1">
             <div>
               <label className="font-display text-base font-semibold text-ink block">Itinerary Stops & Schedule</label>
               <p className="text-xs text-mute mt-0.5">Add, edit, or reorder the stops and venues for this gathering</p>
@@ -374,8 +386,8 @@ export function PlanEditPage() {
           />
         </div>
 
-        {/* Submit */}
-        <div className="pt-2 flex gap-3">
+        {/* Submit — sticky so save is always in reach on the long form */}
+        <div className="sticky bottom-24 z-10 flex gap-3 rounded-2xl bg-card/95 p-2 ring-1 ring-line shadow-md backdrop-blur">
           <Button
             type="button"
             variant="ghost"
@@ -390,6 +402,30 @@ export function PlanEditPage() {
           </Button>
         </div>
       </form>
+
+      {/* Danger zone: cancel notifies the going crew; delete erases silently */}
+      {canCancelPlanStatus(plan.status) && (
+        <div className="mt-6 rounded-3xl bg-card p-6 ring-1 ring-red-500/20 shadow-xs">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-red-500">Danger zone</p>
+          <h2 className="font-display text-base font-bold text-ink">Cancel this plan</h2>
+          <p className="mt-0.5 text-[13px] text-mute">Everyone going gets notified. The plan stays visible as cancelled.</p>
+          <input
+            type="text"
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+            placeholder="Reason for the crew (optional)"
+            aria-label="Cancellation reason"
+            className="mt-3 h-11 w-full rounded-2xl bg-paper px-4 text-sm border border-line outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+          />
+          <button
+            type="button"
+            onClick={handleCancelPlan}
+            className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-full bg-red-500 px-4 text-sm font-semibold text-white shadow-xs hover:bg-red-600 transition active:scale-95"
+          >
+            Cancel plan
+          </button>
+        </div>
+      )}
     </div>
   );
 }

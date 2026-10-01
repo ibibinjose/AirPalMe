@@ -20,6 +20,7 @@ const ScanPage = lazy(() => import("@/pages/ScanPage").then((m) => ({ default: m
 const WavePage = lazy(() => import("@/pages/WavePage").then((m) => ({ default: m.WavePage })));
 const PlacePage = lazy(() => import("@/pages/PlacePage").then((m) => ({ default: m.PlacePage })));
 const EventPage = lazy(() => import("@/pages/EventPage").then((m) => ({ default: m.EventPage })));
+const TicketPage = lazy(() => import("@/pages/TicketPage").then((m) => ({ default: m.TicketPage })));
 const CalendarPage = lazy(() => import("@/pages/CalendarPage").then((m) => ({ default: m.CalendarPage })));
 const StallPage = lazy(() => import("@/pages/StallPage").then((m) => ({ default: m.StallPage })));
 const OrganiserEventPage = lazy(() =>
@@ -28,6 +29,7 @@ const OrganiserEventPage = lazy(() =>
 
 const MePage = lazy(() => import("@/pages/MePage").then((m) => ({ default: m.MePage })));
 const MyTicketsPage = lazy(() => import("@/pages/MyTicketsPage").then((m) => ({ default: m.MyTicketsPage })));
+const RewardsPage = lazy(() => import("@/pages/RewardsPage").then((m) => ({ default: m.RewardsPage })));
 const InboxPage = lazy(() => import("@/pages/InboxPage").then((m) => ({ default: m.InboxPage })));
 const ZooPage = lazy(() => import("@/pages/ZooPage").then((m) => ({ default: m.ZooPage })));
 const MemoryWallPage = lazy(() => import("@/pages/MemoryWallPage").then((m) => ({ default: m.MemoryWallPage })));
@@ -36,6 +38,7 @@ const SettingsPage = lazy(() => import("@/pages/SettingsPage").then((m) => ({ de
 const MarkerPage = lazy(() => import("@/pages/MarkerPage").then((m) => ({ default: m.MarkerPage })));
 const StayPage = lazy(() => import("@/pages/StayPage").then((m) => ({ default: m.StayPage })));
 const DemoHotelPage = lazy(() => import("@/pages/DemoHotelPage").then((m) => ({ default: m.DemoHotelPage })));
+const DemoPage = lazy(() => import("@/pages/DemoPage").then((m) => ({ default: m.DemoPage })));
 const HostPage = lazy(() => import("@/pages/HostPage").then((m) => ({ default: m.HostPage })));
 const HostPulsePage = lazy(() => import("@/pages/HostPulsePage").then((m) => ({ default: m.HostPulsePage })));
 const PulseHubPage = lazy(() => import("@/pages/PulseHubPage").then((m) => ({ default: m.PulseHubPage })));
@@ -46,6 +49,7 @@ const PartnersPage = lazy(() => import("@/pages/PartnersPage").then((m) => ({ de
 const CreatePage = lazy(() => import("@/pages/CreatePage").then((m) => ({ default: m.CreatePage })));
 const PartnerPage = lazy(() => import("@/pages/PartnerPage").then((m) => ({ default: m.PartnerPage })));
 const JoinPage = lazy(() => import("@/pages/JoinPage").then((m) => ({ default: m.JoinPage })));
+const FoundersPage = lazy(() => import("@/pages/FoundersPage").then((m) => ({ default: m.FoundersPage })));
 const BusinessPage = lazy(() => import("@/pages/BusinessPage").then((m) => ({ default: m.BusinessPage })));
 const BusinessOnboardPage = lazy(() =>
   import("@/pages/BusinessOnboardPage").then((m) => ({ default: m.BusinessOnboardPage })),
@@ -57,6 +61,10 @@ const BioPublicPage = lazy(() => import("@/pages/BioPublicPage").then((m) => ({ 
 const BioSetupPage = lazy(() => import("@/pages/BioSetupPage").then((m) => ({ default: m.BioSetupPage })));
 const BioEditPage = lazy(() => import("@/pages/BioEditPage").then((m) => ({ default: m.BioEditPage })));
 const BioRecoverPage = lazy(() => import("@/pages/BioRecoverPage").then((m) => ({ default: m.BioRecoverPage })));
+const SearchPage = lazy(() => import("@/pages/SearchPage").then((m) => ({ default: m.SearchPage })));
+const SearchAnalyticsPage = lazy(() =>
+  import("@/pages/SearchAnalyticsPage").then((m) => ({ default: m.SearchAnalyticsPage })),
+);
 const CampusPage = lazy(() => import("@/pages/CampusPage").then((m) => ({ default: m.CampusPage })));
 const AdminPage = lazy(() => import("@/pages/AdminPage").then((m) => ({ default: m.AdminPage })));
 const GiveawaysPage = lazy(() => import("@/pages/GiveawaysPage").then((m) => ({ default: m.GiveawaysPage })));
@@ -134,6 +142,11 @@ export function AppRoutes() {
     <Suspense fallback={<RouteFallback />}>
       <Switch>
         <Route path="/" component={HomePage} />
+        <Route path="/search/analytics" component={SearchAnalyticsPage} />
+        <Route path="/admin/search-analytics">
+          <Redirect to="/search/analytics" />
+        </Route>
+        <Route path="/search" component={SearchPage} />
         <Route path="/mate" component={MatePage} />
         <Route path="/mate/request" component={MateRequestPage} />
         <Route path="/explore" component={ExplorePage} />
@@ -160,6 +173,10 @@ export function AppRoutes() {
         <Route path="/demohotel">
           <Redirect to="/DemoHotel" />
         </Route>
+        <Route path="/Demo" component={DemoPage} />
+        <Route path="/demo">
+          <Redirect to="/Demo" />
+        </Route>
         <Route path="/q/:city/:handle" component={MarkerPage} />
         <Route path="/q/:a" component={MarkerPage} />
         <Route path="/q">
@@ -168,6 +185,7 @@ export function AppRoutes() {
         <Route path="/p/:id" component={PlacePage} />
         <Route path="/e/:eventId/s/:stallId" component={StallPage} />
         <Route path="/e/:id" component={EventPage} />
+        <Route path="/ticket/:id" component={TicketPage} />
         <Route path="/f/new" component={FestivalCreatePage} />
         <Route path="/f/:slug" component={FestivalPage} />
         <Route path="/calendar" component={CalendarPage} />
@@ -189,8 +207,12 @@ export function AppRoutes() {
         <Route path="/me/zoo" component={ZooPage} />
         <Route path="/me/memories" component={MemoryWallPage} />
         <Route path="/me/people" component={PeoplePage} />
+        <Route path="/inbox" component={InboxPage} />
+        <Route path="/chat" component={InboxPage} />
+        <Route path="/messages" component={InboxPage} />
         <Route path="/me/inbox" component={InboxPage} />
         <Route path="/me/tickets" component={MyTicketsPage} />
+        <Route path="/me/rewards" component={RewardsPage} />
         <Route path="/circle" component={CirclePage} />
         <Route path="/me" component={MePage} />
         <Route path="/settings" component={SettingsPage} />
@@ -208,6 +230,7 @@ export function AppRoutes() {
         </Route>
         <Route path="/auth/action" component={AuthActionPage} />
         <Route path="/join" component={JoinPage} />
+        <Route path="/founders" component={FoundersPage} />
         <Route path="/fashion" component={FashionPage} />
         <Route path="/club/list" component={ClubListPage} />
         <Route path="/club" component={ClubPage} />

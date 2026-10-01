@@ -21,6 +21,7 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  Star,
   Store,
   Ticket,
   UserRound,
@@ -295,7 +296,11 @@ export function ProfileMenu() {
             )}
             {(mine || business) && (
               <p className="mt-0.5 truncate text-[10px] font-bold uppercase tracking-wider text-gold">
-                {[mine && bioKindLabel(mine.kind), business && bioKindLabel(business.kind ?? "business")]
+                {[
+                  mine && bioKindLabel(mine.kind),
+                  business && bioKindLabel(business.kind ?? "business"),
+                  mine?.starTier && `★ ${mine.starTier}`,
+                ]
                   .filter(Boolean)
                   .join(" · ")}
               </p>
@@ -513,15 +518,12 @@ export function ProfileMenu() {
         )}
 
         {business ? (
-          <>
-            <Row icon={Store} label="Your Place" hint={`AirPal.Me/@${business.handle}`} onClick={() => go("/business")} />
-            <Row
-              icon={PencilLine}
-              label="Edit Place"
-              hint="Listing, hours & promotions"
-              onClick={() => go("/business")}
-            />
-          </>
+          <Row
+            icon={Store}
+            label="Your Place"
+            hint={`AirPal.Me/@${business.handle} · Listing, hours & promotions`}
+            onClick={() => go("/business")}
+          />
         ) : (
           <Row
             icon={Store}
@@ -531,11 +533,12 @@ export function ProfileMenu() {
           />
         )}
 
-        {myEvent ? (
-          <Row icon={CalendarDays} label="Event Manager" hint={myEvent.name} onClick={() => go("/event")} />
-        ) : (
-          <Row icon={CalendarDays} label="Run an Event" hint="Market, festival, expo" onClick={() => go("/event")} />
-        )}
+        <Row
+          icon={CalendarDays}
+          label={myEvent ? "Event Manager" : "Run an Event"}
+          hint={myEvent ? myEvent.name : "Market, festival, expo"}
+          onClick={() => go("/event")}
+        />
 
         {clubMember && <Row icon={Users} label="AirPal Club" hint="Guest list & perks" onClick={() => go("/club")} />}
       </div>
@@ -551,6 +554,14 @@ export function ProfileMenu() {
           onClick={() => go("/me")}
         />
         <Row icon={Ticket} label="My Tickets" hint="Passes & reservations" onClick={() => go("/me/tickets")} />
+        <Row
+          icon={Star}
+          label="Stars & Rewards"
+          hint="Invite mates, earn Stars"
+          badge={mine?.starTier}
+          badgeColor="bg-gold/15 text-gold"
+          onClick={() => go("/me/rewards")}
+        />
         {mine && <Row icon={Cat} label="Air Zoo" hint="Stickers, shops & hunts" onClick={() => go("/me/zoo")} />}
         <Row icon={Images} label="Memory Wall" hint="Keepsakes & moments" onClick={() => go("/me/memories")} />
         <Row icon={QrCode} label="Scan QR & Wave" hint="Scan marks & interact" onClick={() => go("/scan")} />

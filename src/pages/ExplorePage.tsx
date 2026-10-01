@@ -6,8 +6,6 @@ import {
   Map as MapIcon,
   MapPin,
   SlidersHorizontal,
-  Search,
-  X,
   Sparkles,
   ArrowRight,
   Compass,
@@ -24,6 +22,8 @@ import {
 import { usePlans } from "@/contexts/PlanContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { toast } from "sonner";
+import { SearchBar } from "@/components/search/SearchBar";
+import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
 import { useLocalNow } from "@/contexts/LocalNowContext";
 import { useListings } from "@/contexts/ListingsContext";
 import { discoverPlaces } from "@/lib/catalog";
@@ -54,12 +54,12 @@ const FILTERS: { id: ExploreFilter; label: string; icon?: typeof Compass }[] = [
   { id: "all", label: "All" },
   { id: "nearby", label: "Nearby" },
   { id: "events", label: "Events" },
+  { id: "experiences", label: "Experiences" },
   { id: "places", label: "Places" },
   { id: "food", label: "Food & Drinks" },
-  { id: "experiences", label: "Experiences" },
+  { id: "people", label: "Mates" },
   { id: "communities", label: "Communities" },
   { id: "travel", label: "Travel & Stays" },
-  { id: "people", label: "Mates" },
 ];
 
 const CURATED_JOURNEYS = [
@@ -235,7 +235,7 @@ export function ExplorePage() {
             Explore {effectiveCity}
           </h1>
           <p className="mt-1 text-sm text-mute">
-            Discover local places, upcoming events, and curated experiences.
+            Places, events, and experiences.
           </p>
           <Link
             href="/birthday-freebies/au"
@@ -295,26 +295,18 @@ export function ExplorePage() {
       </header>
 
       {/* Search Field */}
-      <div className="relative mt-5">
-        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand" />
-        <input
-          type="search"
+      <div className="mt-5">
+        <SearchBar
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={setSearchQuery}
+          sizeVariant="md"
+          variant="card"
           placeholder={`Search places, events, or experiences in ${effectiveCity}…`}
           aria-label="Search explore"
-          className="h-12 w-full rounded-2xl bg-card pl-11 pr-10 text-sm text-ink ring-1 ring-line outline-none placeholder:text-mute focus:ring-2 focus:ring-brand/30 shadow-xs"
+          showFullSearchAction={Boolean(searchQuery.trim())}
+          fullSearchLabel="Full Search"
+          onFullSearch={(q) => openGlobalSearch({ query: q, category: "places" })}
         />
-        {searchQuery && (
-          <button
-            type="button"
-            onClick={() => setSearchQuery("")}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-mute hover:text-ink"
-            aria-label="Clear search"
-          >
-            <X size={16} />
-          </button>
-        )}
       </div>
 
       {/* Categories Pill Scroller */}
@@ -501,6 +493,15 @@ export function ExplorePage() {
           {/* Travel & Stays Showcase */}
           {showTravel && (
             <div className="space-y-6">
+              <div>
+                <h2 className="font-display text-xl font-bold text-ink flex items-center gap-2">
+                  <Hotel size={18} className="text-brand" />
+                  <span>Travel & Stays in {effectiveCity}</span>
+                </h2>
+                <p className="text-xs text-mute mt-0.5">
+                  Trip plans, stay concierge, and verified places to stay
+                </p>
+              </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs flex flex-col justify-between">
                   <div>
@@ -519,9 +520,9 @@ export function ExplorePage() {
 
                 <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs flex flex-col justify-between">
                   <div>
-                    <h3 className="font-display text-xl font-bold text-ink">Digital Compendium & Concierge</h3>
-                    <p className="mt-1 text-xs text-mute">
-                      One scan replaces binders and PDFs. 1-tap door PIN, Wi-Fi, in-room dining, and 24/7 AI receptionist.
+                    <h3 className="font-display text-xl font-bold text-ink">Digital Compendium &amp; Concierge</h3>
+                    <p className="mt-0.5 text-xs text-mute">
+                      1-tap door PIN, Wi-Fi, dining, and stay services.
                     </p>
                   </div>
                   <div className="mt-4 flex items-center gap-2">
@@ -540,11 +541,15 @@ export function ExplorePage() {
                     <h2 className="font-display text-xl font-bold text-ink flex items-center gap-2">
                       <Hotel size={18} className="text-brand" />
                       <span>Verified Stays in {effectiveCity}</span>
+                      <span className="text-xs font-semibold text-mute">({harbourStaySeeds().length})</span>
                     </h2>
                     <p className="text-xs text-mute mt-0.5">
-                      Hotels and boutique retreats powered by AirPal Digital Compendium.
+                      Hotels &amp; boutique retreats
                     </p>
                   </div>
+                  <Link href="/concierge" className="text-xs font-bold text-brand hover:underline shrink-0">
+                    All Stays →
+                  </Link>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
@@ -595,23 +600,16 @@ export function ExplorePage() {
                           )}
 
                           {p.facilities && p.facilities.length > 0 && (
-                            <div className="flex flex-wrap gap-1">
-                              {p.facilities.slice(0, 4).map((f) => (
-                                <span
-                                  key={f.id}
-                                  className="rounded-full bg-paper px-2 py-0.5 text-[10px] font-medium text-mute ring-1 ring-line"
-                                >
-                                  {f.name}
-                                </span>
-                              ))}
-                            </div>
+                            <p className="text-xs text-mute font-medium truncate">
+                              {p.facilities.slice(0, 4).map((f) => f.name).join(" · ")}
+                            </p>
                           )}
 
                           <div className="flex items-center gap-2 pt-1 border-t border-line/60">
                             <Button
                               size="sm"
                               onClick={() => nav(`/stay/${p.id}`)}
-                              className="h-9 flex-1 rounded-full text-xs font-bold"
+                              className="min-h-[44px] flex-1 rounded-full text-xs font-bold"
                             >
                               Digital Compendium
                             </Button>
@@ -619,7 +617,7 @@ export function ExplorePage() {
                               size="sm"
                               variant="ghost"
                               onClick={() => nav(`/concierge?p=${p.id}`)}
-                              className="h-9 flex-1 rounded-full text-xs font-semibold ring-1 ring-line"
+                              className="min-h-[44px] flex-1 rounded-full text-xs font-semibold ring-1 ring-line"
                             >
                               AI Concierge
                             </Button>

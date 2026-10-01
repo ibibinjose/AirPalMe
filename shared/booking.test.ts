@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   balanceDueCents,
+  bookingDisplayPaid,
   bookingFeesMatch,
   bookingValid,
   canRefundPaid,
@@ -12,15 +13,20 @@ import {
   canRetryPayout,
   checkoutPaymentCollected,
   DEFAULT_FEE_CONFIG,
+  hasCanceledParam,
   isBookingStatus,
   paymentStatusForPrice,
   payoutStatusAfterGuestPaid,
   payoutStatusForPrice,
   isBusinessProviderBooking,
   isOpenProviderBooking,
+  isTicketId,
   providerShareCents,
   quoteFees,
   repriceSourcedBooking,
+  ticketAdmitCheck,
+  ticketAdmitReasonLabel,
+  ticketIdFromSearch,
 } from "./booking";
 
 describe("booking engine", () => {
@@ -207,6 +213,77 @@ describe("booking engine", () => {
     expect(providerShareCents({ priceCents: 8000, feeCents: NaN })).toBe(
       quoteFees(8000).providerCents,
     );
+  });
+
+  it("detects Stripe cancel returns in both param spellings", () => {
+    expect(hasCanceledParam("?canceled=1")).toBe(true);
+    expect(hasCanceledParam("?canceled=true")).toBe(true);
+    expect(hasCanceledParam("?booked=b1&canceled=1")).toBe(true);
+    expect(hasCanceledParam("")).toBe(false);
+    expect(hasCanceledParam("?canceled=0")).toBe(false);
+    expect(hasCanceledParam("?canceled=")).toBe(false);
+    expect(hasCanceledParam("?booked=b1")).toBe(false);
+  });
+
+  it("treats Stripe-paid and free bookings as display-paid", () => {
+    expect(bookingDisplayPaid({ paymentStatus: "paid", priceCents: 8000 })).toBe(true);
+    expect(bookingDisplayPaid({ paymentStatus: "unpaid", priceCents: 0 })).toBe(true);
+    expect(bookingDisplayPaid({ paymentStatus: "unpaid", priceCents: 8000 })).toBe(false);
+    expect(bookingDisplayPaid({ paymentStatus: "deferred", priceCents: 8000 })).toBe(false);
+  });
+
+  it("validates ticket id segments", () => {
+    expect(isTicketId("bk_abc123")).toBe(true);
+    expect(isTicketId("bk-1")).toBe(true);
+    expect(isTicketId("")).toBe(false);
+    expect(isTicketId("a/b")).toBe(false);
+    expect(isTicketId("a b")).toBe(false);
+    expect(isTicketId("a".repeat(129))).toBe(false);
+    expect(isTicketId(undefined)).toBe(false);
+    expect(isTicketId(42)).toBe(false);
+  });
+
+  it("parses gate-scan ticket ids strictly", () => {
+    expect(ticketIdFromSearch("?ticket=bk_abc123")).toBe("bk_abc123");
+    expect(ticketIdFromSearch("?booked=x&ticket=bk-1")).toBe("bk-1");
+    expect(ticketIdFromSearch("")).toBeNull();
+    expect(ticketIdFromSearch("?booked=b1")).toBeNull();
+    expect(ticketIdFromSearch("?ticket=")).toBeNull();
+    expect(ticketIdFromSearch("?ticket=a/b")).toBeNull();
+    expect(ticketIdFromSearch("?ticket=a b")).toBeNull();
+    expect(ticketIdFromSearch(`?ticket=${"a".repeat(129)}`)).toBeNull();
+  });
+
+  it("admits paid-and-open bookings, refuses everything else with a reason", () => {
+    expect(
+      ticketAdmitCheck({ paymentStatus: "paid", priceCents: 8000, status: "confirmed" }),
+    ).toEqual({ valid: true });
+    expect(ticketAdmitCheck({ paymentStatus: "unpaid", priceCents: 0, status: "pending" })).toEqual({
+      valid: true,
+    });
+    expect(
+      ticketAdmitCheck({ paymentStatus: "unpaid", priceCents: 8000, status: "confirmed" }),
+    ).toEqual({ valid: false, reason: "unpaid" });
+    expect(ticketAdmitCheck({ paymentStatus: "paid", priceCents: 8000, status: "cancelled" })).toEqual(
+      { valid: false, reason: "cancelled" },
+    );
+    expect(ticketAdmitCheck({ paymentStatus: "paid", priceCents: 8000, status: "refunded" })).toEqual({
+      valid: false,
+      reason: "refunded",
+    });
+    expect(ticketAdmitCheck({ paymentStatus: "paid", priceCents: 8000, status: "disputed" })).toEqual({
+      valid: false,
+      reason: "disputed",
+    });
+    expect(ticketAdmitCheck({ paymentStatus: "paid", priceCents: 8000, status: "completed" })).toEqual(
+      { valid: false, reason: "completed" },
+    );
+  });
+
+  it("words every refusal for gate staff", () => {
+    for (const reason of ["unpaid", "cancelled", "refunded", "disputed", "completed"] as const) {
+      expect(ticketAdmitReasonLabel(reason).length).toBeGreaterThan(10);
+    }
   });
 
   it("scopes business inbox to the owning provider", () => {

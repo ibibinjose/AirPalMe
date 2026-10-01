@@ -3,6 +3,8 @@ import {
   adminCanTransition,
   canPublish,
   currentWeekId,
+  foundingPoolState,
+  isUpdateNoteKind,
   legalGateSatisfied,
   offerTargetValid,
   ownerCanTransition,
@@ -26,6 +28,16 @@ describe("promotion transitions", () => {
     expect(adminCanTransition("live", "live")).toBe(false);
     expect(adminCanTransition("archived", "live")).toBe(false);
     expect(adminCanTransition("archived", "draft")).toBe(true);
+  });
+});
+
+describe("update-note kinds", () => {
+  it("routes announcements to Updates, promos to Activity", () => {
+    expect(isUpdateNoteKind("announcement")).toBe(true);
+    expect(isUpdateNoteKind("giveaway_launched")).toBe(false);
+    expect(isUpdateNoteKind("winner_selected")).toBe(false);
+    expect(isUpdateNoteKind("here")).toBe(false);
+    expect(isUpdateNoteKind("")).toBe(false);
   });
 });
 
@@ -99,5 +111,23 @@ describe("draft validation", () => {
     expect(errors).toContain("Terms and conditions are required.");
     expect(errors).toContain("End date must be after the start date.");
     expect(errors).toContain("Entry limit must be at least 1.");
+  });
+});
+
+describe("foundingPoolState", () => {
+  it("reports uncapped when no cap is set", () => {
+    expect(foundingPoolState(500, undefined)).toMatchObject({ capped: false, full: false });
+    expect(foundingPoolState(500, 0)).toMatchObject({ capped: false });
+  });
+
+  it("tracks the first-100k pool honestly", () => {
+    const open = foundingPoolState(12408, 100000);
+    expect(open).toMatchObject({ capped: true, cap: 100000, used: 12408, left: 87592, full: false });
+    expect(open.percent).toBe(12);
+  });
+
+  it("clamps over-counts and marks a full pool", () => {
+    expect(foundingPoolState(100000, 100000)).toMatchObject({ full: true, left: 0, percent: 100 });
+    expect(foundingPoolState(120000, 100000)).toMatchObject({ full: true, used: 100000, left: 0 });
   });
 });

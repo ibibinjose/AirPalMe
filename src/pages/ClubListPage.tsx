@@ -42,14 +42,18 @@ export function ClubListPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 pb-10 pt-6">
+    <div className="mx-auto max-w-md px-4 pb-28 pt-6">
       <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Guest list</p>
       <h1 className="font-display mt-1 text-3xl font-semibold">{clubName}</h1>
       <p className="mt-2 text-sm text-mute">
         Mail invites to people who asked. Import AirPal Club if they opted in for invites.
       </p>
       {isAdmin && business && (
-        <button type="button" className="mt-3 text-sm text-brand" onClick={() => nav("/admin")}>
+        <button
+          type="button"
+          className="mt-3 inline-flex min-h-[44px] items-center text-sm font-semibold text-brand"
+          onClick={() => nav("/admin")}
+        >
           Also send as AirPal Club from Network
         </button>
       )}

@@ -33,11 +33,15 @@ export {
   addPlanStopRemote,
   votePlanStop,
   votePlanStopRemote,
+  voteDateOption,
+  voteDateOptionRemote,
   postPlanComment,
   postPlanCommentRemote,
   completePlan,
   completePlanRemote,
   getPlanByInviteCode,
+  getExperienceProof,
+  getExperienceProofRemote,
 } from "./plans";
 export { createManagedProduct, createManagedCheckoutSession } from "./managed-payments";
 export { placeDiningOrder, updateDiningOrderStatus } from "./dining";
@@ -76,10 +80,15 @@ export {
   seedPromotionDemo,
 } from "./promotions";
 export { createBroadcast, reviewBroadcast } from "./notifications";
+export { teardownDemoBusiness } from "./demo";
+export { verifyTicket, admitTicket } from "./gate";
+export { shareMeta } from "./share-meta";
+export { sendPlanBroadcast, sendPlanReminders, onPlanUpdated, inviteToPlan } from "./plan-notify";
 export { shareHere, stopHere } from "./here";
 export { startWave, waveAt, stopWave } from "./wave";
 export {
   getPulseByToken,
+  getBioPulse,
   submitPulseResponse,
   createPulse,
   publishPulse,

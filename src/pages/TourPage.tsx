@@ -35,13 +35,13 @@ export function TourPage() {
   const [step, setStep] = useState(0);
   const stop = tour.stops[step];
   return (
-    <div className="mx-auto max-w-lg px-4 pb-10">
+    <div className="mx-auto max-w-lg px-4 pb-28">
       <div className="flex items-center gap-3 pt-4">
         <button
           type="button"
           onClick={() => nav("/guide")}
           aria-label="Back to all walks"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full ring-1 ring-line bg-card transition hover:ring-brand/40 active:scale-95"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full ring-1 ring-line bg-card transition hover:ring-brand/40 active:scale-95"
         >
           <ArrowLeft size={16} />
         </button>
@@ -54,7 +54,7 @@ export function TourPage() {
             void trackFeatureEngagement("guide", "share_tour", { tourId: tour.id, title: tour.title });
             void shareTour({ id: tour.id, title: tour.title, duration: tour.duration });
           }}
-          className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-xs font-medium text-ink ring-1 ring-line hover:bg-paper hover:ring-brand/40 transition active:scale-95 cursor-pointer shadow-xs"
+          className="ml-auto inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-medium text-ink ring-1 ring-line hover:bg-paper hover:ring-brand/40 transition active:scale-95 cursor-pointer shadow-xs"
           title={`Share "${tour.title}" walk`}
           aria-label={`Share "${tour.title}" walk`}
         >
@@ -106,12 +106,12 @@ export function TourPage() {
         )}
       </div>
       <a
-        className="mt-4 block text-center text-sm text-brand"
+        className="mt-4 flex min-h-[48px] items-center justify-center rounded-full bg-card text-sm font-semibold text-brand ring-1 ring-line transition hover:bg-paper active:scale-[0.99]"
         href={mapsUrl({ lat: stop.lat, lng: stop.lng }, stop.name)}
         target="_blank"
         rel="noreferrer"
       >
-        Maps
+        Open this stop in Maps
       </a>
     </div>
   );

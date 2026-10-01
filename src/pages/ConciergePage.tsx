@@ -2,17 +2,21 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import {
   ArrowRight,
   Bell,
+  BookOpen,
   CalendarDays,
   CircleHelp,
   ClipboardCheck,
   HeartHandshake,
+  Map,
   Shield,
   Sparkles,
   Utensils,
   Wifi,
 } from "lucide-react";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { Button } from "@/components/ui/Button";
+import { TicketPass } from "@/components/plan/TicketPass";
+import { PaymentCanceledNotice } from "@/components/booking/PaymentCanceledNotice";
 import { Sheet } from "@/components/ui/Sheet";
 import { PlaceCard } from "@/components/discovery/PlaceCard";
 import { LocalFavorites } from "@/components/stay/LocalFavorites";
@@ -51,6 +55,7 @@ export function ConciergePage() {
   const { now, timeZone, city } = useLocalNow();
   const { calendarEvents, remoteNearby } = useEvents();
   const [, nav] = useLocation();
+  const bookedId = new URLSearchParams(useSearch()).get("booked") || "";
 
   // Tonight around the guest, for Ask answers — live DB data only.
   const tonightForAsk = useMemo(() => {
@@ -144,13 +149,13 @@ export function ConciergePage() {
 
   if (!hasStay && session.kind !== "marker") {
     return (
-      <div className="mx-auto max-w-lg px-4 pb-10">
+      <div className="mx-auto max-w-lg px-4 pb-28">
         <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
           {property.heroImage && <img src={property.heroImage} alt="" className="h-72 w-full object-cover" />}
           <div className="hero-scrim absolute inset-0" />
           <div className="absolute inset-x-0 bottom-0 p-6">
             <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-slate-950 border border-line shadow-xs mb-2">
-              Guest Companion · Sydney 🇦🇺
+              Guest Companion · Sydney
             </span>
             <h1 className="font-display text-3xl font-bold text-white">I&apos;m staying here</h1>
             <p className="mt-1 text-sm text-white/80">
@@ -188,11 +193,11 @@ export function ConciergePage() {
 
   if (loadingProperty && !property.name) {
     return (
-      <div className="mx-auto max-w-lg px-4 pb-10">
-        <div className="mt-2 h-48 animate-pulse rounded-3xl bg-card ring-1 ring-line" />
+      <div className="mx-auto max-w-lg px-4 pb-28">
+        <div className="mt-2 h-48 motion-safe:animate-pulse rounded-3xl bg-card ring-1 ring-line" />
         <div className="mt-5 grid grid-cols-2 gap-2">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-14 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
+            <div key={i} className="h-14 motion-safe:animate-pulse rounded-2xl bg-card ring-1 ring-line" />
           ))}
         </div>
       </div>
@@ -212,6 +217,8 @@ export function ConciergePage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-12 md:px-6">
+      <PaymentCanceledNotice />
+      {bookedId ? <TicketPass bookingId={bookedId} /> : null}
       {/* View Mode Switcher */}
       <div className="mb-5 flex items-center justify-center">
         <div className="flex rounded-full bg-paper p-1 ring-1 ring-line shadow-xs">
@@ -221,11 +228,13 @@ export function ConciergePage() {
               setViewMode("compendium");
               void triggerHaptic("light");
             }}
-            className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-black transition ${
+            aria-pressed={viewMode === "compendium"}
+            className={`flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-black transition ${
               viewMode === "compendium" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink"
             }`}
           >
-            <span>📖 Digital Compendium</span>
+            <BookOpen size={14} />
+            <span>Digital Compendium</span>
           </button>
           <button
             type="button"
@@ -233,11 +242,13 @@ export function ConciergePage() {
               setViewMode("concierge");
               void triggerHaptic("light");
             }}
-            className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-black transition ${
+            aria-pressed={viewMode === "concierge"}
+            className={`flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-black transition ${
               viewMode === "concierge" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink"
             }`}
           >
-            <span>🗺️ Stay &amp; Guide</span>
+            <Map size={14} />
+            <span>Stay &amp; Guide</span>
           </button>
         </div>
       </div>
@@ -286,7 +297,7 @@ export function ConciergePage() {
             </div>
             <Button
               size="sm"
-              className="relative shrink-0 font-extrabold gap-1.5 shadow-sm rounded-full bg-white text-brand hover:bg-amber-300 hover:text-slate-950 transition active:scale-95 px-3.5 h-9"
+              className="relative shrink-0 font-extrabold gap-1.5 shadow-sm rounded-full bg-white text-brand hover:bg-amber-300 hover:text-slate-950 transition active:scale-95 px-4 min-h-[44px]"
               onClick={() => nav("/companion")}
             >
               <span>Find Mate</span>
@@ -400,7 +411,11 @@ export function ConciergePage() {
           <div>
             <div className="flex items-end justify-between mb-3">
               <h2 className="font-display text-xl font-bold text-ink">{t("aroundYou")}</h2>
-              <button type="button" className="text-xs font-bold text-mute hover:text-ink" onClick={() => nav("/")}>
+              <button
+                type="button"
+                className="inline-flex min-h-[44px] items-center px-1 text-xs font-bold text-mute hover:text-ink"
+                onClick={() => nav("/")}
+              >
                 {t("all")}
               </button>
             </div>

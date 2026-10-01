@@ -20,6 +20,7 @@ import {
 import type { CalendarEventCategory } from "@shared/event";
 import { CALENDAR_CATEGORIES, CATEGORY_THEMES, type CalendarFilter, type CalendarViewMode } from "@/lib/calendar-utils";
 import { cn } from "@/lib/cn";
+import { triggerHaptic, triggerHapticSelection } from "@/lib/native";
 
 export interface CalendarSidebarProps {
   viewMode: CalendarViewMode;
@@ -203,7 +204,10 @@ export function CalendarSidebar({
             type="button"
             role="radio"
             aria-checked={viewMode === "month"}
-            onClick={() => onViewModeChange("month")}
+            onClick={() => {
+              void triggerHapticSelection();
+              onViewModeChange("month");
+            }}
             className={cn(
               "flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition active:scale-95 cursor-pointer",
               viewMode === "month" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink hover:bg-card/70",
@@ -216,7 +220,10 @@ export function CalendarSidebar({
             type="button"
             role="radio"
             aria-checked={viewMode === "week"}
-            onClick={() => onViewModeChange("week")}
+            onClick={() => {
+              void triggerHapticSelection();
+              onViewModeChange("week");
+            }}
             className={cn(
               "flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition active:scale-95 cursor-pointer",
               viewMode === "week" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink hover:bg-card/70",
@@ -229,7 +236,10 @@ export function CalendarSidebar({
             type="button"
             role="radio"
             aria-checked={viewMode === "day"}
-            onClick={() => onViewModeChange("day")}
+            onClick={() => {
+              void triggerHapticSelection();
+              onViewModeChange("day");
+            }}
             className={cn(
               "flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition active:scale-95 cursor-pointer",
               viewMode === "day" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink hover:bg-card/70",
@@ -242,7 +252,10 @@ export function CalendarSidebar({
             type="button"
             role="radio"
             aria-checked={viewMode === "list"}
-            onClick={() => onViewModeChange("list")}
+            onClick={() => {
+              void triggerHapticSelection();
+              onViewModeChange("list");
+            }}
             className={cn(
               "flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition active:scale-95 cursor-pointer",
               viewMode === "list" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink hover:bg-card/70",
@@ -263,25 +276,29 @@ export function CalendarSidebar({
           Search Events
         </label>
         <div className="relative">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-mute pointer-events-none" />
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mute pointer-events-none" />
           <input
             id={`${idPrefix}-search`}
             type="search"
             inputMode="search"
+            enterKeyHint="search"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search by title, tag (#jazz)..."
             aria-label="Search events by title or tag"
-            className="h-10 w-full rounded-xl bg-paper/90 pl-9 pr-8 text-xs text-ink placeholder:text-mute border border-line outline-none transition focus:bg-card focus:ring-2 focus:ring-brand focus:border-brand"
+            className="h-11 sm:h-10 w-full rounded-xl bg-paper/90 pl-10 pr-10 text-[16px] sm:text-xs text-ink placeholder:text-mute border border-line outline-none transition focus:bg-card focus:ring-2 focus:ring-brand focus:border-brand shadow-xs"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => onSearchChange("")}
               aria-label="Clear search input"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-mute hover:text-ink transition cursor-pointer"
+              className="absolute right-1 top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center text-mute hover:text-ink transition active:scale-95 cursor-pointer"
             >
-              <X size={14} />
+              <X size={15} />
             </button>
           )}
         </div>
@@ -315,7 +332,10 @@ export function CalendarSidebar({
               <button
                 key={c.id}
                 type="button"
-                onClick={() => onCategoryChange(c.id)}
+                onClick={() => {
+                  void triggerHapticSelection();
+                  onCategoryChange(c.id);
+                }}
                 aria-pressed={isSelected}
                 className={cn(
                   "w-full flex items-center justify-between rounded-xl px-3 py-2 text-xs transition cursor-pointer active:scale-[0.98]",
@@ -390,6 +410,7 @@ export function CalendarSidebar({
                   key={tag}
                   type="button"
                   onClick={() => {
+                    void triggerHapticSelection();
                     if (isActive) {
                       onSearchChange("");
                     } else {
@@ -449,7 +470,10 @@ export function CalendarSidebar({
               <button
                 key={opt.id}
                 type="button"
-                onClick={() => onFilterChange(opt.id)}
+                onClick={() => {
+                  void triggerHapticSelection();
+                  onFilterChange(opt.id);
+                }}
                 aria-pressed={isSelected}
                 className={cn(
                   "w-full flex items-center justify-between rounded-xl px-3 py-2 text-xs transition cursor-pointer active:scale-[0.98]",
@@ -485,7 +509,10 @@ export function CalendarSidebar({
         {hasActiveFilters && (
           <button
             type="button"
-            onClick={onResetFilters}
+            onClick={() => {
+              void triggerHaptic("light");
+              onResetFilters();
+            }}
             className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-card py-1.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-line/60 transition active:scale-95 cursor-pointer"
           >
             <RotateCcw size={12} />

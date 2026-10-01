@@ -315,7 +315,7 @@ export function MePage() {
                 <button
                   type="button"
                   onClick={handleCopyBioLink}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-full bg-paper px-3 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card active:scale-95 shrink-0 self-start sm:self-auto cursor-pointer"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-paper px-3 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card active:scale-95 shrink-0 self-start sm:self-auto cursor-pointer"
                   title="Copy your Meet & Hangout link"
                 >
                   {copiedBioLink ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} className="text-mute" />}
@@ -526,15 +526,61 @@ export function MePage() {
               )}
             </div>
           </section>
-          <Section title="Activity">
-            <Row kicker="Mate" title="Find someone to go with you" action="Open" onClick={() => nav("/mate")} />
-            <Row kicker="Requests" title="Your matches, chat and bookings" action="Open" onClick={() => nav("/mate")} />
+          {mine && (
+            <Section title="My Bio">
+              <Row
+                kicker="Public bio"
+                title={`@${mine.handle} — how the world sees you`}
+                action="View"
+                onClick={() => nav(bioPath(mine.handle))}
+              />
+              <Row
+                kicker="Edit"
+                title="Photo, links, catalog, story"
+                action="Open"
+                onClick={() => nav("/bio/edit")}
+              />
+            </Section>
+          )}
+
+          <Section title="Plans & Circles">
+            <Row kicker="Plan" title="Make one with family and friends" action="Create" onClick={() => nav("/plan/new")} />
+            <Row kicker="Trips" title="Your plans and invites" action="Open" onClick={() => nav("/plan")} />
+            <Row
+              kicker="Circle"
+              title={peopleCount > 0 ? `Audience · ${peopleCount} met` : "Your people in one place"}
+              action="Open"
+              onClick={() => nav("/circle")}
+            />
+            <Row
+              kicker="People met"
+              title={
+                peopleCount > 0
+                  ? `${peopleCount} ${peopleCount === 1 ? "person" : "people"} + catch-ups`
+                  : "Log everyone you meet"
+              }
+              action={peopleCount > 0 ? "Open" : "Add"}
+              onClick={() => nav("/me/people")}
+            />
+          </Section>
+
+          <Section title="Mate">
+            <Row
+              kicker="Find a Mate"
+              title="Want to do something? Find someone to go with you"
+              action="Open"
+              onClick={() => nav("/mate/request")}
+            />
+            <Row kicker="Matches" title="Your matches, chat and bookings" action="Open" onClick={() => nav("/mate")} />
             <Row
               kicker="Become a Mate"
-              title="Apply to go with people — reviewed by AirPal"
-              action="Apply"
+              title="Apply or check status — reviewed by AirPal"
+              action="Open"
               onClick={() => nav("/companion")}
             />
+          </Section>
+
+          <Section title="Wallet">
             <Row
               kicker="Tickets"
               title="Your AirPal Wallet — every ticket in one place"
@@ -546,7 +592,7 @@ export function MePage() {
           <PayoutSetupCard />
           <BookingsSection />
 
-          <Section title="Your spaces">
+          <Section title="Business">
             <Row
               kicker="Host"
               title={user.propertyIds?.length ? "Your place" : "List a hotel, venue, or campus"}
@@ -559,7 +605,6 @@ export function MePage() {
               action={business ? "Open" : "Add"}
               onClick={() => nav(partnerAccountPath({ signedIn: true, hasPlace: Boolean(business) }))}
             />
-            <Row kicker="Plan" title="With family and friends" action="Create" onClick={() => nav("/plan/new")} />
             <Row
               kicker="Event"
               title="Ticketed public night or experience"
@@ -576,28 +621,6 @@ export function MePage() {
               title={club ? "Invites and offers on" : "Join for invites and offers"}
               action={club ? "Open" : "Join"}
               onClick={() => nav("/club")}
-            />
-            <Row
-              kicker="Companion"
-              title="AirPal Mate application status"
-              action="Open"
-              onClick={() => nav("/companion")}
-            />
-            <Row
-              kicker="Circle"
-              title={peopleCount > 0 ? `Audience · ${peopleCount} met` : "Your people in one place"}
-              action="Open"
-              onClick={() => nav("/circle")}
-            />
-            <Row
-              kicker="People met"
-              title={
-                peopleCount > 0
-                  ? `${peopleCount} ${peopleCount === 1 ? "person" : "people"} + catch-ups`
-                  : "Log everyone you meet"
-              }
-              action={peopleCount > 0 ? "Open" : "Add"}
-              onClick={() => nav("/me/people")}
             />
           </Section>
 

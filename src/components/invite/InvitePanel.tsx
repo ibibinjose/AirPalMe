@@ -1,26 +1,34 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { Check, Copy, Send } from "lucide-react";
+import { Check, Copy, Send, Star } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
-import { fetchInviteOverview, inviteLinkFor, type InviteOverview } from "@/lib/app-invites";
+import { fetchInviteOverview, fetchStarBalance, inviteLinkFor, type InviteOverview } from "@/lib/app-invites";
+import { REFERRAL_INVITEE_STARS, REFERRAL_INVITER_STARS, STAR_TIERS, nextTier, tierForBalance } from "@shared/stars";
 import { shareContent } from "@/lib/share";
+import { cn } from "@/lib/cn";
 
-/** Send invites to join AirPal, and see who invited you + who joined with your code. */
+/** Send invites to join AirPal, earn Stars when mates complete experiences, and climb tiers. */
 export function InvitePanel({ handle, loading }: { handle?: string; loading?: boolean }) {
   const [, nav] = useLocation();
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
   const [overview, setOverview] = useState<InviteOverview | null>(null);
+  const [balance, setBalance] = useState(0);
 
   const link = handle ? inviteLinkFor(handle) : "";
+  const tier = tierForBalance(balance);
+  const upcoming = nextTier(balance);
 
   useEffect(() => {
     if (!user) return;
     let alive = true;
     void fetchInviteOverview(user.uid).then((o) => {
       if (alive) setOverview(o);
+    });
+    void fetchStarBalance(user.uid).then((b) => {
+      if (alive) setBalance(b);
     });
     return () => {
       alive = false;
@@ -64,7 +72,38 @@ export function InvitePanel({ handle, loading }: { handle?: string; loading?: bo
 
   return (
     <div className="rounded-[28px] ring-1 ring-line bg-card p-5">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Your invite code</p>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Your Stars</p>
+          <p className="font-display mt-1 text-2xl font-semibold">
+            ★ {balance} <span className="text-base font-medium text-mute">· {tier.name}</span>
+          </p>
+        </div>
+        {upcoming && (
+          <p className="shrink-0 text-right text-[11px] leading-4 text-mute">
+            {upcoming.stars - balance} to go
+            <br />
+            <span className="font-semibold text-ink">{upcoming.name}</span>
+          </p>
+        )}
+      </div>
+
+      <ol className="mt-4 space-y-2 border-t border-line pt-3 text-[13px]">
+        <li className="flex gap-2.5">
+          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-brand">1</span>
+          <span><strong>Share</strong> your link — your @handle is the code.</span>
+        </li>
+        <li className="flex gap-2.5">
+          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-brand">2</span>
+          <span><strong>Mate completes</strong> their first real experience.</span>
+        </li>
+        <li className="flex gap-2.5">
+          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-brand">3</span>
+          <span><strong>You both earn</strong> — {REFERRAL_INVITER_STARS} Stars for you, {REFERRAL_INVITEE_STARS} for them. Signups alone earn nothing.</span>
+        </li>
+      </ol>
+
+      <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Your invite code</p>
       <p className="font-display mt-1 text-2xl font-semibold">@{handle}</p>
 
       <div className="mt-3 flex items-center gap-2 rounded-2xl bg-paper px-3 py-2 ring-1 ring-line">
@@ -85,6 +124,11 @@ export function InvitePanel({ handle, loading }: { handle?: string; loading?: bo
       {overview?.invitedBy && (
         <p className="mt-4 border-t border-line pt-3 text-sm text-mute">
           Invited by <span className="font-semibold text-brand">@{overview.invitedBy.inviterHandle}</span>
+          {overview.invitedBy.rewardedAt ? (
+            <span> — you earned {REFERRAL_INVITEE_STARS} Stars!</span>
+          ) : (
+            <span> — complete your first experience to earn {REFERRAL_INVITEE_STARS} Stars.</span>
+          )}
         </p>
       )}
 
@@ -106,6 +150,28 @@ export function InvitePanel({ handle, loading }: { handle?: string; loading?: bo
         ) : (
           <p className="mt-1 text-[13px] text-mute">Nobody yet — share your link and they’ll show up here.</p>
         )}
+      </div>
+
+      <div className="mt-3 border-t border-line pt-3">
+        <p className="text-sm font-semibold">Star tiers</p>
+        <ul className="mt-2 space-y-1.5">
+          {STAR_TIERS.map((t) => {
+            const unlocked = balance >= t.stars;
+            return (
+              <li key={t.name} className="flex items-center gap-2.5 text-sm">
+                <Star
+                  size={15}
+                  className={cn("shrink-0", unlocked ? "fill-gold text-gold" : "fill-line text-line")}
+                />
+                <span className={cn("min-w-0 flex-1 truncate", unlocked ? "font-semibold" : "text-mute")}>
+                  {t.name}
+                  <span className="font-normal text-mute"> — {t.blurb}</span>
+                </span>
+                <span className="shrink-0 text-xs text-mute">{t.stars}★</span>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </div>
   );

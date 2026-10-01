@@ -31,7 +31,19 @@ export type PlanTheme =
   | "fluro"
   | "jetblack";
 
-export type PlanAttendeeStatus = "going" | "maybe" | "declined";
+export type PlanAttendeeStatus = "going" | "maybe" | "declined" | "waitlisted" | "pending";
+
+/**
+ * Who's-going privacy, host-controlled. Absent = everything visible
+ * (today's behaviour). Guests never see more than this allows on the
+ * invite page; the host always sees the full list.
+ */
+export interface PlanGuestListVisibility {
+  /** Hide attendee names/handles/avatars/notes from other guests. */
+  hideNames?: boolean;
+  /** Hide going/maybe headcounts from other guests. */
+  hideCount?: boolean;
+}
 
 export interface PlanAttendee {
   id: string; // uid or anonymous guest session ID
@@ -40,6 +52,17 @@ export interface PlanAttendee {
   avatar?: string;
   status: PlanAttendeeStatus;
   isAnonymous?: boolean;
+  /** Extra heads beyond the guest (party size = 1 + plusOnes). Counts toward host capacity. */
+  plusOnes?: number;
+  /** Answers to host guest questions, keyed by question id. */
+  answers?: Record<string, string>;
+  /** Host-confirmed attendance: this person showed up. */
+  checkedIn?: boolean;
+  checkedInAt?: string;
+  /** Post-experience rating (1–5) from someone who went. */
+  rating?: number;
+  /** Post-experience words (host-visible). */
+  review?: string;
   notes?: string;
   respondedAt: string;
 }
@@ -222,10 +245,12 @@ export interface HangoutPlan {
   stops: PlanStop[];
   attendees: PlanAttendee[];
   comments?: PlanComment[];
-  subscribers: string[]; // emails or user IDs following the plan
+  subscribers: string[]; // user IDs following the plan (legacy rows may hold emails)
   inviteCode: string; // 6-char unique short code
   /** Public plans appear on the live map and nearby feed; private stay invite-only. */
   isPublic?: boolean;
+  /** Demo-business marker: filtered from guest discovery, `demo-` ids skip KPIs. */
+  demo?: boolean;
   /** Dropped pin for the meeting point. Absent = shown as a city-area pin. */
   geo?: Geo;
   /** Interest tags used for nearby matching. */
@@ -234,6 +259,25 @@ export interface HangoutPlan {
   /** Server-stamped when status flips to completed via completePlanRemote. */
   completedAt?: string;
   completedByUid?: string;
+  /** Auto-reminder stamps, keyed by the plan date each nudge was sent for. */
+  remindersSent?: {
+    dayBefore?: string;
+    dayOf?: string;
+  };
+  /** Who's-going visibility. Absent = names and counts visible. */
+  guestList?: PlanGuestListVisibility;
+  /** Host approves every guest: going intents land as pending requests. */
+  requiresApproval?: boolean;
+  /** Host questions for guests (diet, transport, vibe). Answers ride attendee rows. */
+  guestQuestions?: PlanGuestQuestion[];
+  /** Co-hosts: attendee uids with full host powers (manage, broadcast, check in). */
+  coHostUids?: string[];
+  /** Why the host cancelled, shown to the crew. */
+  cancelReason?: string;
+  /** "When works?" candidates. The host locks one into date/time. */
+  dateOptions?: PlanDateOption[];
+  /** True once the host locks a date option in. */
+  datePollLocked?: boolean;
 
   // Experience Marketplace & Monetization Fields (Optional for full backward compatibility)
   isExperience?: boolean;
@@ -271,6 +315,412 @@ export function spotsLeft(plan: Pick<HangoutPlan, "capacity" | "spotsBooked">): 
 export function isSoldOut(plan: Pick<HangoutPlan, "capacity" | "spotsBooked">): boolean {
   const left = spotsLeft(plan);
   return left !== null && left <= 0;
+}
+
+/** Sanity cap per RSVP — host capacity is the real gate. */
+export const PLAN_PLUS_ONES_MAX = 5;
+/** Sanity cap for host guest limits. */
+export const PLAN_CAPACITY_MAX = 500;
+
+export function normalizePlusOnes(n: unknown): number {
+  const v = Math.floor(Number(n));
+  if (!Number.isFinite(v)) return 0;
+  return Math.min(PLAN_PLUS_ONES_MAX, Math.max(0, v));
+}
+
+/** Seats one attendee occupies: head + plus-ones. Only going counts. */
+export function attendeeSeats(a: Pick<PlanAttendee, "status" | "plusOnes"> | undefined): number {
+  if (!a || a.status !== "going") return 0;
+  return 1 + normalizePlusOnes(a.plusOnes);
+}
+
+/** Total seats taken by going attendees (party sizes), for host capacity. */
+export function headcountTaken(plan: Pick<HangoutPlan, "attendees">): number {
+  return (plan.attendees || []).reduce((n, a) => n + attendeeSeats(a), 0);
+}
+
+/** Spots left under the host guest limit, or null when the plan has no limit. */
+export function headcountLeft(plan: Pick<HangoutPlan, "attendees" | "capacity">): number | null {
+  const cap = Math.floor(Number(plan.capacity));
+  if (!Number.isFinite(cap) || cap <= 0) return null;
+  return Math.max(0, cap - headcountTaken(plan));
+}
+
+/** Clamp a host guest limit: empty/invalid clears it, otherwise 1..MAX. */
+export function normalizeCapacity(n: unknown): number | undefined {
+  if (n === undefined || n === null || String(n).trim() === "") return undefined;
+  const v = Math.floor(Number(n));
+  if (!Number.isFinite(v) || v <= 0) return undefined;
+  return Math.min(PLAN_CAPACITY_MAX, Math.max(1, v));
+}
+
+/** Experience money guardrails (dollars): finite, non-negative, capped. */
+export const EXPERIENCE_PRICE_MAX = 1000000;
+export const EXPERIENCE_CAPACITY_MAX = 100000;
+export const EXPERIENCE_TIERS_MAX = 20;
+
+export function clampExperienceMoney(n: unknown): number {
+  const v = Number(n || 0);
+  if (!Number.isFinite(v) || v <= 0) return 0;
+  return Math.min(EXPERIENCE_PRICE_MAX, Math.round(v * 100) / 100);
+}
+
+export function clampExperienceCapacity(n: unknown, fallback = 20): number {
+  const v = Math.floor(Number(n || 0));
+  if (!Number.isFinite(v) || v <= 0) return fallback;
+  return Math.min(EXPERIENCE_CAPACITY_MAX, v);
+}
+
+export function sanitizeCurrencyCode(n: unknown): string {
+  const code = String(n || "AUD").trim().toUpperCase();
+  return /^[A-Z]{3}$/.test(code) ? code : "AUD";
+}
+
+export function sanitizePricingTiers(tiers: unknown): PlanPricingTier[] | undefined {
+  if (!Array.isArray(tiers)) return undefined;
+  const clean = tiers.slice(0, EXPERIENCE_TIERS_MAX).map((row, i) => {
+    const t = (row || {}) as Partial<PlanPricingTier>;
+    return {
+      id: String(t.id || `tier-${i + 1}`),
+      name: String(t.name || `Tier ${i + 1}`).slice(0, 80),
+      description: t.description ? String(t.description).slice(0, 280) : undefined,
+      price: clampExperienceMoney(t.price),
+      capacity: clampExperienceCapacity(t.capacity),
+      spotsBooked: 0,
+      depositAmount: t.depositAmount === undefined ? undefined : clampExperienceMoney(t.depositAmount),
+    } as PlanPricingTier;
+  });
+  return clean.length ? clean : undefined;
+}
+
+export function sanitizeDepositConfig(config: unknown): PlanDepositConfig | undefined {
+  if (!config || typeof config !== "object") return undefined;
+  const c = config as Partial<PlanDepositConfig>;
+  const pct = Number(c.depositPercentage);
+  return {
+    depositAmount: clampExperienceMoney(c.depositAmount),
+    depositPercentage: Number.isFinite(pct) ? Math.min(100, Math.max(0, pct)) : undefined,
+    balanceDueDate: c.balanceDueDate ? String(c.balanceDueDate).slice(0, 20) : undefined,
+    balanceDueDaysBefore: c.balanceDueDaysBefore === undefined ? undefined : Math.max(0, Math.floor(Number(c.balanceDueDaysBefore)) || 0),
+    dueDateDaysBefore: c.dueDateDaysBefore === undefined ? undefined : Math.max(0, Math.floor(Number(c.dueDateDaysBefore)) || 0),
+    balanceDueDescription: c.balanceDueDescription ? String(c.balanceDueDescription).slice(0, 280) : undefined,
+  };
+}
+
+/** One "when works?" candidate. Votes decide; the host locks one in. */
+export interface PlanDateOption {
+  id: string;
+  /** YYYY-MM-DD calendar date. */
+  date: string;
+  /** HH:mm local time, optional — falls back to the plan time on lock. */
+  time?: string;
+  votes: number;
+  voterUids?: string[];
+  addedByUid?: string;
+  addedByName?: string;
+}
+
+/** YYYY-MM-DD + optional HH:mm, both real calendar values. */
+export function validDateOption(input: { date: unknown; time?: unknown }): string[] {
+  const errors: string[] = [];
+  const date = String(input.date || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    errors.push("Pick a date.");
+  } else {
+    const [y, m, d] = date.split("-").map(Number);
+    const dt = new Date(Date.UTC(y!, m! - 1, d!));
+    if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== m! - 1 || dt.getUTCDate() !== d) {
+      errors.push("Pick a real date.");
+    }
+  }
+  const time = String(input.time || "").trim();
+  if (time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(time)) errors.push("Pick a real time.");
+  return errors;
+}
+
+/** A live poll: options proposed, host hasn't locked one in. */
+export function hasOpenDatePoll(plan: Pick<HangoutPlan, "dateOptions" | "datePollLocked">): boolean {
+  return Boolean((plan.dateOptions || []).length) && !plan.datePollLocked;
+}
+
+/** A host question for guests: diet, transport, vibe. Answers ride the attendee row. */
+export type PlanQuestionType = "text" | "choice";
+
+export interface PlanGuestQuestion {
+  id: string;
+  question: string;
+  type: PlanQuestionType;
+  /** Choice options (single-select). Ignored for text. */
+  options?: string[];
+}
+
+export const PLAN_QUESTIONS_MAX = 10;
+export const PLAN_QUESTION_MAX = 140;
+export const PLAN_QUESTION_OPTIONS_MAX = 6;
+export const PLAN_ANSWER_MAX = 280;
+
+/** Host-side validation for a new question. */
+export function validGuestQuestion(input: { question: unknown; type: unknown; options?: unknown }): string[] {
+  const errors: string[] = [];
+  const question = String(input.question || "").trim();
+  if (!question) errors.push("Write the question.");
+  if (question.length > PLAN_QUESTION_MAX) errors.push(`Keep it under ${PLAN_QUESTION_MAX} characters.`);
+  const type = String(input.type || "text");
+  if (type !== "text" && type !== "choice") {
+    errors.push("Pick text or choice.");
+    return errors;
+  }
+  if (type === "choice") {
+    const raw = Array.isArray(input.options) ? input.options : [];
+    const options = raw.map((o) => String(o || "").trim()).filter(Boolean);
+    if (options.length < 2) errors.push("Choice needs at least 2 options.");
+    if (options.length > PLAN_QUESTION_OPTIONS_MAX) errors.push(`At most ${PLAN_QUESTION_OPTIONS_MAX} options.`);
+    if (new Set(options.map((o) => o.toLowerCase())).size !== options.length) errors.push("Options must differ.");
+  }
+  return errors;
+}
+
+/** Clean a guest answer: trim, clamp, and (for choice) only a listed option survives. */
+export function normalizeAnswer(question: Pick<PlanGuestQuestion, "type" | "options">, raw: unknown): string {
+  const text = String(raw || "").trim().slice(0, PLAN_ANSWER_MAX);
+  if (!text) return "";
+  if (question.type === "choice") {
+    const hit = (question.options || []).find((o) => o.toLowerCase() === text.toLowerCase());
+    return hit || "";
+  }
+  return text;
+}
+
+/** Choice tallies, most-picked first (zero-vote options included so hosts see the full menu). */
+export function choiceAnswerCounts(
+  question: Pick<PlanGuestQuestion, "id" | "options">,
+  attendees: Array<{ answers?: Record<string, string> } | undefined>,
+): Array<{ option: string; count: number }> {
+  const options = question.options || [];
+  const id = String(question.id || "");
+  const counts = new Map<string, number>(options.map((o) => [o, 0]));
+  for (const a of attendees || []) {
+    const v = String(a?.answers?.[id] || "").trim();
+    if (!v) continue;
+    const hit = options.find((o) => o.toLowerCase() === v.toLowerCase());
+    if (hit) counts.set(hit, (counts.get(hit) || 0) + 1);
+  }
+  return options.map((option) => ({ option, count: counts.get(option) || 0 })).sort((a, b) => b.count - a.count);
+}
+
+/** Free-text answers in attendee order. */
+export function textAnswers(
+  question: Pick<PlanGuestQuestion, "id">,
+  attendees: Array<{ answers?: Record<string, string> } | undefined>,
+): string[] {
+  const id = String(question.id || "");
+  const out: string[] = [];
+  for (const a of attendees || []) {
+    const v = String(a?.answers?.[id] || "").trim();
+    if (v) out.push(v);
+  }
+  return out;
+}
+
+/** Front-runner: most votes, earliest date breaks ties. */
+export function topDateOption(
+  plan: Pick<HangoutPlan, "dateOptions">,
+): PlanDateOption | undefined {
+  const opts = [...(plan.dateOptions || [])];
+  if (!opts.length) return undefined;
+  opts.sort((a, b) => b.votes - a.votes || String(a.date).localeCompare(String(b.date)));
+  return opts[0];
+}
+
+/** "Sat 20 Sep" + " · 7:00 PM" when a time is set. */
+export function formatDateOption(opt: Pick<PlanDateOption, "date" | "time">): string {
+  const time = String(opt.time || "").trim();
+  const d = new Date(`${opt.date}T${time || "12:00"}:00`);
+  const datePart = Number.isNaN(d.getTime())
+    ? opt.date
+    : new Intl.DateTimeFormat(undefined, { weekday: "short", day: "numeric", month: "short" }).format(d);
+  if (!time) return datePart;
+  const m = time.match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return `${datePart} · ${time}`;
+  let h = parseInt(m[1]!, 10);
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return `${datePart} · ${h}:${m[2]} ${ampm}`;
+}
+
+/** Pending join requests, oldest first. Host approves from this queue. */
+export function pendingRequests(plan: Pick<HangoutPlan, "attendees">): PlanAttendee[] {
+  return (plan.attendees || [])
+    .filter((a) => a?.status === "pending")
+    .sort((a, b) => String(a.respondedAt || "").localeCompare(String(b.respondedAt || "")));
+}
+
+/** Waitlist in promotion order: earliest response first. */
+export function waitlistQueue(plan: Pick<HangoutPlan, "attendees">): PlanAttendee[] {
+  return (plan.attendees || [])
+    .filter((a) => a?.status === "waitlisted")
+    .sort((a, b) => String(a.respondedAt || "").localeCompare(String(b.respondedAt || "")));
+}
+
+/** One shared-album photo, sourced from a photo comment on the plan. */
+export interface PlanPhoto {
+  commentId: string;
+  url: string;
+  caption: string;
+  authorId: string;
+  authorName: string;
+  createdAt: string;
+}
+
+/** Newest-first album feed: every comment carrying a photo, tag prefix stripped. */
+export function planPhotos(plan: Pick<HangoutPlan, "comments">): PlanPhoto[] {
+  return (plan.comments || [])
+    .filter((c) => c && c.photoUrl)
+    .map((c) => ({
+      commentId: c.id,
+      url: String(c.photoUrl),
+      caption: String(c.text || "").replace(/^\[(Meetup|Carpool|Tables|Photos)\]\s?/, "").trim(),
+      authorId: String(c.authorId || ""),
+      authorName: String(c.authorName || "Mate"),
+      createdAt: String(c.createdAt || ""),
+    }))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+/** 1-based position in line, or null when not waitlisted. */
+export function waitlistPosition(
+  plan: Pick<HangoutPlan, "attendees">,
+  attendeeId: string,
+): number | null {
+  const idx = waitlistQueue(plan).findIndex((a) => a.id === attendeeId);
+  return idx < 0 ? null : idx + 1;
+}
+
+/** Creator or co-host: full management powers over the plan. */
+export function isPlanManager(
+  plan: Pick<HangoutPlan, "creator" | "coHostUids">,
+  uid: string | null | undefined,
+): boolean {
+  if (!uid) return false;
+  if (plan.creator?.uid && plan.creator.uid === uid) return true;
+  return (plan.coHostUids || []).includes(uid);
+}
+
+/** Sanity cap — a plan needs hosts, not a committee. */
+export const PLAN_COHOSTS_MAX = 5;
+
+/** Co-host attendee rows (for badges and management), in RSVP order. */
+export function coHostAttendees(plan: Pick<HangoutPlan, "attendees" | "coHostUids">): PlanAttendee[] {
+  const set = new Set(plan.coHostUids || []);
+  if (!set.size) return [];
+  return (plan.attendees || []).filter((a) => a && set.has(a.id));
+}
+
+export interface PastCrewEntry {
+  id: string;
+  name: string;
+  handle?: string;
+  avatar?: string;
+  /** Plans shared with the viewer. */
+  sharedPlans: number;
+  /** Latest RSVP timestamp across shared plans. */
+  lastSeen: string;
+}
+
+/**
+ * People you've already been out with, for re-invites: attendees across your
+ * plans (excluding this plan's crew and yourself), ranked by shared plans
+ * then recency. Device-local guest ids never leave the device.
+ */
+export function pastCrew(
+  plans: Array<Pick<HangoutPlan, "id" | "attendees">>,
+  selfUid: string | null | undefined,
+  opts?: { excludeIds?: readonly string[]; excludePlanId?: string; limit?: number },
+): PastCrewEntry[] {
+  const excluded = new Set(opts?.excludeIds || []);
+  const limit = Math.max(1, Math.min(20, Math.floor(Number(opts?.limit)) || 8));
+  const byId = new Map<string, PastCrewEntry>();
+  for (const p of plans || []) {
+    if (!p || (opts?.excludePlanId && p.id === opts.excludePlanId)) continue;
+    for (const a of p.attendees || []) {
+      const id = String(a?.id || "").trim();
+      if (!id || id === selfUid || excluded.has(id) || id.startsWith("anon-")) continue;
+      const seen = String(a?.respondedAt || "");
+      const prev = byId.get(id);
+      if (prev) {
+        prev.sharedPlans += 1;
+        if (seen > prev.lastSeen) {
+          prev.lastSeen = seen;
+          prev.name = String(a?.name || prev.name);
+          if (a?.handle) prev.handle = String(a.handle);
+          if (a?.avatar) prev.avatar = String(a.avatar);
+        }
+      } else {
+        byId.set(id, {
+          id,
+          name: String(a?.name || "Mate"),
+          handle: a?.handle ? String(a.handle) : undefined,
+          avatar: a?.avatar ? String(a.avatar) : undefined,
+          sharedPlans: 1,
+          lastSeen: seen,
+        });
+      }
+    }
+  }
+  return Array.from(byId.values())
+    .sort((a, b) => b.sharedPlans - a.sharedPlans || b.lastSeen.localeCompare(a.lastSeen))
+    .slice(0, limit);
+}
+
+export const PLAN_REVIEW_MAX = 500;
+
+/** Star rating 1–5, or undefined when blank/invalid. */
+export function normalizeRating(n: unknown): number | undefined {
+  const v = Math.floor(Number(n));
+  if (!Number.isFinite(v) || v < 1 || v > 5) return undefined;
+  return v;
+}
+
+/** Review words, trimmed and clamped — blank becomes undefined. */
+export function normalizeReview(text: unknown): string | undefined {
+  const v = String(text || "").trim().slice(0, PLAN_REVIEW_MAX);
+  return v || undefined;
+}
+
+/** Aggregate stars across going attendees who rated: average + count. */
+export function planRatingSummary(plan: Pick<HangoutPlan, "attendees">): {
+  average: number;
+  count: number;
+} {
+  const ratings = (plan.attendees || [])
+    .filter((a) => a?.status === "going")
+    .map((a) => normalizeRating(a?.rating))
+    .filter((r): r is number => r !== undefined);
+  if (!ratings.length) return { average: 0, count: 0 };
+  const sum = ratings.reduce((n, r) => n + r, 0);
+  return { average: Math.round((sum / ratings.length) * 10) / 10, count: ratings.length };
+}
+
+/** How many showed (host-confirmed), regardless of RSVP status. */
+export function checkedInCount(plan: Pick<HangoutPlan, "attendees">): number {
+  return (plan.attendees || []).filter((a) => a?.checkedIn).length;
+}
+
+/** Host door check: flip one attendee's checked-in flag (stamp on, clear off). */
+export function setAttendeeCheckedIn(
+  attendees: readonly PlanAttendee[],
+  attendeeId: string,
+  on: boolean,
+  now = new Date().toISOString(),
+): PlanAttendee[] {
+  return (attendees || []).map((a) => {
+    if (!a || a.id !== attendeeId) return a;
+    if (on) return { ...a, checkedIn: true, checkedInAt: now };
+    const rest: PlanAttendee = { ...a };
+    delete rest.checkedIn;
+    delete rest.checkedInAt;
+    return rest;
+  });
 }
 
 export const ACTIVITY_INTERESTS = [
@@ -1567,6 +2017,17 @@ export interface VotePlanStopResponse {
   voted: boolean;
 }
 
+export interface VoteDateOptionRequest {
+  planId: string;
+  optionId: string;
+}
+
+export interface VoteDateOptionResponse {
+  ok: true;
+  votes: number;
+  voted: boolean;
+}
+
 export interface PostPlanCommentRequest {
   planId: string;
   text: string;
@@ -1596,6 +2057,13 @@ export function canCompletePlanStatus(status: PlanStatus): boolean {
   return COMPLETABLE_PLAN_STATUSES.includes(status);
 }
 
+/** Only a live plan can be cancelled — drafts, completed, and already-cancelled plans cannot. */
+export const CANCELLABLE_PLAN_STATUSES: readonly PlanStatus[] = ["open", "confirmed"];
+
+export function canCancelPlanStatus(status: PlanStatus): boolean {
+  return CANCELLABLE_PLAN_STATUSES.includes(status);
+}
+
 export interface GetPlanByInviteCodeRequest {
   inviteCode: string;
 }
@@ -1603,4 +2071,31 @@ export interface GetPlanByInviteCodeRequest {
 export interface GetPlanByInviteCodeResponse {
   ok: true;
   plan: HangoutPlan;
+}
+
+/**
+ * Public proof counters for the home hero. Aggregates only — no plan bodies,
+ * no names — so guests can see the loop is alive without reading anyone's plans.
+ */
+export interface ExperienceProofResponse {
+  ok: true;
+  /** Plans with status completed (all cities; Sydney beachhead dominates). */
+  completed: number;
+  /** Plans currently open or confirmed and joinable. */
+  live: number;
+}
+
+/**
+ * Plan-form `?date=` prefill. Valid YYYY-MM-DD on/after the zoned today
+ * wins; anything else falls back to today (never a past or malformed date).
+ */
+export function initialPlanDate(param: string | null, today: string): string {
+  if (param && /^\d{4}-\d{2}-\d{2}$/.test(param) && param >= today) return param;
+  return today;
+}
+
+/** Plan-form `?time=` prefill. Valid 24h HH:MM wins, else the fallback. */
+export function initialPlanTime(param: string | null, fallback: string): string {
+  if (param && /^([01]\d|2[0-3]):[0-5]\d$/.test(param)) return param;
+  return fallback;
 }

@@ -14,6 +14,7 @@ import {
   Info,
   Lock,
   Mail,
+  Megaphone,
   MessageSquare,
   Pencil,
   Printer,
@@ -23,6 +24,7 @@ import {
   ShieldCheck,
   Sparkles,
   Trash2,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { toast } from "sonner";
@@ -36,14 +38,28 @@ import { PlanShareModal } from "@/components/plan/PlanShareModal";
 import { PlanQrModal } from "@/components/plan/PlanQrModal";
 import { toPublicUrl } from "@/lib/public-origin";
 import { PlanRsvpSheet } from "@/components/plan/PlanRsvpSheet";
+import { PlanBroadcastSheet } from "@/components/plan/PlanBroadcastSheet";
+import { PlanDatePoll } from "@/components/plan/PlanDatePoll";
+import { PlanQuestionManager } from "@/components/plan/PlanQuestionManager";
+import { PlanAlbum } from "@/components/plan/PlanAlbum";
+import { PlanReviewPrompt } from "@/components/plan/PlanReviewPrompt";
 import { PlanGroupHeader } from "@/components/plan/PlanGroupHeader";
 import { PlanDiscussionWall } from "@/components/plan/PlanDiscussionWall";
 import { SafetyMenu } from "@/components/safety/SafetyMenu";
+import { PaymentCanceledNotice } from "@/components/booking/PaymentCanceledNotice";
+import { TicketGatePanel } from "@/components/booking/TicketGatePanel";
+import { ticketIdFromSearch } from "@shared/booking";
 import { ItineraryStopsManager } from "@/components/plan/ItineraryStopsManager";
 import { ExperienceBookingModal } from "@/components/plan/ExperienceBookingModal";
 import { HereCheckIn } from "@/components/circle/HereCheckIn";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { EXPERIENCE_CATEGORIES, hasTripItinerary, isSoldOut, isTicketed, type HangoutPlan } from "@shared/plan";
+import { PLAN_CAPACITY_MAX, headcountLeft, headcountTaken, isPlanManager, normalizeCapacity } from "@shared/plan";
+import { pendingRequests, waitlistPosition } from "@shared/plan";
+import { choiceAnswerCounts, textAnswers } from "@shared/plan";
+import { checkedInCount } from "@shared/plan";
+import { PLAN_COHOSTS_MAX, coHostAttendees } from "@shared/plan";
+import { planRatingSummary } from "@shared/plan";
 import { ExperienceReviews } from "@/components/plan/ExperienceReviews";
 import { TicketPass } from "@/components/plan/TicketPass";
 import { TicketSalesPanel } from "@/components/plan/TicketSalesPanel";
@@ -51,6 +67,7 @@ import { TripItinerary } from "@/components/plan/TripItinerary";
 import { exportPlanItineraryPdf } from "@/lib/plan-pdf";
 import { NotFoundPage } from "./NotFoundPage";
 import { localTodayStr, shouldAutoOpenInviteRsvp } from "@/lib/plan-invite";
+import { guestListDisplay, visibleAttendees } from "@shared/plan-notify";
 import { trackContentAction } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 import { SegmentedControl } from "@/components/design-system/companions";
@@ -73,6 +90,13 @@ export function PlanDetailPage() {
     getPlan,
     fetchPlan,
     rsvpPlan,
+    reviewRsvp,
+    submitPlanReview,
+    toggleCheckIn,
+    proposeDateOption,
+    lockDateOption,
+    reopenDatePoll,
+    voteDateOption,
     addStop,
     updateStop,
     removeStop,
@@ -87,6 +111,8 @@ export function PlanDetailPage() {
     deletePlan,
   } = usePlans();
   const { user } = useAuth();
+  // Gate-scan QR landings (?ticket=). Guests never fire it; the panel hides on denial.
+  const ticketId = user ? ticketIdFromSearch(search) : null;
 
   const [localPlan, setLocalPlan] = useState<HangoutPlan | undefined>(() => getPlan(targetId));
   const [loading, setLoading] = useState(!localPlan);
@@ -151,6 +177,7 @@ export function PlanDetailPage() {
   const [shareOpen, setShareOpen] = useState(() => searchParams.get("share") === "true");
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [rsvpOpen, setRsvpOpen] = useState(false);
+  const [broadcastOpen, setBroadcastOpen] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
   const [detailTab, setDetailTab] = useState<"overview" | "plan" | "map" | "people" | "chat">("overview");
@@ -189,9 +216,10 @@ export function PlanDetailPage() {
   const ticketed = plan ? isTicketed(plan) : false;
   const soldOut = plan ? isSoldOut(plan) : false;
 
+  // Creator or co-host: full management powers (host controls, reviews, check-in, polls, blasts).
   const isHost = useMemo(() => {
     if (!plan || !user) return false;
-    return Boolean(plan.creator.uid && plan.creator.uid === user.uid);
+    return isPlanManager(plan, user.uid);
   }, [plan, user]);
 
   const userAttendee = useMemo(() => {
@@ -199,6 +227,36 @@ export function PlanDetailPage() {
     const anonId = typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null;
     return plan.attendees.find((a) => (user?.uid && a.id === user.uid) || (anonId && a.id === anonId));
   }, [plan, user]);
+
+  // Who's-going privacy: host sees all, guests see names/counts per host toggles.
+  const viewerUid = user?.uid || (typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null);
+  const guestList = useMemo(
+    () => (plan ? visibleAttendees(plan, { uid: viewerUid, isHost }) : []),
+    [plan, viewerUid, isHost],
+  );
+  const guestListShowCount = !plan || isHost || guestListDisplay(plan).showCount;
+  // The sheet offers going/maybe/declined — queued guests reopen it on their intent.
+  const rsvpSheetStatus =
+    userAttendee?.status === "maybe" || userAttendee?.status === "declined" ? userAttendee.status : "going";
+  const pendingList = useMemo(() => (plan ? pendingRequests(plan) : []), [plan]);
+  const ratingSummary = useMemo(() => planRatingSummary(plan ?? { attendees: [] }), [plan]);
+  const crewReviews = useMemo(
+    () => (plan ? plan.attendees.filter((a) => a.status === "going" && (a.rating || a.review)) : []),
+    [plan],
+  );
+  const cohostRows = useMemo(() => (plan ? coHostAttendees(plan) : []), [plan]);
+  const eligibleCohosts = useMemo(() => {
+    if (!plan) return [];
+    const set = new Set(plan.coHostUids || []);
+    return (plan.attendees || []).filter(
+      (a) => a.status === "going" && a.id !== plan.creator.uid && !set.has(a.id),
+    );
+  }, [plan]);
+
+  const goingCount = useMemo(() => {
+    if (!plan) return 0;
+    return plan.attendees.filter((a) => a.status === "going").length;
+  }, [plan]);
 
   // Invite-link arrival: open the RSVP sheet automatically (once) for guests
   // who haven't joined yet — the link does the inviting, one tap completes it.
@@ -223,9 +281,13 @@ export function PlanDetailPage() {
 
   const isSubscribed = useMemo(() => {
     if (!plan) return false;
-    const id =
-      user?.email || user?.uid || (typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null);
-    return Boolean(id && plan.subscribers.includes(id));
+    const ids = [
+      user?.uid,
+      // Legacy rows may hold the email instead of the uid.
+      user?.email,
+      typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null,
+    ].filter(Boolean) as string[];
+    return ids.some((id) => plan.subscribers.includes(id));
   }, [plan, user]);
 
   const stopPins: MapPin[] = useMemo(
@@ -252,17 +314,8 @@ export function PlanDetailPage() {
     [plan],
   );
 
-  if (loading) {
-    return <PageLoading />;
-  }
-
-  if (!plan) {
-    return <NotFoundPage />;
-  }
-
-  const goingAttendees = plan ? plan.attendees.filter((a) => a.status === "going") : [];
-  const maybeAttendees = plan ? plan.attendees.filter((a) => a.status === "maybe") : [];
-
+  // Above the early returns: hooks must run in the same order on every render,
+  // including the loading → loaded transition on cold invite-link opens.
   const brainHealth = useMemo(() => {
     if (!plan) return null;
     return evaluatePlanHealth({
@@ -275,6 +328,17 @@ export function PlanDetailPage() {
     });
   }, [plan]);
 
+  if (loading) {
+    return <PageLoading />;
+  }
+
+  if (!plan) {
+    return <NotFoundPage />;
+  }
+
+  const goingAttendees = guestList.filter((a) => a.status === "going");
+  const maybeAttendees = guestList.filter((a) => a.status === "maybe");
+
   const handleDeletePlan = () => {
     if (window.confirm("Are you sure you want to delete this plan?")) {
       deletePlan(plan.id);
@@ -284,29 +348,48 @@ export function PlanDetailPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 md:py-10 pb-32">
-      {/* Top Floating Controls */}
-      <div className="flex items-center justify-between gap-3 mb-6">
+      <PaymentCanceledNotice />
+      {ticketId && (
+        <div className="mx-auto max-w-lg">
+          <TicketGatePanel ticketId={ticketId} />
+        </div>
+      )}
+      {/* Top Floating Controls — scrolls sideways on narrow phones so nothing clips */}
+      <div className="flex items-center gap-3 mb-6">
         <button
           type="button"
           onClick={() => {
             if (window.history.length > 1) window.history.back();
             else nav("/plan");
           }}
-          className="grid h-10 w-10 place-items-center rounded-full bg-card ring-1 ring-line text-ink hover:bg-paper transition"
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-card ring-1 ring-line text-ink hover:bg-paper transition"
           aria-label="Go back"
         >
           <ArrowLeft size={18} />
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="no-scrollbar flex min-w-0 flex-1 items-center justify-end gap-2 overflow-x-auto py-0.5">
           {isHost && (
             <Link
               href={`/plan/${plan.id}/edit`}
-              className="inline-flex h-10 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
+              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
             >
               <Pencil size={13} />
               <span className="hidden sm:inline">Edit Plan</span>
             </Link>
+          )}
+
+          {isHost && (
+            <button
+              type="button"
+              onClick={() => setBroadcastOpen(true)}
+              aria-label="Message everyone going"
+              title="Message everyone going"
+              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
+            >
+              <Megaphone size={13} />
+              <span className="hidden sm:inline">Message going</span>
+            </button>
           )}
 
           <button
@@ -314,7 +397,7 @@ export function PlanDetailPage() {
             onClick={() => followPlan(plan.id)}
             aria-label={isSubscribed ? "Following event" : "Follow event"}
             className={cn(
-              "inline-flex h-10 items-center gap-1.5 rounded-full px-3.5 text-xs font-medium ring-1 transition",
+              "inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-xs font-medium ring-1 transition",
               isSubscribed
                 ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 ring-amber-500/30"
                 : "bg-card text-ink ring-line hover:bg-paper",
@@ -329,7 +412,7 @@ export function PlanDetailPage() {
             size="sm"
             variant="ghost"
             onClick={() => setQrModalOpen(true)}
-            className="gap-1.5 rounded-full h-10 px-3 text-xs font-semibold ring-1 ring-line bg-card hover:bg-line/40 text-ink shadow-xs"
+            className="gap-1.5 rounded-full h-10 px-3 text-xs font-semibold ring-1 ring-line bg-card hover:bg-line/40 text-ink shadow-xs shrink-0"
             title="In-person Dynamic QR Code"
           >
             <QrCode size={14} />
@@ -339,7 +422,7 @@ export function PlanDetailPage() {
           <Button
             size="sm"
             onClick={() => setShareOpen(true)}
-            className="gap-1.5 rounded-full h-10 px-4 text-xs font-semibold shadow-sm"
+            className="gap-1.5 rounded-full h-10 px-4 text-xs font-semibold shadow-sm shrink-0"
           >
             <Share2 size={14} />
             <span>Invite Mates</span>
@@ -350,10 +433,12 @@ export function PlanDetailPage() {
       {/* Hero — the invitation */}
       <InvitationCard
         plan={plan}
-        userStatus={userAttendee?.status}
+        userStatus={userAttendee ? rsvpSheetStatus : null}
         onOpenRsvp={() => setRsvpOpen(true)}
         onOpenQr={() => setQrModalOpen(true)}
         onOpenBooking={() => setBookingOpen(true)}
+        viewerUid={viewerUid}
+        viewerIsHost={isHost}
       />
 
       {/* Host Controls: Privacy toggle */}
@@ -387,6 +472,120 @@ export function PlanDetailPage() {
         </div>
       )}
 
+      {/* Host Controls: who's-going visibility */}
+      {isHost && (
+        <div className="mt-4 rounded-2xl bg-card px-4 py-2 ring-1 ring-line">
+          <p className="pt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Who's going</p>
+          {(
+            [
+              { key: "hideNames", label: "Guest names", hint: "Show who else is coming" },
+              { key: "hideCount", label: "Headcount", hint: "Show going / maybe numbers" },
+            ] as const
+          ).map((row) => {
+            const hidden = Boolean(plan.guestList?.[row.key]);
+            return (
+              <div key={row.key} className="flex items-center justify-between gap-3 border-t border-line/60 py-2.5">
+                <span className="min-w-0">
+                  <span className="block truncate text-xs font-medium text-ink">{row.label}</span>
+                  <span className="block truncate text-[11px] text-mute">{row.hint}</span>
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={!hidden}
+                  aria-label={row.label}
+                  onClick={() =>
+                    updatePlan(plan.id, { guestList: { ...(plan.guestList || {}), [row.key]: !hidden } })
+                  }
+                  className={cn(
+                    "relative h-7 w-12 shrink-0 rounded-full transition",
+                    !hidden ? "bg-brand" : "bg-line",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all",
+                      !hidden ? "left-[22px]" : "left-0.5",
+                    )}
+                  />
+                </button>
+              </div>
+            );
+          })}
+          <div className="flex items-center justify-between gap-3 border-t border-line/60 py-2.5">
+            <span className="min-w-0">
+              <span className="block truncate text-xs font-medium text-ink">Max guests</span>
+              <span className="block truncate text-[11px] text-mute">
+                {plan.capacity && plan.capacity > 0
+                  ? `${headcountTaken(plan)} of ${plan.capacity} spots filled`
+                  : "No guest limit"}
+              </span>
+            </span>
+            <input
+              key={`cap-${plan.id}-${plan.capacity ?? "open"}`}
+              type="number"
+              min={1}
+              max={PLAN_CAPACITY_MAX}
+              defaultValue={plan.capacity ?? ""}
+              placeholder="No limit"
+              inputMode="numeric"
+              aria-label="Max guests"
+              onBlur={(e) => {
+                const next = normalizeCapacity(e.currentTarget.value);
+                if (next !== plan.capacity) updatePlan(plan.id, { capacity: next });
+                else e.currentTarget.value = plan.capacity != null ? String(plan.capacity) : "";
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") e.currentTarget.blur();
+              }}
+              className="h-11 w-24 shrink-0 rounded-2xl bg-paper px-3 text-center text-sm text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+            />
+          </div>
+          <div className="flex items-center justify-between gap-3 border-t border-line/60 py-2.5">
+            <span className="min-w-0">
+              <span className="block truncate text-xs font-medium text-ink">Approve guests</span>
+              <span className="block truncate text-[11px] text-mute">Going taps land as requests</span>
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={Boolean(plan.requiresApproval)}
+              aria-label="Approve guests"
+              onClick={() => updatePlan(plan.id, { requiresApproval: !plan.requiresApproval })}
+              className={cn(
+                "relative h-7 w-12 shrink-0 rounded-full transition",
+                plan.requiresApproval ? "bg-brand" : "bg-line",
+              )}
+            >
+              <span
+                className={cn(
+                  "absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all",
+                  plan.requiresApproval ? "left-[22px]" : "left-0.5",
+                )}
+              />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Host Controls: guest questions */}
+      {isHost && (
+        <div className="mt-4 rounded-2xl bg-card px-4 py-2 ring-1 ring-line">
+          <p className="pt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Guest questions</p>
+          <PlanQuestionManager
+            questions={plan.guestQuestions || []}
+            onAdd={(q) =>
+              updatePlan(plan.id, {
+                guestQuestions: [...(plan.guestQuestions || []), { id: `q-${Date.now().toString(36)}`, ...q }],
+              })
+            }
+            onRemove={(id) =>
+              updatePlan(plan.id, { guestQuestions: (plan.guestQuestions || []).filter((q) => q.id !== id) })
+            }
+          />
+        </div>
+      )}
+
       {/* Close the loop — Brain north star is completed experiences */}
       {(isHost || userAttendee?.status === "going") &&
         plan.status !== "completed" &&
@@ -398,6 +597,11 @@ export function PlanDetailPage() {
               <p className="mt-0.5 text-[13px] text-mute">
                 Mark this complete so AirPal counts a real experience — not just an RSVP.
               </p>
+              {isHost && checkedInCount(plan) > 0 && (
+                <p className="mt-0.5 text-[13px] font-semibold text-emerald-700 dark:text-emerald-300">
+                  {checkedInCount(plan)} checked in so far.
+                </p>
+              )}
             </div>
             <Button
               size="sm"
@@ -415,7 +619,28 @@ export function PlanDetailPage() {
       {plan.status === "completed" && (
         <div className="mt-4 flex items-center gap-2 rounded-2xl bg-emerald-500/10 px-4 py-3 text-[13px] font-medium text-emerald-800 ring-1 ring-emerald-500/20 dark:text-emerald-200">
           <CheckCircle2 size={16} className="shrink-0" />
-          Experience completed
+          <span>
+            Experience completed
+            {ratingSummary.count > 0 && (
+              <span className="font-semibold">
+                {" "}
+                · ★ {ratingSummary.average} ({ratingSummary.count} rating{ratingSummary.count === 1 ? "" : "s"})
+              </span>
+            )}
+          </span>
+        </div>
+      )}
+
+      {plan.status === "completed" &&
+        userAttendee?.status === "going" &&
+        userAttendee.rating === undefined && (
+          <PlanReviewPrompt onSubmit={(input) => submitPlanReview(plan.id, input)} />
+        )}
+
+      {plan.status === "cancelled" && (
+        <div className="mt-4 rounded-2xl bg-paper px-4 py-3 ring-1 ring-line">
+          <p className="text-[13px] font-semibold text-ink">This plan was cancelled</p>
+          {plan.cancelReason && <p className="mt-0.5 text-[13px] text-mute">{plan.cancelReason}</p>}
         </div>
       )}
 
@@ -423,7 +648,7 @@ export function PlanDetailPage() {
         <div className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs">
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1.5 text-xs font-bold text-brand uppercase tracking-wider">
-              <Sparkles size={14} className="animate-pulse" />
+              <Sparkles size={14} className="motion-safe:animate-pulse" />
               AirPal Brain · Experience Readiness
             </span>
             <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-bold text-brand">
@@ -444,7 +669,7 @@ export function PlanDetailPage() {
         </div>
       )}
 
-      <div className="mt-6">
+      <div className="sticky top-0 z-20 -mx-4 mt-6 bg-paper/95 px-4 py-2 backdrop-blur">
         <SegmentedControl
           label="Plan sections"
           value={detailTab}
@@ -464,6 +689,20 @@ export function PlanDetailPage() {
 
       {detailTab === "overview" && (
         <>
+
+      {/* Date poll — "when works?" before the RSVP ask */}
+      <PlanDatePoll
+        plan={plan}
+        isHost={isHost}
+        viewerUid={viewerUid}
+        onVote={(optionId) => void voteDateOption(plan.id, optionId)}
+        onPropose={(input) => proposeDateOption(plan.id, input)}
+        onLock={(optionId) => {
+          const updated = lockDateOption(plan.id, optionId);
+          if (updated) setBroadcastOpen(true);
+        }}
+        onReopen={() => reopenDatePoll(plan.id)}
+      />
 
       {/* RSVP Status — hidden for ticketed experiences: booking IS the RSVP */}
       {!ticketed && (
@@ -532,7 +771,7 @@ export function PlanDetailPage() {
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
               userAttendee?.status === "going"
-                ? "bg-emerald-500 text-white shadow-xs"
+                ? "bg-emerald-700 text-white shadow-xs"
                 : "bg-paper text-ink/80 hover:bg-emerald-500/10 hover:text-emerald-600 ring-1 ring-line",
             )}
           >
@@ -550,7 +789,7 @@ export function PlanDetailPage() {
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
               userAttendee?.status === "maybe"
-                ? "bg-amber-500 text-white shadow-xs"
+                ? "bg-amber-700 text-white shadow-xs"
                 : "bg-paper text-ink/80 hover:bg-amber-500/10 hover:text-amber-600 ring-1 ring-line",
             )}
           >
@@ -586,6 +825,27 @@ export function PlanDetailPage() {
       </>
       )}
 
+      {/* Going alone? Find an AirPal (§11 key CTA: Plan → Mate loop) */}
+      <button
+        type="button"
+        onClick={() => {
+          void triggerHaptic("light");
+          nav("/mate/request");
+        }}
+        className="mt-4 flex w-full cursor-pointer items-center gap-3 rounded-3xl bg-card p-4 text-left ring-1 ring-line shadow-xs transition hover:ring-brand/30 active:scale-[0.99]"
+      >
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
+          <Users size={20} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-bold text-ink">Going alone? Find an AirPal</span>
+          <span className="block truncate text-xs text-mute">Get matched with someone to go with you</span>
+        </span>
+        <span className="shrink-0 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-bold text-brand">
+          Find a Mate
+        </span>
+      </button>
+
       <HereCheckIn placeName={plan.destination} planId={plan.id} />
 
       {/* Experience Showcase & Booking Card (When plan is marked as experience) */}
@@ -608,7 +868,7 @@ export function PlanDetailPage() {
             <Button
               onClick={() => setBookingOpen(true)}
               disabled={soldOut}
-              className="gap-2 rounded-2xl h-11 px-5 font-bold shadow-lg bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700"
+              className="gap-2 rounded-2xl h-11 px-5 font-bold shadow-lg bg-amber-700 text-white hover:bg-amber-800"
             >
               <CreditCard size={16} />
               <span>{soldOut ? "Sold out" : ticketed ? "Buy ticket" : "Book spot"}</span>
@@ -819,6 +1079,9 @@ export function PlanDetailPage() {
       {hasTripItinerary(plan) ? <TripItinerary plan={plan} /> : null}
       {plan.isExperience ? <ExperienceReviews planId={plan.id} /> : null}
 
+      {/* Shared album — Remember → Repeat */}
+      <PlanAlbum plan={plan} canPost={Boolean(user)} onPostPhoto={(text, photoUrl) => addComment(plan.id, text, photoUrl)} />
+
         </>
       )}
 
@@ -898,7 +1161,7 @@ export function PlanDetailPage() {
               reorderStops(plan.id, fromIdx, toIdx);
             }}
             onVoteStop={(stopId) => {
-              voteStop(plan.id, stopId);
+              void voteStop(plan.id, stopId);
             }}
           />
         )}
@@ -936,8 +1199,210 @@ export function PlanDetailPage() {
         <>
 
       <div className="mt-8">
-        <PlanGroupHeader plan={plan} onInvite={() => setShareOpen(true)} onRsvp={() => setRsvpOpen(true)} />
+        <PlanGroupHeader
+          plan={plan}
+          onInvite={() => setShareOpen(true)}
+          onRsvp={() => setRsvpOpen(true)}
+          viewerUid={viewerUid}
+          viewerIsHost={isHost}
+        />
       </div>
+
+      {/* Host Controls: co-hosts */}
+      {isHost && (
+        <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Crew</span>
+          <h2 className="font-display text-xl font-bold text-ink">Co-hosts</h2>
+          <p className="mt-0.5 text-[13px] text-mute">Co-hosts can manage, message, check in and lock dates.</p>
+          {cohostRows.length > 0 && (
+            <div className="mt-4 space-y-2">
+              {cohostRows.map((att) => (
+                <div
+                  key={att.id}
+                  className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-card text-xs font-bold text-ink ring-1 ring-line uppercase">
+                      {att.name.charAt(0)}
+                    </span>
+                    <p className="truncate text-xs sm:text-sm font-semibold text-ink">{att.name}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      updatePlan(plan.id, { coHostUids: (plan.coHostUids || []).filter((id) => id !== att.id) })
+                    }
+                    aria-label={`Remove co-host ${att.name}`}
+                    className="inline-flex h-11 shrink-0 items-center rounded-full px-4 text-xs font-semibold text-mute ring-1 ring-line hover:text-ink transition active:scale-95"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {eligibleCohosts.length > 0 && (
+            <div className="mt-4">
+              <p className="text-xs font-semibold text-ink/80 mb-1.5">Add from going</p>
+              <div className="space-y-2">
+                {eligibleCohosts.map((att) => (
+                  <div
+                    key={att.id}
+                    className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-card text-xs font-bold text-ink ring-1 ring-line uppercase">
+                        {att.name.charAt(0)}
+                      </span>
+                      <p className="truncate text-xs sm:text-sm font-semibold text-ink">{att.name}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = [...(plan.coHostUids || []), att.id];
+                        if (next.length > PLAN_COHOSTS_MAX) {
+                          toast.message(`Up to ${PLAN_COHOSTS_MAX} co-hosts.`);
+                          return;
+                        }
+                        updatePlan(plan.id, { coHostUids: next });
+                      }}
+                      aria-label={`Make ${att.name} a co-host`}
+                      className="inline-flex h-11 shrink-0 items-center rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
+                    >
+                      Add
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Host Controls: join requests */}
+      {isHost && pendingList.length > 0 && (
+        <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Requests</span>
+          <h2 className="font-display text-xl font-bold text-ink">Requests to join</h2>
+          <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
+            {pendingList.map((att) => (
+              <div
+                key={att.id}
+                className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-card text-xs font-bold text-ink ring-1 ring-line uppercase">
+                    {att.name.charAt(0)}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-xs sm:text-sm font-semibold text-ink">
+                      {att.name}
+                      {att.plusOnes ? <span className="text-mute font-normal"> +{att.plusOnes}</span> : null}
+                    </p>
+                    {att.notes && <p className="truncate text-[11px] text-mute">{att.notes}</p>}
+                    {(plan.guestQuestions || []).map((q) => {
+                      const v = att.answers?.[q.id];
+                      if (!v) return null;
+                      return (
+                        <p key={q.id} className="truncate text-[11px] text-mute">
+                          {q.question} — <span className="font-medium text-ink/80">{v}</span>
+                        </p>
+                      );
+                    })}
+                  </div>
+                </div>
+                <span className="flex shrink-0 items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => reviewRsvp(plan.id, att.id, "decline")}
+                    aria-label={`Decline ${att.name}`}
+                    className="inline-flex h-11 min-w-11 items-center justify-center rounded-full px-3 text-xs font-semibold text-mute ring-1 ring-line hover:bg-line/40 transition active:scale-95"
+                  >
+                    Decline
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => reviewRsvp(plan.id, att.id, "approve")}
+                    aria-label={`Approve ${att.name}`}
+                    className="inline-flex h-11 min-w-11 items-center justify-center rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
+                  >
+                    Approve
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Host Controls: guest answers */}
+      {isHost && (plan.guestQuestions || []).length > 0 && (
+        <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Guest answers</span>
+          <h2 className="font-display text-xl font-bold text-ink">What the crew said</h2>
+          <div className="mt-4 space-y-4">
+            {(plan.guestQuestions || []).map((q) => {
+              const counts = q.type === "choice" ? choiceAnswerCounts(q, plan.attendees) : [];
+              const texts = q.type === "text" ? textAnswers(q, plan.attendees).slice(0, 10) : [];
+              if (q.type === "text" && !texts.length) return null;
+              return (
+                <div key={q.id}>
+                  <p className="text-xs font-semibold text-ink">{q.question}</p>
+                  {q.type === "choice" ? (
+                    <div className="mt-1.5 space-y-1">
+                      {counts.map(({ option, count }) => (
+                        <div key={option} className="flex items-center gap-2 text-[11px]">
+                          <span className="w-32 shrink-0 truncate text-mute">{option}</span>
+                          <span className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-paper ring-1 ring-line">
+                            <span
+                              className="block h-full rounded-full bg-brand"
+                              style={{
+                                width: `${Math.round(
+                                  (count / Math.max(1, goingAttendees.length)) * 100,
+                                )}%`,
+                              }}
+                            />
+                          </span>
+                          <span className="w-6 shrink-0 text-right font-semibold text-ink">{count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <ul className="mt-1.5 space-y-1">
+                      {texts.map((t, i) => (
+                        <li key={i} className="truncate text-[11px] text-mute">
+                          “{t}”
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Host Controls: crew reviews */}
+      {isHost && crewReviews.length > 0 && (
+        <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Crew reviews</span>
+          <h2 className="font-display text-xl font-bold text-ink">
+            ★ {ratingSummary.average} · {ratingSummary.count} rating{ratingSummary.count === 1 ? "" : "s"}
+          </h2>
+          <ul className="mt-4 space-y-2">
+            {crewReviews.map((att) => (
+              <li key={att.id} className="rounded-2xl bg-paper px-3.5 py-2.5 ring-1 ring-line">
+                <p className="text-xs font-semibold text-ink">
+                  {att.name}
+                  {att.rating !== undefined && <span className="text-mute font-normal"> · ★ {att.rating}</span>}
+                </p>
+                {att.review && <p className="mt-0.5 text-[13px] leading-5 text-ink/80">{att.review}</p>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Attendees Guest List */}
       <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
@@ -947,19 +1412,32 @@ export function PlanDetailPage() {
             <h2 className="font-display text-xl font-bold text-ink">Mates Attending</h2>
           </div>
           <div className="flex items-center gap-2">
-            <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/20">
-              {goingAttendees.length} Going
-            </span>
-            {maybeAttendees.length > 0 && (
-              <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/20">
-                {maybeAttendees.length} Maybe
+            {guestListShowCount ? (
+              <>
+                <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/20">
+                  {goingAttendees.length} Going
+                </span>
+                {maybeAttendees.length > 0 && (
+                  <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/20">
+                    {maybeAttendees.length} Maybe
+                  </span>
+                )}
+                {isHost && goingAttendees.length > 0 && (
+                  <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-semibold text-brand ring-1 ring-brand/20">
+                    {checkedInCount(plan)}/{goingAttendees.length} checked in
+                  </span>
+                )}
+              </>
+            ) : (
+              <span className="rounded-full bg-paper px-2.5 py-0.5 text-xs font-medium text-mute ring-1 ring-line">
+                Guest list private
               </span>
             )}
           </div>
         </div>
 
         <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
-          {plan.attendees.map((att) => (
+          {guestList.map((att) => (
             <div
               key={att.id}
               className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line"
@@ -971,13 +1449,36 @@ export function PlanDetailPage() {
                 <div className="min-w-0">
                   <p className="truncate text-xs sm:text-sm font-semibold text-ink">
                     {att.name}
+                    {att.plusOnes ? <span className="text-mute font-normal"> +{att.plusOnes}</span> : null}
                     {att.handle && <span className="text-mute font-normal"> (@{att.handle})</span>}
+                    {plan.coHostUids?.includes(att.id) && (
+                      <span className="ml-1.5 rounded-full bg-brand/10 px-2 py-0.2 text-[10px] font-medium text-brand">
+                        Co-host
+                      </span>
+                    )}
                   </p>
                   {att.notes && <p className="truncate text-[11px] text-mute">{att.notes}</p>}
                 </div>
               </div>
 
               <span className="flex shrink-0 items-center gap-1">
+                {isHost && att.status === "going" && (
+                  <button
+                    type="button"
+                    onClick={() => toggleCheckIn(plan.id, att.id)}
+                    aria-pressed={Boolean(att.checkedIn)}
+                    aria-label={att.checkedIn ? `Uncheck ${att.name}` : `Check in ${att.name}`}
+                    title={att.checkedIn ? "Checked in" : "Check in"}
+                    className={cn(
+                      "grid h-11 w-11 place-items-center rounded-full ring-1 transition active:scale-95",
+                      att.checkedIn
+                        ? "bg-emerald-500 text-white ring-emerald-500"
+                        : "text-mute ring-line hover:bg-paper hover:text-ink",
+                    )}
+                  >
+                    <Check size={16} />
+                  </button>
+                )}
                 <span
                   className={cn(
                     "rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider shrink-0",
@@ -988,7 +1489,11 @@ export function PlanDetailPage() {
                         : "bg-paper text-mute",
                   )}
                 >
-                  {att.status}
+                  {att.status === "waitlisted"
+                    ? `waitlisted · #${waitlistPosition(plan, att.id) ?? "–"}`
+                    : att.status === "pending"
+                      ? "awaiting host"
+                      : att.status}
                 </span>
                 {userAttendee && att.id !== userAttendee.id && (
                   <SafetyMenu targetUid={att.id} targetName={att.name} planId={plan.id} />
@@ -1027,7 +1532,7 @@ export function PlanDetailPage() {
         <PlanDiscussionWall
           plan={plan}
           onPostComment={(text, photoUrl) => {
-            addComment(plan.id, text, photoUrl);
+            void addComment(plan.id, text, photoUrl);
           }}
         />
       </div>
@@ -1055,16 +1560,29 @@ export function PlanDetailPage() {
       )}
 
       {/* Modals */}
-      <PlanShareModal plan={plan} open={shareOpen} onClose={() => setShareOpen(false)} />
+      <PlanShareModal plan={plan} open={shareOpen} onClose={() => setShareOpen(false)} canInvite={isHost} />
       <PlanQrModal plan={plan} isOpen={qrModalOpen} onClose={() => setQrModalOpen(false)} />
+
+      <PlanBroadcastSheet
+        open={broadcastOpen}
+        onClose={() => setBroadcastOpen(false)}
+        planId={plan.id}
+        planTitle={plan.title}
+        goingCount={goingCount}
+      />
 
       <PlanRsvpSheet
         open={rsvpOpen}
         onClose={() => setRsvpOpen(false)}
-        currentStatus={userAttendee?.status}
+        currentStatus={rsvpSheetStatus}
         currentNotes={userAttendee?.notes}
-        onSubmit={(status, name, notes) => {
-          rsvpPlan(plan.id, status, name, notes);
+        currentPlusOnes={userAttendee?.plusOnes}
+        spotsLeft={headcountLeft(plan)}
+        requiresApproval={plan.requiresApproval}
+        questions={plan.guestQuestions}
+        currentAnswers={userAttendee?.answers}
+        onSubmit={(status, name, notes, plusOnes, answers) => {
+          void rsvpPlan(plan.id, status, name, notes, plusOnes, answers);
         }}
       />
 

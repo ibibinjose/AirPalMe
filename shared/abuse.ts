@@ -21,6 +21,7 @@ export const RATE_LIMIT_ACTIONS = [
   "hereShare",
   "wave",
   "pay",
+  "gate",
 ] as const;
 
 export type RateLimitAction = (typeof RATE_LIMIT_ACTIONS)[number];
@@ -52,6 +53,7 @@ export const RATE_LIMITS: Record<RateLimitAction, RateLimitSpec> = {
   hereShare: { windowMs: 60_000, max: 8, anonymousMax: 0 },
   wave: { windowMs: 60_000, max: 12, anonymousMax: 0 },
   pay: { windowMs: 60_000, max: 8, anonymousMax: 0 },
+  gate: { windowMs: 60_000, max: 60, anonymousMax: 0 },
 };
 
 export function rateLimitMax(action: RateLimitAction, anonymous: boolean): number {

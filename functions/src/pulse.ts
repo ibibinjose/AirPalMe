@@ -11,6 +11,7 @@ import {
   isPulsePublicToken,
   isValidClientKey,
   issueSummaryFromAnswers,
+  pulseImageUrlOk,
   PULSE_TEMPLATES,
   resolvePulseStatusTransition,
   scoreBucket,
@@ -111,11 +112,13 @@ export const getPulseByToken = onCall(CALLABLE, async (request) => {
   const dto: PulsePublicDto = {
     propertyId,
     propertyName: String(propSnap.data()?.name || "AirPal stay"),
+    propertyHeroImage: String(propSnap.data()?.heroImage || ""),
     pulseId,
     deploymentId,
     publicToken,
     name: String(pulse.name || "Pulse"),
     title: String((pulse.branding as { title?: string } | undefined)?.title || pulse.name || "How is your stay?"),
+    imageUrl: String((pulse.branding as { imageUrl?: string } | undefined)?.imageUrl || ""),
     questions: Array.isArray(pulse.questions) ? pulse.questions : [],
     logic: Array.isArray(pulse.logic) ? pulse.logic : [],
     status: "live",
@@ -138,6 +141,49 @@ export const getPulseByToken = onCall(CALLABLE, async (request) => {
   });
 
   return dto;
+});
+
+/**
+ * Bio-page rate card: resolve the property's currently live Pulse. Anonymous
+ * OK — the token is the same capability the printed QR carries, and misses
+ * are indistinguishable from inactive so the endpoint is not an oracle.
+ */
+export const getBioPulse = onCall(CALLABLE, async (request) => {
+  await noteAppCheck(request, "getBioPulse");
+  const propertyId = String((request.data || {}).propertyId || "").trim();
+  if (!propertyId) throw new HttpsError("invalid-argument", "propertyId is required.");
+  await enforceRateLimit(
+    request.auth?.uid || `bio:${propertyId}`,
+    "pulse_scan",
+    !request.auth?.uid || isAnonymousAuth(request),
+  );
+
+  const depSnap = await db
+    .collection("properties")
+    .doc(propertyId)
+    .collection("pulseDeployments")
+    .where("active", "==", true)
+    .limit(1)
+    .get();
+  if (depSnap.empty) return { found: false as const };
+  const dep = depSnap.docs[0]!.data() || {};
+  const publicToken = String(dep.publicToken || "");
+  const pulseId = String(dep.pulseId || "");
+  if (!publicToken || !isPulsePublicToken(publicToken) || !pulseId) return { found: false as const };
+  const [propSnap, pulseSnap] = await Promise.all([
+    db.collection("properties").doc(propertyId).get(),
+    db.collection("properties").doc(propertyId).collection("pulses").doc(pulseId).get(),
+  ]);
+  if (!pulseSnap.exists || pulseSnap.data()?.status !== "live") return { found: false as const };
+  const pulse = pulseSnap.data() || {};
+  return {
+    found: true as const,
+    publicToken,
+    title: String(
+      (pulse.branding as { title?: string } | undefined)?.title || pulse.name || "How is your stay?",
+    ).slice(0, 80),
+    propertyName: String(propSnap.data()?.name || "AirPal stay"),
+  };
 });
 
 /** Anonymous OK — rate-limited. Writes response (+ issue when rules say so). */
@@ -333,8 +379,16 @@ export const createPulse = onCall(CALLABLE, async (request) => {
   const pulseId = `pulse_${Date.now().toString(36)}_${createPublicToken().slice(-6)}`;
   const draftName = typeof data.name === "string" && data.name.trim() ? data.name.trim().slice(0, 80) : undefined;
   const draft = createPulseTemplate(template, propertyId, uid, draftName);
-  if (typeof data.title === "string" && data.title.trim()) {
-    draft.branding = { title: data.title.trim().slice(0, 80) };
+  const customTitle = typeof data.title === "string" && data.title.trim() ? data.title.trim().slice(0, 80) : "";
+  const customImage = typeof data.imageUrl === "string" ? data.imageUrl.trim() : "";
+  if (customImage && !pulseImageUrlOk(customImage)) {
+    throw new HttpsError("invalid-argument", "Cover image must be an https URL.");
+  }
+  if (customTitle || customImage) {
+    draft.branding = {
+      title: customTitle || draft.branding?.title,
+      ...(customImage ? { imageUrl: customImage } : {}),
+    };
   }
 
   await db

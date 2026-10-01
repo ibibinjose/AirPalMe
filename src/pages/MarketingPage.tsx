@@ -62,7 +62,7 @@ function MarketingPoster() {
       <div
         aria-hidden
         className="pointer-events-none absolute -right-[20cqi] top-[24cqi] h-[50cqi] w-[50cqi] rounded-full opacity-25 blur-3xl"
-        style={{ background: "#2563eb" }}
+        style={{ background: "#1805db" }}
       />
 
       <div className="relative flex h-full flex-col px-[6cqi] pb-[5cqi] pt-[6cqi]">

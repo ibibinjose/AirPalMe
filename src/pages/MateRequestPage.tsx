@@ -4,37 +4,27 @@ import { addDoc, collection } from "firebase/firestore";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocalNow } from "@/hooks/useLocalNow";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { cn } from "@/lib/cn";
+import { triggerHaptic } from "@/lib/native";
 import { createSubmitGuard } from "@/lib/submit-guard";
-import { MATE_USE_CASES, emptyMateRequest, isUseCase, mateRequestValid } from "@shared/mate-request";
+import {
+  MATE_USE_CASES,
+  emptyMateRequest,
+  isUseCase,
+  mateRequestPlanHref,
+  mateRequestValid,
+} from "@shared/mate-request";
 
 const inputCls =
-  "mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm outline-none placeholder:text-mute focus:border-brand";
-
-function localToday(): string {
-  let timeZone: string | undefined;
-  try {
-    timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  } catch {
-    timeZone = undefined;
-  }
-  try {
-    return new Intl.DateTimeFormat("en-CA", {
-      ...(timeZone ? { timeZone } : {}),
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-  } catch {
-    return "";
-  }
-}
+  "mt-1 min-h-[48px] w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none placeholder:text-mute focus:border-brand";
 
 export function MateRequestPage() {
   const params = new URLSearchParams(useSearch());
   const [, nav] = useLocation();
   const { user, authReady, requireUser } = useAuth();
+  const { today } = useLocalNow();
   const preferredMateUid = params.get("preferredMate") || "";
   const preferredMateName = params.get("name") || "";
 
@@ -57,7 +47,7 @@ export function MateRequestPage() {
   async function submit() {
     setError(null);
     if (!requireUser("Sign in to request a Mate.")) return;
-    if (!user || !mateRequestValid(form)) return;
+    if (!user || !mateRequestValid(form, today)) return;
     const db = getFirebaseDb();
     if (!db || !isFirebaseConfigured) {
       setError("Connect Firebase first — requests are filed through the live backend.");
@@ -84,8 +74,10 @@ export function MateRequestPage() {
         createdAt: now,
         updatedAt: now,
       });
+      void triggerHaptic("success");
       setSent(true);
     } catch (e) {
+      void triggerHaptic("error");
       guardRef.current.release();
       setError(e instanceof Error ? e.message : "Couldn't file your request. Try again.");
     } finally {
@@ -109,8 +101,8 @@ export function MateRequestPage() {
         </p>
         <div className="mt-6 flex flex-col gap-2">
           <Button onClick={() => nav("/mate")}>Back to Mate</Button>
-          <Button variant="ghost" onClick={() => nav("/")}>
-            Browse meanwhile
+          <Button variant="ghost" onClick={() => nav(mateRequestPlanHref(form))}>
+            Make a Plan
           </Button>
         </div>
       </div>
@@ -118,11 +110,15 @@ export function MateRequestPage() {
   }
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-8">
-      <Link href="/mate" className="flex items-center gap-1 text-[13px] font-medium text-mute">
+    <div className="mx-auto max-w-xl px-4 py-8 pb-28">
+      <Link
+        href="/mate"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={14} /> Mate
       </Link>
-      <h1 className="font-display mt-2 text-3xl font-bold tracking-tight">What do you want to do?</h1>
+      <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.16em] text-gold">AirPal Mate</p>
+      <h1 className="font-display mt-1 text-3xl font-bold tracking-tight">What do you want to do?</h1>
       <p className="mt-1 text-sm text-mute">
         One request, one match. If you set a budget, you pay by card on AirPal after you’re matched.
       </p>
@@ -130,7 +126,7 @@ export function MateRequestPage() {
       {preferredMateName && (
         <div className="mt-4 flex items-center justify-between rounded-2xl bg-brand/10 p-3.5 ring-1 ring-brand/20">
           <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-brand animate-pulse" />
+            <span className="h-2 w-2 rounded-full bg-brand motion-safe:animate-pulse" />
             <span className="text-xs font-semibold text-brand">
               Requesting with preferred Mate: <strong>{preferredMateName}</strong>
             </span>
@@ -148,17 +144,20 @@ export function MateRequestPage() {
         </div>
       )}
 
-      <div className="mt-5 rounded-2xl border border-line bg-card p-5">
+      <div className="mt-5 rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
         <span className="text-[13px] font-semibold">I want someone to…</span>
         <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
           {MATE_USE_CASES.map((c) => (
             <button
               key={c.id}
+              type="button"
               onClick={() => setForm((f) => ({ ...f, useCase: c.id }))}
               aria-pressed={form.useCase === c.id}
               className={cn(
-                "rounded-xl border px-3 py-2.5 text-left",
-                form.useCase === c.id ? "border-brand bg-brand/5" : "border-line hover:border-mute",
+                "min-h-[64px] rounded-xl border px-3 py-2.5 text-left transition active:scale-[0.98]",
+                form.useCase === c.id
+                  ? "border-brand bg-brand/10 shadow-xs ring-1 ring-brand/30"
+                  : "border-line hover:border-brand/40 hover:bg-paper",
               )}
             >
               <span className="block text-sm font-semibold">{c.label}</span>
@@ -183,7 +182,7 @@ export function MateRequestPage() {
               <span className="text-[13px] font-semibold">Date</span>
               <input
                 type="date"
-                min={localToday() || undefined}
+                min={today || undefined}
                 value={form.date}
                 onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
                 className={inputCls}
@@ -244,18 +243,25 @@ export function MateRequestPage() {
           </label>
         </div>
 
-        {error && <p className="mt-3 rounded-xl bg-paper p-3 text-[13px] text-mute ring-1 ring-line">{error}</p>}
+        {error && (
+          <p role="alert" className="mt-3 rounded-xl bg-red-500/10 p-3 text-[13px] font-medium text-red-700 ring-1 ring-red-500/20">
+            {error}
+          </p>
+        )}
 
-        <Button
-          className="mt-4 w-full"
-          size="lg"
-          disabled={!mateRequestValid(form) || sending}
-          loading={sending}
-          onClick={() => void submit()}
-        >
-          Request my Mate <ArrowRight size={16} />
-        </Button>
-        <p className="mt-2 text-center text-xs text-mute">Meet in public. You only pay when booking opens.</p>
+        {/* Sticky submit — always visible while filling the long form */}
+        <div className="sticky bottom-24 z-10 mt-4 rounded-2xl bg-card/95 p-2 ring-1 ring-line shadow-md backdrop-blur">
+          <Button
+            className="w-full"
+            size="lg"
+            disabled={!mateRequestValid(form, today) || sending}
+            loading={sending}
+            onClick={() => void submit()}
+          >
+            Request my Mate <ArrowRight size={16} />
+          </Button>
+          <p className="mt-2 text-center text-xs text-mute">Meet in public. You only pay when booking opens.</p>
+        </div>
       </div>
     </div>
   );

@@ -15,6 +15,7 @@ import { bioPath } from "@shared/bio";
 import { isFirebaseConfigured } from "@/lib/firebase";
 import { GuestListPanel } from "@/components/club/GuestListPanel";
 import { CompanionAdmin } from "@/components/admin/CompanionAdmin";
+import { DemoAdmin } from "@/components/admin/DemoAdmin";
 import { MateRequestsAdmin } from "@/components/admin/MateRequestsAdmin";
 import { StudioInboxAdmin } from "@/components/admin/StudioInboxAdmin";
 import { PartnerLeadsAdmin } from "@/components/admin/PartnerLeadsAdmin";
@@ -22,6 +23,7 @@ import { SafetyInboxAdmin } from "@/components/admin/SafetyInboxAdmin";
 import { CampaignInboxAdmin } from "@/components/admin/CampaignInboxAdmin";
 import { FestivalAdmin } from "@/components/admin/FestivalAdmin";
 import { AuditTrailAdmin } from "@/components/admin/AuditTrailAdmin";
+import { SearchQueriesDashboardTab } from "@/components/admin/SearchQueriesDashboardTab";
 import { ADMIN_TABS, AdminOverview, type AdminTab } from "@/components/admin/AdminOverview";
 import { AIRPAL_CLUB_ID } from "@/contexts/ClubContext";
 import { seedDatabase } from "@/lib/seed-database";
@@ -155,7 +157,7 @@ export function AdminPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-8">
+    <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-8 pb-28">
       {/* Top Command Bar & Status Header */}
       <header className="rounded-[28px] bg-card p-5 sm:p-6 ring-1 ring-line shadow-xs">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -166,7 +168,7 @@ export function AdminPage() {
                 AirPal OS · Platform Admin
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 motion-safe:animate-pulse" />
                 {isFirebaseConfigured ? "Firebase Live" : "Local Mode"}
               </span>
               <span className="text-[11px] text-mute font-mono">
@@ -185,30 +187,30 @@ export function AdminPage() {
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/helpdesk"
-              className="inline-flex items-center gap-1.5 rounded-2xl bg-paper px-3 py-2 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-2xl bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
             >
               <Headphones className="h-3.5 w-3.5 text-brand" />
               Help Desk
             </Link>
             <Link
               href="/pulse"
-              className="inline-flex items-center gap-1.5 rounded-2xl bg-paper px-3 py-2 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-2xl bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
             >
               <Activity className="h-3.5 w-3.5 text-indigo-500" />
               Pulse Hub
             </Link>
             <Link
               href="/host"
-              className="inline-flex items-center gap-1.5 rounded-2xl bg-paper px-3 py-2 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-2xl bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
             >
               <Building2 className="h-3.5 w-3.5 text-amber-500" />
               Host Desk
             </Link>
             <Link
               href="/business"
-              className="inline-flex items-center gap-1.5 rounded-2xl bg-paper px-3 py-2 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-2xl bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
             >
-              <Users className="h-3.5 w-3.5 text-purple-500" />
+              <Users className="h-3.5 w-3.5 text-brand" />
               Business
             </Link>
           </div>
@@ -282,7 +284,7 @@ export function AdminPage() {
             >
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10 text-brand">
                     <Award className="h-5 w-5" />
                   </span>
                   <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand" />
@@ -448,14 +450,14 @@ export function AdminPage() {
                     value={handleSearch}
                     onChange={(e) => setHandleSearch(e.target.value)}
                     placeholder="Search handle or name…"
-                    className="w-48 sm:w-56 rounded-xl bg-paper pl-8 pr-3 py-1.5 text-xs text-ink ring-1 ring-line focus:outline-none focus:ring-2 focus:ring-brand/40"
+                    className="w-48 sm:w-56 rounded-xl bg-paper pl-8 pr-3 py-2.5 text-sm text-ink ring-1 ring-line focus:outline-none focus:ring-2 focus:ring-brand/40"
                   />
                 </div>
                 <select
                   value={handleSort}
                   onChange={(e) => setHandleSort(e.target.value as "taps" | "alpha")}
                   aria-label="Sort handles"
-                  className="rounded-xl bg-paper px-2.5 py-1.5 text-xs text-ink ring-1 ring-line focus:outline-none focus:ring-2 focus:ring-brand/40"
+                  className="rounded-xl bg-paper px-3 py-2.5 text-sm text-ink ring-1 ring-line focus:outline-none focus:ring-2 focus:ring-brand/40"
                 >
                   <option value="taps">Sort by Taps</option>
                   <option value="alpha">Sort A-Z</option>
@@ -493,7 +495,7 @@ export function AdminPage() {
                         type="button"
                         onClick={() => copyHandleLink(row.handle)}
                         title="Copy profile URL"
-                        className="rounded-lg p-1.5 text-mute hover:bg-card hover:text-ink transition"
+                        className="grid h-11 w-11 place-items-center rounded-lg text-mute hover:bg-card hover:text-ink transition"
                       >
                         {isCopied ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
                       </button>
@@ -542,6 +544,7 @@ export function AdminPage() {
             </div>
           )}
           {tab === "safety" && <SafetyInboxAdmin />}
+          {tab === "search" && <SearchQueriesDashboardTab />}
           {tab === "experiences" && (
             <div className="space-y-6">
               <CampaignInboxAdmin />
@@ -549,6 +552,7 @@ export function AdminPage() {
             </div>
           )}
           {tab === "audit" && <AuditTrailAdmin />}
+          {tab === "demo" && <DemoAdmin />}
         </div>
       )}
 

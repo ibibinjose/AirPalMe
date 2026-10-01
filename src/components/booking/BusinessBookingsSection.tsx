@@ -32,6 +32,7 @@ export function BusinessBookingsSection() {
   const [rows, setRows] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState(false);
 
   async function reload(uid: string) {
     const db = getFirebaseDb();
@@ -53,8 +54,10 @@ export function BusinessBookingsSection() {
         return b.createdAt.localeCompare(a.createdAt);
       });
       setRows(list);
+      setLoadError(false);
     } catch {
       setRows([]);
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -90,6 +93,20 @@ export function BusinessBookingsSection() {
 
   if (loading) {
     return <p className="mt-5 text-sm text-mute">Loading bookings…</p>;
+  }
+
+  if (loadError) {
+    return (
+      <div className="mt-5 rounded-2xl border border-dashed border-line bg-card p-6 text-center">
+        <p className="font-display text-lg font-bold">Couldn&apos;t load bookings</p>
+        <p className="mx-auto mt-1 max-w-sm text-[13px] leading-6 text-mute">
+          Check your connection and retry.
+        </p>
+        <Button size="sm" variant="ghost" className="mt-3" onClick={() => void reload(user.uid)}>
+          Retry
+        </Button>
+      </div>
+    );
   }
 
   if (rows.length === 0) {

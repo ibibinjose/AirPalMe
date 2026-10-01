@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { makeQrDataUrl } from "@/lib/qr";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { Button } from "@/components/ui/Button";
+import { AppleWalletButton } from "@/components/ui/AppleWalletButton";
+import { businessCardWalletPassUrl, openAppleWalletPass } from "@/lib/wallet";
 
 type BioShareModalProps = {
   open: boolean;
@@ -115,6 +117,14 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
             Download
           </Button>
         </div>
+
+        <AppleWalletButton
+          className="mt-3 w-full justify-center"
+          onClick={() => {
+            const passUrl = businessCardWalletPassUrl(handle);
+            void openAppleWalletPass(passUrl, "@" + handle + "-AirPal-BusinessCard");
+          }}
+        />
 
         {typeof navigator !== "undefined" && "share" in navigator && (
           <Button size="sm" onClick={handleNativeShare} className="mt-2 w-full gap-1.5 bg-brand text-white">

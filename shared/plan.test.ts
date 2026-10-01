@@ -9,12 +9,49 @@ import {
   PLAN_TYPES,
   PLAN_COVER_PRESETS,
   PLAN_THEMES,
+  PLAN_PLUS_ONES_MAX,
+  PLAN_CAPACITY_MAX,
+  attendeeSeats,
   buildStopChangeMessage,
+  canCancelPlanStatus,
   canCompletePlanStatus,
+  checkedInCount,
+  choiceAnswerCounts,
+  coHostAttendees,
+  formatDateOption,
   formatTime12h,
+  hasOpenDatePoll,
+  headcountLeft,
+  headcountTaken,
+  initialPlanDate,
+  initialPlanTime,
+  isPlanManager,
+  normalizeAnswer,
+  normalizeCapacity,
+  normalizePlusOnes,
+  clampExperienceMoney,
+  clampExperienceCapacity,
+  sanitizeCurrencyCode,
+  sanitizeDepositConfig,
+  sanitizePricingTiers,
+  EXPERIENCE_TIERS_MAX,
+  normalizeRating,
+  normalizeReview,
+  pastCrew,
+  planRatingSummary,
+  pendingRequests,
+  planPhotos,
+  PLAN_REVIEW_MAX,
   reorderStops,
+  setAttendeeCheckedIn,
   spotsLeft,
   stopChangeRecipients,
+  textAnswers,
+  topDateOption,
+  validDateOption,
+  validGuestQuestion,
+  waitlistPosition,
+  waitlistQueue,
 } from "./plan";
 
 describe("interest matching", () => {
@@ -142,6 +179,276 @@ describe("ticketed events", () => {
   });
 });
 
+describe("headcount capacity", () => {
+  const going = (id: string, plusOnes?: number) => ({
+    id,
+    name: id,
+    status: "going" as const,
+    plusOnes,
+    respondedAt: "2026-09-01T00:00:00Z",
+  });
+
+  it("clamps plus-ones into range", () => {
+    expect(normalizePlusOnes(2)).toBe(2);
+    expect(normalizePlusOnes(-1)).toBe(0);
+    expect(normalizePlusOnes(99)).toBe(PLAN_PLUS_ONES_MAX);
+    expect(normalizePlusOnes("abc")).toBe(0);
+  });
+
+  it("counts seats from party sizes, going only", () => {
+    expect(attendeeSeats(going("a", 2))).toBe(3);
+    expect(attendeeSeats(going("b"))).toBe(1);
+    expect(attendeeSeats({ ...going("c", 2), status: "maybe" })).toBe(0);
+    expect(attendeeSeats(undefined)).toBe(0);
+  });
+
+  it("reports spots left or null without a limit", () => {
+    const plan = { capacity: 5, attendees: [going("a", 2), going("b")] };
+    expect(headcountTaken(plan)).toBe(4);
+    expect(headcountLeft(plan)).toBe(1);
+    expect(headcountLeft({ attendees: [going("a")] })).toBeNull();
+    expect(headcountLeft({ capacity: 2, attendees: [going("a", 2)] })).toBe(0);
+  });
+
+  it("normalizes host limits, clearing on empty", () => {
+    expect(normalizeCapacity("")).toBeUndefined();
+    expect(normalizeCapacity("0")).toBeUndefined();
+    expect(normalizeCapacity("12")).toBe(12);
+    expect(normalizeCapacity("9999")).toBe(PLAN_CAPACITY_MAX);
+  });
+});
+
+describe("waitlist and approval queues", () => {
+  const att = (id: string, status: "going" | "waitlisted" | "pending", respondedAt: string) => ({
+    id,
+    name: id,
+    status,
+    respondedAt,
+  });
+  const plan = {
+    attendees: [
+      att("w2", "waitlisted", "2026-09-02T00:00:00Z"),
+      att("g1", "going", "2026-09-01T00:00:00Z"),
+      att("w1", "waitlisted", "2026-09-01T00:00:00Z"),
+      att("p1", "pending", "2026-09-03T00:00:00Z"),
+    ],
+  };
+
+  it("orders queues oldest-first and positions the line", () => {
+    expect(waitlistQueue(plan).map((a) => a.id)).toEqual(["w1", "w2"]);
+    expect(pendingRequests(plan).map((a) => a.id)).toEqual(["p1"]);
+    expect(waitlistPosition(plan, "w2")).toBe(2);
+    expect(waitlistPosition(plan, "g1")).toBeNull();
+  });
+
+  it("gates cancellation to live plans", () => {
+    expect(canCancelPlanStatus("open")).toBe(true);
+    expect(canCancelPlanStatus("confirmed")).toBe(true);
+    expect(canCancelPlanStatus("completed")).toBe(false);
+    expect(canCancelPlanStatus("cancelled")).toBe(false);
+    expect(canCancelPlanStatus("draft")).toBe(false);
+  });
+});
+
+describe("check-in", () => {
+  const attendees = [
+    { id: "a", name: "A", status: "going" as const, respondedAt: "2026-09-01T00:00:00Z" },
+    {
+      id: "b",
+      name: "B",
+      status: "going" as const,
+      checkedIn: true,
+      checkedInAt: "2026-09-20T09:00:00Z",
+      respondedAt: "2026-09-01T00:00:00Z",
+    },
+  ];
+
+  it("counts the showed and flips one flag with a stamp", () => {
+    expect(checkedInCount({ attendees })).toBe(1);
+    const on = setAttendeeCheckedIn(attendees, "a", true, "2026-09-20T10:00:00Z");
+    expect(on.find((a) => a.id === "a")).toMatchObject({ checkedIn: true, checkedInAt: "2026-09-20T10:00:00Z" });
+    expect(checkedInCount({ attendees: on })).toBe(2);
+    const off = setAttendeeCheckedIn(on, "b", false);
+    expect(off.find((a) => a.id === "b")).not.toHaveProperty("checkedIn");
+    expect(off.find((a) => a.id === "b")).not.toHaveProperty("checkedInAt");
+    expect(checkedInCount({ attendees: off })).toBe(1);
+  });
+
+  it("leaves everyone else untouched", () => {
+    const next = setAttendeeCheckedIn(attendees, "nobody", true);
+    expect(next).toEqual(attendees);
+  });
+});
+
+describe("co-hosts and past crew", () => {
+  const att = (id: string, name = id) => ({
+    id,
+    name,
+    status: "going" as const,
+    respondedAt: "2026-09-01T00:00:00Z",
+  });
+
+  it("treats creator and co-hosts as managers, no one else", () => {
+    const plan = { creator: { uid: "host", name: "Host" }, coHostUids: ["co1"] };
+    expect(isPlanManager(plan, "host")).toBe(true);
+    expect(isPlanManager(plan, "co1")).toBe(true);
+    expect(isPlanManager(plan, "guest")).toBe(false);
+    expect(isPlanManager(plan, null)).toBe(false);
+    expect(isPlanManager({ creator: { name: "NoUid" } }, "guest")).toBe(false);
+  });
+
+  it("resolves co-host rows and ranks past crew", () => {
+    const plan = { creator: { uid: "me", name: "Me" }, coHostUids: ["co1"], attendees: [att("me"), att("co1")] };
+    expect(coHostAttendees(plan).map((a) => a.id)).toEqual(["co1"]);
+    expect(coHostAttendees({ attendees: [att("me")] })).toEqual([]);
+
+    const plans = [
+      { id: "p1", attendees: [att("me"), att("a"), att("b")] },
+      { id: "p2", attendees: [att("me"), { ...att("a"), respondedAt: "2026-09-05T00:00:00Z" }, att("anon-1")] },
+    ];
+    const crew = pastCrew(plans, "me", { excludeIds: ["b"], excludePlanId: "p9", limit: 8 });
+    expect(crew.map((c) => c.id)).toEqual(["a"]);
+    expect(crew[0]).toMatchObject({ sharedPlans: 2, lastSeen: "2026-09-05T00:00:00Z" });
+    expect(pastCrew(plans, "me", { excludePlanId: "p1" }).map((c) => c.id)).toEqual(["a"]);
+  });
+});
+
+describe("shared album", () => {
+  const plan = {
+    comments: [
+      {
+        id: "c1",
+        authorId: "u1",
+        authorName: "Alex",
+        text: "[Photos] Sunset toast",
+        photoUrl: "https://img/1",
+        createdAt: "2026-09-20T08:00:00Z",
+      },
+      { id: "c2", authorId: "u2", authorName: "Sam", text: "Just words", createdAt: "2026-09-20T09:00:00Z" },
+      {
+        id: "c3",
+        authorId: "u3",
+        authorName: "Jo",
+        text: "[Photos]",
+        photoUrl: "https://img/3",
+        createdAt: "2026-09-20T10:00:00Z",
+      },
+    ],
+  };
+
+  it("feeds newest-first photo comments with clean captions", () => {
+    const photos = planPhotos(plan);
+    expect(photos.map((p) => p.commentId)).toEqual(["c3", "c1"]);
+    expect(photos[1]).toMatchObject({ url: "https://img/1", caption: "Sunset toast", authorName: "Alex" });
+    expect(photos[0]!.caption).toBe("");
+  });
+
+  it("stays empty without photos", () => {
+    expect(planPhotos({ comments: [] })).toEqual([]);
+    expect(planPhotos({})).toEqual([]);
+  });
+});
+
+describe("post-experience reviews", () => {
+  it("normalizes stars and words", () => {
+    expect(normalizeRating(5)).toBe(5);
+    expect(normalizeRating(0)).toBeUndefined();
+    expect(normalizeRating(6)).toBeUndefined();
+    expect(normalizeRating("abc")).toBeUndefined();
+    expect(normalizeReview("  Great night  ")).toBe("Great night");
+    expect(normalizeReview("   ")).toBeUndefined();
+    expect(normalizeReview("x".repeat(999))).toHaveLength(PLAN_REVIEW_MAX);
+  });
+
+  it("averages going ratings only", () => {
+    const at = (status: "going" | "maybe", rating?: number) => ({
+      id: `${status}-${rating}`,
+      name: "X",
+      status,
+      rating,
+      respondedAt: "2026-09-01T00:00:00Z",
+    });
+    expect(planRatingSummary({ attendees: [at("going", 5), at("going", 4), at("maybe", 5), at("going")] })).toEqual({
+      average: 4.5,
+      count: 2,
+    });
+    expect(planRatingSummary({ attendees: [] })).toEqual({ average: 0, count: 0 });
+  });
+});
+
+describe("date poll", () => {
+  it("validates real calendar dates and times", () => {
+    expect(validDateOption({ date: "2026-09-20" })).toEqual([]);
+    expect(validDateOption({ date: "2026-09-20", time: "19:00" })).toEqual([]);
+    expect(validDateOption({ date: "" })).toContain("Pick a date.");
+    expect(validDateOption({ date: "2026-02-30" })).toContain("Pick a real date.");
+    expect(validDateOption({ date: "2026-09-20", time: "25:00" })).toContain("Pick a real time.");
+  });
+
+  it("opens with options until the host locks", () => {
+    expect(hasOpenDatePoll({ dateOptions: [{ id: "o1", date: "2026-09-20", votes: 0 }] })).toBe(true);
+    expect(
+      hasOpenDatePoll({ dateOptions: [{ id: "o1", date: "2026-09-20", votes: 0 }], datePollLocked: true }),
+    ).toBe(false);
+    expect(hasOpenDatePoll({})).toBe(false);
+  });
+
+  it("picks the front-runner, earliest date on ties", () => {
+    const plan = {
+      dateOptions: [
+        { id: "o1", date: "2026-09-21", votes: 2 },
+        { id: "o2", date: "2026-09-20", votes: 2 },
+        { id: "o3", date: "2026-09-22", votes: 5 },
+      ],
+    };
+    expect(topDateOption(plan)?.id).toBe("o3");
+    expect(topDateOption({ dateOptions: plan.dateOptions.slice(0, 2) })?.id).toBe("o2");
+    expect(topDateOption({})).toBeUndefined();
+  });
+
+  it("formats options with weekday and optional time", () => {
+    expect(formatDateOption({ date: "2026-09-20", time: "19:00" })).toContain("7:00 PM");
+    expect(formatDateOption({ date: "2026-09-20" })).not.toContain("·");
+  });
+});
+
+describe("guest questions", () => {
+  const diet = { id: "q1", question: "Any dietary needs?", type: "choice" as const, options: ["None", "Vego", "Vegan"] };
+  const ride = { id: "q2", question: "How are you getting there?", type: "text" as const };
+
+  it("validates host questions", () => {
+    expect(validGuestQuestion({ question: "Diet?", type: "text", options: [] })).toEqual([]);
+    expect(validGuestQuestion({ question: "", type: "text", options: [] })).toContain("Write the question.");
+    expect(validGuestQuestion({ question: "X", type: "choice", options: ["Only"] })).toContain(
+      "Choice needs at least 2 options.",
+    );
+    expect(validGuestQuestion({ question: "X", type: "choice", options: ["A", "a"] })).toContain("Options must differ.");
+    expect(validGuestQuestion({ question: "X", type: "weird", options: [] })).toContain("Pick text or choice.");
+  });
+
+  it("cleans answers, keeping only listed choice options", () => {
+    expect(normalizeAnswer(diet, "  vego ")).toBe("Vego");
+    expect(normalizeAnswer(diet, "Keto")).toBe("");
+    expect(normalizeAnswer(ride, "  Ferry  ")).toBe("Ferry");
+    expect(normalizeAnswer(ride, "")).toBe("");
+  });
+
+  it("tallies choices and lists texts", () => {
+    const attendees: Array<{ answers?: Record<string, string> }> = [
+      { answers: { q1: "Vego", q2: "Ferry" } },
+      { answers: { q1: "vego", q2: "" } },
+      { answers: { q1: "None" } },
+      {},
+    ];
+    expect(choiceAnswerCounts(diet, attendees)).toEqual([
+      { option: "Vego", count: 2 },
+      { option: "None", count: 1 },
+      { option: "Vegan", count: 0 },
+    ]);
+    expect(textAnswers(ride, attendees)).toEqual(["Ferry"]);
+  });
+});
+
 describe("trip itinerary", () => {
   const day = (dayNumber: number, title: string) => ({ dayNumber, title, description: "", stops: [] });
   it("orders days and renumbers without gaps", () => {
@@ -163,6 +470,23 @@ describe("trip itinerary", () => {
   });
 });
 
+describe("plan form date/time prefill", () => {
+  it("honors a valid future date param, else today", () => {
+    expect(initialPlanDate("2026-10-04", "2026-10-03")).toBe("2026-10-04");
+    expect(initialPlanDate("2026-10-03", "2026-10-03")).toBe("2026-10-03");
+    expect(initialPlanDate("2026-10-02", "2026-10-03")).toBe("2026-10-03");
+    expect(initialPlanDate("tomorrow", "2026-10-03")).toBe("2026-10-03");
+    expect(initialPlanDate(null, "2026-10-03")).toBe("2026-10-03");
+  });
+
+  it("honors a valid time param, else the fallback", () => {
+    expect(initialPlanTime("19:30", "18:00")).toBe("19:30");
+    expect(initialPlanTime("7pm", "18:00")).toBe("18:00");
+    expect(initialPlanTime("25:00", "18:00")).toBe("18:00");
+    expect(initialPlanTime(null, "18:00")).toBe("18:00");
+  });
+});
+
 describe("plan completion guard", () => {
   it("allows only live plans to close the loop", () => {
     expect(canCompletePlanStatus("open")).toBe(true);
@@ -170,5 +494,56 @@ describe("plan completion guard", () => {
     expect(canCompletePlanStatus("draft")).toBe(false);
     expect(canCompletePlanStatus("completed")).toBe(false);
     expect(canCompletePlanStatus("cancelled")).toBe(false);
+  });
+});
+
+describe("experience pricing sanitizer", () => {
+  it("clamps money to finite non-negative capped dollars", () => {
+    expect(clampExperienceMoney(49.99)).toBe(49.99);
+    expect(clampExperienceMoney(-50)).toBe(0);
+    expect(clampExperienceMoney(Number.NaN)).toBe(0);
+    expect(clampExperienceMoney(undefined)).toBe(0);
+    expect(clampExperienceMoney(2_000_000)).toBe(1_000_000);
+  });
+
+  it("clamps capacity with a fallback", () => {
+    expect(clampExperienceCapacity(30)).toBe(30);
+    expect(clampExperienceCapacity(-4)).toBe(20);
+    expect(clampExperienceCapacity(undefined)).toBe(20);
+    expect(clampExperienceCapacity(0, 10)).toBe(10);
+    expect(clampExperienceCapacity(500_000)).toBe(100_000);
+  });
+
+  it("normalizes currency codes with an AUD fallback", () => {
+    expect(sanitizeCurrencyCode("aud")).toBe("AUD");
+    expect(sanitizeCurrencyCode("USD")).toBe("USD");
+    expect(sanitizeCurrencyCode("bogus")).toBe("AUD");
+    expect(sanitizeCurrencyCode(undefined)).toBe("AUD");
+  });
+
+  it("sanitizes pricing tiers and caps the count", () => {
+    expect(sanitizePricingTiers(undefined)).toBeUndefined();
+    expect(sanitizePricingTiers([])).toBeUndefined();
+    const tiers = sanitizePricingTiers([
+      { id: "vip", name: "VIP", price: -10, capacity: 5 },
+      { id: "", name: "", price: 25.5, capacity: 0 },
+    ])!;
+    expect(tiers).toHaveLength(2);
+    expect(tiers[0]!.price).toBe(0);
+    expect(tiers[0]!.capacity).toBe(5);
+    expect(tiers[1]!.price).toBe(25.5);
+    expect(tiers[1]!.capacity).toBe(20);
+    const many = sanitizePricingTiers(
+      Array.from({ length: EXPERIENCE_TIERS_MAX + 5 }, (_, i) => ({ id: `t${i}`, name: `T${i}`, price: 1, capacity: 1 })),
+    )!;
+    expect(many).toHaveLength(EXPERIENCE_TIERS_MAX);
+  });
+
+  it("sanitizes deposit configs", () => {
+    expect(sanitizeDepositConfig(undefined)).toBeUndefined();
+    expect(sanitizeDepositConfig(null)).toBeUndefined();
+    const cfg = sanitizeDepositConfig({ depositAmount: -20, depositPercentage: 150 })!;
+    expect(cfg.depositAmount).toBe(0);
+    expect(cfg.depositPercentage).toBe(100);
   });
 });

@@ -114,13 +114,13 @@ export function MarkerPage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-10">
+    <div className="mx-auto max-w-lg px-4 pb-28">
       <div className="flex items-center gap-3 pt-3">
         <button
           type="button"
           onClick={goBack}
           aria-label="Go back"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full ring-1 ring-line bg-card transition hover:ring-brand/40 active:scale-95"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full ring-1 ring-line bg-card transition hover:ring-brand/40 active:scale-95"
         >
           <ArrowLeft size={16} />
         </button>

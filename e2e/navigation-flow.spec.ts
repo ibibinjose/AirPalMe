@@ -140,4 +140,12 @@ test.describe("Global Navigation & Profile Flow", () => {
     await result.click();
     await expect(page).toHaveURL(/\/@glenmore|\/p\/glenmore/);
   });
+
+  test("showcase tour opens for guests and links live stops", async ({ page }) => {
+    await page.goto("/demo");
+    await expect(page).toHaveURL(/\/Demo/);
+    await expect(page.getByRole("heading", { level: 1, name: /five minutes/i })).toBeVisible();
+    await page.getByRole("link", { name: /tour the demo hotel/i }).click();
+    await expect(page).toHaveURL(/\/DemoHotel/);
+  });
 });

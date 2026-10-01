@@ -80,7 +80,7 @@ export type Pulse = {
   status: PulseStatus;
   questions: PulseQuestion[];
   logic: PulseLogicRule[];
-  branding?: { title?: string; accent?: string };
+  branding?: { title?: string; accent?: string; imageUrl?: string };
   createdAt: string;
   updatedAt: string;
   createdBy: string;
@@ -158,15 +158,38 @@ export type PulseIssue = {
 export type PulsePublicDto = {
   propertyId: string;
   propertyName: string;
+  /** Property hero image for the branded header ("" when none). */
+  propertyHeroImage: string;
   pulseId: string;
   deploymentId: string;
   publicToken: string;
   name: string;
   title: string;
+  /** Per-pulse cover image for the guest header ("" when none — fall back to property hero). */
+  imageUrl: string;
   questions: PulseQuestion[];
   logic: PulseLogicRule[];
   status: "live";
 };
+
+/** Fling distance that commits a swipe answer (px, either direction). */
+export const SWIPE_CHOOSE_THRESHOLD_PX = 90;
+
+/**
+ * Which side a drag offset commits to, if any. Positive x = right.
+ * Shared so the card and its tests agree on the threshold.
+ */
+export function swipeChoiceForOffset(offsetX: number): "left" | "right" | null {
+  if (!Number.isFinite(offsetX)) return null;
+  if (offsetX >= SWIPE_CHOOSE_THRESHOLD_PX) return "right";
+  if (offsetX <= -SWIPE_CHOOSE_THRESHOLD_PX) return "left";
+  return null;
+}
+
+/** Bio-page rate card: the property's currently live Pulse, if any. */
+export type BioPulseResult =
+  | { found: false }
+  | { found: true; publicToken: string; title: string; propertyName: string };
 
 export type PulseSubmitPayload = {
   publicToken: string;
@@ -200,6 +223,22 @@ const CLIENT_KEY_RE = /^[A-Za-z0-9_-]{8,64}$/;
 
 export function isValidClientKey(value: unknown): value is string {
   return typeof value === "string" && CLIENT_KEY_RE.test(value);
+}
+
+/** Max stored length for a Pulse cover image URL. */
+export const PULSE_IMAGE_URL_MAX_LEN = 2048;
+
+/** Cover images must be plain https URLs (Firebase Storage download URLs). Empty means "no image". */
+export function pulseImageUrlOk(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  const url = value.trim();
+  if (!url || url.length > PULSE_IMAGE_URL_MAX_LEN) return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 export type FollowupValidation = { ok: true; score: number; note?: string } | { ok: false; reason: string };

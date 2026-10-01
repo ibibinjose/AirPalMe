@@ -4,6 +4,8 @@ import { collection, doc, getDoc, getDocs, limit, query, where } from "firebase/
 import { ArrowLeft, BadgeCheck, CalendarDays, CheckCircle2, Gift, MapPin, Share2, Trophy, User } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
+import { AirPalMascot } from "@/components/brand/AirPalMascot";
+import { ConfettiBurst } from "@/components/brand/ConfettiBurst";
 import { PromotionTerms } from "@/components/promotions/PromotionTerms";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
@@ -17,6 +19,7 @@ import {
 } from "@/lib/promotions";
 import { targetHref, type Promotion } from "@shared/promotions";
 import { toPublicUrl } from "@/lib/public-origin";
+import { clearPendingIntent, peekPendingIntent } from "@/lib/pending-intent";
 
 export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }) {
   const { id } = useParams<{ id: string }>();
@@ -31,6 +34,8 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
   const [code, setCode] = useState("");
   const [redeemCode, setRedeemCode] = useState<string | null>(null);
   const [reference, setReference] = useState<string | null>(null);
+  const [founderNumber, setFounderNumber] = useState<number | null>(null);
+  const [celebrate, setCelebrate] = useState(0);
 
   const refParam = new URLSearchParams(search).get("ref") || "";
 
@@ -84,19 +89,29 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
       query(collection(db, "promotion_entries"), where("promotionId", "==", id), where("uid", "==", user.uid)),
     )
       .then((snap) => {
-        if (!snap.empty) setReference(String(snap.docs[0].data().reference || ""));
+        if (snap.empty) return;
+        const data = snap.docs[0].data() as { reference?: string; founderNumber?: number };
+        setReference(String(data.reference || ""));
+        if (typeof data.founderNumber === "number") setFounderNumber(data.founderNumber);
       })
       .catch(() => undefined);
   }, [user, id, promo]);
 
-  async function enter() {
-    if (!requireUser("Sign in to enter this giveaway.")) return;
+  async function doEnter() {
     if (!id) return;
     setEntering(true);
     try {
       const res = await enterPromotionRemote({ promotionId: id, code: code || undefined, ref: refParam || undefined });
       setReference(res.reference);
-      toast.success(res.duplicate ? "You're already in — entry confirmed." : "Entry confirmed. Good luck!");
+      if (typeof res.founderNumber === "number") setFounderNumber(res.founderNumber);
+      if (!res.duplicate) setCelebrate((n) => n + 1);
+      toast.success(
+        typeof res.founderNumber === "number" && !res.duplicate
+          ? `You're founder #${res.founderNumber.toLocaleString("en-AU")}. Good luck!`
+          : res.duplicate
+            ? "You're already in — entry confirmed."
+            : "Entry confirmed. Good luck!",
+      );
     } catch (err) {
       toast.error(friendlyPromotionError(err));
     } finally {
@@ -104,8 +119,15 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
     }
   }
 
-  async function redeem() {
-    if (!requireUser("Sign in to redeem member offers.")) return;
+  async function enter() {
+    if (
+      !requireUser("Sign in to enter this giveaway — your spot is saved when you return.", id ? { kind: "enter-promotion", id } : undefined)
+    )
+      return;
+    await doEnter();
+  }
+
+  async function doRedeem() {
     if (!id) return;
     setRedeeming(true);
     try {
@@ -118,6 +140,28 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
       setRedeeming(false);
     }
   }
+
+  async function redeem() {
+    if (
+      !requireUser("Sign in to redeem this offer — it's saved for you when you return.", id ? { kind: "redeem-promotion", id } : undefined)
+    )
+      return;
+    await doRedeem();
+  }
+
+  // Resume a guest's saved entry after they finish signing in.
+  useEffect(() => {
+    if (!user || !promo || !id) return;
+    const intent = peekPendingIntent();
+    if (!intent || intent.id !== id) return;
+    if (intent.kind === "enter-promotion" && promo.kind === "giveaway" && !reference) {
+      clearPendingIntent();
+      void doEnter();
+    } else if (intent.kind === "redeem-promotion" && promo.kind === "promotion" && !redeemCode) {
+      clearPendingIntent();
+      void doRedeem();
+    }
+  }, [user, promo, id]);
 
   async function share() {
     const url = toPublicUrl(`${window.location.pathname}${user ? `?ref=${user.uid}` : ""}`);
@@ -152,18 +196,18 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
   const art = promoArtFor(promo.category, promo.heroImage);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-2xl px-4 py-8 pb-28">
+      <div className="flex items-center justify-between gap-3">
         <Link
           href={kind === "giveaway" ? "/giveaways" : "/promotions"}
-          className="flex items-center gap-1 text-[13px] font-medium text-mute"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
         >
           <ArrowLeft size={14} /> {kind === "giveaway" ? "Giveaways" : "Promotions"}
         </Link>
         <button
           type="button"
           onClick={share}
-          className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand hover:underline"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-brand ring-1 ring-line hover:bg-paper"
         >
           <Share2 size={14} /> Share
         </button>
@@ -249,9 +293,16 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
 
       <div className="mt-4">
         {reference ? (
-          <div className="rounded-2xl border-2 border-emerald-600 bg-emerald-50 p-4 text-center">
-            <CheckCircle2 size={28} className="mx-auto text-emerald-600" />
+          <div className="rounded-2xl border-2 border-emerald-600/50 bg-emerald-500/10 p-4 text-center">
+            <ConfettiBurst fireKey={celebrate} />
+            <AirPalMascot className="mx-auto h-28 w-auto" />
+            <CheckCircle2 size={28} className="mx-auto mt-2 text-emerald-600" />
             <p className="font-display mt-1 text-lg font-bold">Entry confirmed</p>
+            {founderNumber !== null && (
+              <p className="font-display mt-1 text-3xl font-black text-ink">
+                #{founderNumber.toLocaleString("en-AU")}
+              </p>
+            )}
             <p className="mt-0.5 text-sm text-mute">
               Reference <span className="font-mono font-bold text-ink">{reference}</span>
             </p>
@@ -268,7 +319,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="Promotional code"
-                className="w-full rounded-2xl ring-1 ring-line bg-card p-3 text-sm font-semibold"
+                className="min-h-[48px] w-full rounded-2xl ring-1 ring-line bg-card px-4 py-3 text-sm font-semibold outline-none placeholder:font-normal placeholder:text-mute focus:ring-2 focus:ring-brand"
                 aria-label="Promotional code"
               />
             )}
@@ -297,7 +348,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
               <Link
                 key={r.id}
                 href={`/${r.kind === "giveaway" ? "giveaways" : "promotions"}/${r.id}`}
-                className="flex items-center gap-3 rounded-2xl ring-1 ring-line/15 bg-card p-3"
+                className="flex items-center gap-3 rounded-2xl ring-1 ring-line bg-card p-3 transition hover:bg-paper active:scale-[0.99]"
               >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm font-bold">{r.title}</span>

@@ -1,6 +1,7 @@
 import { useLocation } from "wouter";
 import type { WalkingTour } from "@shared/tours";
 import { Photo } from "@/components/ui/Photo";
+import { triggerHaptic } from "@/lib/native";
 
 const TOUR_IMAGES: Record<string, string> = {
   "rocks-harbour": "/media/harbour.jpg",
@@ -13,7 +14,10 @@ export function TourCard({ tour }: { tour: WalkingTour }) {
   const [, nav] = useLocation();
   return (
     <button
-      onClick={() => nav(`/tour/${tour.id}`)}
+      onClick={() => {
+        void triggerHaptic("light");
+        nav(`/tour/${tour.id}`);
+      }}
       className="relative min-h-[240px] w-full overflow-hidden rounded-3xl text-left"
     >
       <Photo src={TOUR_IMAGES[tour.id] || DEFAULT_TOUR_IMAGE} className="absolute inset-0 h-full w-full object-cover" />

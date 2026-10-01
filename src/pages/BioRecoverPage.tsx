@@ -42,7 +42,7 @@ export function BioRecoverPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 py-8">
+    <div className="mx-auto max-w-md px-4 py-8 pb-28">
       <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Trade mark</p>
       <h1 className="font-display mt-1 text-3xl font-semibold">Recover a handle</h1>
       <p className="mt-2 text-sm text-mute">

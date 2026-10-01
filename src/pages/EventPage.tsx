@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useRoute, useLocation } from "wouter";
+import { useRoute, useLocation, useSearch } from "wouter";
 import { Check, ChevronDown, Heart, MapPin, Plus, Share2, Sparkles, Star, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { StickyAction } from "@/components/design-system/companions";
@@ -25,11 +25,27 @@ import { PageLoading } from "@/components/ui/PageLoading";
 import { NotFoundPage } from "./NotFoundPage";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { HereCheckIn } from "@/components/circle/HereCheckIn";
+import { TicketGatePanel } from "@/components/booking/TicketGatePanel";
+import { ticketIdFromSearch } from "@shared/booking";
 
 export function EventPage() {
   const [, params] = useRoute("/e/:id");
   const id = params?.id || "";
-  const { getEvent: getExpo, calendarEvents, remoteNearby, remoteLoaded, fetchRemoteStalls } = useEvents();
+  const search = useSearch();
+  const { user } = useAuth();
+  // Gate-scan QR landings (?ticket=). Guests never fire it; non-entitled
+  // signed-in viewers get a silent denial and the plain event page.
+  const ticketId = user ? ticketIdFromSearch(search) : null;
+  const {
+    getEvent: getExpo,
+    calendarEvents,
+    remoteNearby,
+    remoteLoaded,
+    fetchRemoteStalls,
+    fetchRemoteEvent,
+  } = useEvents();
+  const [directEv, setDirectEv] = useState<CalendarEvent | null>(null);
+  const [directDone, setDirectDone] = useState(false);
 
   useEffect(() => {
     if (id) void fetchRemoteStalls(id);
@@ -40,25 +56,58 @@ export function EventPage() {
   // Migrated curated events live in Firestore, not in the bundle.
   const near = remoteNearby.find((e) => e.id === id);
 
+  // Direct by-id fallback for deep links the list fetch skipped (demo docs).
+  // Renders the exact same detail view as live content.
+  useEffect(() => {
+    setDirectEv(null);
+    setDirectDone(false);
+    if (!id || expo || calEv || near || !remoteLoaded) return;
+    let alive = true;
+    void fetchRemoteEvent(id).then((base) => {
+      if (!alive) return;
+      if (base) setDirectEv(base);
+      setDirectDone(true);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [id, expo, calEv, near, remoteLoaded, fetchRemoteEvent]);
+
   // A context_view with loadStatus "ok" already fired for /e/:id — pair it
   // with context_load_failed when nothing resolves, or the miss reads as a hit.
   const loadFailed = useRef("");
   useEffect(() => {
-    if (!remoteLoaded || expo || calEv || near || !id || loadFailed.current === id) return;
+    if (!remoteLoaded || !directDone || expo || calEv || near || directEv || !id || loadFailed.current === id)
+      return;
     loadFailed.current = id;
     void track("context_load_failed", { contextType: "event", contextId: id, errorClass: "not_found" });
-  }, [remoteLoaded, expo, calEv, near, id]);
+  }, [remoteLoaded, directDone, expo, calEv, near, directEv, id]);
 
-  if (!remoteLoaded) {
+  if (!remoteLoaded || (!expo && !calEv && !near && !directEv && !directDone)) {
     return <PageLoading />;
   }
 
-  if (expo) return <ExpoDirectoryPage event={expo} />;
-
-  if (calEv) return <CalendarEventDetailView event={calEv} />;
-
-  if (near) return <NearbyEventDetailView event={near} />;
-  return <NotFoundPage />;
+  const body = expo ? (
+    <ExpoDirectoryPage event={expo} />
+  ) : calEv ? (
+    <CalendarEventDetailView event={calEv} />
+  ) : near ? (
+    <NearbyEventDetailView event={near} />
+  ) : directEv ? (
+    <CalendarEventDetailView event={directEv} />
+  ) : (
+    <NotFoundPage />
+  );
+  return (
+    <>
+      {ticketId && (
+        <div className="mx-auto max-w-lg px-4 pt-4">
+          <TicketGatePanel ticketId={ticketId} />
+        </div>
+      )}
+      {body}
+    </>
+  );
 }
 
 function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
@@ -152,7 +201,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
         <button
           type="button"
           onClick={() => nav("/calendar")}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-mute hover:text-ink transition"
+          className="inline-flex min-h-[44px] items-center gap-1.5 text-xs font-medium text-mute hover:text-ink transition"
         >
           <ArrowLeft size={14} />
           <span>Calendar</span>
@@ -160,10 +209,11 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
         <button
           type="button"
           onClick={handleShare}
-          className="grid h-8 w-8 place-items-center rounded-full bg-card ring-1 ring-line text-mute hover:text-ink transition"
+          aria-label="Share event"
+          className="grid h-11 w-11 place-items-center rounded-full bg-card ring-1 ring-line text-mute hover:text-ink transition"
           title="Share"
         >
-          <Share2 size={14} />
+          <Share2 size={16} />
         </button>
       </div>
 
@@ -375,7 +425,7 @@ function NearbyEventDetailView({ event: ev }: { event: NearbyEvent }) {
     });
   }, [ev.id, ev.title, ev.insiderTip, ev.detail, ev.heroImage]);
   return (
-    <div className="mx-auto max-w-lg pb-10">
+    <div className="mx-auto max-w-lg pb-28">
       {ev.heroImage && (
         <img src={ev.heroImage} alt="" referrerPolicy="no-referrer" className="h-72 w-full object-cover" />
       )}

@@ -13,6 +13,7 @@ import { trackContentAction } from "@/lib/analytics";
 import { createBookingForCampaign } from "@/components/booking/BookingsSection";
 import { createBookingCheckoutSessionRemote } from "@/lib/functions";
 import { TicketPass } from "@/components/plan/TicketPass";
+import { PaymentCanceledNotice } from "@/components/booking/PaymentCanceledNotice";
 import { EventTile } from "@/components/event/EventTile";
 import { aud, type Campaign } from "@shared/campaign";
 import { cn } from "@/lib/cn";
@@ -96,7 +97,10 @@ export function ExperiencesPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 pb-28">
-      <Link href="/" className="flex items-center gap-1 text-[13px] font-medium text-mute">
+      <Link
+        href="/"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={14} /> Explore
       </Link>
       <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
@@ -108,6 +112,7 @@ export function ExperiencesPage() {
           <Plus size={16} /> Create
         </Button>
       </div>
+      <PaymentCanceledNotice />
       {bookedId ? <TicketPass bookingId={bookedId} /> : null}
 
       {loading && livePlans.length === 0 ? (

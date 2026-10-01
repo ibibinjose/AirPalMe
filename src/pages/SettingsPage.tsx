@@ -22,7 +22,7 @@ export function SettingsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState("");
 
   return (
-    <div className="mx-auto max-w-md px-4 pb-10">
+    <div className="mx-auto max-w-md px-4 pb-28">
       <p className="pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Account</p>
       <h1 className="font-display mt-1 text-3xl font-semibold">Settings</h1>
 
@@ -52,7 +52,7 @@ export function SettingsPage() {
       <div className="mt-3 space-y-2">
         <button
           type="button"
-          className="flex w-full items-center justify-between rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line"
+          className="flex w-full items-center justify-between rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line transition hover:bg-paper active:scale-[0.99]"
           onClick={() => nav("/me")}
         >
           <span>
@@ -63,7 +63,7 @@ export function SettingsPage() {
         </button>
         <button
           type="button"
-          className="flex w-full items-center justify-between rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line"
+          className="flex w-full items-center justify-between rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line transition hover:bg-paper active:scale-[0.99]"
           onClick={() => nav("/host")}
         >
           <span>
@@ -74,7 +74,7 @@ export function SettingsPage() {
         </button>
         <button
           type="button"
-          className="flex w-full items-center justify-between rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line"
+          className="flex w-full items-center justify-between rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line transition hover:bg-paper active:scale-[0.99]"
           onClick={() => nav(partnerAccountPath({ signedIn: Boolean(user), hasPlace: Boolean(business) }))}
         >
           <span>
@@ -85,7 +85,7 @@ export function SettingsPage() {
         </button>
         <button
           type="button"
-          className="flex w-full items-center justify-between rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line"
+          className="flex w-full items-center justify-between rounded-2xl bg-card px-4 py-3 text-left ring-1 ring-line transition hover:bg-paper active:scale-[0.99]"
           onClick={() => nav("/event")}
         >
           <span>
@@ -144,7 +144,11 @@ export function SettingsPage() {
 
       {user ? (
         <>
-          <button type="button" className="mt-8 text-sm text-mute" onClick={() => void logout().then(() => nav("/"))}>
+          <button
+            type="button"
+            className="mt-8 inline-flex min-h-[44px] items-center text-sm font-medium text-mute hover:text-ink"
+            onClick={() => void logout().then(() => nav("/"))}
+          >
             Sign out
           </button>
           <h2 className="font-display mt-10 text-xl text-rose-700">Delete account</h2>
@@ -162,7 +166,7 @@ export function SettingsPage() {
           <button
             type="button"
             disabled={deleteBusy || deleteConfirm !== "DELETE"}
-            className="mt-3 text-sm font-semibold text-rose-700 disabled:opacity-40"
+            className="mt-3 inline-flex min-h-[44px] items-center rounded-full bg-rose-500/10 px-4 text-sm font-semibold text-rose-700 ring-1 ring-rose-500/20 transition hover:bg-rose-500/15 disabled:opacity-40"
             onClick={() => {
               setDeleteBusy(true);
               void deleteAccount()

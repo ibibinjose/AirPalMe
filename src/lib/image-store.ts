@@ -109,3 +109,36 @@ export function readFileAsImage(file: File): Promise<{ image: HTMLImageElement; 
     img.src = url;
   });
 }
+
+/**
+ * Downscale an image file to an upload-ready JPEG. Returns the blob plus a
+ * preview object URL the caller revokes when done with it.
+ */
+export async function preparePhotoBlob(file: File, maxEdge = 1200): Promise<{ blob: Blob; previewUrl: string }> {
+  const { image, url } = await readFileAsImage(file);
+  try {
+    const canvas = document.createElement("canvas");
+    let { width, height } = image;
+    if (width > maxEdge || height > maxEdge) {
+      if (width > height) {
+        height = Math.round((height * maxEdge) / width);
+        width = maxEdge;
+      } else {
+        width = Math.round((width * maxEdge) / height);
+        height = maxEdge;
+      }
+    }
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Could not process image");
+    ctx.drawImage(image, 0, 0, width, height);
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Could not encode image"))), "image/jpeg", 0.88);
+    });
+    return { blob, previewUrl: url };
+  } catch (err) {
+    URL.revokeObjectURL(url);
+    throw err;
+  }
+}

@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { CalendarDays, MapPin, Ticket } from "lucide-react";
 import { formatPlanDate, type HangoutPlan } from "@shared/plan";
+import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
 export function EventTile({ plan }: { plan: HangoutPlan }) {
@@ -13,6 +14,9 @@ export function EventTile({ plan }: { plan: HangoutPlan }) {
   return (
     <Link
       href={`/plan/${plan.id}`}
+      onClick={() => {
+        void triggerHaptic("light");
+      }}
       className="group flex flex-col overflow-hidden rounded-3xl bg-card text-left ring-1 ring-line shadow-xs transition hover:-translate-y-0.5 hover:ring-brand/30"
     >
       <div className="relative aspect-square w-full overflow-hidden bg-paper">

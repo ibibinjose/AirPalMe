@@ -7,6 +7,8 @@
  * analytics + consent). Firebase's own keys (`firebase:...`) are untouched.
  */
 
+import { safeLocalStorage, safeSessionStorage } from "./safe-storage";
+
 const PREFIXES = ["airpal.", "airpal:"];
 
 /** Device prefs that survive logout. Everything else `airpal*` is user data. */
@@ -49,25 +51,9 @@ function sweep(storage: Storage | null): string[] {
   return removed;
 }
 
-function storage(): Storage | null {
-  try {
-    return typeof localStorage !== "undefined" ? localStorage : null;
-  } catch {
-    return null;
-  }
-}
-
-function session(): Storage | null {
-  try {
-    return typeof sessionStorage !== "undefined" ? sessionStorage : null;
-  } catch {
-    return null;
-  }
-}
-
 /** Remove all signed-in user data from this device. Safe to call twice. */
 export function clearDeviceCache(): string[] {
-  const removed = [...sweep(storage()), ...sweep(session())];
+  const removed = [...sweep(safeLocalStorage()), ...sweep(safeSessionStorage())];
   try {
     if (typeof indexedDB !== "undefined" && indexedDB.deleteDatabase) {
       indexedDB.deleteDatabase(MEDIA_DB);

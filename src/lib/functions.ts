@@ -21,13 +21,22 @@ import type {
   AddPlanStopResponse,
   VotePlanStopRequest,
   VotePlanStopResponse,
+  VoteDateOptionRequest,
+  VoteDateOptionResponse,
   PostPlanCommentRequest,
   PostPlanCommentResponse,
   CompletePlanRequest,
   CompletePlanResponse,
   GetPlanByInviteCodeRequest,
   GetPlanByInviteCodeResponse,
+  ExperienceProofResponse,
 } from "@shared/plan";
+import type {
+  InviteToPlanRequest,
+  InviteToPlanResponse,
+  SendPlanBroadcastRequest,
+  SendPlanBroadcastResponse,
+} from "@shared/plan-notify";
 import { getFirebaseFunctions, isFirebaseConfigured } from "./firebase";
 
 export function liveBackendEnabled() {
@@ -132,6 +141,7 @@ export function upsertBusinessListingRemote(data: {
   website?: string;
   plan?: string;
   abnOrTaxId?: string;
+  demo?: boolean;
 }) {
   return callFunction<typeof data, { listingId: string; placeId: string }>(CALLABLES.upsertBusinessListing, data);
 }
@@ -179,6 +189,7 @@ export function upsertEventRemote(data: {
   registrationUrl?: string;
   registrationNote?: string;
   speakers?: { name: string; role?: string }[];
+  demo?: boolean;
 }) {
   return callFunction<typeof data, { eventId: string }>(CALLABLES.upsertEvent, data);
 }
@@ -345,6 +356,10 @@ export function votePlanStopRemote(data: VotePlanStopRequest) {
 }
 export const votePlanStopRemoteCall = votePlanStopRemote;
 
+export function voteDateOptionRemote(data: VoteDateOptionRequest) {
+  return callFunction<VoteDateOptionRequest, VoteDateOptionResponse>(CALLABLES.voteDateOption, data);
+}
+
 export function postPlanCommentRemote(data: PostPlanCommentRequest) {
   return callFunction<PostPlanCommentRequest, PostPlanCommentResponse>(CALLABLES.postPlanComment, data);
 }
@@ -359,6 +374,18 @@ export function getPlanByInviteCodeRemote(data: GetPlanByInviteCodeRequest) {
   return callFunction<GetPlanByInviteCodeRequest, GetPlanByInviteCodeResponse>(CALLABLES.getPlanByInviteCode, data);
 }
 export const getPlanByInviteCodeRemoteCall = getPlanByInviteCodeRemote;
+
+export function getExperienceProofRemote() {
+  return callFunction<Record<string, never>, ExperienceProofResponse>(CALLABLES.getExperienceProof, {});
+}
+
+export function sendPlanBroadcastRemote(data: SendPlanBroadcastRequest) {
+  return callFunction<SendPlanBroadcastRequest, SendPlanBroadcastResponse>(CALLABLES.sendPlanBroadcast, data);
+}
+
+export function inviteToPlanRemote(data: InviteToPlanRequest) {
+  return callFunction<InviteToPlanRequest, InviteToPlanResponse>(CALLABLES.inviteToPlan, data);
+}
 
 export function createExperienceCheckoutSessionRemote(data: {
   planId: string;
@@ -520,6 +547,41 @@ export function createConnectLoginLinkRemote() {
   return callFunction<Record<string, never>, { ok: boolean; url: string }>(CALLABLES.createConnectLoginLink, {});
 }
 
+export function teardownDemoBusinessRemote() {
+  return callFunction<Record<string, never>, { deleted: Record<string, number> }>(
+    CALLABLES.teardownDemoBusiness,
+    {},
+  );
+}
+
+export function verifyTicketRemote(data: { ticketId: string }) {
+  return callFunction<
+    typeof data,
+    {
+      ticketId: string;
+      eventId: string;
+      eventName: string;
+      title: string;
+      date: string;
+      time: string;
+      spots: number;
+      paymentStatus: string;
+      displayPaid: boolean;
+      status: string;
+      valid: boolean;
+      reason: string | null;
+      admittedAt: string | null;
+    }
+  >(CALLABLES.verifyTicket, data);
+}
+
+export function admitTicketRemote(data: { ticketId: string }) {
+  return callFunction<typeof data, { ticketId: string; admittedAt: string; already: boolean }>(
+    CALLABLES.admitTicket,
+    data,
+  );
+}
+
 export function releaseHeldPayoutsRemote() {
   return callFunction<
     Record<string, never>,
@@ -598,6 +660,10 @@ export function getPulseByTokenRemote(data: { publicToken: string }) {
   return callFunction<typeof data, import("@shared/pulse").PulsePublicDto>(CALLABLES.getPulseByToken, data);
 }
 
+export function getBioPulseRemote(data: { propertyId: string }) {
+  return callFunction<typeof data, import("@shared/pulse").BioPulseResult>(CALLABLES.getBioPulse, data);
+}
+
 export function submitPulseResponseRemote(data: {
   publicToken: string;
   answers: import("@shared/pulse").PulseAnswer[];
@@ -613,7 +679,13 @@ export function submitPulseResponseRemote(data: {
   >(CALLABLES.submitPulseResponse, data);
 }
 
-export function createPulseRemote(data: { propertyId: string; template?: string; name?: string; title?: string }) {
+export function createPulseRemote(data: {
+  propertyId: string;
+  template?: string;
+  name?: string;
+  title?: string;
+  imageUrl?: string;
+}) {
   return callFunction<typeof data, { pulseId: string; status: "draft" }>(CALLABLES.createPulse, data);
 }
 

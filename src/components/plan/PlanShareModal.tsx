@@ -1,18 +1,65 @@
-import { useEffect, useState } from "react";
-import { Check, Copy, Download, MessageCircle, QrCode, Share2, X } from "lucide-react";
-import { type HangoutPlan, formatPlanDate, planInviteUrl } from "@shared/plan";
+import { useEffect, useMemo, useState } from "react";
+import { Check, Copy, Download, MessageCircle, QrCode, Send, Share2, X } from "lucide-react";
+import { type HangoutPlan, formatPlanDate, pastCrew, planInviteUrl } from "@shared/plan";
 import { makeQrDataUrl } from "@/lib/qr";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { shareNative, triggerHaptic } from "@/lib/native";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { publicSiteOrigin, toPublicUrl } from "@/lib/public-origin";
+import { useAuth } from "@/contexts/AuthContext";
+import { usePlans } from "@/contexts/PlanContext";
+import { inviteToPlanRemote, liveBackendEnabled } from "@/lib/functions";
 
-export function PlanShareModal({ plan, open, onClose }: { plan: HangoutPlan; open: boolean; onClose: () => void }) {
+export function PlanShareModal({
+  plan,
+  open,
+  onClose,
+  canInvite,
+}: {
+  plan: HangoutPlan;
+  open: boolean;
+  onClose: () => void;
+  /** Managers can ping past crew straight to their inbox. */
+  canInvite?: boolean;
+}) {
   useScrollLock(open);
 
   const [copied, setCopied] = useState(false);
   const [qrUrl, setQrUrl] = useState<string>("");
+  const [invited, setInvited] = useState<Set<string>>(new Set());
+  const { plans } = usePlans();
+  const { user } = useAuth();
+  const viewerId = user?.uid || (typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null);
+
+  // People you've already been out with, minus this plan's crew.
+  const crew = useMemo(
+    () =>
+      pastCrew(plans, viewerId, {
+        excludeIds: plan.attendees.map((a) => a.id),
+        excludePlanId: plan.id,
+        limit: 6,
+      }),
+    [plans, viewerId, plan],
+  );
+
+  useEffect(() => {
+    if (open) setInvited(new Set());
+  }, [open, plan.id]);
+
+  async function inviteCrew(id: string) {
+    if (!liveBackendEnabled()) {
+      toast.message("Connect Firebase to send invites.");
+      return;
+    }
+    try {
+      await inviteToPlanRemote({ planId: plan.id, uid: id });
+      setInvited((prev) => new Set(prev).add(id));
+      toast.success("Invite sent!");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not invite");
+    }
+  }
 
   const origin = publicSiteOrigin();
   const inviteUrl = toPublicUrl(planInviteUrl(plan.id, origin));
@@ -141,6 +188,56 @@ export function PlanShareModal({ plan, open, onClose }: { plan: HangoutPlan; ope
             <span className="text-[11px] font-medium">More…</span>
           </button>
         </div>
+
+        {/* Been out with — one-tap re-invite to their inbox */}
+        {canInvite && crew.length > 0 && (
+          <div className="mt-6">
+            <p className="text-xs font-semibold text-ink/80 mb-1.5">Been out with — tap to re-invite</p>
+            <ul className="space-y-2">
+              {crew.map((c) => (
+                <li
+                  key={c.id}
+                  className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-2.5 pl-3 ring-1 ring-line"
+                >
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-card text-xs font-bold text-ink ring-1 ring-line uppercase">
+                      {c.avatar ? (
+                        <img src={c.avatar} alt={c.name} className="h-full w-full object-cover" />
+                      ) : (
+                        c.name.charAt(0)
+                      )}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-xs font-semibold text-ink">
+                        {c.name}
+                        {c.handle && <span className="text-mute font-normal"> (@{c.handle})</span>}
+                      </span>
+                      <span className="block truncate text-[11px] text-mute">
+                        {c.sharedPlans} plan{c.sharedPlans === 1 ? "" : "s"} together
+                      </span>
+                    </span>
+                  </span>
+                  {invited.has(c.id) ? (
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500/15 px-3 py-2 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+                      <Check size={13} />
+                      <span>Sent</span>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => void inviteCrew(c.id)}
+                      aria-label={`Invite ${c.name}`}
+                      className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
+                    >
+                      <Send size={13} />
+                      <span>Invite</span>
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* QR Code Presentation */}
         <div className="mt-6 rounded-3xl bg-paper p-5 ring-1 ring-line text-center">

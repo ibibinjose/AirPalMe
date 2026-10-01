@@ -4,6 +4,7 @@ import { getFirebaseDb } from "./firebase";
 import {
   acknowledgePulseIssueRemote,
   createPulseRemote,
+  getBioPulseRemote,
   getPulseByTokenRemote,
   liveBackendEnabled,
   publishPulseRemote,
@@ -83,6 +84,11 @@ export async function fetchPulseByToken(publicToken: string) {
   return getPulseByTokenRemote({ publicToken });
 }
 
+export async function fetchBioPulse(propertyId: string) {
+  if (!liveBackendEnabled()) return { found: false as const };
+  return getBioPulseRemote({ propertyId });
+}
+
 export async function submitPulse(input: Parameters<typeof submitPulseResponseRemote>[0]) {
   if (!liveBackendEnabled()) throw new Error("Pulse needs a live connection.");
   return submitPulseResponseRemote(input);
@@ -93,9 +99,10 @@ export async function createPulse(
   template: PulseTemplate = "general_csat",
   name?: string,
   title?: string,
+  imageUrl?: string,
 ) {
   if (!liveBackendEnabled()) throw new Error("Pulse needs a live connection.");
-  return createPulseRemote({ propertyId, template, name, title });
+  return createPulseRemote({ propertyId, template, name, title, imageUrl });
 }
 
 export async function createDuringStayPulse(propertyId: string, name?: string) {
@@ -143,17 +150,20 @@ export type PropertyPulse = {
   name: string;
   status: "draft" | "live" | "paused" | "archived";
   activePublicToken?: string;
+  imageUrl?: string;
   updatedAt?: string;
 };
 
 export function pulseFromDoc(id: string, data: Record<string, unknown>): PropertyPulse | null {
   const status = String(data.status || "draft");
   if (status !== "draft" && status !== "live" && status !== "paused" && status !== "archived") return null;
+  const branding = (data.branding || {}) as { imageUrl?: unknown };
   return {
     id,
     name: typeof data.name === "string" && data.name ? data.name : "Pulse",
     status,
     activePublicToken: typeof data.activePublicToken === "string" ? data.activePublicToken : undefined,
+    imageUrl: typeof branding.imageUrl === "string" && branding.imageUrl ? branding.imageUrl : undefined,
     updatedAt: asIso(data.updatedAtIso) || asIso(data.updatedAt) || undefined,
   };
 }

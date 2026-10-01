@@ -88,12 +88,12 @@ export function PeoplePage() {
   }
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-10">
+    <div className="mx-auto max-w-lg px-4 pb-28">
       <div className="flex items-center gap-3 pt-4">
         <button
           type="button"
           onClick={() => nav("/me")}
-          className="grid h-9 w-9 place-items-center rounded-full bg-card ring-1 ring-line transition hover:bg-card/80"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-card ring-1 ring-line transition hover:bg-card/80"
           aria-label="Back to profile"
         >
           <ArrowLeft size={16} />
@@ -113,7 +113,8 @@ export function PeoplePage() {
         <button
           type="button"
           onClick={() => setActiveTab("met")}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-xl transition ${
+          aria-pressed={activeTab === "met"}
+          className={`flex-1 flex items-center justify-center gap-1.5 min-h-[44px] text-xs font-semibold rounded-xl transition ${
             activeTab === "met" ? "bg-card text-ink shadow-xs" : "text-mute hover:text-ink"
           }`}
         >
@@ -123,7 +124,8 @@ export function PeoplePage() {
         <button
           type="button"
           onClick={() => setActiveTab("catchup")}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-xl transition ${
+          aria-pressed={activeTab === "catchup"}
+          className={`flex-1 flex items-center justify-center gap-1.5 min-h-[44px] text-xs font-semibold rounded-xl transition ${
             activeTab === "catchup" ? "bg-card text-gold shadow-xs" : "text-mute hover:text-ink"
           }`}
         >
@@ -173,7 +175,7 @@ export function PeoplePage() {
                       <button
                         type="button"
                         onClick={() => nav(bioPath(c.targetHandle))}
-                        className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-paper text-xs font-semibold ring-1 ring-line hover:bg-card"
+                        className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-paper text-xs font-semibold ring-1 ring-line hover:bg-card"
                         title="View profile"
                       >
                         @
@@ -183,7 +185,7 @@ export function PeoplePage() {
                     <button
                       type="button"
                       onClick={() => onRemoveCatchUp(c.id, c.requesterName)}
-                      className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-paper text-mute ring-1 ring-line hover:text-red-600"
+                      className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-paper text-mute ring-1 ring-line hover:text-red-600"
                       title="Remove reminder"
                     >
                       <Trash2 size={14} />
@@ -287,7 +289,7 @@ export function PeoplePage() {
                       <button
                         type="button"
                         onClick={() => nav(bioPath(p.handle!))}
-                        className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-paper text-xs font-semibold ring-1 ring-line transition hover:bg-card"
+                        className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-paper text-xs font-semibold ring-1 ring-line transition hover:bg-card"
                         aria-label={`Open ${p.name}'s bio`}
                         title="Open bio"
                       >
@@ -303,7 +305,7 @@ export function PeoplePage() {
                           note: p.whereMet ? `Met at ${p.whereMet} · AirPal` : "AirPal contact",
                         })
                       }
-                      className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-paper ring-1 ring-line transition hover:bg-card"
+                      className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-paper ring-1 ring-line transition hover:bg-card"
                       aria-label={`Save ${p.name} to contacts`}
                       title="Save contact (.vcf)"
                     >
@@ -312,7 +314,7 @@ export function PeoplePage() {
                     <button
                       type="button"
                       onClick={() => onRemove(p.id, p.name)}
-                      className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-paper text-mute ring-1 ring-line transition hover:text-red-600"
+                      className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-paper text-mute ring-1 ring-line transition hover:text-red-600"
                       aria-label={`Remove ${p.name}`}
                       title="Remove"
                     >

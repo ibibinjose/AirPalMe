@@ -4,9 +4,11 @@ import { TabPills } from "@/components/ui/TabPills";
 
 export type BusinessRoleDomain = "venue" | "bookings" | "experiences" | "promotions" | "onboard";
 
+export type BusinessNavTab = "place" | "bookings" | "list" | "offer";
+
 interface BusinessNavHubProps {
-  activeTab: string;
-  onTabChange: (tab: any) => void;
+  activeTab: BusinessNavTab;
+  onTabChange: (tab: BusinessNavTab) => void;
   listingActive: boolean;
   dealLive: boolean;
   campaignCount: number;

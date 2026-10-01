@@ -1,5 +1,5 @@
 import { DEFAULT_LISTING_GEO, DEFAULT_PRECINCT_ID, listingToPlace, type BusinessListing } from "@shared/business";
-import { isContentLive, stampContentMeta } from "@shared/content-meta";
+import { isContentLive, isDemoContent, stampContentMeta } from "@shared/content-meta";
 import type { NearbyPlace } from "@shared/nearby";
 
 const KEY = "airpal.listings.v1";
@@ -47,8 +47,28 @@ export function getCachedListings() {
 
 export function listedPlaces(): NearbyPlace[] {
   return getCachedListings()
-    .filter((row) => isContentLive(row))
+    .filter((row) => isContentLive(row) && !isDemoContent(row))
     .map(listingToPlace);
+}
+
+/**
+ * By-id lookup over the raw cache, bypassing discovery filters. Detail
+ * pages fall back to this so direct links — including demo docs — resolve
+ * through the exact same view as live content. Predicate mirrors
+ * catalog.getPlace.
+ */
+export function getListedPlaceById(id: string): NearbyPlace | undefined {
+  const norm = id.trim().toLowerCase();
+  const withoutList = norm.replace(/^list-/, "");
+  return getCachedListings()
+    .map(listingToPlace)
+    .find(
+      (p) =>
+        p.id.toLowerCase() === norm ||
+        p.handle?.toLowerCase() === norm ||
+        p.id.toLowerCase() === withoutList ||
+        p.id.toLowerCase() === `pl-${withoutList}`,
+    );
 }
 
 export function upsertCachedListing(listing: BusinessListing) {

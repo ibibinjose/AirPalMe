@@ -2,6 +2,8 @@ export interface PropertyInfo {
   id: string;
   name: string;
   tagline: string;
+  /** Demo-business marker: filtered from guest discovery, `demo-` ids skip KPIs. */
+  demo?: boolean;
   /** D3 commercial kinds; residential stays stay out until legal compliance lands. */
   kind?: "hotel" | "motel" | "serviced-apartment" | "hostel" | "boutique" | "campus" | "venue";
   destination: string;

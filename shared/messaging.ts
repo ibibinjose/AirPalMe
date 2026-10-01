@@ -45,6 +45,9 @@ export interface UniversalConversation {
   isAiEnabled?: boolean;
 }
 
+/** Local delivery state. Absent = legacy cached message, treated as sent. */
+export type ChatMessageSync = "local" | "sent" | "failed";
+
 export interface UniversalChatMessage {
   id: string;
   conversationId: string;
@@ -57,6 +60,7 @@ export interface UniversalChatMessage {
   readBy: string[];
   createdAt: string;
   updatedAt?: string;
+  sync?: ChatMessageSync;
 }
 
 export const MESSAGE_MAX = 1000;
@@ -73,4 +77,31 @@ export function isChatParticipant(uid: string, ownerUid?: string, mateUid?: stri
 
 export function unreadCount(messages: Pick<ChatMessage, "senderUid" | "readBy">[], uid: string): number {
   return messages.filter((m) => m.senderUid !== uid && !m.readBy.includes(uid)).length;
+}
+
+export type MatchChatActionId = "book" | "plan";
+
+export interface MatchChatAction {
+  id: MatchChatActionId;
+  label: string;
+}
+
+/**
+ * Match → book handoff chips inside the request_chats thread. Customer-only:
+ * book while unbooked (label mirrors the Mate page Book button), then plan.
+ */
+export function matchChatActions(opts: {
+  viewerIsCustomer: boolean;
+  matched: boolean;
+  booked: boolean;
+  budget: number;
+}): MatchChatAction[] {
+  if (!opts.viewerIsCustomer || !opts.matched) return [];
+  const actions: MatchChatAction[] = [];
+  if (!opts.booked) {
+    const amount = Number.isFinite(opts.budget) ? Math.max(0, Math.floor(opts.budget)) : 0;
+    actions.push({ id: "book", label: amount > 0 ? `Book · about $${amount}` : "Book · free" });
+  }
+  actions.push({ id: "plan", label: "Make a Plan" });
+  return actions;
 }

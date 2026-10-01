@@ -122,8 +122,11 @@ export function PromotionAdminDetailPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/admin/promotions" className="flex items-center gap-1 text-[13px] font-medium text-mute">
+    <div className="mx-auto max-w-2xl px-4 py-8 pb-28">
+      <Link
+        href="/admin/promotions"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={14} /> Promotions
       </Link>
       <div className="mt-4 flex items-center gap-2">
@@ -157,7 +160,7 @@ export function PromotionAdminDetailPage() {
             type="button"
             disabled={busy === d}
             onClick={() => act(d)}
-            className="rounded-lg border border-line/20 px-2 py-1 text-[11px] font-bold hover:bg-brand hover:text-white disabled:opacity-50"
+            className="inline-flex min-h-[44px] items-center rounded-lg border border-line px-3.5 text-xs font-bold transition hover:bg-brand hover:text-white active:scale-95 disabled:opacity-50"
           >
             {d}
           </button>
@@ -177,7 +180,7 @@ export function PromotionAdminDetailPage() {
               max={10}
               value={winnerCount}
               onChange={(e) => setWinnerCount(Number(e.target.value))}
-              className="w-20 rounded-xl ring-1 ring-line/15 p-2 text-sm"
+              className="h-11 w-20 rounded-xl ring-1 ring-line px-3 text-sm outline-none focus:ring-2 focus:ring-brand/40"
               aria-label="Number of winners"
             />
             <Button onClick={draw} disabled={busy === "draw"} className="flex-1">
@@ -206,7 +209,7 @@ export function PromotionAdminDetailPage() {
                       type="button"
                       disabled={busy === w.id + to}
                       onClick={() => advanceWinner(w, to)}
-                      className="rounded-lg border border-line/20 px-2 py-1 text-[11px] font-bold hover:bg-brand hover:text-white disabled:opacity-50"
+                      className="inline-flex min-h-[44px] items-center rounded-lg border border-line px-3.5 text-xs font-bold transition hover:bg-brand hover:text-white active:scale-95 disabled:opacity-50"
                     >
                       → {to.replace("_", " ")}
                     </button>

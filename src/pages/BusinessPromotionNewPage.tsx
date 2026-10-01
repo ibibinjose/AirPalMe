@@ -71,8 +71,11 @@ export function BusinessPromotionNewPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/business/promotions" className="flex items-center gap-1 text-[13px] font-medium text-mute">
+    <div className="mx-auto max-w-2xl px-4 py-8 pb-28">
+      <Link
+        href="/business/promotions"
+        className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
+      >
         <ArrowLeft size={14} /> Your promotions
       </Link>
       <h1 className="font-display mt-4 text-2xl font-bold">New campaign</h1>

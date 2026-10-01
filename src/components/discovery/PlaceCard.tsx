@@ -6,6 +6,7 @@ import { isOpenAt } from "@/lib/hours";
 import { freshnessOf } from "@shared/freshness";
 import { useOptionalLocalNow } from "@/contexts/LocalNowContext";
 import { useLocale } from "@/contexts/LocaleContext";
+import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
 export function PlaceCard({ place, walk }: { place: NearbyPlace; walk?: string }) {
@@ -24,6 +25,9 @@ export function PlaceCard({ place, walk }: { place: NearbyPlace; walk?: string }
   return (
     <Link
       href={hrefForPlace(place)}
+      onClick={() => {
+        void triggerHaptic("light");
+      }}
       className={cn(
         "group relative block aspect-square overflow-hidden rounded-3xl text-left ring-1 ring-line",
         onPhoto ? "bg-paper" : "bg-card",

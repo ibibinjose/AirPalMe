@@ -9,7 +9,6 @@ import {
   MapPin,
   Plane,
   Plus,
-  QrCode,
   Search,
   ShieldCheck,
   Sparkles,
@@ -26,12 +25,11 @@ import { formatPlanDate } from "@shared/plan";
 import { Photo } from "@/components/ui/Photo";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
-import { DoorChooser } from "@/components/home/DoorChooser";
-import { loadDoor, saveDoor } from "@/lib/door";
 import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
 import { triggerHaptic } from "@/lib/native";
 import { loadPublicMatesRemote } from "@/lib/companion-remote";
 import type { PublicMate } from "@shared/companion";
+import { getExperienceProofRemote } from "@/lib/functions";
 import {
   ArrowCta,
   AvatarStack,
@@ -45,10 +43,10 @@ import { cn } from "@/lib/cn";
 type AroundFilter = "events" | "food" | "places" | "community";
 
 const AROUND: { id: AroundFilter; label: string; color: string }[] = [
-  { id: "events", label: "Events & Shows", color: "#e86a33" },
-  { id: "food", label: "Dining & Drinks", color: "#d99a17" },
+  { id: "events", label: "Events & Shows", color: "#c2410c" },
+  { id: "food", label: "Dining & Drinks", color: "#b45309" },
   { id: "places", label: "Places & Stays", color: "#2b7cd3" },
-  { id: "community", label: "Community Hub", color: "#2fa866" },
+  { id: "community", label: "Community Hub", color: "#15803d" },
 ];
 
 const QUICK_PROMPTS = [
@@ -65,17 +63,17 @@ const VERTICALS = [
   {
     id: "mate",
     label: "AirPal Mate",
-    sub: "Find someone to go with you",
+    sub: "Find someone to go with",
     href: "/mate",
     icon: Users,
     gradient: "from-blue-600/15 via-indigo-500/10 to-transparent",
     iconBg: "bg-brand text-white",
-    badge: "MVP Priority",
+    badge: "Connect",
   },
   {
     id: "experiences",
     label: "Experiences",
-    sub: "Food, culture, art & music",
+    sub: "Food, art & culture",
     href: "/experiences",
     icon: Sparkles,
     gradient: "from-amber-500/15 via-orange-500/10 to-transparent",
@@ -84,8 +82,8 @@ const VERTICALS = [
   },
   {
     id: "stay",
-    label: "Stays & Places",
-    sub: "Hotels, hostels & retreats",
+    label: "Stays",
+    sub: "Hotels & boutique rooms",
     href: "/explore",
     icon: Hotel,
     gradient: "from-emerald-500/15 via-teal-500/10 to-transparent",
@@ -95,27 +93,27 @@ const VERTICALS = [
   {
     id: "events",
     label: "What's On",
-    sub: "Daily discovery & nightlife",
+    sub: "Live gigs & events",
     href: "/calendar",
     icon: CalendarDays,
     gradient: "from-rose-500/15 via-pink-500/10 to-transparent",
     iconBg: "bg-rose-600 text-white",
-    badge: "Live Daily",
+    badge: "Live",
   },
   {
     id: "trips",
-    label: "Plan & Travel",
-    sub: "Itineraries & group hangouts",
+    label: "Trips",
+    sub: "Plans & itineraries",
     href: "/plan",
     icon: Plane,
     gradient: "from-purple-500/15 via-violet-500/10 to-transparent",
     iconBg: "bg-purple-600 text-white",
-    badge: "Collaborate",
+    badge: "Trips",
   },
   {
     id: "perks",
     label: "Perks & Drops",
-    sub: "Giveaways, birthday freebies & rewards",
+    sub: "Birthday freebies, giveaways & rewards",
     href: "/birthday-freebies/au",
     icon: Gift,
     gradient: "from-yellow-500/15 via-amber-500/10 to-transparent",
@@ -132,8 +130,8 @@ export function HomePage() {
   const { city, here, today, now } = useLocalNow();
   const { version } = useListings();
   const [around, setAround] = useState<AroundFilter>("events");
-  const [door, setDoor] = useState(() => loadDoor());
   const [publicMates, setPublicMates] = useState<PublicMate[]>([]);
+  const [completedCount, setCompletedCount] = useState(0);
 
   useEffect(() => {
     loadPublicMatesRemote()
@@ -143,6 +141,19 @@ export function HomePage() {
         }
       })
       .catch(() => undefined);
+  }, []);
+
+  // Proof the loop is alive: real completed-plan count, shown only when nonzero.
+  useEffect(() => {
+    let cancelled = false;
+    getExperienceProofRemote()
+      .then((proof) => {
+        if (!cancelled && proof?.ok) setCompletedCount(Math.max(0, Number(proof.completed) || 0));
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const firstName = useMemo(() => {
@@ -182,17 +193,6 @@ export function HomePage() {
 
   const forYou = useMemo(() => publicPlans.slice(0, 3), [publicPlans]);
 
-  if (!door) {
-    return (
-      <DoorChooser
-        onPick={(id) => {
-          saveDoor(id);
-          setDoor(id);
-        }}
-      />
-    );
-  }
-
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 md:px-6">
       {/* Hero Header Section */}
@@ -206,29 +206,30 @@ export function HomePage() {
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md ring-1 ring-white/30">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
               {city || "Sydney"} · Live
+              {completedCount > 0 && <> · {completedCount.toLocaleString("en-AU")} completed</>}
             </span>
             <span className="text-xs font-medium text-white/80">
               {greeting}, {firstName}
             </span>
           </div>
 
-          <h1 className="font-display mt-3 text-[32px] sm:text-[42px] font-bold leading-[1.05] tracking-tight text-white max-w-2xl">
+          <h1 className="font-display mt-3 text-[30px] sm:text-[40px] font-bold leading-[1.05] tracking-tight text-white max-w-2xl">
             What do you want to do?
           </h1>
-          <p className="mt-1.5 text-sm sm:text-base font-medium text-white/85 max-w-xl">
-            AirPal.me — Life Made Easy. Find mates, discover experiences, explore stays, and make real plans.
+          <p className="mt-1 text-sm sm:text-base font-medium text-white/90 max-w-lg">
+            Find mates, places, and experiences.
           </p>
 
           {/* Quick Search Trigger */}
-          <div className="mt-5">
+          <div className="mt-4">
             <button
               type="button"
-              onClick={openGlobalSearch}
-              className="flex w-full items-center justify-between rounded-2xl bg-card/90 px-4 py-3.5 text-left text-sm font-medium text-mute ring-1 ring-line/80 shadow-md backdrop-blur-md hover:bg-card hover:text-ink transition cursor-pointer"
+              onClick={() => openGlobalSearch()}
+              className="flex w-full min-h-[48px] items-center justify-between rounded-2xl bg-card/90 px-4 py-3 text-left text-sm font-medium text-mute ring-1 ring-line/80 shadow-md backdrop-blur-md hover:bg-card hover:text-ink transition cursor-pointer touch-manipulation active:scale-[0.99]"
             >
               <span className="flex items-center gap-2.5">
                 <Search size={18} className="text-brand" />
-                <span>Search mates, places, events, food or trips…</span>
+                <span>Search mates, places, events, or trips…</span>
               </span>
               <kbd className="hidden rounded bg-paper/90 px-2 py-0.5 text-xs font-semibold text-mute ring-1 ring-line sm:inline-block">
                 ⌘K
@@ -260,11 +261,11 @@ export function HomePage() {
               size="sm"
               onClick={() => {
                 void triggerHaptic("medium");
-                nav("/mate");
+                nav("/mate/request");
               }}
-              className="h-11 rounded-full px-5 font-bold shadow-[0_6px_20px_rgba(24,5,219,0.35)]"
+              className="h-11 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(24,5,219,0.35)]"
             >
-              <Users size={16} className="mr-1.5" />
+              <Users size={16} className="mr-2" />
               Find a Mate
             </Button>
             <Button
@@ -274,22 +275,10 @@ export function HomePage() {
                 void triggerHaptic("light");
                 nav("/plan/new");
               }}
-              className="h-11 rounded-full px-5 bg-white/15 text-white ring-1 ring-white/30 hover:bg-white/25 font-semibold"
+              className="h-11 rounded-full px-5 bg-white/15 text-white ring-1 ring-white/30 hover:bg-white/25 font-semibold backdrop-blur-md"
             >
               <Plus size={16} className="mr-1.5" />
-              Make a Plan
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                void triggerHaptic("light");
-                nav("/scan");
-              }}
-              className="h-11 rounded-full px-4 bg-white/15 text-white ring-1 ring-white/30 hover:bg-white/25"
-              title="Scan QR / NFC"
-            >
-              <QrCode size={16} />
+              Plan a Hangout
             </Button>
           </div>
         </div>
@@ -298,10 +287,7 @@ export function HomePage() {
       {/* Six Marketplace Pillars Grid */}
       <section aria-label="Explore AirPal Verticals" className="mt-8">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-display text-xl font-bold tracking-tight">Life Made Easy</h2>
-            <p className="text-xs text-mute mt-0.5">Everything you need across people, places, and experiences.</p>
-          </div>
+          <h2 className="font-display text-xl font-bold tracking-tight text-ink">Life Made Easy</h2>
           <Link href="/explore" className="text-xs font-bold text-brand hover:underline">
             View All →
           </Link>
@@ -318,22 +304,19 @@ export function HomePage() {
                   void triggerHaptic("light");
                   nav(v.href);
                 }}
-                className={cn(
-                  "group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-card p-3.5 text-left ring-1 ring-line/80 shadow-xs transition-all hover:shadow-md hover:ring-brand/30 active:scale-[0.98] cursor-pointer",
-                )}
+                className="group relative flex flex-col justify-between rounded-2xl bg-card p-4 text-left ring-1 ring-line/80 shadow-xs transition hover:shadow-md hover:ring-brand/30 active:scale-[0.98] cursor-pointer"
               >
-                <div className={cn("absolute inset-0 bg-gradient-to-br opacity-60 transition-opacity group-hover:opacity-100", v.gradient)} />
-                <div className="relative z-10 flex items-start justify-between">
-                  <div className={cn("grid h-9 w-9 place-items-center rounded-xl shadow-xs", v.iconBg)}>
+                <div className="flex items-center justify-between">
+                  <div className={cn("grid h-10 w-10 place-items-center rounded-xl shadow-xs transition group-hover:scale-105", v.iconBg)}>
                     <Icon size={18} />
                   </div>
                   {v.badge && (
-                    <span className="rounded-full bg-paper px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-mute ring-1 ring-line">
+                    <span className="text-[10px] font-bold text-mute">
                       {v.badge}
                     </span>
                   )}
                 </div>
-                <div className="relative z-10 mt-4">
+                <div className="mt-4">
                   <p className="font-display text-[15px] font-bold text-ink leading-snug group-hover:text-brand transition-colors">
                     {v.label}
                   </p>
@@ -400,8 +383,8 @@ export function HomePage() {
                   <Plane size={14} /> Ready for your next outing?
                 </div>
                 <h3 className="font-display text-lg font-bold mt-1 text-ink">Plan a hangout or trip</h3>
-                <p className="text-xs text-mute mt-1">
-                  Keep your destinations, times, and mates connected on one shared live itinerary.
+                <p className="text-xs text-mute mt-0.5">
+                  Live itineraries with friends &amp; mates.
                 </p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -448,9 +431,7 @@ export function HomePage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-line/60 pb-4">
             <div>
               <p className="font-display text-base font-bold text-ink">Going somewhere? Don&apos;t go alone.</p>
-              <p className="text-xs text-mute mt-0.5">
-                Connect with verified local mates for dinners, events, workouts, or exploring the city safely.
-              </p>
+              <p className="text-xs text-mute mt-0.5">Verified local companions.</p>
             </div>
             <Button
               size="sm"
@@ -488,16 +469,9 @@ export function HomePage() {
                       </p>
                     </div>
                   </div>
-                  <div className="mt-2.5 flex flex-wrap gap-1">
-                    {(m.interests || ["Events", "Coffee", "Walks"]).slice(0, 2).map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full bg-paper px-2 py-0.5 text-[10px] font-medium text-mute ring-1 ring-line"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                  <p className="mt-2 text-[11px] text-mute font-medium truncate">
+                    {(m.interests || ["Events", "Coffee", "Walks"]).slice(0, 3).join(" · ")}
+                  </p>
                 </CardShell>
               ))
             ) : (
@@ -564,11 +538,11 @@ export function HomePage() {
             <div className="flex items-start justify-between">
               <div>
                 <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
-                  Social Circles & Moments
+                  Social Circles
                 </span>
                 <p className="font-display text-lg font-bold mt-2 text-ink">Communities Around Movement</p>
                 <p className="mt-1 text-sm text-mute max-w-xl">
-                  Connect with foodies, travellers, and locals planning things together — life made easy, not another endless feed.
+                  Connect and plan activities with locals.
                 </p>
               </div>
               <ArrowCta />
@@ -731,12 +705,20 @@ export function HomePage() {
             <h3 className="font-display text-base font-bold text-ink">AirPal Trust & Safety</h3>
           </div>
           <p className="text-xs text-mute mt-1 max-w-xl leading-relaxed">
-            Verified identity badges, safe public meetup guidelines, transparent pricing with Stripe protection, and 24/7 incident support.
+            Verified identity badges, safe public meetups, and Stripe payment protection.
           </p>
-          <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-semibold text-ink/70">
-            <span className="rounded-full bg-paper px-2.5 py-1 ring-1 ring-line">✓ Identity Verified Mates</span>
-            <span className="rounded-full bg-paper px-2.5 py-1 ring-1 ring-line">✓ Stripe Secure Payments</span>
-            <span className="rounded-full bg-paper px-2.5 py-1 ring-1 ring-line">✓ Public Meetup Safety</span>
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-mute font-medium">
+            <span className="flex items-center gap-1.5 text-ink font-semibold">
+              <span className="text-emerald-600 font-bold">✓</span> Identity Verified Mates
+            </span>
+            <span aria-hidden="true" className="text-line select-none hidden sm:inline">·</span>
+            <span className="flex items-center gap-1.5 text-ink font-semibold">
+              <span className="text-emerald-600 font-bold">✓</span> Stripe Secure Payments
+            </span>
+            <span aria-hidden="true" className="text-line select-none hidden sm:inline">·</span>
+            <span className="flex items-center gap-1.5 text-ink font-semibold">
+              <span className="text-emerald-600 font-bold">✓</span> Public Meetup Safety
+            </span>
           </div>
         </div>
       </section>

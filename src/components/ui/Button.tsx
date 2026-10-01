@@ -1,13 +1,32 @@
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
+import { triggerHaptic, type HapticStyle } from "@/lib/native";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "ghost" | "dark" | "gold" | "light" | "onDark" | "tonal" | "elevated" | "outlined";
   size?: "md" | "lg" | "sm";
   loading?: boolean;
+  haptic?: HapticStyle | false;
 };
 
-export function Button({ variant = "primary", size = "md", className, loading, disabled, children, ...props }: Props) {
+export function Button({
+  variant = "primary",
+  size = "md",
+  className,
+  loading,
+  disabled,
+  children,
+  onClick,
+  haptic = "light",
+  ...props
+}: Props) {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!disabled && !loading && haptic !== false) {
+      void triggerHaptic(haptic);
+    }
+    onClick?.(e);
+  };
+
   return (
     <button
       className={cn(
@@ -29,6 +48,7 @@ export function Button({ variant = "primary", size = "md", className, loading, d
       )}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
+      onClick={handleClick}
       {...props}
     >
       {loading ? (

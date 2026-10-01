@@ -12,7 +12,10 @@ import {
   type BioProfile,
 } from "@shared/bio";
 import type { BusinessCategoryId } from "@shared/business";
+import type { FacilityItem } from "@shared/airpal-data";
+import { STAR_TIERS } from "@shared/stars";
 import { getFirebaseDb } from "./firebase";
+import { toZonedDateStr } from "./local-time";
 
 const KEY = "airpal.bios.v1";
 const TAPS_KEY = "airpal.bio-taps.v1";
@@ -63,7 +66,7 @@ export function persistBios(rows: BioProfile[]) {
 }
 
 export function todayKey() {
-  return new Date().toISOString().slice(0, 10);
+  return toZonedDateStr(new Date());
 }
 
 export function tapCount(handle: string) {
@@ -100,6 +103,7 @@ export function profileFromDoc(id: string, data: Record<string, unknown>): BioPr
         })) satisfies BioLink[])
     : [];
   const offer = data.offer as { badge?: string; detail?: string } | null | undefined;
+  const starTierRaw = typeof data.starTier === "string" ? data.starTier : "";
   return {
     id,
     handle: normalizeHandle(String(data.handle || "")),
@@ -116,6 +120,7 @@ export function profileFromDoc(id: string, data: Record<string, unknown>): BioPr
     cover: data.cover ? String(data.cover) : undefined,
     geo: Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : undefined,
     offer: offer?.badge ? { badge: String(offer.badge), detail: String(offer.detail || "") } : undefined,
+    starTier: STAR_TIERS.some((t) => t.name === starTierRaw) ? starTierRaw : undefined,
     products: sanitizeCatalog("product", data.products),
     services: sanitizeCatalog("service", data.services),
     deals: sanitizeCatalog("deal", data.deals),
@@ -144,7 +149,7 @@ export function profileFromDoc(id: string, data: Record<string, unknown>): BioPr
     zooHunt: data.zooHunt === true ? true : undefined,
     checkIn: data.checkIn ? String(data.checkIn) : undefined,
     checkOut: data.checkOut ? String(data.checkOut) : undefined,
-    facilities: Array.isArray(data.facilities) ? (data.facilities as any) : undefined,
+    facilities: Array.isArray(data.facilities) ? (data.facilities as FacilityItem[]) : undefined,
   };
 }
 

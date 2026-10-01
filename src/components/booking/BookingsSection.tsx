@@ -56,6 +56,7 @@ export function BookingsSection() {
   const { user, isAdmin } = useAuth();
   const [rows, setRows] = useState<Booking[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState(false);
   // Synchronous double-tap guard per booking: `busy` only disables the button
   // after a re-render, so a second tap on Pay could open a second Stripe
   // checkout session for the same booking (double charge risk).
@@ -88,9 +89,11 @@ export function BookingsSection() {
         if (left > 0) due[d.id] = left;
       }
       setBalances(due);
+      setLoadError(false);
     } catch {
       setRows([]);
       setBalances({});
+      setLoadError(true);
     }
   }
 
@@ -222,7 +225,21 @@ export function BookingsSection() {
     }
   }
 
-  if (!user || rows.length === 0) return null;
+  if (!user) return null;
+
+  if (loadError) {
+    return (
+      <section className="mt-6 rounded-2xl border border-line bg-card p-4">
+        <h2 className="font-display text-base font-bold">Tickets & bookings</h2>
+        <p className="mt-0.5 text-[13px] text-mute">Couldn&apos;t load your bookings. Check your connection and retry.</p>
+        <Button size="sm" variant="ghost" className="mt-2" onClick={() => void reload(user.uid)}>
+          Retry
+        </Button>
+      </section>
+    );
+  }
+
+  if (rows.length === 0) return null;
 
   return (
     <section className="mt-6 rounded-2xl border border-line bg-card p-4">

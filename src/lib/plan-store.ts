@@ -5,6 +5,7 @@ import {
   type PlanStop,
   type StopChangeAction,
   buildStopChangeMessage,
+  canCancelPlanStatus,
   randomInviteCode,
   planInviteUrl,
   reorderStops,
@@ -199,6 +200,20 @@ export function completePlan(planId: string): HangoutPlan | undefined {
   });
 }
 
+/** Host cancellation: flips a live plan to cancelled with an optional reason for the crew. */
+export function cancelPlan(planId: string, reason?: string): HangoutPlan | undefined {
+  const current = getPlan(planId);
+  if (!current) return undefined;
+  if (!canCancelPlanStatus(current.status)) return current;
+  const cleanReason = String(reason || "").trim().slice(0, 280);
+  return savePlan({
+    ...current,
+    status: "cancelled",
+    cancelReason: cleanReason || undefined,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
 export function deletePlan(planId: string): boolean {
   const all = loadPlans();
   const next = all.filter((p) => p.id !== planId);
@@ -219,7 +234,17 @@ export function respondToPlan(planId: string, attendee: Omit<PlanAttendee, "resp
 
   const existingIdx = plan.attendees.findIndex((a) => a.id === attendee.id);
   const now = new Date().toISOString();
-  const newAttendee: PlanAttendee = { ...attendee, respondedAt: now };
+  const existing = existingIdx >= 0 ? plan.attendees[existingIdx] : undefined;
+  // RSVP edits must never wipe host/guest-managed history the form doesn't
+  // touch: ratings, reviews, and door check-ins survive re-RSVPs.
+  const newAttendee: PlanAttendee = {
+    ...attendee,
+    rating: attendee.rating ?? existing?.rating,
+    review: attendee.review ?? existing?.review,
+    checkedIn: attendee.checkedIn ?? existing?.checkedIn,
+    checkedInAt: attendee.checkedInAt ?? existing?.checkedInAt,
+    respondedAt: now,
+  };
 
   const nextAttendees = [...plan.attendees];
   if (existingIdx >= 0) {
@@ -328,6 +353,27 @@ export function voteStopInPlan(planId: string, stopId: string, userId: string): 
   };
 
   return savePlan(updatedPlan);
+}
+
+/** Date-poll votes ride the plan doc (`dateOptions`); guests vote through the callable (rules keep direct writes host-only). */
+export function votePlanDateOption(
+  planId: string,
+  optionId: string,
+  userId: string,
+  syncRemote = true,
+): HangoutPlan | undefined {
+  const plan = getPlan(planId);
+  if (!plan || !plan.dateOptions?.some((o) => o.id === optionId)) return undefined;
+
+  const nextOptions = plan.dateOptions.map((o) => {
+    if (o.id !== optionId) return o;
+    const voters = new Set(o.voterUids || []);
+    if (voters.has(userId)) voters.delete(userId);
+    else voters.add(userId);
+    return { ...o, voterUids: Array.from(voters), votes: voters.size };
+  });
+
+  return savePlan({ ...plan, dateOptions: nextOptions }, syncRemote);
 }
 
 export const PLAN_COMMENT_MAX = 500;

@@ -78,3 +78,24 @@ export function isContentLive(
 export function contentNeedsReview(meta: Partial<ContentMeta>): boolean {
   return !meta.verifiedOwner || meta.reviewStatus === "pending" || meta.reviewStatus === "draft";
 }
+
+/**
+ * Demo-business marker (/Demo showcase). Strict `true` only — demo docs
+ * are filtered from guest discovery; `demo-` ids are excluded from KPIs.
+ */
+export function isDemoContent(input: { demo?: unknown }): boolean {
+  return input.demo === true;
+}
+
+/** Id prefix every demo-business doc carries (matches isSeedContextId). */
+export const DEMO_ID_PREFIX = "demo-";
+
+/** Deterministic demo doc id; caller supplies randomness (nanoid/server bytes). */
+export function demoDocId(kind: string, rand: string): string {
+  return `${DEMO_ID_PREFIX}${kind}-${rand}`;
+}
+
+/** The demo flag is stampable by platform admins only — never by owners. */
+export function demoFlagAllowed(isAdmin: boolean, requested: unknown): boolean {
+  return isAdmin === true && requested === true;
+}

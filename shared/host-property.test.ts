@@ -48,6 +48,16 @@ describe("wifi secret split", () => {
       wifiNetwork: "GuestNet",
     });
   });
+
+  it("strips the owner email from the public property doc", () => {
+    const property = buildHostProperty({
+      propertyName: "Test Hotel",
+      ownerEmail: "host@example.com",
+      ownerId: "uid-1",
+    });
+    expect(property.ownerEmail).toBe("host@example.com");
+    expect(toPublicPropertyDoc(property).ownerEmail).toBeUndefined();
+  });
 });
 
 describe("opaque property ids", () => {

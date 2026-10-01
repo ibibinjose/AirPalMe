@@ -23,6 +23,8 @@ import {
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { ImageField } from "@/components/media/ImageField";
+import { Photo } from "@/components/ui/Photo";
 import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
 import { makeQrDataUrl } from "@/lib/qr";
@@ -135,6 +137,7 @@ export function PulseHubPage() {
   const [pulseName, setPulseName] = useState("");
   const [pulseTitle, setPulseTitle] = useState(TEMPLATES[0]!.defaultTitle);
   const [placementLabel, setPlacementLabel] = useState(TEMPLATES[0]!.defaultPlacement);
+  const [pulseImage, setPulseImage] = useState<string | undefined>(undefined);
   const [busy, setBusy] = useState(false);
 
   // Live Pulses & Responses
@@ -217,7 +220,13 @@ export function PulseHubPage() {
     setBusy(true);
     try {
       const name = pulseName.trim() || `${TEMPLATES.find((t) => t.id === selectedTemplate)?.title || "Pulse"}`;
-      const created = await createPulse(workspaceId, selectedTemplate, name, pulseTitle.trim() || undefined);
+      const created = await createPulse(
+        workspaceId,
+        selectedTemplate,
+        name,
+        pulseTitle.trim() || undefined,
+        pulseImage || undefined,
+      );
       const pub = await publishPulse(workspaceId, created.pulseId, "other", placementLabel.trim() || "QR Card");
 
       setActivePublicToken(pub.publicToken);
@@ -346,6 +355,7 @@ export function PulseHubPage() {
                         key={tmpl.id}
                         type="button"
                         onClick={() => setSelectedTemplate(tmpl.id)}
+                        aria-pressed={isSelected}
                         className={`text-left p-3.5 rounded-2xl ring-1 transition-all text-sm ${
                           isSelected
                             ? "ring-2 ring-brand bg-brand/5 shadow-xs"
@@ -410,6 +420,14 @@ export function PulseHubPage() {
                       className="w-full h-11 px-4 rounded-2xl bg-paper ring-1 ring-line text-xs sm:text-sm text-ink outline-none focus:ring-2 focus:ring-brand/40"
                     />
                   </div>
+
+                  <ImageField
+                    kind="cover"
+                    folder="listings"
+                    label="Cover image (optional)"
+                    value={pulseImage}
+                    onChange={(src) => setPulseImage(src)}
+                  />
                 </div>
 
                 <Button
@@ -426,10 +444,10 @@ export function PulseHubPage() {
             <div className="lg:col-span-5 space-y-4 sticky top-6">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-mute">
-                  Interactive Guest Mobile Preview
+                  3. Live guest preview
                 </span>
                 <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 motion-safe:animate-pulse" />
                   Live Reactive
                 </span>
               </div>
@@ -437,6 +455,17 @@ export function PulseHubPage() {
               {/* Mobile Mockup Frame */}
               <div className="p-4 rounded-[32px] bg-card ring-2 ring-line shadow-xl max-w-sm mx-auto">
                 <div className="w-12 h-1 bg-line rounded-full mx-auto mb-4" />
+                {pulseImage ? (
+                  <div className="relative mb-4 h-28 overflow-hidden rounded-2xl ring-1 ring-line">
+                    <Photo src={pulseImage} alt="" className="h-full w-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-ink/10 to-transparent" aria-hidden />
+                    <div className="absolute inset-x-0 bottom-0 p-3 text-left">
+                      <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                        {pulseName.trim() || "Your Business"}
+                      </span>
+                    </div>
+                  </div>
+                ) : null}
                 <div className="p-4 rounded-2xl bg-paper/80 ring-1 ring-line space-y-4">
                   <div className="text-center space-y-1">
                     <span className="text-[10px] font-bold text-brand uppercase tracking-wider">
@@ -456,9 +485,11 @@ export function PulseHubPage() {
                           key={item.score}
                           type="button"
                           onClick={() => setPreviewRating(item.score)}
-                          className={`flex flex-col items-center p-2 rounded-xl transition-all ${
+                          aria-pressed={active}
+                          aria-label={`Preview ${item.label} rating`}
+                          className={`flex min-h-[44px] min-w-[44px] flex-col items-center justify-center rounded-xl p-1.5 transition-colors ${
                             active
-                              ? "bg-brand/15 scale-110 ring-1 ring-brand"
+                              ? "bg-brand/15 ring-2 ring-brand"
                               : "hover:bg-paper opacity-75"
                           }`}
                         >
@@ -518,14 +549,14 @@ export function PulseHubPage() {
                         <button
                           type="button"
                           onClick={handleCopyLink}
-                          className="inline-flex items-center gap-1 rounded-full bg-paper px-3 py-1 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card transition"
+                          className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card transition"
                         >
                           <Copy className="w-3 h-3" /> Copy Link
                         </button>
                         <button
                           type="button"
                           onClick={() => setShowPrintModal(true)}
-                          className="inline-flex items-center gap-1 rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition"
+                          className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition"
                         >
                           <Printer className="w-3 h-3" /> Print Standee
                         </button>
@@ -533,7 +564,7 @@ export function PulseHubPage() {
                           href={buildPulsePublicUrl(activePublicToken, publicSiteOrigin())}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1 text-xs font-semibold text-brand hover:underline"
+                          className="inline-flex min-h-[44px] items-center gap-1 px-1 text-xs font-semibold text-brand hover:underline"
                         >
                           Test View <ExternalLink className="w-3 h-3" />
                         </a>
@@ -559,13 +590,13 @@ export function PulseHubPage() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outlined" size="sm" onClick={handleDownloadCsv} className="h-9 rounded-full text-xs">
+              <Button variant="outlined" size="sm" onClick={handleDownloadCsv} className="min-h-[44px] rounded-full text-xs">
                 <Download className="w-3.5 h-3.5 mr-1.5" />
                 Export CSV
               </Button>
               <Link
                 href="/helpdesk"
-                className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 h-9 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition"
+                className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 min-h-[44px] text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition"
               >
                 <Headphones className="w-3.5 h-3.5" />
                 Help Desk Console
@@ -600,7 +631,7 @@ export function PulseHubPage() {
                 <span className="text-xs font-semibold text-mute">Open Tickets</span>
                 <AlertCircle size={16} className="text-rose-500" />
               </div>
-              <p className={`font-display text-2xl font-bold mt-2 ${openIssues.length > 0 ? "text-rose-600 animate-pulse" : "text-ink"}`}>
+              <p className={`font-display text-2xl font-bold mt-2 ${openIssues.length > 0 ? "text-rose-600 motion-safe:animate-pulse" : "text-ink"}`}>
                 {openIssues.length}
               </p>
               <p className="text-[10px] text-mute mt-0.5">Awaiting staff recovery</p>
@@ -691,7 +722,7 @@ export function PulseHubPage() {
                         <button
                           type="button"
                           onClick={() => handleAcknowledge(issue.id)}
-                          className="w-full rounded-full bg-paper py-1.5 text-xs font-semibold text-mute hover:text-ink ring-1 ring-line transition"
+                          className="w-full rounded-full bg-paper min-h-[44px] text-xs font-semibold text-mute hover:text-ink ring-1 ring-line transition"
                         >
                           Acknowledge Issue
                         </button>
@@ -705,12 +736,12 @@ export function PulseHubPage() {
                           onChange={(e) =>
                             setResolutionNoteByIssue({ ...resolutionNoteByIssue, [issue.id]: e.target.value })
                           }
-                          className="flex-1 h-9 px-3 rounded-full bg-paper ring-1 ring-line text-xs text-ink outline-none focus:ring-2 focus:ring-brand/40"
+                          className="flex-1 h-11 px-4 rounded-full bg-paper ring-1 ring-line text-xs text-ink outline-none focus:ring-2 focus:ring-brand/40"
                         />
                         <button
                           type="button"
                           onClick={() => handleResolve(issue.id)}
-                          className="rounded-full bg-emerald-600 text-white hover:bg-emerald-700 h-9 text-xs font-semibold px-4 shadow-xs transition"
+                          className="rounded-full bg-emerald-600 text-white hover:bg-emerald-700 min-h-[44px] text-xs font-semibold px-4 shadow-xs transition"
                         >
                           Resolve
                         </button>
@@ -732,7 +763,8 @@ export function PulseHubPage() {
               <button
                 type="button"
                 onClick={() => setShowPrintModal(false)}
-                className="text-zinc-400 hover:text-zinc-800"
+                aria-label="Close print preview"
+                className="grid h-11 w-11 place-items-center rounded-full text-zinc-400 hover:text-zinc-800"
               >
                 <X size={20} />
               </button>
