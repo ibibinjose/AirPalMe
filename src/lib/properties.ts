@@ -1,4 +1,16 @@
-import { collection, deleteDoc, deleteField, doc, getDoc, getDocs, onSnapshot, setDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  deleteField,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  onSnapshot,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
 import type { MenuItem, PropertyInfo } from "@shared/airpal-data";
 import { buildHostProperty, parseHostPropertyKind } from "@shared/host-property";
 import { isoFromUnknown } from "@shared/freshness";
@@ -62,6 +74,109 @@ export function unknownProperty(id: string): PropertyInfo {
     breakfast: { hours: "", location: "", type: "", price: "" },
     facilities: [],
   };
+}
+
+/**
+ * Stay-finder honesty gate. A property is listable guest discovery only when
+ * it is real supply (never a demo), not suspended, named, and known to be in
+ * the guest's city. New host properties default to `trial`, so trial counts
+ * as listable; docs without a status predate the field and stay listable.
+ * Placeholder cities ("Your city") never match.
+ */
+export function stayFinderVisible(prop: PropertyInfo, city: string): boolean {
+  if (!prop || prop.demo === true) return false;
+  if (prop.status === "suspended") return false;
+  if (!prop.name || !prop.name.trim()) return false;
+  const want = city.trim().toLowerCase();
+  if (!want) return false;
+  const candidates = [prop.city, prop.destination]
+    .map((value) => value.trim().toLowerCase())
+    .filter((value) => value && value !== "your city");
+  if (candidates.length === 0) return false;
+  return candidates.some((candidate) => candidate === want || candidate.includes(want) || want.includes(candidate));
+}
+
+/** Live-data stay finder: real, listable stays in the guest's city. */
+export function filterStayFinder(props: PropertyInfo[], city: string): PropertyInfo[] {
+  return props.filter((prop) => stayFinderVisible(prop, city));
+}
+
+/**
+ * DemoHotel picker: first listable stay in the guest's city, else the first
+ * listable stay anywhere. Never a demo, suspended, or unnamed doc — null
+ * means no real supply, and the caller falls back to the Harbour simulation.
+ */
+export function pickDemoProperty(props: PropertyInfo[], city: string): PropertyInfo | null {
+  const inCity = filterStayFinder(props, city);
+  if (inCity.length > 0) return inCity[0];
+  return props.find((prop) => prop && prop.demo !== true && prop.status !== "suspended" && prop.name?.trim()) ?? null;
+}
+
+const STAY_KIND_LABELS: Record<string, string> = {
+  hotel: "Hotel",
+  motel: "Motel",
+  "serviced-apartment": "Serviced Apartment",
+  hostel: "Hostel",
+  boutique: "Boutique Stay",
+  campus: "Campus Stay",
+  venue: "Venue Stay",
+};
+
+/** Display label for a commercial stay kind. Empty when the kind is unknown. */
+export function stayKindLabel(kind: string | undefined): string {
+  if (!kind) return "";
+  return STAY_KIND_LABELS[kind] || "";
+}
+
+/**
+ * Listing price label from host-published nightly prices (dollars, matching
+ * the host panels). Range when room types disagree, "from" for one price,
+ * null when the host published nothing — never an invented number.
+ */
+export function stayPriceLabel(prop: PropertyInfo): string | null {
+  const prices = [...(prop.roomTypes || []).map((room) => room.startingPrice), prop.startingPrice].filter(
+    (price): price is number => typeof price === "number" && price > 0,
+  );
+  if (prices.length === 0) return null;
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  if (max > min) return `$${min}–$${max} / night`;
+  return `from $${min} / night`;
+}
+
+/** Public stay-profile path: handle first, then slug, then the opaque id. */
+export function stayProfilePath(prop: Pick<PropertyInfo, "id" | "handle" | "slug">): string {
+  const key = prop.handle?.trim() || prop.slug?.trim() || prop.id;
+  return `/stay/@${encodeURIComponent(key)}`;
+}
+
+/**
+ * Resolve a stay-profile key to a live property doc: direct id first, then
+ * the public vanity handle, then the legacy slug. Unknown keys yield the
+ * generic unknown-property placeholder, never seed content.
+ */
+export async function fetchPropertyByHandle(rawKey: string): Promise<PropertyInfo> {
+  const key = rawKey.trim().replace(/^@+/, "");
+  if (!key) return unknownProperty(rawKey);
+  const db = getFirebaseDb();
+  if (!db || !liveBackendEnabled()) return unknownProperty(key);
+  try {
+    const direct = await withTimeout(getDoc(doc(db, "properties", key)), REMOTE_TIMEOUT_MS);
+    if (direct?.exists()) return normalizeProperty(key, direct.data() as Record<string, unknown>);
+    for (const field of ["handle", "slug"] as const) {
+      for (const candidate of [key, key.toLowerCase()]) {
+        const snap = await withTimeout(
+          getDocs(query(collection(db, "properties"), where(field, "==", candidate), limit(1))),
+          REMOTE_TIMEOUT_MS,
+        );
+        const hit = snap?.docs[0];
+        if (hit) return normalizeProperty(hit.id, hit.data() as Record<string, unknown>);
+      }
+    }
+  } catch {
+    /* unknown stay below */
+  }
+  return unknownProperty(key);
 }
 
 export function getCachedProperty(id: string): PropertyInfo | undefined {

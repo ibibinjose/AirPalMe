@@ -140,6 +140,10 @@ export function SettingsPage() {
         <Link href="/contact" className="text-brand">
           Contact
         </Link>
+        {" · "}
+        <Link href="/help" className="text-brand">
+          Help
+        </Link>
       </p>
 
       {user ? (

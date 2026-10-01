@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
+import { collection, getDocs } from "firebase/firestore";
 import {
   Heart,
   List as ListIcon,
@@ -45,10 +46,13 @@ import { CityMap, type MapPin as Pin } from "@/components/map/CityMap";
 import { RatingBadge } from "@/components/design-system/companions";
 import { triggerHaptic } from "@/lib/native";
 import { Button } from "@/components/ui/Button";
-import { harbourStaySeeds } from "@/lib/seed-stay";
+import { filterStayFinder, normalizeProperty, stayKindLabel, stayProfilePath } from "@/lib/properties";
+import { getFirebaseDb } from "@/lib/firebase";
+import type { PropertyInfo } from "@shared/airpal-data";
 import { cn } from "@/lib/cn";
 
-type ExploreFilter = "all" | "nearby" | "events" | "places" | "food" | "experiences" | "communities" | "travel" | "people";
+type ExploreFilter =
+  "all" | "nearby" | "events" | "places" | "food" | "experiences" | "communities" | "travel" | "people";
 
 const FILTERS: { id: ExploreFilter; label: string; icon?: typeof Compass }[] = [
   { id: "all", label: "All" },
@@ -112,6 +116,33 @@ export function ExplorePage() {
 
   const effectiveCity = city && city !== "Choose a city" && city !== "Current location" ? city : "Sydney";
 
+  const [stays, setStays] = useState<PropertyInfo[] | null>(null);
+  const [staysFailed, setStaysFailed] = useState(false);
+
+  useEffect(() => {
+    if (filter !== "travel") return;
+    let cancelled = false;
+    setStays(null);
+    setStaysFailed(false);
+    const db = getFirebaseDb();
+    if (!db) {
+      setStays([]);
+      return;
+    }
+    void getDocs(collection(db, "properties"))
+      .then((snap) => {
+        if (cancelled) return;
+        const rows = snap.docs.map((d) => normalizeProperty(d.id, d.data() as Record<string, unknown>));
+        setStays(filterStayFinder(rows, effectiveCity));
+      })
+      .catch(() => {
+        if (!cancelled) setStaysFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [filter, effectiveCity]);
+
   const rawPlaces = useMemo(
     () => filterPlacesByPrice(discoverPlaces(here, city, "city"), price),
     [here, city, version, price],
@@ -150,18 +181,13 @@ export function ExplorePage() {
     if (q) {
       list = list.filter(
         (e) =>
-          e.title.toLowerCase().includes(q) ||
-          e.venue?.toLowerCase().includes(q) ||
-          e.city?.toLowerCase().includes(q),
+          e.title.toLowerCase().includes(q) || e.venue?.toLowerCase().includes(q) || e.city?.toLowerCase().includes(q),
       );
     }
     return list.slice(0, 16);
   }, [rawEvents, searchQuery]);
 
-  const rawExperiences = useMemo(
-    () => publicPlans.filter((p) => p.isExperience),
-    [publicPlans],
-  );
+  const rawExperiences = useMemo(() => publicPlans.filter((p) => p.isExperience), [publicPlans]);
 
   const experiences = useMemo(() => {
     let list = rawExperiences;
@@ -194,10 +220,7 @@ export function ExplorePage() {
     [places],
   );
 
-  const center = useMemo(
-    () => knownCityCenter(city) || { lat: -33.8688, lng: 151.2093 },
-    [city],
-  );
+  const center = useMemo(() => knownCityCenter(city) || { lat: -33.8688, lng: 151.2093 }, [city]);
 
   const activeFiltersCount = (when !== "any" ? 1 : 0) + (price !== "any" ? 1 : 0);
 
@@ -356,17 +379,18 @@ export function ExplorePage() {
               >
                 <div className="flex items-center justify-between">
                   <span className="text-2xl">{j.emoji}</span>
-                  <span className={cn("flex h-7 w-7 items-center justify-center rounded-xl bg-linear-to-br transition group-hover:scale-110", j.color)}>
+                  <span
+                    className={cn(
+                      "flex h-7 w-7 items-center justify-center rounded-xl bg-linear-to-br transition group-hover:scale-110",
+                      j.color,
+                    )}
+                  >
                     <Compass size={15} />
                   </span>
                 </div>
                 <div className="mt-3">
-                  <span className="block truncate text-sm font-bold text-ink">
-                    {j.title}
-                  </span>
-                  <span className="block truncate text-[11px] text-mute">
-                    {j.subtitle}
-                  </span>
+                  <span className="block truncate text-sm font-bold text-ink">{j.title}</span>
+                  <span className="block truncate text-[11px] text-mute">{j.subtitle}</span>
                 </div>
               </Link>
             ))}
@@ -378,12 +402,7 @@ export function ExplorePage() {
       {view === "map" ? (
         <section aria-label="Map View" className="mt-6">
           <div className="overflow-hidden rounded-3xl ring-1 ring-line shadow-xs">
-            <CityMap
-              center={center}
-              pins={pins}
-              selectedId={selectedPin?.id}
-              onPin={setSelectedPin}
-            />
+            <CityMap center={center} pins={pins} selectedId={selectedPin?.id} onPin={setSelectedPin} />
           </div>
 
           <div className="mt-4 flex items-center justify-between">
@@ -398,9 +417,7 @@ export function ExplorePage() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-bold text-ink truncate">{selectedPlace.name}</span>
-                  {typeof selectedPlace.rating === "number" && (
-                    <RatingBadge value={selectedPlace.rating} />
-                  )}
+                  {typeof selectedPlace.rating === "number" && <RatingBadge value={selectedPlace.rating} />}
                 </div>
                 <p className="text-xs text-mute truncate mt-0.5">{selectedPlace.shortWhy || "Nearby place"}</p>
               </div>
@@ -498,9 +515,7 @@ export function ExplorePage() {
                   <Hotel size={18} className="text-brand" />
                   <span>Travel & Stays in {effectiveCity}</span>
                 </h2>
-                <p className="text-xs text-mute mt-0.5">
-                  Trip plans, stay concierge, and verified places to stay
-                </p>
+                <p className="text-xs text-mute mt-0.5">Trip plans, Stay & Guide, and places to stay</p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs flex flex-col justify-between">
@@ -520,14 +535,12 @@ export function ExplorePage() {
 
                 <div className="rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs flex flex-col justify-between">
                   <div>
-                    <h3 className="font-display text-xl font-bold text-ink">Digital Compendium &amp; Concierge</h3>
-                    <p className="mt-0.5 text-xs text-mute">
-                      1-tap door PIN, Wi-Fi, dining, and stay services.
-                    </p>
+                    <h3 className="font-display text-xl font-bold text-ink">Stay &amp; Guide</h3>
+                    <p className="mt-0.5 text-xs text-mute">1-tap door PIN, Wi-Fi, dining, and stay services.</p>
                   </div>
                   <div className="mt-4 flex items-center gap-2">
                     <Button onClick={() => nav("/concierge")} className="h-10 rounded-full px-5 text-xs font-bold">
-                      <span>Open Stay Concierge</span>
+                      <span>Open Stay & Guide</span>
                       <ArrowRight size={13} />
                     </Button>
                   </div>
@@ -540,22 +553,38 @@ export function ExplorePage() {
                   <div>
                     <h2 className="font-display text-xl font-bold text-ink flex items-center gap-2">
                       <Hotel size={18} className="text-brand" />
-                      <span>Verified Stays in {effectiveCity}</span>
-                      <span className="text-xs font-semibold text-mute">({harbourStaySeeds().length})</span>
+                      <span>Stays in {effectiveCity}</span>
+                      <span className="text-xs font-semibold text-mute">({stays === null ? "…" : stays.length})</span>
                     </h2>
-                    <p className="text-xs text-mute mt-0.5">
-                      Hotels &amp; boutique retreats
-                    </p>
+                    <p className="text-xs text-mute mt-0.5">Places to stay, from live host listings</p>
                   </div>
-                  <Link href="/concierge" className="text-xs font-bold text-brand hover:underline shrink-0">
+                  <Link href="/stay" className="text-xs font-bold text-brand hover:underline shrink-0">
                     All Stays →
                   </Link>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
-                  {harbourStaySeeds().map((seed) => {
-                    const p = seed.property;
-                    return (
+                {stays === null && !staysFailed ? (
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-busy="true" aria-label="Loading stays">
+                    {[0, 1].map((i) => (
+                      <div key={i} className="h-64 animate-pulse rounded-3xl bg-card ring-1 ring-line" />
+                    ))}
+                  </div>
+                ) : staysFailed || stays === null ? (
+                  <div className="rounded-3xl border border-dashed border-line p-8 text-center">
+                    <p className="font-display text-lg font-medium">Couldn&apos;t load stays right now</p>
+                    <p className="mt-1 text-sm text-mute">Check your connection and try again.</p>
+                  </div>
+                ) : stays.length === 0 ? (
+                  <div className="rounded-3xl border border-dashed border-line p-8 text-center">
+                    <p className="font-display text-lg font-medium">No stays listed in {effectiveCity} yet</p>
+                    <p className="mt-1 text-sm text-mute">Are you a host? List your stay to appear here.</p>
+                    <Button size="sm" className="mt-4" onClick={() => nav("/business/onboard")}>
+                      List your stay
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                    {stays.map((p) => (
                       <div
                         key={p.id}
                         className="group relative flex flex-col overflow-hidden rounded-3xl bg-card ring-1 ring-line shadow-xs transition hover:shadow-md"
@@ -568,12 +597,10 @@ export function ExplorePage() {
                           />
                           <div className="hero-scrim absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                           <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-brand/90 px-3 py-1 text-xs font-bold text-white shadow-xs backdrop-blur-md">
-                            <Hotel size={13} /> Verified Stay
+                            <Hotel size={13} /> {stayKindLabel(p.kind) || p.city || "Stay"}
                           </span>
                           <div className="absolute bottom-3 left-3 right-3">
-                            <p className="font-display text-lg font-bold text-white leading-tight">
-                              {p.name}
-                            </p>
+                            <p className="font-display text-lg font-bold text-white leading-tight">{p.name}</p>
                             <p className="text-xs font-medium text-white/80 line-clamp-1 mt-0.5">
                               {p.tagline || p.address}
                             </p>
@@ -586,10 +613,12 @@ export function ExplorePage() {
                               <MapPin size={12} className="text-brand" />
                               {p.address || p.city}
                             </span>
-                            <span className="flex items-center gap-1">
-                              <Clock size={12} />
-                              Check-in: {p.checkIn || "2:00 PM"}
-                            </span>
+                            {p.checkIn ? (
+                              <span className="flex items-center gap-1">
+                                <Clock size={12} />
+                                Check-in: {p.checkIn}
+                              </span>
+                            ) : null}
                           </div>
 
                           {p.wifi?.speed && (
@@ -601,17 +630,20 @@ export function ExplorePage() {
 
                           {p.facilities && p.facilities.length > 0 && (
                             <p className="text-xs text-mute font-medium truncate">
-                              {p.facilities.slice(0, 4).map((f) => f.name).join(" · ")}
+                              {p.facilities
+                                .slice(0, 4)
+                                .map((f) => f.name)
+                                .join(" · ")}
                             </p>
                           )}
 
                           <div className="flex items-center gap-2 pt-1 border-t border-line/60">
                             <Button
                               size="sm"
-                              onClick={() => nav(`/stay/${p.id}`)}
+                              onClick={() => nav(stayProfilePath(p))}
                               className="min-h-[44px] flex-1 rounded-full text-xs font-bold"
                             >
-                              Digital Compendium
+                              View stay
                             </Button>
                             <Button
                               size="sm"
@@ -624,9 +656,9 @@ export function ExplorePage() {
                           </div>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    ))}
+                  </div>
+                )}
               </section>
             </div>
           )}
@@ -679,10 +711,7 @@ export function ExplorePage() {
                         aria-pressed={e.isInterested}
                         className="absolute right-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-full bg-white/90 backdrop-blur-xs transition active:scale-90 shadow-xs"
                       >
-                        <Heart
-                          size={15}
-                          className={e.isInterested ? "fill-brand text-brand" : "text-ink"}
-                        />
+                        <Heart size={15} className={e.isInterested ? "fill-brand text-brand" : "text-ink"} />
                       </button>
 
                       <div className="absolute bottom-2.5 left-2.5 right-2.5">
@@ -760,9 +789,7 @@ export function ExplorePage() {
                     </div>
 
                     <div className="p-3">
-                      <p className="truncate text-xs text-mute">
-                        {formatPlanDate(p.date, p.time)}
-                      </p>
+                      <p className="truncate text-xs text-mute">{formatPlanDate(p.date, p.time)}</p>
                     </div>
                   </Link>
                 ))}
@@ -804,7 +831,7 @@ export function ExplorePage() {
                       className="group relative flex flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-line transition-all duration-200 hover:-translate-y-0.5 hover:ring-brand/30 hover:shadow-xs"
                     >
                       <div className="relative aspect-square overflow-hidden bg-paper">
-                        {(p.heroImage || p.photos?.[0]) ? (
+                        {p.heroImage || p.photos?.[0] ? (
                           <Photo
                             src={p.heroImage || p.photos![0]}
                             alt={p.name}
@@ -934,4 +961,3 @@ export function ExplorePage() {
     </div>
   );
 }
-

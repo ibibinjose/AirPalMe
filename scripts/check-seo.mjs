@@ -40,6 +40,10 @@ must(!locs.some((l) => /\/:|\*|\(/.test(l)), "sitemap.xml must not contain param
 const llms = read("public/llms.txt");
 must(llms.includes("AirPal.Me"), "llms.txt must name the brand");
 must(llms.includes("https://airpal.me/contact"), "llms.txt must give AI a contact path");
+must(llms.includes("https://airpal.me/trust"), "llms.txt must point AI at the company-facts page");
+must(llms.includes("https://airpal.me/concierge"), "llms.txt must point AI at the concierge page");
+must(llms.includes("https://airpal.me/mate"), "llms.txt must point AI at the Mate page");
+must(llms.includes("/alternatives/"), "llms.txt must point AI at the comparison pages");
 
 const security = read("public/.well-known/security.txt");
 must(/^Contact: /m.test(security), "security.txt must declare a Contact");
@@ -66,6 +70,54 @@ const hosting = JSON.parse(read("firebase.json")).hosting;
 const sources = (hosting.headers || []).map((h) => h.source);
 for (const s of ["/robots.txt", "/sitemap.xml", "/llms.txt", "/.well-known/security.txt"]) {
   must(sources.includes(s), `firebase.json must set headers for ${s}`);
+}
+
+// Non-JS crawlers must get readable words, not an empty shell.
+must(head.includes("<noscript>"), "index.html must carry a <noscript> fallback for non-JS readers");
+must(head.includes("prerender:body-start"), "index.html must keep the static #root placeholder for crawlers");
+must(
+  (head.split("prerender:body-start")[1] || "").split("prerender:body-end")[0].includes("<div") === false,
+  "index.html #root placeholder must not nest <div> (prerender script invariant)",
+);
+must(head.includes('href="/about"'), "index.html static body must link to public routes");
+must(head.includes('href="/contact"'), "index.html static body must link to contact");
+must(head.includes('"addressCountry": "AU"'), "index.html Organization JSON-LD must declare the Australian address");
+
+// Marketing routes prerender with self-referencing canonicals at build time.
+must(
+  read("package.json").includes("node scripts/prerender-routes.mjs"),
+  "package.json build must run the route prerender script",
+);
+let prerenderRoutes = [];
+try {
+  prerenderRoutes = JSON.parse(read("scripts/prerender-routes.json"));
+  must(Array.isArray(prerenderRoutes) && prerenderRoutes.length > 0, "prerender-routes.json must list routes");
+} catch {
+  must(false, "prerender-routes.json must be valid JSON");
+}
+for (const route of prerenderRoutes) {
+  const label = (route && route.path) || "?";
+  must(/^\/[a-z-]+(?:\/[a-z-]+)?$/.test(label), `prerender route ${label} must be a simple public path`);
+  for (const key of ["title", "description", "heading", "summary"]) {
+    must(typeof route[key] === "string" && route[key].trim().length > 0, `prerender route ${label} must have ${key}`);
+  }
+  must(locs.includes(`https://airpal.me${label}`), `prerender route ${label} must be in the sitemap`);
+  if (route.jsonLd !== undefined) {
+    must(
+      Array.isArray(route.jsonLd) && route.jsonLd.length > 0,
+      `prerender route ${label} jsonLd must be a non-empty array`,
+    );
+    for (const block of route.jsonLd) {
+      must(
+        block && typeof block === "object" && typeof block["@type"] === "string",
+        `prerender route ${label} jsonLd blocks must declare @type`,
+      );
+      must(
+        !JSON.stringify(block).includes("</script"),
+        `prerender route ${label} jsonLd must not break out of its script tag`,
+      );
+    }
+  }
 }
 
 if (problems.length) {

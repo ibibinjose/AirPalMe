@@ -46,16 +46,26 @@ import { playResolutionChime, stopTicketAlarm } from "@/lib/ticket-alert-sound";
 
 type Tab = "today" | "facilities" | "dining" | "rooms" | "place" | "print";
 
-const TICKET_CATEGORIES: Record<
-  StaffTicket["category"],
-  { label: string; icon: typeof BellRing; badgeClass: string }
-> = {
-  reception: { label: "Reception", icon: BellRing, badgeClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
-  housekeeping: { label: "Housekeeping", icon: Sparkles, badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-  maintenance: { label: "Maintenance", icon: Wrench, badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-  dining: { label: "Dining", icon: UtensilsCrossed, badgeClass: "bg-brand/10 text-brand" },
-  late_checkout: { label: "Late Checkout", icon: Clock, badgeClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400" },
-};
+const TICKET_CATEGORIES: Record<StaffTicket["category"], { label: string; icon: typeof BellRing; badgeClass: string }> =
+  {
+    reception: { label: "Reception", icon: BellRing, badgeClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
+    housekeeping: {
+      label: "Housekeeping",
+      icon: Sparkles,
+      badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+    },
+    maintenance: {
+      label: "Maintenance",
+      icon: Wrench,
+      badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    },
+    dining: { label: "Dining", icon: UtensilsCrossed, badgeClass: "bg-brand/10 text-brand" },
+    late_checkout: {
+      label: "Late Checkout",
+      icon: Clock,
+      badgeClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
+    },
+  };
 
 function timeAgo(isoString?: string): string {
   if (!isoString) return "";
@@ -391,7 +401,9 @@ export function HostPage() {
                   </span>
                   <span className="block text-xs text-white/80">Unified desk for Stays, Dining & Events</span>
                 </span>
-                <span aria-hidden className="font-bold">→</span>
+                <span aria-hidden className="font-bold">
+                  →
+                </span>
               </button>
 
               <button
@@ -424,7 +436,7 @@ export function HostPage() {
                     )}
                   </div>
                   <p className="mt-0.5 text-[13px] text-mute">
-                    Real-time front desk requests from in-stay guests via AI Receptionist & Compendium.
+                    Real-time front desk requests from in-stay guests via AI Receptionist & Stay & Guide.
                   </p>
                 </div>
 
@@ -478,9 +490,7 @@ export function HostPage() {
                   onClick={() => setTicketTab("active")}
                   aria-pressed={ticketTab === "active"}
                   className={`inline-flex min-h-[44px] items-center rounded-full px-4 text-xs font-semibold transition ${
-                    ticketTab === "active"
-                      ? "bg-brand text-white shadow-xs"
-                      : "text-mute hover:text-ink hover:bg-paper"
+                    ticketTab === "active" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink hover:bg-paper"
                   }`}
                 >
                   Active ({tickets.filter((t) => t.status !== "resolved").length})
@@ -517,12 +527,12 @@ export function HostPage() {
                           >
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ${catMeta.badgeClass}`}>
+                                <span
+                                  className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ${catMeta.badgeClass}`}
+                                >
                                   <catMeta.icon size={12} /> {catMeta.label}
                                 </span>
-                                <span className="text-xs font-semibold text-ink">
-                                  Room {t.roomNumber}
-                                </span>
+                                <span className="text-xs font-semibold text-ink">Room {t.roomNumber}</span>
                                 {t.urgency === "urgent" && (
                                   <span className="inline-flex items-center gap-1 rounded-md bg-red-500/15 px-2 py-0.5 text-[11px] font-bold text-red-600 dark:text-red-400">
                                     <Siren size={11} /> Urgent
@@ -559,40 +569,38 @@ export function HostPage() {
                         );
                       })
                   )
+                ) : tickets.filter((t) => t.status === "resolved").length === 0 ? (
+                  <li className="rounded-2xl bg-paper/60 p-6 text-center text-sm text-mute ring-1 ring-line">
+                    No resolved tickets in history yet.
+                  </li>
                 ) : (
-                  tickets.filter((t) => t.status === "resolved").length === 0 ? (
-                    <li className="rounded-2xl bg-paper/60 p-6 text-center text-sm text-mute ring-1 ring-line">
-                      No resolved tickets in history yet.
-                    </li>
-                  ) : (
-                    tickets
-                      .filter((t) => t.status === "resolved")
-                      .slice(0, 15)
-                      .map((t) => {
-                        const catMeta = TICKET_CATEGORIES[t.category] || TICKET_CATEGORIES.reception;
-                        return (
-                          <li
-                            key={t.id}
-                            className="flex items-center justify-between gap-3 rounded-2xl bg-paper/40 px-4 py-3 ring-1 ring-line/60 opacity-85"
-                          >
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className="inline-flex items-center gap-1 text-xs font-medium text-ink/70">
-                                  <catMeta.icon size={12} /> Room {t.roomNumber}
-                                </span>
-                                <span className="text-[11px] text-mute">
-                                  Resolved {t.resolvedAt ? timeAgo(t.resolvedAt) : "recently"}
-                                </span>
-                              </div>
-                              <p className="truncate text-xs text-mute mt-0.5 line-through">{t.details}</p>
+                  tickets
+                    .filter((t) => t.status === "resolved")
+                    .slice(0, 15)
+                    .map((t) => {
+                      const catMeta = TICKET_CATEGORIES[t.category] || TICKET_CATEGORIES.reception;
+                      return (
+                        <li
+                          key={t.id}
+                          className="flex items-center justify-between gap-3 rounded-2xl bg-paper/40 px-4 py-3 ring-1 ring-line/60 opacity-85"
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="inline-flex items-center gap-1 text-xs font-medium text-ink/70">
+                                <catMeta.icon size={12} /> Room {t.roomNumber}
+                              </span>
+                              <span className="text-[11px] text-mute">
+                                Resolved {t.resolvedAt ? timeAgo(t.resolvedAt) : "recently"}
+                              </span>
                             </div>
-                            <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">
-                              Resolved ✓
-                            </span>
-                          </li>
-                        );
-                      })
-                  )
+                            <p className="truncate text-xs text-mute mt-0.5 line-through">{t.details}</p>
+                          </div>
+                          <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">
+                            Resolved ✓
+                          </span>
+                        </li>
+                      );
+                    })
                 )}
               </ul>
             </div>
@@ -613,9 +621,7 @@ export function HostPage() {
                       </span>
                     )}
                   </div>
-                  <p className="mt-0.5 text-[13px] text-mute">
-                    In-room dining orders placed by guests via QR menu.
-                  </p>
+                  <p className="mt-0.5 text-[13px] text-mute">In-room dining orders placed by guests via QR menu.</p>
                 </div>
               </div>
 
@@ -626,9 +632,7 @@ export function HostPage() {
                   onClick={() => setOrderTab("active")}
                   aria-pressed={orderTab === "active"}
                   className={`inline-flex min-h-[44px] items-center rounded-full px-4 text-xs font-semibold transition ${
-                    orderTab === "active"
-                      ? "bg-brand text-white shadow-xs"
-                      : "text-mute hover:text-ink hover:bg-paper"
+                    orderTab === "active" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink hover:bg-paper"
                   }`}
                 >
                   Active Orders ({orders.filter((o) => o.status !== "delivered" && o.status !== "cancelled").length})
@@ -638,9 +642,7 @@ export function HostPage() {
                   onClick={() => setOrderTab("history")}
                   aria-pressed={orderTab === "history"}
                   className={`inline-flex min-h-[44px] items-center rounded-full px-4 text-xs font-semibold transition ${
-                    orderTab === "history"
-                      ? "bg-brand text-white shadow-xs"
-                      : "text-mute hover:text-ink hover:bg-paper"
+                    orderTab === "history" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink hover:bg-paper"
                   }`}
                 >
                   Past Orders ({orders.filter((o) => o.status === "delivered" || o.status === "cancelled").length})
@@ -658,11 +660,7 @@ export function HostPage() {
                       .filter((o) => o.status !== "delivered" && o.status !== "cancelled")
                       .map((o) => {
                         const next =
-                          o.status === "ready"
-                            ? "delivered"
-                            : o.status === "preparing"
-                              ? "ready"
-                              : "preparing";
+                          o.status === "ready" ? "delivered" : o.status === "preparing" ? "ready" : "preparing";
                         const nextLabel =
                           next === "delivered"
                             ? "Complete Delivery"
@@ -705,9 +703,7 @@ export function HostPage() {
                                   <span>
                                     <strong className="text-brand">{it.qty}×</strong> {it.name}
                                   </span>
-                                  <span className="text-mute">
-                                    A${((it.unitCents * it.qty) / 100).toFixed(2)}
-                                  </span>
+                                  <span className="text-mute">A${((it.unitCents * it.qty) / 100).toFixed(2)}</span>
                                 </div>
                               ))}
                             </div>
@@ -749,9 +745,7 @@ export function HostPage() {
                                         next === "delivered" ? "Order Delivered & Closed" : `Order ${nextLabel}`,
                                       );
                                     } catch (err) {
-                                      toast.error(
-                                        err instanceof Error ? err.message : "Couldn't update order",
-                                      );
+                                      toast.error(err instanceof Error ? err.message : "Couldn't update order");
                                     }
                                   })();
                                 }}
@@ -763,46 +757,40 @@ export function HostPage() {
                         );
                       })
                   )
+                ) : orders.filter((o) => o.status === "delivered" || o.status === "cancelled").length === 0 ? (
+                  <li className="rounded-2xl bg-paper/60 p-6 text-center text-sm text-mute ring-1 ring-line">
+                    No order history yet.
+                  </li>
                 ) : (
-                  orders.filter((o) => o.status === "delivered" || o.status === "cancelled").length === 0 ? (
-                    <li className="rounded-2xl bg-paper/60 p-6 text-center text-sm text-mute ring-1 ring-line">
-                      No order history yet.
-                    </li>
-                  ) : (
-                    orders
-                      .filter((o) => o.status === "delivered" || o.status === "cancelled")
-                      .slice(0, 15)
-                      .map((o) => (
-                        <li
-                          key={o.id}
-                          className="flex items-center justify-between gap-3 rounded-2xl bg-paper/40 px-4 py-3 ring-1 ring-line/60 opacity-85"
-                        >
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs font-medium text-ink/80">Room {o.roomNumber}</span>
-                              <span className="text-[11px] text-mute">{timeAgo(o.updatedAt)}</span>
-                            </div>
-                            <p className="truncate text-xs text-mute mt-0.5">
-                              {o.items.map((i) => `${i.qty}× ${i.name}`).join(", ")}
-                            </p>
+                  orders
+                    .filter((o) => o.status === "delivered" || o.status === "cancelled")
+                    .slice(0, 15)
+                    .map((o) => (
+                      <li
+                        key={o.id}
+                        className="flex items-center justify-between gap-3 rounded-2xl bg-paper/40 px-4 py-3 ring-1 ring-line/60 opacity-85"
+                      >
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-ink/80">Room {o.roomNumber}</span>
+                            <span className="text-[11px] text-mute">{timeAgo(o.updatedAt)}</span>
                           </div>
-                          <div className="text-right shrink-0">
-                            <span
-                              className={`text-[11px] font-semibold ${
-                                o.status === "delivered"
-                                  ? "text-emerald-600 dark:text-emerald-400"
-                                  : "text-red-500"
-                              }`}
-                            >
-                              {o.status === "delivered" ? "Delivered ✓" : "Cancelled ✕"}
-                            </span>
-                            <p className="text-xs font-medium text-ink/70">
-                              A${(o.totalCents / 100).toFixed(2)}
-                            </p>
-                          </div>
-                        </li>
-                      ))
-                  )
+                          <p className="truncate text-xs text-mute mt-0.5">
+                            {o.items.map((i) => `${i.qty}× ${i.name}`).join(", ")}
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span
+                            className={`text-[11px] font-semibold ${
+                              o.status === "delivered" ? "text-emerald-600 dark:text-emerald-400" : "text-red-500"
+                            }`}
+                          >
+                            {o.status === "delivered" ? "Delivered ✓" : "Cancelled ✕"}
+                          </span>
+                          <p className="text-xs font-medium text-ink/70">A${(o.totalCents / 100).toFixed(2)}</p>
+                        </div>
+                      </li>
+                    ))
                 )}
               </ul>
             </div>

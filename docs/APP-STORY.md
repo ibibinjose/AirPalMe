@@ -57,7 +57,7 @@ never as separate apps. Build order follows the Brain (P0 first):
 | 2 | Plan | What are we doing, when, where, who? | Trips tab (`/plan`), invites, RSVP, calendar |
 | 3 | Mate (People) | Who will go with me? | `/mate`, requests, matching, mate chat |
 | 4 | Discovery | What's happening near me? | Home + Explore, events, places, guides |
-| 5 | Stay (Places) | Where do I sleep / what's here? | Concierge, compendium, `/g/:id`, host tools |
+| 5 | Stay (Places) | Where do I sleep / what's here? | Stay & Guide, `/g/:id`, host tools |
 | 6 | Experiences | What can I book into? | `/experiences`, festivals, tickets |
 | 7 | Travel / Fashion / Commerce | Trips, drops, rentals | Later — only after the loop repeats |
 
@@ -112,7 +112,7 @@ moderation, incident cases · human approves Mates and closes safety
 cases (AI only assists) · one `bookings` engine, Stripe Checkout +
 Connect, held payouts, refunds/disputes · every privileged action
 audited · home addresses, documents, phones, notes stay private ·
-never claim guaranteed safety.
+never claim guaranteed safety; public company facts live at `/trust`.
 
 ## 6. What AirPal is not
 
@@ -132,3 +132,4 @@ Discovery and content exist to create transactions, not attention.
 | Events | `/calendar`, `/experiences` | Browse, then book + ticket |
 | Identity | `/@handle`, `/me/tickets` | Public bio, wallet passes |
 | Full business | `/Demo` (hub, in build) | All of the above, one guided tour |
+| Trust | `/trust` | Company facts, verification, honest status |

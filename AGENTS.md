@@ -53,7 +53,7 @@ Application required. Collect: identity, profile, interests, experience categori
 
 ## 7. Trust & Safety
 
-Core product feature: identity verification where required, email/phone verification, report, block, moderation, incident management, admin review, payment protection, refund/dispute workflow, audit logs, safety guidance, age restrictions, privacy controls. For selected activities: safety check-in, emergency contact, meeting-place guidance, post-experience check-in. Never market AirPal as guaranteeing personal safety.
+Core product feature: identity verification where required, email/phone verification, report, block, moderation, incident management, admin review, payment protection, refund/dispute workflow, audit logs, safety guidance, age restrictions, privacy controls. For selected activities: safety check-in, emergency contact, meeting-place guidance, post-experience check-in. Never market AirPal as guaranteeing personal safety. Canonical public trust surface: `/trust` (verified company facts, disambiguation, honest proof status — never invented ratings, counts, or customers).
 
 ## 8. Messaging
 
@@ -195,6 +195,7 @@ One trusted marketplace engine, six eventual verticals. Proof: someone wants to 
 - Provider order in `src/app/providers.tsx` (LocalNow after Stay). Shared function types live in `shared/`.
 - Live Firestore reads with honest empty states; `hoursVerifiedAt`/`scheduleVerifiedAt` freshness SLAs; city-only presence; legal copy in pages + `src/lib/legal.ts` (bump `LEGAL.updated` on change); tickets via callables not localStorage; `/host` reads live property; `unknownProperty` for missing stays.
 - Env: Firebase `VITE_FIREBASE_*`, Maps key, `PLATFORM_ADMIN_EMAILS`; never commit `.env`. Deploy: hosting/functions/rules scripts. Native: Capacitor `me.airpal.app`.
+- Marketing routes prerender to static HTML at build (`scripts/prerender-routes.mjs` + `prerender-routes.json`): per-route title/description/self-referencing canonical, static body, `/trust` JSON-LD. Client copy in `src/lib/share-meta.ts` must match (parity test `src/lib/prerender.test.ts`); `scripts/check-seo.mjs` enforces the invariants.
 
 ## 42. Modern UI Architecture & Native Builds Annex
 

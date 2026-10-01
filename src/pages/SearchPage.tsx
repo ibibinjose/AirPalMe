@@ -321,9 +321,9 @@ export function SearchPage() {
       items.push({
         id: "stay-concierge",
         category: "stay",
-        title: "Stay Concierge",
-        subtitle: "Digital compendium, Wi-Fi & checkout",
-        badge: "Concierge",
+        title: "Stay & Guide",
+        subtitle: "Stay guide, Wi-Fi & checkout",
+        badge: "Guide",
         href: "/concierge",
         icon: Hotel,
       });
@@ -368,24 +368,14 @@ export function SearchPage() {
     }
 
     return items;
-  }, [
-    query,
-    catalogVersion,
-    calendarEvents,
-    liveExperiences,
-    publicMates,
-    handleBio,
-    plans,
-    here,
-    city,
-    usingGps,
-  ]);
+  }, [query, catalogVersion, calendarEvents, liveExperiences, publicMates, handleBio, plans, here, city, usingGps]);
 
   // Filtered by selected category tab
   const filteredResults = useMemo(() => {
     if (activeCategory === "all") return allResults;
     if (activeCategory === "people") return allResults.filter((r) => r.category === "person");
-    if (activeCategory === "places") return allResults.filter((r) => r.category === "place" || r.category === "partner");
+    if (activeCategory === "places")
+      return allResults.filter((r) => r.category === "place" || r.category === "partner");
     if (activeCategory === "events") return allResults.filter((r) => r.category === "event");
     if (activeCategory === "experiences") return allResults.filter((r) => r.category === "experience");
     if (activeCategory === "stay") return allResults.filter((r) => r.category === "stay");
@@ -407,12 +397,8 @@ export function SearchPage() {
         <div className="mx-auto max-w-4xl px-4 py-3 sm:px-6">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-ink">
-                Search AirPal
-              </h1>
-              <p className="text-xs text-mute mt-0.5">
-                {city || "Sydney"}
-              </p>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-ink">Search AirPal</h1>
+              <p className="text-xs text-mute mt-0.5">{city || "Sydney"}</p>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -454,16 +440,16 @@ export function SearchPage() {
                 tab.id === "all"
                   ? allResults.length
                   : tab.id === "people"
-                  ? allResults.filter((r) => r.category === "person").length
-                  : tab.id === "places"
-                  ? allResults.filter((r) => r.category === "place" || r.category === "partner").length
-                  : tab.id === "events"
-                  ? allResults.filter((r) => r.category === "event").length
-                  : tab.id === "experiences"
-                  ? allResults.filter((r) => r.category === "experience").length
-                  : tab.id === "stay"
-                  ? allResults.filter((r) => r.category === "stay").length
-                  : allResults.filter((r) => r.category === "plan").length;
+                    ? allResults.filter((r) => r.category === "person").length
+                    : tab.id === "places"
+                      ? allResults.filter((r) => r.category === "place" || r.category === "partner").length
+                      : tab.id === "events"
+                        ? allResults.filter((r) => r.category === "event").length
+                        : tab.id === "experiences"
+                          ? allResults.filter((r) => r.category === "experience").length
+                          : tab.id === "stay"
+                            ? allResults.filter((r) => r.category === "stay").length
+                            : allResults.filter((r) => r.category === "plan").length;
 
               return (
                 <button
@@ -505,7 +491,8 @@ export function SearchPage() {
           <div>
             {query.trim() ? (
               <span>
-                Found <strong className="font-semibold text-ink">{filteredResults.length}</strong> {filteredResults.length === 1 ? "result" : "results"} for &ldquo;{query}&rdquo;
+                Found <strong className="font-semibold text-ink">{filteredResults.length}</strong>{" "}
+                {filteredResults.length === 1 ? "result" : "results"} for &ldquo;{query}&rdquo;
               </span>
             ) : (
               <span>Popular in {city || "Sydney"}</span>
@@ -527,9 +514,7 @@ export function SearchPage() {
           <div className="mb-5 rounded-2xl bg-card p-4 ring-1 ring-line/80 shadow-xs">
             <div className="flex items-center gap-1.5 mb-2.5">
               <TrendingUp size={15} className="text-brand" />
-              <h2 className="text-xs font-bold uppercase tracking-wider text-brand">
-                Popular Searches
-              </h2>
+              <h2 className="text-xs font-bold uppercase tracking-wider text-brand">Popular Searches</h2>
             </div>
             <div className="flex flex-wrap gap-2">
               {popularTerms.map((pt) => (
@@ -595,11 +580,10 @@ export function SearchPage() {
             <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand/10 text-brand mb-3">
               <Search size={26} />
             </div>
-            <h3 className="text-base font-bold text-ink">
-              No results found for &ldquo;{query}&rdquo;
-            </h3>
+            <h3 className="text-base font-bold text-ink">No results found for &ldquo;{query}&rdquo;</h3>
             <p className="mt-1 text-xs text-mute max-w-md mx-auto">
-              We couldn&apos;t find an exact match in {activeCategory === "all" ? "AirPal" : activeCategory}. Try a different term or find someone to explore with.
+              We couldn&apos;t find an exact match in {activeCategory === "all" ? "AirPal" : activeCategory}. Try a
+              different term or find someone to explore with.
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
               <button

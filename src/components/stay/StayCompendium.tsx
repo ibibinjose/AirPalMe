@@ -1,21 +1,16 @@
 import { useState, useMemo, useEffect } from "react";
 import {
-  Share2,
-  KeyRound,
-  Wine,
   PhoneCall,
   Wifi,
   Clock,
   Coffee,
   ChevronDown,
   ChevronUp,
-  Utensils,
   Check,
   Copy,
   Plus,
   Minus,
   ShoppingBag,
-  MapPin,
   CheckCircle2,
   LogIn,
   LogOut,
@@ -31,35 +26,23 @@ import { submitStaffTicket } from "@/lib/tickets-store";
 import type { MenuItem } from "@shared/airpal-data";
 import { toast } from "sonner";
 import { triggerHaptic } from "@/lib/native";
-import { AirPalAiReceptionist } from "./AirPalAiReceptionist";
 import { AirPalChatModal } from "@/components/messaging/AirPalChatModal";
 import { createConversationRecord } from "@/lib/chat-store";
 import type { UniversalConversation } from "@shared/messaging";
-
-type CategoryTab = "info" | "activities" | "tours" | "recommendations";
 
 export function StayCompendium() {
   const { property, roomLabel } = useStay();
   const [, nav] = useLocation();
 
-  const [activeTab, setActiveTab] = useState<CategoryTab>("info");
   const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>({
     welcome: true,
     dining: false,
-    offers: false,
-    palate: false,
     wifi: false,
     phone: false,
     housekeeping: false,
     facilities: false,
     transport: false,
   });
-
-  // Door Code Modal State
-  const [showDoorCodeModal, setShowDoorCodeModal] = useState(false);
-  // Free Drink Voucher Modal State
-  const [showDrinkModal, setShowDrinkModal] = useState(false);
-  const [drinkClaimed, setDrinkClaimed] = useState(false);
 
   // AirPal Universal Chat Modal State
   const [showChatModal, setShowChatModal] = useState(false);
@@ -95,8 +78,9 @@ export function StayCompendium() {
 
   useEffect(() => {
     let active = true;
+    // Never invent a menu: empty means the stay hasn't published one yet.
     if (!property.id || property.id === "unknown") {
-      setMenuItems(getFallbackMenu());
+      setMenuItems([]);
       return;
     }
     fetchPropertyMenu(property.id).then((items) => {
@@ -104,7 +88,7 @@ export function StayCompendium() {
         if (items && items.length > 0) {
           setMenuItems(items.filter((i) => i.available !== false));
         } else {
-          setMenuItems(getFallbackMenu());
+          setMenuItems([]);
         }
       }
     });
@@ -118,31 +102,13 @@ export function StayCompendium() {
     setOpenAccordions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleShare = async () => {
-    void triggerHaptic("light");
-    const shareData = {
-      title: property.name || "AirPal Stay Compendium",
-      text: `Digital Compendium & 24/7 Concierge for ${property.name || "our stay"}`,
-      url: window.location.href,
-    };
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch {
-        /* share dismissed */
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        toast.success("Stay link copied to clipboard!");
-      } catch {
-        toast.error("Could not copy link");
-      }
-    }
-  };
-
   const handleCopyWifi = async () => {
-    const pwd = property.wifi?.password || "AirPalGuest2026";
+    // Never invent a password: empty means "ask the desk", never a seed fallback.
+    const pwd = property.wifi?.password || "";
+    if (!pwd) {
+      toast.info("Ask the front desk for the Wi-Fi password.");
+      return;
+    }
     try {
       await navigator.clipboard.writeText(pwd);
       setWifiCopied(true);
@@ -229,66 +195,13 @@ export function StayCompendium() {
     }, 0);
   }, [orderCart, menuItems]);
 
-  const propertyName = property.name || "Harbour Hotel & Suites";
-  const propertyDesc =
-    property.tagline ||
-    "Modern and stylish boutique accommodation located in the vibrant city center. Enjoy 24/7 digital concierge, in-room dining, high-speed Wi-Fi, and personalized local experiences.";
-
-  const brandLogoLetter = propertyName.charAt(0).toUpperCase();
+  const propertyName = property.name || "AirPal Stay";
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-24 pt-4 md:px-0 font-sans text-ink">
-      {/* Header Profile Section (FreeGuides Reference Style) */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          {/* Avatar Circle with Badge */}
-          <div className="relative">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-brand via-[#240cf0] to-[#0a0270] text-2xl font-black text-white shadow-md ring-2 ring-white">
-              {property.heroImage ? (
-                <img
-                  src={property.heroImage}
-                  alt={propertyName}
-                  className="h-full w-full rounded-full object-cover"
-                />
-              ) : (
-                brandLogoLetter
-              )}
-            </div>
-            {/* Top Verified / Partner Badge */}
-            <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-amber-400 text-[10px] font-black text-slate-950 ring-2 ring-white shadow-xs">
-              ★
-            </span>
-          </div>
-
-          <div>
-            <h1 className="font-display text-xl font-extrabold text-ink leading-tight">
-              {propertyName}
-            </h1>
-            <p className="text-xs text-mute font-semibold mt-0.5 flex items-center gap-1">
-              <MapPin size={12} className="text-brand" />
-              {property.city || property.address || "Sydney, Australia"}
-            </p>
-          </div>
-        </div>
-
-        {/* Share Button */}
-        <button
-          type="button"
-          onClick={handleShare}
-          aria-label="Share property link"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-paper ring-1 ring-line text-ink hover:bg-card active:scale-95 transition shadow-xs"
-        >
-          <Share2 size={18} />
-        </button>
-      </div>
-
-      {/* Property Short Bio / Description */}
-      <div className="mt-4">
-        <p className="text-[13px] text-ink/80 leading-relaxed font-normal line-clamp-3">
-          {propertyDesc}
-        </p>
-      </div>
-
+    <div className="mx-auto max-w-lg px-0 pb-2 pt-1 font-sans text-ink">
+      {/* Stay actions + guide sections. Property identity (name, tagline,
+          location, share) lives in the Stay & Guide shell hero above — never
+          repeated here. */}
       {/* Hero Action Buttons (Exact layout from reference) */}
       <div className="mt-5 space-y-2.5">
         {/* Banner 1: Live Chat with Front Desk & AirPal AI */}
@@ -296,7 +209,7 @@ export function StayCompendium() {
           type="button"
           onClick={() => {
             void triggerHaptic("light");
-            const stayId = property.id || "harbour-hotel";
+            const stayId = property.id || "unknown";
             const conv = createConversationRecord({
               type: "stay",
               targetId: stayId,
@@ -327,64 +240,21 @@ export function StayCompendium() {
           <span className="text-base">👏</span>
         </button>
 
-        {/* Banner 2: Digital Key / Door Access */}
-        <button
-          type="button"
-          onClick={() => setShowDoorCodeModal(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f03a17] hover:bg-[#d83212] px-4 py-3.5 text-center text-sm font-black text-white shadow-md transition active:scale-[0.98]"
-        >
-          <KeyRound size={17} />
-          <span>Click to access door code</span>
-        </button>
-
-        {/* Split Banner: Free Drink Voucher | Call Reception */}
-        <div className="grid grid-cols-2 gap-2.5">
-          <button
-            type="button"
-            onClick={() => setShowDrinkModal(true)}
-            className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#f03a17] hover:bg-[#d83212] px-3 py-3 text-center text-xs font-black text-white shadow-sm transition active:scale-[0.98]"
-          >
-            <Wine size={15} />
-            <span>Get your free drink</span>
-          </button>
-
+        {/* Call Reception — only a real published number ever dials */}
+        {property.phone ? (
           <a
-            href={property.phone ? `tel:${property.phone}` : "tel:000"}
-            className="flex items-center justify-center gap-1.5 rounded-2xl bg-card border border-line px-3 py-3 text-center text-xs font-bold text-ink hover:bg-paper shadow-xs transition active:scale-[0.98]"
+            href={`tel:${property.phone}`}
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-card border border-line px-4 py-3.5 text-center text-sm font-bold text-ink hover:bg-paper shadow-xs transition active:scale-[0.98]"
           >
-            <PhoneCall size={15} className="text-brand" />
+            <PhoneCall size={16} className="text-brand" />
             <span>Call Reception</span>
           </a>
-        </div>
-      </div>
-
-      {/* Category Navigation Tabs */}
-      <div className="mt-6 flex items-center gap-2 border-b border-line pb-2 overflow-x-auto no-scrollbar">
-        {[
-          { id: "info", label: "General" },
-          { id: "activities", label: "Activities" },
-          { id: "tours", label: "Tours" },
-          { id: "recommendations", label: "Recommendations" },
-        ].map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => {
-                setActiveTab(tab.id as CategoryTab);
-                void triggerHaptic("light");
-              }}
-              className={`shrink-0 rounded-xl px-4 py-2 text-xs font-extrabold transition active:scale-95 ${
-                isActive
-                  ? "bg-[#f03a17] text-white shadow-xs"
-                  : "text-mute hover:text-ink hover:bg-paper font-bold"
-              }`}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
+        ) : (
+          <div className="flex w-full items-center justify-center gap-2 rounded-2xl bg-card border border-line px-4 py-3.5 text-center text-sm font-bold text-mute shadow-xs">
+            <PhoneCall size={16} />
+            <span>Reception number not listed — ask at the desk</span>
+          </div>
+        )}
       </div>
 
       {/* Quick Highlight Info Cards (Wi-Fi, Breakfast, Check-in/out) */}
@@ -399,11 +269,16 @@ export function StayCompendium() {
               <Wifi size={22} />
             </div>
             <div>
-              <p className="text-[13px] font-extrabold text-ink">
-                {property.wifi?.network || "Free throughout hostel & rooms"}
-              </p>
+              <p className="text-[13px] font-extrabold text-ink">{property.wifi?.network || "Wi-Fi — ask reception"}</p>
               <p className="text-[11px] text-mute font-medium mt-0.5">
-                Password: <span className="font-mono font-bold text-ink">{property.wifi?.password || "AirPalGuest2026"}</span> (Tap to copy)
+                {property.wifi?.password ? (
+                  <>
+                    Password: <span className="font-mono font-bold text-ink">{property.wifi.password}</span> (Tap to
+                    copy)
+                  </>
+                ) : (
+                  "Ask the front desk for the password"
+                )}
               </p>
             </div>
           </div>
@@ -415,26 +290,17 @@ export function StayCompendium() {
           </button>
         </div>
 
-        {/* Breakfast / Dining Schedule Card */}
-        <div className="grid grid-cols-2 gap-2.5">
-          <div className="flex items-center gap-3 rounded-2xl bg-[#fff2ee] dark:bg-[#2a130e] p-3.5 ring-1 ring-[#f9d3c7] dark:ring-[#472218]">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f03a17]/15 text-[#f03a17]">
-              <Coffee size={20} />
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-mute">Start</p>
-              <p className="text-[13px] font-extrabold text-ink">07:30 AM</p>
-            </div>
+        {/* Breakfast card — bound to the stay's published breakfast hours */}
+        <div className="flex items-center gap-3 rounded-2xl bg-[#fff2ee] dark:bg-[#2a130e] p-3.5 ring-1 ring-[#f9d3c7] dark:ring-[#472218]">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f03a17]/15 text-[#f03a17]">
+            <Coffee size={20} />
           </div>
-
-          <div className="flex items-center gap-3 rounded-2xl bg-[#fff2ee] dark:bg-[#2a130e] p-3.5 ring-1 ring-[#f9d3c7] dark:ring-[#472218]">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f03a17]/15 text-[#f03a17]">
-              <Utensils size={18} />
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-mute">End</p>
-              <p className="text-[13px] font-extrabold text-ink">11:00 AM</p>
-            </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-wider text-mute">Breakfast</p>
+            <p className="text-[13px] font-extrabold text-ink">{property.breakfast?.hours || "Ask reception"}</p>
+            {property.breakfast?.location ? (
+              <p className="text-[11px] font-medium text-mute">{property.breakfast.location}</p>
+            ) : null}
           </div>
         </div>
 
@@ -447,7 +313,7 @@ export function StayCompendium() {
               </div>
               <div>
                 <p className="text-[10px] font-black uppercase tracking-wider text-mute">Check-In</p>
-                <p className="text-[13px] font-extrabold text-ink">{property.checkIn || "02:30 PM"}</p>
+                <p className="text-[13px] font-extrabold text-ink">{property.checkIn || "Ask reception"}</p>
               </div>
             </div>
 
@@ -455,7 +321,7 @@ export function StayCompendium() {
 
             <div>
               <p className="text-[10px] font-black uppercase tracking-wider text-mute">Check-Out</p>
-              <p className="text-[13px] font-extrabold text-ink">{property.checkOut || "11:00 AM"}</p>
+              <p className="text-[13px] font-extrabold text-ink">{property.checkOut || "Ask reception"}</p>
             </div>
           </div>
 
@@ -467,9 +333,7 @@ export function StayCompendium() {
                 void triggerHaptic("light");
               }}
               className={`flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-black transition active:scale-95 shadow-xs ${
-                isCheckedIn
-                  ? "bg-emerald-600 text-white"
-                  : "bg-[#f03a17] text-white hover:bg-[#d83212]"
+                isCheckedIn ? "bg-emerald-600 text-white" : "bg-[#f03a17] text-white hover:bg-[#d83212]"
               }`}
             >
               {isCheckedIn ? <CheckCircle2 size={13} /> : null}
@@ -495,11 +359,9 @@ export function StayCompendium() {
         </div>
       </div>
 
-      {/* Main Digital Compendium Accordions (Replaces binders & PDFs) */}
+      {/* Stay guide accordions (replaces binders & PDFs) */}
       <div className="mt-6 space-y-3">
-        <p className="text-[11px] font-black uppercase tracking-wider text-mute px-1">
-          Digital Compendium
-        </p>
+        <p className="text-[11px] font-black uppercase tracking-wider text-mute px-1">Good to know</p>
 
         {/* 1. Welcome & House Rules */}
         <div className="rounded-2xl bg-card ring-1 ring-line shadow-xs overflow-hidden transition">
@@ -517,15 +379,14 @@ export function StayCompendium() {
           {openAccordions.welcome && (
             <div className="p-4 pt-1 border-t border-line/60 bg-paper/30 space-y-2 text-xs text-ink/80 leading-relaxed font-medium">
               <p>
-                Welcome to <strong>{propertyName}</strong>! We’re thrilled to have you staying with us. Our team is available 24/7 to ensure your stay is comfortable and seamless.
+                Welcome to <strong>{propertyName}</strong>! This guide has your Wi-Fi, dining, housekeeping requests and
+                local tips in one place.
               </p>
               <div className="mt-2 space-y-1.5 rounded-xl bg-card p-3 ring-1 ring-line">
                 <p className="font-bold text-ink">🔑 Key Information:</p>
                 <ul className="list-disc list-inside space-y-1 text-mute">
-                  <li>Quiet Hours: 10:00 PM – 8:00 AM</li>
-                  <li>Non-Smoking Property throughout all rooms and balconies</li>
-                  <li>Complimentary Luggage Storage available before check-in and after check-out</li>
-                  <li>Questions at 2am? Tap the chat bubble to speak with AirPal AI, your 24/7 AI Receptionist.</li>
+                  <li>House rules aren’t published here yet — ask reception for this stay’s rules.</li>
+                  <li>Questions at 2am? Tap the chat bubble to ask AirPal, your 24/7 AI Receptionist.</li>
                 </ul>
               </div>
             </div>
@@ -547,10 +408,14 @@ export function StayCompendium() {
           </button>
           {openAccordions.dining && (
             <div className="p-4 pt-1 border-t border-line/60 bg-paper/30 space-y-3">
-              <p className="text-xs text-mute font-medium">
-                Freshly prepared local dishes delivered directly to your door.
-              </p>
-              
+              {menuItems.length > 0 ? (
+                <p className="text-xs text-mute font-medium">Order from the kitchen below — charged to your room.</p>
+              ) : (
+                <p className="text-xs text-mute font-medium">
+                  No menu published yet — ask reception what the kitchen is serving.
+                </p>
+              )}
+
               <div className="space-y-2.5">
                 {menuItems.map((item) => {
                   const qty = orderCart[item.id] || 0;
@@ -587,9 +452,7 @@ export function StayCompendium() {
                         {qty > 0 && <span className="w-5 text-center text-xs font-black">{qty}</span>}
                         <button
                           type="button"
-                          onClick={() =>
-                            setOrderCart((prev) => ({ ...prev, [item.id]: (prev[item.id] || 0) + 1 }))
-                          }
+                          onClick={() => setOrderCart((prev) => ({ ...prev, [item.id]: (prev[item.id] || 0) + 1 }))}
                           className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-white shadow-xs active:scale-95"
                         >
                           <Plus size={13} />
@@ -615,9 +478,7 @@ export function StayCompendium() {
                   </div>
 
                   <div className="flex items-center justify-between border-t border-line pt-2">
-                    <span className="text-sm font-extrabold text-ink">
-                      Total: A${totalOrderPrice.toFixed(2)}
-                    </span>
+                    <span className="text-sm font-extrabold text-ink">Total: A${totalOrderPrice.toFixed(2)}</span>
                     <button
                       type="button"
                       disabled={isOrdering}
@@ -634,70 +495,8 @@ export function StayCompendium() {
           )}
         </div>
 
-        {/* 3. Dining Offers & Drink Specials */}
-        <div className="rounded-2xl bg-card ring-1 ring-line shadow-xs overflow-hidden transition">
-          <button
-            type="button"
-            onClick={() => toggleAccordion("offers")}
-            className="flex w-full items-center justify-between p-4 text-left font-bold text-ink hover:bg-paper transition"
-          >
-            <span className="flex items-center gap-3">
-              <span className="text-lg">🥤</span>
-              <span className="text-sm font-extrabold">Dining Offers</span>
-            </span>
-            {openAccordions.offers ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-          </button>
-          {openAccordions.offers && (
-            <div className="p-4 pt-1 border-t border-line/60 bg-paper/30 space-y-2.5 text-xs">
-              <div className="rounded-xl bg-card p-3 ring-1 ring-line">
-                <p className="font-extrabold text-ink">🍹 Daily Sunset Happy Hour (5:00 PM – 7:00 PM)</p>
-                <p className="text-mute mt-0.5">2-for-1 Spritz, craft beers on tap, and complimentary house olives at the rooftop lounge.</p>
-              </div>
-              <div className="rounded-xl bg-card p-3 ring-1 ring-line">
-                <p className="font-extrabold text-ink">🥐 Breakfast Buffet Deal</p>
-                <p className="text-mute mt-0.5">Show your room key at the lobby bistro to receive 20% off the hot breakfast buffet.</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 4. Entertain Your Palate */}
-        <div className="rounded-2xl bg-card ring-1 ring-line shadow-xs overflow-hidden transition">
-          <button
-            type="button"
-            onClick={() => toggleAccordion("palate")}
-            className="flex w-full items-center justify-between p-4 text-left font-bold text-ink hover:bg-paper transition"
-          >
-            <span className="flex items-center gap-3">
-              <span className="text-lg">🍴</span>
-              <span className="text-sm font-extrabold">Entertain your palate</span>
-            </span>
-            {openAccordions.palate ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-          </button>
-          {openAccordions.palate && (
-            <div className="p-4 pt-1 border-t border-line/60 bg-paper/30 space-y-2.5 text-xs">
-              <p className="text-mute font-medium">Curated local favorites hand-picked by our concierge team:</p>
-              <div className="space-y-2">
-                <div className="rounded-xl bg-card p-3 ring-1 ring-line">
-                  <div className="flex items-center justify-between">
-                    <p className="font-extrabold text-ink">Darling Harbour Seafood Grill</p>
-                    <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600">3 min walk</span>
-                  </div>
-                  <p className="text-mute mt-0.5">Fresh Sydney rock oysters, wood-fired barramundi, and harbour views.</p>
-                </div>
-                <div className="rounded-xl bg-card p-3 ring-1 ring-line">
-                  <div className="flex items-center justify-between">
-                    <p className="font-extrabold text-ink">The Little Artisan Bakery &amp; Espresso</p>
-                    <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600">5 min walk</span>
-                  </div>
-                  <p className="text-mute mt-0.5">Specialty flat whites, fresh almond croissants, and sourdough toasties.</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 5. Wi-Fi Details */}
+        {/* Staff picks render once, in the shell's Host recommends section above. */}
+        {/* 3. Wi-Fi Details */}
         <div className="rounded-2xl bg-card ring-1 ring-line shadow-xs overflow-hidden transition">
           <button
             type="button"
@@ -715,9 +514,9 @@ export function StayCompendium() {
               <div className="flex items-center justify-between rounded-xl bg-card p-3 ring-1 ring-line">
                 <div>
                   <p className="text-[10px] font-black uppercase text-mute">Network</p>
-                  <p className="font-bold text-ink">{property.wifi?.network || "AirPal_Guest_HighSpeed"}</p>
+                  <p className="font-bold text-ink">{property.wifi?.network || "Ask reception"}</p>
                   <p className="text-[10px] font-black uppercase text-mute mt-2">Password</p>
-                  <p className="font-mono font-extrabold text-ink">{property.wifi?.password || "AirPalGuest2026"}</p>
+                  <p className="font-mono font-extrabold text-ink">{property.wifi?.password || "Ask the front desk"}</p>
                 </div>
                 <button
                   type="button"
@@ -732,7 +531,7 @@ export function StayCompendium() {
           )}
         </div>
 
-        {/* 6. Phone Directory */}
+        {/* 4. Phone Directory */}
         <div className="rounded-2xl bg-card ring-1 ring-line shadow-xs overflow-hidden transition">
           <button
             type="button"
@@ -748,17 +547,21 @@ export function StayCompendium() {
           {openAccordions.phone && (
             <div className="p-4 pt-1 border-t border-line/60 bg-paper/30 space-y-2 text-xs">
               <div className="grid grid-cols-2 gap-2">
-                <a
-                  href={property.phone ? `tel:${property.phone}` : "tel:000"}
-                  className="rounded-xl bg-card p-3 ring-1 ring-line block hover:bg-paper"
-                >
-                  <p className="font-bold text-ink">Front Desk / Concierge</p>
-                  <p className="text-brand font-extrabold mt-1">Dial 9 or {property.phone || "000"}</p>
-                </a>
-                <a
-                  href="tel:000"
-                  className="rounded-xl bg-card p-3 ring-1 ring-line block hover:bg-paper"
-                >
+                {property.phone ? (
+                  <a
+                    href={`tel:${property.phone}`}
+                    className="rounded-xl bg-card p-3 ring-1 ring-line block hover:bg-paper"
+                  >
+                    <p className="font-bold text-ink">Front Desk / Concierge</p>
+                    <p className="text-brand font-extrabold mt-1">Dial 9 or {property.phone}</p>
+                  </a>
+                ) : (
+                  <div className="rounded-xl bg-card p-3 ring-1 ring-line">
+                    <p className="font-bold text-ink">Front Desk / Concierge</p>
+                    <p className="text-mute font-bold mt-1">Number not listed — ask at the desk</p>
+                  </div>
+                )}
+                <a href="tel:000" className="rounded-xl bg-card p-3 ring-1 ring-line block hover:bg-paper">
                   <p className="font-bold text-ink">Emergency (AU)</p>
                   <p className="text-red-500 font-extrabold mt-1">Dial 000 / 112</p>
                 </a>
@@ -767,7 +570,7 @@ export function StayCompendium() {
           )}
         </div>
 
-        {/* 7. Housekeeping Service */}
+        {/* 5. Housekeeping Service */}
         <div className="rounded-2xl bg-card ring-1 ring-line shadow-xs overflow-hidden transition">
           <button
             type="button"
@@ -814,7 +617,7 @@ export function StayCompendium() {
           )}
         </div>
 
-        {/* 8. Hotel Facilities */}
+        {/* 6. Hotel Facilities — bound to the stay's published facilities */}
         <div className="rounded-2xl bg-card ring-1 ring-line shadow-xs overflow-hidden transition">
           <button
             type="button"
@@ -829,90 +632,35 @@ export function StayCompendium() {
           </button>
           {openAccordions.facilities && (
             <div className="p-4 pt-1 border-t border-line/60 bg-paper/30 space-y-2 text-xs">
-              <div className="space-y-2">
-                <div className="rounded-xl bg-card p-3 ring-1 ring-line">
-                  <p className="font-bold text-ink">🏊 Heated Swimming Pool &amp; Spa</p>
-                  <p className="text-mute mt-0.5">Level 5 · Open 6:00 AM – 10:00 PM daily. Towels provided poolside.</p>
+              {(property.facilities || []).length > 0 ? (
+                <div className="space-y-2">
+                  {(property.facilities || []).map((facility, index) => {
+                    const where = [facility.floor, facility.hours].filter(Boolean).join(" · ");
+                    const extra = facility.details || facility.description || "";
+                    return (
+                      <div
+                        key={facility.id || `${facility.name}-${index}`}
+                        className="rounded-xl bg-card p-3 ring-1 ring-line"
+                      >
+                        <p className="font-bold text-ink">
+                          {facility.icon ? `${facility.icon} ` : ""}
+                          {facility.name}
+                        </p>
+                        {where ? <p className="text-mute mt-0.5">{where}</p> : null}
+                        {extra ? <p className="text-mute mt-0.5">{extra}</p> : null}
+                      </div>
+                    );
+                  })}
                 </div>
-                <div className="rounded-xl bg-card p-3 ring-1 ring-line">
-                  <p className="font-bold text-ink">🏋️ Fitness Centre &amp; Gym</p>
-                  <p className="text-mute mt-0.5">Level 5 · 24/7 Access with your room key. Cardio machines &amp; free weights.</p>
-                </div>
-                <div className="rounded-xl bg-card p-3 ring-1 ring-line">
-                  <p className="font-bold text-ink">🧺 Guest Laundry</p>
-                  <p className="text-mute mt-0.5">Level 2 · Coin &amp; contactless card operated washers and dryers.</p>
-                </div>
-              </div>
+              ) : (
+                <p className="text-mute font-medium">No facilities listed yet — ask reception.</p>
+              )}
             </div>
           )}
         </div>
       </div>
 
-      {/* Floating AirPal AI Receptionist */}
-      <AirPalAiReceptionist />
-
-      {/* Door Code Modal */}
-      {showDoorCodeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-sm rounded-[28px] bg-card p-6 ring-1 ring-line shadow-2xl space-y-4 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand">
-              <KeyRound size={28} />
-            </div>
-            <div>
-              <h3 className="font-display text-xl font-black text-ink">Digital Key &amp; Door Code</h3>
-              <p className="text-xs text-mute mt-1">
-                {roomLabel ? `Room ${roomLabel}` : "Main Entrance & Guest Access"}
-              </p>
-            </div>
-            <div className="rounded-2xl bg-paper p-4 ring-1 ring-line">
-              <p className="text-[10px] font-black uppercase tracking-wider text-mute">Keypad PIN Code</p>
-              <p className="font-mono text-3xl font-black tracking-widest text-brand mt-1">#4829*</p>
-              <p className="text-[11px] text-mute mt-2">Enter code on the door keypad followed by the # symbol.</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowDoorCodeModal(false)}
-              className="w-full rounded-full bg-brand py-3 text-sm font-black text-white shadow-md active:scale-95"
-            >
-              Got it
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Free Drink Voucher Modal */}
-      {showDrinkModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-sm rounded-[28px] bg-card p-6 ring-1 ring-line shadow-2xl space-y-4 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-400/20 text-amber-500">
-              <Wine size={28} />
-            </div>
-            <div>
-              <h3 className="font-display text-xl font-black text-ink">Welcome Drink Voucher</h3>
-              <p className="text-xs text-mute mt-1">Complimentary beverage on us at the Lobby Bar!</p>
-            </div>
-            <div className="rounded-2xl bg-paper p-4 ring-1 ring-line border-2 border-dashed border-amber-400/60">
-              <p className="text-[10px] font-black uppercase tracking-wider text-mute">Voucher Code</p>
-              <p className="font-mono text-2xl font-black tracking-wider text-amber-600 mt-1">AIRPAL-WELCOME</p>
-              <p className="text-[11px] text-mute mt-2">
-                Show this digital voucher to the bartender for 1x House Wine, Beer, Spritz or Barista Coffee.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setDrinkClaimed(true);
-                setShowDrinkModal(false);
-                toast.success("Voucher ready! Show this at the bar.");
-              }}
-              className="w-full rounded-full bg-brand py-3 text-sm font-black text-white shadow-md active:scale-95"
-            >
-              {drinkClaimed ? "Close" : "Redeem at Bar"}
-            </button>
-          </div>
-        </div>
-      )}
-
+      {/* The shell renders the one floating AI Receptionist — never twice. */}
       {/* Digital Check-In Modal */}
       {showCheckInModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in">
@@ -958,7 +706,7 @@ export function StayCompendium() {
                 <div>
                   <label className="text-[11px] font-bold uppercase tracking-wider text-mute">Check-In Time</label>
                   <div className="mt-1 flex h-10 items-center rounded-xl bg-paper px-3 text-xs font-bold text-ink ring-1 ring-line">
-                    {property.checkIn || "02:30 PM"}
+                    {property.checkIn || "Ask reception"}
                   </div>
                 </div>
               </div>
@@ -993,7 +741,7 @@ export function StayCompendium() {
                   });
                 }
                 toast.success("Check-In Complete! Welcome to your stay.", {
-                  description: `Digital Key active. PIN #4829* for Room ${roomLabel || "Guest"}.`,
+                  description: `Reception has been notified for Room ${roomLabel || "Guest"}.`,
                 });
               }}
               className="w-full rounded-full bg-emerald-600 hover:bg-emerald-500 py-3 text-sm font-black text-white shadow-md active:scale-95 disabled:opacity-40"
@@ -1027,17 +775,16 @@ export function StayCompendium() {
               </p>
             </div>
 
-            {/* Folio Billing Summary */}
+            {/* Folio note — AirPal never invents a billing balance */}
             <div className="rounded-2xl bg-paper p-3.5 ring-1 ring-line space-y-2 text-xs">
               <div className="flex items-center justify-between font-bold text-ink">
                 <span className="flex items-center gap-1.5">
                   <Receipt size={14} className="text-brand" />
                   <span>Stay Folio Balance</span>
                 </span>
-                <span className="text-brand font-black">A$0.00 (Settled)</span>
               </div>
               <p className="text-[11px] text-mute leading-snug">
-                All room charges &amp; incidentals have been finalized to your card on file.
+                Ask reception for your folio balance — room charges are settled at the desk, not in this guide.
               </p>
             </div>
 
@@ -1071,7 +818,7 @@ export function StayCompendium() {
             </div>
 
             <div className="rounded-xl bg-amber-400/10 p-2.5 text-[11px] text-amber-700 dark:text-amber-300 font-medium text-center">
-              🔑 Please leave room keycards on the nightstand or drop in the lobby express box.
+              🔑 Please return room keys as instructed by reception.
             </div>
 
             <button
@@ -1123,57 +870,4 @@ export function StayCompendium() {
       />
     </div>
   );
-}
-
-function getFallbackMenu(): MenuItem[] {
-  return [
-    {
-      id: "menu-1",
-      name: "Club Sandwich & Fries",
-      description: "Smoked turkey, crispy bacon, aged cheddar, lettuce, tomato & aioli.",
-      price: 24,
-      category: "Mains",
-      available: true,
-    },
-    {
-      id: "menu-2",
-      name: "Artisan Margherita Pizza",
-      description: "San Marzano tomato, buffalo mozzarella, fresh basil & extra virgin olive oil.",
-      price: 26,
-      category: "Mains",
-      available: true,
-    },
-    {
-      id: "menu-3",
-      name: "Sydney Rock Oysters (6pcs)",
-      description: "Freshly shucked with mignonette dressing & lemon wedges.",
-      price: 28,
-      category: "Starters",
-      available: true,
-    },
-    {
-      id: "menu-4",
-      name: "Truffle Parmesan Fries",
-      description: "Crispy shoestring fries tossed in white truffle oil & parmesan.",
-      price: 14,
-      category: "Starters",
-      available: true,
-    },
-    {
-      id: "menu-5",
-      name: "Aperol Spritz",
-      description: "Aperol, prosecco, splash of soda, fresh orange slice.",
-      price: 18,
-      category: "Drinks",
-      available: true,
-    },
-    {
-      id: "menu-6",
-      name: "Australian Craft Beer (Pint)",
-      description: "Local pale ale brewed in Sydney.",
-      price: 12,
-      category: "Drinks",
-      available: true,
-    },
-  ];
 }

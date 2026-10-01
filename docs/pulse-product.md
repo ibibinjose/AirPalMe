@@ -68,7 +68,7 @@ Pulse MVP is a **Stay / host ops extension**, not a new Studio SaaS.
 | Public respondent | `/pulse/:publicToken` — mobile browser, no install, no account required |
 | Host operator | `/host` tab or `/host/pulse` — builder (thin), responses, issues |
 | Studio | Link only (“Pulse” card → host Pulse) — no separate Studio app |
-| Stay attach | Optional CTA from Concierge / Demo Hotel: “How is your stay?” → same public Pulse |
+| Stay attach | Optional CTA from Stay & Guide / Demo Hotel: “How is your stay?” → same public Pulse |
 
 ### Reuse (do not rewrite)
 

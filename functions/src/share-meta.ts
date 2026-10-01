@@ -116,7 +116,22 @@ async function resolveBioCard(handle: string, origin: string): Promise<ShareCard
 }
 
 async function resolvePropertyCard(id: string, origin: string): Promise<ShareCard> {
-  const doc = await getDocData("properties", id);
+  let doc = await getDocData("properties", id);
+  if (!doc) {
+    const key = id.trim().replace(/^@+/, "");
+    for (const field of ["handle", "slug"]) {
+      if (doc) break;
+      for (const candidate of [key, key.toLowerCase()]) {
+        try {
+          const snap = await db.collection("properties").where(field, "==", candidate).limit(1).get();
+          if (!snap.empty) doc = snap.docs[0]!.data() as Record<string, unknown>;
+        } catch {
+          /* keep generic */
+        }
+        if (doc) break;
+      }
+    }
+  }
   if (!doc) return genericCard(origin);
   // Pick public fields only — the raw doc carries host secrets (wifi).
   return shareCardFor(
@@ -129,11 +144,7 @@ async function resolvePropertyCard(id: string, origin: string): Promise<ShareCar
 async function resolveDemoHotelCard(origin: string): Promise<ShareCard> {
   const doc = await getDocData("properties", "harbour-hotel");
   if (!doc) return shareCardFor("demoHotel", {}, origin);
-  return shareCardFor(
-    "demoHotel",
-    { name: doc.name, tagline: doc.tagline, heroImage: doc.heroImage },
-    origin,
-  );
+  return shareCardFor("demoHotel", { name: doc.name, tagline: doc.tagline, heroImage: doc.heroImage }, origin);
 }
 
 /** Match a share path to its card. Null = not a share route (passthrough). */

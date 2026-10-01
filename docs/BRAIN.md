@@ -1,7 +1,7 @@
 # AirPal Brain
 
 **Company:** SarvamDaily Pty Ltd, trading as AirPal.Me.
-**Status:** Binding on product expansion. Established 22 September 2026.
+**Status:** Binding on product expansion. Established 22 September 2026. Last synced 1 October 2026.
 **Shipped product freeze:** `docs/CANON.md`. Engineering and safety rules: `AGENTS.md`.
 
 > **AirPal makes life easier by helping people discover what to do, find who to do it with, make a plan, and actually experience it.**
@@ -55,6 +55,8 @@ First city: Sydney. The same loop can open another city only after Sydney produc
 A person has time and an urge, and no simple way to turn that into a plan with a place and other people.
 
 Directories list things. Social networks collect attention. Marketplaces list inventory. None of them own the step from "I feel like doing something" to "we went."
+
+Discovery now includes AI answer engines: if a model cannot read AirPal's public surfaces, it invents AirPal instead. Public marketing routes ship as prerendered, crawlable HTML for that reason, and `/trust` publishes the checkable company facts.
 
 Similarly, hotel and accommodation guests struggle with outdated binders and PDFs, lack 24/7 front desk access at 2am, and cannot easily discover vetted local activities.
 
@@ -148,7 +150,7 @@ Identity, biometric authentication (Face ID / WebAuthn passkeys), trust, profile
 Intent, plans, invitations, matching, calendar, maps, collaborative trip planning.
 
 ### Layer 3 — AirPal Marketplace
-People (AirPal Mate), businesses, experiences, stays (AirPal Stay & Digital Compendium), offers, bookings, payments.
+People (AirPal Mate), businesses, experiences, stays (AirPal Stay & Guide), offers, bookings, payments.
 
 ### Layer 4 — AirPal Discovery
 What's on, events, places, Daily, deals, local discovery.
@@ -174,7 +176,7 @@ AirPal includes a native, real-time Universal Chat system (`shared/messaging.ts`
 
 ## 11. AirPal Stay & Host Operating Model
 
-### Digital Compendium (`/stay`, `/stay/:id`, `/concierge`, `/g/:id`)
+### Stay & Guide (`/stay`, `/stay/:id`, `/concierge`, `/g/:id`)
 Replaces paper binders and PDFs with a modern, mobile-first companion:
 - **Digital Key / Door PIN Code**: Instant keypad access.
 - **Welcome Drink Voucher**: Digital redemption at the hotel bar.
@@ -196,7 +198,7 @@ Replaces paper binders and PDFs with a modern, mobile-first companion:
 
 Every business, venue, and stay receives a public presence on `AirPal.me/@handle`:
 - Category badge and verified credentials.
-- Digital Compendium and 24/7 Concierge launcher.
+- Stay & Guide launcher with 24/7 assistant.
 - Hotel facilities & amenities showcase.
 - Direct booking link (`Book Direct`).
 - 1-tap quick action deck: `[Chat on AirPal]`, `[Website]`, `[WhatsApp]`, `[Call]`, `[Directions]`.

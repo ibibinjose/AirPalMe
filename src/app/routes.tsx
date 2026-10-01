@@ -37,6 +37,8 @@ const PeoplePage = lazy(() => import("@/pages/PeoplePage").then((m) => ({ defaul
 const SettingsPage = lazy(() => import("@/pages/SettingsPage").then((m) => ({ default: m.SettingsPage })));
 const MarkerPage = lazy(() => import("@/pages/MarkerPage").then((m) => ({ default: m.MarkerPage })));
 const StayPage = lazy(() => import("@/pages/StayPage").then((m) => ({ default: m.StayPage })));
+const StayListPage = lazy(() => import("@/pages/StayListPage").then((m) => ({ default: m.StayListPage })));
+const StayProfilePage = lazy(() => import("@/pages/StayProfilePage").then((m) => ({ default: m.StayProfilePage })));
 const DemoHotelPage = lazy(() => import("@/pages/DemoHotelPage").then((m) => ({ default: m.DemoHotelPage })));
 const DemoPage = lazy(() => import("@/pages/DemoPage").then((m) => ({ default: m.DemoPage })));
 const HostPage = lazy(() => import("@/pages/HostPage").then((m) => ({ default: m.HostPage })));
@@ -102,8 +104,11 @@ const NotificationsAdminPage = lazy(() =>
 );
 const GetAirPalPage = lazy(() => import("@/pages/GetAirPalPage").then((m) => ({ default: m.GetAirPalPage })));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })));
+const TrustPage = lazy(() => import("@/pages/TrustPage").then((m) => ({ default: m.TrustPage })));
+const AlternativePage = lazy(() => import("@/pages/AlternativePage").then((m) => ({ default: m.AlternativePage })));
 const AboutPage = lazy(() => import("@/pages/AboutPage").then((m) => ({ default: m.AboutPage })));
 const ContactPage = lazy(() => import("@/pages/ContactPage").then((m) => ({ default: m.ContactPage })));
+const HelpPage = lazy(() => import("@/pages/HelpPage").then((m) => ({ default: m.HelpPage })));
 const PrivacyPage = lazy(() => import("@/pages/PrivacyPage").then((m) => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import("@/pages/TermsPage").then((m) => ({ default: m.TermsPage })));
 const CookiesPage = lazy(() => import("@/pages/CookiesPage").then((m) => ({ default: m.CookiesPage })));
@@ -156,6 +161,9 @@ export function AppRoutes() {
         <Route path="/discovery">
           <Redirect to="/explore" />
         </Route>
+        <Route path="/listings">
+          <Redirect to="/partners" />
+        </Route>
         <Route path="/solutions/:id" component={SolutionDetailPage} />
         <Route path="/solutions" component={SolutionsPage} />
         <Route path="/guide" component={GuidePage} />
@@ -163,11 +171,10 @@ export function AppRoutes() {
         <Route path="/scan" component={ScanPage} />
         <Route path="/w/:code" component={WavePage} />
         <Route path="/concierge" component={ConciergePage} />
-        <Route path="/stay">
-          <Redirect to="/concierge" />
-        </Route>
+        <Route path="/stay" component={StayListPage} />
         <Route path="/companion" component={CompanionPage} />
         <Route path="/g/:id" component={StayPage} />
+        <Route path="/stay/@:handle" component={StayProfilePage} />
         <Route path="/stay/:id" component={StayPage} />
         <Route path="/DemoHotel" component={DemoHotelPage} />
         <Route path="/demohotel">
@@ -288,7 +295,10 @@ export function AppRoutes() {
           <Redirect to="/getAirPalApp" />
         </Route>
         <Route path="/about" component={AboutPage} />
+        <Route path="/trust" component={TrustPage} />
+        <Route path="/alternatives/:slug" component={AlternativePage} />
         <Route path="/contact" component={ContactPage} />
+        <Route path="/help" component={HelpPage} />
         <Route path="/privacy" component={PrivacyPage} />
         <Route path="/terms" component={TermsPage} />
         <Route path="/cookies" component={CookiesPage} />

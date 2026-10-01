@@ -1,7 +1,7 @@
 # AirPal.me — App Mind Map, Review & Improvement Plan
 
 Source of truth for structure: `src/app/routes.tsx`, `src/App.tsx`, `src/app/providers.tsx`, `src/pages/*`, `src/contexts/*`, `shared/*`, `functions/src/index.ts`, `docs/analytics-event-dictionary.md`.
-North-star: **WQGA/Context** (weekly qualified guest actions ÷ active QR contexts).
+North-star: **Completed AirPal Experiences per active user** (Brain §7). WQGA/Context survives only as an operator/analytics metric, never the company North Star.
 
 ## 1. Mind map (full app)
 
@@ -20,7 +20,7 @@ AirPal.me (scan-first guest concierge + precinct guide, no account for guests)
 │   │   fallback = map embed, never dev card on guest surfaces
 │   └── Analytics: WQGA dictionary, anonymousSessionId, backendState live/offline_queued/local_demo/failed
 │
-├── PRIMARY CHROME: Scan / Stay / Explore / Inbox
+├── PRIMARY CHROME: Home / Explore / Trips / Inbox / Me + global + Create (five-tab companion dock since 22 Sep 2026 — see docs/CANON.md §3; Scan lives behind + Create, Stay inside Explore/Home)
 │   ├── /scan — camera (jsQR) + manual code + demo tiles (room/lobby/street/campus/market/bio/zoo)
 │   │   sets Stay session (stay/marker/campus) + noteQrContext, then navs to /g /q /c /e /@
 │   ├── /concierge + /stay + /stay/:id + /g/:id (StayPage → ConciergePage → StayCompendium) — room stay home
@@ -74,7 +74,7 @@ AirPal.me (scan-first guest concierge + precinct guide, no account for guests)
 │   ├── /getAirPalApp — install page: PWA steps, QR, store badges (Soon until listed)
 │   ├── /fashion, /experiences — vertical surfaces (brand-collab first for fashion)
 │   ├── /promotions, /giveaways, /business/*, /club, /studio — commerce + operator
-│   ├── /about /contact /privacy /terms /cookies /legal → /privacy
+│   ├── /about /trust /contact /privacy /terms /cookies /legal → /privacy
 │   └── ExpoDirectory, Stall, MemoryWall, Settings, AuthAction, NotFound
 │
 ├── BACKEND (functions/src/index.ts callables)
@@ -108,14 +108,13 @@ operator side (host/business/event/admin) already exists end-to-end.
   implicit; stale Wi-Fi/hours had no freshness signal.
 - Companion had no 18+ gate and no funnel events; Stripe bookings and deal
   claims were only partly measured.
-- Bottom tabs are Scan / Stay / Explore / Plan / Me — Calendar moved to the
-  desktop header only (Sep 2026).
+- Bottom tabs were Scan / Stay / Explore / Plan / Me (resolved 22 Sep 2026: Home / Explore / Trips / Inbox / Me + one global + Create — see docs/CANON.md §3).
 
 ## 3. What to change / add (priority order)
 
 1. One winnable loop (scan → Wi-Fi + tonight + answer <60s), measured per
    context — done, see log below.
-2. Four-tab IA (Scan/Stay/Explore/Plan) + one global search — done.
+2. Four-tab IA (Scan/Stay/Explore/Plan) + one global search — done, then superseded 22 Sep 2026 by the five-tab companion dock (search stays global).
 3. Trust: no invented guest data, demo badges, offline-tolerant scan,
    Maps rebuild discipline — done.
 4. Host activation checklist + Wi-Fi freshness — done.
@@ -153,7 +152,7 @@ Posture: **real database only, empty is OK**. Curated bundle content
   return a generic `unknownProperty` (no venue facts, no invented Wi-Fi).
   `fetchProperty` is cache-first with a 3s bounded remote refresh
   (offline-safe). `StayContext` no longer defaults to the Harbour seed;
-  Concierge shows ask-the-desk states, `askLocal` answers only from live
+  Stay & Guide shows ask-the-desk states, `askLocal` answers only from live
   data + tonight list.
 - **Google:** removed `GooglePlacesSearcher`/`searchNearby` merge, invented
   `4.7`/`340` rating fallbacks, `googleMapsUri` links, third-party
@@ -173,11 +172,11 @@ Posture: **real database only, empty is OK**. Curated bundle content
 1. **Winnable loop:** `first_value` now carries real `timeFromSessionStartMs`,
    `timeFromQrScanMs`, `loopTargetMet` (60s target, `WINNABLE_LOOP_TARGET_MS` in
    `shared/analytics.ts`); Ask answers emit `first_value("answer", …)`.
-2. **Nav collapse:** TabBar/TopNav are Scan / Stay / Explore / Plan; Calendar +
+2. **Nav collapse:** TabBar/TopNav were Scan / Stay / Explore / Plan (historical — five-tab dock since 22 Sep 2026); Calendar +
    Guide map to the Explore tab; global search (⌘K) now also indexes open plans,
    walks, and markers.
 3. **Trust:** removed the hardcoded `harbour101` Wi-Fi fallback (empty = "ask the
-   desk"); `DemoBadge` on the Concierge hero in demo mode; Scan camera-denied
+   desk"); `DemoBadge` on the Stay & Guide hero in demo mode; Scan camera-denied
    path explains settings + offline code entry; dev-only warn on missing Maps key
    (guest embed fallback unchanged).
 4. **Hosts:** `HostActivationChecklist` on `/host` today tab (listed → Wi-Fi →

@@ -189,9 +189,7 @@ export function AirPalAiReceptionist() {
           m.id === msgId
             ? {
                 ...m,
-                escalation: m.escalation
-                  ? { ...m.escalation, escalated: true, ticketId: savedTicket.id }
-                  : undefined,
+                escalation: m.escalation ? { ...m.escalation, escalated: true, ticketId: savedTicket.id } : undefined,
               }
             : m,
         ),
@@ -229,7 +227,7 @@ export function AirPalAiReceptionist() {
         >
           {/* Glowing pulse ring */}
           <span className="absolute -inset-1 rounded-full bg-brand/30 animate-ping pointer-events-none opacity-75" />
-          
+
           <Sparkles className="h-6 w-6 text-amber-300 transition group-hover:rotate-12" />
 
           {/* Unread badge */}
@@ -262,9 +260,7 @@ export function AirPalAiReceptionist() {
                         AI Receptionist
                       </span>
                     </div>
-                    <p className="text-xs text-white/80 font-medium">
-                      24/7 Digital Compendium &amp; Desk Assistant
-                    </p>
+                    <p className="text-xs text-white/80 font-medium">24/7 Stay &amp; Guide Assistant</p>
                   </div>
                 </div>
 
@@ -295,7 +291,9 @@ export function AirPalAiReceptionist() {
                               selectedLang === lang.code ? "bg-brand text-white" : "hover:bg-paper"
                             }`}
                           >
-                            <span>{lang.flag} {lang.label}</span>
+                            <span>
+                              {lang.flag} {lang.label}
+                            </span>
                             {selectedLang === lang.code && <CheckCircle2 size={12} />}
                           </button>
                         ))}
@@ -334,10 +332,7 @@ export function AirPalAiReceptionist() {
             {/* Chat Body */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-paper/50">
               {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex flex-col ${msg.sender === "guest" ? "items-end" : "items-start"}`}
-                >
+                <div key={msg.id} className={`flex flex-col ${msg.sender === "guest" ? "items-end" : "items-start"}`}>
                   <div
                     className={`max-w-[85%] rounded-2xl p-3.5 shadow-xs text-[14px] leading-relaxed ${
                       msg.sender === "guest"
@@ -346,7 +341,7 @@ export function AirPalAiReceptionist() {
                     }`}
                   >
                     <p className="whitespace-pre-wrap">{msg.text}</p>
-                    
+
                     {/* Smart Staff Escalation Card */}
                     {msg.escalation && (
                       <div className="mt-3 rounded-xl bg-paper p-3 ring-1 ring-line border-l-4 border-l-amber-400">
@@ -371,9 +366,7 @@ export function AirPalAiReceptionist() {
                           <button
                             type="button"
                             disabled={escalatingId === msg.id}
-                            onClick={() =>
-                              handleEscalate(msg.id, msg.escalation!.details, msg.escalation!.category)
-                            }
+                            onClick={() => handleEscalate(msg.id, msg.escalation!.details, msg.escalation!.category)}
                             className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 px-3 py-2 text-xs font-black text-slate-950 shadow-xs transition active:scale-95 disabled:opacity-50"
                           >
                             {escalatingId === msg.id ? (

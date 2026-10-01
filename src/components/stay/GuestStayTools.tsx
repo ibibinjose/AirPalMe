@@ -39,7 +39,7 @@ export function GuestStayTools() {
   return (
     <>
       {!answersOpen && !contactOpen && !checklistOpen && (
-        <div className="pointer-events-none fixed right-4 bottom-32 z-50 flex flex-col items-end gap-2 md:bottom-10">
+        <div className="pointer-events-none fixed left-4 bottom-32 z-50 flex flex-col items-start gap-2 md:bottom-10">
           <button
             type="button"
             onClick={openAnswers}

@@ -98,7 +98,7 @@ const PERSONAL_CTA_PRESETS = [
 
 // Business Action Button Presets
 const BUSINESS_CTA_PRESETS = [
-  "View Digital Compendium",
+  "View Stay & Guide",
   "Book Direct",
   "Order Online",
   "Book Table",
@@ -280,9 +280,7 @@ export function BioEditPage() {
     );
     setPronouns(activeProfile.pronouns || "");
     setLanguages(activeProfile.languages || "");
-    setPrimaryCta(
-      activeProfile.primaryCta || (isBusinessKind(activeProfile.kind) ? "Order Online" : "Catch Up"),
-    );
+    setPrimaryCta(activeProfile.primaryCta || (isBusinessKind(activeProfile.kind) ? "Order Online" : "Catch Up"));
     setCity(activeProfile.city || "");
     setHours(activeProfile.hours || "");
     setOpenNow(activeProfile.openNow ?? true);
@@ -313,10 +311,7 @@ export function BioEditPage() {
             Set up your personal AirPal profile or business place handle to get started.
           </p>
           <div className="mt-6 space-y-2">
-            <Button
-              className="w-full h-11 text-sm font-semibold shadow-md gap-2"
-              onClick={() => nav("/bio/setup")}
-            >
+            <Button className="w-full h-11 text-sm font-semibold shadow-md gap-2" onClick={() => nav("/bio/setup")}>
               <User size={16} />
               Set Up Personal Bio
             </Button>
@@ -368,9 +363,7 @@ export function BioEditPage() {
         services,
         deals,
       });
-      toast.success(
-        isBusiness ? "Saved business place profile" : "Saved personal AirPal profile",
-      );
+      toast.success(isBusiness ? "Saved business place profile" : "Saved personal AirPal profile");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save profile changes. Try again.");
     }
@@ -813,9 +806,7 @@ export function BioEditPage() {
               <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-4">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-bold uppercase tracking-wider text-gold">Media & Photos</p>
-                  <span className="text-[11px] text-mute">
-                    {isBusiness ? "Storefront & Logo" : "Cover & Avatar"}
-                  </span>
+                  <span className="text-[11px] text-mute">{isBusiness ? "Storefront & Logo" : "Cover & Avatar"}</span>
                 </div>
                 <div className="space-y-4">
                   <div>

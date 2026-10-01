@@ -33,8 +33,18 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
     description: "What's on near you — upcoming events, experiences and things to do.",
   },
   {
+    match: /^\/event(\/|$)/,
+    title: "Host an event · AirPal.Me",
+    description: "List free or ticketed events on AirPal.Me — stalls, festivals, guest lists and door check-in.",
+  },
+  {
+    match: /^\/stay$/,
+    title: "Stays · AirPal.Me",
+    description: "Hotels, motels, hostels and boutique stays — browse live listings and book direct with the property.",
+  },
+  {
     match: /^\/concierge(\/|$)|^\/stay(\/|$)/,
-    title: "Stay concierge · AirPal.Me",
+    title: "Stay & Guide · AirPal.Me",
     description: "Your guest companion — Wi-Fi, dining, the desk and what's around your stay.",
   },
   {
@@ -46,6 +56,11 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
     match: /^\/helpdesk(\/|$)/,
     title: "Help Desk Operations · AirPal.Me",
     description: "Live Help Desk Console for Stays, In-Room Dining, Event Hosts and Local Venues on AirPal.Me.",
+  },
+  {
+    match: /^\/help(\/|$)/,
+    title: "Help center · AirPal.Me",
+    description: "Guides to plans, Mates, tickets, safety, and your account on AirPal.Me.",
   },
   {
     match: /^\/business(\/|$)/,
@@ -83,6 +98,31 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
     description: "Scan an AirPal code to open Wi-Fi, menus, events and offers.",
   },
   {
+    match: /^\/trust(\/|$)/,
+    title: "Trust · AirPal.Me",
+    description: "Is AirPal.Me legit? Company facts, who runs it, and what it isn't.",
+  },
+  {
+    match: /^\/alternatives\/meetup(\/|$)/,
+    title: "Meetup alternative for casual plans · AirPal.Me",
+    description: "Blend social planning with local discovery: group plans, verified Mates, and what's on nearby.",
+  },
+  {
+    match: /^\/alternatives\/touch-stay(\/|$)/,
+    title: "Touch Stay alternative · AirPal.Me",
+    description: "Lighter QR guest concierge with no download: Wi-Fi, dining, housekeeping and local discovery.",
+  },
+  {
+    match: /^\/alternatives\/hostfully(\/|$)/,
+    title: "Hostfully alternative · AirPal.Me",
+    description: "Simpler stay concierge plus local events and experiences for boutique hosts and rentals.",
+  },
+  {
+    match: /^\/alternatives\/eventbrite(\/|$)/,
+    title: "Eventbrite alternative · AirPal.Me",
+    description: "List events and let groups coordinate plans around them: ticketing, check-in, payouts.",
+  },
+  {
     match: /^\/about(\/|$)/,
     title: "About · AirPal.Me",
     description: "One trusted marketplace for people, places, things and experiences.",
@@ -106,7 +146,7 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
 ];
 
 /** Detail pages own their tags (child effects run before AppShell's). */
-const DYNAMIC_OWNED = [/^\/@/, /^\/(plan|e|invite|p|tour|c|solutions)\/[^/]/, /^\/marketing(\/|$)/];
+const DYNAMIC_OWNED = [/^\/@/, /^\/(plan|e|invite|p|tour|c|solutions)\/[^/]/, /^\/marketing(\/|$)/, /^\/stay\/@/];
 
 /** Pure route → static meta lookup. Null when a dynamic page owns the tags. */
 export function routeMetaFor(pathname: string): { title: string; description: string; path: string } | null {

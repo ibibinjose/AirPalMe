@@ -157,7 +157,9 @@ export function StartPage() {
   const [method, setMethod] = useState<AuthMethod>(initialMethod);
 
   // Form inputs
-  const [email, setEmail] = useState(() => emailParam || (typeof window !== "undefined" ? localStorage.getItem(LAST_EMAIL_KEY) || "" : ""));
+  const [email, setEmail] = useState(
+    () => emailParam || (typeof window !== "undefined" ? localStorage.getItem(LAST_EMAIL_KEY) || "" : ""),
+  );
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -516,9 +518,7 @@ export function StartPage() {
             <MeAvatar faceClassName="h-16 w-16 text-xl" />
           </div>
           <h1 className="font-display mt-4 text-2xl font-semibold">{user.displayName || "Your Account"}</h1>
-          {mine?.handle ? (
-            <p className="mt-0.5 text-xs font-bold text-brand">@{mine.handle}</p>
-          ) : null}
+          {mine?.handle ? <p className="mt-0.5 text-xs font-bold text-brand">@{mine.handle}</p> : null}
           <p className="text-xs text-mute mt-1">{user.email || user.phone || "Signed in"}</p>
 
           {next && (
@@ -606,7 +606,7 @@ export function StartPage() {
             Find a place. Make&nbsp;a&nbsp;plan. Meet&nbsp;your&nbsp;people.
           </h1>
           <p className="mx-auto mt-2 max-w-sm text-sm text-mute">
-            Find places and experiences, make plans with family and friends, and use Stay concierge — in one account.
+            Find places and experiences, make plans with family and friends, and use Stay & Guide — in one account.
           </p>
           <div className="mt-4 grid grid-cols-3 gap-2 text-left">
             {[
@@ -780,8 +780,8 @@ export function StartPage() {
 
       {mode === "signup" && inviterHandle && (
         <p className="mb-4 rounded-2xl ring-1 ring-line bg-card px-4 py-3 text-center text-sm">
-          You’re invited by <span className="font-semibold text-brand">@{inviterHandle}</span> — your
-          signup lands you in the{" "}
+          You’re invited by <span className="font-semibold text-brand">@{inviterHandle}</span> — your signup lands you
+          in the{" "}
           <Link href="/founders" className="font-semibold text-brand hover:underline">
             Founders 100K pool
           </Link>
@@ -789,7 +789,10 @@ export function StartPage() {
       )}
 
       {/* Main Card */}
-      <div id="auth-card" className="rounded-3xl ring-1 ring-line/70 bg-card/95 backdrop-blur-md p-6 shadow-sm border border-line/40 scroll-mt-4">
+      <div
+        id="auth-card"
+        className="rounded-3xl ring-1 ring-line/70 bg-card/95 backdrop-blur-md p-6 shadow-sm border border-line/40 scroll-mt-4"
+      >
         {mode === "reset" ? (
           /* Password Reset Flow */
           <div>
@@ -888,7 +891,9 @@ export function StartPage() {
                 aria-pressed={method === "email"}
                 className={cn(
                   "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition cursor-pointer",
-                  method === "email" ? "bg-brand text-white shadow-xs" : "bg-paper text-mute hover:text-ink ring-1 ring-line/80",
+                  method === "email"
+                    ? "bg-brand text-white shadow-xs"
+                    : "bg-paper text-mute hover:text-ink ring-1 ring-line/80",
                 )}
               >
                 <Mail size={13} />
@@ -900,7 +905,9 @@ export function StartPage() {
                 aria-pressed={method === "phone"}
                 className={cn(
                   "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition cursor-pointer",
-                  method === "phone" ? "bg-brand text-white shadow-xs" : "bg-paper text-mute hover:text-ink ring-1 ring-line/80",
+                  method === "phone"
+                    ? "bg-brand text-white shadow-xs"
+                    : "bg-paper text-mute hover:text-ink ring-1 ring-line/80",
                 )}
               >
                 <Phone size={13} />
@@ -940,10 +947,7 @@ export function StartPage() {
 
             {mode === "signin" && hasEnrolledBiometrics && (
               <div className="mt-4">
-                <BiometricAuthButton
-                  variant="hero"
-                  onSuccess={() => setPendingGo(true)}
-                />
+                <BiometricAuthButton variant="hero" onSuccess={() => setPendingGo(true)} />
               </div>
             )}
 
@@ -1046,7 +1050,12 @@ export function StartPage() {
                           Forgot password?
                         </button>
                       </div>
-                      <Button type="submit" className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(24,5,219,0.3)]" disabled={busy} loading={busy}>
+                      <Button
+                        type="submit"
+                        className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(24,5,219,0.3)]"
+                        disabled={busy}
+                        loading={busy}
+                      >
                         {busy ? "Signing in…" : "Sign In"}
                       </Button>
                       <p className="text-center text-[12px] text-mute">
@@ -1103,8 +1112,18 @@ export function StartPage() {
                 <ValidField
                   label="Personal @handle"
                   ok={handleOk}
-                  error={signupHandle && !handleStatus.checking && !handleOk ? handleStatus.reason || "Handle unavailable" : null}
-                  hint={handleStatus.checking ? "Checking availability…" : handleOk ? `@${signupHandle} is available!` : "Unique handle for your AirPal profile"}
+                  error={
+                    signupHandle && !handleStatus.checking && !handleOk
+                      ? handleStatus.reason || "Handle unavailable"
+                      : null
+                  }
+                  hint={
+                    handleStatus.checking
+                      ? "Checking availability…"
+                      : handleOk
+                        ? `@${signupHandle} is available!`
+                        : "Unique handle for your AirPal profile"
+                  }
                 >
                   <div className="relative">
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-mute">@</span>
@@ -1160,7 +1179,16 @@ export function StartPage() {
                   <div className="space-y-1.5 pt-0.5">
                     <div className="flex items-center justify-between text-[11px]">
                       <span className="text-mute font-medium">Password Strength</span>
-                      <span className={cn("font-bold", passwordStrength.score >= 3 ? "text-emerald-600 dark:text-emerald-400" : passwordStrength.score === 2 ? "text-amber-500" : "text-red-500")}>
+                      <span
+                        className={cn(
+                          "font-bold",
+                          passwordStrength.score >= 3
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : passwordStrength.score === 2
+                              ? "text-amber-500"
+                              : "text-red-500",
+                        )}
+                      >
                         {passwordStrength.label}
                       </span>
                     </div>
@@ -1202,7 +1230,9 @@ export function StartPage() {
                 <Button
                   type="submit"
                   className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(24,5,219,0.3)] mt-2"
-                  disabled={busy || !emailOk || !passOk || !handleOk || signupName.trim().length < 2 || !signupAdultConfirmed}
+                  disabled={
+                    busy || !emailOk || !passOk || !handleOk || signupName.trim().length < 2 || !signupAdultConfirmed
+                  }
                   loading={busy}
                 >
                   {busy ? "Creating account…" : "Create My AirPal Account"}
@@ -1273,7 +1303,12 @@ export function StartPage() {
                   </button>
                 </div>
 
-                <Button type="submit" className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(24,5,219,0.3)] mt-2" disabled={busy || !emailOk || !password} loading={busy}>
+                <Button
+                  type="submit"
+                  className="w-full h-11 text-sm font-bold shadow-[0_4px_16px_rgba(24,5,219,0.3)] mt-2"
+                  disabled={busy || !emailOk || !password}
+                  loading={busy}
+                >
                   {busy ? "Signing in…" : "Sign In"}
                 </Button>
               </form>

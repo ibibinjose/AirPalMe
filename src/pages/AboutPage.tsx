@@ -244,19 +244,15 @@ export function AboutPage() {
           The guest companion — and the operating system behind it.
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-mute sm:text-base">
-          AirPal.Me is the guest companion for hotels and residential colleges, and the operating
-          system for the people who run them. Guests get one place for everything about their stay.
-          Hosts get one place to run it.
+          AirPal.Me is the guest companion for hotels and residential colleges, and the operating system for the people
+          who run them. Guests get one place for everything about their stay. Hosts get one place to run it.
         </p>
 
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {STAY_GUEST_POINTS.map((pt) => {
             const Icon = pt.icon;
             return (
-              <div
-                key={pt.title}
-                className="rounded-[28px] bg-card p-5 ring-1 ring-line/80 shadow-xs"
-              >
+              <div key={pt.title} className="rounded-[28px] bg-card p-5 ring-1 ring-line/80 shadow-xs">
                 <span className="grid h-10 w-10 place-items-center rounded-2xl bg-brand/10 text-brand ring-1 ring-brand/20">
                   <Icon size={20} strokeWidth={2} />
                 </span>
@@ -273,9 +269,8 @@ export function AboutPage() {
             Run everything from one place.
           </h3>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/70">
-            Manage guest requests, send announcements, coordinate staff, publish local
-            recommendations, and see what guests need most. One dashboard replaces the scattered
-            messages, notice boards, and spreadsheets.
+            Manage guest requests, send announcements, coordinate staff, publish local recommendations, and see what
+            guests need most. One dashboard replaces the scattered messages, notice boards, and spreadsheets.
           </p>
           <div className="mt-5 flex flex-wrap gap-2.5">
             <Link
@@ -302,6 +297,13 @@ export function AboutPage() {
         <h2 className="font-display mt-1 text-xl font-bold text-ink sm:text-2xl">
           Trust & Safety Are Core Product Features
         </h2>
+        <Link
+          href="/trust"
+          onClick={() => void triggerHaptic("light")}
+          className="mt-2 inline-block text-xs font-bold text-brand hover:underline"
+        >
+          Company facts, verification & what AirPal.Me isn&apos;t →
+        </Link>
 
         <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
           {TRUST_POINTS.map((pt) => {
@@ -324,13 +326,10 @@ export function AboutPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="max-w-2xl">
             <p className="text-[11px] font-bold uppercase tracking-wider text-gold">Australian Roots</p>
-            <h3 className="font-display mt-1 text-lg font-bold text-ink sm:text-xl">
-              Born in The Rocks, Sydney.
-            </h3>
+            <h3 className="font-display mt-1 text-lg font-bold text-ink sm:text-xl">Born in The Rocks, Sydney.</h3>
             <p className="mt-2 text-xs sm:text-sm text-mute leading-relaxed">
               We started amidst sandstone lanes, harbour weather, and historic hospitality. Built in{" "}
-              <strong className="text-ink font-semibold">{LEGAL.location}</strong>.{" "}
-              {LEGAL.brand} is proudly operated by{" "}
+              <strong className="text-ink font-semibold">{LEGAL.location}</strong>. {LEGAL.brand} is proudly operated by{" "}
               <strong className="text-ink font-semibold">{LEGAL.company}</strong> (ABN {LEGAL.abn}).
             </p>
           </div>

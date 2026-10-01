@@ -3,7 +3,7 @@
 **Every coding agent (Grok, Claude, Gemini, Muse, Cursor, Copilot) must read this file and `AGENTS.md` before editing.**  
 If a later prompt conflicts with this file on shipped chrome, auth, or identity, **this file wins** unless the human explicitly says to change the canon. For *what to build next*, follow `docs/BRAIN.md` (Brain does not override this freeze).
 
-Last sealed: 21 September 2026. Product: AirPal.me — Life Made Easy. One marketplace engine, six eventual verticals.
+Last sealed: 1 October 2026 (freeze sealed 21 September 2026; synced with /trust + prerender pipeline). Product: AirPal.me — Life Made Easy. One marketplace engine, six eventual verticals.
 
 ---
 
@@ -33,6 +33,8 @@ Canonical Firebase project: **`airpalme-app`**. Production web: **https://airpal
 Shared types: `shared/`. Callables: `functions/src/` + `src/lib/functions.ts`. Privileged writes stay on Functions. Never weaken `firestore.rules`.
 
 Gate before ship: `npm run verify`. Native after web build: `npm run cap:sync`.
+
+Marketing routes (`/`, `/about`, `/concierge`, `/plan`, `/mate`, `/experiences`, `/calendar`, `/event`, `/business`, `/solutions`, `/guide`, `/join`, `/partners`, `/trust`, `/alternatives/meetup`, `/alternatives/touch-stay`, `/alternatives/hostfully`, `/alternatives/eventbrite`, `/stay`) are prerendered to static HTML at build time (`node scripts/prerender-routes.mjs`, wired into `npm run build`): per-route title/description/self-referencing canonical plus a static body React wipes on mount. Client-side meta in `src/lib/share-meta.ts` must match the prerender copy in `scripts/prerender-routes.json` (enforced by `src/lib/prerender.test.ts` + `scripts/check-seo.mjs`). Firebase Hosting serves these files statically; all other routes keep the SPA fallback.
 
 Sydney calendar dates: `toZonedDateStr` / `useLocalNow`. Never `new Date().toISOString().slice(0,10)` for “today”.
 
@@ -75,6 +77,8 @@ Mapping: `src/lib/tabs.ts`, `src/components/layout/TabBar.tsx`. Global create: `
 
 Changed 22 September 2026 at the human's explicit request (companion redesign: Home/Explore/Trips/Inbox/Me + one + Create action, all existing routes preserved). `AGENTS.md` §3 IA now matches the shipped dock. Add Mate/Fashion as routes, not extra tabs, unless the human asks.
 
+Desktop top bar (`TopNav.tsx`): Home · Explore · **Browse ▾** · Mate · Plan · Pulse · Inbox. The Browse menu (`BrowseMenu.tsx`, links in `src/lib/browse-menu.ts`) holds the parent categories Stay / Events / Offers & Deals / Experiences, plus Host shortcuts (dashboard, guest ratings, promotions) for hosts. Mobile keeps the five-tab dock untouched; browse-context routes (Home, Explore, category pages) show a category chip strip under the header instead. `/pulse` hub renders full chrome; only anonymous `/pulse/:token` guest links stay minimal (`isWorkspacePath` in `src/lib/workspace.ts`).
+
 ---
 
 ## 4. Auth and identity (do not revert)
@@ -106,8 +110,10 @@ Reuse these. Do not add a parallel page for the same job.
 | Plan hub | `/plan` |
 | Create / view / edit plan | `/plan/new`, `/plan/:id`, `/plan/:id/edit`, `/invite/:code` |
 | Scan QR | `/scan` |
-| Stay concierge / compendium | `/concierge`, `/stay`, `/stay/:id`, `/g/:id` |
-| Demo Hotel stay QR showcase | `/DemoHotel` |
+| Stay listings | `/stay` (live listings; book-direct outbound, no platform booking) |
+| Stay & Guide (merged) | `/concierge`, `/stay/:id`, `/g/:id` (single view; guide + compendium, no mode switch) |
+| Stay profile | `/stay/@handle` (listing profile + what's around) |
+| Demo Hotel stay QR showcase (first live listable stay, else Harbour sim) | `/DemoHotel` |
 | Marker / campus | `/q/:id`, `/c/:id` |
 | Calendar / events | `/calendar`, `/e/:id`, `/event` (single organizer door; `/event/new` redirects there; ticketed + free) |
 | Festival program | `/f/:slug` (sessions are `events` with `festivalSlug`; attend/calendar reuse the events engine) |
@@ -167,6 +173,8 @@ Reuse these. Do not add a parallel page for the same job.
 | Giveaways / promotions | `/giveaways`, `/promotions` |
 | Fashion (copy, not P2P store) | `/fashion` |
 | Studio lead | `/studio` |
+| Trust & company facts | `/trust` (prerendered; Organization + FAQPage JSON-LD) |
+| Alternatives | `/alternatives/:slug` — meetup, touch-stay, hostfully, eventbrite (prerendered; verified AirPal facts only) |
 
 Route table source of truth: `src/app/routes.tsx`.
 
@@ -209,6 +217,8 @@ Do not undo these without the human naming them:
 - AirPal Blue `#1805db` and DM Sans / Outfit
 - Vite + Firebase + Capacitor stack
 - 18+ accounts
+- Prerendered marketing HTML (per-route head + static body, parity-tested)
+- `/trust` company-facts page (verified facts only, no invented proof)
 
 ---
 

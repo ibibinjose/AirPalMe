@@ -1,0 +1,187 @@
+[
+  {
+    "path": "/about",
+    "title": "About · AirPal.Me",
+    "description": "One trusted marketplace for people, places, things and experiences.",
+    "heading": "About AirPal.Me",
+    "summary": "AirPal.Me — Life Made Easy — is one trusted marketplace for people, places, things and experiences. Born in The Rocks, Sydney, it connects mates, stays, experiences and plans on one identity, with human-reviewed trust and safety."
+  },
+  {
+    "path": "/concierge",
+    "title": "Stay & Guide · AirPal.Me",
+    "description": "Your guest companion — Wi-Fi, dining, the desk and what's around your stay.",
+    "heading": "Stay & Guide",
+    "summary": "The guest companion for AirPal Stay: Wi-Fi, dining, the front desk and what's around your stay. Guests scan a code — no download, no account — and everything for the stay is in one place."
+  },
+  {
+    "path": "/plan",
+    "title": "Plans · AirPal.Me",
+    "description": "Make plans with family and friends — pick a place, gather the crew, go.",
+    "heading": "Plans",
+    "summary": "Make plans with family and friends on AirPal.Me — pick a place, gather the crew, and go: stops, votes and RSVPs in one shared plan. Guests can browse plans on the web without an account."
+  },
+  {
+    "path": "/business",
+    "title": "AirPal for Business",
+    "description": "List your place, publish experiences and offers, take bookings on AirPal.Me.",
+    "heading": "AirPal for Business",
+    "summary": "List your place, publish experiences and offers, and take bookings on AirPal.Me — one backend for your venue, events and brand."
+  },
+  {
+    "path": "/solutions",
+    "title": "Guides · AirPal.Me",
+    "description": "Local guides and curated ways to experience the city.",
+    "heading": "Solutions",
+    "summary": "AirPal.Me solutions — local guides and curated ways to experience the city."
+  },
+  {
+    "path": "/guide",
+    "title": "Guides · AirPal.Me",
+    "description": "Local guides and curated ways to experience the city.",
+    "heading": "Guide",
+    "summary": "The AirPal.Me guide — local guides and curated ways to experience the city."
+  },
+  {
+    "path": "/join",
+    "title": "Partner with AirPal.Me",
+    "description": "Add your place or venue to AirPal.Me and reach guests already nearby.",
+    "heading": "Join AirPal.Me",
+    "summary": "Add your place or venue to AirPal.Me and reach guests already nearby."
+  },
+  {
+    "path": "/partners",
+    "title": "Partner with AirPal.Me",
+    "description": "Add your place or venue to AirPal.Me and reach guests already nearby.",
+    "heading": "AirPal.Me partners",
+    "summary": "Add your place or venue to AirPal.Me and reach guests already nearby."
+  },
+  {
+    "path": "/trust",
+    "title": "Trust · AirPal.Me",
+    "description": "Is AirPal.Me legit? Company facts, who runs it, and what it isn't.",
+    "heading": "Is AirPal.Me legit?",
+    "summary": "AirPal.Me is a guest-companion and local-discovery platform built in Sydney by SarvamDaily Pty Ltd (ABN 83 702 462 977). It is not Arjo's AirPal mattress or the airpal.app flight tool — company facts, verification links and an honest early-access status.",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "AirPal.Me",
+        "legalName": "SarvamDaily Pty Ltd",
+        "taxID": "83 702 462 977",
+        "url": "https://airpal.me/",
+        "logo": "https://airpal.me/brand/logo-full.jpg",
+        "foundingLocation": {
+          "@type": "Place",
+          "name": "Sydney, New South Wales, Australia"
+        },
+        "disambiguatingDescription": "AirPal.Me is a Sydney-built guest-companion and local-discovery platform operated by SarvamDaily Pty Ltd. It is not Arjo's AirPal patient-transfer mattress, the airpal.app flight-search tool, or any other AirPal-named app.",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "url": "https://airpal.me/contact",
+          "contactType": "customer support"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is AirPal.Me safe?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "AirPal.Me is built with email and phone verification, understandable reputation, reporting and blocking, human admin review of safety cases, and payments held inside the platform — but no marketplace where people meet in real life can guarantee personal safety. Meet in public places, keep chat and payment inside AirPal.Me, and read the safety guidance in our help center."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Who owns AirPal.Me?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "AirPal.Me is operated by SarvamDaily Pty Ltd (ABN 83 702 462 977), trading as AirPal.Me, in New South Wales, Australia. You can check the ABN Lookup record yourself — the link is at the bottom of this page."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is AirPal.Me the same as AirPal mattresses?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Arjo's AirPal is a medical patient-transfer mattress made by Arjo. AirPal.Me has no affiliation with Arjo, with the airpal.app flight-search tool, or with any other AirPal-named app."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do I need to download an app?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Guests can browse places, stays, plans and events on the airpal.me website without an account. Native iOS and Android apps exist for members who want them; they require sign-in."
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "path": "/mate",
+    "title": "AirPal Mate · Find someone to go with you",
+    "description": "Going alone? Find a verified local AirPal Mate for food, culture, fitness, events and more in your city.",
+    "heading": "Find a Mate",
+    "summary": "Going alone? Find a verified local AirPal Mate for food, culture, fitness, events and more in your city. Send a request with what, when and where — approved Mates accept, then you chat and plan together."
+  },
+  {
+    "path": "/experiences",
+    "title": "Experiences · AirPal.Me",
+    "description": "Food, culture, fitness, art, music and local experiences near you.",
+    "heading": "Experiences",
+    "summary": "Food, culture, fitness, art, music and local experiences near you. Businesses list paid activities on AirPal.Me — going alone? Find an AirPal to join you."
+  },
+  {
+    "path": "/calendar",
+    "title": "Events · AirPal.Me",
+    "description": "What's on near you — upcoming events, experiences and things to do.",
+    "heading": "What's on",
+    "summary": "What's on near you — upcoming events, experiences and things to do, with month, week and day views."
+  },
+  {
+    "path": "/event",
+    "title": "Host an event · AirPal.Me",
+    "description": "List free or ticketed events on AirPal.Me — stalls, festivals, guest lists and door check-in.",
+    "heading": "Host an event",
+    "summary": "List free or ticketed events on AirPal.Me — stalls, festival programs, guest lists and door check-in. One organiser door, with payouts after delivery."
+  },
+  {
+    "path": "/alternatives/meetup",
+    "title": "Meetup alternative for casual plans · AirPal.Me",
+    "description": "Blend social planning with local discovery: group plans, verified Mates, and what's on nearby.",
+    "heading": "A Meetup alternative for casual plans",
+    "summary": "Meetup organises strangers into groups. AirPal.Me starts from your own circle: shared plans with stops, votes and RSVPs, verified Mates to go with you, and what's on nearby."
+  },
+  {
+    "path": "/alternatives/touch-stay",
+    "title": "Touch Stay alternative · AirPal.Me",
+    "description": "Lighter QR guest concierge with no download: Wi-Fi, dining, housekeeping and local discovery.",
+    "heading": "A Touch Stay alternative",
+    "summary": "Touch Stay is digital guest guidebook software. AirPal.Me is a QR guest concierge: guests scan — no download, no account — for Wi-Fi, dining, housekeeping, tickets and checkout."
+  },
+  {
+    "path": "/alternatives/hostfully",
+    "title": "Hostfully alternative · AirPal.Me",
+    "description": "Simpler stay concierge plus local events and experiences for boutique hosts and rentals.",
+    "heading": "A Hostfully alternative",
+    "summary": "Hostfully is a short-term-rental platform. AirPal.Me keeps it tight: a QR concierge for guests, one backend for hosts, and local events guests discover."
+  },
+  {
+    "path": "/alternatives/eventbrite",
+    "title": "Eventbrite alternative · AirPal.Me",
+    "description": "List events and let groups coordinate plans around them: ticketing, check-in, payouts.",
+    "heading": "An Eventbrite alternative with group planning",
+    "summary": "Eventbrite is an event discovery and ticketing platform. AirPal.Me lists free or ticketed events, and groups make shared plans with stops, votes and RSVPs on the same platform."
+  },
+  {
+    "path": "/stay",
+    "title": "Stays · AirPal.Me",
+    "description": "Hotels, motels, hostels and boutique stays — browse live listings and book direct with the property.",
+    "heading": "Stays",
+    "summary": "Hotels, motels, hostels and boutique stays in live host listings. AirPal is a listing platform, not a booking platform: browse stays, open a property profile, and book direct with the property."
+  }
+]

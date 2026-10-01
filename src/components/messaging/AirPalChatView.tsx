@@ -1,10 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import {
-  Send,
-  Sparkles,
-  Bot,
-  RotateCcw,
-} from "lucide-react";
+import { Send, Sparkles, Bot, RotateCcw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   ChatSendError,
@@ -152,7 +147,7 @@ export function AirPalChatView({
             <p className="text-[11px] text-mute truncate">
               {conversation.subtitle ||
                 (conversation.type === "ai"
-                  ? "Always online · Concierge & Assistant"
+                  ? "Always online · Guide & Assistant"
                   : conversation.type === "stay"
                     ? "Front Desk & AirPal AI Staff"
                     : "Active on AirPal")}
@@ -198,10 +193,7 @@ export function AirPalChatView({
             const stamp = smartChatTime(msg.createdAt || "");
 
             return (
-              <div
-                key={msg.id}
-                className={cn("flex flex-col", isMe ? "items-end" : "items-start")}
-              >
+              <div key={msg.id} className={cn("flex flex-col", isMe ? "items-end" : "items-start")}>
                 <div
                   className={cn(
                     "flex items-end gap-2 max-w-[85%] sm:max-w-[75%]",
@@ -289,7 +281,10 @@ export function AirPalChatView({
             <div className="grid h-7 w-7 place-items-center rounded-full bg-[#1805db] text-white">
               <Bot size={14} />
             </div>
-            <span className="flex gap-1 rounded-2xl rounded-bl-xs bg-paper px-3.5 py-2.5 ring-1 ring-brand/30" aria-label="AirPal AI is thinking">
+            <span
+              className="flex gap-1 rounded-2xl rounded-bl-xs bg-paper px-3.5 py-2.5 ring-1 ring-brand/30"
+              aria-label="AirPal AI is thinking"
+            >
               {[0, 1, 2].map((i) => (
                 <span
                   key={i}
@@ -304,10 +299,7 @@ export function AirPalChatView({
       </div>
 
       {/* Input Bar */}
-      <form
-        onSubmit={handleSend}
-        className="border-t border-line/70 bg-card p-3 sm:p-4"
-      >
+      <form onSubmit={handleSend} className="border-t border-line/70 bg-card p-3 sm:p-4">
         <div className="flex items-center gap-2">
           <input
             ref={inputRef}

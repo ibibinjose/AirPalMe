@@ -26,7 +26,15 @@
   <url><loc>https://airpal.me/studio</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://airpal.me/marketing</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://airpal.me/about</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://airpal.me/trust</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://airpal.me/event</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://airpal.me/stay</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://airpal.me/alternatives/meetup</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://airpal.me/alternatives/touch-stay</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://airpal.me/alternatives/hostfully</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://airpal.me/alternatives/eventbrite</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://airpal.me/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://airpal.me/help</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://airpal.me/privacy</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
   <url><loc>https://airpal.me/terms</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
   <url><loc>https://airpal.me/cookies</loc><changefreq>monthly</changefreq><priority>0.2</priority></url>

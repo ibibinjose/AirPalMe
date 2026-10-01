@@ -154,7 +154,7 @@ export function AuthGate({
       role: "guest",
       badge: kicker || "AirPal Account",
       title: title || "Sign in to continue",
-      description: lede || "Log in or sign up to start a Circle, make plans, save places, and use Stay concierge.",
+      description: lede || "Log in or sign up to start a Circle, make plans, save places, and use Stay & Guide.",
       benefits: [
         "Invite family and friends into your Circle",
         "Make plans with people nearby",

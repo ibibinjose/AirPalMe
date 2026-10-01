@@ -34,7 +34,9 @@ const NAV_HOSPITALITY = [
 
 const NAV_LEGAL = [
   { href: "/about", label: "About" },
+  { href: "/trust", label: "Trust & facts" },
   { href: "/contact", label: "Contact" },
+  { href: "/help", label: "Help center" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
   { href: "/cookies", label: "Cookies" },

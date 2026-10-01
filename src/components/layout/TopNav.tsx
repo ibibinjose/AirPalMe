@@ -13,21 +13,53 @@ import { triggerHaptic } from "@/lib/native";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { partnerAccountPath } from "@/lib/partner-account";
+import { BrowseMenu } from "@/components/layout/BrowseMenu";
 import { NAMES } from "@shared/names";
 
 const LINKS = [
   { href: "/", label: "Home", match: (p: string) => p === "/" },
   { href: "/explore", label: "Explore", match: (p: string) => p.startsWith("/explore") || p.startsWith("/discover") },
   { href: "/mate", label: "Mate", match: (p: string) => p.startsWith("/mate") },
-  { href: "/plan", label: "Plan", match: (p: string) => p.startsWith("/plan") || p.startsWith("/circle") || p.startsWith("/invite") },
+  {
+    href: "/plan",
+    label: "Plan",
+    match: (p: string) => p.startsWith("/plan") || p.startsWith("/circle") || p.startsWith("/invite"),
+  },
   { href: "/pulse", label: "Pulse", match: (p: string) => p.startsWith("/pulse") },
-  { href: "/inbox", label: "Inbox", match: (p: string) => p.startsWith("/inbox") || p.startsWith("/chat") || p.startsWith("/messages") || p.startsWith("/me/inbox") },
+  {
+    href: "/inbox",
+    label: "Inbox",
+    match: (p: string) =>
+      p.startsWith("/inbox") || p.startsWith("/chat") || p.startsWith("/messages") || p.startsWith("/me/inbox"),
+  },
 ];
 
 export function TopNav({ path, enter = false }: { path: string; enter?: boolean }) {
   const [, nav] = useLocation();
   const { user, isHost } = useAuth();
   const { business } = useBio();
+
+  const renderLink = (link: (typeof LINKS)[number]) => {
+    const isActive = link.match(path);
+    return (
+      <button
+        key={link.href}
+        onClick={() => {
+          void triggerHaptic("light");
+          nav(link.href);
+        }}
+        aria-current={isActive ? "page" : undefined}
+        className={cn(
+          "h-8.5 touch-manipulation rounded-full px-3.5 text-sm font-semibold transition-all duration-200 cursor-pointer",
+          isActive
+            ? "bg-brand text-white shadow-[0_4px_12px_-4px_rgba(24,5,219,0.7)]"
+            : "text-mute hover:bg-paper/80 hover:text-ink",
+        )}
+      >
+        {link.label}
+      </button>
+    );
+  };
 
   return (
     <motion.header
@@ -48,27 +80,9 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
           <BrandMark />
         </button>
         <nav className="flex items-center justify-center gap-1 rounded-full bg-card/60 p-1 ring-1 ring-line/70 backdrop-blur-md">
-          {LINKS.map((link) => {
-            const isActive = link.match(path);
-            return (
-              <button
-                key={link.href}
-                onClick={() => {
-                  void triggerHaptic("light");
-                  nav(link.href);
-                }}
-                aria-current={isActive ? "page" : undefined}
-                className={cn(
-                  "h-8.5 touch-manipulation rounded-full px-3.5 text-sm font-semibold transition-all duration-200 cursor-pointer",
-                  isActive
-                    ? "bg-brand text-white shadow-[0_4px_12px_-4px_rgba(24,5,219,0.7)]"
-                    : "text-mute hover:bg-paper/80 hover:text-ink",
-                )}
-              >
-                {link.label}
-              </button>
-            );
-          })}
+          {LINKS.slice(0, 2).map(renderLink)}
+          <BrowseMenu path={path} isHost={isHost} />
+          {LINKS.slice(2).map(renderLink)}
         </nav>
         <div className="flex items-center justify-end gap-2 shrink-0">
           <button

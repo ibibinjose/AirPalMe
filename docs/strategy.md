@@ -52,6 +52,14 @@ First milestone: 100 successful transactions by hand if needed. Downloads and fo
 - Business onboarding (`/business/onboard`) exists; Experiences + Stay-partner booking economics unbuilt.
 - Launch campaign asset ("Don't Go Alone") and founding-100 tooling unbuilt.
 
+### Sync — 1 October 2026 (verified this session)
+
+- Closed: public marketing surfaces are crawler-readable (18 prerendered routes incl. 4 competitor-alternative pages + `/stay` listings + `/trust` with Organization/FAQPage JSON-LD; 38 sitemap URLs; llms.txt answers the top buyer-question clusters). Proof stays real-only.
+- Fixed: Explore stay grid reads live `properties` (demo/suspended/unplaced supply excluded, honest empty state); seed data is no longer rendered as live stays. Chatbot is named AirPal.Chat going forward.
+- Merged: the Digital Compendium / Stay & Guide switcher is one Stay & Guide view; product renamed from Stay concierge/Digital Compendium (routes unchanged); +/chat FABs moved to opposite corners.
+- Shipped since Sep: Stripe validation hardening, ticket-gate scanning, demo showcase + admin demo builds, stay-blocks/host improvements, chat-store hardening, iOS store metadata (see `git log`).
+- Carried over unverified: Mate loop, Sydney beachhead IA, Stay-partner economics, founding-100 tooling (see gaps above).
+
 ## Build rules from this strategy
 
 - Mate loop entities (`mate_requests`, `matches`, `bookings`, `payments`, `reviews`, `payouts`) come before any new vertical UI.

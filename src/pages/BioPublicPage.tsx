@@ -323,11 +323,11 @@ export function BioPublicPage() {
 
   const isStay = Boolean(
     profile &&
-      (profile.category === "stay" ||
-        Boolean(profile.propertyId) ||
-        Boolean(propertyData) ||
-        (profile.categoryTag && /stay|hotel|accommodation|hostel|resort|lodge|motel|inn/i.test(profile.categoryTag)) ||
-        (profile.facilities && profile.facilities.length > 0)),
+    (profile.category === "stay" ||
+      Boolean(profile.propertyId) ||
+      Boolean(propertyData) ||
+      (profile.categoryTag && /stay|hotel|accommodation|hostel|resort|lodge|motel|inn/i.test(profile.categoryTag)) ||
+      (profile.facilities && profile.facilities.length > 0)),
   );
 
   // Harbour demo facilities come from CURRENT_PROPERTY via propertyData — never invent them for other stays.
@@ -380,7 +380,8 @@ export function BioPublicPage() {
             </div>
             <h1 className="font-display mt-5 text-2xl sm:text-3xl font-bold text-ink">@{handle} is available!</h1>
             <p className="mt-2.5 text-sm text-mute leading-relaxed">
-              This AirPal handle hasn’t been set up yet. Be the first to claim <strong>@{handle}</strong> and launch your public bio page.
+              This AirPal handle hasn’t been set up yet. Be the first to claim <strong>@{handle}</strong> and launch
+              your public bio page.
             </p>
             <div className="mt-6 flex flex-col gap-2.5">
               <Button
@@ -710,9 +711,7 @@ export function BioPublicPage() {
                   size="sm"
                   className="rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-sm hover:bg-brand-ink active:scale-95"
                   onClick={() =>
-                    nav(
-                      `/bio/setup?handle=${bio.handle}${bio.kind === "business" || isStay ? "&kind=business" : ""}`,
-                    )
+                    nav(`/bio/setup?handle=${bio.handle}${bio.kind === "business" || isStay ? "&kind=business" : ""}`)
                   }
                   title={
                     bio.kind === "business" || isStay
@@ -789,9 +788,7 @@ export function BioPublicPage() {
           {/* Profile Name & Primary Identity */}
           <div className="mt-3.5 text-left">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-                {bio.name}
-              </h1>
+              <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">{bio.name}</h1>
               {bio.categoryTag && (
                 <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-brand">
                   {bio.categoryTag}
@@ -819,7 +816,10 @@ export function BioPublicPage() {
               )}
               {(bio.kind === "business" || isStay) && bio.category && (
                 <span>
-                  · {bio.category === "stay" ? "Stay & Accommodation" : (BUSINESS_CATEGORIES.find((c) => c.id === bio.category)?.label || "Business")}
+                  ·{" "}
+                  {bio.category === "stay"
+                    ? "Stay & Accommodation"
+                    : BUSINESS_CATEGORIES.find((c) => c.id === bio.category)?.label || "Business"}
                 </span>
               )}
               {bio.languages && <span>· {bio.languages}</span>}
@@ -863,13 +863,12 @@ export function BioPublicPage() {
 
             {/* Extended About Story Card */}
             {bio.aboutText && (
-              <div id="bio-about" className="mt-4 scroll-mt-24 rounded-3xl bg-paper/60 p-4 sm:p-5 border border-line/80 shadow-2xs">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-gold mb-1.5">
-                  About Story
-                </p>
-                <p className="text-xs sm:text-sm leading-relaxed text-ink/80 whitespace-pre-line">
-                  {bio.aboutText}
-                </p>
+              <div
+                id="bio-about"
+                className="mt-4 scroll-mt-24 rounded-3xl bg-paper/60 p-4 sm:p-5 border border-line/80 shadow-2xs"
+              >
+                <p className="text-[10px] font-bold uppercase tracking-wider text-gold mb-1.5">About Story</p>
+                <p className="text-xs sm:text-sm leading-relaxed text-ink/80 whitespace-pre-line">{bio.aboutText}</p>
               </div>
             )}
           </div>
@@ -926,7 +925,10 @@ export function BioPublicPage() {
                 onClick={() => recordTap(bio.handle, "whatsapp")}
                 className="group flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-paper/70 px-2 text-xs font-semibold text-ink ring-1 ring-line/80 transition-all duration-200 hover:bg-paper hover:ring-emerald-500/40 active:scale-95 shadow-2xs"
               >
-                <MessageCircle size={15} className="text-emerald-600 shrink-0 group-hover:scale-110 transition-transform" />
+                <MessageCircle
+                  size={15}
+                  className="text-emerald-600 shrink-0 group-hover:scale-110 transition-transform"
+                />
                 <span className="truncate">WhatsApp</span>
               </a>
             ) : (
@@ -970,7 +972,11 @@ export function BioPublicPage() {
                   className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:bg-paper active:scale-95"
                   aria-label="Copy invite code"
                 >
-                  {copiedCode ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} className="text-mute" />}
+                  {copiedCode ? (
+                    <Check size={14} className="text-emerald-600" />
+                  ) : (
+                    <Copy size={14} className="text-mute" />
+                  )}
                   {copiedCode ? "Copied" : "Copy"}
                 </button>
                 <button
@@ -1080,11 +1086,7 @@ export function BioPublicPage() {
 
               {/* Action Circles */}
               <div className="mt-4 flex gap-3 overflow-x-auto pb-1 no-scrollbar" aria-label="Contact actions">
-                <BizCircle
-                  label="Chat"
-                  Icon={MessageSquare}
-                  onClick={handleStartChat}
-                />
+                <BizCircle label="Chat" Icon={MessageSquare} onClick={handleStartChat} />
                 {propertyData?.bookingUrl ? (
                   <BizCircle
                     label="Book Direct"
@@ -1133,12 +1135,12 @@ export function BioPublicPage() {
               {/* Stay / Hotel Companion & Facilities Deck */}
               {isStay && (
                 <div id="bio-stay" className="mt-5 scroll-mt-24 space-y-4">
-                  {/* Digital Compendium & 24/7 AirPal AI Concierge Hero Banner */}
+                  {/* Stay & Guide hero banner */}
                   <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-[#1805db]/10 via-card to-paper p-5 ring-1 ring-brand/30 shadow-xs">
                     <div className="flex items-center justify-between">
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-brand">
                         <Sparkles size={11} />
-                        Digital Compendium &amp; Concierge
+                        Stay &amp; Guide
                       </span>
                       <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/15 rounded-full px-2.5 py-0.5">
                         24/7 Live
@@ -1149,7 +1151,8 @@ export function BioPublicPage() {
                       Room Companion &amp; 24/7 AirPal AI
                     </h3>
                     <p className="mt-1 text-xs sm:text-sm text-mute leading-relaxed">
-                      Everything for your stay in one scan: in-room dining, Wi-Fi 1-tap connect, room service, express check-in/out, house rules, and 24/7 AI Receptionist.
+                      Everything for your stay in one scan: in-room dining, Wi-Fi 1-tap connect, room service, express
+                      check-in/out, house rules, and 24/7 AI Receptionist.
                     </p>
 
                     <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -1158,10 +1161,10 @@ export function BioPublicPage() {
                         className="flex h-11 items-center justify-center gap-2 rounded-full bg-brand px-5 text-xs font-bold text-white shadow-xs transition hover:bg-brand-ink active:scale-95"
                       >
                         <DoorOpen size={15} />
-                        <span>Open Digital Compendium</span>
+                        <span>Open Stay & Guide</span>
                       </Link>
                       <Link
-                        href={`/stay/${stayTargetId}?tab=receptionist`}
+                        href={`/stay/${stayTargetId}?open=answers`}
                         className="flex h-11 items-center justify-center gap-2 rounded-full bg-paper px-5 text-xs font-bold text-ink ring-1 ring-line/80 shadow-2xs transition hover:bg-paper/80 active:scale-95"
                       >
                         <Sparkles size={14} className="text-gold" />
@@ -1211,7 +1214,10 @@ export function BioPublicPage() {
 
                   {/* 🏢 Hotel Facilities & Amenities Grid */}
                   {stayFacilities.length > 0 && (
-                    <div id="bio-facilities" className="scroll-mt-24 rounded-3xl bg-paper/60 p-5 ring-1 ring-line/80 shadow-2xs">
+                    <div
+                      id="bio-facilities"
+                      className="scroll-mt-24 rounded-3xl bg-paper/60 p-5 ring-1 ring-line/80 shadow-2xs"
+                    >
                       <div className="flex items-center justify-between mb-3.5">
                         <div>
                           <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand">
@@ -1242,9 +1248,7 @@ export function BioPublicPage() {
                                     <p className="font-bold text-xs sm:text-sm text-ink group-hover:text-brand transition-colors">
                                       {fac.name}
                                     </p>
-                                    {fac.floor && (
-                                      <p className="text-[11px] text-mute font-medium">{fac.floor}</p>
-                                    )}
+                                    {fac.floor && <p className="text-[11px] text-mute font-medium">{fac.floor}</p>}
                                   </div>
                                 </div>
                                 {fac.hours && (
@@ -1287,11 +1291,7 @@ export function BioPublicPage() {
                   )}
                   {bio.hours && (
                     <div className="p-1">
-                      <TradingHoursScheduleView
-                        hours={bio.hours}
-                        placeName={bio.name || bio.handle}
-                        variant="row"
-                      />
+                      <TradingHoursScheduleView hours={bio.hours} placeName={bio.name || bio.handle} variant="row" />
                     </div>
                   )}
                   {bio.phone && (
@@ -1328,7 +1328,8 @@ export function BioPublicPage() {
                 Meet &amp; Hangout with Friends &amp; Mates
               </h3>
               <p className="mt-1 text-xs leading-relaxed text-mute">
-                Anyone visiting your bio can request a 1-on-1 coffee, schedule a meeting, or invite you to a group hangout.
+                Anyone visiting your bio can request a 1-on-1 coffee, schedule a meeting, or invite you to a group
+                hangout.
               </p>
 
               {/* Format Launcher Options */}
@@ -1437,7 +1438,9 @@ export function BioPublicPage() {
                                 {item.time && ` @ ${item.time}`}
                                 {item.venue && ` · ${item.venue}`}
                               </p>
-                              {item.notes && <p className="text-[11px] text-ink/80 italic mt-0.5 truncate">"{item.notes}"</p>}
+                              {item.notes && (
+                                <p className="text-[11px] text-ink/80 italic mt-0.5 truncate">"{item.notes}"</p>
+                              )}
                             </div>
                           </div>
 
@@ -1472,94 +1475,98 @@ export function BioPublicPage() {
           )}
 
           {/* Catch Up & Hangout Deck for Visitors */}
-          {!isOwner && !(bio.kind === "business" && ((bio.products || []).length > 0 || (bio.services || []).length > 0)) && (
-            <div className="mt-6 rounded-3xl bg-gradient-to-br from-paper/90 via-card to-paper/60 p-5 ring-1 ring-line/80 shadow-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold flex items-center gap-1.5">
-                  <Sparkles size={12} className="text-gold" />
-                  <span>Meet &amp; Hangout</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    void triggerHaptic("light");
-                    const next = toggleCatchUpReminder({
-                      handle: bio.handle,
-                      name: bio.name,
-                      photo: avatar,
-                      city: bio.city,
-                      requesterUid: user?.uid,
-});
-                    toast[next ? "success" : "info"](
-                      next ? `Saved a reminder to catch up with ${bio.name}` : `Removed reminder for ${bio.name}`,
-                    );
-                    setCatchUpsList(listCatchUpsForHandle(bio.handle));
-                  }}
-                  className={cn(
-                    "inline-flex min-h-[40px] items-center gap-1.5 rounded-full px-3.5 text-[11px] font-semibold ring-1 transition cursor-pointer active:scale-95",
-                    hasCatchUpReminder(bio.handle)
-                      ? "bg-amber-500/15 text-amber-800 ring-amber-500/40 font-bold"
-                      : "bg-card text-mute ring-line hover:text-ink hover:bg-paper",
-                  )}
-                  title={hasCatchUpReminder(bio.handle) ? "Catch-up reminder active" : "Set a reminder to catch up"}
-                >
-                  <span className={cn("h-1.5 w-1.5 rounded-full", hasCatchUpReminder(bio.handle) ? "bg-amber-500 motion-safe:animate-pulse" : "bg-mute/50")} />
-                  <span>{hasCatchUpReminder(bio.handle) ? "Reminder on ✓" : "Remind me"}</span>
-                </button>
-              </div>
-              <h3 className="font-display mt-2 text-lg font-bold text-ink">
-                Catch up with {bio.name}
-              </h3>
-              <p className="mt-1 text-xs leading-relaxed text-mute">
-                Propose a 1-on-1 coffee, schedule a sync meeting, or create a group hangout plan.
-              </p>
-
-              <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
-                {(
-                  [
-                    {
-                      type: "catchup" as const,
-                      label: "Catch Up",
-                      sub: "1-on-1 coffee",
-                      Icon: Coffee,
-                      tint: "bg-amber-500/15 text-amber-700",
-                    },
-                    {
-                      type: "meeting" as const,
-                      label: "Meeting",
-                      sub: "1-on-1 sync",
-                      Icon: Calendar,
-                      tint: "bg-sky-500/15 text-sky-700",
-                    },
-                    {
-                      type: "nightout" as const,
-                      label: "Hangout",
-                      sub: "Group plan",
-                      Icon: Users,
-                      tint: "bg-violet-500/15 text-violet-700",
-                    },
-                  ] as const
-                ).map((opt) => (
+          {!isOwner &&
+            !(bio.kind === "business" && ((bio.products || []).length > 0 || (bio.services || []).length > 0)) && (
+              <div className="mt-6 rounded-3xl bg-gradient-to-br from-paper/90 via-card to-paper/60 p-5 ring-1 ring-line/80 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold flex items-center gap-1.5">
+                    <Sparkles size={12} className="text-gold" />
+                    <span>Meet &amp; Hangout</span>
+                  </span>
                   <button
-                    key={opt.type}
                     type="button"
                     onClick={() => {
                       void triggerHaptic("light");
-                      setCatchUpInitialType(opt.type);
-                      setCatchUpModalOpen(true);
+                      const next = toggleCatchUpReminder({
+                        handle: bio.handle,
+                        name: bio.name,
+                        photo: avatar,
+                        city: bio.city,
+                        requesterUid: user?.uid,
+                      });
+                      toast[next ? "success" : "info"](
+                        next ? `Saved a reminder to catch up with ${bio.name}` : `Removed reminder for ${bio.name}`,
+                      );
+                      setCatchUpsList(listCatchUpsForHandle(bio.handle));
                     }}
-                    className="flex flex-col items-center rounded-2xl bg-card p-3 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98] cursor-pointer"
+                    className={cn(
+                      "inline-flex min-h-[40px] items-center gap-1.5 rounded-full px-3.5 text-[11px] font-semibold ring-1 transition cursor-pointer active:scale-95",
+                      hasCatchUpReminder(bio.handle)
+                        ? "bg-amber-500/15 text-amber-800 ring-amber-500/40 font-bold"
+                        : "bg-card text-mute ring-line hover:text-ink hover:bg-paper",
+                    )}
+                    title={hasCatchUpReminder(bio.handle) ? "Catch-up reminder active" : "Set a reminder to catch up"}
                   >
-                    <span className={cn("mb-2 grid h-10 w-10 place-items-center rounded-2xl", opt.tint)}>
-                      <opt.Icon size={18} />
-                    </span>
-                    <span className="text-xs font-bold text-ink">{opt.label}</span>
-                    <span className="mt-0.5 text-[10px] text-mute">{opt.sub}</span>
+                    <span
+                      className={cn(
+                        "h-1.5 w-1.5 rounded-full",
+                        hasCatchUpReminder(bio.handle) ? "bg-amber-500 motion-safe:animate-pulse" : "bg-mute/50",
+                      )}
+                    />
+                    <span>{hasCatchUpReminder(bio.handle) ? "Reminder on ✓" : "Remind me"}</span>
                   </button>
-                ))}
+                </div>
+                <h3 className="font-display mt-2 text-lg font-bold text-ink">Catch up with {bio.name}</h3>
+                <p className="mt-1 text-xs leading-relaxed text-mute">
+                  Propose a 1-on-1 coffee, schedule a sync meeting, or create a group hangout plan.
+                </p>
+
+                <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+                  {(
+                    [
+                      {
+                        type: "catchup" as const,
+                        label: "Catch Up",
+                        sub: "1-on-1 coffee",
+                        Icon: Coffee,
+                        tint: "bg-amber-500/15 text-amber-700",
+                      },
+                      {
+                        type: "meeting" as const,
+                        label: "Meeting",
+                        sub: "1-on-1 sync",
+                        Icon: Calendar,
+                        tint: "bg-sky-500/15 text-sky-700",
+                      },
+                      {
+                        type: "nightout" as const,
+                        label: "Hangout",
+                        sub: "Group plan",
+                        Icon: Users,
+                        tint: "bg-violet-500/15 text-violet-700",
+                      },
+                    ] as const
+                  ).map((opt) => (
+                    <button
+                      key={opt.type}
+                      type="button"
+                      onClick={() => {
+                        void triggerHaptic("light");
+                        setCatchUpInitialType(opt.type);
+                        setCatchUpModalOpen(true);
+                      }}
+                      className="flex flex-col items-center rounded-2xl bg-card p-3 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98] cursor-pointer"
+                    >
+                      <span className={cn("mb-2 grid h-10 w-10 place-items-center rounded-2xl", opt.tint)}>
+                        <opt.Icon size={18} />
+                      </span>
+                      <span className="text-xs font-bold text-ink">{opt.label}</span>
+                      <span className="mt-0.5 text-[10px] text-mute">{opt.sub}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Public Plans & Hangouts created by this creator */}
           {userPlans.length > 0 && (
@@ -1640,7 +1647,9 @@ export function BioPublicPage() {
                         className="min-w-0 flex-1 text-left active:scale-[0.99] cursor-pointer"
                       >
                         <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold">Appearing at</p>
-                        <p className="font-display text-sm font-bold text-ink mt-0.5">{event?.name || "Event / Market"}</p>
+                        <p className="font-display text-sm font-bold text-ink mt-0.5">
+                          {event?.name || "Event / Market"}
+                        </p>
                         {s.booth && <p className="text-xs text-mute mt-0.5">Booth {s.booth}</p>}
                       </button>
                       <div className="flex items-center gap-2 shrink-0">
@@ -1669,7 +1678,10 @@ export function BioPublicPage() {
 
           {/* Featured Live Offer Banner */}
           {liveOffer && (
-            <div id="bio-offers" className="mt-7 scroll-mt-24 overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card to-paper p-5 ring-1 ring-gold/40 shadow-sm">
+            <div
+              id="bio-offers"
+              className="mt-7 scroll-mt-24 overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card to-paper p-5 ring-1 ring-gold/40 shadow-sm"
+            >
               <div className="flex items-center justify-between">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">
                   <Sparkles size={11} />
@@ -1677,7 +1689,9 @@ export function BioPublicPage() {
                 </span>
                 <span className="text-[10px] font-medium text-mute uppercase tracking-wider">AirPal Offer</span>
               </div>
-              <h3 className="font-display mt-2.5 text-lg sm:text-xl font-bold leading-snug text-ink">{liveOffer.title}</h3>
+              <h3 className="font-display mt-2.5 text-lg sm:text-xl font-bold leading-snug text-ink">
+                {liveOffer.title}
+              </h3>
               <p className="mt-1 text-xs sm:text-sm leading-relaxed text-mute">{liveOffer.detail}</p>
               <Button
                 className="mt-4 w-full gap-2 rounded-full bg-brand text-white shadow-sm hover:bg-brand-ink active:scale-[0.98]"
@@ -1721,9 +1735,7 @@ export function BioPublicPage() {
           {/* Custom Outbound Links Stack */}
           {stacked.length > 0 && (
             <div className="mt-7">
-              <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold mb-2.5">
-                Featured Links
-              </h3>
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold mb-2.5">Featured Links</h3>
               <ul className="space-y-2.5">
                 {stacked
                   .filter((link) => isSafeBioHref(link.href))
@@ -1749,12 +1761,8 @@ export function BioPublicPage() {
           {bio.links && socialLinks(bio.links).some((l) => isSafeBioHref(l.href)) && (
             <div className="mt-8 pt-5 border-t border-line/60">
               <div className="flex items-center justify-between mb-3 px-0.5">
-                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
-                  Follow &amp; Connect
-                </p>
-                <span className="text-[10px] font-medium text-mute uppercase tracking-wider">
-                  Social Channels
-                </span>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Follow &amp; Connect</p>
+                <span className="text-[10px] font-medium text-mute uppercase tracking-wider">Social Channels</span>
               </div>
               <BioSocials links={bio.links} onTap={(kind) => recordTap(bio.handle, kind)} />
             </div>
@@ -1787,7 +1795,13 @@ export function BioPublicPage() {
                 e.preventDefault();
                 try {
                   addGuest(bio.handle, { email: listEmail, name: listName, source: "bio" });
-                  joinClub({ email: listEmail, name: listName || bio.name, city: bio.city, invites: true, offers: true });
+                  joinClub({
+                    email: listEmail,
+                    name: listName || bio.name,
+                    city: bio.city,
+                    invites: true,
+                    offers: true,
+                  });
                   toast.success("On the guest list · AirPal Club");
                   setListEmail("");
                   setListName("");
@@ -1938,4 +1952,3 @@ export function BioPublicPage() {
     </div>
   );
 }
-

@@ -4,6 +4,9 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Plus, Search } from "lucide-react";
 import { TabBar } from "./TabBar";
 import { TopNav } from "./TopNav";
+import { BrowseStrip } from "./BrowseMenu";
+import { isWorkspacePath } from "@/lib/workspace";
+import { showBrowseStrip } from "@/lib/browse-menu";
 import { LocalNowBar } from "./LocalNowBar";
 import { BatteryWarningBanner } from "./BatteryWarningBanner";
 import { SyncStatusBar } from "./SyncStatusBar";
@@ -33,29 +36,6 @@ import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { useDataReload } from "@/hooks/useDataReload";
 import { PullToRefreshContainer } from "./PullToRefreshContainer";
 
-
-const WORKSPACE = [
-  /^\/host/,
-  /^\/start/,
-  /^\/admin/,
-  /^\/partners/,
-  /^\/join/,
-  /^\/business/,
-  /^\/event/,
-  /^\/pulse/,
-  /^\/me\/(zoo|memories|people|giveaways)/,
-  /^\/zoo/,
-  /^\/settings/,
-  /^\/bio/,
-  /^\/about/,
-  /^\/contact/,
-  /^\/privacy/,
-  /^\/terms/,
-  /^\/cookies/,
-  /^\/legal/,
-  /^\/club/,
-];
-
 export function AppShell({ children }: { children: ReactNode }) {
   const [path] = useLocation();
   useEffect(() => {
@@ -64,7 +44,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     applyRouteMeta(path);
     forceUnlockBodyScroll();
   }, [path]);
-  const workspace = WORKSPACE.some((re) => re.test(path));
+  const workspace = isWorkspacePath(path);
   // Plan detail + invite links own the bottom slot with their Share/RSVP bar —
   // rendering the tab bar too would stack two fixed bars on mobile.
   // (/plan/new keeps the tab bar: it has no action bar of its own.)
@@ -201,6 +181,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     <ProfileMenu />
                   </div>
                 </motion.div>
+                {showBrowseStrip(path) && <BrowseStrip path={path} />}
               </>
             )}
             <BatteryWarningBanner />

@@ -2,12 +2,11 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import {
   ArrowRight,
   Bell,
-  BookOpen,
   CalendarDays,
   CircleHelp,
   ClipboardCheck,
   HeartHandshake,
-  Map,
+  Share2,
   Shield,
   Sparkles,
   Utensils,
@@ -78,8 +77,6 @@ export function ConciergePage() {
   const [orderQty, setOrderQty] = useState<Record<string, number>>({});
   const [orderRoom, setOrderRoom] = useState("");
   const [ordering, setOrdering] = useState(false);
-  const [viewMode, setViewMode] = useState<"compendium" | "concierge">("compendium");
-
   const hasStay =
     session.kind === "stay" || session.kind === "campus" || Boolean(roomLabel) || Boolean(session.propertyId);
 
@@ -219,62 +216,50 @@ export function ConciergePage() {
     <div className="mx-auto max-w-5xl px-4 pb-12 md:px-6">
       <PaymentCanceledNotice />
       {bookedId ? <TicketPass bookingId={bookedId} /> : null}
-      {/* View Mode Switcher */}
-      <div className="mb-5 flex items-center justify-center">
-        <div className="flex rounded-full bg-paper p-1 ring-1 ring-line shadow-xs">
-          <button
-            type="button"
-            onClick={() => {
-              setViewMode("compendium");
-              void triggerHaptic("light");
-            }}
-            aria-pressed={viewMode === "compendium"}
-            className={`flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-black transition ${
-              viewMode === "compendium" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink"
-            }`}
-          >
-            <BookOpen size={14} />
-            <span>Digital Compendium</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setViewMode("concierge");
-              void triggerHaptic("light");
-            }}
-            aria-pressed={viewMode === "concierge"}
-            className={`flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-black transition ${
-              viewMode === "concierge" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink"
-            }`}
-          >
-            <Map size={14} />
-            <span>Stay &amp; Guide</span>
-          </button>
-        </div>
-      </div>
-
-      {viewMode === "compendium" ? (
-        <StayCompendium />
-      ) : (
-        <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
-          {/* Left Column: Header Banner, AirPal Mate Priority, Room details & Quick Action Tiles (5 cols) */}
-          <div className="lg:col-span-5 space-y-4">
-            <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
-              {property.heroImage && <img src={property.heroImage} alt="" className="h-48 w-full object-cover" />}
-              <div className="hero-scrim absolute inset-0" />
-              <div className="absolute inset-x-0 bottom-0 p-5">
-                <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-slate-950 border border-line shadow-xs mb-1.5">
-                  {roomLabel ? `Room ${roomLabel}` : property.city || property.destination || "AirPal Stay Concierge"}
-                </span>
-                <h1 className="font-display text-2xl font-extrabold text-white">{property.name || t("scanRoom")}</h1>
-                {property.tagline ? <p className="mt-1 text-xs text-white/80">{property.tagline}</p> : null}
-                {demoModeActive() && (
-                  <div className="mt-2">
-                    <DemoBadge />
-                  </div>
-                )}
-              </div>
+      <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
+        {/* Left Column: Header Banner, AirPal Mate Priority, Room details & Quick Action Tiles (5 cols) */}
+        <div className="lg:col-span-5 space-y-4">
+          <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
+            {property.heroImage && <img src={property.heroImage} alt="" className="h-48 w-full object-cover" />}
+            <div className="hero-scrim absolute inset-0" />
+            <button
+              type="button"
+              aria-label="Share this stay"
+              onClick={() => {
+                void triggerHaptic("light");
+                const shareData = {
+                  title: property.name || "AirPal Stay & Guide",
+                  text: `Stay & Guide for ${property.name || "our stay"}`,
+                  url: window.location.href,
+                };
+                if (navigator.share) {
+                  void navigator.share(shareData).catch(() => {
+                    /* share dismissed */
+                  });
+                } else {
+                  void navigator.clipboard
+                    .writeText(window.location.href)
+                    .then(() => toast.success("Stay link copied to clipboard!"))
+                    .catch(() => toast.error("Could not copy link"));
+                }
+              }}
+              className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full bg-black/35 text-white ring-1 ring-white/25 backdrop-blur-md transition hover:bg-black/50 active:scale-95"
+            >
+              <Share2 size={18} />
+            </button>
+            <div className="absolute inset-x-0 bottom-0 p-5">
+              <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-[11px] font-black uppercase tracking-wider text-slate-950 border border-line shadow-xs mb-1.5">
+                {`Stay & Guide${roomLabel ? ` · Room ${roomLabel}` : ""}`}
+              </span>
+              <h1 className="font-display text-2xl font-extrabold text-white">{property.name || t("scanRoom")}</h1>
+              {property.tagline ? <p className="mt-1 text-xs text-white/80">{property.tagline}</p> : null}
+              {demoModeActive() && (
+                <div className="mt-2">
+                  <DemoBadge />
+                </div>
+              )}
             </div>
+          </div>
 
           <div className="relative overflow-hidden rounded-3xl ring-1 ring-white/10 bg-gradient-to-br from-brand via-[#1c08d4] to-[#0d027a] p-4 text-white shadow-md flex items-center justify-between gap-3">
             <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-amber-400/20 blur-xl pointer-events-none" />
@@ -335,6 +320,13 @@ export function ConciergePage() {
               ))}
             </div>
           </div>
+
+          {/* Stay sections sit directly below Guest Actions: chat, call,
+              wi-fi, breakfast, check-in/out, then the Good to know guide. */}
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-gold mb-2 px-1">Your stay</p>
+            <StayCompendium />
+          </div>
         </div>
 
         {/* Right Column: Ask AirPal, Recommendations, Arrival Guide & Around You (7 cols) */}
@@ -366,7 +358,7 @@ export function ConciergePage() {
             <section className="rounded-3xl ring-1 ring-line bg-card p-5 shadow-xs">
               <p className="text-[11px] font-bold uppercase tracking-wider text-gold">Host recommends</p>
               <ul className="mt-3 space-y-2.5">
-                {property.staffPicks?.slice(0, 3).map((pick) => (
+                {property.staffPicks?.map((pick) => (
                   <li key={pick.id} className="flex items-start gap-2.5">
                     <Sparkles size={16} className="mt-0.5 shrink-0 text-brand" />
                     <div className="min-w-0">
@@ -433,7 +425,6 @@ export function ConciergePage() {
           </div>
         </div>
       </div>
-      )}
 
       {/* 24/7 AI Receptionist: AirPal AI */}
       <AirPalAiReceptionist />

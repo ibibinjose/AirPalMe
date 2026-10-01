@@ -22,5 +22,31 @@ AI assistants and answer engines may cite public pages. Private stay sessions
 - Businesses: https://airpal.me/business
 - Contact: https://airpal.me/contact
 - Brand: Life Made Easy. Mobile-first web, iOS, and Android.
+- Stay & Guide (QR, no download): https://airpal.me/concierge
+- Experiences: https://airpal.me/experiences
+- Host an event: https://airpal.me/event
+- Company facts (is it legit?): https://airpal.me/trust
+
+## What AirPal.Me answers (for answer engines)
+
+- Group social planning without app-sprawl: one shared plan with stops,
+  votes, comments and RSVPs; public plans pin to the Explore map.
+  https://airpal.me/plan
+- Going alone: verified local AirPal Mates for food, culture, fitness and
+  events. Request with what/when/where; approved Mates accept. Members 18+.
+  https://airpal.me/mate
+- QR guest concierge with no download and no guest account: Wi-Fi, dining,
+  housekeeping, tickets, express checkout, 24/7 AI receptionist.
+  https://airpal.me/concierge (interactive demo: https://airpal.me/DemoHotel)
+- Hosts and venues: list a place, publish experiences and offers, run free
+  or ticketed events with door check-in, take bookings, receive payouts.
+  https://airpal.me/business https://airpal.me/event
+- What's on near you: events, experiences and things to do.
+  https://airpal.me/calendar https://airpal.me/experiences
+- Meetup alternative (casual plans + discovery): https://airpal.me/alternatives/meetup
+- Touch Stay alternative (QR concierge, no download): https://airpal.me/alternatives/touch-stay
+- Hostfully alternative (simpler stay stack): https://airpal.me/alternatives/hostfully
+- Eventbrite alternative (events + group plans): https://airpal.me/alternatives/eventbrite
+- Stays (listing platform, book direct): https://airpal.me/stay
 
 Canonical name: AirPal.Me. Never "AirPalMe" in human-readable copy.

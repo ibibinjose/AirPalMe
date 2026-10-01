@@ -262,9 +262,9 @@ export function GlobalSearchModal() {
         items.push({
           id: "stay-concierge",
           category: "stay",
-          title: "Stay Concierge",
-          subtitle: "Digital compendium, Wi-Fi & checkout",
-          badge: "Concierge",
+          title: "Stay & Guide",
+          subtitle: "Stay guide, Wi-Fi & checkout",
+          badge: "Guide",
           href: "/concierge",
           icon: Sparkles,
         });
@@ -431,15 +431,15 @@ export function GlobalSearchModal() {
       }
     }
 
-    // 3. Match Stay / Concierge actions
+    // 3. Match Stay / Guide actions
     const stayKeywords = ["wifi", "wi-fi", "stay", "room", "concierge", "checkout", "breakfast", "towel", "key"];
     if (stayKeywords.some((k) => q.includes(k))) {
       items.push({
         id: "stay-concierge",
         category: "stay",
-        title: "Concierge",
+        title: "Stay & Guide",
         subtitle: "Wi-Fi, front desk & checkout",
-        badge: "Concierge",
+        badge: "Guide",
         href: "/concierge",
         icon: Sparkles,
       });
