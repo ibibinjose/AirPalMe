@@ -20,5 +20,8 @@
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10"
+  },
+  "overrides": {
+    "joi": "^17.13.8"
   }
 }

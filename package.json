@@ -24,7 +24,7 @@
     "secrets:check": "node scripts/check-secrets.mjs",
     "seo:check": "node scripts/check-seo.mjs",
     "screenshots": "node scripts/screenshots.mjs",
-    "audit": "npm audit --audit-level=high && npm --prefix functions audit --audit-level=high",
+    "audit": "node scripts/check-audit.mjs",
     "verify": "npm run typecheck && npm run functions:typecheck && npm run lint && npm test && npm run functions:test && npm run build && npm run functions:build && npm run rules:check && npm run secrets:check && npm run seo:check",
     "ci": "npm run ci:install && npm run verify && npm run audit",
     "deploy": "npm run verify && npx -y firebase-tools@latest deploy --project airpalme-app",
@@ -81,5 +81,8 @@
     "typescript-eslint": "^8.70.0",
     "vite": "^7.1.7",
     "vitest": "^3.2.6"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.14.5"
   }
 }
