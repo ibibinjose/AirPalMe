@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation } from "wouter";
-import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useLocation, useSearch } from "wouter";
+import { collection, limit, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { Bell, MessageCircle, Sparkles, Building2, Store, User, Plane } from "lucide-react";
 import { SegmentedControl } from "@/components/design-system/companions";
 import { PingsPanel } from "@/components/social/PingsPanel";
@@ -11,6 +11,7 @@ import { getFirebaseDb } from "@/lib/firebase";
 import { enableWebPush, markAllNotificationsRead, markNotificationRead, pushPrefEnabled } from "@/lib/notifications";
 import { cn } from "@/lib/cn";
 import { isUpdateNoteKind, type PromotionNotification } from "@shared/promotions";
+import { notificationPresentation } from "@shared/notifications";
 import { relativeAgo, smartChatTime } from "@shared/time-ago";
 import { toast } from "sonner";
 import { subscribeConversations, createConversationRecord, getLocalConversations } from "@/lib/chat-store";
@@ -45,19 +46,23 @@ function NotificationRows({
     <ul className="mt-4 overflow-hidden rounded-[24px] bg-card ring-1 ring-line/80 shadow-xs">
       {rows.map((n, i) => {
         const when = relativeAgo(n.at);
+        const presentation = notificationPresentation(n.kind);
         return (
           <li key={n.id} className={cn(i > 0 && "border-t border-line/70")}>
             <button
               type="button"
               onClick={() => void onOpen(n)}
-              className="flex w-full gap-3 px-4 py-3.5 text-left transition hover:bg-paper/60 active:bg-paper"
+              className="flex min-h-[44px] w-full cursor-pointer gap-3 px-4 py-3.5 text-left transition-colors hover:bg-paper/60 active:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
             >
               <span
-                className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", n.read ? "bg-transparent" : "bg-brand")}
+                className={cn("mt-2 h-2 w-2 shrink-0 rounded-full", n.read ? "bg-transparent" : "bg-brand")}
                 aria-hidden
               />
               <span className="min-w-0 flex-1">
-                <span className={cn("block text-[15px] leading-5", n.read ? "text-ink" : "font-bold text-ink")}>
+                <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-brand">
+                  {presentation.label}
+                </span>
+                <span className={cn("mt-0.5 block text-[15px] leading-5", n.read ? "text-ink" : "font-bold text-ink")}>
                   {n.title}
                 </span>
                 <span className="mt-0.5 line-clamp-2 block text-[13px] leading-5 text-mute">{n.body}</span>
@@ -76,6 +81,8 @@ function NotificationRows({
 export function InboxPage() {
   const { user, authReady } = useAuth();
   const [, nav] = useLocation();
+  const search = useSearch();
+  const openedChat = useRef("");
   const { myPlans } = usePlans();
   const [notes, setNotes] = useState<PromotionNotification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,20 +120,40 @@ export function InboxPage() {
   }, [user]);
 
   useEffect(() => {
+    const chatId = new URLSearchParams(search).get("chat");
+    if (!chatId || openedChat.current === chatId) return;
+    const conv = universalChats.find((row) => row.id === chatId);
+    if (!conv) return;
+    openedChat.current = chatId;
+    setActiveChat(conv);
+    setShowChatModal(true);
+    setSegment("messages");
+  }, [search, universalChats]);
+
+  useEffect(() => {
     const db = getFirebaseDb();
     if (!db || !user) {
       setNotes([]);
       setLoading(false);
       return;
     }
-    void getDocs(
-      query(collection(db, "promotion_notifications"), where("uid", "==", user.uid), orderBy("at", "desc"), limit(40)),
-    )
-      .then((snap) =>
-        setNotes(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<PromotionNotification, "id">) }))),
-      )
-      .catch(() => setNotes([]))
-      .finally(() => setLoading(false));
+    const q = query(
+      collection(db, "promotion_notifications"),
+      where("uid", "==", user.uid),
+      orderBy("at", "desc"),
+      limit(40),
+    );
+    return onSnapshot(
+      q,
+      (snap) => {
+        setNotes(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<PromotionNotification, "id">) })));
+        setLoading(false);
+      },
+      () => {
+        setNotes([]);
+        setLoading(false);
+      },
+    );
   }, [user]);
 
   if (!authReady || loading) {
@@ -432,7 +459,7 @@ export function InboxPage() {
               </span>
               <p className="font-display mt-4 text-xl font-bold text-ink">Nothing yet</p>
               <p className="mx-auto mt-1 max-w-xs text-[14px] leading-relaxed text-mute">
-                When a giveaway or reward updates, it lands here.
+                Catch-ups, meetings, waves, and rewards land here as they happen.
               </p>
               <Link
                 href="/giveaways"

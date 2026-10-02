@@ -8,6 +8,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
+import type { CatchUpSlot } from "@shared/catchup-agent";
 import type { PlanType } from "@shared/plan";
 import { getFirebaseDb, isFirebaseConfigured } from "./firebase";
 import { safeLocalStorage } from "./safe-storage";
@@ -26,6 +27,8 @@ export interface CatchUpItem {
   venue?: string;
   notes?: string;
   planId?: string;
+  proposals?: CatchUpSlot[];
+  conversationId?: string;
   createdAt: string;
   isReminderOnly?: boolean;
   status: "pending" | "accepted" | "scheduled" | "dismissed";
@@ -87,7 +90,7 @@ function mergeRemoteForOwner(ownerUid: string, rows: CatchUpItem[]): void {
   memory = [...memory.filter((item) => item.targetOwnerUid !== ownerUid), ...rows];
 }
 
-async function writeRemote(item: CatchUpItem): Promise<void> {
+export async function persistCatchUp(item: CatchUpItem): Promise<void> {
   if (!isFirebaseConfigured || !item.requesterUid) return;
   const db = getFirebaseDb();
   if (!db) return;
@@ -97,7 +100,7 @@ async function writeRemote(item: CatchUpItem): Promise<void> {
 }
 
 function syncRemote(item: CatchUpItem): void {
-  void writeRemote(item).catch(() => undefined);
+  void persistCatchUp(item).catch(() => undefined);
 }
 
 /**

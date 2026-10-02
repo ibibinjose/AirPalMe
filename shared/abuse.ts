@@ -22,6 +22,7 @@ export const RATE_LIMIT_ACTIONS = [
   "wave",
   "pay",
   "gate",
+  "guestlistSignup",
 ] as const;
 
 export type RateLimitAction = (typeof RATE_LIMIT_ACTIONS)[number];
@@ -54,6 +55,7 @@ export const RATE_LIMITS: Record<RateLimitAction, RateLimitSpec> = {
   wave: { windowMs: 60_000, max: 12, anonymousMax: 0 },
   pay: { windowMs: 60_000, max: 8, anonymousMax: 0 },
   gate: { windowMs: 60_000, max: 60, anonymousMax: 0 },
+  guestlistSignup: { windowMs: 5 * 60_000, max: 5, anonymousMax: 3 },
 };
 
 export function rateLimitMax(action: RateLimitAction, anonymous: boolean): number {

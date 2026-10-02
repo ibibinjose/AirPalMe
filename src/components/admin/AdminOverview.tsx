@@ -13,6 +13,7 @@ export type AdminTab =
   | "studio"
   | "system"
   | "audit"
+  | "audience"
   | "demo";
 
 export const ADMIN_TABS: { id: AdminTab; label: string }[] = [
@@ -25,6 +26,7 @@ export const ADMIN_TABS: { id: AdminTab; label: string }[] = [
   { id: "studio", label: "Studio" },
   { id: "system", label: "System" },
   { id: "audit", label: "Audit" },
+  { id: "audience", label: "Audience" },
   { id: "demo", label: "Demo" },
 ];
 
@@ -63,21 +65,33 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
     let cancelled = false;
     void (async () => {
       try {
-        const [open, matched, completed, bPending, bConfirmed, bDone, cPending, cLive, sNew, wNew, audits, searchQueries] =
-          await Promise.all([
-            countIn("mate_requests", "status", "open"),
-            countIn("mate_requests", "status", "matched"),
-            countIn("mate_requests", "status", "completed"),
-            countIn("bookings", "status", "pending"),
-            countIn("bookings", "status", "confirmed"),
-            countIn("bookings", "status", "completed"),
-            countIn("campaigns", "status", "pending"),
-            countIn("campaigns", "status", "live"),
-            countIn("safety_reports", "status", "new"),
-            countIn("studio_walkthroughs", "status", "new"),
-            countAll("admin_audits"),
-            countAll("popular_searches"),
-          ]);
+        const [
+          open,
+          matched,
+          completed,
+          bPending,
+          bConfirmed,
+          bDone,
+          cPending,
+          cLive,
+          sNew,
+          wNew,
+          audits,
+          searchQueries,
+        ] = await Promise.all([
+          countIn("mate_requests", "status", "open"),
+          countIn("mate_requests", "status", "matched"),
+          countIn("mate_requests", "status", "completed"),
+          countIn("bookings", "status", "pending"),
+          countIn("bookings", "status", "confirmed"),
+          countIn("bookings", "status", "completed"),
+          countIn("campaigns", "status", "pending"),
+          countIn("campaigns", "status", "live"),
+          countIn("safety_reports", "status", "new"),
+          countIn("studio_walkthroughs", "status", "new"),
+          countAll("admin_audits"),
+          countAll("popular_searches"),
+        ]);
         // GMV over recent bookings — indicative only, pre-Stripe.
         let gmv = 0;
         try {
@@ -91,19 +105,99 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
         }
         if (cancelled) return;
         setKpis([
-          { label: "Open Requests", value: String(open), hint: "needs mate match", tab: "marketplace", badgeClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
-          { label: "Active Matches", value: String(matched), hint: "in conversation", tab: "marketplace", badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-          { label: "Completed Plans", value: String(completed), hint: "awaiting review", tab: "marketplace", badgeClass: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" },
-          { label: "Pending Bookings", value: String(bPending), hint: "awaiting provider", tab: "marketplace", badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-          { label: "Confirmed Bookings", value: String(bConfirmed), hint: "upcoming experiences", tab: "marketplace", badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-          { label: "Completed Bookings", value: String(bDone), hint: "ready for payout", tab: "marketplace", badgeClass: "bg-brand/10 text-brand" },
-          { label: "Recent GMV", value: aud(gmv), hint: "marketplace volume", tab: "marketplace", badgeClass: "bg-emerald-500/10 text-emerald-700 font-mono" },
-          { label: "Pending Campaigns", value: String(cPending), hint: "needs admin review", tab: "experiences", badgeClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400", urgent: cPending > 0 },
-          { label: "Live Experiences", value: String(cLive), hint: "bookable in Sydney", tab: "experiences", badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-          { label: "Safety Triage", value: String(sNew), hint: "unresolved incidents", tab: "safety", badgeClass: "bg-red-500/10 text-red-600 dark:text-red-400", urgent: sNew > 0 },
-          { label: "Studio Leads", value: String(wNew), hint: "partner inquiries", tab: "studio", badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-          { label: "Search Queries", value: String(searchQueries), hint: "top queries tracked", tab: "search", badgeClass: "bg-brand/10 text-brand" },
-          { label: "Audit Logs", value: String(audits), hint: "immutable trail", tab: "audit", badgeClass: "bg-zinc-500/10 text-zinc-600 dark:text-zinc-400" },
+          {
+            label: "Open Requests",
+            value: String(open),
+            hint: "needs mate match",
+            tab: "marketplace",
+            badgeClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+          },
+          {
+            label: "Active Matches",
+            value: String(matched),
+            hint: "in conversation",
+            tab: "marketplace",
+            badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+          },
+          {
+            label: "Completed Plans",
+            value: String(completed),
+            hint: "awaiting review",
+            tab: "marketplace",
+            badgeClass: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
+          },
+          {
+            label: "Pending Bookings",
+            value: String(bPending),
+            hint: "awaiting provider",
+            tab: "marketplace",
+            badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+          },
+          {
+            label: "Confirmed Bookings",
+            value: String(bConfirmed),
+            hint: "upcoming experiences",
+            tab: "marketplace",
+            badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+          },
+          {
+            label: "Completed Bookings",
+            value: String(bDone),
+            hint: "ready for payout",
+            tab: "marketplace",
+            badgeClass: "bg-brand/10 text-brand",
+          },
+          {
+            label: "Recent GMV",
+            value: aud(gmv),
+            hint: "marketplace volume",
+            tab: "marketplace",
+            badgeClass: "bg-emerald-500/10 text-emerald-700 font-mono",
+          },
+          {
+            label: "Pending Campaigns",
+            value: String(cPending),
+            hint: "needs admin review",
+            tab: "experiences",
+            badgeClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+            urgent: cPending > 0,
+          },
+          {
+            label: "Live Experiences",
+            value: String(cLive),
+            hint: "bookable in Sydney",
+            tab: "experiences",
+            badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+          },
+          {
+            label: "Safety Triage",
+            value: String(sNew),
+            hint: "unresolved incidents",
+            tab: "safety",
+            badgeClass: "bg-red-500/10 text-red-600 dark:text-red-400",
+            urgent: sNew > 0,
+          },
+          {
+            label: "Studio Leads",
+            value: String(wNew),
+            hint: "partner inquiries",
+            tab: "studio",
+            badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+          },
+          {
+            label: "Search Queries",
+            value: String(searchQueries),
+            hint: "top queries tracked",
+            tab: "search",
+            badgeClass: "bg-brand/10 text-brand",
+          },
+          {
+            label: "Audit Logs",
+            value: String(audits),
+            hint: "immutable trail",
+            tab: "audit",
+            badgeClass: "bg-zinc-500/10 text-zinc-600 dark:text-zinc-400",
+          },
         ]);
       } catch {
         if (!cancelled) setKpis([]);
@@ -143,7 +237,9 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
           <div className="flex items-center justify-between gap-1">
             <span className="text-[10px] font-bold uppercase tracking-wider text-mute truncate">{k.label}</span>
             {k.badgeClass && (
-              <span className={`inline-block rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${k.badgeClass}`}>
+              <span
+                className={`inline-block rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${k.badgeClass}`}
+              >
                 {k.tab}
               </span>
             )}

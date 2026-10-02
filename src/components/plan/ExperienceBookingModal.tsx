@@ -138,9 +138,10 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
           <button
             type="button"
             onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-full text-mute hover:text-ink hover:bg-paper"
+            aria-label="Close dialog"
+            className="grid h-10 w-10 min-h-[44px] min-w-[44px] place-items-center rounded-full text-mute hover:text-ink hover:bg-paper transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
-            <X size={15} />
+            <X size={16} />
           </button>
         </div>
 

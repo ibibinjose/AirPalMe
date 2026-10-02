@@ -143,9 +143,9 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-paper text-mute hover:text-ink transition ring-1 ring-line/80"
+            className="grid h-10 w-10 min-h-[44px] min-w-[44px] shrink-0 place-items-center rounded-full bg-paper text-mute hover:text-ink transition ring-1 ring-line/80 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
-            <X size={15} />
+            <X size={16} />
           </button>
         </div>
 

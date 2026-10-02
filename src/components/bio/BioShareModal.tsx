@@ -90,7 +90,7 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full text-mute transition hover:bg-black/5 hover:text-ink"
+          className="absolute right-4 top-4 grid h-10 w-10 min-h-[44px] min-w-[44px] place-items-center rounded-full text-mute transition hover:bg-black/5 hover:text-ink cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           aria-label="Close"
         >
           <X size={18} />

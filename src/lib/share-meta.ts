@@ -139,6 +139,11 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
     description: "Contact AirPal.Me support: help guides, safety, and how to reach the Sydney team.",
   },
   {
+    match: /^\/unsubscribe(\/|$)/,
+    title: "Unsubscribe · AirPal.Me",
+    description: "Leave the AirPal Guestlist in one tap.",
+  },
+  {
     match: /^\/(getAirPalApp|getAirPal)(\/|$)/,
     title: "Get the AirPal app",
     description: "Take AirPal.Me anywhere — get the app for iOS and Android.",

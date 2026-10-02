@@ -5,6 +5,7 @@ import {
   EVERYONE_BROADCAST_CAP,
   isMarketingKind,
   isPriorityKind,
+  notificationPresentation,
   validateBroadcast,
 } from "./notifications";
 
@@ -22,6 +23,13 @@ describe("broadcast validation", () => {
       validateBroadcast({ title: "Hi", body: "Hello", audience: "promotion_entrants", promotionId: "p1" }),
     ).toEqual([]);
     expect(validateBroadcast({ title: "Tonight", body: "Doors at 7.", audience: "circle" })).toEqual([]);
+  });
+
+  it("labels catch-up and meeting notices for the activity list", () => {
+    expect(notificationPresentation("announcement")).toEqual({ label: "Update", segment: "updates" });
+    expect(notificationPresentation("catchup_proposed")).toEqual({ label: "Catch-up", segment: "activity" });
+    expect(notificationPresentation("catchup_scheduled")).toEqual({ label: "Meeting", segment: "activity" });
+    expect(notificationPresentation("giveaway_launched").label).toBe("Giveaway");
     expect(broadcastNeedsReview("circle")).toBe(false);
     expect(broadcastNeedsReview("everyone")).toBe(true);
   });

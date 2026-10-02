@@ -342,6 +342,8 @@ export const NOTIFICATION_KINDS = [
   "announcement",
   "here",
   "wave",
+  "catchup_proposed",
+  "catchup_scheduled",
 ] as const;
 export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 

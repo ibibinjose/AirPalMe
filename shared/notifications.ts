@@ -50,6 +50,33 @@ export function isPriorityKind(kind: string): boolean {
   return (PRIORITY_KINDS as readonly string[]).includes(kind);
 }
 
+/** How an inbox row is labelled. Updates stay on the Updates segment. */
+export function notificationPresentation(kind: string): { label: string; segment: "updates" | "activity" } {
+  if (kind === "announcement") return { label: "Update", segment: "updates" };
+  switch (kind) {
+    case "catchup_proposed":
+      return { label: "Catch-up", segment: "activity" };
+    case "catchup_scheduled":
+      return { label: "Meeting", segment: "activity" };
+    case "here":
+      return { label: "I'm here", segment: "activity" };
+    case "wave":
+      return { label: "Wave", segment: "activity" };
+    case "winner_selected":
+    case "winner_verification":
+    case "prize_available":
+    case "winner_update":
+      return { label: "Reward", segment: "activity" };
+    case "giveaway_launched":
+    case "entry_confirmed":
+    case "promotion_ending_soon":
+    case "promotion_closed":
+      return { label: "Giveaway", segment: "activity" };
+    default:
+      return { label: "Activity", segment: "activity" };
+  }
+}
+
 export function validateBroadcast(input: Record<string, unknown>): string[] {
   const errors: string[] = [];
   if (!String(input.title || "").trim()) errors.push("Title is required.");

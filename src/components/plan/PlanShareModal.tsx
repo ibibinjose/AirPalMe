@@ -122,7 +122,7 @@ export function PlanShareModal({
             type="button"
             onClick={onClose}
             aria-label="Close modal"
-            className="grid h-8 w-8 place-items-center rounded-full text-mute hover:bg-paper hover:text-ink transition"
+            className="grid h-10 w-10 min-h-[44px] min-w-[44px] place-items-center rounded-full text-mute hover:bg-paper hover:text-ink transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             <X size={18} />
           </button>

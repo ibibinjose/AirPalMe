@@ -36,6 +36,7 @@ import { ChangeHandleForm } from "@/components/bio/ChangeHandleForm";
 import { BookingsSection } from "@/components/booking/BookingsSection";
 import { PayoutSetupCard } from "@/components/connect/PayoutSetupCard";
 import { BioCatchUpModal } from "@/components/bio/BioCatchUpModal";
+import { CatchUpSlotActions } from "@/components/bio/CatchUpSlotActions";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { PlanGridCard } from "@/components/airpal/PlanGridCard";
 import {
@@ -431,6 +432,9 @@ export function MePage() {
                               {item.venue && ` · ${item.venue}`}
                             </p>
                             {item.notes && <p className="text-[11px] text-ink/80 italic mt-0.5 truncate">"{item.notes}"</p>}
+                            <div className="mt-2">
+                              <CatchUpSlotActions item={item} />
+                            </div>
                           </div>
                         </div>
 

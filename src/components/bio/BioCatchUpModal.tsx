@@ -13,6 +13,7 @@ import {
   Users,
   X,
   Zap,
+  Loader2,
 } from "lucide-react";
 import { Photo } from "@/components/ui/Photo";
 import { Button } from "@/components/ui/Button";
@@ -21,6 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import {
+  persistCatchUp,
   recordCatchUpInterest,
   toggleCatchUpReminder,
   hasCatchUpReminder,
@@ -32,6 +34,7 @@ import { toZonedDateStr } from "@/lib/local-time";
 import { triggerHaptic } from "@/lib/native";
 import type { PlanType } from "@shared/plan";
 import { toast } from "sonner";
+import { scheduleCatchUpRemote } from "@/lib/functions";
 import { cn } from "@/lib/cn";
 
 interface BioCatchUpModalProps {
@@ -152,7 +155,7 @@ export function BioCatchUpModal({
     );
   };
 
-  const handleLaunch = () => {
+  const handleLaunch = async () => {
     if (!requireUser("Sign in to propose a catch-up, meeting, or hangout.")) return;
     // Re-check at click time so a stale render cannot bypass the hard block.
     const liveConflict = checkTimeConflict(date, time, myPlans, myCatchups);
@@ -186,7 +189,7 @@ export function BioCatchUpModal({
               : [{ name: place, time, notes: "Meet here", icon: "drinks", address: place }],
       });
 
-      recordCatchUpInterest({
+      const interest = recordCatchUpInterest({
         targetHandle: handle,
         targetOwnerUid: ownerUid,
         requesterUid: user?.uid,
@@ -200,6 +203,12 @@ export function BioCatchUpModal({
         notes,
         planId: created.id,
       });
+      try {
+        await persistCatchUp(interest);
+        await scheduleCatchUpRemote({ catchupId: interest.id, action: "open" });
+      } catch {
+        /* The plan and the catch-up row still exist. Suggest times retries the thread. */
+      }
 
       toast.success(`Proposed ${currentOption.label} with ${name}`);
       onClose();
@@ -235,10 +244,10 @@ export function BioCatchUpModal({
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-card text-mute ring-1 ring-line hover:text-ink transition cursor-pointer"
+            className="absolute right-4 top-4 grid h-11 w-11 min-h-[44px] min-w-[44px] place-items-center rounded-full bg-card text-mute ring-1 ring-line hover:text-ink transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             aria-label="Close dialog"
           >
-            <X size={16} />
+            <X size={18} />
           </button>
           <div className="flex items-center gap-3 pr-10">
             <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full ring-1 ring-line">
@@ -339,7 +348,7 @@ export function BioCatchUpModal({
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-xs font-semibold outline-none focus:border-brand"
+                  className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
                 />
               </div>
               <div className="mt-1.5 flex gap-1.5">
@@ -355,7 +364,7 @@ export function BioCatchUpModal({
                       void triggerHaptic("light");
                       setDate(localDate(Number(days)));
                     }}
-                    className="rounded-lg bg-card px-2 py-0.5 text-[10px] font-semibold text-mute ring-1 ring-line hover:text-ink cursor-pointer"
+                    className="rounded-lg bg-card px-2 py-0.5 text-[10px] font-semibold text-mute ring-1 ring-line hover:text-ink cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     {label}
                   </button>
@@ -370,7 +379,7 @@ export function BioCatchUpModal({
                   type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-xs font-semibold outline-none focus:border-brand"
+                  className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
                 />
               </div>
             </div>
@@ -385,7 +394,7 @@ export function BioCatchUpModal({
                 value={venue}
                 onChange={(e) => setVenue(e.target.value)}
                 placeholder={city || "A café nearby"}
-                className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-xs font-semibold outline-none focus:border-brand"
+                className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
               />
             </div>
           </div>
@@ -399,7 +408,7 @@ export function BioCatchUpModal({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Optional notes, topic, or meetup idea"
-                className="w-full resize-none rounded-2xl border border-line bg-card py-2.5 pl-9 pr-3 text-xs outline-none focus:border-brand"
+                className="w-full resize-none rounded-2xl border border-line bg-card py-2.5 pl-9 pr-3 text-xs outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
               />
             </div>
           </div>
@@ -407,13 +416,22 @@ export function BioCatchUpModal({
 
         <div className="space-y-3 border-t border-line bg-card/60 p-5">
           <Button
-            className="h-12 w-full gap-2 rounded-full font-bold shadow-md"
+            className="h-12 w-full gap-2 rounded-full font-bold shadow-md cursor-pointer"
             onClick={handleLaunch}
             disabled={isSubmitting || conflict.hasConflict}
             title={conflict.hasConflict ? "Pick a free time slot before proposing" : undefined}
           >
-            <Zap size={16} />
-            {conflict.hasConflict ? "Pick a free time first" : "Create Plan & Propose"}
+            {isSubmitting ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Creating Plan…
+              </>
+            ) : (
+              <>
+                <Zap size={16} />
+                {conflict.hasConflict ? "Pick a free time first" : "Create Plan & Propose"}
+              </>
+            )}
           </Button>
           <div className="flex items-center justify-between gap-2">
             <button

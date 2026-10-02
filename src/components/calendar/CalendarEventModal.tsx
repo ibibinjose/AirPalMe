@@ -106,15 +106,23 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-card/80 text-mute hover:text-ink backdrop-blur-md transition z-20 ring-1 ring-line/80 shadow-xs"
+          className="absolute right-4 top-4 grid h-10 w-10 min-h-[44px] min-w-[44px] place-items-center rounded-full bg-card/80 text-mute hover:text-ink backdrop-blur-md transition z-20 ring-1 ring-line/80 shadow-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
         >
-          <X size={16} />
+          <X size={18} />
         </button>
 
         {/* Hero Image */}
         {event.heroImage && (
           <div className="relative -mx-5 -mt-5 mb-4 h-48 sm:-mx-6 sm:-mt-6 sm:h-56 overflow-hidden rounded-t-3xl bg-paper">
-            <img src={event.heroImage} alt={event.title} className="h-full w-full object-cover" />
+            <img
+              src={event.heroImage}
+              alt={event.title}
+              width={600}
+              height={300}
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover"
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
           </div>
         )}

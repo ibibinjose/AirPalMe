@@ -48,6 +48,7 @@ import { BioSocials } from "@/components/bio/BioSocials";
 import { BioCatalogSection } from "@/components/bio/BioCatalog";
 import { BioShareModal } from "@/components/bio/BioShareModal";
 import { BioCatchUpModal } from "@/components/bio/BioCatchUpModal";
+import { CatchUpSlotActions } from "@/components/bio/CatchUpSlotActions";
 import { BioStatusModal } from "@/components/bio/BioStatusModal";
 import { BioPulseRate } from "@/components/bio/BioPulseRate";
 import { BioKindIcon } from "@/components/bio/BioKindBadge";
@@ -75,7 +76,15 @@ import { fetchPublicBio } from "@/lib/bio-store";
 import { TradingHoursScheduleView } from "@/components/discovery/TradingHoursScheduleView";
 import { resolvePublicBio } from "@/lib/bio-handle";
 import { claimCode, loadClaim, saveClaim } from "@/lib/bio-claims";
-import { liveBackendEnabled, claimBioOfferRemote } from "@/lib/functions";
+import { liveBackendEnabled, claimBioOfferRemote, joinGuestlistSignupRemote } from "@/lib/functions";
+import { CITY_OPTIONS } from "@/lib/cities";
+import { ensureAnonymousSession } from "@/lib/firebase";
+import {
+  GUESTLIST_CONSENT_V1,
+  GUESTLIST_INTERESTS,
+  validateGuestlistSignup,
+  type GuestlistInterest,
+} from "@shared/airpal-guestlist";
 import { track, trackMapClick } from "@/lib/analytics";
 import { setShareMeta } from "@/lib/share-meta";
 import {
@@ -186,6 +195,10 @@ export function BioPublicPage() {
   const { addGuest, joinClub } = useClub();
   const [listEmail, setListEmail] = useState("");
   const [listName, setListName] = useState("");
+  const [listCity, setListCity] = useState("");
+  const [listCityOther, setListCityOther] = useState("");
+  const [listInterests, setListInterests] = useState<GuestlistInterest[]>([]);
+  const [listSending, setListSending] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
   const [catchUpModalOpen, setCatchUpModalOpen] = useState(false);
@@ -1441,6 +1454,9 @@ export function BioPublicPage() {
                               {item.notes && (
                                 <p className="text-[11px] text-ink/80 italic mt-0.5 truncate">"{item.notes}"</p>
                               )}
+                              <div className="mt-2">
+                                <CatchUpSlotActions item={item} />
+                              </div>
                             </div>
                           </div>
 
@@ -1787,40 +1803,118 @@ export function BioPublicPage() {
             </div>
           )}
 
-          {/* Guest list sign up */}
+          {/* AirPal Guestlist sign up: Name, City, Email + interest opt-ins.
+              Persists server-side (callable) so invites can actually be sent;
+              the local club copy stays for on-device perks. */}
           {(bio.kind === "business" || ["bar", "club", "events", "eat"].includes(bio.category)) && (
             <form
               className="mt-8 rounded-3xl bg-paper/60 p-5 ring-1 ring-line/80 shadow-2xs space-y-2.5"
               onSubmit={(e) => {
                 e.preventDefault();
-                try {
-                  addGuest(bio.handle, { email: listEmail, name: listName, source: "bio" });
-                  joinClub({
-                    email: listEmail,
-                    name: listName || bio.name,
-                    city: bio.city,
-                    invites: true,
-                    offers: true,
-                  });
-                  toast.success("On the guest list · AirPal Club");
-                  setListEmail("");
-                  setListName("");
-                } catch (err) {
-                  toast.error(err instanceof Error ? err.message : "Failed");
+                if (listSending) return;
+                const cityLabel =
+                  listCity === "other"
+                    ? listCityOther.trim()
+                    : (CITY_OPTIONS.find((c) => c.id === listCity)?.label || "").trim();
+                const problems = validateGuestlistSignup({
+                  name: listName,
+                  city: cityLabel,
+                  email: listEmail,
+                  interests: listInterests,
+                  source: bio.handle,
+                });
+                if (problems.length > 0) {
+                  toast.error(problems[0] || "Check the form and try again.");
+                  return;
                 }
+                setListSending(true);
+                void (async () => {
+                  try {
+                    await ensureAnonymousSession();
+                    await joinGuestlistSignupRemote({
+                      name: listName.trim(),
+                      city: cityLabel,
+                      email: listEmail.trim(),
+                      interests: listInterests,
+                      source: bio.handle,
+                    });
+                    addGuest(bio.handle, { email: listEmail, name: listName, source: "bio" });
+                    joinClub({
+                      email: listEmail,
+                      name: listName || bio.name,
+                      city: cityLabel,
+                      invites: true,
+                      offers: true,
+                    });
+                    toast.success("You're on the AirPal Guestlist");
+                    setListEmail("");
+                    setListName("");
+                    setListCity("");
+                    setListCityOther("");
+                    setListInterests([]);
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : "Couldn't join. Try again.");
+                  } finally {
+                    setListSending(false);
+                  }
+                })();
               }}
             >
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold">VIP Guest List</p>
-                <h4 className="font-display text-base font-bold text-ink mt-0.5">Get invites &amp; secret drops</h4>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold">AirPal Guestlist</p>
+                <h4 className="font-display text-base font-bold text-ink mt-0.5">Get invites near you</h4>
               </div>
+              <label htmlFor="guestlist-name" className="sr-only">
+                Your name
+              </label>
               <input
+                id="guestlist-name"
                 value={listName}
                 onChange={(e) => setListName(e.target.value)}
                 placeholder="Your Name"
+                autoComplete="name"
+                maxLength={80}
                 className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus:border-brand shadow-2xs"
               />
+              <label htmlFor="guestlist-city" className="sr-only">
+                Your city
+              </label>
+              <select
+                id="guestlist-city"
+                value={listCity}
+                onChange={(e) => setListCity(e.target.value)}
+                className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus:border-brand shadow-2xs"
+              >
+                <option value="">Your City</option>
+                {CITY_OPTIONS.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label}
+                    {c.region ? `, ${c.region}` : ""}
+                  </option>
+                ))}
+                <option value="other">Somewhere else</option>
+              </select>
+              {listCity === "other" && (
+                <>
+                  <label htmlFor="guestlist-city-other" className="sr-only">
+                    Your city or town
+                  </label>
+                  <input
+                    id="guestlist-city-other"
+                    value={listCityOther}
+                    onChange={(e) => setListCityOther(e.target.value)}
+                    placeholder="Your city or town"
+                    autoComplete="address-level2"
+                    maxLength={60}
+                    className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus:border-brand shadow-2xs"
+                  />
+                </>
+              )}
+              <label htmlFor="guestlist-email" className="sr-only">
+                Your email
+              </label>
               <input
+                id="guestlist-email"
                 type="email"
                 inputMode="email"
                 autoComplete="email"
@@ -1831,13 +1925,43 @@ export function BioPublicPage() {
                 placeholder="Your Email"
                 className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus:border-brand shadow-2xs"
               />
+              <fieldset>
+                <legend className="text-[11px] font-semibold text-mute">I&apos;m into — pick any</legend>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {GUESTLIST_INTERESTS.map((interest) => {
+                    const on = listInterests.includes(interest.id);
+                    return (
+                      <button
+                        key={interest.id}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() =>
+                          setListInterests((prev) =>
+                            prev.includes(interest.id) ? prev.filter((v) => v !== interest.id) : [...prev, interest.id],
+                          )
+                        }
+                        className={
+                          on
+                            ? "h-9 shrink-0 cursor-pointer rounded-full bg-brand px-3.5 text-xs font-bold text-white shadow-xs transition active:scale-95"
+                            : "h-9 shrink-0 cursor-pointer rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
+                        }
+                      >
+                        {interest.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
               <button
                 type="submit"
-                className="h-11 w-full rounded-full bg-brand text-xs font-bold text-white transition hover:bg-brand-ink active:scale-95 shadow-xs"
+                disabled={listSending}
+                className="h-11 w-full rounded-full bg-brand text-xs font-bold text-white transition hover:bg-brand-ink active:scale-95 shadow-xs disabled:opacity-60"
               >
-                Join VIP List
+                {listSending ? "Joining…" : "Join the Guestlist"}
               </button>
-              <p className="text-center text-[11px] text-mute">Includes AirPal Club perks and priority invites.</p>
+              <p className="text-center text-[11px] leading-relaxed text-mute">
+                {GUESTLIST_CONSENT_V1} Includes AirPal Club perks and priority invites.
+              </p>
             </form>
           )}
 

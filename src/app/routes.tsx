@@ -112,6 +112,7 @@ const AboutPage = lazy(() => import("@/pages/AboutPage").then((m) => ({ default:
 const ContactPage = lazy(() => import("@/pages/ContactPage").then((m) => ({ default: m.ContactPage })));
 const HelpPage = lazy(() => import("@/pages/HelpPage").then((m) => ({ default: m.HelpPage })));
 const AssistPage = lazy(() => import("@/pages/AssistPage").then((m) => ({ default: m.AssistPage })));
+const UnsubscribePage = lazy(() => import("@/pages/UnsubscribePage").then((m) => ({ default: m.UnsubscribePage })));
 const PrivacyPage = lazy(() => import("@/pages/PrivacyPage").then((m) => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import("@/pages/TermsPage").then((m) => ({ default: m.TermsPage })));
 const CookiesPage = lazy(() => import("@/pages/CookiesPage").then((m) => ({ default: m.CookiesPage })));
@@ -303,6 +304,7 @@ export function AppRoutes() {
         <Route path="/contact" component={ContactPage} />
         <Route path="/help" component={HelpPage} />
         <Route path="/assist" component={AssistPage} />
+        <Route path="/unsubscribe" component={UnsubscribePage} />
         <Route path="/privacy" component={PrivacyPage} />
         <Route path="/terms" component={TermsPage} />
         <Route path="/cookies" component={CookiesPage} />

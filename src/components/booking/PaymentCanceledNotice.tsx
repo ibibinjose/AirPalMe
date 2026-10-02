@@ -31,7 +31,7 @@ export function PaymentCanceledNotice() {
           void triggerHaptic("light");
           setDismissed(true);
         }}
-        className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-mute transition hover:bg-paper hover:text-ink active:scale-95"
+        className="grid h-10 w-10 min-h-[44px] min-w-[44px] shrink-0 place-items-center rounded-full text-mute transition hover:bg-paper hover:text-ink cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-95"
       >
         <X size={16} />
       </button>

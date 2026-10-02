@@ -123,10 +123,10 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
           <button
             type="button"
             onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-full bg-paper text-ink hover:bg-card ring-1 ring-line transition cursor-pointer shadow-xs"
+            className="grid h-10 w-10 min-h-[44px] min-w-[44px] place-items-center rounded-full bg-paper text-ink hover:bg-card ring-1 ring-line transition cursor-pointer shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             aria-label="Close"
           >
-            <X size={16} />
+            <X size={18} />
           </button>
         </div>
 

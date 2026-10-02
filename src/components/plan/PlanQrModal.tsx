@@ -114,7 +114,7 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
             type="button"
             onClick={onClose}
             aria-label="Close modal"
-            className="grid h-8 w-8 place-items-center rounded-full text-mute hover:bg-paper hover:text-ink transition"
+            className="grid h-10 w-10 min-h-[44px] min-w-[44px] place-items-center rounded-full text-mute hover:bg-paper hover:text-ink transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             <X size={18} />
           </button>
@@ -127,6 +127,8 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
               <img
                 src={qrUrl}
                 alt={`QR code for ${plan.title}`}
+                width={256}
+                height={256}
                 className="h-56 w-56 sm:h-64 sm:w-64 rounded-2xl object-contain mx-auto"
               />
             ) : (
@@ -177,10 +179,10 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
           <Button
             onClick={onPrintPdf}
             disabled={isPrinting}
-            className="w-full h-11 rounded-2xl text-xs font-bold gap-2 shadow-md bg-amber-500 text-white hover:bg-amber-600"
+            className="w-full h-11 rounded-2xl text-xs font-bold gap-2 shadow-md bg-amber-500 text-white hover:bg-amber-600 cursor-pointer"
           >
             <Printer size={15} />
-            <span>{isPrinting ? "Preparing PDF..." : "Export & Print PDF Trip Guide"}</span>
+            <span>{isPrinting ? "Preparing PDF…" : "Export & Print PDF Trip Guide"}</span>
           </Button>
 
           <Button

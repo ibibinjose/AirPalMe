@@ -83,10 +83,12 @@ export { createBroadcast, reviewBroadcast } from "./notifications";
 export { teardownDemoBusiness } from "./demo";
 export { verifyTicket, admitTicket } from "./gate";
 export { checkInGuest, closeGuestlist, listDoorTeam, onGuestBookingWritten, onGuestRsvpWritten } from "./guestlist";
+export { joinGuestlistSignup, listGuestlistSignups, unsubscribeGuestlist } from "./guestlist-signups";
 export { shareMeta } from "./share-meta";
 export { walletPass } from "./wallet";
 export { googleWalletPass } from "./google-wallet";
 export { sendPlanBroadcast, sendPlanReminders, onPlanUpdated, inviteToPlan } from "./plan-notify";
+export { scheduleCatchUp } from "./catchup-agent";
 export { shareHere, stopHere } from "./here";
 export { startWave, waveAt, stopWave } from "./wave";
 export {

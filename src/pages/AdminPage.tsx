@@ -23,12 +23,14 @@ import { SafetyInboxAdmin } from "@/components/admin/SafetyInboxAdmin";
 import { CampaignInboxAdmin } from "@/components/admin/CampaignInboxAdmin";
 import { FestivalAdmin } from "@/components/admin/FestivalAdmin";
 import { AuditTrailAdmin } from "@/components/admin/AuditTrailAdmin";
+import { GuestlistSignupsAdmin } from "@/components/admin/GuestlistSignupsAdmin";
 import { SearchQueriesDashboardTab } from "@/components/admin/SearchQueriesDashboardTab";
 import { ADMIN_TABS, AdminOverview, type AdminTab } from "@/components/admin/AdminOverview";
 import { AIRPAL_CLUB_ID } from "@/contexts/ClubContext";
 import { seedDatabase } from "@/lib/seed-database";
 import { toast } from "sonner";
-import { Cake,
+import {
+  Cake,
   Activity,
   ArrowLeft,
   ArrowUpRight,
@@ -272,7 +274,9 @@ export function AdminPage() {
                 <ShieldCheck className={`h-4 w-4 ${clientErrors > 0 ? "text-amber-500" : "text-emerald-500"}`} />
               </div>
               <p className="font-display mt-2 text-3xl font-bold text-ink">{clientErrors}</p>
-              <p className="text-[11px] text-mute mt-0.5">{clientErrors === 0 ? "System healthy" : "Requires triage"}</p>
+              <p className="text-[11px] text-mute mt-0.5">
+                {clientErrors === 0 ? "System healthy" : "Requires triage"}
+              </p>
             </div>
           </section>
 
@@ -307,7 +311,9 @@ export function AdminPage() {
                   <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand" />
                 </div>
                 <h3 className="font-display mt-3 text-sm font-bold text-ink">Birthday Freebies</h3>
-                <p className="mt-1 text-xs text-mute">Curate regional birthday rewards and set offers live for Mate meetups.</p>
+                <p className="mt-1 text-xs text-mute">
+                  Curate regional birthday rewards and set offers live for Mate meetups.
+                </p>
               </div>
               <span className="mt-4 text-[11px] font-semibold text-brand">Open Birthday Catalog →</span>
             </Link>
@@ -341,7 +347,9 @@ export function AdminPage() {
                   <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand" />
                 </div>
                 <h3 className="font-display mt-3 text-sm font-bold text-ink">Universal Help Desk</h3>
-                <p className="mt-1 text-xs text-mute">Multi-property guest support tickets, room service & dining alerts.</p>
+                <p className="mt-1 text-xs text-mute">
+                  Multi-property guest support tickets, room service & dining alerts.
+                </p>
               </div>
               <span className="mt-4 text-[11px] font-semibold text-brand">View All Open Tickets →</span>
             </Link>
@@ -358,7 +366,9 @@ export function AdminPage() {
                   <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand" />
                 </div>
                 <h3 className="font-display mt-3 text-sm font-bold text-ink">Pulse & Standees</h3>
-                <p className="mt-1 text-xs text-mute">Guest feedback kiosk simulator, NFC tap stands, and CSAT recovery.</p>
+                <p className="mt-1 text-xs text-mute">
+                  Guest feedback kiosk simulator, NFC tap stands, and CSAT recovery.
+                </p>
               </div>
               <span className="mt-4 text-[11px] font-semibold text-brand">Open Pulse Station →</span>
             </Link>
@@ -379,7 +389,13 @@ export function AdminPage() {
                   Synchronize bundled Sydney venues, curated stays, events, and test handles into live Cloud Firestore.
                 </p>
               </div>
-              <Button size="sm" variant="outlined" disabled={seeding} onClick={handleSeedDatabase} className="shrink-0 gap-1.5">
+              <Button
+                size="sm"
+                variant="outlined"
+                disabled={seeding}
+                onClick={handleSeedDatabase}
+                className="shrink-0 gap-1.5"
+              >
                 <RefreshCw className={`h-3.5 w-3.5 ${seeding ? "animate-spin" : ""}`} />
                 {seeding ? "Seeding Firestore…" : "Seed Real Database"}
               </Button>
@@ -393,7 +409,8 @@ export function AdminPage() {
                 <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand">North-Star Engine</p>
                 <h2 className="font-display mt-0.5 text-lg font-bold text-ink">WQGA / Active QR Context</h2>
                 <p className="mt-1 text-xs text-mute">
-                  Verified qualified guest actions this week, excluding demo and duplicates. Production reports use server daily facts.
+                  Verified qualified guest actions this week, excluding demo and duplicates. Production reports use
+                  server daily facts.
                 </p>
               </div>
               {liveBackendEnabled() && (
@@ -421,7 +438,11 @@ export function AdminPage() {
                 { n: northStar.value.toFixed(2), l: "WQGA/Context", h: "Target: > 1.50" },
                 { n: String(northStar.qualifiedActions), l: "Qualified Actions", h: "Verified intent" },
                 { n: String(northStar.activeQrContexts), l: "Active QR Contexts", h: "Physical touchpoints" },
-                { n: `${Math.round(northStar.firstValueRate * 100)}%`, l: "First-Value Rate", h: "Conversion efficiency" },
+                {
+                  n: `${Math.round(northStar.firstValueRate * 100)}%`,
+                  l: "First-Value Rate",
+                  h: "Conversion efficiency",
+                },
               ].map((s) => (
                 <div key={s.l} className="rounded-2xl bg-paper p-3.5 text-center ring-1 ring-line/50">
                   <p className="font-display text-2xl font-bold text-ink">{s.n}</p>
@@ -431,7 +452,8 @@ export function AdminPage() {
               ))}
             </div>
             <p className="mt-3 text-[11px] text-mute">
-              Demo excluded: {northStar.localDemoExcluded} · Duplicates excluded: {northStar.duplicatesExcluded} · Unique sessions: {northStar.uniqueSessions}
+              Demo excluded: {northStar.localDemoExcluded} · Duplicates excluded: {northStar.duplicatesExcluded} ·
+              Unique sessions: {northStar.uniqueSessions}
             </p>
           </section>
 
@@ -497,7 +519,11 @@ export function AdminPage() {
                         title="Copy profile URL"
                         className="grid h-11 w-11 place-items-center rounded-lg text-mute hover:bg-card hover:text-ink transition"
                       >
-                        {isCopied ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+                        {isCopied ? (
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                        ) : (
+                          <Copy className="h-3.5 w-3.5" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -552,6 +578,7 @@ export function AdminPage() {
             </div>
           )}
           {tab === "audit" && <AuditTrailAdmin />}
+          {tab === "audience" && <GuestlistSignupsAdmin />}
           {tab === "demo" && <DemoAdmin />}
         </div>
       )}

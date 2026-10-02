@@ -387,6 +387,22 @@ export function inviteToPlanRemote(data: InviteToPlanRequest) {
   return callFunction<InviteToPlanRequest, InviteToPlanResponse>(CALLABLES.inviteToPlan, data);
 }
 
+export function scheduleCatchUpRemote(data: {
+  catchupId: string;
+  action: "open" | "accept";
+  slotId?: string;
+}) {
+  return callFunction<
+    typeof data,
+    {
+      ok: boolean;
+      conversationId: string;
+      status: string;
+      proposals: { id: string; date: string; time: string; label: string }[];
+    }
+  >(CALLABLES.scheduleCatchUp, data);
+}
+
 export function createExperienceCheckoutSessionRemote(data: {
   planId: string;
   tierId?: string;
@@ -591,6 +607,45 @@ export function closeGuestlistRemote(data: { scope: "event" | "plan"; id: string
     CALLABLES.closeGuestlist,
     data,
   );
+}
+
+export function joinGuestlistSignupRemote(data: {
+  name: string;
+  city: string;
+  email: string;
+  interests: string[];
+  source?: string;
+}) {
+  return callFunction<typeof data, { ok: boolean; email: string }>(CALLABLES.joinGuestlistSignup, data);
+}
+
+export function listGuestlistSignupsRemote(data: {
+  city?: string;
+  interest?: string;
+  limit?: number;
+  startAfter?: string;
+}) {
+  return callFunction<
+    typeof data,
+    {
+      rows: Array<{
+        email: string;
+        name: string;
+        city: string;
+        interests: string[];
+        source: string;
+        consentAt: string;
+        createdAt: string;
+        unsubscribedAt: string | null;
+      }>;
+      hasMore: boolean;
+      total: number;
+    }
+  >(CALLABLES.listGuestlistSignups, data);
+}
+
+export function unsubscribeGuestlistRemote(data: { email: string }) {
+  return callFunction<typeof data, { ok: boolean }>(CALLABLES.unsubscribeGuestlist, data);
 }
 
 export function listDoorTeamRemote(data: { scope: "event" | "plan"; id: string }) {

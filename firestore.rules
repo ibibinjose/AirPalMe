@@ -96,6 +96,12 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // AirPal Guestlist marketing signups. Callable-only: guests join through
+    // joinGuestlistSignup, admins read through listGuestlistSignups.
+    match /guestlist_signups/{signupId} {
+      allow read, write: if false;
+    }
+
     match /users/{userId} {
       allow read: if signedIn() && (request.auth.uid == userId || platformAdmin());
       allow create, delete: if false;

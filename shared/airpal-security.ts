@@ -64,6 +64,7 @@ export const CALLABLES = {
   placeDiningOrder: "placeDiningOrder",
   updateDiningOrderStatus: "updateDiningOrderStatus",
   askAirPal: "askAirPal",
+  scheduleCatchUp: "scheduleCatchUp",
   createPlan: "createPlanRemote",
   createPlanRemote: "createPlanRemote",
   rsvpPlan: "rsvpPlanRemote",
@@ -111,6 +112,9 @@ export const CALLABLES = {
   checkInGuest: "checkInGuest",
   closeGuestlist: "closeGuestlist",
   listDoorTeam: "listDoorTeam",
+  joinGuestlistSignup: "joinGuestlistSignup",
+  listGuestlistSignups: "listGuestlistSignups",
+  unsubscribeGuestlist: "unsubscribeGuestlist",
 } as const;
 
 export type TeardownDemoBusinessResponse = {
@@ -169,6 +173,47 @@ export type ListDoorTeamResponse = {
   id: string;
   members: Array<{ uid: string; name: string; handle?: string; owner: boolean }>;
 };
+
+/** AirPal Guestlist marketing signup. Anonymous auth OK, rate-limited. */
+export type JoinGuestlistSignupRequest = {
+  name: string;
+  city: string;
+  email: string;
+  interests: string[];
+  source?: string;
+};
+
+export type JoinGuestlistSignupResponse = { ok: boolean; email: string };
+
+/** Admin-only audience list with city/interest filters. */
+export type ListGuestlistSignupsRequest = {
+  city?: string;
+  interest?: string;
+  limit?: number;
+  startAfter?: string;
+};
+
+export type GuestlistSignupRow = {
+  email: string;
+  name: string;
+  city: string;
+  interests: string[];
+  source: string;
+  consentAt: string;
+  createdAt: string;
+  unsubscribedAt: string | null;
+};
+
+export type ListGuestlistSignupsResponse = {
+  rows: GuestlistSignupRow[];
+  hasMore: boolean;
+  total: number;
+};
+
+/** One-click unsubscribe. Always OK, even for unknown addresses. */
+export type UnsubscribeGuestlistRequest = { email: string };
+
+export type UnsubscribeGuestlistResponse = { ok: boolean };
 
 export type CompleteAccountSignupRequest = {
   handle: string;
