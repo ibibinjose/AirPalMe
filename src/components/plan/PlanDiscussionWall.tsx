@@ -246,7 +246,7 @@ export function PlanDiscussionWall({
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-ink truncate">
-                {uploadingPhoto ? "Optimizing & attaching photo..." : "Photo attached"}
+                {uploadingPhoto ? "Optimizing & attaching photo…" : "Photo attached"}
               </p>
               <p className="text-[11px] text-mute">Will be shared with your message</p>
             </div>
@@ -257,8 +257,9 @@ export function PlanDiscussionWall({
                   setPhotoUrl("");
                   if (fileInputRef.current) fileInputRef.current.value = "";
                 }}
-                className="grid h-7 w-7 place-items-center rounded-full bg-card ring-1 ring-line text-mute hover:text-red-500 transition cursor-pointer"
+                className="grid h-8 w-8 min-h-[44px] min-w-[44px] place-items-center rounded-full bg-card ring-1 ring-line text-mute hover:text-red-500 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 title="Remove photo"
+                aria-label="Remove photo"
               >
                 <X size={14} />
               </button>
@@ -274,13 +275,13 @@ export function PlanDiscussionWall({
               type="url"
               value={photoUrl}
               onChange={(e) => setPhotoUrl(e.target.value)}
-              placeholder="Or paste web image link (https://...)"
-              className="w-full bg-transparent text-xs text-ink outline-none"
+              placeholder="Or paste web image link (https://…)"
+              className="w-full bg-transparent text-xs text-ink outline-none focus-visible:ring-2 focus-visible:ring-brand"
             />
             <button
               type="button"
               onClick={() => setShowUrlInput(false)}
-              className="text-[11px] font-medium text-mute hover:text-red-500"
+              className="text-[11px] font-medium text-mute hover:text-red-500 cursor-pointer"
             >
               Close
             </button>
@@ -293,8 +294,8 @@ export function PlanDiscussionWall({
             required
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Post a message, meeting spot update, or photo..."
-            className="h-11 flex-1 rounded-2xl bg-paper px-4 text-xs sm:text-sm border border-line outline-none focus:ring-2 focus:ring-brand text-ink focus:border-brand"
+            placeholder="Post a message, meeting spot update, or photo…"
+            className="h-11 flex-1 rounded-2xl bg-paper px-4 text-xs sm:text-sm border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand text-ink focus-visible:border-brand"
           />
 
           {/* Direct File Picker Button */}
@@ -303,8 +304,9 @@ export function PlanDiscussionWall({
             onClick={() => fileInputRef.current?.click()}
             disabled={uploadingPhoto}
             title="Upload photo from device or take picture"
+            aria-label="Upload photo from device or take picture"
             className={cn(
-              "grid h-11 w-11 shrink-0 place-items-center rounded-2xl transition ring-1 cursor-pointer",
+              "grid h-11 w-11 shrink-0 place-items-center rounded-2xl transition ring-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
               photoUrl ? "bg-emerald-500/15 text-emerald-600 ring-emerald-500/30" : "bg-paper text-mute ring-line hover:text-ink",
             )}
           >
@@ -316,8 +318,9 @@ export function PlanDiscussionWall({
             type="button"
             onClick={() => setShowUrlInput((v) => !v)}
             title="Paste image URL"
+            aria-label="Paste image URL"
             className={cn(
-              "hidden sm:grid h-11 w-11 shrink-0 place-items-center rounded-2xl transition ring-1 cursor-pointer",
+              "hidden sm:grid h-11 w-11 shrink-0 place-items-center rounded-2xl transition ring-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
               showUrlInput ? "bg-brand text-white ring-brand" : "bg-paper text-mute ring-line hover:text-ink",
             )}
           >
@@ -328,7 +331,8 @@ export function PlanDiscussionWall({
             type="submit"
             size="sm"
             disabled={uploadingPhoto}
-            className="h-11 rounded-2xl px-4 shrink-0 gap-1.5 shadow-[0_6px_20px_rgba(18,22,20,0.15)]"
+            aria-label="Send message"
+            className="h-11 rounded-2xl px-4 shrink-0 gap-1.5 shadow-[0_6px_20px_rgba(18,22,20,0.15)] cursor-pointer"
           >
             <Send size={15} />
             <span className="hidden sm:inline">Send</span>

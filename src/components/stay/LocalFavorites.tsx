@@ -276,11 +276,11 @@ export function LocalFavorites() {
               id="btn-locate-device-geo"
               onClick={handleRequestDeviceLocation}
               disabled={geoLoading}
-              className="inline-flex h-8 items-center gap-1.5 rounded-full bg-brand px-3.5 text-xs font-bold text-white transition hover:bg-slate-800 disabled:opacity-50 cursor-pointer shadow-xs"
+              className="inline-flex min-h-[44px] sm:min-h-0 sm:h-8 items-center gap-1.5 rounded-full bg-brand px-3.5 text-xs font-bold text-white transition hover:bg-slate-800 disabled:opacity-50 cursor-pointer shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
               title="Use current device GPS location"
             >
-              <Compass size={13} className={cn("text-brand", geoLoading && "animate-spin")} />
-              {geoLoading ? "Locating..." : "Use My Location"}
+              <Compass size={13} className={cn("text-white", geoLoading && "animate-spin")} />
+              {geoLoading ? "Locating…" : "Use My Location"}
             </button>
           )}
         </div>

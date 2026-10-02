@@ -106,7 +106,7 @@ export function AddToCalendarMenu({
         const url = getGoogleCalendarUrl(event);
         window.open(url, "_blank", "noopener,noreferrer");
         setOpen(false);
-        toast.success("Opening Google Calendar...");
+        toast.success("Opening Google Calendar…");
       },
     },
     {
@@ -129,7 +129,7 @@ export function AddToCalendarMenu({
         const url = getOutlookLiveCalendarUrl(event);
         window.open(url, "_blank", "noopener,noreferrer");
         setOpen(false);
-        toast.success("Opening Outlook Live...");
+        toast.success("Opening Outlook Live…");
       },
     },
     {
@@ -141,7 +141,7 @@ export function AddToCalendarMenu({
         const url = getOffice365CalendarUrl(event);
         window.open(url, "_blank", "noopener,noreferrer");
         setOpen(false);
-        toast.success("Opening Microsoft 365 Calendar...");
+        toast.success("Opening Microsoft 365 Calendar…");
       },
     },
     {
@@ -153,7 +153,7 @@ export function AddToCalendarMenu({
         const url = getYahooCalendarUrl(event);
         window.open(url, "_blank", "noopener,noreferrer");
         setOpen(false);
-        toast.success("Opening Yahoo Calendar...");
+        toast.success("Opening Yahoo Calendar…");
       },
     },
     {
