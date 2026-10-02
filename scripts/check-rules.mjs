@@ -22,6 +22,11 @@ must(firestore.includes("match /abuseSignals/{docId}"), "firestore.rules must lo
 must(firestore.includes("match /contentAudits/{docId}"), "firestore.rules must lock contentAudits to functions");
 must(firestore.includes("!isAnonymous()"), "listings/events creates must reject anonymous writers");
 must(firestore.includes("request.resource.data.uid == request.auth.uid"), "guest writes must bind uid");
+must(firestore.includes("match /guestlist/{entryId}"), "firestore.rules must declare the event guestlist");
+must(
+  firestore.includes("resource.data.uid == request.auth.uid") && firestore.includes("match /guestlist/{entryId}"),
+  "guestlist reads must stay host-only with own-row guest access",
+);
 must(firestore.includes("details.size() < 2000"), "tickets must cap details length");
 must(indexes.includes("analyticsDaily"), "firestore.indexes.json must index analyticsDaily");
 

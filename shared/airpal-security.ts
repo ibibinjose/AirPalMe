@@ -108,6 +108,8 @@ export const CALLABLES = {
   teardownDemoBusiness: "teardownDemoBusiness",
   verifyTicket: "verifyTicket",
   admitTicket: "admitTicket",
+  checkInGuest: "checkInGuest",
+  closeGuestlist: "closeGuestlist",
 } as const;
 
 export type TeardownDemoBusinessResponse = {
@@ -141,6 +143,21 @@ export type AdmitTicketResponse = {
   admittedAt: string;
   already: boolean;
 };
+
+/** Door check-in for one guestlist row. Organiser or admin only. */
+export type CheckInGuestRequest = { eventId: string; entryId: string };
+
+export type CheckInGuestResponse = {
+  eventId: string;
+  entryId: string;
+  checkedInAt: string;
+  already: boolean;
+};
+
+/** Close the list after doors: still-going rows become no-shows. */
+export type CloseGuestlistRequest = { eventId: string };
+
+export type CloseGuestlistResponse = { eventId: string; closed: number };
 
 export type CompleteAccountSignupRequest = {
   handle: string;

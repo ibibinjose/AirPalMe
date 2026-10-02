@@ -1,5 +1,5 @@
 /**
- * Shipped dock (CANON §3): Home / Explore / Trips / Inbox / Me.
+ * Shipped dock (CANON §3): Home / Explore / Plan / Inbox / Me.
  * "scan" is a path bucket, not a tab — Scan lives behind + Create.
  */
 export type GuestTab = "home" | "explore" | "trips" | "scan" | "inbox" | "me";
@@ -17,22 +17,12 @@ export function tabFromPath(path: string): GuestTab {
   ) {
     return "trips";
   }
-  if (
-    path.startsWith("/explore") ||
-    path.startsWith("/discover") ||
-    path.startsWith("/discovery")
-  ) {
+  if (path.startsWith("/explore") || path.startsWith("/discover") || path.startsWith("/discovery")) {
     return "explore";
   }
-  if (
-    path.startsWith("/me") ||
-    path.startsWith("/bio") ||
-    path.startsWith("/@") ||
-    path.startsWith("/settings")
-  ) {
+  if (path.startsWith("/me") || path.startsWith("/bio") || path.startsWith("/@") || path.startsWith("/settings")) {
     return "me";
   }
   if (path === "/") return "home";
   return "explore";
 }
-

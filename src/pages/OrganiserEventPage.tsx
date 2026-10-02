@@ -49,7 +49,12 @@ import { CITY_OPTIONS } from "@/lib/cities";
 import { cn } from "@/lib/cn";
 import { HostFreshnessBanner } from "@/components/host/HostFreshnessBanner";
 import { EventFestivalFields, type FestivalFieldValues } from "@/components/event/EventFestivalFields";
-import { EventTicketFields, ticketValuesToCents, validateTickets, type TicketFieldValues } from "@/components/event/EventTicketFields";
+import {
+  EventTicketFields,
+  ticketValuesToCents,
+  validateTickets,
+  type TicketFieldValues,
+} from "@/components/event/EventTicketFields";
 import { StallHandleField } from "@/components/event/StallHandleField";
 import { landing, landingItem } from "@/lib/motion";
 import { PlaceAddressField, type PickedPlace } from "@/components/forms/PlaceAddressField";
@@ -289,7 +294,7 @@ export function OrganiserEventPage() {
         hostType,
         hostName: hostName.trim() || undefined,
         hostHandle: cleanHostHandle,
-        businessName: hostType === "business" ? (hostName.trim() || undefined) : undefined,
+        businessName: hostType === "business" ? hostName.trim() || undefined : undefined,
         businessHandle: hostType === "business" ? cleanHostHandle : undefined,
         collaboratorHandles: collaboratorHandles.length > 0 ? collaboratorHandles : undefined,
         startsAt: startsAt || new Date().toISOString(),
@@ -397,7 +402,7 @@ export function OrganiserEventPage() {
         hostType,
         hostName: hostName.trim() || undefined,
         hostHandle: cleanHostHandle,
-        businessName: hostType === "business" ? (hostName.trim() || undefined) : undefined,
+        businessName: hostType === "business" ? hostName.trim() || undefined : undefined,
         businessHandle: hostType === "business" ? cleanHostHandle : undefined,
         collaboratorHandles: collaboratorHandles.length > 0 ? collaboratorHandles : undefined,
         startsAt: startsAt || myEvent.startsAt,
@@ -454,7 +459,8 @@ export function OrganiserEventPage() {
               Create a Market, Expo or Event
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-mute">
-              Pick a format, search Google Place for the venue, and set your schedule. Guests scan the entrance Gate QR into a live directory.
+              Pick a format, search Google Place for the venue, and set your schedule. Guests scan the entrance Gate QR
+              into a live directory.
             </p>
           </motion.header>
 
@@ -678,7 +684,8 @@ export function OrganiserEventPage() {
                 </span>
               </div>
               <p className="text-xs text-mute leading-relaxed">
-                Specify whether this event is run by a business or an individual with their AirPal @handle, plus any co-hosts or collaborators.
+                Specify whether this event is run by a business or an individual with their AirPal @handle, plus any
+                co-hosts or collaborators.
               </p>
 
               {/* Host Type Selector */}
@@ -907,8 +914,15 @@ export function OrganiserEventPage() {
 
             <EventTicketFields values={ticketFields} onChange={setTicketFields} />
 
-            <Button type="submit" size="lg" className="w-full h-12 text-base font-semibold shadow-md gap-2" disabled={creating}>
-              <span>{creating ? "Creating Event…" : status === "draft" ? "Save Draft" : "Create Event & Open Gate"}</span>
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full h-12 text-base font-semibold shadow-md gap-2"
+              disabled={creating}
+            >
+              <span>
+                {creating ? "Creating Event…" : status === "draft" ? "Save Draft" : "Create Event & Open Gate"}
+              </span>
               <ArrowRight size={18} />
             </Button>
           </motion.form>
@@ -969,9 +983,7 @@ export function OrganiserEventPage() {
               <h1 className="font-display mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-ink">
                 {myEvent.name}
               </h1>
-              {myEvent.shortWhy && (
-                <p className="text-xs text-mute mt-0.5">{myEvent.shortWhy}</p>
-              )}
+              {myEvent.shortWhy && <p className="text-xs text-mute mt-0.5">{myEvent.shortWhy}</p>}
             </div>
 
             <div className="flex items-center gap-2">
@@ -1072,6 +1084,24 @@ export function OrganiserEventPage() {
                   Print Entrance QR
                 </Button>
               </div>
+
+              <div className="col-span-2 sm:col-span-1 rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs flex flex-col justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-mute">Guestlist</p>
+                  <p className="font-display text-3xl sm:text-4xl font-bold mt-1 text-ink">
+                    {(myEvent as { guestCounts?: { goingHeads?: number } }).guestCounts?.goingHeads ?? "–"}
+                  </p>
+                  <p className="text-xs text-mute mt-0.5">Going heads, live from the list</p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="tonal"
+                  className="mt-2 text-xs"
+                  onClick={() => nav(`/e/${myEvent.id}/guests`)}
+                >
+                  Open guestlist
+                </Button>
+              </div>
             </div>
 
             {/* Description Preview Card */}
@@ -1096,7 +1126,9 @@ export function OrganiserEventPage() {
                 <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-400">
                   <Sparkles size={14} /> Need a bigger crowd?
                 </span>
-                <span className="block text-sm font-semibold mt-1">Fund an Experience Campaign — AirPal drives verified foot traffic.</span>
+                <span className="block text-sm font-semibold mt-1">
+                  Fund an Experience Campaign — AirPal drives verified foot traffic.
+                </span>
               </div>
               <span className="grid h-9 w-9 place-items-center rounded-full bg-white/10 text-white shrink-0">
                 <ArrowRight size={16} />
@@ -1107,7 +1139,11 @@ export function OrganiserEventPage() {
               <Button className="flex-1 h-11 font-semibold" onClick={() => nav(myEvent.gatePath)}>
                 Open Live Guest Directory
               </Button>
-              <Button variant="ghost" className="flex-1 h-11 font-semibold border border-line" onClick={() => setTab("stalls")}>
+              <Button
+                variant="ghost"
+                className="flex-1 h-11 font-semibold border border-line"
+                onClick={() => setTab("stalls")}
+              >
                 {stallFieldLabels(myEvent.flavour).addTitle}
               </Button>
             </div>
@@ -1117,10 +1153,15 @@ export function OrganiserEventPage() {
                 <p className="text-xs font-bold uppercase tracking-wider text-mute">Recent Guest Ratings</p>
                 <ul className="space-y-2">
                   {feedback.slice(0, 8).map((r) => (
-                    <li key={r.id} className="flex items-center gap-3 rounded-2xl bg-paper px-4 py-3 border border-line/70">
+                    <li
+                      key={r.id}
+                      className="flex items-center gap-3 rounded-2xl bg-paper px-4 py-3 border border-line/70"
+                    >
                       <span className="text-2xl">{r.emoji}</span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate font-medium text-xs text-ink">{r.stallName || "Event Entrance"}</span>
+                        <span className="block truncate font-medium text-xs text-ink">
+                          {r.stallName || "Event Entrance"}
+                        </span>
                         {r.note && <span className="block truncate text-xs text-mute">{r.note}</span>}
                       </span>
                     </li>
@@ -1138,10 +1179,7 @@ export function OrganiserEventPage() {
               const labels = stallFieldLabels(myEvent.flavour);
               return (
                 <>
-                  <form
-                    className="space-y-3 rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs"
-                    onSubmit={onAddStall}
-                  >
+                  <form className="space-y-3 rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs" onSubmit={onAddStall}>
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <h2 className="font-display text-lg font-bold text-ink">
@@ -1224,7 +1262,9 @@ export function OrganiserEventPage() {
                               onClick={() => setStallCategory(c.id)}
                               className={cn(
                                 "h-8 rounded-full px-3 text-xs font-semibold transition active:scale-95",
-                                on ? "bg-brand text-white shadow-xs" : "bg-paper text-mute border border-line hover:text-ink",
+                                on
+                                  ? "bg-brand text-white shadow-xs"
+                                  : "bg-paper text-mute border border-line hover:text-ink",
                               )}
                             >
                               {c.label}
@@ -1316,9 +1356,7 @@ export function OrganiserEventPage() {
                                 {STALL_CATEGORIES.find((c) => c.id === s.category)?.label || s.category}
                                 {s.handle ? ` · @${s.handle}` : ""}
                               </span>
-                              <span className="text-[11px] font-semibold text-brand group-hover:underline">
-                                Edit
-                              </span>
+                              <span className="text-[11px] font-semibold text-brand group-hover:underline">Edit</span>
                             </div>
                             <p className="font-semibold text-sm text-ink mt-0.5">{s.name}</p>
                             {s.shortWhy && <p className="text-xs text-mute">{s.shortWhy}</p>}
@@ -1343,7 +1381,8 @@ export function OrganiserEventPage() {
             <div>
               <h2 className="font-display text-2xl font-bold text-ink">Entrance Gate QR Code</h2>
               <p className="mt-1 text-xs text-mute max-w-sm mx-auto">
-                Print and display this QR code at your entrance gate, registration desk, or tables. Attendees scan directly into your live directory.
+                Print and display this QR code at your entrance gate, registration desk, or tables. Attendees scan
+                directly into your live directory.
               </p>
             </div>
 
@@ -1356,7 +1395,10 @@ export function OrganiserEventPage() {
             )}
 
             <div>
-              <p className="font-mono text-xs text-ink font-semibold">{publicSiteOrigin()}{myEvent.gatePath}</p>
+              <p className="font-mono text-xs text-ink font-semibold">
+                {publicSiteOrigin()}
+                {myEvent.gatePath}
+              </p>
             </div>
 
             <div className="mt-4 flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
@@ -1450,7 +1492,9 @@ export function OrganiserEventPage() {
                     onClick={() => setFlavour(id)}
                     className={cn(
                       "h-9 rounded-full px-4 text-xs font-semibold transition active:scale-95",
-                      flavour === id ? "bg-brand text-white shadow-xs" : "bg-paper text-mute border border-line hover:text-ink",
+                      flavour === id
+                        ? "bg-brand text-white shadow-xs"
+                        : "bg-paper text-mute border border-line hover:text-ink",
                     )}
                   >
                     {EVENT_FLAVOUR_LABELS[id]}
@@ -1555,7 +1599,8 @@ export function OrganiserEventPage() {
                 </span>
               </div>
               <p className="text-xs text-mute leading-relaxed">
-                Specify whether this event is run by a business or an individual with their AirPal @handle, plus any co-hosts or collaborators.
+                Specify whether this event is run by a business or an individual with their AirPal @handle, plus any
+                co-hosts or collaborators.
               </p>
 
               {/* Host Type Selector */}
@@ -1765,9 +1810,7 @@ export function OrganiserEventPage() {
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                  Ends At
-                </label>
+                <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">Ends At</label>
                 <input
                   type="datetime-local"
                   value={endsLocal}

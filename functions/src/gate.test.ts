@@ -17,6 +17,7 @@ const { fakes, FakeHttpsError } = vi.hoisted(() => {
       writes: [] as { id: string; data: Record<string, unknown> }[],
       audits: [] as unknown[],
       rateLimited: [] as string[],
+      guestlistMarks: [] as unknown[][],
     },
   };
 });
@@ -61,6 +62,13 @@ vi.mock("firebase-functions/v2/https", () => ({
   onCall: vi.fn((_opts: unknown, handler: unknown) => handler),
 }));
 
+vi.mock("./guestlist", () => ({
+  markTicketCheckedIn: (...args: unknown[]) => {
+    fakes.guestlistMarks.push(args);
+    return Promise.resolve();
+  },
+}));
+
 import { admitTicket, verifyTicket } from "./gate";
 
 type Handler = (request: unknown) => Promise<Record<string, unknown>>;
@@ -91,6 +99,7 @@ describe("gate scan", () => {
     fakes.writes.length = 0;
     fakes.audits.length = 0;
     fakes.rateLimited.length = 0;
+    fakes.guestlistMarks.length = 0;
   });
 
   it("verifyTicket requires sign-in", async () => {
@@ -161,6 +170,7 @@ describe("gate scan", () => {
     });
     expect(fakes.writes[0]!.data.admittedAt).toBe(res.admittedAt);
     expect(fakes.audits).toHaveLength(1);
+    expect(fakes.guestlistMarks).toEqual([["evt-1", "bk-1", "guest-9"]]);
   });
 
   it("admitTicket is idempotent on double scans", async () => {
@@ -169,6 +179,7 @@ describe("gate scan", () => {
     expect(res).toEqual({ ticketId: "bk-1", admittedAt: "2026-10-03T09:00:00Z", already: true });
     expect(fakes.writes).toEqual([]);
     expect(fakes.audits).toEqual([]);
+    expect(fakes.guestlistMarks).toEqual([]);
   });
 
   it("admitTicket refuses cancelled tickets without writing", async () => {

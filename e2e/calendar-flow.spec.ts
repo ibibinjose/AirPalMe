@@ -83,6 +83,10 @@ test.describe("Calendar & Events Flow", () => {
             stallCount: 3,
           },
         ];
+        localStorage.setItem(
+          "airpal.test.user",
+          JSON.stringify({ uid: "test-user-sydney", email: "test@airpal.me", displayName: "Alex Rivera", role: "guest" }),
+        );
         localStorage.setItem("airpal.events.v1", JSON.stringify(events));
       } catch {
         /* ignore */

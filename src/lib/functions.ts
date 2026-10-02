@@ -548,10 +548,7 @@ export function createConnectLoginLinkRemote() {
 }
 
 export function teardownDemoBusinessRemote() {
-  return callFunction<Record<string, never>, { deleted: Record<string, number> }>(
-    CALLABLES.teardownDemoBusiness,
-    {},
-  );
+  return callFunction<Record<string, never>, { deleted: Record<string, number> }>(CALLABLES.teardownDemoBusiness, {});
 }
 
 export function verifyTicketRemote(data: { ticketId: string }) {
@@ -580,6 +577,17 @@ export function admitTicketRemote(data: { ticketId: string }) {
     CALLABLES.admitTicket,
     data,
   );
+}
+
+export function checkInGuestRemote(data: { eventId: string; entryId: string }) {
+  return callFunction<typeof data, { eventId: string; entryId: string; checkedInAt: string; already: boolean }>(
+    CALLABLES.checkInGuest,
+    data,
+  );
+}
+
+export function closeGuestlistRemote(data: { eventId: string }) {
+  return callFunction<typeof data, { eventId: string; closed: number }>(CALLABLES.closeGuestlist, data);
 }
 
 export function releaseHeldPayoutsRemote() {
@@ -709,15 +717,14 @@ export function resolvePulseIssueRemote(data: { propertyId: string; issueId: str
   return callFunction<typeof data, { ok: true }>(CALLABLES.resolvePulseIssue, data);
 }
 
-export function setPulseStatusRemote(data: { propertyId: string; pulseId: string; status: "live" | "paused" | "archived" }) {
+export function setPulseStatusRemote(data: {
+  propertyId: string;
+  pulseId: string;
+  status: "live" | "paused" | "archived";
+}) {
   return callFunction<typeof data, { status: "live" | "paused" | "archived" }>(CALLABLES.setPulseStatus, data);
 }
 
-export function recordPulseFollowupRemote(data: {
-  propertyId: string;
-  issueId: string;
-  score: number;
-  note?: string;
-}) {
+export function recordPulseFollowupRemote(data: { propertyId: string; issueId: string; score: number; note?: string }) {
   return callFunction<typeof data, { ok: true }>(CALLABLES.recordPulseFollowup, data);
 }

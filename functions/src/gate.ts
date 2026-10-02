@@ -1,10 +1,5 @@
 import { HttpsError, onCall } from "firebase-functions/v2/https";
-import {
-  bookingDisplayPaid,
-  ticketAdmitCheck,
-  ticketAdmitReasonLabel,
-  type Booking,
-} from "../../shared/booking";
+import { bookingDisplayPaid, ticketAdmitCheck, ticketAdmitReasonLabel, type Booking } from "../../shared/booking";
 import {
   type AccessClaims,
   type AdmitTicketRequest,
@@ -14,6 +9,7 @@ import {
 } from "../../shared/airpal-security";
 import { enforceRateLimit, noteAppCheck, writeAudit } from "./abuse";
 import { CALLABLE, db, isPlatformAdmin, requireAccount } from "./admin";
+import { markTicketCheckedIn } from "./guestlist";
 
 /**
  * Gate scan: load a ticket the caller is entitled to verify. Organisers
@@ -28,9 +24,7 @@ async function loadEntitledTicket(ticketId: string, uid: string, claims: AccessC
   if (!snap.exists) throw new HttpsError("not-found", "Ticket not found.");
   const booking = { id: snap.id, ...(snap.data() as Omit<Booking, "id">) };
   const entitled =
-    isPlatformAdmin(claims) ||
-    booking.providerUid === uid ||
-    (await isEventOrganiser(booking.eventId, uid));
+    isPlatformAdmin(claims) || booking.providerUid === uid || (await isEventOrganiser(booking.eventId, uid));
   if (!entitled) {
     throw new HttpsError("permission-denied", "Only the event organiser can verify tickets.");
   }
@@ -97,11 +91,7 @@ export const admitTicket = onCall(CALLABLE, async (request) => {
   const uid = requireAccount(request, "Sign in to admit tickets.");
   await enforceRateLimit(uid, "gate", false);
   const ticketId = ticketIdFromRequest(request.data as AdmitTicketRequest | undefined);
-  const { ref, booking } = await loadEntitledTicket(
-    ticketId,
-    uid,
-    request.auth?.token as AccessClaims | undefined,
-  );
+  const { ref, booking } = await loadEntitledTicket(ticketId, uid, request.auth?.token as AccessClaims | undefined);
   if (booking.admittedAt) {
     const already: AdmitTicketResponse = { ticketId, admittedAt: booking.admittedAt, already: true };
     return already;
@@ -119,6 +109,9 @@ export const admitTicket = onCall(CALLABLE, async (request) => {
     actorUid: uid,
     note: "gate admit",
   });
+  if (booking.eventId) {
+    await markTicketCheckedIn(String(booking.eventId), ticketId, String(booking.customerUid || ""));
+  }
   const admitted: AdmitTicketResponse = { ticketId, admittedAt: now, already: false };
   return admitted;
 });

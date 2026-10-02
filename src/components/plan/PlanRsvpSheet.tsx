@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Check, HelpCircle, Minus, Plus, Smartphone, User, Users, X, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -47,26 +47,36 @@ export function PlanRsvpSheet({
 
   const [status, setStatus] = useState<"going" | "maybe" | "declined">(currentStatus || "going");
   const [name, setName] = useState("");
-  const [notes, setNotes] = useState(currentNotes);
+  const [notes, setNotes] = useState(currentNotes || "");
   const [plusOnes, setPlusOnes] = useState(() => normalizePlusOnes(currentPlusOnes));
   const [answers, setAnswers] = useState<Record<string, string>>(() => ({ ...currentAnswers }));
 
   const isFull = spotsLeft !== null && spotsLeft <= 0;
 
-  // Reset from the latest RSVP every time the sheet opens (never show a
-  // previous plan's status/notes/party), prefill the name, lock scroll, Esc closes.
+  // Reset from the latest RSVP only when the sheet transitions to open (never
+  // wipe user's typed inputs on re-render while typing).
+  const wasOpenRef = useRef(false);
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      wasOpenRef.current = false;
+      return;
+    }
+    if (wasOpenRef.current) return;
+    wasOpenRef.current = true;
     setStatus(currentStatus || "going");
-    setNotes(currentNotes);
+    setNotes(currentNotes || "");
     setPlusOnes(normalizePlusOnes(currentPlusOnes));
-    setAnswers({ ...currentAnswers });
+    setAnswers({ ...(currentAnswers || {}) });
     if (user?.displayName) setName(user.displayName);
     else if (mine?.name) setName(mine.name);
     else if (typeof window !== "undefined") {
       const storedName = localStorage.getItem("airpal.guest.name");
       if (storedName) setName(storedName);
     }
+  }, [open, currentStatus, currentNotes, currentPlusOnes, currentAnswers, user, mine]);
+
+  useEffect(() => {
+    if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -74,7 +84,7 @@ export function PlanRsvpSheet({
     return () => {
       window.removeEventListener("keydown", onKey);
     };
-  }, [open, currentStatus, currentNotes, currentPlusOnes, currentAnswers, user, mine, onClose]);
+  }, [open, onClose]);
 
   useScrollLock(open);
 
@@ -247,7 +257,7 @@ export function PlanRsvpSheet({
             <label className="text-xs font-semibold text-ink/80 block mb-1">Note for the crew (optional)</label>
             <input
               type="text"
-              value={notes}
+              value={notes || ""}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. Bringing drinks, arriving by 7pm!"
               className="h-11 w-full rounded-2xl bg-paper px-4 text-sm border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"

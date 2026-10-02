@@ -6,7 +6,7 @@ test.describe("Concierge & Stay Companion Flow", () => {
     await page.waitForLoadState("domcontentloaded");
 
     // No stay session: guest sees Scan + Explore, never a fake demo room.
-    await expect(page.getByRole("button", { name: /Scan a code|Scan/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Scan a code" })).toBeVisible();
     await expect(page.getByRole("button", { name: /Try demo room/i })).toHaveCount(0);
   });
 
@@ -20,7 +20,7 @@ test.describe("Concierge & Stay Companion Flow", () => {
     const main = page.getByRole("main");
     await expect(main.getByRole("button", { name: "Wi-Fi", exact: true })).toBeVisible();
     await expect(main.getByRole("button", { name: "Staff" })).toBeVisible();
-    await expect(main.getByRole("button", { name: "Dining" })).toBeVisible();
+    await expect(main.getByRole("button", { name: "Dining", exact: true })).toBeVisible();
     await expect(main.getByRole("button", { name: "Calendar" })).toBeVisible();
   });
 

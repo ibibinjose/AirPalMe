@@ -71,7 +71,7 @@ Brand: **AirPal.me** (the `.me` stays). Tagline **Life Made Easy.** Script logo 
 
 ## 3. Shipped chrome (do not replace)
 
-Bottom tabs, in this order: **Home** (`/`) · **Explore** (`/explore`) · **Trips** (`/plan`) · **Inbox** (`/me/inbox`) · **Me** (`/me`). Circle + EventCreate live under Trips (`/circle`, `/event/new`). Mate is `/mate`, **not** a tab. Scan is not a tab — it lives behind the global **+ Create** action (`CreateFab`) and Home quick actions. Stay (`/concierge`) lives inside Explore/Home, not as a tab.
+Bottom tabs, in this order: **Home** (`/`) · **Explore** (`/explore`) · **Plan** (`/plan`) · **Inbox** (`/me/inbox`) · **Me** (`/me`). Circle + EventCreate live under Plan (`/circle`, `/event/new`). Mate is `/mate`, **not** a tab. Scan is not a tab — it lives behind the global **+ Create** action (`CreateFab`) and Home quick actions. Stay (`/concierge`) lives inside Explore/Home, not as a tab.
 
 Mapping: `src/lib/tabs.ts`, `src/components/layout/TabBar.tsx`. Global create: `src/components/design-system/CreateFab.tsx` (rendered by `AppShell`).
 
@@ -211,7 +211,7 @@ Do not undo these without the human naming them:
 - Website guest browse
 - Personal vs business identity; Google import on business only
 - Firestore profile persist (`persistOwnedProfile`, `hydrateOwnedBios`)
-- Five-tab companion dock (Home / Explore / Trips / Inbox / Me) + global + Create action (Scan lives there, not as a tab)
+- Five-tab companion dock (Home / Explore / Plan / Inbox / Me) + global + Create action (Scan lives there, not as a tab)
 - Capacitor origin `airpal.me`
 - Sign in with Apple + Google on native
 - Stay scan session as device-only

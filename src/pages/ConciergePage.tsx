@@ -144,6 +144,22 @@ export function ConciergePage() {
     }
   }
 
+  // A context_view with loadStatus "ok" already fired for /g/:id — pair it
+  // with context_load_failed when the stay resolves to nothing, or the miss
+  // reads as a hit.
+  const loadFailed = useRef("");
+  useEffect(() => {
+    if (loadingProperty || !session.propertyId) return;
+    if (property.id && property.id !== "unknown" && property.name) return;
+    if (loadFailed.current === session.propertyId) return;
+    loadFailed.current = session.propertyId;
+    void track("context_load_failed", {
+      contextType: "property",
+      contextId: session.propertyId,
+      errorClass: "not_found",
+    });
+  }, [loadingProperty, session.propertyId, property.id, property.name]);
+
   if (!hasStay && session.kind !== "marker") {
     return (
       <div className="mx-auto max-w-lg px-4 pb-28">
@@ -172,22 +188,6 @@ export function ConciergePage() {
       </div>
     );
   }
-
-  // A context_view with loadStatus "ok" already fired for /g/:id — pair it
-  // with context_load_failed when the stay resolves to nothing, or the miss
-  // reads as a hit.
-  const loadFailed = useRef("");
-  useEffect(() => {
-    if (loadingProperty || !session.propertyId) return;
-    if (property.id && property.id !== "unknown" && property.name) return;
-    if (loadFailed.current === session.propertyId) return;
-    loadFailed.current = session.propertyId;
-    void track("context_load_failed", {
-      contextType: "property",
-      contextId: session.propertyId,
-      errorClass: "not_found",
-    });
-  }, [loadingProperty, session.propertyId, property.id, property.name]);
 
   if (loadingProperty && !property.name) {
     return (

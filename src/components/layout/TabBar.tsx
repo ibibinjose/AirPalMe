@@ -14,11 +14,11 @@ import { tabFromPath, type GuestTab } from "@/lib/tabs";
 
 export { tabFromPath };
 
-/** Shipped companion dock: Home / Explore / Trips / Inbox / Me. Scan & create live on CreateFab. */
+/** Shipped companion dock: Home / Explore / Plan / Inbox / Me. Scan & create live on CreateFab. */
 const TABS: { href: string; id: GuestTab; label: string; icon: typeof Compass }[] = [
   { href: "/", id: "home", label: "Home", icon: Home },
   { href: "/explore", id: "explore", label: "Explore", icon: Compass },
-  { href: "/plan", id: "trips", label: "Trips", icon: CalendarDays },
+  { href: "/plan", id: "trips", label: "Plan", icon: CalendarDays },
   { href: "/me/inbox", id: "inbox", label: "Inbox", icon: Inbox },
   { href: "/me", id: "me", label: "Me", icon: AtSign },
 ];
@@ -115,7 +115,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
                     <span className="text-[17px] font-bold leading-none">@</span>
                   ) : (
                     <span className="relative">
-                      <Icon size={21} strokeWidth={on ? 2.3 : 1.75} fill={on ? "currentColor" : "none"} />
+                      <Icon size={21} strokeWidth={on ? 2.3 : 1.75} fill="none" />
                       {tab.id === "inbox" && inboxUnread > 0 && (
                         <span
                           className="absolute -right-2 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white"

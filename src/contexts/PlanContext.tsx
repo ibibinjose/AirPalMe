@@ -409,6 +409,12 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       if (canRsvpAsGuest({ isNative: isNativeApp(), hasAccount: false })) {
         const anonUid = await ensureAnonymousSession();
         if (anonUid) return anonUid;
+        let guestId = typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null;
+        if (!guestId && typeof window !== "undefined") {
+          guestId = `guest-${Date.now()}`;
+          localStorage.setItem("airpal.anon.id", guestId);
+        }
+        if (guestId) return guestId;
       }
       requireUser(reason);
       return null;
@@ -741,7 +747,6 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       stop: { name: string; time?: string; notes?: string; placeId?: string; icon?: string; address?: string },
       opts?: { silent?: boolean },
     ) => {
-      if (!requireUser("Sign in to add stops to plans.")) return undefined;
       const adderName = user?.displayName || mine?.name || "Mate";
       const updated = addStopToPlan(planId, {
         name: stop.name,
@@ -852,7 +857,6 @@ export function PlanProvider({ children }: { children: ReactNode }) {
 
   const followPlan = useCallback(
     (planId: string) => {
-      if (!requireUser("Sign in to follow plans.")) return false;
       let anonId = typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null;
       if (!anonId && typeof window !== "undefined") {
         anonId = `anon-${Date.now()}`;
@@ -871,7 +875,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       }
       return false;
     },
-    [user, requireUser],
+    [user],
   );
 
   const exportIcs = useCallback((plan: HangoutPlan) => {

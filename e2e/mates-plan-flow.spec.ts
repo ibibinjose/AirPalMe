@@ -49,8 +49,8 @@ test.describe("Mates Social Planning & Digital Invitations Flow", () => {
 
     // RSVP Sheet opens (exact names: plan cards behind the sheet also mention Going/Maybe)
     await expect(page.getByRole("heading", { name: "Your Response" })).toBeVisible({ timeout: 10000 });
-    await expect(page.getByRole("button", { name: "Going", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Maybe", exact: true })).toBeVisible();
+    await expect(page.locator("form").getByRole("button", { name: "Going" })).toBeVisible();
+    await expect(page.locator("form").getByRole("button", { name: "Maybe" })).toBeVisible();
 
     // Fill guest name
     const nameInput = page.getByPlaceholder("e.g. Alex or Jordan");
@@ -64,16 +64,21 @@ test.describe("Mates Social Planning & Digital Invitations Flow", () => {
     await confirmBtn.click({ force: true });
 
     // Status strip should update
-    await expect(page.getByText("You're in — see you there")).toBeVisible();
-    await expect(page.getByText('"Bringing good vibes!"')).toBeVisible();
+    await expect(page.getByText("You're in for this hangout!")).toBeVisible();
+    await expect(page.getByRole("button", { name: /You're Going/i })).toBeVisible();
 
-    // Guest list should show Sam Taylor
+    // Switch to People tab to view guest list and note
+    await page.getByRole("tab", { name: /^people/i }).click();
     await expect(page.getByText("Sam Taylor", { exact: true })).toBeVisible();
+    await expect(page.getByText("Bringing good vibes!", { exact: true })).toBeVisible();
   });
 
   test("allows mates to co-plan and suggest itinerary stops", async ({ page }) => {
     await page.goto("/plan/plan-rocks-night-out");
     await page.waitForLoadState("domcontentloaded");
+
+    // Switch to Plan tab
+    await page.getByRole("tab", { name: /^plan/i }).click();
 
     // Suggest a new stop through the current add-stop form
     const stopInput = page.getByPlaceholder(/Stop \/ venue name/i);

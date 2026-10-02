@@ -190,6 +190,52 @@ service cloud.firestore {
           && request.resource.data.mood is string;
         allow update, delete: if false;
       }
+
+      match /guestlist/{entryId} {
+        // Names never public: hosts list and manage, guests read only their own row.
+        allow get: if signedIn() && (
+          resource.data.uid == request.auth.uid
+          || get(/databases/$(database)/documents/events/$(eventId)).data.organiserUid == request.auth.uid
+          || platformAdmin()
+        );
+        allow list: if signedIn() && (
+          get(/databases/$(database)/documents/events/$(eventId)).data.organiserUid == request.auth.uid
+          || platformAdmin()
+        );
+        // Guest rows arrive via server triggers (RSVP, ticket) or host door adds.
+        // Guests never write here directly, so badges and party sizes can't be forged.
+        allow create: if signedIn() && !isAnonymous()
+          && (
+            get(/databases/$(database)/documents/events/$(eventId)).data.organiserUid == request.auth.uid
+            || platformAdmin()
+          )
+          && request.resource.data.name is string
+          && request.resource.data.name.size() >= 1
+          && request.resource.data.name.size() <= 80
+          && request.resource.data.status in ['invited', 'going', 'checked-in', 'no-show', 'cancelled']
+          && request.resource.data.source in ['rsvp', 'ticket', 'door', 'invite', 'import']
+          && request.resource.data.partySize is int
+          && request.resource.data.partySize >= 1
+          && request.resource.data.partySize <= 20
+          && request.resource.data.addedBy == request.auth.uid;
+        allow update: if signedIn() && !isAnonymous()
+          && (
+            get(/databases/$(database)/documents/events/$(eventId)).data.organiserUid == request.auth.uid
+            || platformAdmin()
+          )
+          && request.resource.data.name is string
+          && request.resource.data.name.size() >= 1
+          && request.resource.data.name.size() <= 80
+          && request.resource.data.status in ['invited', 'going', 'checked-in', 'no-show', 'cancelled']
+          && request.resource.data.partySize is int
+          && request.resource.data.partySize >= 1
+          && request.resource.data.partySize <= 20
+          && request.resource.data.addedBy == resource.data.addedBy;
+        allow delete: if signedIn() && (
+          get(/databases/$(database)/documents/events/$(eventId)).data.organiserUid == request.auth.uid
+          || platformAdmin()
+        );
+      }
     }
 
     // Festival week programs: sessions stay on `events` (festivalSlug).

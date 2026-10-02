@@ -109,7 +109,7 @@ First-class application: overview, users, active Mates, requests, matches, booki
 
 ## 21. Data Model
 
-Shared marketplace collections: users, profiles, verification, preferences, mates, mate_applications, mate_requests (`mate_requests`), matches, messages (`request_chats`), conversations, experiences (`campaigns`), experience_providers, experience_slots, businesses, business_members, business_listings (`listings`, `partnerVenues`), stays (`properties`), stay_rooms, stay_rates, stay_availability, fashion_*, events, daily_content, offers, bookings, booking_items, payments, payouts, refunds, disputes, reviews (`rating` on requests), ratings, saved_items, reports (`safety_reports`), incidents, moderation_cases, admin_notes, audit_logs (`admin_audits`), notifications, promotions, campaigns. One AirPal account across the platform — never separate user systems per vertical.
+Shared marketplace collections: users, profiles, verification, preferences, mates, mate_applications, mate_requests (`mate_requests`), matches, messages (`request_chats`), conversations, experiences (`campaigns`), experience_providers, experience_slots, businesses, business_members, business_listings (`listings`, `partnerVenues`), stays (`properties`), stay_rooms, stay_rates, stay_availability, fashion_*, events, event guestlists (`events/{id}/guestlist`), daily_content, offers, bookings, booking_items, payments, payouts, refunds, disputes, reviews (`rating` on requests), ratings, saved_items, reports (`safety_reports`), incidents, moderation_cases, admin_notes, audit_logs (`admin_audits`), notifications, promotions, campaigns. One AirPal account across the platform — never separate user systems per vertical.
 
 ## 22. Technical Architecture
 

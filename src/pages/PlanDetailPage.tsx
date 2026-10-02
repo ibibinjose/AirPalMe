@@ -87,6 +87,7 @@ export function PlanDetailPage() {
 
   const targetId = paramsPlan?.id || paramsInvite?.code || "";
   const {
+    plans,
     getPlan,
     fetchPlan,
     rsvpPlan,
@@ -128,7 +129,7 @@ export function PlanDetailPage() {
         setLoading(false);
       });
     }
-  }, [targetId, getPlan, fetchPlan]);
+  }, [targetId, getPlan, fetchPlan, plans]);
 
   const plan = getPlan(targetId) || localPlan;
 
@@ -1581,8 +1582,9 @@ export function PlanDetailPage() {
         requiresApproval={plan.requiresApproval}
         questions={plan.guestQuestions}
         currentAnswers={userAttendee?.answers}
-        onSubmit={(status, name, notes, plusOnes, answers) => {
-          void rsvpPlan(plan.id, status, name, notes, plusOnes, answers);
+        onSubmit={async (status, name, notes, plusOnes, answers) => {
+          const updated = await rsvpPlan(plan.id, status, name, notes, plusOnes, answers);
+          if (updated) setLocalPlan(updated);
         }}
       />
 
