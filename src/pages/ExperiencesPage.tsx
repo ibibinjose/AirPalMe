@@ -105,7 +105,7 @@ export function ExperiencesPage() {
       </Link>
       <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight">Join</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight">Experiences</h1>
           <p className="mt-1 text-sm text-mute">Public events and experiences. Free or paid.</p>
         </div>
         <Button onClick={() => nav("/event/new?kind=experience")} className="h-11 rounded-full px-5">

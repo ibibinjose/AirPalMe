@@ -302,7 +302,7 @@ export function StickyAction({
   // would trap `fixed` mid-page. Same pattern as Sheet.
   if (typeof document === "undefined") return null;
   return createPortal(
-    <div className="fixed-element fixed inset-x-0 bottom-24 z-30 lg:hidden pointer-events-none">
+    <div className="fixed-element fixed inset-x-0 bottom-24 lg:bottom-6 z-30 pointer-events-none">
       <div className="mx-auto max-w-lg px-4">
         <div className="pointer-events-auto flex items-center gap-2 rounded-full bg-card/95 p-2 shadow-xl ring-1 ring-line backdrop-blur-xl">
           <div className="min-w-0 flex-1">{primary}</div>

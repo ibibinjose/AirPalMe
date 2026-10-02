@@ -8,6 +8,8 @@ describe("isNativeAuthPublicPath", () => {
     expect(isNativeAuthPublicPath("/privacy")).toBe(true);
     expect(isNativeAuthPublicPath("/terms")).toBe(true);
     expect(isNativeAuthPublicPath("/auth/action")).toBe(true);
+    expect(isNativeAuthPublicPath("/contact")).toBe(true);
+    expect(isNativeAuthPublicPath("/assist")).toBe(true);
   });
 
   it("requires an account for home and product doors", () => {

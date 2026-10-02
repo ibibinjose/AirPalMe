@@ -190,5 +190,68 @@
     "description": "Hotels, motels, hostels and boutique stays — browse live listings and book direct with the property.",
     "heading": "Stays",
     "summary": "Hotels, motels, hostels and boutique stays in live host listings. AirPal is a listing platform, not a booking platform: browse stays, open a property profile, and book direct with the property."
+  },
+  {
+    "path": "/assist",
+    "title": "Help & support · AirPal.Me",
+    "description": "Contact AirPal.Me support: help guides, safety, and how to reach the Sydney team.",
+    "heading": "Help & support",
+    "summary": "Customer support for AirPal.Me: write to the Sydney team, browse help guides for stays, plans, tickets and safety, and verify the company behind the app.",
+    "jsonLd": [
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How do I contact AirPal.Me support?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Write to us from the contact page, or email hello@airpal.me or AirPalMe@gmail.com directly. AirPal.Me is operated from Sydney, Australia by SarvamDaily Pty Ltd — we read every message and aim to reply within 30 days."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do I need an account to get help?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. On the airpal.me website you can read the help guides and contact us without signing in. The native iOS and Android apps require an account."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "I scanned a stay QR code — where is my help?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Open the Staying guest guide in the help center for scans, Wi-Fi, dining and the front desk. For anything about your room or your booking, ask the property's reception directly."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I report someone or stay safe?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Use report and block inside the app — every safety case gets human review. Meet in public places and keep chat and payment inside AirPal.Me. No marketplace where people meet in real life can guarantee personal safety, so in an emergency call your local emergency number."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I get a copy of my data or delete it?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Choose “Copy of my data” or “Delete my data” as the topic on the contact page, and read the privacy policy for how we handle your information."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is AirPal.Me a real company?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. AirPal.Me is operated by SarvamDaily Pty Ltd (ABN 83 702 462 977) in Sydney, Australia. Company facts and verification links are on the trust page."
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

@@ -5,6 +5,7 @@ const PUBLIC_PREFIXES = [
   "/terms",
   "/cookies",
   "/contact",
+  "/assist",
   "/about",
   "/legal",
   "/auth/action",

@@ -177,10 +177,7 @@ export function HomePage() {
     [myPlans, today],
   );
 
-  const places = useMemo(
-    () => discoverPlaces(here, city, "city").slice(0, 8),
-    [here, city, version],
-  );
+  const places = useMemo(() => discoverPlaces(here, city, "city").slice(0, 8), [here, city, version]);
 
   const tonightEvents = useMemo(
     () =>
@@ -237,24 +234,6 @@ export function HomePage() {
             </button>
           </div>
 
-          {/* Prompt Chips */}
-          <div className="mt-3 flex flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-            {QUICK_PROMPTS.map((p) => (
-              <button
-                key={p.label}
-                type="button"
-                onClick={() => {
-                  void triggerHaptic("light");
-                  if (p.href) nav(p.href);
-                  else openGlobalSearch();
-                }}
-                className="inline-flex shrink-0 items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white backdrop-blur-md ring-1 ring-white/25 hover:bg-white/25 transition cursor-pointer active:scale-95"
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-
           {/* Primary Action Buttons */}
           <div className="mt-5 flex flex-wrap items-center gap-2.5">
             <Button
@@ -284,6 +263,24 @@ export function HomePage() {
         </div>
       </header>
 
+      {/* Quick prompts — below the hero so the image stays clean on mobile */}
+      <nav aria-label="Quick prompts" className="mt-4 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+        {QUICK_PROMPTS.map((p) => (
+          <button
+            key={p.label}
+            type="button"
+            onClick={() => {
+              void triggerHaptic("light");
+              if (p.href) nav(p.href);
+              else openGlobalSearch();
+            }}
+            className="inline-flex min-h-[44px] shrink-0 items-center gap-1 rounded-full bg-card px-4 py-2 text-[13px] font-semibold text-ink shadow-xs ring-1 ring-line transition hover:ring-brand/40 cursor-pointer active:scale-95"
+          >
+            {p.label}
+          </button>
+        ))}
+      </nav>
+
       {/* Six Marketplace Pillars Grid */}
       <section aria-label="Explore AirPal Verticals" className="mt-8">
         <div className="flex items-center justify-between">
@@ -307,14 +304,15 @@ export function HomePage() {
                 className="group relative flex flex-col justify-between rounded-2xl bg-card p-4 text-left ring-1 ring-line/80 shadow-xs transition hover:shadow-md hover:ring-brand/30 active:scale-[0.98] cursor-pointer"
               >
                 <div className="flex items-center justify-between">
-                  <div className={cn("grid h-10 w-10 place-items-center rounded-xl shadow-xs transition group-hover:scale-105", v.iconBg)}>
+                  <div
+                    className={cn(
+                      "grid h-10 w-10 place-items-center rounded-xl shadow-xs transition group-hover:scale-105",
+                      v.iconBg,
+                    )}
+                  >
                     <Icon size={18} />
                   </div>
-                  {v.badge && (
-                    <span className="text-[10px] font-bold text-mute">
-                      {v.badge}
-                    </span>
-                  )}
+                  {v.badge && <span className="text-[10px] font-bold text-mute">{v.badge}</span>}
                 </div>
                 <div className="mt-4">
                   <p className="font-display text-[15px] font-bold text-ink leading-snug group-hover:text-brand transition-colors">
@@ -354,7 +352,7 @@ export function HomePage() {
                   </p>
                   <p className="mt-1 text-[13px] font-medium text-white/90">
                     {formatPlanDate(nextTrip.date, nextTrip.time)}
-                    {(nextTrip.attendees?.length || nextTrip.stops?.length)
+                    {nextTrip.attendees?.length || nextTrip.stops?.length
                       ? ` · ${[
                           nextTrip.attendees?.length
                             ? `${nextTrip.attendees.length} ${nextTrip.attendees.length === 1 ? "traveller" : "travellers"}`
@@ -383,9 +381,7 @@ export function HomePage() {
                   <Plane size={14} /> Ready for your next outing?
                 </div>
                 <h3 className="font-display text-lg font-bold mt-1 text-ink">Plan a hangout or trip</h3>
-                <p className="text-xs text-mute mt-0.5">
-                  Live itineraries with friends &amp; mates.
-                </p>
+                <p className="text-xs text-mute mt-0.5">Live itineraries with friends &amp; mates.</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <Button
@@ -541,9 +537,7 @@ export function HomePage() {
                   Social Circles
                 </span>
                 <p className="font-display text-lg font-bold mt-2 text-ink">Communities Around Movement</p>
-                <p className="mt-1 text-sm text-mute max-w-xl">
-                  Connect and plan activities with locals.
-                </p>
+                <p className="mt-1 text-sm text-mute max-w-xl">Connect and plan activities with locals.</p>
               </div>
               <ArrowCta />
             </div>
@@ -557,9 +551,7 @@ export function HomePage() {
               {tonightEvents.map((e) => {
                 const day = new Date(`${e.date}T00:00:00`);
                 const dayNum = Number.isNaN(day.getTime()) ? "" : String(day.getDate());
-                const month = Number.isNaN(day.getTime())
-                  ? ""
-                  : day.toLocaleString(undefined, { month: "short" });
+                const month = Number.isNaN(day.getTime()) ? "" : day.toLocaleString(undefined, { month: "short" });
                 return (
                   <CardShell
                     key={e.id}
@@ -689,7 +681,12 @@ export function HomePage() {
               <Button size="sm" onClick={() => nav("/plan/new")} className="rounded-full px-4">
                 Make a plan
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => nav("/mate")} className="rounded-full px-4 ring-1 ring-line">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => nav("/mate")}
+                className="rounded-full px-4 ring-1 ring-line"
+              >
                 Find a Mate
               </Button>
             </div>
@@ -711,11 +708,15 @@ export function HomePage() {
             <span className="flex items-center gap-1.5 text-ink font-semibold">
               <span className="text-emerald-600 font-bold">✓</span> Identity Verified Mates
             </span>
-            <span aria-hidden="true" className="text-line select-none hidden sm:inline">·</span>
+            <span aria-hidden="true" className="text-line select-none hidden sm:inline">
+              ·
+            </span>
             <span className="flex items-center gap-1.5 text-ink font-semibold">
               <span className="text-emerald-600 font-bold">✓</span> Stripe Secure Payments
             </span>
-            <span aria-hidden="true" className="text-line select-none hidden sm:inline">·</span>
+            <span aria-hidden="true" className="text-line select-none hidden sm:inline">
+              ·
+            </span>
             <span className="flex items-center gap-1.5 text-ink font-semibold">
               <span className="text-emerald-600 font-bold">✓</span> Public Meetup Safety
             </span>

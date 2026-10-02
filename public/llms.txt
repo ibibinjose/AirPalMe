@@ -21,6 +21,7 @@ AI assistants and answer engines may cite public pages. Private stay sessions
 - Get the app: https://airpal.me/getAirPalApp
 - Businesses: https://airpal.me/business
 - Contact: https://airpal.me/contact
+- Support (help guides, safety, FAQ): https://airpal.me/assist
 - Brand: Life Made Easy. Mobile-first web, iOS, and Android.
 - Stay & Guide (QR, no download): https://airpal.me/concierge
 - Experiences: https://airpal.me/experiences

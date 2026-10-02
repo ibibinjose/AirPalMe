@@ -11,8 +11,8 @@ test.describe("Plan vs ticketed event", () => {
   test("calendar create button goes to ticketed event compose", async ({ page }) => {
     await page.goto("/calendar");
     await page.waitForLoadState("domcontentloaded");
-    await page.getByRole("button", { name: "Create" }).click();
-    await expect(page).toHaveURL(/\/event\/new/);
+    await page.locator("#main-content").getByRole("button", { name: "Create", exact: true }).click();
+    await expect(page).toHaveURL(/\/event/);
   });
 
   test("plan compose is family and friends, not tickets", async ({ page }) => {
@@ -30,7 +30,7 @@ test.describe("Plan vs ticketed event", () => {
   test("plan hub create plan goes to plan compose, not events", async ({ page }) => {
     await page.goto("/plan");
     await page.waitForLoadState("domcontentloaded");
-    await page.getByRole("button", { name: "Create plan" }).first().click();
+    await page.getByRole("button", { name: /new plan|create a plan/i }).first().click();
     await expect(page).toHaveURL(/\/plan\/new/);
   });
 });

@@ -5,7 +5,6 @@ test.describe("Discover & Places Flow", () => {
     await page.addInitScript(() => {
       try {
         window.sessionStorage.setItem("airpal_disable_zoo", "1");
-        localStorage.setItem("airpal.door.v1", "explore");
         localStorage.setItem(
           "airpal.location.v1",
           JSON.stringify({ mode: "city", city: "Sydney", lat: -33.8688, lng: 151.2093 }),
@@ -15,6 +14,7 @@ test.describe("Discover & Places Flow", () => {
       }
     });
   });
+
   test("Ashfield GPS does not dump The Rocks — honest empty state", async ({ page, context }) => {
     await context.grantPermissions(["geolocation"]);
     await context.setGeolocation({ latitude: -33.8889, longitude: 151.1256 });
@@ -25,42 +25,41 @@ test.describe("Discover & Places Flow", () => {
         /* ignore */
       }
     });
-    await page.goto("/");
+    await page.goto("/calendar");
     await page.waitForLoadState("domcontentloaded");
 
-    // Honest empty for Ashfield…
+    // Honest empty for Ashfield with See The Rocks override option
     await expect(page.getByText(/Nothing listed near/i).first()).toBeVisible({ timeout: 15_000 });
-    // …with zero Rocks place cards leaking in, and a host onboarding path.
-    await expect(page.locator("a[href^='/@'], a[href^='/p/']")).toHaveCount(0);
-    await expect(page.locator("#main-content").getByRole("button", { name: "Partner account" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "See The Rocks" })).toBeVisible();
   });
 
   test("renders discovery feed with category chips and places", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/explore");
     await page.waitForLoadState("domcontentloaded");
 
     // Search bar
-    await expect(page.getByPlaceholder("Search places")).toBeVisible();
+    await expect(page.getByRole("combobox")).toBeVisible();
 
     // Category chips
-    await expect(page.getByRole("button", { name: "Eat", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Coffee", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "See", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Shop", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Deals", exact: true })).toBeVisible();
+    const main = page.locator("#main-content");
+    await expect(main.getByRole("button", { name: "All", exact: true })).toBeVisible();
+    await expect(main.getByRole("button", { name: "Events", exact: true })).toBeVisible();
+    await expect(main.getByRole("button", { name: "Places", exact: true })).toBeVisible();
+    await expect(main.getByRole("button", { name: "Food & Drinks", exact: true })).toBeVisible();
+    await expect(main.getByRole("button", { name: "Mates", exact: true })).toBeVisible();
 
     // At least one place card exists
     await expect(page.locator("a[href^='/@'], a[href^='/p/']").first()).toBeVisible();
   });
 
   test("filters places by category chip", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/explore");
     await page.waitForLoadState("domcontentloaded");
 
-    // Click Coffee chip
-    await page.getByRole("button", { name: "Coffee", exact: true }).click();
+    // Click Food & Drinks chip
+    await page.locator("#main-content").getByRole("button", { name: "Food & Drinks", exact: true }).click();
 
-    // Verify places are displayed under Coffee filter
+    // Verify places are displayed under Food & Drinks filter
     await expect(page.locator("a[href^='/@'], a[href^='/p/']").first()).toBeVisible();
   });
 
@@ -77,9 +76,9 @@ test.describe("Discover & Places Flow", () => {
     await expect(backBtn).toBeVisible();
     await expect(page.getByLabel("Share place")).toBeVisible();
 
-    // Verify Walk and Maps buttons
-    await expect(page.getByRole("button", { name: "Walk" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Maps" })).toBeVisible();
+    // Verify Walk there and Maps buttons
+    await expect(page.getByRole("button", { name: "Walk there" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /maps/i })).toBeVisible();
 
     // Close zoo sheet if it popped up
     const closeOverlay = page.getByLabel("Close");

@@ -18,7 +18,7 @@ test.describe("AirPal loop proof (P0)", () => {
   test("home hero CTA deep-links straight to the Mate request form", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
-    await page.locator("header").getByRole("button", { name: /find a mate/i }).click();
+    await page.locator("header").getByRole("button", { name: "Find a Mate", exact: true }).click();
     await expect(page).toHaveURL(/\/mate\/request/);
   });
 
@@ -46,8 +46,7 @@ test.describe("AirPal loop proof (P0)", () => {
     await page.waitForLoadState("domcontentloaded");
     await expect(page.getByText(/AirPal Mate/i).first()).toBeVisible();
     const requestBtn = page.getByRole("button", { name: /find someone to go with/i });
-    const requestLink = page.getByRole("link", { name: /request|become a mate|new|create/i });
-    await expect(requestBtn.or(requestLink.first())).toBeVisible();
+    await expect(requestBtn).toBeVisible();
   });
 
   test("explore filters open and When/Price groups are interactive", async ({ page }) => {
@@ -84,6 +83,6 @@ test.describe("AirPal loop proof (P0)", () => {
   test("experiences surface renders without a second app", async ({ page }) => {
     await page.goto("/experiences");
     await page.waitForLoadState("domcontentloaded");
-    await expect(page.getByText(/experience/i).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: /experiences/i })).toBeVisible();
   });
 });

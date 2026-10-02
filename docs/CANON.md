@@ -1,7 +1,7 @@
 # AirPal.me — Canon (do not revert)
 
 **Every coding agent (Grok, Claude, Gemini, Muse, Cursor, Copilot) must read this file and `AGENTS.md` before editing.**  
-If a later prompt conflicts with this file on shipped chrome, auth, or identity, **this file wins** unless the human explicitly says to change the canon. For *what to build next*, follow `docs/BRAIN.md` (Brain does not override this freeze).
+If a later prompt conflicts with this file on shipped chrome, auth, or identity, **this file wins** unless the human explicitly says to change the canon. For _what to build next_, follow `docs/BRAIN.md` (Brain does not override this freeze).
 
 Last sealed: 1 October 2026 (freeze sealed 21 September 2026; synced with /trust + prerender pipeline). Product: AirPal.me — Life Made Easy. One marketplace engine, six eventual verticals.
 
@@ -34,7 +34,7 @@ Shared types: `shared/`. Callables: `functions/src/` + `src/lib/functions.ts`. P
 
 Gate before ship: `npm run verify`. Native after web build: `npm run cap:sync`.
 
-Marketing routes (`/`, `/about`, `/concierge`, `/plan`, `/mate`, `/experiences`, `/calendar`, `/events`, `/event`, `/business`, `/solutions`, `/guide`, `/join`, `/partners`, `/trust`, `/alternatives/meetup`, `/alternatives/touch-stay`, `/alternatives/hostfully`, `/alternatives/eventbrite`, `/stay`) are prerendered to static HTML at build time (`node scripts/prerender-routes.mjs`, wired into `npm run build`): per-route title/description/self-referencing canonical plus a static body React wipes on mount. Client-side meta in `src/lib/share-meta.ts` must match the prerender copy in `scripts/prerender-routes.json` (enforced by `src/lib/prerender.test.ts` + `scripts/check-seo.mjs`). Firebase Hosting serves these files statically; all other routes keep the SPA fallback.
+Marketing routes (`/`, `/about`, `/concierge`, `/plan`, `/mate`, `/experiences`, `/calendar`, `/events`, `/event`, `/business`, `/solutions`, `/guide`, `/join`, `/partners`, `/trust`, `/alternatives/meetup`, `/alternatives/touch-stay`, `/alternatives/hostfully`, `/alternatives/eventbrite`, `/stay`, `/assist`) are prerendered to static HTML at build time (`node scripts/prerender-routes.mjs`, wired into `npm run build`): per-route title/description/self-referencing canonical plus a static body React wipes on mount. Client-side meta in `src/lib/share-meta.ts` must match the prerender copy in `scripts/prerender-routes.json` (enforced by `src/lib/prerender.test.ts` + `scripts/check-seo.mjs`). Firebase Hosting serves these files statically; all other routes keep the SPA fallback.
 
 Sydney calendar dates: `toZonedDateStr` / `useLocalNow`. Never `new Date().toISOString().slice(0,10)` for “today”.
 
@@ -44,16 +44,16 @@ Sydney calendar dates: `toZonedDateStr` / `useLocalNow`. Never `new Date().toISO
 
 Tokens live in `src/index.css` `@theme`. Do not invent a new palette.
 
-| Token | Value | Use |
-| --- | --- | --- |
-| `--color-brand` | `#1805db` | AirPal Blue — primary CTA, links, active |
-| `--color-brand-ink` | `#0e0394` | Pressed / dark brand |
-| `--color-gold` | `#1805db` | Eyebrow labels (same hue as brand) |
-| `--color-paper` | `#eef1f6` | Page mist — cards float on it |
-| `--color-card` | `#ffffff` | Cards |
-| `--color-ink` | `#121614` | Text |
-| `--color-mute` | `#6a726c` | Secondary text |
-| `--color-line` | `#e5e7eb` | Rings / hairlines |
+| Token               | Value     | Use                                      |
+| ------------------- | --------- | ---------------------------------------- |
+| `--color-brand`     | `#1805db` | AirPal Blue — primary CTA, links, active |
+| `--color-brand-ink` | `#0e0394` | Pressed / dark brand                     |
+| `--color-gold`      | `#1805db` | Eyebrow labels (same hue as brand)       |
+| `--color-paper`     | `#eef1f6` | Page mist — cards float on it            |
+| `--color-card`      | `#ffffff` | Cards                                    |
+| `--color-ink`       | `#121614` | Text                                     |
+| `--color-mute`      | `#6a726c` | Secondary text                           |
+| `--color-line`      | `#e5e7eb` | Rings / hairlines                        |
 
 Fonts: **DM Sans** (UI), **Outfit** (display). Self-hosted in `public/fonts/`. No Google Fonts CDN.
 
@@ -83,16 +83,16 @@ Desktop top bar (`TopNav.tsx`): Home · Explore · **Browse ▾** · Mate · Pla
 
 ## 4. Auth and identity (do not revert)
 
-| Surface | Rule |
-| --- | --- |
-| Website | Guests browse Stay / Explore / Scan / plans without an account. |
-| Native iOS/Android | Account required. `NativeAuthGate` + `NativeOpenScreen`. Public paths only: `/start`, `/privacy`, `/terms`, `/cookies`, `/contact`, `/about`, `/legal`, `/auth/action`, `/getAirPalApp`. |
-| Sign-in | Email+password, phone SMS, phone+password, Google, Apple. Native social: `@capacitor-firebase/authentication` with `skipNativeAuth: true` then JS credential. |
-| Profiles | Personal `@handle` is a person. Business is a separate profile on the same account. Google listing import is **business only**. |
-| Persistence | Account bios (name, photos, Instagram/Facebook/X/website links, catalog) live in Firestore `profiles` + `handles` via `persistOwnedProfile`. |
-| Stay scan exception | Guest Stay session is **this device only** (`airpal.stay` in sessionStorage). Do not put Stay scan keys in the personal bio. |
-| Age | Accounts are **18+**. |
-| WebView origin | `https://airpal.me` (`capacitor.config.ts` hostname + https schemes). |
+| Surface             | Rule                                                                                                                                                                                                |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Website             | Guests browse Stay / Explore / Scan / plans without an account.                                                                                                                                     |
+| Native iOS/Android  | Account required. `NativeAuthGate` + `NativeOpenScreen`. Public paths only: `/start`, `/privacy`, `/terms`, `/cookies`, `/contact`, `/assist`, `/about`, `/legal`, `/auth/action`, `/getAirPalApp`. |
+| Sign-in             | Email+password, phone SMS, phone+password, Google, Apple. Native social: `@capacitor-firebase/authentication` with `skipNativeAuth: true` then JS credential.                                       |
+| Profiles            | Personal `@handle` is a person. Business is a separate profile on the same account. Google listing import is **business only**.                                                                     |
+| Persistence         | Account bios (name, photos, Instagram/Facebook/X/website links, catalog) live in Firestore `profiles` + `handles` via `persistOwnedProfile`.                                                        |
+| Stay scan exception | Guest Stay session is **this device only** (`airpal.stay` in sessionStorage). Do not put Stay scan keys in the personal bio.                                                                        |
+| Age                 | Accounts are **18+**.                                                                                                                                                                               |
+| WebView origin      | `https://airpal.me` (`capacitor.config.ts` hostname + https schemes).                                                                                                                               |
 
 After native sign-in, land on `/` unless `next` / role overrides. Website default after sign-in remains `/circle` unless overridden.
 
@@ -104,77 +104,78 @@ Reuse these. Do not add a parallel page for the same job.
 
 ### Anyone (web guest)
 
-| Case | Path |
-| --- | --- |
-| What's on / home | `/` `DiscoverPage` |
-| Plan hub | `/plan` |
-| Create / view / edit plan | `/plan/new`, `/plan/:id`, `/plan/:id/edit`, `/invite/:code` |
-| Scan QR | `/scan` |
-| Stay listings | `/stay` (live listings; book-direct outbound, no platform booking) |
-| Stay & Guide (merged) | `/concierge`, `/stay/:id`, `/g/:id` (single view; guide + compendium, no mode switch) |
-| Stay profile | `/stay/@handle` (listing profile + what's around) |
-| Demo Hotel stay QR showcase (first live listable stay, else Harbour sim) | `/DemoHotel` |
-| Marker / campus | `/q/:id`, `/c/:id` |
-| Calendar / events | `/calendar` (month/week/day planner), `/events` (all upcoming in Places / Community / Friends), `/e/:id`, `/event` (single organizer door; `/event/new` redirects there; ticketed + free) |
-| Festival program | `/f/:slug` (sessions are `events` with `festivalSlug`; attend/calendar reuse the events engine) |
-| Places / experiences | `/p/:id`, `/experiences` |
-| Public bio & Stay showcase | `/@handle` (links stack, catalog, deals, hotel facilities deck & chat trigger) |
-| Join | `/join` |
-| Get the app | `/getAirPalApp` |
-| Legal | `/privacy` `/terms` `/cookies` `/contact` `/about` |
-| Wave | `/w/:id`, `/wave` |
+| Case                                                                     | Path                                                                                                                                                                                      |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| What's on / home                                                         | `/` `DiscoverPage`                                                                                                                                                                        |
+| Plan hub                                                                 | `/plan`                                                                                                                                                                                   |
+| Create / view / edit plan                                                | `/plan/new`, `/plan/:id`, `/plan/:id/edit`, `/invite/:code`                                                                                                                               |
+| Scan QR                                                                  | `/scan`                                                                                                                                                                                   |
+| Stay listings                                                            | `/stay` (live listings; book-direct outbound, no platform booking)                                                                                                                        |
+| Stay & Guide (merged)                                                    | `/concierge`, `/stay/:id`, `/g/:id` (single view; guide + compendium, no mode switch)                                                                                                     |
+| Stay profile                                                             | `/stay/@handle` (listing profile + what's around)                                                                                                                                         |
+| Demo Hotel stay QR showcase (first live listable stay, else Harbour sim) | `/DemoHotel`                                                                                                                                                                              |
+| Marker / campus                                                          | `/q/:id`, `/c/:id`                                                                                                                                                                        |
+| Calendar / events                                                        | `/calendar` (month/week/day planner), `/events` (all upcoming in Places / Community / Friends), `/e/:id`, `/event` (single organizer door; `/event/new` redirects there; ticketed + free) |
+| Festival program                                                         | `/f/:slug` (sessions are `events` with `festivalSlug`; attend/calendar reuse the events engine)                                                                                           |
+| Places / experiences                                                     | `/p/:id`, `/experiences`                                                                                                                                                                  |
+| Public bio & Stay showcase                                               | `/@handle` (links stack, catalog, deals, hotel facilities deck & chat trigger)                                                                                                            |
+| Join                                                                     | `/join`                                                                                                                                                                                   |
+| Get the app                                                              | `/getAirPalApp`                                                                                                                                                                           |
+| Legal                                                                    | `/privacy` `/terms` `/cookies` `/contact` `/about`                                                                                                                                        |
+| Wave                                                                     | `/w/:id`, `/wave`                                                                                                                                                                         |
 
 ### Signed-in person
 
-| Case | Path |
-| --- | --- |
-| Account / Me | `/me` |
-| Claim / edit bio | `/bio/setup`, `/bio/edit` |
-| Circle | `/circle` |
-| Inbox / Universal Chat | `/me/inbox`, Universal AirPal Chat modal (guests, mates, hosts, AirPal AI) |
-| Settings & Passkeys | `/settings` (profile, privacy, WebAuthn biometric passkeys) |
-| Zoo / memories / people | `/me/zoo`, `/me/memories`, `/me/people` |
-| Start / auth | `/start` |
-| Partner inquiry | `/partner` (segmented B2B form → `partner_leads`; admin triage under Studio; distinct from `/partners` directory) |
-| Create hub | `/create` (one door: individual tools + partner tools gated by partner profile; locked → `/join`) |
-| AirPal Wallet (tickets) | `/me/tickets` (every booking as a branded pass; save-as-PDF + share) |
-| Create festival | `/f/new` (organizer draft → live; manage panel on `/f/:slug`; admin list under Experiences) |
+| Case                    | Path                                                                                                              |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Account / Me            | `/me`                                                                                                             |
+| Claim / edit bio        | `/bio/setup`, `/bio/edit`                                                                                         |
+| Circle                  | `/circle`                                                                                                         |
+| Inbox / Universal Chat  | `/me/inbox`, Universal AirPal Chat modal (guests, mates, hosts, AirPal AI)                                        |
+| Settings & Passkeys     | `/settings` (profile, privacy, WebAuthn biometric passkeys)                                                       |
+| Zoo / memories / people | `/me/zoo`, `/me/memories`, `/me/people`                                                                           |
+| Start / auth            | `/start`                                                                                                          |
+| Partner inquiry         | `/partner` (segmented B2B form → `partner_leads`; admin triage under Studio; distinct from `/partners` directory) |
+| Create hub              | `/create` (one door: individual tools + partner tools gated by partner profile; locked → `/join`)                 |
+| AirPal Wallet (tickets) | `/me/tickets` (every booking as a branded pass; save-as-PDF + share)                                              |
+| Create festival         | `/f/new` (organizer draft → live; manage panel on `/f/:slug`; admin list under Experiences)                       |
 
 ### Business
 
-| Case | Path |
-| --- | --- |
-| Register / onboard | `/business/onboard` |
-| Add 3 things | `/business/setup` |
-| Dashboard | `/business` |
-| Campaigns / promotions | `/business/campaigns`, `/business/promotions` |
-| Google import | `GooglePlaceImportCard` on onboard + `/business` only |
+| Case                   | Path                                                  |
+| ---------------------- | ----------------------------------------------------- |
+| Register / onboard     | `/business/onboard`                                   |
+| Add 3 things           | `/business/setup`                                     |
+| Dashboard              | `/business`                                           |
+| Campaigns / promotions | `/business/campaigns`, `/business/promotions`         |
+| Google import          | `GooglePlaceImportCard` on onboard + `/business` only |
 
 ### Stay host
 
-| Case | Path |
-| --- | --- |
+| Case                        | Path                                                                                |
+| --------------------------- | ----------------------------------------------------------------------------------- |
 | Host workspace & Facilities | `/host` (today, facilities CRUD, tickets dispatch, place info, Wi-Fi, QR print kit) |
-| Stay guest (QR) | `/g/:propertyId`, `/stay/:propertyId` — session on device |
+| Stay guest (QR)             | `/g/:propertyId`, `/stay/:propertyId` — session on device                           |
 
 ### Mate (off chrome)
 
-| Case | Path |
-| --- | --- |
-| Demand | `/mate`, `/mate/request` |
-| Supply apply | `/companion` |
+| Case          | Path                     |
+| ------------- | ------------------------ |
+| Demand        | `/mate`, `/mate/request` |
+| Supply apply  | `/companion`             |
 | Admin approve | `/admin` Companion admin |
 
 ### Platform
 
-| Case | Path |
-| --- | --- |
-| Admin | `/admin` |
-| Giveaways / promotions | `/giveaways`, `/promotions` |
-| Fashion (copy, not P2P store) | `/fashion` |
-| Studio lead | `/studio` |
-| Trust & company facts | `/trust` (prerendered; Organization + FAQPage JSON-LD) |
-| Alternatives | `/alternatives/:slug` — meetup, touch-stay, hostfully, eventbrite (prerendered; verified AirPal facts only) |
+| Case                          | Path                                                                                                        |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Admin                         | `/admin`                                                                                                    |
+| Giveaways / promotions        | `/giveaways`, `/promotions`                                                                                 |
+| Fashion (copy, not P2P store) | `/fashion`                                                                                                  |
+| Studio lead                   | `/studio`                                                                                                   |
+| Trust & company facts         | `/trust` (prerendered; Organization + FAQPage JSON-LD)                                                      |
+| Customer support              | `/assist` (prerendered; FAQPage JSON-LD) + `/help` guides + `/contact` form                                 |
+| Alternatives                  | `/alternatives/:slug` — meetup, touch-stay, hostfully, eventbrite (prerendered; verified AirPal facts only) |
 
 Route table source of truth: `src/app/routes.tsx`.
 
@@ -219,6 +220,7 @@ Do not undo these without the human naming them:
 - 18+ accounts
 - Prerendered marketing HTML (per-route head + static body, parity-tested)
 - `/trust` company-facts page (verified facts only, no invented proof)
+- `/assist` customer-support URL (contact, guides, safety, FAQPage JSON-LD; public pre-login in native apps)
 
 ---
 

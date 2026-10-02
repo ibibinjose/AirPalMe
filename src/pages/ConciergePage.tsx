@@ -147,6 +147,7 @@ export function ConciergePage() {
   if (!hasStay && session.kind !== "marker") {
     return (
       <div className="mx-auto max-w-lg px-4 pb-28">
+        <PaymentCanceledNotice />
         <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
           {property.heroImage && <img src={property.heroImage} alt="" className="h-72 w-full object-cover" />}
           <div className="hero-scrim absolute inset-0" />

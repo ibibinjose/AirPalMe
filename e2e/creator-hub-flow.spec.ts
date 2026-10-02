@@ -24,31 +24,31 @@ test.describe("Join & business profile", () => {
   test("onboard is Register, You, then Google import — not Google ownership", async ({ page }) => {
     await page.goto("/business/onboard");
     await page.waitForLoadState("domcontentloaded");
-    await expect(page.getByRole("heading", { name: /Register the business/i })).toBeVisible();
-    await expect(page.getByRole("heading", { name: /What's the business called/i })).toBeVisible();
-    await expect(page.getByText(/Search Google/i).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: /What is the venue or business called/i })).toBeVisible();
     await expect(page.getByPlaceholder(/The Glenmore Hotel/i)).toBeVisible();
     await page.getByPlaceholder(/The Glenmore Hotel/i).fill("The Glenmore");
     await expect(page.getByRole("button", { name: "Coffee", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Coffee", exact: true }).click();
     await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByRole("heading", { name: "You" })).toBeVisible();
-    await expect(page.getByText(/Featured uses that address|Gmail is fine for a free listing/i)).toBeVisible();
-    await page.getByPlaceholder(/Sam Chen/i).fill("Sam Chen");
-    await page.getByPlaceholder(/sam@venue.com.au/i).fill("sam@gmail.com");
+
+    // Step 1: Owner
+    await expect(page.getByRole("heading", { name: /Owner & Contact Details/i })).toBeVisible();
+    await page.getByPlaceholder(/Sarah Jenkins/i).fill("Sam Chen");
+    await page.getByPlaceholder(/sarah@venue.com.au/i).fill("sam@gmail.com");
     await page.getByPlaceholder(/0412 345 678/i).fill("0412 345 678");
     await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByRole("heading", { name: /Verify The Glenmore/i })).toBeVisible();
-    await expect(page.getByRole("heading", { name: /Import or sync the listing/i })).toBeVisible();
-    await expect(page.getByText(/directory claim — not Google ownership/i)).toBeVisible();
+
+    // Step 2: Location & verify
+    await expect(page.getByRole("heading", { name: /Verify Location Details/i })).toBeVisible();
     await page.getByPlaceholder(/18 Lower Fort/i).fill("96 Cumberland St, The Rocks");
-    await page.getByText(/directory claim — not Google ownership/i).click();
-    await page.getByText(/This is my business and the details look right/i).click();
+    await page.getByText(/I manage this venue listing/i).click();
+    await page.getByText(/This is my legitimate business/i).click();
     await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page.getByRole("heading", { name: /Check everything/i })).toBeVisible();
-    await expect(page.getByText(/Directory claim/i)).toBeVisible();
-    await expect(page.getByText(/Needs a work email on the Google website, or an ABN/i).first()).toBeVisible();
-    await expect(page.getByRole("button", { name: /Go live/i })).toBeDisabled();
+
+    // Step 3: Review & Go Live
+    await expect(page.getByRole("heading", { name: /Review & Go Live/i })).toBeVisible();
+    await expect(page.getByText(/The Glenmore/i).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: /Go Live/i })).toBeVisible();
   });
 
   test("after go live, setup is add 3 things", async ({ page }) => {

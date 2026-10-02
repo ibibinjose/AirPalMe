@@ -2,37 +2,46 @@ import { test, expect } from "@playwright/test";
 
 /**
  * Home exposes the AirPal journey: Discover → Connect → Plan → Go.
- * (Playbook §24, adapted to the shipped UI.)
+ * Tests modern v2.0 hero, quick search, prompts, and 6 marketplace pillars.
  */
 test.describe("Home journey", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      try {
-        localStorage.setItem("airpal.door.v1", "explore");
-      } catch {
-        /* ignore */
-      }
-    });
-  });
-
-  test("home exposes the journey: title, search, quick actions", async ({ page }) => {
+  test("home exposes the journey: hero title, search trigger, and quick prompts", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 
-    await expect(page.getByRole("heading", { level: 1, name: "What's on" })).toBeVisible();
-    await expect(page.getByRole("button", { name: /where are you going/i })).toBeVisible();
+    // Hero title and subtitle
+    await expect(page.getByRole("heading", { level: 1, name: "What do you want to do?" })).toBeVisible();
+    await expect(page.getByText("Find mates, places, and experiences.")).toBeVisible();
 
-    const quick = page.getByRole("navigation", { name: /quick actions/i });
-    await expect(quick).toBeVisible();
-    for (const label of ["Places", "Events", "Plan", "People"]) {
-      await expect(quick.getByRole("link", { name: label })).toBeVisible();
-    }
+    // Search trigger
+    await expect(page.getByRole("button", { name: /search mates, places, events, or trips/i })).toBeVisible();
+
+    // Quick prompts
+    await expect(page.getByRole("button", { name: "✨ Find a Mate" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "🎭 Live Tonight" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "🗺️ Plan a Trip" })).toBeVisible();
+
+    // Primary CTA buttons
+    await expect(page.locator("header").getByRole("button", { name: "Find a Mate", exact: true })).toBeVisible();
+    await expect(page.locator("header").getByRole("button", { name: "Plan a Hangout", exact: true })).toBeVisible();
   });
 
-  test("events tile leads to the calendar", async ({ page }) => {
+  test("marketplace verticals grid displays 6 pillars and What's On leads to calendar", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
-    await page.getByRole("navigation", { name: /quick actions/i }).getByRole("link", { name: "Events" }).click();
+
+    const verticalsSection = page.getByRole("region", { name: /Explore AirPal Verticals/i });
+    await expect(verticalsSection).toBeVisible();
+
+    // Verify key vertical pillars exist
+    await expect(verticalsSection.getByRole("button", { name: /AirPal Mate/i })).toBeVisible();
+    await expect(verticalsSection.getByRole("button", { name: /Experiences/i })).toBeVisible();
+    await expect(verticalsSection.getByRole("button", { name: /Stays/i })).toBeVisible();
+    await expect(verticalsSection.getByRole("button", { name: /What's On/i })).toBeVisible();
+    await expect(verticalsSection.getByRole("button", { name: /Trips/i })).toBeVisible();
+
+    // What's On tile leads to calendar
+    await verticalsSection.getByRole("button", { name: /What's On/i }).click();
     await expect(page).toHaveURL(/\/calendar/);
   });
 });

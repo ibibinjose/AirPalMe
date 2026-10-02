@@ -935,6 +935,7 @@ export function ExplorePage() {
             {(when !== "any" || price !== "any") && (
               <Button
                 variant="outlined"
+                aria-label="Clear filters"
                 onClick={() => {
                   void triggerHaptic("light");
                   setWhen("any");
@@ -942,7 +943,7 @@ export function ExplorePage() {
                 }}
                 className="h-11 flex-1 rounded-full text-xs font-semibold"
               >
-                <span>Reset</span>
+                <span>Clear filters</span>
               </Button>
             )}
 

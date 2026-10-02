@@ -17,14 +17,21 @@ test.describe("Authentication & Security Flow", () => {
     await expect(page.getByRole("button", { name: "Forgot password?" })).toBeVisible();
   });
 
-  test("create account starts with handle and mobile, not email", async ({ page }) => {
+  test("create account offers direct signup and mobile SMS signup", async ({ page }) => {
     await page.getByRole("button", { name: "Create Account", exact: true }).click();
 
+    // Default Email signup fields
+    await expect(page.getByPlaceholder("Alex Rivera")).toBeVisible();
+    await expect(page.getByPlaceholder("you@domain.com")).toBeVisible();
+    await expect(page.getByPlaceholder("alex", { exact: true })).toBeVisible();
+    await expect(page.getByPlaceholder("At least 8 characters")).toBeVisible();
+    await expect(page.getByText(/18 years or older/i)).toBeVisible();
+
+    // Switch to Mobile SMS method
+    await page.getByRole("button", { name: /Mobile SMS/i }).click();
     await expect(page.getByPlaceholder("maya")).toBeVisible();
     await expect(page.getByPlaceholder("412 345 678")).toBeVisible();
     await expect(page.getByRole("button", { name: "Send SMS code" })).toBeVisible();
-    await expect(page.getByPlaceholder("e.g. Alex Rivera")).toHaveCount(0);
-    await expect(page.getByPlaceholder("you@domain.com")).toHaveCount(0);
   });
 
   test("toggles password visibility with Eye icon", async ({ page }) => {

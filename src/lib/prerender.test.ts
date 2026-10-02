@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { routeMetaFor } from "./share-meta";
+import { buildAssistJsonLd } from "./assist-meta";
 import { buildTrustJsonLd } from "./trust-meta";
 
 const root = resolve(import.meta.dirname, "../..");
@@ -48,8 +49,8 @@ describe("prerender routes", () => {
   it("injects the same structured data the page renders", () => {
     for (const route of loadRoutes()) {
       if (route.jsonLd === undefined) continue;
-      expect(route.path, "only /trust carries prerendered JSON-LD").toBe("/trust");
-      expect(route.jsonLd).toEqual(buildTrustJsonLd());
+      expect(route.path, "only /trust and /assist carry prerendered JSON-LD").toMatch(/^\/(trust|assist)$/);
+      expect(route.jsonLd).toEqual(route.path === "/assist" ? buildAssistJsonLd() : buildTrustJsonLd());
     }
   });
 
