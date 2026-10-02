@@ -734,10 +734,10 @@ export function ProfileMenu() {
                         void triggerHaptic("light");
                         setOpen(false);
                       }}
-                      className="grid h-8 w-8 touch-manipulation place-items-center rounded-full text-mute hover:bg-paper hover:text-ink ring-1 ring-line/70 transition active:scale-95"
+                      className="grid h-10 w-10 min-h-[44px] min-w-[44px] touch-manipulation place-items-center rounded-full text-mute hover:bg-paper hover:text-ink ring-1 ring-line/70 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-95"
                       aria-label="Close menu"
                     >
-                      <X size={16} />
+                      <X size={18} />
                     </button>
                   </div>
 

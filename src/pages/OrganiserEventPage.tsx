@@ -876,8 +876,8 @@ export function OrganiserEventPage() {
                 maxLength={1000}
                 rows={4}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe your market, expo, or gathering. What can attendees expect? Highlight special guests, parking tips, food & drink, entry details..."
-                className="w-full rounded-2xl border border-line bg-paper p-3.5 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20 placeholder:text-mute/60 resize-none leading-relaxed"
+                placeholder="Describe your market, expo, or gathering. What can attendees expect? Highlight special guests, parking tips, food & drink, entry details…"
+                className="w-full rounded-2xl border border-line bg-paper p-3.5 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-brand focus:border-brand placeholder:text-mute/60 resize-none leading-relaxed"
               />
             </div>
 
@@ -1791,8 +1791,8 @@ export function OrganiserEventPage() {
                 maxLength={1000}
                 rows={4}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Detailed event information for attendees: what to see, parking & public transport directions, timetable, food options, special exhibitors..."
-                className="w-full rounded-2xl border border-line bg-paper p-3.5 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20 placeholder:text-mute/60 resize-none leading-relaxed"
+                placeholder="Detailed event information for attendees: what to see, parking & public transport directions, timetable, food options, special exhibitors…"
+                className="w-full rounded-2xl border border-line bg-paper p-3.5 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-brand focus:border-brand placeholder:text-mute/60 resize-none leading-relaxed"
               />
             </div>
 

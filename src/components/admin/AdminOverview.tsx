@@ -230,11 +230,11 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
           key={k.label}
           type="button"
           onClick={() => onSelectTab(k.tab)}
-          className={`group relative rounded-2xl bg-card/90 p-3.5 text-left ring-1 ring-line transition-all duration-150 hover:bg-paper hover:ring-2 hover:ring-brand/40 shadow-2xs ${
+          className={`group relative rounded-2xl bg-card/90 p-3.5 text-left ring-1 ring-line transition-colors duration-150 hover:bg-paper hover:ring-2 hover:ring-brand/40 shadow-2xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
             k.urgent ? "ring-red-500/30 bg-red-500/5" : ""
           }`}
         >
-          <div className="flex items-center justify-between gap-1">
+          <div className="flex min-w-0 items-center justify-between gap-1">
             <span className="text-[10px] font-bold uppercase tracking-wider text-mute truncate">{k.label}</span>
             {k.badgeClass && (
               <span
@@ -244,7 +244,7 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
               </span>
             )}
           </div>
-          <p className="font-display mt-1 text-2xl font-bold tracking-tight text-ink group-hover:text-brand transition-colors">
+          <p className="font-display mt-1 text-2xl font-bold tracking-tight text-ink group-hover:text-brand transition-colors tabular-nums">
             {k.value}
           </p>
           <p className="text-[11px] text-mute mt-0.5 truncate">{k.hint}</p>

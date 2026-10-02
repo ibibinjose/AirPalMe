@@ -921,10 +921,10 @@ export function BioEditPage() {
                     onChange={(e) => setAboutText(e.target.value)}
                     placeholder={
                       isBusiness
-                        ? "Tell customers what makes your venue, menu, or services special..."
-                        : "Share who you are, your background, hobbies, or what you love exploring..."
+                        ? "Tell customers what makes your venue, menu, or services special…"
+                        : "Share who you are, your background, hobbies, or what you love exploring…"
                     }
-                    className="w-full rounded-2xl border border-line bg-paper p-3 text-sm outline-none transition focus:border-ink placeholder:text-mute/60 resize-none"
+                    className="w-full rounded-2xl border border-line bg-paper p-3 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-brand focus:border-ink placeholder:text-mute/60 resize-none"
                   />
                 </div>
               </div>

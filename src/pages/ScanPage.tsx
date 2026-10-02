@@ -245,10 +245,10 @@ export function ScanPage() {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="inline-flex items-center gap-1.5 rounded-2xl bg-black/60 px-3 py-1.5 text-xs font-semibold text-white shadow-md backdrop-blur-md hover:bg-black/80 transition active:scale-95 border border-white/20"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-2xl bg-black/60 px-3.5 py-2 text-xs font-semibold text-white shadow-md backdrop-blur-md hover:bg-black/80 transition active:scale-95 border border-white/20 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             <ImageIcon size={14} className="text-brand" />
-            <span>{uploading ? "Scanning Photo..." : "Scan Photo"}</span>
+            <span>{uploading ? "Scanning Photo…" : "Scan Photo"}</span>
           </button>
           <span className="text-[11px] font-semibold text-white/80 backdrop-blur-xs bg-black/40 px-2.5 py-1 rounded-full">
             AirPal Universal QR
@@ -264,12 +264,12 @@ export function ScanPage() {
           type="text"
           value={manualCode}
           onChange={(e) => setManualCode(e.target.value)}
-          placeholder="Enter room # (e.g. 101), invite code, or @handle..."
-          className="h-11 flex-1 rounded-2xl bg-card px-4 text-xs md:text-sm font-medium text-ink border border-line outline-none focus:ring-2 focus:ring-brand placeholder:text-mute focus:border-brand"
+          placeholder="Enter room # (e.g. 101), invite code, or @handle…"
+          className="h-11 flex-1 rounded-2xl bg-card px-4 text-xs md:text-sm font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand placeholder:text-mute focus-visible:border-brand"
         />
         <button
           type="submit"
-          className="h-11 rounded-2xl bg-brand px-4 text-xs md:text-sm font-semibold text-white shadow-sm hover:bg-brand-ink transition shrink-0"
+          className="h-11 rounded-2xl bg-brand px-4 text-xs md:text-sm font-semibold text-white shadow-sm hover:bg-brand-ink transition shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
         >
           Open
         </button>

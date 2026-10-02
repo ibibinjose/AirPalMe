@@ -438,20 +438,26 @@ export function MarketingPage() {
               colleagues and mates with places, stays, experiences and more in any city worldwide.
             </p>
             <div className="mt-7 flex flex-col items-center justify-center gap-2.5 sm:flex-row md:justify-start">
-              <Button onClick={() => nav("/getAirPalApp")} className="h-12 gap-1.5 rounded-full px-7 text-[15px]">
-                <Smartphone size={17} /> Get the app
+              <Button onClick={() => nav("/start?tab=signup")} className="h-12 gap-1.5 rounded-full px-7 text-[15px] cursor-pointer shadow-md hover:bg-brand-ink">
+                <Sparkles size={17} /> Claim your @handle free
               </Button>
               <Button
                 onClick={() => nav("/")}
                 variant="ghost"
-                className="h-12 rounded-full border border-line px-7 text-[15px]"
+                className="h-12 rounded-full border border-line px-7 text-[15px] cursor-pointer hover:bg-paper"
               >
                 Explore nearby <ArrowRight size={16} />
               </Button>
             </div>
-            <p className="mt-4 text-xs font-semibold text-mute">
-              Free to browse · No download needed — runs on iPhone, Android and desktop
-            </p>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs font-semibold text-mute md:justify-start">
+              <span className="inline-flex items-center gap-1 text-ink">
+                <ShieldCheck size={14} className="text-emerald-500" /> 100% Free to browse
+              </span>
+              <span>·</span>
+              <span>No download required</span>
+              <span>·</span>
+              <span>Runs on iOS, Android &amp; Web</span>
+            </div>
           </div>
           <PhoneMock />
         </div>
@@ -482,7 +488,7 @@ export function MarketingPage() {
         title="Meet the right people, not just profiles."
         body="Verified mates matched on interests, availability and area — with understandable reasons, QR connect, and plans you build together. Real connection, zero awkwardness."
         cta="Find your mates"
-        href="/plan"
+        href="/mate"
         visual={<NetworkingVisual />}
       />
 
@@ -494,7 +500,7 @@ export function MarketingPage() {
           title="One link for your whole world."
           body="Your AirPal profile is your link-in-bio: plans, favourite stays, rentals and events — all behind airpal.me/@you. Share it anywhere; it opens instantly, no app install needed."
           cta="Claim your link"
-          href="/getAirPalApp"
+          href="/start?tab=signup"
           visual={<LinkInBioVisual />}
           flip
         />
@@ -594,8 +600,8 @@ export function MarketingPage() {
           Your world, all in one app.
         </h2>
         <div className="mt-5 flex flex-col gap-2">
-          <Button onClick={() => nav("/getAirPalApp")} className="h-12 rounded-full">
-            Get AirPal free
+          <Button onClick={() => nav("/start?tab=signup")} className="h-12 rounded-full cursor-pointer shadow-md hover:bg-brand-ink">
+            Get AirPal free · Claim your @handle
           </Button>
           <Button
             variant="ghost"
@@ -606,7 +612,7 @@ export function MarketingPage() {
                 /* clipboard unavailable */
               }
             }}
-            className="h-12 rounded-full border border-line"
+            className="h-12 rounded-full border border-line cursor-pointer hover:bg-paper"
           >
             Copy creative link
           </Button>

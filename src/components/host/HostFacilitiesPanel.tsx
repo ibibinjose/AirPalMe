@@ -345,13 +345,13 @@ export function HostFacilitiesPanel({
           <textarea
             value={details}
             onChange={(e) => setDetails(e.target.value)}
-            placeholder="e.g. Heated water, panoramic views, keycard access required..."
+            placeholder="e.g. Heated water, panoramic views, keycard access required…"
             rows={2}
-            className="mt-1 w-full rounded-2xl ring-1 ring-line bg-paper/70 p-3.5 text-xs sm:text-sm outline-none transition focus:bg-card focus:ring-2 focus:ring-brand/40"
+            className="mt-1 w-full rounded-2xl ring-1 ring-line bg-paper/70 p-3.5 text-xs sm:text-sm outline-none transition focus:bg-card focus-visible:ring-2 focus-visible:ring-brand"
           />
         </label>
 
-        <Button type="submit" disabled={busy} loading={busy} className="w-full h-11 text-xs font-bold">
+        <Button type="submit" disabled={busy} loading={busy} className="w-full h-11 text-xs font-bold cursor-pointer">
           {editingIndex !== null ? "Save Changes" : "Add Facility to Property"}
         </Button>
       </form>

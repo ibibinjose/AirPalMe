@@ -817,7 +817,7 @@ export function ItineraryStopsManager({
                   <button
                     type="button"
                     onClick={() => handleOpenMaps(stop.name, stop.address)}
-                    className="grid h-8 w-8 place-items-center rounded-full bg-card text-mute ring-1 ring-line transition hover:text-brand"
+                    className="grid h-8 w-8 place-items-center rounded-full bg-card text-mute ring-1 ring-line transition hover:text-brand cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                     title="Open in Maps"
                     aria-label={`Open ${stop.name} in Maps`}
                   >
@@ -832,7 +832,7 @@ export function ItineraryStopsManager({
                           type="button"
                           disabled={index === 0}
                           onClick={() => handleMoveUp(index)}
-                          className="grid h-4 w-6 place-items-center text-mute hover:text-ink disabled:opacity-20"
+                          className="grid h-4 w-6 place-items-center text-mute hover:text-ink disabled:opacity-20 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
                           title="Move stop earlier"
                         >
                           <ChevronUp size={12} />
@@ -841,7 +841,7 @@ export function ItineraryStopsManager({
                           type="button"
                           disabled={index === stops.length - 1}
                           onClick={() => handleMoveDown(index)}
-                          className="grid h-4 w-6 place-items-center text-mute hover:text-ink disabled:opacity-20"
+                          className="grid h-4 w-6 place-items-center text-mute hover:text-ink disabled:opacity-20 cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand"
                           title="Move stop later"
                         >
                           <ChevronDown size={12} />
@@ -852,7 +852,7 @@ export function ItineraryStopsManager({
                       <button
                         type="button"
                         onClick={() => handleStartEdit(index)}
-                        className="grid h-8 w-8 place-items-center rounded-full bg-card text-mute ring-1 ring-line transition hover:text-ink"
+                        className="grid h-8 w-8 place-items-center rounded-full bg-card text-mute ring-1 ring-line transition hover:text-ink cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                         title="Edit stop"
                         aria-label={`Edit ${stop.name}`}
                       >
@@ -866,7 +866,7 @@ export function ItineraryStopsManager({
                           void triggerHaptic("light");
                           onRemoveStop(index);
                         }}
-                        className="grid h-8 w-8 place-items-center rounded-full bg-card text-mute ring-1 ring-line transition hover:text-red-500 hover:bg-red-500/10"
+                        className="grid h-8 w-8 place-items-center rounded-full bg-card text-mute ring-1 ring-line transition hover:text-red-500 hover:bg-red-500/10 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                         title="Remove stop"
                         aria-label={`Remove ${stop.name}`}
                       >

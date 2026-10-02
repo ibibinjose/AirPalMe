@@ -215,8 +215,8 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Search stall, business, or @handle..."
-        className="mt-4 h-12 w-full rounded-full bg-card px-4 border border-line outline-none focus:border-brand shadow-xs text-sm"
+        placeholder="Search stall, business, or @handle…"
+        className="mt-4 h-12 w-full rounded-full bg-card px-4 border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand focus:border-brand shadow-xs text-sm"
       />
 
       {/* Category Filter Chips */}
@@ -224,7 +224,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
         <button
           onClick={() => setChip("all")}
           className={cn(
-            "h-11 shrink-0 rounded-full px-4 text-xs font-semibold transition active:scale-95",
+            "h-11 shrink-0 rounded-full px-4 text-xs font-semibold transition active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
             chip === "all" ? "bg-brand text-white shadow-xs" : "bg-card ring-1 ring-line text-mute hover:text-ink",
           )}
         >
