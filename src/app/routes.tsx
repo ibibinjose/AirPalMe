@@ -206,6 +206,7 @@ export function AppRoutes() {
         </Route>
         <Route path="/plan/new" component={PlanCreatePage} />
         <Route path="/plan/:id/edit" component={PlanEditPage} />
+        <Route path="/plan/:id/guests" component={GuestlistPage} />
         <Route path="/plan/:id" component={PlanDetailPage} />
         <Route path="/plan" component={PlanHubPage} />
         <Route path="/invite/:code" component={PlanDetailPage} />

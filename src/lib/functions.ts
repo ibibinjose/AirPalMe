@@ -579,15 +579,29 @@ export function admitTicketRemote(data: { ticketId: string }) {
   );
 }
 
-export function checkInGuestRemote(data: { eventId: string; entryId: string }) {
-  return callFunction<typeof data, { eventId: string; entryId: string; checkedInAt: string; already: boolean }>(
-    CALLABLES.checkInGuest,
+export function checkInGuestRemote(data: { scope: "event" | "plan"; id: string; entryId: string }) {
+  return callFunction<
+    typeof data,
+    { scope: "event" | "plan"; id: string; entryId: string; checkedInAt: string; already: boolean }
+  >(CALLABLES.checkInGuest, data);
+}
+
+export function closeGuestlistRemote(data: { scope: "event" | "plan"; id: string }) {
+  return callFunction<typeof data, { scope: "event" | "plan"; id: string; closed: number }>(
+    CALLABLES.closeGuestlist,
     data,
   );
 }
 
-export function closeGuestlistRemote(data: { eventId: string }) {
-  return callFunction<typeof data, { eventId: string; closed: number }>(CALLABLES.closeGuestlist, data);
+export function listDoorTeamRemote(data: { scope: "event" | "plan"; id: string }) {
+  return callFunction<
+    typeof data,
+    {
+      scope: "event" | "plan";
+      id: string;
+      members: Array<{ uid: string; name: string; handle?: string; owner: boolean }>;
+    }
+  >(CALLABLES.listDoorTeam, data);
 }
 
 export function releaseHeldPayoutsRemote() {

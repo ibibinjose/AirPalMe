@@ -109,7 +109,7 @@ First-class application: overview, users, active Mates, requests, matches, booki
 
 ## 21. Data Model
 
-Shared marketplace collections: users, profiles, verification, preferences, mates, mate_applications, mate_requests (`mate_requests`), matches, messages (`request_chats`), conversations, experiences (`campaigns`), experience_providers, experience_slots, businesses, business_members, business_listings (`listings`, `partnerVenues`), stays (`properties`), stay_rooms, stay_rates, stay_availability, fashion_*, events, event guestlists (`events/{id}/guestlist`), daily_content, offers, bookings, booking_items, payments, payouts, refunds, disputes, reviews (`rating` on requests), ratings, saved_items, reports (`safety_reports`), incidents, moderation_cases, admin_notes, audit_logs (`admin_audits`), notifications, promotions, campaigns. One AirPal account across the platform — never separate user systems per vertical.
+Shared marketplace collections: users, profiles, verification, preferences, mates, mate_applications, mate_requests (`mate_requests`), matches, messages (`request_chats`), conversations, experiences (`campaigns`), experience_providers, experience_slots, businesses, business_members, business_listings (`listings`, `partnerVenues`), stays (`properties`), stay_rooms, stay_rates, stay_availability, fashion_*, events, event + plan guestlists (`events/{id}/guestlist`, `plans/{id}/guestlist`, `coHostUids` door teams), daily_content, offers, bookings, booking_items, payments, payouts, refunds, disputes, reviews (`rating` on requests), ratings, saved_items, reports (`safety_reports`), incidents, moderation_cases, admin_notes, audit_logs (`admin_audits`), notifications, promotions, campaigns. One AirPal account across the platform — never separate user systems per vertical.
 
 ## 22. Technical Architecture
 
@@ -219,4 +219,3 @@ What to build next is gated by **`docs/BRAIN.md`** (established 22 September 202
 Conflict order when documents disagree: (1) safety, security, privacy, and payment integrity in this file; (2) shipped freeze in `docs/CANON.md`; (3) Brain on expansion; (4) older vertical plans in this file that pull the product into another layer. Never start P3/P4 (Studio second app, Travel/Fashion as products, etc.) while P0 — Plan → connect → experience → complete in Sydney — is unproven.
 
 To change Brain, the human asks in plain language; update `docs/BRAIN.md` in the same change as any product rule that contradicts it.
-

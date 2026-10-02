@@ -110,6 +110,7 @@ export const CALLABLES = {
   admitTicket: "admitTicket",
   checkInGuest: "checkInGuest",
   closeGuestlist: "closeGuestlist",
+  listDoorTeam: "listDoorTeam",
 } as const;
 
 export type TeardownDemoBusinessResponse = {
@@ -144,20 +145,30 @@ export type AdmitTicketResponse = {
   already: boolean;
 };
 
-/** Door check-in for one guestlist row. Organiser or admin only. */
-export type CheckInGuestRequest = { eventId: string; entryId: string };
+/** Door check-in for one guestlist row. Door team or admin only. */
+export type CheckInGuestRequest = { scope: "event" | "plan"; id: string; entryId: string };
 
 export type CheckInGuestResponse = {
-  eventId: string;
+  scope: "event" | "plan";
+  id: string;
   entryId: string;
   checkedInAt: string;
   already: boolean;
 };
 
 /** Close the list after doors: still-going rows become no-shows. */
-export type CloseGuestlistRequest = { eventId: string };
+export type CloseGuestlistRequest = { scope: "event" | "plan"; id: string };
 
-export type CloseGuestlistResponse = { eventId: string; closed: number };
+export type CloseGuestlistResponse = { scope: "event" | "plan"; id: string; closed: number };
+
+/** Door-team roster with display names. Door team or admin only. */
+export type ListDoorTeamRequest = { scope: "event" | "plan"; id: string };
+
+export type ListDoorTeamResponse = {
+  scope: "event" | "plan";
+  id: string;
+  members: Array<{ uid: string; name: string; handle?: string; owner: boolean }>;
+};
 
 export type CompleteAccountSignupRequest = {
   handle: string;

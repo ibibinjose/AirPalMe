@@ -81,6 +81,7 @@ const CALLABLES = [
   "admitTicket",
   "checkInGuest",
   "closeGuestlist",
+  "listDoorTeam",
   "onGuestBookingWritten",
   "onGuestRsvpWritten",
   "shareMeta",

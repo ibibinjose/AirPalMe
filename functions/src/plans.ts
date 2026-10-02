@@ -42,6 +42,7 @@ import {
 } from "../../shared/stars";
 import { CALLABLE, db, isPlatformAdmin, requireAuth } from "./admin";
 import { enforceRateLimit, isAnonymousAuth, noteAppCheck } from "./abuse";
+import { syncPlanRsvpGuest } from "./guestlist";
 import type { AccessClaims } from "../../shared/airpal-security";
 import { writeAuthoritativeEvent } from "./analytics";
 
@@ -209,6 +210,8 @@ export const rsvpPlanRemote = onCall(CALLABLE, async (request) => {
     updatedAt: now,
   });
 
+  await syncPlanRsvpGuest(planId, uid, status, name);
+
   return { ok: true, attendee: newAttendee };
 });
 
@@ -359,7 +362,12 @@ export const completePlanRemote = onCall(CALLABLE, async (request) => {
     throw new HttpsError("permission-denied", "Only the host, someone who went, or an admin can complete this plan.");
   }
   if (plan.status === "completed") {
-    return { ok: true, planId, status: "completed", completedAt: plan.completedAt || plan.updatedAt } as CompletePlanResponse;
+    return {
+      ok: true,
+      planId,
+      status: "completed",
+      completedAt: plan.completedAt || plan.updatedAt,
+    } as CompletePlanResponse;
   }
   if (!canCompletePlanStatus(plan.status)) {
     throw new HttpsError("failed-precondition", "Only a live plan can be marked completed.");

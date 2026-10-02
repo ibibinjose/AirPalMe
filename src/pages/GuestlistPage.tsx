@@ -9,19 +9,23 @@ import { TabPills } from "@/components/ui/TabPills";
 import { SearchBar } from "@/components/search/SearchBar";
 import { NotFoundPage } from "./NotFoundPage";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEvents } from "@/contexts/EventsContext";
 import { cn } from "@/lib/cn";
 import { triggerHaptic } from "@/lib/native";
-import { checkInGuestRemote, closeGuestlistRemote } from "@/lib/functions";
+import { checkInGuestRemote, closeGuestlistRemote, listDoorTeamRemote } from "@/lib/functions";
 import {
   addDoorGuest,
+  addEventCoHost,
   canManageGuestlist,
+  fetchListHeader,
   guestStatusLabel,
+  removeEventCoHost,
+  resolveHandleOwner,
   setEventCapacity,
   subscribeGuestlist,
   type GuestRow,
+  type ListHeader,
 } from "@/lib/guestlist";
-import { summarizeGuestlist, type GuestStatus } from "@shared/guestlist";
+import { summarizeGuestlist, type GuestScope, type GuestStatus } from "@shared/guestlist";
 
 type Filter = "all" | "going" | "checked-in" | "no-show";
 
@@ -55,14 +59,22 @@ function StatusPill({ status }: { status: GuestStatus }) {
   );
 }
 
-export function GuestlistPage() {
-  const [, params] = useRoute("/e/:id/guests");
-  const id = params?.id || "";
-  const { user, isAdmin } = useAuth();
-  const { calendarEvents, remoteNearby, remoteLoaded, fetchRemoteEvent } = useEvents();
+interface DoorMember {
+  uid: string;
+  name: string;
+  handle?: string;
+  owner: boolean;
+}
 
-  const [directEv, setDirectEv] = useState<{ title: string; organiserUid?: string; capacity?: number } | null>(null);
-  const [directDone, setDirectDone] = useState(false);
+export function GuestlistPage() {
+  const [, eventParams] = useRoute("/e/:id/guests");
+  const [, planParams] = useRoute("/plan/:id/guests");
+  const scope: GuestScope | null = eventParams?.id ? "event" : planParams?.id ? "plan" : null;
+  const id = eventParams?.id || planParams?.id || "";
+  const { user, isAdmin } = useAuth();
+
+  const [header, setHeader] = useState<ListHeader | null>(null);
+  const [headerDone, setHeaderDone] = useState(false);
   const [rows, setRows] = useState<GuestRow[]>([]);
   const [listLoading, setListLoading] = useState(true);
   const [listError, setListError] = useState("");
@@ -78,39 +90,36 @@ export function GuestlistPage() {
   const [capSaving, setCapSaving] = useState(false);
   const [closing, setClosing] = useState(false);
   const [closeArmed, setCloseArmed] = useState(false);
-
-  const calEv = calendarEvents.find((e) => e.id === id);
-  const near = remoteNearby.find((e) => e.id === id);
-  const raw = calEv || near || directEv;
-  // Runtime docs carry organiserUid/capacity even where the list types don't.
-  const event = raw
-    ? {
-        title: raw.title,
-        organiserUid: (raw as { organiserUid?: string }).organiserUid,
-        capacity: (raw as { capacity?: number }).capacity,
-      }
-    : null;
+  const [team, setTeam] = useState<DoorMember[]>([]);
+  const [teamLoading, setTeamLoading] = useState(false);
+  const [handleDraft, setHandleDraft] = useState("");
+  const [teamBusy, setTeamBusy] = useState(false);
 
   useEffect(() => {
-    setDirectEv(null);
-    setDirectDone(false);
-    if (!id || calEv || near || !remoteLoaded) return;
+    setHeader(null);
+    setHeaderDone(false);
+    if (!scope || !id || !user) return;
     let alive = true;
-    void fetchRemoteEvent(id).then((base) => {
-      if (!alive) return;
-      if (base) setDirectEv(base);
-      setDirectDone(true);
-    });
+    void fetchListHeader(scope, id)
+      .then((next) => {
+        if (alive) setHeader(next);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (alive) setHeaderDone(true);
+      });
     return () => {
       alive = false;
     };
-  }, [id, remoteLoaded, calEv, near, fetchRemoteEvent]);
+  }, [scope, id, user]);
 
   useEffect(() => {
-    if (!id || !user) return;
+    if (!scope || !id || !user || !header) return;
+    if (!canManageGuestlist(header, user.uid, isAdmin)) return;
     setListLoading(true);
     setListError("");
     return subscribeGuestlist(
+      scope,
       id,
       (next) => {
         setRows(next);
@@ -121,10 +130,39 @@ export function GuestlistPage() {
         setListLoading(false);
       },
     );
-  }, [id, user]);
+  }, [scope, id, user, header, isAdmin]);
+
+  useEffect(() => {
+    if (!scope || !id || !user || !header) return;
+    if (!canManageGuestlist(header, user.uid, isAdmin)) return;
+    let alive = true;
+    setTeamLoading(true);
+    void listDoorTeamRemote({ scope, id })
+      .then((res) => {
+        if (alive) setTeam(res.members);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (alive) setTeamLoading(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [scope, id, user, header, isAdmin]);
+
+  async function reloadTeam() {
+    if (!scope || !id) return;
+    try {
+      const res = await listDoorTeamRemote({ scope, id });
+      setTeam(res.members);
+    } catch {
+      /* keep the last roster on refresh failures */
+    }
+  }
 
   const counts = useMemo(() => summarizeGuestlist(rows), [rows]);
-  const capacity = typeof event?.capacity === "number" && event.capacity > 0 ? event.capacity : null;
+  const manages = canManageGuestlist(header, user?.uid, isAdmin);
+  const owns = Boolean(header && user && (header.ownerUid === user.uid || isAdmin));
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -141,39 +179,41 @@ export function GuestlistPage() {
 
   const visible = showAll ? filtered : filtered.slice(0, ROW_CAP);
 
-  if (!user) {
+  if (!user || !scope) {
     return (
       <AuthGate
-        next={`/e/${id}/guests`}
-        kicker="Organiser"
+        next={scope ? `/${scope === "event" ? "e" : "plan"}/${id}/guests` : "/"}
+        kicker="Door team"
         title="Guestlist"
-        lede="Sign in to manage this event's guestlist."
+        lede="Sign in to manage this guestlist."
       />
     );
   }
-  if (!remoteLoaded || (!event && !directDone)) return <PageLoading />;
-  if (!event) return <NotFoundPage />;
-  if (!canManageGuestlist(event, user.uid, isAdmin)) {
+  if (!headerDone || !header) {
+    if (!headerDone) return <PageLoading />;
+    return <NotFoundPage />;
+  }
+  if (!manages) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center">
         <Users size={28} aria-hidden className="mx-auto text-mute" />
-        <h1 className="font-display mt-3 text-2xl font-bold">Organisers only</h1>
+        <h1 className="font-display mt-3 text-2xl font-bold">Door team only</h1>
         <p className="mt-2 text-sm leading-6 text-mute">
-          The guestlist is only visible to the event organiser. If this is your event, sign in with the organiser
-          account.
+          The guestlist is only visible to the {scope === "event" ? "event organiser" : "plan host"} and co-hosts. If
+          this is yours, sign in with the host account.
         </p>
-        <Link href={`/e/${id}`} className="mt-4 inline-block text-sm font-semibold text-brand hover:underline">
-          Back to the event
+        <Link href={header.backHref} className="mt-4 inline-block text-sm font-semibold text-brand hover:underline">
+          Back to {scope === "event" ? "the event" : "the plan"}
         </Link>
       </div>
     );
   }
 
   async function onCheckIn(row: GuestRow) {
-    if (checkingId || !user) return;
+    if (checkingId || !user || !scope) return;
     setCheckingId(row.id);
     try {
-      const res = await checkInGuestRemote({ eventId: id, entryId: row.id });
+      const res = await checkInGuestRemote({ scope, id, entryId: row.id });
       void triggerHaptic(res.already ? "light" : "medium");
       toast.success(res.already ? `${row.name} is already checked in.` : `${row.name} checked in.`);
     } catch {
@@ -184,14 +224,14 @@ export function GuestlistPage() {
   }
 
   async function onAddDoor() {
-    if (adding || !user) return;
+    if (adding || !user || !scope) return;
     if (!addName.trim()) {
       toast.error("Add a guest name to put them on the list.");
       return;
     }
     setAdding(true);
     try {
-      await addDoorGuest(id, user.uid, { name: addName, partySize: addParty });
+      await addDoorGuest(scope, id, user.uid, { name: addName, partySize: addParty });
       void triggerHaptic("light");
       toast.success(`${addName.trim()} is on the list.`);
       setAddName("");
@@ -205,13 +245,14 @@ export function GuestlistPage() {
   }
 
   async function onSaveCapacity() {
-    if (capSaving) return;
+    if (capSaving || scope !== "event") return;
     const next = Number.parseInt(capDraft, 10);
     setCapSaving(true);
     try {
       await setEventCapacity(id, next);
       toast.success("Capacity updated.");
       setCapDraft("");
+      setHeader((h) => (h ? { ...h, capacity: next } : h));
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't save capacity.");
     } finally {
@@ -224,10 +265,10 @@ export function GuestlistPage() {
       setCloseArmed(true);
       return;
     }
-    if (closing) return;
+    if (closing || !scope) return;
     setClosing(true);
     try {
-      const res = await closeGuestlistRemote({ eventId: id });
+      const res = await closeGuestlistRemote({ scope, id });
       void triggerHaptic("medium");
       toast.success(
         res.closed === 0
@@ -242,15 +283,53 @@ export function GuestlistPage() {
     }
   }
 
+  async function onAddCoHost() {
+    if (teamBusy || scope !== "event" || !header) return;
+    setTeamBusy(true);
+    try {
+      const resolved = await resolveHandleOwner(handleDraft);
+      if (resolved.uid === header.ownerUid) {
+        toast.error("That's already the organiser.");
+        return;
+      }
+      await addEventCoHost(id, resolved.uid, header.coHostUids);
+      setHeader((h) => (h ? { ...h, coHostUids: [...h.coHostUids, resolved.uid] } : h));
+      setHandleDraft("");
+      void triggerHaptic("light");
+      toast.success(`@${resolved.handle} joined the door team.`);
+      await reloadTeam();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't add the co-host.");
+    } finally {
+      setTeamBusy(false);
+    }
+  }
+
+  async function onRemoveCoHost(member: DoorMember) {
+    if (teamBusy || scope !== "event") return;
+    setTeamBusy(true);
+    try {
+      await removeEventCoHost(id, member.uid);
+      setHeader((h) => (h ? { ...h, coHostUids: h.coHostUids.filter((v) => v !== member.uid) } : h));
+      toast.success(`${member.name} left the door team.`);
+      await reloadTeam();
+    } catch {
+      toast.error("Couldn't remove the co-host.");
+    } finally {
+      setTeamBusy(false);
+    }
+  }
+
+  const capacity = header.capacity;
   const goingPct = capacity ? Math.min(100, Math.round((counts.goingHeads / capacity) * 100)) : null;
 
   return (
     <div className="mx-auto max-w-2xl px-4 pb-28 pt-4 md:px-6">
       <Link
-        href={`/e/${id}`}
+        href={header.backHref}
         className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-brand hover:underline"
       >
-        <ArrowLeft size={16} aria-hidden /> {event.title}
+        <ArrowLeft size={16} aria-hidden /> {header.title}
       </Link>
       <h1 className="font-display mt-1 text-3xl font-bold tracking-tight">Guestlist</h1>
       <p className="mt-1 text-sm text-mute">
@@ -270,45 +349,47 @@ export function GuestlistPage() {
         ))}
       </div>
 
-      <div className="mt-3 rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-semibold">
-            Capacity <span className="text-mute">{capacity ? `${counts.goingHeads} / ${capacity}` : "not set"}</span>
-          </p>
-          {goingPct !== null && <p className="text-sm font-bold tabular-nums text-brand">{goingPct}%</p>}
-        </div>
-        {goingPct !== null && (
-          <div
-            className="mt-2 h-2 overflow-hidden rounded-full bg-ink/10"
-            role="progressbar"
-            aria-valuenow={goingPct}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="Capacity filled"
-          >
-            <div className="h-full rounded-full bg-brand" style={{ width: `${goingPct}%` }} />
+      {scope === "event" && (
+        <div className="mt-3 rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold">
+              Capacity <span className="text-mute">{capacity ? `${counts.goingHeads} / ${capacity}` : "not set"}</span>
+            </p>
+            {goingPct !== null && <p className="text-sm font-bold tabular-nums text-brand">{goingPct}%</p>}
           </div>
-        )}
-        <div className="mt-3 flex gap-2">
-          <label htmlFor="guestlist-capacity" className="sr-only">
-            Set capacity
-          </label>
-          <input
-            id="guestlist-capacity"
-            type="number"
-            inputMode="numeric"
-            min={1}
-            max={100000}
-            value={capDraft}
-            onChange={(e) => setCapDraft(e.target.value)}
-            placeholder={capacity ? String(capacity) : "e.g. 120"}
-            className="h-11 min-w-0 flex-1 rounded-xl bg-paper px-3 text-[16px] text-ink ring-1 ring-line"
-          />
-          <Button size="sm" onClick={onSaveCapacity} disabled={capSaving || !capDraft.trim()} className="h-11">
-            {capSaving ? "Saving…" : "Save"}
-          </Button>
+          {goingPct !== null && (
+            <div
+              className="mt-2 h-2 overflow-hidden rounded-full bg-ink/10"
+              role="progressbar"
+              aria-valuenow={goingPct}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label="Capacity filled"
+            >
+              <div className="h-full rounded-full bg-brand" style={{ width: `${goingPct}%` }} />
+            </div>
+          )}
+          <div className="mt-3 flex gap-2">
+            <label htmlFor="guestlist-capacity" className="sr-only">
+              Set capacity
+            </label>
+            <input
+              id="guestlist-capacity"
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={100000}
+              value={capDraft}
+              onChange={(e) => setCapDraft(e.target.value)}
+              placeholder={capacity ? String(capacity) : "e.g. 120"}
+              className="h-11 min-w-0 flex-1 rounded-xl bg-paper px-3 text-[16px] text-ink ring-1 ring-line"
+            />
+            <Button size="sm" onClick={onSaveCapacity} disabled={capSaving || !capDraft.trim()} className="h-11">
+              {capSaving ? "Saving…" : "Save"}
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="mt-4 flex flex-col gap-2">
         <SearchBar
@@ -437,6 +518,74 @@ export function GuestlistPage() {
           <Button variant="ghost" onClick={() => setShowAll((v) => !v)} className="mt-2 h-11 w-full">
             {showAll ? "Show fewer" : `Show all ${filtered.length} guests`}
           </Button>
+        )}
+      </section>
+
+      <section aria-label="Door team" className="mt-6 rounded-2xl bg-card p-4 ring-1 ring-line">
+        <h2 className="text-[15px] font-bold">Door team</h2>
+        <p className="mt-1 text-sm leading-6 text-mute">
+          {scope === "event"
+            ? "Co-hosts check guests in and see this list. Only the organiser can change the team."
+            : "Co-hosts check guests in and see this list. Manage them from the plan page."}
+        </p>
+        {teamLoading ? (
+          <p className="mt-3 text-sm text-mute">Loading team…</p>
+        ) : team.length > 0 ? (
+          <ul className="mt-3 divide-y divide-line overflow-hidden rounded-xl ring-1 ring-line">
+            {team.map((m) => (
+              <li key={m.uid} className="flex items-center gap-3 bg-paper px-4 py-2.5">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-card text-xs font-bold uppercase ring-1 ring-line">
+                  {m.name.charAt(0)}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold">{m.name}</span>
+                  <span className="block truncate text-[13px] text-mute">
+                    {m.handle ? `@${m.handle} · ` : ""}
+                    {m.owner ? "Organiser" : "Co-host"}
+                  </span>
+                </span>
+                {owns && !m.owner && scope === "event" && (
+                  <button
+                    type="button"
+                    onClick={() => void onRemoveCoHost(m)}
+                    disabled={teamBusy}
+                    aria-label={`Remove ${m.name} from the door team`}
+                    className="inline-flex h-11 shrink-0 cursor-pointer items-center rounded-full px-4 text-xs font-semibold text-mute ring-1 ring-line transition hover:text-ink active:scale-95 disabled:opacity-60"
+                  >
+                    Remove
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-sm text-mute">Just you on the door so far.</p>
+        )}
+        {owns && scope === "event" && (
+          <div className="mt-3 flex gap-2">
+            <label htmlFor="door-team-handle" className="sr-only">
+              Add co-host by handle
+            </label>
+            <input
+              id="door-team-handle"
+              type="text"
+              value={handleDraft}
+              onChange={(e) => setHandleDraft(e.target.value)}
+              placeholder="@handle"
+              maxLength={31}
+              autoComplete="off"
+              autoCapitalize="none"
+              className="h-11 min-w-0 flex-1 rounded-xl bg-paper px-3 text-[16px] text-ink ring-1 ring-line"
+            />
+            <Button size="sm" onClick={onAddCoHost} disabled={teamBusy || !handleDraft.trim()} className="h-11">
+              {teamBusy ? "Adding…" : "Add"}
+            </Button>
+          </div>
+        )}
+        {scope === "plan" && (
+          <Link href={header.backHref} className="mt-3 inline-block text-sm font-semibold text-brand hover:underline">
+            Manage co-hosts on the plan page
+          </Link>
         )}
       </section>
 

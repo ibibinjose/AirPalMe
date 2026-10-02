@@ -14,6 +14,7 @@ const { fakes, FakeHttpsError } = vi.hoisted(() => {
       isAdmin: false,
       bookings: {} as Record<string, Record<string, unknown>>,
       events: {} as Record<string, Record<string, unknown>>,
+      plans: {} as Record<string, Record<string, unknown>>,
       writes: [] as { id: string; data: Record<string, unknown> }[],
       audits: [] as unknown[],
       rateLimited: [] as string[],
@@ -67,6 +68,16 @@ vi.mock("./guestlist", () => ({
     fakes.guestlistMarks.push(args);
     return Promise.resolve();
   },
+  scopeHostUids: async (scope: string, id: string) => {
+    if (scope === "event") {
+      const e = fakes.events[id] as { organiserUid?: string; coHostUids?: string[] } | undefined;
+      if (!e?.organiserUid) return null;
+      return { ownerUid: e.organiserUid, coHostUids: e.coHostUids || [] };
+    }
+    const p = fakes.plans[id] as { creator?: { uid?: string }; coHostUids?: string[] } | undefined;
+    if (!p?.creator?.uid) return null;
+    return { ownerUid: p.creator.uid, coHostUids: p.coHostUids || [] };
+  },
 }));
 
 import { admitTicket, verifyTicket } from "./gate";
@@ -96,6 +107,7 @@ describe("gate scan", () => {
     fakes.isAdmin = false;
     fakes.bookings = {};
     fakes.events = {};
+    fakes.plans = {};
     fakes.writes.length = 0;
     fakes.audits.length = 0;
     fakes.rateLimited.length = 0;
@@ -124,6 +136,22 @@ describe("gate scan", () => {
       code: "permission-denied",
     });
     expect(fakes.writes).toEqual([]);
+  });
+
+  it("verifyTicket admits event co-hosts and plan hosts", async () => {
+    fakes.bookings = {
+      "bk-1": { ...PAID_BOOKING },
+      "bk-2": { ...PAID_BOOKING, eventId: undefined, planId: "plan-1", providerUid: "prov-9" },
+    };
+    fakes.events = { "evt-1": { organiserUid: "org-1", coHostUids: ["co-1"] } };
+    fakes.plans = { "plan-1": { creator: { uid: "own-1" }, coHostUids: ["co-2"] } };
+    const co = await run(verifyTicket, "co-1", { ticketId: "bk-1" });
+    expect(co.ticketId).toBe("bk-1");
+    const ph = await run(verifyTicket, "co-2", { ticketId: "bk-2" });
+    expect(ph.ticketId).toBe("bk-2");
+    await expect(run(verifyTicket, "stranger", { ticketId: "bk-2" })).rejects.toMatchObject({
+      code: "permission-denied",
+    });
   });
 
   it("verifyTicket returns the gate card for the organiser", async () => {
@@ -170,7 +198,7 @@ describe("gate scan", () => {
     });
     expect(fakes.writes[0]!.data.admittedAt).toBe(res.admittedAt);
     expect(fakes.audits).toHaveLength(1);
-    expect(fakes.guestlistMarks).toEqual([["evt-1", "bk-1", "guest-9"]]);
+    expect(fakes.guestlistMarks).toEqual([["event", "evt-1", "bk-1", "guest-9"]]);
   });
 
   it("admitTicket is idempotent on double scans", async () => {

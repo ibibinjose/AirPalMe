@@ -82,7 +82,7 @@ export {
 export { createBroadcast, reviewBroadcast } from "./notifications";
 export { teardownDemoBusiness } from "./demo";
 export { verifyTicket, admitTicket } from "./gate";
-export { checkInGuest, closeGuestlist, onGuestBookingWritten, onGuestRsvpWritten } from "./guestlist";
+export { checkInGuest, closeGuestlist, listDoorTeam, onGuestBookingWritten, onGuestRsvpWritten } from "./guestlist";
 export { shareMeta } from "./share-meta";
 export { walletPass } from "./wallet";
 export { googleWalletPass } from "./google-wallet";

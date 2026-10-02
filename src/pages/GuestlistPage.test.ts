@@ -3,42 +3,44 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 const { fakes } = vi.hoisted(() => ({
-  fakes: { uid: "org-1", isAdmin: false },
+  fakes: { uid: null as string | null, route: "event" as "event" | "plan" },
 }));
 
 vi.mock("wouter", () => ({
-  useRoute: () => [true, { id: "evt-1" }],
+  useRoute: (pattern: string) => {
+    if (pattern === "/e/:id/guests") return [fakes.route === "event", { id: "evt-1" }];
+    if (pattern === "/plan/:id/guests") return [fakes.route === "plan", { id: "plan-1" }];
+    return [false, {}];
+  },
+  useLocation: () => ["/", vi.fn()],
   Link: ({ href, children }: { href: string; children: React.ReactNode }) => createElement("a", { href }, children),
 }));
 vi.mock("@/contexts/AuthContext", () => ({
-  useAuth: () => ({ user: { uid: fakes.uid }, isAdmin: fakes.isAdmin }),
-}));
-vi.mock("@/contexts/EventsContext", () => ({
-  useEvents: () => ({
-    calendarEvents: [{ id: "evt-1", title: "Rooftop Sessions", organiserUid: "org-1" }],
-    remoteNearby: [],
-    remoteLoaded: true,
-    fetchRemoteEvent: async () => null,
-  }),
+  useAuth: () => ({ user: fakes.uid ? { uid: fakes.uid } : undefined, isAdmin: false }),
 }));
 vi.mock("@/lib/firebase", () => ({ getFirebaseDb: () => undefined }));
 
 import { GuestlistPage } from "./GuestlistPage";
 
+function render(uid: string | null, route: "event" | "plan") {
+  fakes.uid = uid;
+  fakes.route = route;
+  return renderToStaticMarkup(createElement(GuestlistPage));
+}
+
 describe("GuestlistPage", () => {
-  it("denies strangers with an organiser-only message", () => {
-    fakes.uid = "stranger";
-    fakes.isAdmin = false;
-    const markup = renderToStaticMarkup(createElement(GuestlistPage));
-    expect(markup).toContain("Organisers only");
-    expect(markup).not.toContain("Add a walk-in");
+  it("gates signed-out visitors on both scopes", () => {
+    const eventMarkup = render(null, "event");
+    expect(eventMarkup).toContain("Guestlist");
+    expect(eventMarkup).toContain("Sign in");
+    const planMarkup = render(null, "plan");
+    expect(planMarkup).toContain("Guestlist");
+    expect(planMarkup).toContain("Sign in");
   });
 
-  it("opens the list shell for the organiser", () => {
-    fakes.uid = "org-1";
-    fakes.isAdmin = false;
-    const markup = renderToStaticMarkup(createElement(GuestlistPage));
-    expect(markup).toContain("Guestlist");
-    expect(markup).not.toContain("Organisers only");
+  it("renders the loading shell for signed-in viewers (live data needs effects)", () => {
+    const markup = render("org-1", "event");
+    expect(markup).not.toContain("Door team only");
+    expect(markup).not.toContain("Add a walk-in");
   });
 });

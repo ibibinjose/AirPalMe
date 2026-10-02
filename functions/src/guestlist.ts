@@ -1,10 +1,15 @@
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import { ticketAdmitCheck, type Booking } from "../../shared/booking";
+import type { PlanAttendeeStatus } from "../../shared/plan";
 import {
   guestEntryIdForRsvp,
   guestEntryIdForTicket,
+  guestScopeCollection,
+  isGuestScope,
+  isListManager,
   summarizeGuestlist,
+  type GuestScope,
   type GuestStatus,
 } from "../../shared/guestlist";
 import type {
@@ -13,34 +18,62 @@ import type {
   CheckInGuestResponse,
   CloseGuestlistRequest,
   CloseGuestlistResponse,
+  ListDoorTeamRequest,
+  ListDoorTeamResponse,
 } from "../../shared/airpal-security";
 import { enforceRateLimit, noteAppCheck, writeAudit } from "./abuse";
 import { CALLABLE, db, isPlatformAdmin, requireAccount } from "./admin";
 
 /**
- * Event guestlist server: triggers keep rows in sync with RSVPs and
- * tickets, callables power the door. Every write is idempotent
+ * Guestlist server for events and plans: triggers keep rows in sync with
+ * RSVPs and tickets, callables power the door. Every write is idempotent
  * (deterministic ids, status guards) so redeliveries can't duplicate rows.
  *
- * Status guards never downgrade a checked-in guest: refunds and RSVP
- * withdrawals after the door stay visible to the host instead of vanishing.
+ * The door team is the owner plus listed co-hosts (events grow coHostUids,
+ * plans reuse theirs). Status guards never downgrade a checked-in guest:
+ * refunds and RSVP withdrawals after the door stay visible instead of
+ * vanishing.
  */
 
 const TERMINAL_KEEP = new Set(["checked-in", "no-show"]);
 
-async function eventOrganiserUid(eventId: string): Promise<string | null> {
-  if (!eventId) return null;
-  const snap = await db.collection("events").doc(eventId).get();
-  if (!snap.exists) return null;
-  return String(snap.data()?.organiserUid || "") || null;
+export interface ScopeHosts {
+  ownerUid: string;
+  coHostUids: string[];
 }
 
-async function requireOrganiser(eventId: string, uid: string, claims: AccessClaims | undefined) {
-  const organiserUid = await eventOrganiserUid(eventId);
-  if (!organiserUid) throw new HttpsError("not-found", "Event not found.");
-  if (organiserUid !== uid && !isPlatformAdmin(claims)) {
-    throw new HttpsError("permission-denied", "Only the event organiser can manage the guestlist.");
+/** Owner + co-hosts for either scope. Null when the event/plan doesn't exist. */
+export async function scopeHostUids(scope: GuestScope, id: string): Promise<ScopeHosts | null> {
+  if (!id) return null;
+  const snap = await db.collection(guestScopeCollection(scope)).doc(id).get();
+  if (!snap.exists) return null;
+  const data = (snap.data() || {}) as Record<string, unknown>;
+  const ownerUid =
+    scope === "event"
+      ? String(data.organiserUid || "")
+      : String((data.creator as Record<string, unknown> | undefined)?.uid || "");
+  const coHostUids = Array.isArray(data.coHostUids)
+    ? (data.coHostUids as unknown[]).filter((v): v is string => typeof v === "string")
+    : [];
+  if (!ownerUid) return null;
+  return { ownerUid, coHostUids };
+}
+
+async function requireHost(scope: GuestScope, id: string, uid: string, claims: AccessClaims | undefined) {
+  const hosts = await scopeHostUids(scope, id);
+  if (!hosts) throw new HttpsError("not-found", scope === "event" ? "Event not found." : "Plan not found.");
+  if (!isListManager(hosts, uid) && !isPlatformAdmin(claims)) {
+    throw new HttpsError(
+      "permission-denied",
+      scope === "event"
+        ? "Only the event organiser can manage the guestlist."
+        : "Only the plan host can manage the guestlist.",
+    );
   }
+}
+
+function guestlistCol(scope: GuestScope, id: string) {
+  return db.collection(guestScopeCollection(scope)).doc(id).collection("guestlist");
 }
 
 async function guestDisplayFor(uid: string): Promise<{ name: string; handle?: string; verified: boolean }> {
@@ -63,8 +96,8 @@ async function guestDisplayFor(uid: string): Promise<{ name: string; handle?: st
 }
 
 /** Public counts mirror: heads per status, never names. Recomputed from rows. */
-export async function refreshGuestCounts(eventId: string): Promise<void> {
-  const snap = await db.collection("events").doc(eventId).collection("guestlist").get();
+export async function refreshGuestCounts(scope: GuestScope, id: string): Promise<void> {
+  const snap = await guestlistCol(scope, id).get();
   const counts = summarizeGuestlist(
     snap.docs.map((row) => {
       const d = row.data() as { status?: GuestStatus; partySize?: number };
@@ -72,28 +105,35 @@ export async function refreshGuestCounts(eventId: string): Promise<void> {
     }),
   );
   const now = new Date().toISOString();
-  await db.collection("events").doc(eventId).set({ guestCounts: counts, guestCountsAt: now }, { merge: true });
+  await db
+    .collection(guestScopeCollection(scope))
+    .doc(id)
+    .set({ guestCounts: counts, guestCountsAt: now }, { merge: true });
+}
+
+function parseScope(value: unknown): GuestScope {
+  if (!isGuestScope(value)) throw new HttpsError("invalid-argument", "scope must be event or plan.");
+  return value;
 }
 
 /**
- * RSVP → guestlist. "going" upserts the account row; anything else
+ * RSVP → guestlist (events). "going" upserts the account row; anything else
  * (interested, withdrawn, deleted) cancels it unless the door already saw
- * them. Events that don't exist in Firestore are skipped, so local and
- * curated calendar saves never create orphan rows.
+ * them. Unknown events are skipped, so local calendar saves never orphan.
  */
 export const onGuestRsvpWritten = onDocumentWritten("users/{uid}/calendar/{eventId}", async (event) => {
   const uid = String(event.params.uid || "");
   const eventId = String(event.params.eventId || "");
   if (!uid || !eventId) return;
-  if ((await eventOrganiserUid(eventId)) === null) return;
+  if ((await scopeHostUids("event", eventId)) === null) return;
 
   const after = event.data?.after.data() as { status?: string } | undefined;
-  const ref = db.collection("events").doc(eventId).collection("guestlist").doc(guestEntryIdForRsvp(uid));
+  const ref = guestlistCol("event", eventId).doc(guestEntryIdForRsvp(uid));
 
   if (after?.status === "going") {
     const existing = await ref.get();
     if (existing.exists && TERMINAL_KEEP.has(String(existing.data()?.status))) {
-      await refreshGuestCounts(eventId);
+      await refreshGuestCounts("event", eventId);
       return;
     }
     const display = await guestDisplayFor(uid);
@@ -120,29 +160,78 @@ export const onGuestRsvpWritten = onDocumentWritten("users/{uid}/calendar/{event
     if (data.source !== "rsvp" || TERMINAL_KEEP.has(String(data.status))) return;
     await ref.set({ status: "cancelled" }, { merge: true });
   }
-  await refreshGuestCounts(eventId);
+  await refreshGuestCounts("event", eventId);
 });
 
 /**
+ * Plan RSVP → guestlist. Called by rsvpPlan after the attendee array lands:
+ * going→going, maybe→invited, declined→cancelled. Terminal rows keep their
+ * door state; names come from the RSVP itself.
+ */
+export async function syncPlanRsvpGuest(
+  planId: string,
+  uid: string,
+  status: PlanAttendeeStatus,
+  name: string,
+): Promise<void> {
+  if (!planId || !uid || (status !== "going" && status !== "maybe" && status !== "declined")) return;
+  if ((await scopeHostUids("plan", planId)) === null) return;
+  const ref = guestlistCol("plan", planId).doc(guestEntryIdForRsvp(uid));
+  const existing = await ref.get();
+  const current = existing.exists ? String(existing.data()?.status) : "";
+  if (TERMINAL_KEEP.has(current)) {
+    await refreshGuestCounts("plan", planId);
+    return;
+  }
+  const now = new Date().toISOString();
+  if (status === "declined") {
+    if (!existing.exists) return;
+    const data = existing.data() as { source?: string };
+    if (data.source !== "rsvp") return;
+    await ref.set({ status: "cancelled" }, { merge: true });
+  } else {
+    const display = await guestDisplayFor(uid);
+    await ref.set(
+      {
+        name: (name || display.name).slice(0, 80),
+        uid,
+        ...(display.handle ? { handle: display.handle } : {}),
+        verified: display.verified,
+        status: status === "going" ? "going" : "invited",
+        partySize: 1,
+        source: "rsvp",
+        addedBy: uid,
+        addedAt: now,
+        checkedInAt: null,
+      },
+      { merge: true },
+    );
+  }
+  await refreshGuestCounts("plan", planId);
+}
+
+/**
  * Ticket → guestlist. Admissible bookings (paid or free, still open)
- * upsert the ticket row; cancelled/refunded/disputed bookings cancel it.
- * Pending-unpaid and completed bookings are skipped: rows appear when
- * money lands, and finished bookings don't resurrect the list.
+ * upsert the ticket row on the event list, else the plan list;
+ * cancelled/refunded/disputed bookings cancel it. Pending-unpaid and
+ * completed bookings are skipped.
  */
 export const onGuestBookingWritten = onDocumentWritten("bookings/{bookingId}", async (event) => {
   const bookingId = String(event.params.bookingId || "");
   if (!bookingId) return;
   const after = event.data?.after.data() as Omit<Booking, "id"> | undefined;
-  if (!after?.eventId) return;
-  const eventId = String(after.eventId);
-  if ((await eventOrganiserUid(eventId)) === null) return;
+  if (!after) return;
+  const scope: GuestScope | null = after.eventId ? "event" : after.planId ? "plan" : null;
+  if (!scope) return;
+  const id = String(scope === "event" ? after.eventId : after.planId);
+  if (!id || (await scopeHostUids(scope, id)) === null) return;
 
-  const ref = db.collection("events").doc(eventId).collection("guestlist").doc(guestEntryIdForTicket(bookingId));
+  const ref = guestlistCol(scope, id).doc(guestEntryIdForTicket(bookingId));
   const check = ticketAdmitCheck(after);
   if (check.valid) {
     const existing = await ref.get();
     if (existing.exists && TERMINAL_KEEP.has(String(existing.data()?.status))) {
-      await refreshGuestCounts(eventId);
+      await refreshGuestCounts(scope, id);
       return;
     }
     const customerUid = String(after.customerUid || "");
@@ -173,30 +262,32 @@ export const onGuestBookingWritten = onDocumentWritten("bookings/{bookingId}", a
   } else {
     return;
   }
-  await refreshGuestCounts(eventId);
+  await refreshGuestCounts(scope, id);
 });
 
 /**
- * Door check-in for one guestlist row. Organiser or admin only,
- * idempotent: re-scans return already:true instead of double-counting.
+ * Door check-in for one guestlist row. Door team or admin, idempotent:
+ * re-scans return already:true instead of double-counting.
  */
 export const checkInGuest = onCall(CALLABLE, async (request) => {
   await noteAppCheck(request, "checkInGuest");
   const uid = requireAccount(request, "Sign in to check guests in.");
   await enforceRateLimit(uid, "gate", false);
   const data = (request.data || {}) as CheckInGuestRequest;
-  const eventId = String(data.eventId || "").trim();
+  const scope = parseScope(data.scope);
+  const id = String(data.id || "").trim();
   const entryId = String(data.entryId || "").trim();
-  if (!eventId || !entryId) throw new HttpsError("invalid-argument", "eventId and entryId are required.");
-  await requireOrganiser(eventId, uid, request.auth?.token as AccessClaims | undefined);
+  if (!id || !entryId) throw new HttpsError("invalid-argument", "id and entryId are required.");
+  await requireHost(scope, id, uid, request.auth?.token as AccessClaims | undefined);
 
-  const ref = db.collection("events").doc(eventId).collection("guestlist").doc(entryId);
+  const ref = guestlistCol(scope, id).doc(entryId);
   const snap = await ref.get();
   if (!snap.exists) throw new HttpsError("not-found", "Guest not found on this list.");
   const current = String(snap.data()?.status);
   if (current === "checked-in") {
     const already: CheckInGuestResponse = {
-      eventId,
+      scope,
+      id,
       entryId,
       checkedInAt: String(snap.data()?.checkedInAt || ""),
       already: true,
@@ -205,15 +296,15 @@ export const checkInGuest = onCall(CALLABLE, async (request) => {
   }
   const now = new Date().toISOString();
   await ref.set({ status: "checked-in", checkedInAt: now }, { merge: true });
-  await refreshGuestCounts(eventId);
+  await refreshGuestCounts(scope, id);
   await writeAudit({
-    collection: `events/${eventId}/guestlist`,
+    collection: `${guestScopeCollection(scope)}/${id}/guestlist`,
     docId: entryId,
     action: "update",
     actorUid: uid,
     note: "door check-in",
   });
-  const done: CheckInGuestResponse = { eventId, entryId, checkedInAt: now, already: false };
+  const done: CheckInGuestResponse = { scope, id, entryId, checkedInAt: now, already: false };
   return done;
 });
 
@@ -226,11 +317,12 @@ export const closeGuestlist = onCall(CALLABLE, async (request) => {
   const uid = requireAccount(request, "Sign in to close the guestlist.");
   await enforceRateLimit(uid, "gate", false);
   const data = (request.data || {}) as CloseGuestlistRequest;
-  const eventId = String(data.eventId || "").trim();
-  if (!eventId) throw new HttpsError("invalid-argument", "eventId is required.");
-  await requireOrganiser(eventId, uid, request.auth?.token as AccessClaims | undefined);
+  const scope = parseScope(data.scope);
+  const id = String(data.id || "").trim();
+  if (!id) throw new HttpsError("invalid-argument", "id is required.");
+  await requireHost(scope, id, uid, request.auth?.token as AccessClaims | undefined);
 
-  const col = db.collection("events").doc(eventId).collection("guestlist");
+  const col = guestlistCol(scope, id);
   const snap = await col.where("status", "in", ["going", "invited"]).get();
   let closed = 0;
   for (let i = 0; i < snap.docs.length; i += 400) {
@@ -241,15 +333,44 @@ export const closeGuestlist = onCall(CALLABLE, async (request) => {
     }
     await batch.commit();
   }
-  await refreshGuestCounts(eventId);
+  await refreshGuestCounts(scope, id);
   await writeAudit({
-    collection: `events/${eventId}/guestlist`,
+    collection: `${guestScopeCollection(scope)}/${id}/guestlist`,
     docId: "-",
     action: "update",
     actorUid: uid,
     note: `close guestlist (${closed} no-shows)`,
   });
-  const done: CloseGuestlistResponse = { eventId, closed };
+  const done: CloseGuestlistResponse = { scope, id, closed };
+  return done;
+});
+
+/**
+ * Door-team roster with display names. users docs are private, so the
+ * server resolves them — door team or admin only.
+ */
+export const listDoorTeam = onCall(CALLABLE, async (request) => {
+  await noteAppCheck(request, "listDoorTeam");
+  const uid = requireAccount(request, "Sign in to see the door team.");
+  await enforceRateLimit(uid, "gate", false);
+  const data = (request.data || {}) as ListDoorTeamRequest;
+  const scope = parseScope(data.scope);
+  const id = String(data.id || "").trim();
+  if (!id) throw new HttpsError("invalid-argument", "id is required.");
+  await requireHost(scope, id, uid, request.auth?.token as AccessClaims | undefined);
+  const hosts = (await scopeHostUids(scope, id)) as { ownerUid: string; coHostUids: string[] };
+  const roster = [hosts.ownerUid, ...hosts.coHostUids.filter((v) => v !== hosts.ownerUid)].slice(0, 6);
+  const members = [];
+  for (const memberUid of roster) {
+    const display = await guestDisplayFor(memberUid);
+    members.push({
+      uid: memberUid,
+      name: display.name,
+      ...(display.handle ? { handle: display.handle } : {}),
+      owner: memberUid === hosts.ownerUid,
+    });
+  }
+  const done: ListDoorTeamResponse = { scope, id, members };
   return done;
 });
 
@@ -258,10 +379,16 @@ export const closeGuestlist = onCall(CALLABLE, async (request) => {
  * the guest's RSVP row when no ticket row exists yet) flips to checked-in.
  * Exported for the gate, not a callable.
  */
-export async function markTicketCheckedIn(eventId: string, ticketId: string, customerUid: string): Promise<void> {
-  if (!eventId || !ticketId) return;
+export async function markTicketCheckedIn(
+  scope: GuestScope,
+  id: string,
+  ticketId: string,
+  customerUid: string,
+): Promise<void> {
+  if (!id || !ticketId) return;
+  if ((await scopeHostUids(scope, id)) === null) return;
   const now = new Date().toISOString();
-  const col = db.collection("events").doc(eventId).collection("guestlist");
+  const col = guestlistCol(scope, id);
   const ticketRef = col.doc(guestEntryIdForTicket(ticketId));
   const ticketSnap = await ticketRef.get();
   if (ticketSnap.exists) {
@@ -292,5 +419,5 @@ export async function markTicketCheckedIn(eventId: string, ticketId: string, cus
       });
     }
   }
-  await refreshGuestCounts(eventId);
+  await refreshGuestCounts(scope, id);
 }

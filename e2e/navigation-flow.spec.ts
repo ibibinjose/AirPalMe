@@ -89,11 +89,11 @@ test.describe("Global Navigation & Profile Flow", () => {
     const tabNav = page.locator("nav.lg\\:hidden");
     await expect(tabNav).toBeVisible();
 
-    // Shipped companion dock: Home / Explore / Trips / Inbox / Me.
+    // Shipped companion dock: Home / Explore / Plan / Inbox / Me.
     await tabNav.getByRole("button", { name: "Explore" }).click();
     await expect(page).toHaveURL(/\/explore/);
 
-    await tabNav.getByRole("button", { name: "Trips" }).click();
+    await tabNav.getByRole("button", { name: /Plan|Trips/i }).click();
     await expect(page).toHaveURL(/\/plan/);
 
     await tabNav.getByRole("button", { name: "Home" }).click();

@@ -4,6 +4,9 @@ import {
   guestEntryIdForTicket,
   guestEntryIsActive,
   guestEntryValid,
+  guestScopeCollection,
+  isGuestScope,
+  isListManager,
   summarizeGuestlist,
   type GuestEntry,
 } from "./guestlist";
@@ -48,6 +51,24 @@ describe("guestlist model", () => {
       { status: "cancelled", partySize: 9 },
     ]);
     expect(counts).toEqual({ goingHeads: 3, checkedInHeads: 4, noshowHeads: 2, listedHeads: 9, entries: 5 });
+  });
+
+  it("maps scopes to collections", () => {
+    expect(isGuestScope("event")).toBe(true);
+    expect(isGuestScope("plan")).toBe(true);
+    expect(isGuestScope("venue")).toBe(false);
+    expect(guestScopeCollection("event")).toBe("events");
+    expect(guestScopeCollection("plan")).toBe("plans");
+  });
+
+  it("treats the owner and co-hosts as managers", () => {
+    const doc = { ownerUid: "own-1", coHostUids: ["co-1", "co-2"] };
+    expect(isListManager(doc, "own-1")).toBe(true);
+    expect(isListManager(doc, "co-2")).toBe(true);
+    expect(isListManager(doc, "stranger")).toBe(false);
+    expect(isListManager(doc, undefined)).toBe(false);
+    expect(isListManager(null, "own-1")).toBe(false);
+    expect(isListManager({ ownerUid: "own-1" }, "own-1")).toBe(true);
   });
 
   it("marks invited/going/checked-in as active", () => {

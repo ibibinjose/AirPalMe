@@ -145,7 +145,10 @@ export function PlanDetailPage() {
     }
     const whenStr = plan.date ? ` on ${plan.date}${plan.time ? ` at ${plan.time}` : ""}` : "";
     const description =
-      `${plan.title} in ${where}${whenStr} — ${plan.notes || "Join the hangout on AirPal.Me. Life Made Easy."}`.slice(0, 160);
+      `${plan.title} in ${where}${whenStr} — ${plan.notes || "Join the hangout on AirPal.Me. Life Made Easy."}`.slice(
+        0,
+        160,
+      );
 
     setShareMeta({
       title: `${plan.title} · AirPal.Me`,
@@ -249,9 +252,7 @@ export function PlanDetailPage() {
   const eligibleCohosts = useMemo(() => {
     if (!plan) return [];
     const set = new Set(plan.coHostUids || []);
-    return (plan.attendees || []).filter(
-      (a) => a.status === "going" && a.id !== plan.creator.uid && !set.has(a.id),
-    );
+    return (plan.attendees || []).filter((a) => a.status === "going" && a.id !== plan.creator.uid && !set.has(a.id));
   }, [plan]);
 
   const goingCount = useMemo(() => {
@@ -310,8 +311,7 @@ export function PlanDetailPage() {
   const mapCenter = useMemo(
     () =>
       (plan?.geo && Number.isFinite(plan.geo.lat) ? { lat: plan.geo.lat, lng: plan.geo.lng } : null) ||
-      knownCityCenter(plan?.city) ||
-      { lat: -33.8688, lng: 151.2093 },
+      knownCityCenter(plan?.city) || { lat: -33.8688, lng: 151.2093 },
     [plan],
   );
 
@@ -495,13 +495,8 @@ export function PlanDetailPage() {
                   role="switch"
                   aria-checked={!hidden}
                   aria-label={row.label}
-                  onClick={() =>
-                    updatePlan(plan.id, { guestList: { ...(plan.guestList || {}), [row.key]: !hidden } })
-                  }
-                  className={cn(
-                    "relative h-7 w-12 shrink-0 rounded-full transition",
-                    !hidden ? "bg-brand" : "bg-line",
-                  )}
+                  onClick={() => updatePlan(plan.id, { guestList: { ...(plan.guestList || {}), [row.key]: !hidden } })}
+                  className={cn("relative h-7 w-12 shrink-0 rounded-full transition", !hidden ? "bg-brand" : "bg-line")}
                 >
                   <span
                     className={cn(
@@ -632,11 +627,9 @@ export function PlanDetailPage() {
         </div>
       )}
 
-      {plan.status === "completed" &&
-        userAttendee?.status === "going" &&
-        userAttendee.rating === undefined && (
-          <PlanReviewPrompt onSubmit={(input) => submitPlanReview(plan.id, input)} />
-        )}
+      {plan.status === "completed" && userAttendee?.status === "going" && userAttendee.rating === undefined && (
+        <PlanReviewPrompt onSubmit={(input) => submitPlanReview(plan.id, input)} />
+      )}
 
       {plan.status === "cancelled" && (
         <div className="mt-4 rounded-2xl bg-paper px-4 py-3 ring-1 ring-line">
@@ -690,496 +683,492 @@ export function PlanDetailPage() {
 
       {detailTab === "overview" && (
         <>
-
-      {/* Date poll — "when works?" before the RSVP ask */}
-      <PlanDatePoll
-        plan={plan}
-        isHost={isHost}
-        viewerUid={viewerUid}
-        onVote={(optionId) => void voteDateOption(plan.id, optionId)}
-        onPropose={(input) => proposeDateOption(plan.id, input)}
-        onLock={(optionId) => {
-          const updated = lockDateOption(plan.id, optionId);
-          if (updated) setBroadcastOpen(true);
-        }}
-        onReopen={() => reopenDatePoll(plan.id)}
-      />
-
-      {/* RSVP Status — hidden for ticketed experiences: booking IS the RSVP */}
-      {!ticketed && (
-      <>
-      {/* RSVP Status Highlight Strip */}
-      <div className="mt-6 rounded-3xl bg-card p-4 sm:p-5 ring-1 ring-line shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <span
-            className={cn(
-              "grid h-12 w-12 shrink-0 place-items-center rounded-2xl shadow-2xs",
-              userAttendee?.status === "going"
-                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30"
-                : userAttendee?.status === "maybe"
-                  ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 ring-1 ring-amber-500/30"
-                  : "bg-paper text-mute ring-1 ring-line",
-            )}
-          >
-            {userAttendee?.status === "going" ? (
-              <CheckCircle2 size={24} />
-            ) : userAttendee?.status === "maybe" ? (
-              <HelpCircle size={24} />
-            ) : (
-              <Mail size={24} />
-            )}
-          </span>
-          <div>
-            <div className="flex items-center gap-2">
-              <p className="text-xs text-mute font-bold uppercase tracking-wider">Your RSVP</p>
-              <span
-                className={cn(
-                  "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",
-                  userAttendee?.status === "going"
-                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                    : userAttendee?.status === "maybe"
-                      ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
-                      : "bg-paper text-mute ring-1 ring-line",
-                )}
-              >
-                {userAttendee?.status === "going"
-                  ? "Attending"
-                  : userAttendee?.status === "maybe"
-                    ? "Tentative"
-                    : "Not Responded"}
-              </span>
-            </div>
-            <p className="text-sm sm:text-base font-bold text-ink mt-0.5">
-              {userAttendee?.status === "going"
-                ? "You're in for this hangout!"
-                : userAttendee?.status === "maybe"
-                  ? "You marked yourself as maybe."
-                  : "Are you coming along?"}
-            </p>
-            {userAttendee?.notes && <p className="text-xs text-mute italic mt-0.5">"{userAttendee.notes}"</p>}
-          </div>
-        </div>
-
-        {/* 1-Tap Quick RSVP Actions */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            type="button"
-            onClick={() => {
-              void triggerHaptic("success");
-              rsvpPlan(plan.id, "going", user?.displayName || "You");
-              toast.success("You're in! RSVP set to Going 🎉");
+          {/* Date poll — "when works?" before the RSVP ask */}
+          <PlanDatePoll
+            plan={plan}
+            isHost={isHost}
+            viewerUid={viewerUid}
+            onVote={(optionId) => void voteDateOption(plan.id, optionId)}
+            onPropose={(input) => proposeDateOption(plan.id, input)}
+            onLock={(optionId) => {
+              const updated = lockDateOption(plan.id, optionId);
+              if (updated) setBroadcastOpen(true);
             }}
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
-              userAttendee?.status === "going"
-                ? "bg-emerald-700 text-white shadow-xs"
-                : "bg-paper text-ink/80 hover:bg-emerald-500/10 hover:text-emerald-600 ring-1 ring-line",
-            )}
-          >
-            <CheckCircle2 size={14} />
-            <span>Going</span>
-          </button>
+            onReopen={() => reopenDatePoll(plan.id)}
+          />
 
+          {/* RSVP Status — hidden for ticketed experiences: booking IS the RSVP */}
+          {!ticketed && (
+            <>
+              {/* RSVP Status Highlight Strip */}
+              <div className="mt-6 rounded-3xl bg-card p-4 sm:p-5 ring-1 ring-line shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <span
+                    className={cn(
+                      "grid h-12 w-12 shrink-0 place-items-center rounded-2xl shadow-2xs",
+                      userAttendee?.status === "going"
+                        ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30"
+                        : userAttendee?.status === "maybe"
+                          ? "bg-amber-500/15 text-amber-600 dark:text-amber-400 ring-1 ring-amber-500/30"
+                          : "bg-paper text-mute ring-1 ring-line",
+                    )}
+                  >
+                    {userAttendee?.status === "going" ? (
+                      <CheckCircle2 size={24} />
+                    ) : userAttendee?.status === "maybe" ? (
+                      <HelpCircle size={24} />
+                    ) : (
+                      <Mail size={24} />
+                    )}
+                  </span>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-mute font-bold uppercase tracking-wider">Your RSVP</p>
+                      <span
+                        className={cn(
+                          "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+                          userAttendee?.status === "going"
+                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                            : userAttendee?.status === "maybe"
+                              ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
+                              : "bg-paper text-mute ring-1 ring-line",
+                        )}
+                      >
+                        {userAttendee?.status === "going"
+                          ? "Attending"
+                          : userAttendee?.status === "maybe"
+                            ? "Tentative"
+                            : "Not Responded"}
+                      </span>
+                    </div>
+                    <p className="text-sm sm:text-base font-bold text-ink mt-0.5">
+                      {userAttendee?.status === "going"
+                        ? "You're in for this hangout!"
+                        : userAttendee?.status === "maybe"
+                          ? "You marked yourself as maybe."
+                          : "Are you coming along?"}
+                    </p>
+                    {userAttendee?.notes && <p className="text-xs text-mute italic mt-0.5">"{userAttendee.notes}"</p>}
+                  </div>
+                </div>
+
+                {/* 1-Tap Quick RSVP Actions */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void triggerHaptic("success");
+                      rsvpPlan(plan.id, "going", user?.displayName || "You");
+                      toast.success("You're in! RSVP set to Going 🎉");
+                    }}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
+                      userAttendee?.status === "going"
+                        ? "bg-emerald-700 text-white shadow-xs"
+                        : "bg-paper text-ink/80 hover:bg-emerald-500/10 hover:text-emerald-600 ring-1 ring-line",
+                    )}
+                  >
+                    <CheckCircle2 size={14} />
+                    <span>Going</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      rsvpPlan(plan.id, "maybe", user?.displayName || "You");
+                      toast.success("RSVP updated to Maybe");
+                    }}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
+                      userAttendee?.status === "maybe"
+                        ? "bg-amber-700 text-white shadow-xs"
+                        : "bg-paper text-ink/80 hover:bg-amber-500/10 hover:text-amber-600 ring-1 ring-line",
+                    )}
+                  >
+                    <HelpCircle size={14} />
+                    <span>Maybe</span>
+                  </button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setRsvpOpen(true)}
+                    className="rounded-full h-8 px-3 text-xs font-semibold ring-1 ring-line text-mute hover:text-ink"
+                  >
+                    Add Note
+                  </Button>
+
+                  <AddToCalendarMenu
+                    event={{
+                      id: plan.id,
+                      title: plan.title,
+                      description: `${plan.notes || "Hangout on AirPal"}\n\nView plan: ${typeof window !== "undefined" ? window.location.href : ""}`,
+                      startsAt: `${plan.date}T${plan.time || "14:00"}:00`,
+                      venue: plan.destination,
+                      city: plan.city,
+                    }}
+                    variant="secondary"
+                    size="sm"
+                    label="Sync Calendar"
+                  />
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Going alone? Find an AirPal (§11 key CTA: Plan → Mate loop) */}
           <button
             type="button"
             onClick={() => {
               void triggerHaptic("light");
-              rsvpPlan(plan.id, "maybe", user?.displayName || "You");
-              toast.success("RSVP updated to Maybe");
+              nav("/mate/request");
             }}
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
-              userAttendee?.status === "maybe"
-                ? "bg-amber-700 text-white shadow-xs"
-                : "bg-paper text-ink/80 hover:bg-amber-500/10 hover:text-amber-600 ring-1 ring-line",
-            )}
+            className="mt-4 flex w-full cursor-pointer items-center gap-3 rounded-3xl bg-card p-4 text-left ring-1 ring-line shadow-xs transition hover:ring-brand/30 active:scale-[0.99]"
           >
-            <HelpCircle size={14} />
-            <span>Maybe</span>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
+              <Users size={20} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-bold text-ink">Going alone? Find an AirPal</span>
+              <span className="block truncate text-xs text-mute">Get matched with someone to go with you</span>
+            </span>
+            <span className="shrink-0 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-bold text-brand">
+              Find a Mate
+            </span>
           </button>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setRsvpOpen(true)}
-            className="rounded-full h-8 px-3 text-xs font-semibold ring-1 ring-line text-mute hover:text-ink"
-          >
-            Add Note
-          </Button>
+          <HereCheckIn placeName={plan.destination} planId={plan.id} />
 
-          <AddToCalendarMenu
-            event={{
-              id: plan.id,
-              title: plan.title,
-              description: `${plan.notes || "Hangout on AirPal"}\n\nView plan: ${typeof window !== "undefined" ? window.location.href : ""}`,
-              startsAt: `${plan.date}T${plan.time || "14:00"}:00`,
-              venue: plan.destination,
-              city: plan.city,
-            }}
-            variant="secondary"
-            size="sm"
-            label="Sync Calendar"
-          />
-        </div>
-      </div>
-
-      </>
-      )}
-
-      {/* Going alone? Find an AirPal (§11 key CTA: Plan → Mate loop) */}
-      <button
-        type="button"
-        onClick={() => {
-          void triggerHaptic("light");
-          nav("/mate/request");
-        }}
-        className="mt-4 flex w-full cursor-pointer items-center gap-3 rounded-3xl bg-card p-4 text-left ring-1 ring-line shadow-xs transition hover:ring-brand/30 active:scale-[0.99]"
-      >
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
-          <Users size={20} />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-sm font-bold text-ink">Going alone? Find an AirPal</span>
-          <span className="block truncate text-xs text-mute">Get matched with someone to go with you</span>
-        </span>
-        <span className="shrink-0 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-bold text-brand">
-          Find a Mate
-        </span>
-      </button>
-
-      <HereCheckIn placeName={plan.destination} planId={plan.id} />
-
-      {/* Experience Showcase & Booking Card (When plan is marked as experience) */}
-      {plan.isExperience && (
-        <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-amber-500/30 shadow-md">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line/60 pb-5">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/30">
-                  {plan.experienceCategory ? EXPERIENCE_CATEGORIES[plan.experienceCategory]?.emoji : "✨"}{" "}
-                  {plan.experienceCategory ? EXPERIENCE_CATEGORIES[plan.experienceCategory]?.label : "Experience"}
-                </span>
-                <span className="rounded-full bg-paper px-2.5 py-1 text-xs font-semibold text-mute ring-1 ring-line">
-                  {plan.durationMode === "multi_day" ? "🌴 Multi-Day Retreat" : "⚡ Single-Day Event"}
-                </span>
-              </div>
-              <h2 className="font-display text-2xl font-bold text-ink mt-2">Curated Experience Pass & Pricing</h2>
-            </div>
-
-            <Button
-              onClick={() => setBookingOpen(true)}
-              disabled={soldOut}
-              className="gap-2 rounded-2xl h-11 px-5 font-bold shadow-lg bg-amber-700 text-white hover:bg-amber-800"
-            >
-              <CreditCard size={16} />
-              <span>{soldOut ? "Sold out" : ticketed ? "Buy ticket" : "Book spot"}</span>
-            </Button>
-          </div>
-
-          {/* Pricing Highlight Row */}
-          <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="rounded-2xl bg-paper p-4 ring-1 ring-line">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-mute block">
-                Price Per Person
-              </span>
-              <p className="font-display text-2xl font-black text-ink mt-1">
-                ${plan.pricePerPerson || 0}{" "}
-                <span className="text-xs font-medium text-mute">{plan.currency || "AUD"}</span>
-              </p>
-              <p className="text-[11px] text-mute mt-0.5">
-                {plan.pricingModel === "deposit"
-                  ? "Deposit balance due prior to arrival"
-                  : plan.pricingModel === "tiered"
-                    ? "Tiered options available below"
-                    : "All inclusive fixed fee"}
-              </p>
-            </div>
-
-            {plan.depositConfig && (
-              <div className="rounded-2xl bg-amber-500/10 p-4 ring-1 ring-amber-500/30">
-                <div className="flex items-center gap-1.5 text-amber-800 dark:text-amber-300 font-semibold text-xs">
-                  <ShieldCheck size={15} />
-                  <span>Deposit Lock-In Option</span>
+          {/* Experience Showcase & Booking Card (When plan is marked as experience) */}
+          {plan.isExperience && (
+            <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-amber-500/30 shadow-md">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line/60 pb-5">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/30">
+                      {plan.experienceCategory ? EXPERIENCE_CATEGORIES[plan.experienceCategory]?.emoji : "✨"}{" "}
+                      {plan.experienceCategory ? EXPERIENCE_CATEGORIES[plan.experienceCategory]?.label : "Experience"}
+                    </span>
+                    <span className="rounded-full bg-paper px-2.5 py-1 text-xs font-semibold text-mute ring-1 ring-line">
+                      {plan.durationMode === "multi_day" ? "🌴 Multi-Day Retreat" : "⚡ Single-Day Event"}
+                    </span>
+                  </div>
+                  <h2 className="font-display text-2xl font-bold text-ink mt-2">Curated Experience Pass & Pricing</h2>
                 </div>
-                <p className="font-display text-2xl font-black text-amber-900 dark:text-amber-200 mt-1">
-                  ${plan.depositConfig.depositAmount}{" "}
-                  <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">Lock-in</span>
-                </p>
-                <p className="text-[11px] text-amber-800/80 dark:text-amber-300/80 mt-0.5">
-                  {plan.depositConfig.balanceDueDescription ||
-                    `Remaining balance due ${plan.depositConfig.dueDateDaysBefore} days before start`}
-                </p>
+
+                <Button
+                  onClick={() => setBookingOpen(true)}
+                  disabled={soldOut}
+                  className="gap-2 rounded-2xl h-11 px-5 font-bold shadow-lg bg-amber-700 text-white hover:bg-amber-800"
+                >
+                  <CreditCard size={16} />
+                  <span>{soldOut ? "Sold out" : ticketed ? "Buy ticket" : "Book spot"}</span>
+                </Button>
               </div>
-            )}
 
-            <div className="rounded-2xl bg-paper p-4 ring-1 ring-line">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-mute block">
-                Capacity & Spots
-              </span>
-              <p className="font-display text-2xl font-black text-ink mt-1">
-                {Math.max(0, (plan.capacity || 20) - goingAttendees.length)}{" "}
-                <span className="text-xs font-medium text-mute">spots left</span>
-              </p>
-              <p className="text-[11px] text-mute mt-0.5">
-                {goingAttendees.length} already booked · max capacity {plan.capacity || 20}
-              </p>
-            </div>
-          </div>
+              {/* Pricing Highlight Row */}
+              <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="rounded-2xl bg-paper p-4 ring-1 ring-line">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-mute block">
+                    Price Per Person
+                  </span>
+                  <p className="font-display text-2xl font-black text-ink mt-1">
+                    ${plan.pricePerPerson || 0}{" "}
+                    <span className="text-xs font-medium text-mute">{plan.currency || "AUD"}</span>
+                  </p>
+                  <p className="text-[11px] text-mute mt-0.5">
+                    {plan.pricingModel === "deposit"
+                      ? "Deposit balance due prior to arrival"
+                      : plan.pricingModel === "tiered"
+                        ? "Tiered options available below"
+                        : "All inclusive fixed fee"}
+                  </p>
+                </div>
 
-          {/* Pricing Tiers / Room Packages if present */}
-          {plan.pricingTiers && plan.pricingTiers.length > 0 && (
-            <div className="mt-6 border-t border-line/60 pt-5">
-              <h3 className="font-display text-base font-bold text-ink mb-3">Available Package & Room Tiers</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {plan.pricingTiers.map((tier) => (
-                  <div
-                    key={tier.id}
-                    className="rounded-2xl bg-paper p-4 ring-1 ring-line flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-bold text-ink">{tier.name}</h4>
-                        <span className="text-sm font-black text-ink">
-                          ${tier.price} {plan.currency || "AUD"}
-                        </span>
-                      </div>
-                      {tier.description && <p className="text-xs text-mute mt-1">{tier.description}</p>}
-                      {tier.depositAmount && (
-                        <span className="inline-block mt-2 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
-                          ${tier.depositAmount} Deposit option
-                        </span>
-                      )}
+                {plan.depositConfig && (
+                  <div className="rounded-2xl bg-amber-500/10 p-4 ring-1 ring-amber-500/30">
+                    <div className="flex items-center gap-1.5 text-amber-800 dark:text-amber-300 font-semibold text-xs">
+                      <ShieldCheck size={15} />
+                      <span>Deposit Lock-In Option</span>
                     </div>
-                    <Button
-                      size="sm"
-                      onClick={() => setBookingOpen(true)}
-                      className="mt-3 w-full rounded-xl text-xs font-semibold"
-                    >
-                      Select Tier
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Inclusions Breakdown */}
-          {plan.inclusions && (
-            <div className="mt-6 border-t border-line/60 pt-5 space-y-4">
-              <h3 className="font-display text-base font-bold text-ink">What to Expect & Inclusions</h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {plan.inclusions.included && plan.inclusions.included.length > 0 && (
-                  <div className="rounded-2xl bg-paper p-4 ring-1 ring-line space-y-2">
-                    <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                      <CheckCircle2 size={14} />
-                      <span>What's Included</span>
+                    <p className="font-display text-2xl font-black text-amber-900 dark:text-amber-200 mt-1">
+                      ${plan.depositConfig.depositAmount}{" "}
+                      <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">Lock-in</span>
                     </p>
-                    <ul className="space-y-1.5">
-                      {plan.inclusions.included.map((item, i) => (
-                        <li key={i} className="text-xs text-ink/90 flex items-start gap-1.5">
-                          <Check size={12} className="text-emerald-500 shrink-0 mt-0.5" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <p className="text-[11px] text-amber-800/80 dark:text-amber-300/80 mt-0.5">
+                      {plan.depositConfig.balanceDueDescription ||
+                        `Remaining balance due ${plan.depositConfig.dueDateDaysBefore} days before start`}
+                    </p>
                   </div>
                 )}
 
-                {plan.inclusions.notIncluded && plan.inclusions.notIncluded.length > 0 && (
-                  <div className="rounded-2xl bg-paper p-4 ring-1 ring-line space-y-2">
-                    <p className="text-xs font-bold text-mute flex items-center gap-1.5">
-                      <Info size={14} />
-                      <span>Not Included</span>
-                    </p>
-                    <ul className="space-y-1.5">
-                      {plan.inclusions.notIncluded.map((item, i) => (
-                        <li key={i} className="text-xs text-mute flex items-start gap-1.5">
-                          <span className="text-mute shrink-0">•</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {plan.inclusions.whatToBring && plan.inclusions.whatToBring.length > 0 && (
-                  <div className="rounded-2xl bg-paper p-4 ring-1 ring-line space-y-2">
-                    <p className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                      <Sparkles size={14} />
-                      <span>What to Bring</span>
-                    </p>
-                    <ul className="space-y-1.5">
-                      {plan.inclusions.whatToBring.map((item, i) => (
-                        <li key={i} className="text-xs text-ink/90 flex items-start gap-1.5">
-                          <Sparkles size={11} className="text-amber-500 shrink-0 mt-0.5" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                <div className="rounded-2xl bg-paper p-4 ring-1 ring-line">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-mute block">
+                    Capacity & Spots
+                  </span>
+                  <p className="font-display text-2xl font-black text-ink mt-1">
+                    {Math.max(0, (plan.capacity || 20) - goingAttendees.length)}{" "}
+                    <span className="text-xs font-medium text-mute">spots left</span>
+                  </p>
+                  <p className="text-[11px] text-mute mt-0.5">
+                    {goingAttendees.length} already booked · max capacity {plan.capacity || 20}
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
 
-          {/* Booking Policy */}
-          {plan.bookingPolicy && (
-            <div className="mt-5 rounded-2xl bg-paper/60 p-3.5 ring-1 ring-line flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-              <div className="flex items-center gap-2 text-ink">
-                <ShieldCheck size={16} className="text-emerald-500 shrink-0" />
-                <span>
-                  {plan.bookingPolicy.instantBooking ? "Instant Booking Confirmation" : "Host approval required"}
-                  {" · "}
-                  <span className="text-mute capitalize">{plan.bookingPolicy.refundPolicy} cancellation policy</span>
-                </span>
-              </div>
-              {plan.bookingPolicy.customTerms && (
-                <p className="text-[11px] text-mute">{plan.bookingPolicy.customTerms}</p>
+              {/* Pricing Tiers / Room Packages if present */}
+              {plan.pricingTiers && plan.pricingTiers.length > 0 && (
+                <div className="mt-6 border-t border-line/60 pt-5">
+                  <h3 className="font-display text-base font-bold text-ink mb-3">Available Package & Room Tiers</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {plan.pricingTiers.map((tier) => (
+                      <div
+                        key={tier.id}
+                        className="rounded-2xl bg-paper p-4 ring-1 ring-line flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-bold text-ink">{tier.name}</h4>
+                            <span className="text-sm font-black text-ink">
+                              ${tier.price} {plan.currency || "AUD"}
+                            </span>
+                          </div>
+                          {tier.description && <p className="text-xs text-mute mt-1">{tier.description}</p>}
+                          {tier.depositAmount && (
+                            <span className="inline-block mt-2 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+                              ${tier.depositAmount} Deposit option
+                            </span>
+                          )}
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() => setBookingOpen(true)}
+                          className="mt-3 w-full rounded-xl text-xs font-semibold"
+                        >
+                          Select Tier
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Inclusions Breakdown */}
+              {plan.inclusions && (
+                <div className="mt-6 border-t border-line/60 pt-5 space-y-4">
+                  <h3 className="font-display text-base font-bold text-ink">What to Expect & Inclusions</h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {plan.inclusions.included && plan.inclusions.included.length > 0 && (
+                      <div className="rounded-2xl bg-paper p-4 ring-1 ring-line space-y-2">
+                        <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                          <CheckCircle2 size={14} />
+                          <span>What's Included</span>
+                        </p>
+                        <ul className="space-y-1.5">
+                          {plan.inclusions.included.map((item, i) => (
+                            <li key={i} className="text-xs text-ink/90 flex items-start gap-1.5">
+                              <Check size={12} className="text-emerald-500 shrink-0 mt-0.5" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {plan.inclusions.notIncluded && plan.inclusions.notIncluded.length > 0 && (
+                      <div className="rounded-2xl bg-paper p-4 ring-1 ring-line space-y-2">
+                        <p className="text-xs font-bold text-mute flex items-center gap-1.5">
+                          <Info size={14} />
+                          <span>Not Included</span>
+                        </p>
+                        <ul className="space-y-1.5">
+                          {plan.inclusions.notIncluded.map((item, i) => (
+                            <li key={i} className="text-xs text-mute flex items-start gap-1.5">
+                              <span className="text-mute shrink-0">•</span>
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {plan.inclusions.whatToBring && plan.inclusions.whatToBring.length > 0 && (
+                      <div className="rounded-2xl bg-paper p-4 ring-1 ring-line space-y-2">
+                        <p className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                          <Sparkles size={14} />
+                          <span>What to Bring</span>
+                        </p>
+                        <ul className="space-y-1.5">
+                          {plan.inclusions.whatToBring.map((item, i) => (
+                            <li key={i} className="text-xs text-ink/90 flex items-start gap-1.5">
+                              <Sparkles size={11} className="text-amber-500 shrink-0 mt-0.5" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Booking Policy */}
+              {plan.bookingPolicy && (
+                <div className="mt-5 rounded-2xl bg-paper/60 p-3.5 ring-1 ring-line flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-2 text-ink">
+                    <ShieldCheck size={16} className="text-emerald-500 shrink-0" />
+                    <span>
+                      {plan.bookingPolicy.instantBooking ? "Instant Booking Confirmation" : "Host approval required"}
+                      {" · "}
+                      <span className="text-mute capitalize">
+                        {plan.bookingPolicy.refundPolicy} cancellation policy
+                      </span>
+                    </span>
+                  </div>
+                  {plan.bookingPolicy.customTerms && (
+                    <p className="text-[11px] text-mute">{plan.bookingPolicy.customTerms}</p>
+                  )}
+                </div>
               )}
             </div>
           )}
-        </div>
-      )}
 
-      {/* Calendar Export & Sync Actions */}
-      <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-        <h2 className="font-display text-xl font-bold text-ink mt-0.5">Sync with Calendar</h2>
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => exportIcs(plan)}
-            className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
-          >
-            <CalendarPlus size={16} className="text-brand" />
-            <span>Apple / Outlook (.ics)</span>
-          </button>
+          {/* Calendar Export & Sync Actions */}
+          <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+            <h2 className="font-display text-xl font-bold text-ink mt-0.5">Sync with Calendar</h2>
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => exportIcs(plan)}
+                className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
+              >
+                <CalendarPlus size={16} className="text-brand" />
+                <span>Apple / Outlook (.ics)</span>
+              </button>
 
-          <button
-            type="button"
-            onClick={() => openGoogleCalendar(plan)}
-            className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
-          >
-            <Calendar size={16} className="text-brand" />
-            <span>Google Calendar</span>
-          </button>
+              <button
+                type="button"
+                onClick={() => openGoogleCalendar(plan)}
+                className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
+              >
+                <Calendar size={16} className="text-brand" />
+                <span>Google Calendar</span>
+              </button>
 
-          <button
-            type="button"
-            onClick={() => void handlePrintGuide()}
-            className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95 col-span-full"
-          >
-            <Printer size={16} className="text-amber-500" />
-            <span>Print / Save Itinerary PDF Guide</span>
-          </button>
-        </div>
-      </div>
+              <button
+                type="button"
+                onClick={() => void handlePrintGuide()}
+                className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95 col-span-full"
+              >
+                <Printer size={16} className="text-amber-500" />
+                <span>Print / Save Itinerary PDF Guide</span>
+              </button>
+            </div>
+          </div>
 
-      {bookedId ? <TicketPass bookingId={bookedId} /> : null}
-      {isHost && ticketed ? <TicketSalesPanel planId={plan.id} /> : null}
-      {hasTripItinerary(plan) ? <TripItinerary plan={plan} /> : null}
-      {plan.isExperience ? <ExperienceReviews planId={plan.id} /> : null}
+          {bookedId ? <TicketPass bookingId={bookedId} /> : null}
+          {isHost && ticketed ? <TicketSalesPanel planId={plan.id} /> : null}
+          {hasTripItinerary(plan) ? <TripItinerary plan={plan} /> : null}
+          {plan.isExperience ? <ExperienceReviews planId={plan.id} /> : null}
 
-      {/* Shared album — Remember → Repeat */}
-      <PlanAlbum plan={plan} canPost={Boolean(user)} onPostPhoto={(text, photoUrl) => addComment(plan.id, text, photoUrl)} />
-
+          {/* Shared album — Remember → Repeat */}
+          <PlanAlbum
+            plan={plan}
+            canPost={Boolean(user)}
+            onPostPhoto={(text, photoUrl) => addComment(plan.id, text, photoUrl)}
+          />
         </>
       )}
 
       {detailTab === "plan" && (
         <>
+          {/* Co-Planning Itinerary Stops */}
+          <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">
+                  Co-Planning Itinerary
+                </span>
+                <h2 className="font-display text-xl font-bold text-ink">Planned Stops & Venues</h2>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <span className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-mute ring-1 ring-line">
+                  {plan.stops.length} {plan.stops.length === 1 ? "stop" : "stops"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => void handlePrintGuide()}
+                  className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 ring-line bg-paper text-mute hover:text-ink transition active:scale-95"
+                  title="Export Itinerary as PDF / Print Guide"
+                >
+                  <Printer size={13} />
+                  <span className="hidden sm:inline">PDF Guide</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewMode((v) => !v)}
+                  aria-pressed={previewMode}
+                  title={previewMode ? "Back to editing" : "Preview clean timeline"}
+                  className={cn(
+                    "inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 transition active:scale-95",
+                    previewMode ? "bg-brand text-white ring-ink" : "bg-paper text-mute ring-line hover:text-ink",
+                  )}
+                >
+                  {previewMode ? <EyeOff size={13} /> : <Eye size={13} />}
+                  <span className="hidden sm:inline">{previewMode ? "Editing" : "Preview"}</span>
+                </button>
+              </div>
+            </div>
 
-      {/* Co-Planning Itinerary Stops */}
-      <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-        <div className="flex items-center justify-between gap-3 mb-4">
-          <div>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">
-              Co-Planning Itinerary
-            </span>
-            <h2 className="font-display text-xl font-bold text-ink">Planned Stops & Venues</h2>
+            {previewMode ? (
+              <div className="mt-5">
+                <ItineraryPreview stops={plan.stops} />
+              </div>
+            ) : (
+              <ItineraryStopsManager
+                stops={plan.stops}
+                planType={plan.type}
+                baseStartTime={plan.time}
+                isEditable={true}
+                canVote={true}
+                currentUserId={user?.uid}
+                onAddStop={(stopData) => {
+                  addStop(plan.id, {
+                    name: stopData.name,
+                    time: stopData.time,
+                    icon: stopData.icon,
+                    address: stopData.address,
+                    notes: stopData.notes,
+                    addedByName: user?.displayName || "You",
+                    addedByUid: user?.uid,
+                  });
+                }}
+                onUpdateStop={(index, patch) => {
+                  const stop = plan.stops[index];
+                  if (stop) updateStop(plan.id, stop.id, patch);
+                }}
+                onRemoveStop={(index) => {
+                  const stop = plan.stops[index];
+                  if (stop) removeStop(plan.id, stop.id);
+                }}
+                onReorderStops={(fromIdx, toIdx) => {
+                  reorderStops(plan.id, fromIdx, toIdx);
+                }}
+                onVoteStop={(stopId) => {
+                  void voteStop(plan.id, stopId);
+                }}
+              />
+            )}
           </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <span className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-mute ring-1 ring-line">
-              {plan.stops.length} {plan.stops.length === 1 ? "stop" : "stops"}
-            </span>
-            <button
-              type="button"
-              onClick={() => void handlePrintGuide()}
-              className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 ring-line bg-paper text-mute hover:text-ink transition active:scale-95"
-              title="Export Itinerary as PDF / Print Guide"
-            >
-              <Printer size={13} />
-              <span className="hidden sm:inline">PDF Guide</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setPreviewMode((v) => !v)}
-              aria-pressed={previewMode}
-              title={previewMode ? "Back to editing" : "Preview clean timeline"}
-              className={cn(
-                "inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 transition active:scale-95",
-                previewMode ? "bg-brand text-white ring-ink" : "bg-paper text-mute ring-line hover:text-ink",
-              )}
-            >
-              {previewMode ? <EyeOff size={13} /> : <Eye size={13} />}
-              <span className="hidden sm:inline">{previewMode ? "Editing" : "Preview"}</span>
-            </button>
-          </div>
-        </div>
-
-        {previewMode ? (
-          <div className="mt-5">
-            <ItineraryPreview stops={plan.stops} />
-          </div>
-        ) : (
-          <ItineraryStopsManager
-            stops={plan.stops}
-            planType={plan.type}
-            baseStartTime={plan.time}
-            isEditable={true}
-            canVote={true}
-            currentUserId={user?.uid}
-            onAddStop={(stopData) => {
-              addStop(plan.id, {
-                name: stopData.name,
-                time: stopData.time,
-                icon: stopData.icon,
-                address: stopData.address,
-                notes: stopData.notes,
-                addedByName: user?.displayName || "You",
-                addedByUid: user?.uid,
-              });
-            }}
-            onUpdateStop={(index, patch) => {
-              const stop = plan.stops[index];
-              if (stop) updateStop(plan.id, stop.id, patch);
-            }}
-            onRemoveStop={(index) => {
-              const stop = plan.stops[index];
-              if (stop) removeStop(plan.id, stop.id);
-            }}
-            onReorderStops={(fromIdx, toIdx) => {
-              reorderStops(plan.id, fromIdx, toIdx);
-            }}
-            onVoteStop={(stopId) => {
-              void voteStop(plan.id, stopId);
-            }}
-          />
-        )}
-      </div>
-
         </>
       )}
 
       {detailTab === "map" && (
         <div className="mt-8">
           <div className="overflow-hidden rounded-[24px] ring-1 ring-line">
-            <CityMap
-              center={mapCenter}
-              pins={stopPins}
-              selectedId={selectedPin?.id}
-              onPin={setSelectedPin}
-            />
+            <CityMap center={mapCenter} pins={stopPins} selectedId={selectedPin?.id} onPin={setSelectedPin} />
           </div>
           {selectedPin ? (
             <div className="mt-3 rounded-2xl bg-card px-4 py-3 ring-1 ring-line">
@@ -1198,55 +1187,111 @@ export function PlanDetailPage() {
 
       {detailTab === "people" && (
         <>
+          <div className="mt-8">
+            <PlanGroupHeader
+              plan={plan}
+              onInvite={() => setShareOpen(true)}
+              onRsvp={() => setRsvpOpen(true)}
+              viewerUid={viewerUid}
+              viewerIsHost={isHost}
+            />
+          </div>
 
-      <div className="mt-8">
-        <PlanGroupHeader
-          plan={plan}
-          onInvite={() => setShareOpen(true)}
-          onRsvp={() => setRsvpOpen(true)}
-          viewerUid={viewerUid}
-          viewerIsHost={isHost}
-        />
-      </div>
-
-      {/* Host Controls: co-hosts */}
-      {isHost && (
-        <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Crew</span>
-          <h2 className="font-display text-xl font-bold text-ink">Co-hosts</h2>
-          <p className="mt-0.5 text-[13px] text-mute">Co-hosts can manage, message, check in and lock dates.</p>
-          {cohostRows.length > 0 && (
-            <div className="mt-4 space-y-2">
-              {cohostRows.map((att) => (
-                <div
-                  key={att.id}
-                  className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line"
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-card text-xs font-bold text-ink ring-1 ring-line uppercase">
-                      {att.name.charAt(0)}
-                    </span>
-                    <p className="truncate text-xs sm:text-sm font-semibold text-ink">{att.name}</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updatePlan(plan.id, { coHostUids: (plan.coHostUids || []).filter((id) => id !== att.id) })
-                    }
-                    aria-label={`Remove co-host ${att.name}`}
-                    className="inline-flex h-11 shrink-0 items-center rounded-full px-4 text-xs font-semibold text-mute ring-1 ring-line hover:text-ink transition active:scale-95"
-                  >
-                    Remove
-                  </button>
+          {/* Host Controls: co-hosts */}
+          {isHost && (
+            <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Crew</span>
+              <h2 className="font-display text-xl font-bold text-ink">Co-hosts</h2>
+              <p className="mt-0.5 text-[13px] text-mute">Co-hosts can manage, message, check in and lock dates.</p>
+              {cohostRows.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  {cohostRows.map((att) => (
+                    <div
+                      key={att.id}
+                      className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-card text-xs font-bold text-ink ring-1 ring-line uppercase">
+                          {att.name.charAt(0)}
+                        </span>
+                        <p className="truncate text-xs sm:text-sm font-semibold text-ink">{att.name}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updatePlan(plan.id, { coHostUids: (plan.coHostUids || []).filter((id) => id !== att.id) })
+                        }
+                        aria-label={`Remove co-host ${att.name}`}
+                        className="inline-flex h-11 shrink-0 items-center rounded-full px-4 text-xs font-semibold text-mute ring-1 ring-line hover:text-ink transition active:scale-95"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
+              {eligibleCohosts.length > 0 && (
+                <div className="mt-4">
+                  <p className="text-xs font-semibold text-ink/80 mb-1.5">Add from going</p>
+                  <div className="space-y-2">
+                    {eligibleCohosts.map((att) => (
+                      <div
+                        key={att.id}
+                        className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line"
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-card text-xs font-bold text-ink ring-1 ring-line uppercase">
+                            {att.name.charAt(0)}
+                          </span>
+                          <p className="truncate text-xs sm:text-sm font-semibold text-ink">{att.name}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = [...(plan.coHostUids || []), att.id];
+                            if (next.length > PLAN_COHOSTS_MAX) {
+                              toast.message(`Up to ${PLAN_COHOSTS_MAX} co-hosts.`);
+                              return;
+                            }
+                            updatePlan(plan.id, { coHostUids: next });
+                          }}
+                          aria-label={`Make ${att.name} a co-host`}
+                          className="inline-flex h-11 shrink-0 items-center rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
+                        >
+                          Add
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
-          {eligibleCohosts.length > 0 && (
-            <div className="mt-4">
-              <p className="text-xs font-semibold text-ink/80 mb-1.5">Add from going</p>
-              <div className="space-y-2">
-                {eligibleCohosts.map((att) => (
+
+          {/* Host Controls: door guestlist */}
+          {isHost && plan && (
+            <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Door</span>
+              <h2 className="font-display text-xl font-bold text-ink">Guestlist</h2>
+              <p className="mt-0.5 text-[13px] text-mute">
+                RSVPs and ticket buyers land here. Check guests in, add walk-ins, close the list after.
+              </p>
+              <Link
+                href={`/plan/${plan.id}/guests`}
+                className="mt-4 inline-flex h-11 items-center rounded-full bg-brand px-5 text-xs font-semibold text-white shadow-xs transition hover:bg-brand/90 active:scale-95"
+              >
+                Open guestlist
+              </Link>
+            </div>
+          )}
+
+          {/* Host Controls: join requests */}
+          {isHost && pendingList.length > 0 && (
+            <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Requests</span>
+              <h2 className="font-display text-xl font-bold text-ink">Requests to join</h2>
+              <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
+                {pendingList.map((att) => (
                   <div
                     key={att.id}
                     className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line"
@@ -1255,289 +1300,248 @@ export function PlanDetailPage() {
                       <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-card text-xs font-bold text-ink ring-1 ring-line uppercase">
                         {att.name.charAt(0)}
                       </span>
-                      <p className="truncate text-xs sm:text-sm font-semibold text-ink">{att.name}</p>
+                      <div className="min-w-0">
+                        <p className="truncate text-xs sm:text-sm font-semibold text-ink">
+                          {att.name}
+                          {att.plusOnes ? <span className="text-mute font-normal"> +{att.plusOnes}</span> : null}
+                        </p>
+                        {att.notes && <p className="truncate text-[11px] text-mute">{att.notes}</p>}
+                        {(plan.guestQuestions || []).map((q) => {
+                          const v = att.answers?.[q.id];
+                          if (!v) return null;
+                          return (
+                            <p key={q.id} className="truncate text-[11px] text-mute">
+                              {q.question} — <span className="font-medium text-ink/80">{v}</span>
+                            </p>
+                          );
+                        })}
+                      </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const next = [...(plan.coHostUids || []), att.id];
-                        if (next.length > PLAN_COHOSTS_MAX) {
-                          toast.message(`Up to ${PLAN_COHOSTS_MAX} co-hosts.`);
-                          return;
-                        }
-                        updatePlan(plan.id, { coHostUids: next });
-                      }}
-                      aria-label={`Make ${att.name} a co-host`}
-                      className="inline-flex h-11 shrink-0 items-center rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
-                    >
-                      Add
-                    </button>
+                    <span className="flex shrink-0 items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => reviewRsvp(plan.id, att.id, "decline")}
+                        aria-label={`Decline ${att.name}`}
+                        className="inline-flex h-11 min-w-11 items-center justify-center rounded-full px-3 text-xs font-semibold text-mute ring-1 ring-line hover:bg-line/40 transition active:scale-95"
+                      >
+                        Decline
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => reviewRsvp(plan.id, att.id, "approve")}
+                        aria-label={`Approve ${att.name}`}
+                        className="inline-flex h-11 min-w-11 items-center justify-center rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
+                      >
+                        Approve
+                      </button>
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
           )}
-        </div>
-      )}
 
-      {/* Host Controls: join requests */}
-      {isHost && pendingList.length > 0 && (
-        <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Requests</span>
-          <h2 className="font-display text-xl font-bold text-ink">Requests to join</h2>
-          <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
-            {pendingList.map((att) => (
-              <div
-                key={att.id}
-                className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-card text-xs font-bold text-ink ring-1 ring-line uppercase">
-                    {att.name.charAt(0)}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-xs sm:text-sm font-semibold text-ink">
-                      {att.name}
-                      {att.plusOnes ? <span className="text-mute font-normal"> +{att.plusOnes}</span> : null}
-                    </p>
-                    {att.notes && <p className="truncate text-[11px] text-mute">{att.notes}</p>}
-                    {(plan.guestQuestions || []).map((q) => {
-                      const v = att.answers?.[q.id];
-                      if (!v) return null;
-                      return (
-                        <p key={q.id} className="truncate text-[11px] text-mute">
-                          {q.question} — <span className="font-medium text-ink/80">{v}</span>
-                        </p>
-                      );
-                    })}
-                  </div>
-                </div>
-                <span className="flex shrink-0 items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => reviewRsvp(plan.id, att.id, "decline")}
-                    aria-label={`Decline ${att.name}`}
-                    className="inline-flex h-11 min-w-11 items-center justify-center rounded-full px-3 text-xs font-semibold text-mute ring-1 ring-line hover:bg-line/40 transition active:scale-95"
-                  >
-                    Decline
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => reviewRsvp(plan.id, att.id, "approve")}
-                    aria-label={`Approve ${att.name}`}
-                    className="inline-flex h-11 min-w-11 items-center justify-center rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
-                  >
-                    Approve
-                  </button>
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Host Controls: guest answers */}
-      {isHost && (plan.guestQuestions || []).length > 0 && (
-        <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Guest answers</span>
-          <h2 className="font-display text-xl font-bold text-ink">What the crew said</h2>
-          <div className="mt-4 space-y-4">
-            {(plan.guestQuestions || []).map((q) => {
-              const counts = q.type === "choice" ? choiceAnswerCounts(q, plan.attendees) : [];
-              const texts = q.type === "text" ? textAnswers(q, plan.attendees).slice(0, 10) : [];
-              if (q.type === "text" && !texts.length) return null;
-              return (
-                <div key={q.id}>
-                  <p className="text-xs font-semibold text-ink">{q.question}</p>
-                  {q.type === "choice" ? (
-                    <div className="mt-1.5 space-y-1">
-                      {counts.map(({ option, count }) => (
-                        <div key={option} className="flex items-center gap-2 text-[11px]">
-                          <span className="w-32 shrink-0 truncate text-mute">{option}</span>
-                          <span className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-paper ring-1 ring-line">
-                            <span
-                              className="block h-full rounded-full bg-brand"
-                              style={{
-                                width: `${Math.round(
-                                  (count / Math.max(1, goingAttendees.length)) * 100,
-                                )}%`,
-                              }}
-                            />
-                          </span>
-                          <span className="w-6 shrink-0 text-right font-semibold text-ink">{count}</span>
+          {/* Host Controls: guest answers */}
+          {isHost && (plan.guestQuestions || []).length > 0 && (
+            <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Guest answers</span>
+              <h2 className="font-display text-xl font-bold text-ink">What the crew said</h2>
+              <div className="mt-4 space-y-4">
+                {(plan.guestQuestions || []).map((q) => {
+                  const counts = q.type === "choice" ? choiceAnswerCounts(q, plan.attendees) : [];
+                  const texts = q.type === "text" ? textAnswers(q, plan.attendees).slice(0, 10) : [];
+                  if (q.type === "text" && !texts.length) return null;
+                  return (
+                    <div key={q.id}>
+                      <p className="text-xs font-semibold text-ink">{q.question}</p>
+                      {q.type === "choice" ? (
+                        <div className="mt-1.5 space-y-1">
+                          {counts.map(({ option, count }) => (
+                            <div key={option} className="flex items-center gap-2 text-[11px]">
+                              <span className="w-32 shrink-0 truncate text-mute">{option}</span>
+                              <span className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-paper ring-1 ring-line">
+                                <span
+                                  className="block h-full rounded-full bg-brand"
+                                  style={{
+                                    width: `${Math.round((count / Math.max(1, goingAttendees.length)) * 100)}%`,
+                                  }}
+                                />
+                              </span>
+                              <span className="w-6 shrink-0 text-right font-semibold text-ink">{count}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      ) : (
+                        <ul className="mt-1.5 space-y-1">
+                          {texts.map((t, i) => (
+                            <li key={i} className="truncate text-[11px] text-mute">
+                              “{t}”
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
-                  ) : (
-                    <ul className="mt-1.5 space-y-1">
-                      {texts.map((t, i) => (
-                        <li key={i} className="truncate text-[11px] text-mute">
-                          “{t}”
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
-      {/* Host Controls: crew reviews */}
-      {isHost && crewReviews.length > 0 && (
-        <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Crew reviews</span>
-          <h2 className="font-display text-xl font-bold text-ink">
-            ★ {ratingSummary.average} · {ratingSummary.count} rating{ratingSummary.count === 1 ? "" : "s"}
-          </h2>
-          <ul className="mt-4 space-y-2">
-            {crewReviews.map((att) => (
-              <li key={att.id} className="rounded-2xl bg-paper px-3.5 py-2.5 ring-1 ring-line">
-                <p className="text-xs font-semibold text-ink">
-                  {att.name}
-                  {att.rating !== undefined && <span className="text-mute font-normal"> · ★ {att.rating}</span>}
-                </p>
-                {att.review && <p className="mt-0.5 text-[13px] leading-5 text-ink/80">{att.review}</p>}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+          {/* Host Controls: crew reviews */}
+          {isHost && crewReviews.length > 0 && (
+            <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Crew reviews</span>
+              <h2 className="font-display text-xl font-bold text-ink">
+                ★ {ratingSummary.average} · {ratingSummary.count} rating{ratingSummary.count === 1 ? "" : "s"}
+              </h2>
+              <ul className="mt-4 space-y-2">
+                {crewReviews.map((att) => (
+                  <li key={att.id} className="rounded-2xl bg-paper px-3.5 py-2.5 ring-1 ring-line">
+                    <p className="text-xs font-semibold text-ink">
+                      {att.name}
+                      {att.rating !== undefined && <span className="text-mute font-normal"> · ★ {att.rating}</span>}
+                    </p>
+                    {att.review && <p className="mt-0.5 text-[13px] leading-5 text-ink/80">{att.review}</p>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-      {/* Attendees Guest List */}
-      <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Guest List</span>
-            <h2 className="font-display text-xl font-bold text-ink">Mates Attending</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            {guestListShowCount ? (
-              <>
-                <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/20">
-                  {goingAttendees.length} Going
-                </span>
-                {maybeAttendees.length > 0 && (
-                  <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/20">
-                    {maybeAttendees.length} Maybe
-                  </span>
-                )}
-                {isHost && goingAttendees.length > 0 && (
-                  <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-semibold text-brand ring-1 ring-brand/20">
-                    {checkedInCount(plan)}/{goingAttendees.length} checked in
-                  </span>
-                )}
-              </>
-            ) : (
-              <span className="rounded-full bg-paper px-2.5 py-0.5 text-xs font-medium text-mute ring-1 ring-line">
-                Guest list private
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
-          {guestList.map((att) => (
-            <div
-              key={att.id}
-              className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-card text-xs font-bold text-ink ring-1 ring-line uppercase">
-                  {att.name.charAt(0)}
-                </span>
-                <div className="min-w-0">
-                  <p className="truncate text-xs sm:text-sm font-semibold text-ink">
-                    {att.name}
-                    {att.plusOnes ? <span className="text-mute font-normal"> +{att.plusOnes}</span> : null}
-                    {att.handle && <span className="text-mute font-normal"> (@{att.handle})</span>}
-                    {plan.coHostUids?.includes(att.id) && (
-                      <span className="ml-1.5 rounded-full bg-brand/10 px-2 py-0.2 text-[10px] font-medium text-brand">
-                        Co-host
+          {/* Attendees Guest List */}
+          <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Guest List</span>
+                <h2 className="font-display text-xl font-bold text-ink">Mates Attending</h2>
+              </div>
+              <div className="flex items-center gap-2">
+                {guestListShowCount ? (
+                  <>
+                    <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/20">
+                      {goingAttendees.length} Going
+                    </span>
+                    {maybeAttendees.length > 0 && (
+                      <span className="rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/20">
+                        {maybeAttendees.length} Maybe
                       </span>
                     )}
-                  </p>
-                  {att.notes && <p className="truncate text-[11px] text-mute">{att.notes}</p>}
-                </div>
-              </div>
-
-              <span className="flex shrink-0 items-center gap-1">
-                {isHost && att.status === "going" && (
-                  <button
-                    type="button"
-                    onClick={() => toggleCheckIn(plan.id, att.id)}
-                    aria-pressed={Boolean(att.checkedIn)}
-                    aria-label={att.checkedIn ? `Uncheck ${att.name}` : `Check in ${att.name}`}
-                    title={att.checkedIn ? "Checked in" : "Check in"}
-                    className={cn(
-                      "grid h-11 w-11 place-items-center rounded-full ring-1 transition active:scale-95",
-                      att.checkedIn
-                        ? "bg-emerald-500 text-white ring-emerald-500"
-                        : "text-mute ring-line hover:bg-paper hover:text-ink",
+                    {isHost && goingAttendees.length > 0 && (
+                      <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-semibold text-brand ring-1 ring-brand/20">
+                        {checkedInCount(plan)}/{goingAttendees.length} checked in
+                      </span>
                     )}
-                  >
-                    <Check size={16} />
-                  </button>
+                  </>
+                ) : (
+                  <span className="rounded-full bg-paper px-2.5 py-0.5 text-xs font-medium text-mute ring-1 ring-line">
+                    Guest list private
+                  </span>
                 )}
-                <span
-                  className={cn(
-                    "rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider shrink-0",
-                    att.status === "going"
-                      ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                      : att.status === "maybe"
-                        ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
-                        : "bg-paper text-mute",
-                  )}
-                >
-                  {att.status === "waitlisted"
-                    ? `waitlisted · #${waitlistPosition(plan, att.id) ?? "–"}`
-                    : att.status === "pending"
-                      ? "awaiting host"
-                      : att.status}
-                </span>
-                {userAttendee && att.id !== userAttendee.id && (
-                  <SafetyMenu targetUid={att.id} targetName={att.name} planId={plan.id} />
-                )}
-              </span>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Live Plan Chat & Copilot Banner */}
-      <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 rounded-3xl bg-brand/5 p-4 ring-1 ring-brand/20">
-        <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
-            <MessageSquare size={18} />
-          </span>
-          <div>
-            <p className="font-display text-sm font-bold text-ink">Plan Chat & AirPal AI</p>
-            <p className="text-xs text-mute">Coordinate with attendees in real-time or ask AirPal AI for suggestions</p>
+            <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
+              {guestList.map((att) => (
+                <div
+                  key={att.id}
+                  className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-card text-xs font-bold text-ink ring-1 ring-line uppercase">
+                      {att.name.charAt(0)}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate text-xs sm:text-sm font-semibold text-ink">
+                        {att.name}
+                        {att.plusOnes ? <span className="text-mute font-normal"> +{att.plusOnes}</span> : null}
+                        {att.handle && <span className="text-mute font-normal"> (@{att.handle})</span>}
+                        {plan.coHostUids?.includes(att.id) && (
+                          <span className="ml-1.5 rounded-full bg-brand/10 px-2 py-0.2 text-[10px] font-medium text-brand">
+                            Co-host
+                          </span>
+                        )}
+                      </p>
+                      {att.notes && <p className="truncate text-[11px] text-mute">{att.notes}</p>}
+                    </div>
+                  </div>
+
+                  <span className="flex shrink-0 items-center gap-1">
+                    {isHost && att.status === "going" && (
+                      <button
+                        type="button"
+                        onClick={() => toggleCheckIn(plan.id, att.id)}
+                        aria-pressed={Boolean(att.checkedIn)}
+                        aria-label={att.checkedIn ? `Uncheck ${att.name}` : `Check in ${att.name}`}
+                        title={att.checkedIn ? "Checked in" : "Check in"}
+                        className={cn(
+                          "grid h-11 w-11 place-items-center rounded-full ring-1 transition active:scale-95",
+                          att.checkedIn
+                            ? "bg-emerald-500 text-white ring-emerald-500"
+                            : "text-mute ring-line hover:bg-paper hover:text-ink",
+                        )}
+                      >
+                        <Check size={16} />
+                      </button>
+                    )}
+                    <span
+                      className={cn(
+                        "rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider shrink-0",
+                        att.status === "going"
+                          ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                          : att.status === "maybe"
+                            ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
+                            : "bg-paper text-mute",
+                      )}
+                    >
+                      {att.status === "waitlisted"
+                        ? `waitlisted · #${waitlistPosition(plan, att.id) ?? "–"}`
+                        : att.status === "pending"
+                          ? "awaiting host"
+                          : att.status}
+                    </span>
+                    {userAttendee && att.id !== userAttendee.id && (
+                      <SafetyMenu targetUid={att.id} targetName={att.name} planId={plan.id} />
+                    )}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-        <Button
-          size="sm"
-          onClick={() => {
-            void triggerHaptic("light");
-            setDetailTab("chat");
-          }}
-          className="rounded-full px-4 text-xs font-semibold shrink-0"
-        >
-          Open Chat
-        </Button>
-      </div>
 
-      {/* Discussion Wall & Activity Stream */}
-      <div className="mt-6">
-        <PlanDiscussionWall
-          plan={plan}
-          onPostComment={(text, photoUrl) => {
-            void addComment(plan.id, text, photoUrl);
-          }}
-        />
-      </div>
+          {/* Live Plan Chat & Copilot Banner */}
+          <div className="mt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 rounded-3xl bg-brand/5 p-4 ring-1 ring-brand/20">
+            <div className="flex items-center gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand text-white shadow-xs">
+                <MessageSquare size={18} />
+              </span>
+              <div>
+                <p className="font-display text-sm font-bold text-ink">Plan Chat & AirPal AI</p>
+                <p className="text-xs text-mute">
+                  Coordinate with attendees in real-time or ask AirPal AI for suggestions
+                </p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              onClick={() => {
+                void triggerHaptic("light");
+                setDetailTab("chat");
+              }}
+              className="rounded-full px-4 text-xs font-semibold shrink-0"
+            >
+              Open Chat
+            </Button>
+          </div>
 
+          {/* Discussion Wall & Activity Stream */}
+          <div className="mt-6">
+            <PlanDiscussionWall
+              plan={plan}
+              onPostComment={(text, photoUrl) => {
+                void addComment(plan.id, text, photoUrl);
+              }}
+            />
+          </div>
         </>
       )}
 

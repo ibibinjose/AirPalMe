@@ -23,6 +23,12 @@ must(firestore.includes("match /contentAudits/{docId}"), "firestore.rules must l
 must(firestore.includes("!isAnonymous()"), "listings/events creates must reject anonymous writers");
 must(firestore.includes("request.resource.data.uid == request.auth.uid"), "guest writes must bind uid");
 must(firestore.includes("match /guestlist/{entryId}"), "firestore.rules must declare the event guestlist");
+must(firestore.includes("function eventHosts(eventId)"), "firestore.rules must define the event door team");
+must(firestore.includes("function planHosts(planId)"), "firestore.rules must define the plan door team");
+must(
+  firestore.includes("match /plans/{planId}") && firestore.includes("planHosts(planId)"),
+  "firestore.rules must declare the plan guestlist",
+);
 must(
   firestore.includes("resource.data.uid == request.auth.uid") && firestore.includes("match /guestlist/{entryId}"),
   "guestlist reads must stay host-only with own-row guest access",

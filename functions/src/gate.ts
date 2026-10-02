@@ -9,12 +9,12 @@ import {
 } from "../../shared/airpal-security";
 import { enforceRateLimit, noteAppCheck, writeAudit } from "./abuse";
 import { CALLABLE, db, isPlatformAdmin, requireAccount } from "./admin";
-import { markTicketCheckedIn } from "./guestlist";
+import { isListManager } from "../../shared/guestlist";
+import { markTicketCheckedIn, scopeHostUids } from "./guestlist";
 
 /**
- * Gate scan: load a ticket the caller is entitled to verify. Organisers
- * (event bookings carry providerUid = organiserUid, with an explicit
- * organiser fallback for legacy rows), providers, and platform admins.
+ * Gate scan: load a ticket the caller is entitled to verify. Providers,
+ * the event or plan door team (owner + co-hosts), and platform admins.
  * Everyone else — including the ticket owner — is denied: owners read
  * their own pass from the wallet, they never self-admit.
  */
@@ -24,9 +24,12 @@ async function loadEntitledTicket(ticketId: string, uid: string, claims: AccessC
   if (!snap.exists) throw new HttpsError("not-found", "Ticket not found.");
   const booking = { id: snap.id, ...(snap.data() as Omit<Booking, "id">) };
   const entitled =
-    isPlatformAdmin(claims) || booking.providerUid === uid || (await isEventOrganiser(booking.eventId, uid));
+    isPlatformAdmin(claims) ||
+    booking.providerUid === uid ||
+    (await isScopeHost("event", booking.eventId, uid)) ||
+    (await isScopeHost("plan", booking.planId, uid));
   if (!entitled) {
-    throw new HttpsError("permission-denied", "Only the event organiser can verify tickets.");
+    throw new HttpsError("permission-denied", "Only the host team can verify tickets.");
   }
   let eventName = "";
   if (booking.eventId) {
@@ -36,10 +39,9 @@ async function loadEntitledTicket(ticketId: string, uid: string, claims: AccessC
   return { ref, booking, eventName };
 }
 
-async function isEventOrganiser(eventId: string | undefined, uid: string): Promise<boolean> {
-  if (!eventId) return false;
-  const snap = await db.collection("events").doc(eventId).get();
-  return snap.exists && String(snap.data()?.organiserUid || "") === uid;
+async function isScopeHost(scope: "event" | "plan", id: string | undefined, uid: string): Promise<boolean> {
+  if (!id) return false;
+  return isListManager(await scopeHostUids(scope, id), uid);
 }
 
 function ticketIdFromRequest(data: VerifyTicketRequest | AdmitTicketRequest | undefined): string {
@@ -110,7 +112,9 @@ export const admitTicket = onCall(CALLABLE, async (request) => {
     note: "gate admit",
   });
   if (booking.eventId) {
-    await markTicketCheckedIn(String(booking.eventId), ticketId, String(booking.customerUid || ""));
+    await markTicketCheckedIn("event", String(booking.eventId), ticketId, String(booking.customerUid || ""));
+  } else if (booking.planId) {
+    await markTicketCheckedIn("plan", String(booking.planId), ticketId, String(booking.customerUid || ""));
   }
   const admitted: AdmitTicketResponse = { ticketId, admittedAt: now, already: false };
   return admitted;

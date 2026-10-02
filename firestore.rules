@@ -64,6 +64,27 @@ service cloud.firestore {
       );
     }
 
+    // Door team: the owner or a listed co-host. Drives guestlist access on both scopes.
+    function eventHosts(eventId) {
+      return platformAdmin() || (signedIn() && (
+        get(/databases/$(database)/documents/events/$(eventId)).data.organiserUid == request.auth.uid
+        || (
+          get(/databases/$(database)/documents/events/$(eventId)).data.keys().hasAny(['coHostUids'])
+          && request.auth.uid in get(/databases/$(database)/documents/events/$(eventId)).data.coHostUids
+        )
+      ));
+    }
+
+    function planHosts(planId) {
+      return platformAdmin() || (signedIn() && (
+        get(/databases/$(database)/documents/plans/$(planId)).data.creator.uid == request.auth.uid
+        || (
+          get(/databases/$(database)/documents/plans/$(planId)).data.keys().hasAny(['coHostUids'])
+          && request.auth.uid in get(/databases/$(database)/documents/plans/$(planId)).data.coHostUids
+        )
+      ));
+    }
+
     // ACL fields must only change via privileged Cloud Functions (setPropertyMember, etc.).
     function propertyAclUnlocked() {
       return !request.resource.data.diff(resource.data).affectedKeys()
@@ -162,12 +183,23 @@ service cloud.firestore {
     match /events/{eventId} {
       allow get, list: if resource.data.status in ['live', 'ended']
         || (signedIn() && resource.data.organiserUid == request.auth.uid)
+        || (signedIn() && resource.data.keys().hasAny(['coHostUids'])
+          && request.auth.uid in resource.data.coHostUids)
         || platformAdmin();
       allow create: if signedIn()
         && !isAnonymous()
         && request.resource.data.organiserUid == request.auth.uid
         && request.resource.data.keys().hasAny(['updatedAt']);
-      allow update, delete: if signedIn() && resource.data.organiserUid == request.auth.uid
+      // Organiser edits anything (co-host roster capped at 5); co-hosts only capacity.
+      allow update: if platformAdmin()
+        || (signedIn() && resource.data.organiserUid == request.auth.uid
+          && (!(request.resource.data.keys().hasAny(['coHostUids']))
+            || request.resource.data.coHostUids.size() <= 5))
+        || (signedIn()
+          && resource.data.keys().hasAny(['coHostUids'])
+          && request.auth.uid in resource.data.coHostUids
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['capacity', 'updatedAt']));
+      allow delete: if signedIn() && resource.data.organiserUid == request.auth.uid
         || platformAdmin();
 
       match /stalls/{stallId} {
@@ -192,23 +224,16 @@ service cloud.firestore {
       }
 
       match /guestlist/{entryId} {
-        // Names never public: hosts list and manage, guests read only their own row.
+        // Names never public: the door team lists and manages, guests read only their own row.
         allow get: if signedIn() && (
           resource.data.uid == request.auth.uid
-          || get(/databases/$(database)/documents/events/$(eventId)).data.organiserUid == request.auth.uid
-          || platformAdmin()
+          || eventHosts(eventId)
         );
-        allow list: if signedIn() && (
-          get(/databases/$(database)/documents/events/$(eventId)).data.organiserUid == request.auth.uid
-          || platformAdmin()
-        );
-        // Guest rows arrive via server triggers (RSVP, ticket) or host door adds.
+        allow list: if eventHosts(eventId);
+        // Guest rows arrive via server triggers (RSVP, ticket) or door-team adds.
         // Guests never write here directly, so badges and party sizes can't be forged.
-        allow create: if signedIn() && !isAnonymous()
-          && (
-            get(/databases/$(database)/documents/events/$(eventId)).data.organiserUid == request.auth.uid
-            || platformAdmin()
-          )
+        allow create: if !isAnonymous()
+          && eventHosts(eventId)
           && request.resource.data.name is string
           && request.resource.data.name.size() >= 1
           && request.resource.data.name.size() <= 80
@@ -218,11 +243,8 @@ service cloud.firestore {
           && request.resource.data.partySize >= 1
           && request.resource.data.partySize <= 20
           && request.resource.data.addedBy == request.auth.uid;
-        allow update: if signedIn() && !isAnonymous()
-          && (
-            get(/databases/$(database)/documents/events/$(eventId)).data.organiserUid == request.auth.uid
-            || platformAdmin()
-          )
+        allow update: if !isAnonymous()
+          && eventHosts(eventId)
           && request.resource.data.name is string
           && request.resource.data.name.size() >= 1
           && request.resource.data.name.size() <= 80
@@ -231,10 +253,7 @@ service cloud.firestore {
           && request.resource.data.partySize >= 1
           && request.resource.data.partySize <= 20
           && request.resource.data.addedBy == resource.data.addedBy;
-        allow delete: if signedIn() && (
-          get(/databases/$(database)/documents/events/$(eventId)).data.organiserUid == request.auth.uid
-          || platformAdmin()
-        );
+        allow delete: if eventHosts(eventId);
       }
     }
 
@@ -1197,10 +1216,14 @@ match /dining_orders/{orderId} {
       allow get: if resource.data.isPublic == true
         || platformAdmin()
         || (signedIn() && resource.data.creator.uid == request.auth.uid)
+        || (signedIn() && resource.data.keys().hasAny(['coHostUids'])
+          && request.auth.uid in resource.data.coHostUids)
         || resource.data.status in ['open', 'confirmed'];
       allow list: if resource.data.isPublic == true
         || platformAdmin()
-        || (signedIn() && resource.data.creator.uid == request.auth.uid);
+        || (signedIn() && resource.data.creator.uid == request.auth.uid)
+        || (signedIn() && resource.data.keys().hasAny(['coHostUids'])
+          && request.auth.uid in resource.data.coHostUids);
       allow create: if signedIn()
         && request.resource.data.id is string
         && request.resource.data.title is string
@@ -1227,6 +1250,37 @@ match /dining_orders/{orderId} {
           && request.resource.data.authorId == request.auth.uid;
         allow update, delete: if platformAdmin()
           || (signedIn() && resource.data.authorId == request.auth.uid);
+      }
+
+      // Same contract as the event guestlist: door team manages, guests read own row.
+      match /guestlist/{entryId} {
+        allow get: if signedIn() && (
+          resource.data.uid == request.auth.uid
+          || planHosts(planId)
+        );
+        allow list: if planHosts(planId);
+        allow create: if !isAnonymous()
+          && planHosts(planId)
+          && request.resource.data.name is string
+          && request.resource.data.name.size() >= 1
+          && request.resource.data.name.size() <= 80
+          && request.resource.data.status in ['invited', 'going', 'checked-in', 'no-show', 'cancelled']
+          && request.resource.data.source in ['rsvp', 'ticket', 'door', 'invite', 'import']
+          && request.resource.data.partySize is int
+          && request.resource.data.partySize >= 1
+          && request.resource.data.partySize <= 20
+          && request.resource.data.addedBy == request.auth.uid;
+        allow update: if !isAnonymous()
+          && planHosts(planId)
+          && request.resource.data.name is string
+          && request.resource.data.name.size() >= 1
+          && request.resource.data.name.size() <= 80
+          && request.resource.data.status in ['invited', 'going', 'checked-in', 'no-show', 'cancelled']
+          && request.resource.data.partySize is int
+          && request.resource.data.partySize >= 1
+          && request.resource.data.partySize <= 20
+          && request.resource.data.addedBy == resource.data.addedBy;
+        allow delete: if planHosts(planId);
       }
     }
 

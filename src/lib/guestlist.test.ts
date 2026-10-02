@@ -2,12 +2,15 @@ import { describe, expect, it } from "vitest";
 import { canManageGuestlist, guestStatusLabel } from "./guestlist";
 
 describe("guestlist client helpers", () => {
-  it("lets only the organiser or an admin manage", () => {
-    expect(canManageGuestlist({ organiserUid: "org-1" }, "org-1")).toBe(true);
-    expect(canManageGuestlist({ organiserUid: "org-1" }, "admin-9", true)).toBe(true);
-    expect(canManageGuestlist({ organiserUid: "org-1" }, "stranger")).toBe(false);
-    expect(canManageGuestlist({ organiserUid: "org-1" }, undefined)).toBe(false);
+  it("lets the owner, co-hosts, and admins manage", () => {
+    const header = { ownerUid: "org-1", coHostUids: ["co-1"] };
+    expect(canManageGuestlist(header, "org-1")).toBe(true);
+    expect(canManageGuestlist(header, "co-1")).toBe(true);
+    expect(canManageGuestlist(header, "admin-9", true)).toBe(true);
+    expect(canManageGuestlist(header, "stranger")).toBe(false);
+    expect(canManageGuestlist(header, undefined)).toBe(false);
     expect(canManageGuestlist(null, "org-1")).toBe(false);
+    expect(canManageGuestlist({ ownerUid: "org-1", coHostUids: [] }, "org-1")).toBe(true);
   });
 
   it("labels every status in plain words", () => {
