@@ -66,8 +66,7 @@ const VERTICALS = [
     sub: "Find someone to go with",
     href: "/mate",
     icon: Users,
-    gradient: "from-blue-600/15 via-indigo-500/10 to-transparent",
-    iconBg: "bg-brand text-white",
+    iconBg: "bg-brand/10 text-brand",
     badge: "Connect",
   },
   {
@@ -76,8 +75,7 @@ const VERTICALS = [
     sub: "Food, art & culture",
     href: "/experiences",
     icon: Sparkles,
-    gradient: "from-amber-500/15 via-orange-500/10 to-transparent",
-    iconBg: "bg-amber-600 text-white",
+    iconBg: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
     badge: "Popular",
   },
   {
@@ -86,8 +84,7 @@ const VERTICALS = [
     sub: "Hotels & boutique rooms",
     href: "/explore",
     icon: Hotel,
-    gradient: "from-emerald-500/15 via-teal-500/10 to-transparent",
-    iconBg: "bg-emerald-600 text-white",
+    iconBg: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
     badge: "Verified",
   },
   {
@@ -96,8 +93,7 @@ const VERTICALS = [
     sub: "Live gigs & events",
     href: "/calendar",
     icon: CalendarDays,
-    gradient: "from-rose-500/15 via-pink-500/10 to-transparent",
-    iconBg: "bg-rose-600 text-white",
+    iconBg: "bg-rose-500/10 text-rose-700 dark:text-rose-400",
     badge: "Live",
   },
   {
@@ -106,18 +102,16 @@ const VERTICALS = [
     sub: "Plans & itineraries",
     href: "/plan",
     icon: Plane,
-    gradient: "from-purple-500/15 via-violet-500/10 to-transparent",
-    iconBg: "bg-purple-600 text-white",
+    iconBg: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400",
     badge: "Trips",
   },
   {
     id: "perks",
     label: "Perks & Drops",
-    sub: "Birthday freebies, giveaways & rewards",
+    sub: "Freebies & rewards",
     href: "/birthday-freebies/au",
     icon: Gift,
-    gradient: "from-yellow-500/15 via-amber-500/10 to-transparent",
-    iconBg: "bg-yellow-600 text-white",
+    iconBg: "bg-brand/10 text-brand",
     badge: "Rewards",
   },
 ];
@@ -242,7 +236,7 @@ export function HomePage() {
                 void triggerHaptic("medium");
                 nav("/mate/request");
               }}
-              className="h-11 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(18,22,20,0.15)]"
+              className="h-11 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(18,22,20,0.15)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <Users size={16} className="mr-2" />
               Find a Mate
@@ -254,7 +248,7 @@ export function HomePage() {
                 void triggerHaptic("light");
                 nav("/plan/new");
               }}
-              className="h-11 rounded-full px-5 bg-white/15 text-white ring-1 ring-white/30 hover:bg-white/25 font-semibold backdrop-blur-md"
+              className="h-11 rounded-full px-5 bg-white/15 text-white ring-1 ring-white/30 hover:bg-white/25 font-semibold backdrop-blur-md cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <Plus size={16} className="mr-1.5" />
               Plan a Hangout
@@ -274,7 +268,7 @@ export function HomePage() {
               if (p.href) nav(p.href);
               else openGlobalSearch();
             }}
-            className="inline-flex min-h-[44px] shrink-0 items-center gap-1 rounded-full bg-card px-4 py-2 text-[13px] font-semibold text-ink shadow-xs ring-1 ring-line transition hover:ring-brand/40 cursor-pointer active:scale-95"
+            className="inline-flex min-h-[44px] shrink-0 items-center gap-1 rounded-full bg-card px-4 py-2 text-[13px] font-semibold text-ink shadow-xs ring-1 ring-line transition hover:ring-brand/40 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-95"
           >
             {p.label}
           </button>
@@ -301,12 +295,12 @@ export function HomePage() {
                   void triggerHaptic("light");
                   nav(v.href);
                 }}
-                className="group relative flex flex-col justify-between rounded-2xl bg-card p-4 text-left ring-1 ring-line/80 shadow-xs transition hover:shadow-md hover:ring-brand/30 active:scale-[0.98] cursor-pointer"
+                className="group relative flex flex-col justify-between rounded-3xl bg-card p-4 text-left ring-1 ring-line/80 shadow-xs transition hover:shadow-md hover:ring-brand/30 active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
                 <div className="flex items-center justify-between">
                   <div
                     className={cn(
-                      "grid h-10 w-10 place-items-center rounded-xl shadow-xs transition group-hover:scale-105",
+                      "grid h-10 w-10 place-items-center rounded-2xl shadow-2xs transition group-hover:scale-105",
                       v.iconBg,
                     )}
                   >

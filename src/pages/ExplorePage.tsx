@@ -260,12 +260,6 @@ export function ExplorePage() {
           <p className="mt-1 text-sm text-mute">
             Places, events, and experiences.
           </p>
-          <Link
-            href="/birthday-freebies/au"
-            className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-pink-500/10 px-3 py-1 text-xs font-semibold text-pink-700 ring-1 ring-pink-500/20 hover:bg-pink-500/15"
-          >
-            🎂 Birthday freebies this month
-          </Link>
         </div>
 
         {/* View Switcher and Filter Toggle */}
@@ -278,7 +272,7 @@ export function ExplorePage() {
             }}
             aria-label="Open filters"
             className={cn(
-              "flex h-11 items-center gap-1.5 rounded-full bg-card px-4 text-xs font-semibold ring-1 transition-all active:scale-95 shadow-xs",
+              "flex h-11 items-center gap-1.5 rounded-full bg-card px-4 text-xs font-semibold ring-1 transition-all active:scale-95 shadow-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
               activeFiltersCount > 0
                 ? "ring-brand text-brand bg-brand/10"
                 : "ring-line text-mute hover:text-ink hover:bg-paper",
@@ -300,7 +294,7 @@ export function ExplorePage() {
               setView((v) => (v === "list" ? "map" : "list"));
             }}
             aria-label={view === "list" ? "Show map" : "Show list"}
-            className="flex h-11 items-center gap-1.5 rounded-full bg-card px-4 text-xs font-semibold ring-1 ring-line text-ink transition-all hover:bg-paper active:scale-95 shadow-xs"
+            className="flex h-11 items-center gap-1.5 rounded-full bg-card px-4 text-xs font-semibold ring-1 ring-line text-ink transition-all hover:bg-paper active:scale-95 shadow-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             {view === "list" ? (
               <>
@@ -346,7 +340,7 @@ export function ExplorePage() {
               }}
               aria-pressed={active}
               className={cn(
-                "flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs font-bold transition-all active:scale-95",
+                "flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs font-bold transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
                 active
                   ? "bg-brand text-white shadow-xs"
                   : "bg-card text-mute hover:text-ink ring-1 ring-line/80 hover:bg-paper",
