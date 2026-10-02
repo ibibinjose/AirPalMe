@@ -1862,7 +1862,8 @@ export function BioPublicPage() {
             >
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold">AirPal Guestlist</p>
-                <h4 className="font-display text-base font-bold text-ink mt-0.5">Get invites near you</h4>
+                <h4 className="font-display text-base font-bold text-ink mt-0.5">VIP Invites &amp; Secret Spots</h4>
+                <p className="text-[11.5px] text-mute mt-0.5">Get notified for exclusive gatherings, door perks, and secret drops.</p>
               </div>
               <label htmlFor="guestlist-name" className="sr-only">
                 Your name
@@ -1874,7 +1875,7 @@ export function BioPublicPage() {
                 placeholder="Your Name"
                 autoComplete="name"
                 maxLength={80}
-                className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus:border-brand shadow-2xs"
+                className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand focus:border-brand shadow-2xs"
               />
               <label htmlFor="guestlist-city" className="sr-only">
                 Your city
@@ -1883,7 +1884,7 @@ export function BioPublicPage() {
                 id="guestlist-city"
                 value={listCity}
                 onChange={(e) => setListCity(e.target.value)}
-                className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus:border-brand shadow-2xs"
+                className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand focus:border-brand shadow-2xs"
               >
                 <option value="">Your City</option>
                 {CITY_OPTIONS.map((c) => (
@@ -1906,7 +1907,7 @@ export function BioPublicPage() {
                     placeholder="Your city or town"
                     autoComplete="address-level2"
                     maxLength={60}
-                    className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus:border-brand shadow-2xs"
+                    className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand focus:border-brand shadow-2xs"
                   />
                 </>
               )}
@@ -1923,7 +1924,7 @@ export function BioPublicPage() {
                 value={listEmail}
                 onChange={(e) => setListEmail(e.target.value)}
                 placeholder="Your Email"
-                className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus:border-brand shadow-2xs"
+                className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand focus:border-brand shadow-2xs"
               />
               <fieldset>
                 <legend className="text-[11px] font-semibold text-mute">I&apos;m into — pick any</legend>
@@ -1942,8 +1943,8 @@ export function BioPublicPage() {
                         }
                         className={
                           on
-                            ? "h-9 shrink-0 cursor-pointer rounded-full bg-brand px-3.5 text-xs font-bold text-white shadow-xs transition active:scale-95"
-                            : "h-9 shrink-0 cursor-pointer rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95"
+                            ? "h-9 shrink-0 cursor-pointer rounded-full bg-brand px-3.5 text-xs font-bold text-white shadow-xs transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                            : "h-9 shrink-0 cursor-pointer rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                         }
                       >
                         {interest.label}
@@ -1955,9 +1956,9 @@ export function BioPublicPage() {
               <button
                 type="submit"
                 disabled={listSending}
-                className="h-11 w-full rounded-full bg-brand text-xs font-bold text-white transition hover:bg-brand-ink active:scale-95 shadow-xs disabled:opacity-60"
+                className="h-11 w-full rounded-full bg-brand text-xs font-bold text-white transition hover:bg-brand-ink active:scale-95 shadow-xs disabled:opacity-60 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
-                {listSending ? "Joining…" : "Join the Guestlist"}
+                {listSending ? "Joining VIP list…" : "Join the Guestlist (Free)"}
               </button>
               <p className="text-center text-[11px] leading-relaxed text-mute">
                 {GUESTLIST_CONSENT_V1} Includes AirPal Club perks and priority invites.

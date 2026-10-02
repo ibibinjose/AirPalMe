@@ -257,18 +257,51 @@ export function MatePage() {
           <h1 className="font-display mt-2 text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-[1.05] tracking-tight text-ink">
             Go with your Mate, Friends &amp; Family.
           </h1>
-          <p className="mt-2 max-w-md text-[14px] sm:text-[15px] text-mute font-medium">
-            Find verified local companions to join your outing.
+          <p className="mt-2 max-w-lg text-[14px] sm:text-[15px] text-mute font-medium leading-relaxed">
+            Want to do something, but have no one to go with? Find verified, local companions for concerts, exhibitions, cafes, and city walks.
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <Button size="lg" className="rounded-full bg-brand font-semibold text-white shadow-md hover:bg-brand-ink" onClick={() => nav("/mate/request")}>
+            <Button size="lg" className="rounded-full bg-brand font-semibold text-white shadow-md hover:bg-brand-ink cursor-pointer" onClick={() => nav("/mate/request")}>
               Find someone to go with <ArrowRight size={17} />
             </Button>
             <Link href="/companion">
-              <Button size="lg" variant="ghost" className="rounded-full border border-line bg-card text-ink hover:bg-paper">
+              <Button size="lg" variant="ghost" className="rounded-full border border-line bg-card text-ink hover:bg-paper cursor-pointer">
                 Become a Mate
               </Button>
             </Link>
+          </div>
+
+          {/* Trust & Safety Assurance Bar */}
+          <div className="mt-3.5 flex flex-wrap items-center gap-x-3.5 gap-y-1 text-xs text-mute font-medium">
+            <span className="inline-flex items-center gap-1 text-ink font-semibold">
+              <ShieldCheck size={14} className="text-emerald-500" /> 100% Identity-checked
+            </span>
+            <span>·</span>
+            <span>Public meetups only</span>
+            <span>·</span>
+            <span>Zero hidden fees</span>
+          </div>
+
+          {/* Quick-Start Outing Ideas (Reduced Activation Energy) */}
+          <div className="mt-4">
+            <p className="text-[10.5px] font-bold uppercase tracking-wider text-mute">Popular outings</p>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              {[
+                { label: "☕ Weekend Coffee & Walk", q: "Weekend coffee and harbour walk" },
+                { label: "🎵 Live Gig / Concert", q: "Live music gig" },
+                { label: "🎨 Art Gallery & Museum", q: "Art exhibition tour" },
+                { label: "🍜 Foodie Dinner", q: "New restaurant food tour" },
+              ].map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => nav(`/mate/request?what=${encodeURIComponent(item.q)}`)}
+                  className="rounded-full bg-card px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line shadow-2xs hover:bg-paper hover:ring-brand/40 transition active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
           </div>
 
       {user && assigned.length > 0 && (

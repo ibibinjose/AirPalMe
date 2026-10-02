@@ -31,6 +31,8 @@ export function MateRequestPage() {
   const initial = emptyMateRequest();
   const hinted = params.get("useCase");
   if (hinted && isUseCase(hinted)) initial.useCase = hinted;
+  const whatParam = params.get("what");
+  if (whatParam && !initial.what) initial.what = whatParam;
   if (preferredMateName && !initial.mateKind) {
     initial.mateKind = `Preferred Mate: ${preferredMateName}`;
   }
