@@ -1,16 +1,20 @@
 # Wallet passes (Apple + Google)
 
-Status: both endpoints live, **neither signer configured** — buttons
-currently toast "not set up yet" instead of downloading garbage. Apple
-needs a Pass Type ID certificate; Google needs a service-account key.
-Setup for each is one session below.
+Status: Apple signer is `pass.me.airpal.wallet` (team `26WGXSNG58`).
+The Pass Type ID certificate and encrypted key are Functions secrets;
+`walletPass` must be redeployed after any secret change because
+Functions pin secret versions at deploy time. Google uses the
+`wallet-passes` service account. `GOOGLE_WALLET_ISSUER_ID` is `3388000000023208916`
+(configured in Google Pay & Wallet Console).
 
 ## Pass design (both wallets)
 
 Luma-style event ticket on AirPal Blue (`#1805db`), white text,
 "AirPal.me" branding: date/time header, big event title, LOCATION row,
-GUEST + HOST row, QR barcode (booking id — hosts verify via gate lookup).
-Profile cards: name + @handle, bio on the back, QR to the profile URL.
+GUEST + HOST row, QR barcode of the same gate URL as the on-screen
+ticket (`/e/:id?ticket=`, `/plan/:id?ticket=`, or `/ticket/:id`).
+Profile cards read `name` and `shortWhy` (city on the front when set),
+QR to the profile URL.
 
 ## Apple Wallet
 
@@ -69,6 +73,11 @@ Profile cards: name + @handle, bio on the back, QR to the profile URL.
   pre-provisioning is needed beyond the issuer.
 - Status contract: `200` `{ saveUrl }` · `404` unknown booking/handle ·
   `501` service account not configured · `500` signing failed (logged).
+
+Google Wallet API is enabled on `airpalme-app`. The service account
+`wallet-passes@airpalme-app.iam.gserviceaccount.com` is granted Developer access
+on issuer `3388000000023208916`, and `GOOGLE_WALLET_ISSUER_ID` is stored in
+Secret Manager. The `googleWalletPass` endpoint mints live signed save links.
 
 ### Google one-time setup (needs a Google Cloud owner)
 

@@ -71,7 +71,7 @@ function configure() {
     publicKeyEncoding: { type: "spki", format: "pem" },
     privateKeyEncoding: { type: "pkcs8", format: "pem" },
   });
-  process.env.GOOGLE_WALLET_ISSUER_ID = "issuer123";
+  process.env.GOOGLE_WALLET_ISSUER_ID = "3388000000012345678";
   process.env.GOOGLE_WALLET_SA_JSON = JSON.stringify({
     client_email: "wallet@test.iam.gserviceaccount.com",
     private_key: privateKey,
@@ -82,6 +82,17 @@ describe("googleWalletPass", () => {
   it("rejects non-GET methods and malformed paths", async () => {
     expect((await run("POST", "/api/wallet/google/ticket/b1")).status).toBe(405);
     expect((await run("GET", "/api/wallet/google/other/b1")).status).toBe(400);
+  });
+
+  it("answers 501 when the issuer id is a filename instead of digits", async () => {
+    process.env.GOOGLE_WALLET_ISSUER_ID = "airpalme-app-592411b17c3a.json";
+    process.env.GOOGLE_WALLET_SA_JSON = JSON.stringify({
+      client_email: "wallet@test.iam.gserviceaccount.com",
+      private_key: "-----BEGIN PRIVATE KEY-----\nexample\n-----END PRIVATE KEY-----",
+    });
+    const out = await run("GET", "/api/wallet/google/ticket/b1");
+    expect(out.status).toBe(501);
+    expect(out.body).toEqual({ error: "google_wallet_not_configured" });
   });
 
   it("answers 501 while the service account is not configured", async () => {
@@ -121,13 +132,17 @@ describe("googleWalletPass", () => {
     const obj = decoded.payload.eventTicketObjects[0] as Record<string, unknown>;
     expect(obj.ticketNumber).toBe("b1");
     expect(obj.hexBackgroundColor).toBe("#1805db");
-    expect(obj.barcode).toEqual({ type: "QR_CODE", value: "b1" });
+    expect(obj.barcode).toEqual({
+      type: "QR_CODE",
+      value: "https://airpal.me/ticket/b1",
+      alternateText: "b1",
+    });
   });
 
   it("mints a profile card save link for a known handle", async () => {
     configure();
     fakes.docs["handles/bibin"] = { profileId: "p1" };
-    fakes.docs["profiles/p1"] = { displayName: "Bibin", bio: "Host" };
+    fakes.docs["profiles/p1"] = { name: "Bibin", shortWhy: "Host", city: "Sydney", kind: "business" };
     const out = await run("GET", "/api/wallet/google/card/bibin");
     expect(out.status).toBe(200);
     const saveUrl = (out.body as { saveUrl: string }).saveUrl;
@@ -136,7 +151,13 @@ describe("googleWalletPass", () => {
     };
     const obj = decoded.payload.genericObjects[0] as Record<string, unknown>;
     expect(obj.hexBackgroundColor).toBe("#1805db");
-    expect(obj.barcode).toEqual({ type: "QR_CODE", value: "https://airpal.me/@bibin" });
+    expect(obj.cardTitle).toEqual({ defaultValue: { language: "en", value: "Bibin" } });
+    expect(obj.subheader).toEqual({ defaultValue: { language: "en", value: "Sydney" } });
+    expect(obj.barcode).toEqual({
+      type: "QR_CODE",
+      value: "https://airpal.me/@bibin",
+      alternateText: "@bibin",
+    });
   });
 });
 
@@ -148,16 +169,20 @@ describe("wallet payload builders", () => {
 
   it("builds Sydney-timezoned ticket payloads on AirPal Blue", () => {
     const payload = ticketSavePayload({
-      issuerId: "issuer123",
+      issuerId: "3388000000012345678",
       bookingId: "b1",
       title: "Show",
       date: "2026-10-02",
       time: "19:00",
       venue: "Enmore",
       guestName: "Bibin",
+      gateUrl: "https://airpal.me/e/show?ticket=b1",
+      eventId: "show",
     });
     const obj = (payload.eventTicketObjects as Record<string, unknown>[])[0] as Record<string, unknown>;
-    expect(obj.id).toBe("issuer123.b1");
+    expect(obj.id).toBe("3388000000012345678.b1");
+    expect(obj.classId).toBe("3388000000012345678.show");
+    expect((payload.eventTicketClasses as { reviewStatus: string }[])[0]?.reviewStatus).toBe("UNDER_REVIEW");
     expect(obj.hexBackgroundColor).toBe("#1805db");
     expect(obj.dateTime).toEqual({
       start: { date: "2026-10-02", time: { hours: 19, minutes: 0 }, timeZone: { id: "Australia/Sydney" } },
@@ -165,9 +190,11 @@ describe("wallet payload builders", () => {
   });
 
   it("builds profile card payloads with a profile link", () => {
-    const payload = cardSavePayload({ issuerId: "issuer123", handle: "bibin", name: "Bibin", bio: "" });
+    const payload = cardSavePayload({ issuerId: "3388000000012345678", handle: "bibin", name: "Bibin", bio: "" });
     const obj = (payload.genericObjects as Record<string, unknown>[])[0] as Record<string, unknown>;
-    expect(obj.id).toBe("issuer123.bibin");
-    expect(obj.linksModuleData).toEqual({ uris: [{ uri: "https://airpal.me/@bibin", description: "View profile" }] });
+    expect(obj.id).toBe("3388000000012345678.bibin");
+    expect(obj.linksModuleData).toEqual({
+      uris: [{ uri: "https://airpal.me/@bibin", description: "View profile", id: "profile" }],
+    });
   });
 });

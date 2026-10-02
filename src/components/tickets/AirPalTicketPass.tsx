@@ -7,7 +7,7 @@ import { googleWalletTicketUrl, openAppleWalletPass, openGoogleWalletPass, ticke
 import { makeQrDataUrl } from "@/lib/qr";
 import { publicSiteOrigin } from "@/lib/public-origin";
 import { shareNative } from "@/lib/native";
-import { bookingDisplayPaid, type Booking } from "@shared/booking";
+import { bookingDisplayPaid, ticketGateUrl, type Booking } from "@shared/booking";
 
 interface Props {
   booking: Booking & { id: string };
@@ -16,12 +16,9 @@ interface Props {
   showActions?: boolean;
 }
 
-/** Gate-scan URL for the ticket QR. Events and plans resolve to their session page; everything else gets the dedicated gate page. */
+/** Gate-scan URL for the ticket QR. Same path the Apple and Google wallet barcodes encode. */
 export function ticketQrHref(booking: Booking & { id: string }): string {
-  const origin = publicSiteOrigin();
-  if (booking.eventId) return `${origin}/e/${booking.eventId}?ticket=${booking.id}`;
-  if (booking.planId) return `${origin}/plan/${booking.planId}?ticket=${booking.id}`;
-  return `${origin}/ticket/${booking.id}`;
+  return ticketGateUrl(booking, publicSiteOrigin());
 }
 
 /**

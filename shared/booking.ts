@@ -149,6 +149,22 @@ export function ticketIdFromSearch(search: string): string | null {
   return isTicketId(id) ? id : null;
 }
 
+/** Gate path the on-screen ticket and both wallet QRs share. */
+export function ticketGatePath(booking: { id: string; eventId?: string; planId?: string }): string {
+  const id = encodeURIComponent(booking.id);
+  if (booking.eventId) return `/e/${encodeURIComponent(booking.eventId)}?ticket=${id}`;
+  if (booking.planId) return `/plan/${encodeURIComponent(booking.planId)}?ticket=${id}`;
+  return `/ticket/${id}`;
+}
+
+/** Absolute gate URL. Wallet barcodes use this so a camera opens the same gate as the ticket. */
+export function ticketGateUrl(
+  booking: { id: string; eventId?: string; planId?: string },
+  origin = "https://airpal.me",
+): string {
+  return origin.replace(/\/$/, "") + ticketGatePath(booking);
+}
+
 export const TICKET_ADMIT_REASONS = ["unpaid", "cancelled", "refunded", "disputed", "completed"] as const;
 export type TicketAdmitReason = (typeof TICKET_ADMIT_REASONS)[number];
 

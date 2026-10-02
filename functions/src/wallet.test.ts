@@ -29,6 +29,7 @@ vi.mock("firebase-functions/params", () => ({
   })),
 }));
 
+import { cardFieldsFromProfile } from "./pass-profile";
 import { cardPassJson, formatPassDate, formatPassTime, ticketPassJson, walletPass } from "./wallet";
 
 type Handler = (
@@ -118,6 +119,20 @@ describe("pass content (Luma layout, AirPal Blue)", () => {
     const generic = json.generic as Record<string, { label: string; value: string }[]>;
     expect(generic.primaryFields[0]?.value).toBe("Bibin");
     expect(generic.secondaryFields[0]?.value).toBe("@bibin");
+  });
+
+  it("reads business-card identity from profile name and shortWhy", () => {
+    const fields = cardFieldsFromProfile(
+      { name: "Harbour Hotel", shortWhy: "Rooms on the quay", city: "Sydney", kind: "business" },
+      "harbour",
+    );
+    const json = cardPassJson({ handle: "harbour", ...fields });
+    expect(json.description).toBe("Harbour Hotel — AirPal business card");
+    const generic = json.generic as Record<string, { value: string }[]>;
+    expect(generic.primaryFields[0]?.value).toBe("Harbour Hotel");
+    expect(generic.auxiliaryFields[0]?.value).toBe("Sydney");
+    const back = generic.backFields as { value: string }[];
+    expect(back.some((field) => field.value === "Rooms on the quay")).toBe(true);
   });
 });
 

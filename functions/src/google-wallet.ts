@@ -1,7 +1,9 @@
 import jwt from "jsonwebtoken";
 import { defineSecret } from "firebase-functions/params";
 import { onRequest } from "firebase-functions/v2/https";
+import { ticketGateUrl } from "../../shared/booking";
 import { db } from "./admin";
+import { cardFieldsFromProfile } from "./pass-profile";
 
 /**
  * Google Wallet save links: GET /api/wallet/google/ticket/:id and
@@ -47,7 +49,8 @@ interface GoogleConfig {
 export function googleConfigFromEnv(): GoogleConfig | null {
   const issuerId = readSecret(issuerIdSecret, "GOOGLE_WALLET_ISSUER_ID").trim();
   const raw = readSecret(saJsonSecret, "GOOGLE_WALLET_SA_JSON").trim();
-  if (!issuerId || !raw) return null;
+  // Issuer ids are digits. A key filename or pasted command is not a configured issuer.
+  if (!/^\d+$/.test(issuerId) || !raw) return null;
   try {
     const sa = JSON.parse(raw) as { client_email?: unknown; private_key?: unknown };
     if (typeof sa.client_email !== "string" || typeof sa.private_key !== "string") return null;
@@ -76,18 +79,31 @@ function parseTime(time: string): { hours: number; minutes: number } | null {
 export interface TicketObjectInput {
   issuerId: string;
   bookingId: string;
+  eventId?: string;
   title: string;
   date: string;
   time: string;
   venue: string;
   guestName: string;
+  gateUrl: string;
+  spots?: number;
 }
 
 export function ticketSavePayload(input: TicketObjectInput): Record<string, unknown> {
-  const classId = `${input.issuerId}.airpal_event_ticket`;
+  const classSuffix = input.eventId
+    ? sanitizeObjectId(input.eventId)
+    : `event_${sanitizeObjectId(input.bookingId)}`;
+  const classId = `${input.issuerId}.${classSuffix}`;
   const time = parseTime(input.time);
   return {
-    eventTicketClasses: [{ id: classId, issuerName: "AirPal" }],
+    eventTicketClasses: [
+      {
+        id: classId,
+        issuerName: "AirPal",
+        reviewStatus: "UNDER_REVIEW",
+        eventName: text(input.title),
+      },
+    ],
     eventTicketObjects: [
       {
         id: `${input.issuerId}.${sanitizeObjectId(input.bookingId)}`,
@@ -103,7 +119,10 @@ export function ticketSavePayload(input: TicketObjectInput): Record<string, unkn
         venue: { name: text(input.venue), address: text(input.venue) },
         ticketHolder: { name: text(input.guestName) },
         ticketNumber: input.bookingId,
-        barcode: { type: "QR_CODE", value: input.bookingId },
+        ...(input.spots && input.spots > 1
+          ? { textModulesData: [{ header: "TICKETS", body: String(input.spots), id: "spots" }] }
+          : {}),
+        barcode: { type: "QR_CODE", value: input.gateUrl, alternateText: input.bookingId },
         hexBackgroundColor: "#1805db",
       },
     ],
@@ -115,13 +134,14 @@ export interface CardObjectInput {
   handle: string;
   name: string;
   bio: string;
+  city?: string;
 }
 
 export function cardSavePayload(input: CardObjectInput): Record<string, unknown> {
   const classId = `${input.issuerId}.airpal_profile_card`;
   const url = `https://airpal.me/@${input.handle}`;
   return {
-    genericClasses: [{ id: classId, issuerName: "AirPal" }],
+    genericClasses: [{ id: classId, issuerName: "AirPal", reviewStatus: "UNDER_REVIEW" }],
     genericObjects: [
       {
         id: `${input.issuerId}.${sanitizeObjectId(input.handle)}`,
@@ -129,13 +149,14 @@ export function cardSavePayload(input: CardObjectInput): Record<string, unknown>
         state: "ACTIVE",
         cardTitle: text(input.name),
         header: text(`@${input.handle}`),
+        ...(input.city ? { subheader: text(input.city) } : {}),
         logo: {
           sourceUri: { uri: "https://airpal.me/logo-mark.png" },
           contentDescription: text("AirPal"),
         },
-        ...(input.bio ? { textModulesData: [{ header: "ABOUT", body: input.bio.slice(0, 200) }] } : {}),
-        barcode: { type: "QR_CODE", value: url },
-        linksModuleData: { uris: [{ uri: url, description: "View profile" }] },
+        ...(input.bio ? { textModulesData: [{ header: "ABOUT", body: input.bio.slice(0, 200), id: "about" }] } : {}),
+        barcode: { type: "QR_CODE", value: url, alternateText: `@${input.handle}` },
+        linksModuleData: { uris: [{ uri: url, description: "View profile", id: "profile" }] },
         hexBackgroundColor: "#1805db",
       },
     ],
@@ -193,14 +214,23 @@ export const googleWalletPass = onRequest(
         let eventName = "";
         const eventId = str(booking.eventId);
         if (eventId) eventName = str((await getDocData("events", eventId))?.name);
+        const spots = Number(booking.spots);
+        const title = eventName || str(booking.title) || "AirPal booking";
         payload = ticketSavePayload({
           issuerId: cfg.issuerId,
           bookingId: key,
-          title: eventName || str(booking.title) || "AirPal booking",
+          eventId: eventId || undefined,
+          title,
           date: str(booking.date),
           time: str(booking.time),
           venue: str(booking.suburb) || str(booking.providerName) || "AirPal",
           guestName: await guestNameFor(str(booking.customerUid)),
+          gateUrl: ticketGateUrl({
+            id: key,
+            eventId: eventId || undefined,
+            planId: str(booking.planId) || undefined,
+          }),
+          spots: Number.isFinite(spots) && spots > 1 ? spots : undefined,
         });
       } else {
         const normalized = key.trim().replace(/^@+/, "").toLowerCase();
@@ -210,11 +240,13 @@ export const googleWalletPass = onRequest(
           res.status(404).json({ error: "profile_not_found" });
           return;
         }
+        const fields = cardFieldsFromProfile(profile, normalized);
         payload = cardSavePayload({
           issuerId: cfg.issuerId,
           handle: normalized,
-          name: str(profile.displayName) || str(profile.firstName) || `@${normalized}`,
-          bio: str(profile.bio),
+          name: fields.name,
+          bio: fields.bio,
+          city: fields.city,
         });
       }
       const saveUrl = `https://pay.google.com/gp/v/save/${mintSaveJwt(cfg, payload)}`;

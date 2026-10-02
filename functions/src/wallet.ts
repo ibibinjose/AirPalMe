@@ -1,7 +1,9 @@
 import { PKPass } from "passkit-generator";
 import { defineSecret } from "firebase-functions/params";
 import { onRequest } from "firebase-functions/v2/https";
+import { ticketGateUrl } from "../../shared/booking";
 import { db } from "./admin";
+import { cardFieldsFromProfile } from "./pass-profile";
 
 /**
  * Apple Wallet .pkpass endpoint: GET /api/wallet/ticket/:id.pkpass and
@@ -104,12 +106,15 @@ export interface TicketPassInput {
   providerName: string;
   status: string;
   guestName: string;
+  spots?: number;
 }
 
 export interface CardPassInput {
   handle: string;
   name: string;
   bio: string;
+  city?: string;
+  kind?: string;
 }
 
 const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
@@ -153,6 +158,9 @@ export function ticketPassJson(input: TicketPassInput): Record<string, unknown> 
       backFields: [
         { key: "booking", label: "Booking", value: input.bookingId },
         { key: "status", label: "Status", value: input.status || "booked" },
+        ...(input.spots && input.spots > 1
+          ? [{ key: "spots", label: "Tickets", value: String(input.spots) }]
+          : []),
       ],
     },
   };
@@ -163,7 +171,7 @@ export function cardPassJson(input: CardPassInput): Record<string, unknown> {
   return {
     formatVersion: 1,
     organizationName: "AirPal.me",
-    description: `${input.name} on AirPal`,
+    description: input.kind === "business" ? `${input.name} — AirPal business card` : `${input.name} on AirPal`,
     serialNumber: `card-${input.handle}`,
     backgroundColor: "rgb(24,5,219)",
     foregroundColor: "rgb(255,255,255)",
@@ -171,7 +179,7 @@ export function cardPassJson(input: CardPassInput): Record<string, unknown> {
     generic: {
       primaryFields: [{ key: "name", label: "AIRPAL", value: input.name }],
       secondaryFields: [{ key: "handle", label: "HANDLE", value: `@${input.handle}` }],
-      auxiliaryFields: [],
+      auxiliaryFields: input.city ? [{ key: "city", label: "CITY", value: input.city }] : [],
       backFields: [
         { key: "profile", label: "Profile", value: url },
         ...(input.bio ? [{ key: "bio", label: "About", value: input.bio.slice(0, 200) }] : []),
@@ -202,7 +210,12 @@ async function buildPassBuffer(
     },
     { serialNumber },
   );
-  pass.setBarcodes({ format: "PKBarcodeFormatQR", message: barcodeMessage, messageEncoding: "iso-8859-1" });
+  pass.setBarcodes({
+    format: "PKBarcodeFormatQR",
+    message: barcodeMessage,
+    messageEncoding: "iso-8859-1",
+    altText: serialNumber.replace(/^(ticket|card)-/, ""),
+  });
   return pass.getAsBuffer();
 }
 
@@ -222,6 +235,7 @@ async function ticketPassBuffer(bookingId: string, cfg: SignerConfig): Promise<B
   let eventName = "";
   const eventId = str(booking.eventId);
   if (eventId) eventName = str((await getDocData("events", eventId))?.name);
+  const spots = Number(booking.spots);
   const passJson = ticketPassJson({
     bookingId,
     title: eventName || str(booking.title) || "AirPal booking",
@@ -231,8 +245,14 @@ async function ticketPassBuffer(bookingId: string, cfg: SignerConfig): Promise<B
     providerName: str(booking.providerName),
     status: str(booking.status),
     guestName: await guestNameFor(str(booking.customerUid)),
+    spots: Number.isFinite(spots) && spots > 1 ? spots : undefined,
   });
-  return buildPassBuffer(cfg, passJson, `ticket-${bookingId}`, bookingId);
+  const gateUrl = ticketGateUrl({
+    id: bookingId,
+    eventId: str(booking.eventId) || undefined,
+    planId: str(booking.planId) || undefined,
+  });
+  return buildPassBuffer(cfg, passJson, `ticket-${bookingId}`, gateUrl);
 }
 
 async function cardPassBuffer(handle: string, cfg: SignerConfig): Promise<Buffer | null> {
@@ -242,10 +262,13 @@ async function cardPassBuffer(handle: string, cfg: SignerConfig): Promise<Buffer
   if (!profileId) return null;
   const profile = await getDocData("profiles", profileId);
   if (!profile) return null;
+  const fields = cardFieldsFromProfile(profile, normalized);
   const passJson = cardPassJson({
     handle: normalized,
-    name: str(profile.displayName) || str(profile.firstName) || `@${normalized}`,
-    bio: str(profile.bio),
+    name: fields.name,
+    bio: fields.bio,
+    city: fields.city,
+    kind: fields.kind,
   });
   return buildPassBuffer(cfg, passJson, `card-${normalized}`, `https://airpal.me/@${normalized}`);
 }

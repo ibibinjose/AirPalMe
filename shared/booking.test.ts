@@ -26,6 +26,8 @@ import {
   repriceSourcedBooking,
   ticketAdmitCheck,
   ticketAdmitReasonLabel,
+  ticketGatePath,
+  ticketGateUrl,
   ticketIdFromSearch,
 } from "./booking";
 
@@ -241,6 +243,15 @@ describe("booking engine", () => {
     expect(isTicketId("a".repeat(129))).toBe(false);
     expect(isTicketId(undefined)).toBe(false);
     expect(isTicketId(42)).toBe(false);
+  });
+
+  it("builds the same gate URL the ticket QR and wallet barcodes use", () => {
+    expect(ticketGatePath({ id: "b1", eventId: "spark26-001" })).toBe("/e/spark26-001?ticket=b1");
+    expect(ticketGatePath({ id: "b2", planId: "p1" })).toBe("/plan/p1?ticket=b2");
+    expect(ticketGateUrl({ id: "b3" })).toBe("https://airpal.me/ticket/b3");
+    expect(ticketIdFromSearch(ticketGateUrl({ id: "b1", eventId: "spark26-001" }).split("airpal.me")[1] || "")).toBe(
+      "b1",
+    );
   });
 
   it("parses gate-scan ticket ids strictly", () => {
