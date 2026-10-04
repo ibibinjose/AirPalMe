@@ -53,6 +53,12 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
     description: "Your guest companion — Wi-Fi, dining, the desk and what's around your stay.",
   },
   {
+    match: /^\/explore\/attractions$/,
+    title: "DayPasses · AirPal.Me",
+    description:
+      "Sydney DayPasses — compare, bundle and book SEA LIFE, WILD LIFE, Madame Tussauds, Sydney Tower Eye and Taronga. Life Made Easy.",
+  },
+  {
     match: /^\/discover(\/|$)|^\/explore(\/|$)|^\/$/,
     title: "Discover · AirPal.Me",
     description: "Discover places, events and experiences near you.",

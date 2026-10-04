@@ -93,6 +93,7 @@ const UnsubscribePage = lazy(() => import("@/pages/UnsubscribePage").then((m) =>
 const PrivacyPage = lazy(() => import("@/pages/PrivacyPage").then((m) => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import("@/pages/TermsPage").then((m) => ({ default: m.TermsPage })));
 const CookiesPage = lazy(() => import("@/pages/CookiesPage").then((m) => ({ default: m.CookiesPage })));
+const AttractionsPage = lazy(() => import("@/pages/AttractionsPage").then((m) => ({ default: m.AttractionsPage })));
 const PlanHubPage = lazy(() => import("@/pages/PlanHubPage").then((m) => ({ default: m.PlanHubPage })));
 const PlanCreatePage = lazy(() => import("@/pages/PlanCreatePage").then((m) => ({ default: m.PlanCreatePage })));
 const PlanDetailPage = lazy(() => import("@/pages/PlanDetailPage").then((m) => ({ default: m.PlanDetailPage })));
@@ -124,6 +125,7 @@ export function AppRoutes() {
         <Switch>
           <Route path="/">{isPassApp() ? <Redirect to="/pass" /> : <HomePage />}</Route>
           <Route path="/now" component={NowPage} />
+          <Route path="/explore/attractions" component={AttractionsPage} />
           {/* One composer: every legacy discovery front door lands on /now. */}
           <Route path="/explore">
             <Redirect to="/now" />
