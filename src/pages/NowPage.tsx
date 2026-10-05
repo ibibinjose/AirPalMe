@@ -6,6 +6,7 @@ import { useLocalNow } from "@/contexts/LocalNowContext";
 import { discoverPlaces } from "@/lib/catalog";
 import { zonedWeekdayIndex } from "@/lib/local-time";
 import { NOW_MOODS, NOW_WHENS, pickSuggestion, type NowMood, type NowWhen } from "@/lib/now-suggest";
+import { nowPlanHref } from "@/lib/now-plan";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { cn } from "@/lib/cn";
@@ -61,7 +62,7 @@ function openLabel(open: boolean | null, when: NowWhen): string {
 }
 
 export function NowPage() {
-  const { here, city, now, time, day, timeZone, usingGps } = useLocalNow();
+  const { here, city, now, today, time, day, timeZone, usingGps } = useLocalNow();
   const { version, remoteLoaded } = useListings();
   const [, navigate] = useLocation();
   const [mood, setMood] = useState<NowMood>("any");
@@ -146,7 +147,22 @@ export function NowPage() {
             {suggestion.place.hours ? <p className="mt-1 text-sm text-mute">Hours: {suggestion.place.hours}</p> : null}
             {suggestion.place.address ? <p className="mt-1 text-sm text-mute">{suggestion.place.address}</p> : null}
             <div className="mt-4 flex flex-wrap gap-2">
-              <Button onClick={() => navigate("/plan/new")}>
+              <Button
+                onClick={() =>
+                  navigate(
+                    nowPlanHref({
+                      mood,
+                      when,
+                      placeName: suggestion.place.name,
+                      address: suggestion.place.address,
+                      city,
+                      date: today,
+                      now,
+                      geo: suggestion.place.geo,
+                    }),
+                  )
+                }
+              >
                 Make it a plan
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Button>

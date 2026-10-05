@@ -239,7 +239,11 @@ export function PlanCreatePage() {
   const [place, setPlace] = useState(
     params.get("dest") || params.get("destination") || solvedIntent?.suburb || city || "The Rocks, Sydney",
   );
-  const [placeGeo, setPlaceGeo] = useState<Geo | undefined>();
+  const [placeGeo, setPlaceGeo] = useState<Geo | undefined>(() => {
+    const lat = Number(params.get("lat"));
+    const lng = Number(params.get("lng"));
+    return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : undefined;
+  });
   const [isPublic, setIsPublic] = useState(false);
   const [hero, setHero] = useState<string | undefined>();
   const [invite, setInvite] = useState<Set<string>>(() => new Set(targetHandle ? [targetHandle] : []));

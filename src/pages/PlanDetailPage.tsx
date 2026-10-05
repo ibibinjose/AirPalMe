@@ -94,6 +94,7 @@ export function PlanDetailPage() {
     reviewRsvp,
     submitPlanReview,
     toggleCheckIn,
+    checkInSelf,
     proposeDateOption,
     lockDateOption,
     reopenDatePoll,
@@ -798,6 +799,21 @@ export function PlanDetailPage() {
                   >
                     Add Note
                   </Button>
+
+                  {userAttendee?.status === "going" && !userAttendee.checkedIn && (
+                    <Button
+                      size="sm"
+                      onClick={() => checkInSelf(plan.id)}
+                      className="rounded-full h-8 px-3 text-xs font-semibold"
+                    >
+                      We’re here
+                    </Button>
+                  )}
+                  {userAttendee?.checkedIn && (
+                    <span className="rounded-full bg-emerald-500/15 px-3 py-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                      Checked in
+                    </span>
+                  )}
 
                   <AddToCalendarMenu
                     event={{

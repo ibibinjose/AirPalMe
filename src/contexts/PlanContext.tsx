@@ -112,6 +112,7 @@ interface PlanContextValue {
     decision: "approve" | "decline",
   ) => HangoutPlan | undefined;
   toggleCheckIn: (planId: string, attendeeId: string) => HangoutPlan | undefined;
+  checkInSelf: (planId: string) => HangoutPlan | undefined;
   proposeDateOption: (planId: string, input: { date: string; time?: string }) => HangoutPlan | undefined;
   lockDateOption: (planId: string, optionId: string) => HangoutPlan | undefined;
   reopenDatePoll: (planId: string) => HangoutPlan | undefined;
@@ -620,6 +621,29 @@ export function PlanProvider({ children }: { children: ReactNode }) {
     [user],
   );
 
+  // Attendee self check-in ("we're here"): the guest flips only their own
+  // row. One-way — the host can undo it from the guest list.
+  const checkInSelf = useCallback(
+    (planId: string) => {
+      const current = storeGetPlan(planId);
+      if (!current) return undefined;
+      const anonId = typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null;
+      const self = current.attendees.find((a) => (user?.uid && a.id === user.uid) || (anonId && a.id === anonId));
+      if (!self || self.status !== "going" || self.checkedIn) return undefined;
+      const updated = savePlan({
+        ...current,
+        attendees: setAttendeeCheckedIn(current.attendees, self.id, true),
+      });
+      if (updated) {
+        setPlans([...loadPlans()]);
+        void triggerHaptic("success");
+        toast.success("Checked in — have a great time!");
+      }
+      return updated;
+    },
+    [user],
+  );
+
   const proposeDateOption = useCallback(
     (planId: string, input: { date: string; time?: string }) => {
       const current = storeGetPlan(planId);
@@ -905,6 +929,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         rsvpPlan,
         reviewRsvp,
         toggleCheckIn,
+        checkInSelf,
         proposeDateOption,
         lockDateOption,
         reopenDatePoll,
