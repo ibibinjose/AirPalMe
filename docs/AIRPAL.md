@@ -73,7 +73,7 @@ Done (memory and repeat):
 
 ### B3. V1 excludes (explicit)
 
-Mate discovery, matching, requests, paid supply, and booking-a-person in any form. Identity verification funnels and admin supply approvals. Public reviews and reputation. Deals posted by users (user-as-seller). Browsing directories of any kind (no events/places/deals/listing feeds as destinations). Business dashboards, campaigns tooling, Stay host operations, Fashion/Travel/Daily as products. Paid paths of any kind — free plans only. Social graph mechanics (followers, posts, feeds, DMs from profiles).
+Mate discovery, matching, requests, paid supply, and booking-a-person in any form. Identity verification funnels and admin supply approvals. Public reviews and reputation. Deals posted by users (user-as-seller). Browsing directories of any kind (no events/places/deals/listing feeds as destinations). Business dashboards, campaigns tooling, Fashion/Travel/Daily as products. Paid paths of any kind — free plans only. (Stay host operations returned early at human request — see G6.) Social graph mechanics (followers, posts, feeds, DMs from profiles).
 
 ### B4. Invariants that keep V1 calm
 
@@ -195,7 +195,8 @@ Nothing here returns on opinion. Each needs its evidence gate plus its trust mac
 - Reviews and reputation: only after paid or completed-transaction loops exist; tied to completed experiences, both sides, reportable and moderated.
 - Mate / stranger matching / booking-a-person: only after V1 repeat rate holds for weeks AND identity verification, admin approvals, safety check-ins, and human moderation are built. Never on automation alone.
 - User-posted deals: only after business deals loop works, with its own seller-trust design.
-- Stay host operations, Fashion, Travel, Daily as products, Studio: only after the V1 loop repeats; each must pass the feature test (G7) first.
+- Stay host operations: returned early at human request (October 2026); `/host` rebuilt with full parity on the same data, no model change.
+- Fashion, Travel, Daily as products, Studio: only after the V1 loop repeats; each must pass the feature test (G7) first.
 
 ### G7. Feature test (every new surface must pass)
 
