@@ -7,6 +7,7 @@ import { HomePage } from "@/pages/HomePage";
 
 // Code-split all other pages dynamically for fast initial bundle
 const ExplorePage = lazy(() => import("@/pages/ExplorePage").then((m) => ({ default: m.ExplorePage })));
+const NowPage = lazy(() => import("@/pages/NowPage").then((m) => ({ default: m.NowPage })));
 const ConciergePage = lazy(() => import("@/pages/ConciergePage").then((m) => ({ default: m.ConciergePage })));
 const CirclePage = lazy(() => import("@/pages/CirclePage").then((m) => ({ default: m.CirclePage })));
 const CompanionPage = lazy(() => import("@/pages/CompanionPage").then((m) => ({ default: m.CompanionPage })));
@@ -151,6 +152,7 @@ export function AppRoutes() {
     <Suspense fallback={<RouteFallback />}>
       <Switch>
         <Route path="/" component={HomePage} />
+        <Route path="/now" component={NowPage} />
         <Route path="/search/analytics" component={SearchAnalyticsPage} />
         <Route path="/admin/search-analytics">
           <Redirect to="/search/analytics" />

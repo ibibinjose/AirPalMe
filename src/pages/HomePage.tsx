@@ -50,6 +50,7 @@ const AROUND: { id: AroundFilter; label: string; color: string }[] = [
 ];
 
 const QUICK_PROMPTS = [
+  { label: "⚡ What now?", href: "/now" },
   { label: "☕ Coffee & Chat", query: "coffee" },
   { label: "✨ Find a Mate", href: "/mate" },
   { label: "🎭 Live Tonight", href: "/calendar" },
