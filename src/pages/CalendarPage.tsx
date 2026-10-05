@@ -382,8 +382,8 @@ function CalendarPageContent() {
 
       {/* Top Header / tools */}
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h2 className="font-display text-xl font-bold tracking-tight text-ink">Browse events</h2>
+        <div className="shrink-0">
+          <h2 className="font-display text-xl font-bold tracking-tight text-ink whitespace-nowrap">Browse events</h2>
         </div>
 
         {/* View Switcher & Action Tools */}

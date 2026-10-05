@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import {
   EVENT_FLAVOUR_LABELS,
@@ -18,6 +18,7 @@ import { MapPin, Navigation, Info, ArrowLeft, Share2, Building2, User, Users, Ex
 import { mapsPlaceUrl } from "@/lib/maps";
 import { shareNative } from "@/lib/native";
 import { toPublicUrl } from "@/lib/public-origin";
+import { setShareMeta } from "@/lib/share-meta";
 import { toast } from "sonner";
 
 export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
@@ -25,6 +26,17 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
   const { stallsFor, savedStalls, isSaved } = useEvents();
   const stalls = stallsFor(event.id);
   const visitList = savedStalls.filter((s) => s.eventId === event.id);
+
+  useEffect(() => {
+    setShareMeta({
+      title: `${event.name} · AirPal`,
+      description: event.shortWhy || event.description || `Explore ${event.name} in ${event.city} on AirPal.Me.`,
+      image: event.coverImage || undefined,
+      url: toPublicUrl(event.gatePath),
+      type: "event",
+    });
+  }, [event.name, event.shortWhy, event.description, event.coverImage, event.gatePath, event.city]);
+
   const chips = useMemo(() => {
     const present = new Set(stalls.map((s) => s.category));
     return STALL_CATEGORIES.filter((c) => present.has(c.id) || event.categoryChips.includes(c.id));

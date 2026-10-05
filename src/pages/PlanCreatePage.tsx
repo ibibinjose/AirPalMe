@@ -7,6 +7,7 @@ import {
   Calendar,
   CalendarDays,
   Check,
+  ChevronDown,
   ChevronRight,
   Clock,
   Coffee,
@@ -25,10 +26,11 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
+import { Photo } from "@/components/ui/Photo";
 import { createSubmitGuard } from "@/lib/submit-guard";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { fieldInput } from "@/components/forms/ValidField";
-import { ImageField } from "@/components/media/ImageField";
+import { PlanCoverPicker } from "@/components/plan/PlanCoverPicker";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePlans } from "@/contexts/PlanContext";
 import { useSocial } from "@/contexts/SocialContext";
@@ -249,6 +251,7 @@ export function PlanCreatePage() {
   const [invite, setInvite] = useState<Set<string>>(() => new Set(targetHandle ? [targetHandle] : []));
   const [peopleSearch, setPeopleSearch] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   // Stepped flow: 0 (Plan Type) → 1 (Details: When & where) → 2 (Who: Invites).
   const [step, setStep] = useState<0 | 1 | 2>(targetHandle || solvedIntent ? 1 : 0);
@@ -805,22 +808,40 @@ export function PlanCreatePage() {
             </div>
           </section>
 
-          {/* Optional Photo Cover */}
+          {/* Cover artwork */}
           <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
-            <ImageField
-              kind="square"
-              folder="listings"
-              label="Cover Photo (Optional — change anytime)"
-              value={hero}
-              onChange={setHero}
-            />
+            <PlanCoverPicker value={hero} onChange={setHero} />
           </section>
 
-          {/* Privacy & Discovery Settings */}
-          <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-gold block">
-              4 · Privacy & Visibility
-            </span>
+          {/* Details (optional): visibility lives here so the core flow stays minimal */}
+          <section className="overflow-hidden rounded-3xl bg-card ring-1 ring-line shadow-xs">
+            <button
+              type="button"
+              onClick={() => {
+                void triggerHapticSelection();
+                setShowDetails((v) => !v);
+              }}
+              aria-expanded={showDetails}
+              className="flex min-h-[56px] w-full cursor-pointer items-center justify-between gap-3 p-5 text-left active:scale-[0.99]"
+            >
+              <span className="min-w-0">
+                <span className="block text-xs font-bold uppercase tracking-wider text-gold">
+                  Details · Optional
+                </span>
+                <span className="mt-0.5 block truncate text-xs text-mute">
+                  {isPublic ? "Public discovery" : "Private · invite-only"}
+                </span>
+              </span>
+              <ChevronDown
+                size={18}
+                className={cn("shrink-0 text-mute transition-transform", showDetails && "rotate-180")}
+              />
+            </button>
+            {showDetails && (
+              <div className="space-y-3 border-t border-line/60 p-5 pt-4">
+                <span className="text-xs font-bold uppercase tracking-wider text-gold block">
+                  Privacy & Visibility
+                </span>
 
             <div className="grid grid-cols-2 gap-2.5">
               <button
@@ -867,6 +888,8 @@ export function PlanCreatePage() {
                 </p>
               </button>
             </div>
+              </div>
+            )}
           </section>
 
           {/* Next Button — sticky so the long details form keeps its way forward */}
@@ -889,7 +912,13 @@ export function PlanCreatePage() {
       {step === 2 && (
         <div className="mt-6 space-y-6 animate-in fade-in duration-200">
           {/* Plan Preview Summary Card */}
-          <div className="overflow-hidden rounded-3xl border border-line bg-card p-5 shadow-sm">
+          <div className="overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
+            {hero && (
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-paper">
+                <Photo src={hero} alt="" className="h-full w-full object-cover" />
+              </div>
+            )}
+            <div className="p-5">
             <div className="flex items-center justify-between gap-2 pb-3 border-b border-line/60">
               <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-brand">
                 <activeTemplate.Icon size={14} className={activeTemplate.textColor} />
@@ -918,6 +947,7 @@ export function PlanCreatePage() {
                 <MapPin size={13} className="text-emerald-500 shrink-0" />
                 {place || city || "Sydney"}
               </span>
+            </div>
             </div>
           </div>
 

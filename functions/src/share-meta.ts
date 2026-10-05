@@ -38,7 +38,9 @@ function str(value: unknown): string {
 
 async function resolveEventCard(id: string, origin: string): Promise<ShareCard> {
   const doc = await getDocData("events", id);
-  if (!doc || (doc.status !== "live" && doc.status !== "ended")) return genericCard(origin);
+  if (!doc) return genericCard(origin);
+  const status = str(doc.status).toLowerCase();
+  if (status === "draft") return genericCard(origin);
   return shareCardFor("event", doc, origin);
 }
 
@@ -91,7 +93,8 @@ async function resolvePulseCard(token: string, origin: string): Promise<ShareCar
 
 async function resolvePlanCardById(id: string, origin: string): Promise<ShareCard> {
   const doc = await getDocData("plans", id);
-  if (!doc || doc.isPublic !== true) return genericCard(origin);
+  // Keep unshared private plan IDs from being enumerated; public plans resolve.
+  if (!doc || doc.status === "cancelled" || doc.isPublic !== true) return genericCard(origin);
   return shareCardFor("plan", doc, origin);
 }
 
@@ -100,8 +103,9 @@ async function resolvePlanCardByInvite(code: string, origin: string): Promise<Sh
   if (!normalized) return genericCard(origin);
   const snap = await db.collection("plans").where("inviteCode", "==", normalized).limit(1).get();
   const doc = snap.empty ? null : (snap.docs[0]!.data() as Record<string, unknown>);
-  if (!doc || doc.isPublic !== true) return genericCard(origin);
-  return shareCardFor("plan", doc, origin);
+  // The unguessable 6-character invite code is the bearer token for the invitation.
+  if (!doc || doc.status === "cancelled") return genericCard(origin);
+  return shareCardFor("plan", { ...doc, _isInvite: true }, origin);
 }
 
 async function resolveBioCard(handle: string, origin: string): Promise<ShareCard> {
@@ -234,5 +238,6 @@ export const shareMeta = onRequest({ invoker: "public" }, async (req, res) => {
   }
   res.set("Content-Type", "text/html; charset=utf-8");
   res.set("Cache-Control", "public, max-age=300");
-  res.status(200).send(buildShareMetaHtml(card, `${origin}${pathname}`));
+  const ogType = /^\/(?:e|plan|invite)\//.test(pathname) ? "event" : /^\/@/.test(pathname) ? "profile" : "website";
+  res.status(200).send(buildShareMetaHtml(card, `${origin}${pathname}`, ogType));
 });

@@ -107,6 +107,8 @@ export const upsertEvent = onCall(CALLABLE, async (request) => {
           speakers: festivalSpeakers || null,
         }
       : { festivalSlug: null, track: null, registrationUrl: null, registrationNote: null, speakers: null };
+  const coverImage = typeof data.coverImage === "string" ? data.coverImage.trim() : "";
+  const heroImage = typeof data.heroImage === "string" ? data.heroImage.trim() : coverImage;
   const record = {
     id: eventId,
     name,
@@ -114,6 +116,19 @@ export const upsertEvent = onCall(CALLABLE, async (request) => {
     city: String(data.city || "Sydney").trim(),
     venue: String(data.venue || "").trim(),
     room: String(data.room || "").trim() || null,
+    address: typeof data.address === "string" && data.address.trim() ? data.address.trim() : null,
+    description: typeof data.description === "string" && data.description.trim() ? data.description.trim() : null,
+    shortWhy: typeof data.shortWhy === "string" && data.shortWhy.trim() ? data.shortWhy.trim() : null,
+    coverImage: coverImage || null,
+    heroImage: heroImage || null,
+    mapsPlaceId: typeof data.mapsPlaceId === "string" && data.mapsPlaceId.trim() ? data.mapsPlaceId.trim() : null,
+    geo: data.geo && typeof data.geo === "object" ? data.geo : null,
+    hostType: data.hostType || null,
+    hostName: typeof data.hostName === "string" && data.hostName.trim() ? data.hostName.trim() : null,
+    hostHandle: typeof data.hostHandle === "string" && data.hostHandle.trim() ? data.hostHandle.trim() : null,
+    businessName: typeof data.businessName === "string" && data.businessName.trim() ? data.businessName.trim() : null,
+    businessHandle: typeof data.businessHandle === "string" && data.businessHandle.trim() ? data.businessHandle.trim() : null,
+    collaboratorHandles: Array.isArray(data.collaboratorHandles) ? data.collaboratorHandles : null,
     ticketPriceCents: cleanTicketCents(data.ticketPriceCents) || null,
     capacity: cleanCapacity(data.capacity) || null,
     ...festivalFields,

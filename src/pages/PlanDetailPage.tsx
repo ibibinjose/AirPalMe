@@ -12,18 +12,14 @@ import {
   EyeOff,
   HelpCircle,
   Info,
-  Lock,
   Mail,
-  Megaphone,
   MessageSquare,
-  Pencil,
   Printer,
   QrCode,
-  Radar,
   Share2,
   ShieldCheck,
+  SlidersHorizontal,
   Sparkles,
-  Trash2,
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -40,7 +36,7 @@ import { toPublicUrl } from "@/lib/public-origin";
 import { PlanRsvpSheet } from "@/components/plan/PlanRsvpSheet";
 import { PlanBroadcastSheet } from "@/components/plan/PlanBroadcastSheet";
 import { PlanDatePoll } from "@/components/plan/PlanDatePoll";
-import { PlanQuestionManager } from "@/components/plan/PlanQuestionManager";
+import { PlanManageSheet } from "@/components/plan/PlanManageSheet";
 import { PlanAlbum } from "@/components/plan/PlanAlbum";
 import { PlanReviewPrompt } from "@/components/plan/PlanReviewPrompt";
 import { PlanGroupHeader } from "@/components/plan/PlanGroupHeader";
@@ -54,7 +50,7 @@ import { ExperienceBookingModal } from "@/components/plan/ExperienceBookingModal
 import { HereCheckIn } from "@/components/circle/HereCheckIn";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { EXPERIENCE_CATEGORIES, hasTripItinerary, isSoldOut, isTicketed, type HangoutPlan } from "@shared/plan";
-import { PLAN_CAPACITY_MAX, headcountLeft, headcountTaken, isPlanManager, normalizeCapacity } from "@shared/plan";
+import { headcountLeft, isPlanManager } from "@shared/plan";
 import { pendingRequests, waitlistPosition } from "@shared/plan";
 import { choiceAnswerCounts, textAnswers } from "@shared/plan";
 import { checkedInCount } from "@shared/plan";
@@ -152,11 +148,19 @@ export function PlanDetailPage() {
         160,
       );
 
+    const isInviteRoute = Boolean(paramsInvite?.code);
+    const title = isInviteRoute ? `You're invited: ${plan.title}` : `${plan.title} · AirPal.Me`;
+    const canonicalPath = isInviteRoute && paramsInvite?.code
+      ? `/invite/${paramsInvite.code}`
+      : plan.inviteCode
+        ? `/invite/${plan.inviteCode}`
+        : `/plan/${plan.id}`;
+
     setShareMeta({
-      title: `${plan.title} · AirPal.Me`,
+      title,
       description,
       image: shareImg,
-      url: toPublicUrl(`/plan/${plan.id}`),
+      url: toPublicUrl(canonicalPath),
       type: "event",
       imageAlt: `${plan.title} on AirPal.Me`,
       jsonLd: {
@@ -178,9 +182,10 @@ export function PlanDetailPage() {
         },
       },
     });
-  }, [plan]);
+  }, [plan, paramsInvite?.code]);
 
   const [shareOpen, setShareOpen] = useState(() => searchParams.get("share") === "true");
+  const [manageOpen, setManageOpen] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [broadcastOpen, setBroadcastOpen] = useState(false);
@@ -373,25 +378,18 @@ export function PlanDetailPage() {
 
         <div className="no-scrollbar flex min-w-0 flex-1 items-center justify-end gap-2 overflow-x-auto py-1">
           {isHost && (
-            <Link
-              href={`/plan/${plan.id}/edit`}
-              className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-            >
-              <Pencil size={13} />
-              <span className="hidden sm:inline">Edit Plan</span>
-            </Link>
-          )}
-
-          {isHost && (
             <button
               type="button"
-              onClick={() => setBroadcastOpen(true)}
-              aria-label="Message everyone going"
-              title="Message everyone going"
+              onClick={() => {
+                void triggerHaptic("light");
+                setManageOpen(true);
+              }}
+              aria-label="Manage plan"
+              title="Manage plan"
               className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
-              <Megaphone size={13} />
-              <span className="hidden sm:inline">Message going</span>
+              <SlidersHorizontal size={14} />
+              <span className="hidden sm:inline">Manage</span>
             </button>
           )}
 
@@ -444,145 +442,7 @@ export function PlanDetailPage() {
         viewerIsHost={isHost}
       />
 
-      {/* Host Controls: Privacy toggle */}
-      {isHost && (
-        <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-card px-4 py-3 ring-1 ring-line">
-          <span className="inline-flex min-w-0 items-center gap-2 text-xs font-medium text-mute">
-            {plan.isPublic ? (
-              <Radar size={14} className="shrink-0 text-brand" />
-            ) : (
-              <Lock size={14} className="shrink-0" />
-            )}
-            <span className="truncate">
-              {plan.isPublic ? "Public · live on discover map" : "Private · invite-only"}
-            </span>
-          </span>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={Boolean(plan.isPublic)}
-            aria-label="Who can discover this plan"
-            onClick={() => updatePlan(plan.id, { isPublic: !plan.isPublic })}
-            className={cn("relative h-7 w-12 shrink-0 rounded-full transition before:absolute before:-inset-3 before:content-['']", plan.isPublic ? "bg-brand" : "bg-line")}
-          >
-            <span
-              className={cn(
-                "absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all",
-                plan.isPublic ? "left-[22px]" : "left-0.5",
-              )}
-            />
-          </button>
-        </div>
-      )}
-
-      {/* Host Controls: who's-going visibility */}
-      {isHost && (
-        <div className="mt-4 rounded-2xl bg-card px-4 py-2 ring-1 ring-line">
-          <p className="pt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Who's going</p>
-          {(
-            [
-              { key: "hideNames", label: "Guest names", hint: "Show who else is coming" },
-              { key: "hideCount", label: "Headcount", hint: "Show going / maybe numbers" },
-            ] as const
-          ).map((row) => {
-            const hidden = Boolean(plan.guestList?.[row.key]);
-            return (
-              <div key={row.key} className="flex items-center justify-between gap-3 border-t border-line/60 py-2.5">
-                <span className="min-w-0">
-                  <span className="block truncate text-xs font-medium text-ink">{row.label}</span>
-                  <span className="block truncate text-[11px] text-mute">{row.hint}</span>
-                </span>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={!hidden}
-                  aria-label={row.label}
-                  onClick={() => updatePlan(plan.id, { guestList: { ...(plan.guestList || {}), [row.key]: !hidden } })}
-                  className={cn("relative h-7 w-12 shrink-0 rounded-full transition before:absolute before:-inset-3 before:content-['']", !hidden ? "bg-brand" : "bg-line")}
-                >
-                  <span
-                    className={cn(
-                      "absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all",
-                      !hidden ? "left-[22px]" : "left-0.5",
-                    )}
-                  />
-                </button>
-              </div>
-            );
-          })}
-          <div className="flex items-center justify-between gap-3 border-t border-line/60 py-2.5">
-            <span className="min-w-0">
-              <span className="block truncate text-xs font-medium text-ink">Max guests</span>
-              <span className="block truncate text-[11px] text-mute">
-                {plan.capacity && plan.capacity > 0
-                  ? `${headcountTaken(plan)} of ${plan.capacity} spots filled`
-                  : "No guest limit"}
-              </span>
-            </span>
-            <input
-              key={`cap-${plan.id}-${plan.capacity ?? "open"}`}
-              type="number"
-              min={1}
-              max={PLAN_CAPACITY_MAX}
-              defaultValue={plan.capacity ?? ""}
-              placeholder="No limit"
-              inputMode="numeric"
-              aria-label="Max guests"
-              onBlur={(e) => {
-                const next = normalizeCapacity(e.currentTarget.value);
-                if (next !== plan.capacity) updatePlan(plan.id, { capacity: next });
-                else e.currentTarget.value = plan.capacity != null ? String(plan.capacity) : "";
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") e.currentTarget.blur();
-              }}
-              className="h-11 w-24 shrink-0 rounded-2xl bg-paper px-3 text-center text-sm text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
-            />
-          </div>
-          <div className="flex items-center justify-between gap-3 border-t border-line/60 py-2.5">
-            <span className="min-w-0">
-              <span className="block truncate text-xs font-medium text-ink">Approve guests</span>
-              <span className="block truncate text-[11px] text-mute">Going taps land as requests</span>
-            </span>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={Boolean(plan.requiresApproval)}
-              aria-label="Approve guests"
-              onClick={() => updatePlan(plan.id, { requiresApproval: !plan.requiresApproval })}
-              className={cn(
-                "relative h-7 w-12 shrink-0 rounded-full transition before:absolute before:-inset-3 before:content-['']",
-                plan.requiresApproval ? "bg-brand" : "bg-line",
-              )}
-            >
-              <span
-                className={cn(
-                  "absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-all",
-                  plan.requiresApproval ? "left-[22px]" : "left-0.5",
-                )}
-              />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Host Controls: guest questions */}
-      {isHost && (
-        <div className="mt-4 rounded-2xl bg-card px-4 py-2 ring-1 ring-line">
-          <p className="pt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Guest questions</p>
-          <PlanQuestionManager
-            questions={plan.guestQuestions || []}
-            onAdd={(q) =>
-              updatePlan(plan.id, {
-                guestQuestions: [...(plan.guestQuestions || []), { id: `q-${Date.now().toString(36)}`, ...q }],
-              })
-            }
-            onRemove={(id) =>
-              updatePlan(plan.id, { guestQuestions: (plan.guestQuestions || []).filter((q) => q.id !== id) })
-            }
-          />
-        </div>
-      )}
+      {/* Host controls live in the Manage sheet — the thread stays one living card. */}
 
       {/* Close the loop — Brain north star is completed experiences */}
       {(isHost || userAttendee?.status === "going") &&
@@ -1581,20 +1441,18 @@ export function PlanDetailPage() {
         </div>
       )}
 
-      {isHost && (
-        <div className="mt-8 border-t border-line/60 pt-6 flex justify-end">
-          <button
-            type="button"
-            onClick={handleDeletePlan}
-            className="text-xs font-semibold text-red-500 hover:text-red-600 transition inline-flex items-center gap-1.5"
-          >
-            <Trash2 size={14} />
-            <span>Delete Hangout Plan</span>
-          </button>
-        </div>
-      )}
-
       {/* Modals */}
+      {isHost && (
+        <PlanManageSheet
+          open={manageOpen}
+          onClose={() => setManageOpen(false)}
+          plan={plan}
+          onUpdate={(patch) => updatePlan(plan.id, patch)}
+          onEdit={() => nav(`/plan/${plan.id}/edit`)}
+          onMessageGoing={() => setBroadcastOpen(true)}
+          onDelete={handleDeletePlan}
+        />
+      )}
       <PlanShareModal plan={plan} open={shareOpen} onClose={() => setShareOpen(false)} canInvite={isHost} />
       <PlanQrModal plan={plan} isOpen={qrModalOpen} onClose={() => setQrModalOpen(false)} />
 

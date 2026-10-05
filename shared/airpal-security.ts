@@ -444,12 +444,25 @@ export type UpsertEventRequest = {
   flavour: string;
   city?: string;
   venue?: string;
+  room?: string;
+  address?: string;
+  description?: string;
+  shortWhy?: string;
+  coverImage?: string;
+  heroImage?: string;
+  mapsPlaceId?: string;
+  geo?: { lat: number; lng: number };
+  hostType?: "business" | "individual";
+  hostName?: string;
+  hostHandle?: string;
+  businessName?: string;
+  businessHandle?: string;
+  collaboratorHandles?: string[];
   startsAt?: string;
   endsAt?: string;
   status?: string;
   categoryChips?: string[];
   scheduleVerifiedAt?: string;
-  room?: string;
   ticketPriceCents?: number;
   capacity?: number;
   /** Festival program slug (festivals/{slug}) this session belongs to. */

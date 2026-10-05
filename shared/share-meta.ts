@@ -97,13 +97,17 @@ export function shareCardFor(
   };
   switch (kind) {
     case "event": {
-      const venueCity = [str(doc.venue), str(doc.city)].filter(Boolean).join(" · ");
+      const title = str(doc.title || doc.name);
+      const venueCity = [str(doc.venue || doc.venueName), str(doc.city)].filter(Boolean).join(" · ");
+      const when = str(doc.timeLabel || doc.when || doc.startsAt);
+      const detail = str(doc.shortWhy || doc.description || doc.detail);
+      const descParts = [detail, [when, venueCity].filter(Boolean).join(" · ")].filter(Boolean);
+      const description = descParts.join(" — ") || venueCity || SHARE_DEFAULTS.description;
+      const firstPhoto = Array.isArray(doc.photos) ? doc.photos[0] : doc.photo;
       return {
-        title: escapeShareText(doc.name, 90) || SHARE_DEFAULTS.title,
-        description:
-          escapeShareText(str(doc.shortWhy) || str(doc.description) || venueCity, 200) ||
-          SHARE_DEFAULTS.description,
-        image: imageOf(doc.coverImage),
+        title: escapeShareText(title, 90) || SHARE_DEFAULTS.title,
+        description: escapeShareText(description, 200) || SHARE_DEFAULTS.description,
+        image: imageOf(doc.coverImage, doc.heroImage, doc.imageUrl, doc.image, firstPhoto),
       };
     }
     case "place":
@@ -127,13 +131,41 @@ export function shareCardFor(
         image: imageOf(doc.imageUrl, doc.propertyHeroImage),
       };
     }
-    case "plan":
+    case "plan": {
+      const rawTitle = str(doc.title);
+      const isInvite = Boolean(doc.inviteCode) || doc._isInvite === true;
+      const title = rawTitle
+        ? isInvite && !rawTitle.toLowerCase().startsWith("you're invited")
+          ? `You're invited: ${rawTitle}`
+          : rawTitle
+        : SHARE_DEFAULTS.title;
+
+      const creator = doc.creator as { name?: string } | undefined;
+      const host = str(doc.hostName || creator?.name);
+      const when = [str(doc.date), str(doc.time)].filter(Boolean).join(" at ");
+      const where = [str(doc.destination), str(doc.city)].filter(Boolean).join(", ");
+      const stops = Array.isArray(doc.stops) ? doc.stops : [];
+      const stopsCount = stops.length > 0 ? `${stops.length} stop${stops.length === 1 ? "" : "s"}` : "";
+
+      const parts: string[] = [];
+      if (host) parts.push(`Join ${host}`);
+      if (when) parts.push(`on ${when}`);
+      if (where) parts.push(`at ${where}`);
+      if (stopsCount) parts.push(`(${stopsCount})`);
+      const inviteLine = parts.join(" ");
+
+      const notes = str(doc.notes);
+      const descLine = [inviteLine, notes, isInvite ? "RSVP on AirPal.me · Life Made Easy." : "AirPal.me"]
+        .filter(Boolean)
+        .join(" — ");
+
+      const firstStopPhoto = stops.length > 0 ? (stops[0]?.photo || stops[0]?.image) : undefined;
       return {
-        title: escapeShareText(doc.title, 90) || SHARE_DEFAULTS.title,
-        description:
-          escapeShareText(str(doc.destination) || str(doc.date), 200) || SHARE_DEFAULTS.description,
-        image: imageOf(doc.coverImage),
+        title: escapeShareText(title, 90) || SHARE_DEFAULTS.title,
+        description: escapeShareText(descLine || where || when, 200) || SHARE_DEFAULTS.description,
+        image: imageOf(doc.heroImage, doc.coverImage, doc.imageUrl, doc.image, firstStopPhoto),
       };
+    }
     case "bio": {
       const handle = str(doc.handle);
       return {
@@ -173,25 +205,36 @@ export function shareCardFor(
 }
 
 /** Minimal crawler HTML: tags only, plus a plain link for odd clients. */
-export function buildShareMetaHtml(card: ShareCard, url: string): string {
+export function buildShareMetaHtml(card: ShareCard, url: string, ogType: "website" | "event" | "profile" = "website"): string {
   const large = Boolean(card.image);
+  const secureImage = card.image && card.image.startsWith("https://") ? card.image : "";
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${card.title}</title>
 <link rel="canonical" href="${url}">
 <meta name="description" content="${card.description}">
-<meta property="og:type" content="website">
+<meta name="theme-color" content="#1805db">
+<meta property="og:type" content="${ogType}">
 <meta property="og:site_name" content="${SHARE_SITE_NAME}">
+<meta property="og:locale" content="en_AU">
 <meta property="og:title" content="${card.title}">
 <meta property="og:description" content="${card.description}">
 <meta property="og:url" content="${url}">
 ${large ? `<meta property="og:image" content="${card.image}">` : ""}
+${secureImage ? `<meta property="og:image:secure_url" content="${secureImage}">` : ""}
+${large ? `<meta property="og:image:width" content="1200">` : ""}
+${large ? `<meta property="og:image:height" content="630">` : ""}
+${large ? `<meta property="og:image:type" content="image/jpeg">` : ""}
+${large ? `<meta property="og:image:alt" content="${card.title}">` : ""}
 <meta name="twitter:card" content="${large ? "summary_large_image" : "summary"}">
+<meta name="twitter:site" content="@airpalme">
 <meta name="twitter:title" content="${card.title}">
 <meta name="twitter:description" content="${card.description}">
 ${large ? `<meta name="twitter:image" content="${card.image}">` : ""}
+${large ? `<meta name="twitter:image:alt" content="${card.title}">` : ""}
 </head>
 <body><p><a href="${url}">${card.title}</a></p></body>
 </html>`;
