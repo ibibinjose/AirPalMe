@@ -184,14 +184,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                       Home
                     </Link>
                     <Link
-                      href="/explore"
-                      aria-current={path.startsWith("/explore") ? "page" : undefined}
+                      href="/now"
+                      aria-current={path.startsWith("/now") ? "page" : undefined}
                       className={cn(
                         "hidden md:inline-flex h-9 touch-manipulation items-center rounded-full px-3 text-sm font-medium",
-                        path.startsWith("/explore") ? "bg-brand text-white" : "text-mute hover:text-ink",
+                        path.startsWith("/now") ? "bg-brand text-white" : "text-mute hover:text-ink",
                       )}
                     >
-                      Explore
+                      Now
                     </Link>
 
                     <NotificationBell />

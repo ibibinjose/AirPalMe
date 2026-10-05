@@ -6,9 +6,11 @@ import {
   Coffee,
   Copy,
   HeartHandshake,
+  PhoneCall,
   Plus,
   Sparkles,
   Users,
+  Video,
   X,
 } from "lucide-react";
 import { ImageField } from "@/components/media/ImageField";
@@ -302,6 +304,20 @@ export function MePage() {
                 <p className="text-xs text-mute leading-relaxed">
                   Propose coffee, sync meetings, or group hangouts. Sync any confirmed plan to your phone calendar.
                 </p>
+                {mine?.meetingUrl && (
+                  <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-brand">
+                    {mine.preferredMeetingPlatform === "facetime" || mine.meetingUrl.includes("facetime") ? (
+                      <PhoneCall size={12} className="text-emerald-700" />
+                    ) : (
+                      <Video size={12} className="text-brand" />
+                    )}
+                    <span>
+                      {mine.preferredMeetingPlatform === "facetime" || mine.meetingUrl.includes("facetime")
+                        ? "FaceTime link active"
+                        : "Google Meet link active"}
+                    </span>
+                  </div>
+                )}
               </div>
               {mine && (
                 <button
@@ -383,6 +399,8 @@ export function MePage() {
                       startsAt: `${item.date || toZonedDateStr(new Date())}T${item.time || "14:00"}:00`,
                       venue: item.venue,
                       city: mine?.city || "Sydney",
+                      meetingLink: item.meetingLink,
+                      meetingPlatform: item.meetingPlatform,
                     };
 
                     return (
@@ -429,7 +447,37 @@ export function MePage() {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                        <div className="flex flex-wrap items-center gap-1.5 shrink-0 self-end sm:self-center">
+                          {item.meetingLink && (
+                            <a
+                              href={item.meetingLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => void triggerHaptic("light")}
+                              className={cn(
+                                "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-xs font-semibold transition active:scale-95 touch-manipulation focus-visible:outline-2 focus-visible:outline-brand",
+                                item.meetingPlatform === "facetime" || item.meetingLink.includes("facetime")
+                                  ? "bg-emerald-500/15 text-emerald-800 ring-1 ring-emerald-500/30 hover:bg-emerald-500/25"
+                                  : "bg-brand/10 text-brand ring-1 ring-brand/30 hover:bg-brand/20",
+                              )}
+                              title={
+                                item.meetingPlatform === "facetime" || item.meetingLink.includes("facetime")
+                                  ? "Open FaceTime call"
+                                  : "Join Google Meet video call"
+                              }
+                            >
+                              {item.meetingPlatform === "facetime" || item.meetingLink.includes("facetime") ? (
+                                <PhoneCall size={13} className="text-emerald-700" />
+                              ) : (
+                                <Video size={13} className="text-brand" />
+                              )}
+                              <span>
+                                {item.meetingPlatform === "facetime" || item.meetingLink.includes("facetime")
+                                  ? "FaceTime"
+                                  : "Google Meet"}
+                              </span>
+                            </a>
+                          )}
                           <AddToCalendarMenu
                             event={eventPayload}
                             size="sm"
@@ -689,6 +737,8 @@ export function MePage() {
           avatar={mine.avatar}
           ownerUid={user.uid}
           initialType={catchUpInitialType}
+          defaultMeetingUrl={mine.meetingUrl}
+          defaultMeetingPlatform={mine.preferredMeetingPlatform}
         />
       )}
     </div>

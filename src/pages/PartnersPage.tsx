@@ -10,16 +10,16 @@ export function PartnersPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-10">
-      <header className="flex items-end justify-between gap-3 py-5">
+      <header className="flex flex-col items-start gap-3 py-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[11px] uppercase tracking-[0.16em] text-gold">Partners</p>
           <h1 className="font-display text-3xl font-semibold">Places & Venues</h1>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <Button size="sm" variant="ghost" onClick={() => nav("/partner")}>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
+          <Button size="sm" variant="ghost" className="w-full sm:w-auto" onClick={() => nav("/partner")}>
             Talk to Partnerships
           </Button>
-          <Button size="sm" onClick={() => nav("/business/onboard")}>
+          <Button size="sm" className="w-full sm:w-auto" onClick={() => nav("/business/onboard")}>
             Onboard Your Business
           </Button>
         </div>

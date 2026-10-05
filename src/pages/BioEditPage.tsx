@@ -17,6 +17,7 @@ import {
   MessageCircle,
   Package,
   Phone,
+  PhoneCall,
   Plus,
   QrCode,
   Share2,
@@ -26,6 +27,7 @@ import {
   User,
   UserCheck,
   UserRound,
+  Video,
   X,
 } from "lucide-react";
 import {
@@ -1071,6 +1073,76 @@ export function BioEditPage() {
                   </label>
                   <PhoneField value={phone} onChange={setPhone} />
                   <p className="text-[11px] text-mute">Include country code for direct WhatsApp & calling.</p>
+                </div>
+              </div>
+
+              {/* Meet & Hangout · Virtual Video Meetings (Google Meet / FaceTime) */}
+              <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
+                    <Sparkles size={12} className="text-gold" />
+                    <span>Meet &amp; Hangout · Video Call Links</span>
+                  </p>
+                  <span className="text-[10px] font-bold text-brand bg-brand/10 rounded-full px-2.5 py-0.5">
+                    Your AirPal Link
+                  </span>
+                </div>
+                <p className="text-xs text-mute leading-relaxed">
+                  Configure your preferred virtual meeting platform and personal link so anyone proposing a 1-on-1 meeting or catch-up with you can join instantly.
+                </p>
+
+                <div className="space-y-2 pt-1">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-mute">
+                    Preferred Video Platform
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: "in_person" as const, label: "In Person", hint: "Local venues", Icon: MapPin },
+                      { id: "google_meet" as const, label: "Google Meet", hint: "meet.google.com", Icon: Video },
+                      { id: "facetime" as const, label: "FaceTime", hint: "Apple & Web", Icon: PhoneCall },
+                    ].map((opt) => {
+                      const Icon = opt.Icon;
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => setPreferredMeetingPlatform(opt.id)}
+                          className={cn(
+                            "flex min-h-[48px] flex-col items-center justify-center gap-1 rounded-2xl border p-2 text-center transition active:scale-95 cursor-pointer",
+                            preferredMeetingPlatform === opt.id
+                              ? "bg-brand/10 border-brand text-brand shadow-xs font-bold"
+                              : "bg-paper border-line text-ink hover:bg-card",
+                          )}
+                        >
+                          <span className="flex items-center gap-1 text-xs font-bold">
+                            <Icon size={12} />
+                            <span>{opt.label}</span>
+                          </span>
+                          <span className="text-[10px] font-medium opacity-70">{opt.hint}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 pt-2 border-t border-line/60">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-mute">
+                    Default Video Meeting URL or Apple ID
+                  </label>
+                  <input
+                    type="text"
+                    value={meetingUrl}
+                    onChange={(e) => setMeetingUrl(e.target.value)}
+                    placeholder={
+                      preferredMeetingPlatform === "facetime"
+                        ? "https://facetime.apple.com/... or Apple ID"
+                        : "https://meet.google.com/xxx-yyyy-zzz"
+                    }
+                    className={fieldInput}
+                  />
+                  <p className="text-[11px] text-mute leading-relaxed">
+                    Pre-fills automatically when visitors propose a sync meeting with you, and embeds directly into Apple &amp; Google Calendar invites.
+                  </p>
                 </div>
               </div>
 

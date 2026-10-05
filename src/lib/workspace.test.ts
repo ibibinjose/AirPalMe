@@ -14,6 +14,8 @@ describe("isWorkspacePath", () => {
       "/admin",
       "/partners",
       "/business",
+      "/event",
+      "/event/new",
       "/settings",
       "/about",
       "/privacy",
@@ -34,6 +36,7 @@ describe("isWorkspacePath", () => {
       "/concierge",
       "/g/hotel",
       "/calendar",
+      "/events",
       "/offers",
     ]) {
       expect(isWorkspacePath(path)).toBe(false);

@@ -689,10 +689,10 @@ export function GlobalSearchModal() {
                           setQuery(pt.term);
                           inputRef.current?.focus();
                         }}
-                        className="flex items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line/80 hover:bg-card hover:ring-brand/30 transition active:scale-95 cursor-pointer touch-manipulation"
+                        className="flex min-w-0 max-w-full items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line/80 hover:bg-card hover:ring-brand/30 transition active:scale-95 cursor-pointer touch-manipulation"
                       >
-                        <Search size={12} className="text-brand" />
-                        <span>{pt.term}</span>
+                        <Search size={12} className="shrink-0 text-brand" />
+                        <span className="truncate">{pt.term}</span>
                       </button>
                     ))}
                   </div>

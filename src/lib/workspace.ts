@@ -5,7 +5,9 @@ const WORKSPACE = [
   /^\/partners/,
   /^\/join/,
   /^\/business/,
-  /^\/event/,
+  // Exact-segment match: the organiser console (/event, /event/new) is a
+  // workspace, but the guest feed (/events) keeps full app chrome.
+  /^\/event(\/|$)/,
   // Pulse hub (/pulse) renders full chrome. Only anonymous public rating
   // links (/pulse/:token) stay minimal.
   /^\/pulse\/.+/,

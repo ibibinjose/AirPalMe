@@ -222,7 +222,7 @@ export function AuthGate({
           onClick={() => nav("/")}
           className="text-xs text-mute hover:text-ink transition underline"
         >
-          ← Return to Explore
+          ← Back to home
         </button>
       </p>
     </div>

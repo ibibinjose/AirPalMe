@@ -203,28 +203,28 @@ export function ScanPage() {
         />
 
         {!live && (
-          <div className="absolute inset-0 grid content-center justify-items-center gap-2 px-6 text-center text-sm text-white/70">
+          <div className="absolute inset-0 grid content-center justify-items-center gap-2 px-6 pb-16 text-center text-sm text-white/70">
             <span>{denied ? t("cameraOff") : t("openingCamera")}</span>
             {denied && (
               <>
-                <p className="max-w-xs text-xs text-white/60">
+                <p className="max-w-xs text-xs leading-relaxed text-white/60">
                   Allow camera access in browser settings, or upload a saved QR photo / enter code below.
                 </p>
-                <div className="flex gap-2 mt-1">
+                <div className="mt-1 flex gap-2">
                   <button
                     type="button"
                     onClick={() => {
                       setDenied(false);
                       setCameraAttempt((n) => n + 1);
                     }}
-                    className="rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/30 transition hover:bg-white/25 active:scale-95"
+                    className="min-h-[44px] rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold text-white ring-1 ring-white/30 transition hover:bg-white/25 active:scale-95"
                   >
                     Try Camera
                   </button>
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="rounded-full bg-brand px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-95 flex items-center gap-1.5"
+                    className="flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:brightness-110 active:scale-95"
                   >
                     <Upload size={13} />
                     <span>Upload QR Image</span>
@@ -235,9 +235,11 @@ export function ScanPage() {
           </div>
         )}
 
-        <div className="pointer-events-none absolute inset-0 grid place-items-center">
-          <div className="h-40 w-40 rounded-3xl border-2 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]" />
-        </div>
+        {live && (
+          <div className="pointer-events-none absolute inset-0 grid place-items-center">
+            <div className="h-40 w-40 rounded-3xl border-2 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.4)]" />
+          </div>
+        )}
 
         {/* Floating Scanner Controls (Upload QR Image) */}
         <div className="absolute bottom-3 inset-x-3 z-10 flex items-center justify-between px-2">

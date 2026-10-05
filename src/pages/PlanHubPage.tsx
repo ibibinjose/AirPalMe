@@ -366,13 +366,13 @@ export function PlanHubPage() {
           <span className="text-xs text-mute">1-tap to start</span>
         </div>
 
-        <div className="no-scrollbar mt-3 flex items-center gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="no-scrollbar -mx-4 mt-3 flex items-center gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 lg:grid-cols-6">
           {QUICK_STARTERS.map((starter) => (
             <button
               key={starter.label}
               type="button"
               onClick={() => handleStarterClick(starter)}
-              className="group flex w-44 shrink-0 flex-col justify-between rounded-2xl bg-card p-3.5 text-left ring-1 ring-line transition-shadow duration-200 hover:ring-brand/30 hover:shadow-sm active:scale-95"
+              className="group flex w-44 shrink-0 flex-col justify-between rounded-2xl bg-card p-3.5 text-left ring-1 ring-line transition-shadow duration-200 hover:ring-brand/30 hover:shadow-sm active:scale-95 sm:w-auto"
             >
               <div className="flex items-center justify-between">
                 <span

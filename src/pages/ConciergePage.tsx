@@ -155,7 +155,11 @@ export function ConciergePage() {
       <div className="mx-auto max-w-lg px-4 pb-28">
         <PaymentCanceledNotice />
         <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
-          {property.heroImage && <img src={property.heroImage} alt="" className="h-72 w-full object-cover" />}
+          {property.heroImage ? (
+            <img src={property.heroImage} alt="" className="h-72 w-full object-cover" />
+          ) : (
+            <div className="h-72 w-full bg-brand" aria-hidden="true" />
+          )}
           <div className="hero-scrim absolute inset-0" />
           <div className="absolute inset-x-0 bottom-0 p-6">
             <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-xs font-black uppercase tracking-wider text-slate-950 border border-line shadow-xs mb-2">
@@ -210,7 +214,11 @@ export function ConciergePage() {
       <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
         <div className="lg:col-span-5 space-y-4">
           <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
-            {property.heroImage && <img src={property.heroImage} alt="" className="h-48 w-full object-cover" />}
+            {property.heroImage ? (
+              <img src={property.heroImage} alt="" className="h-48 w-full object-cover" />
+            ) : (
+              <div className="h-48 w-full bg-brand" aria-hidden="true" />
+            )}
             <div className="hero-scrim absolute inset-0" />
             <button
               type="button"
@@ -269,14 +277,17 @@ export function ConciergePage() {
                 </p>
               </div>
             </div>
-            <Button
-              size="sm"
-              className="relative shrink-0 font-extrabold gap-1.5 shadow-sm rounded-full bg-white text-brand hover:bg-amber-300 hover:text-slate-950 transition active:scale-95 px-4 min-h-[44px]"
-              onClick={() => nav("/now")}
+            <button
+              type="button"
+              className="relative inline-flex min-h-[44px] shrink-0 touch-manipulation items-center justify-center gap-1.5 rounded-full bg-white px-4 text-sm font-extrabold text-brand shadow-sm transition hover:bg-amber-300 hover:text-slate-950 active:scale-95"
+              onClick={() => {
+                void triggerHaptic("light");
+                nav("/now");
+              }}
             >
               <span>What now?</span>
               <ArrowRight size={14} />
-            </Button>
+            </button>
           </div>
 
           {roomLabel ? (
