@@ -95,6 +95,7 @@ export function PlanDetailPage() {
     submitPlanReview,
     toggleCheckIn,
     checkInSelf,
+    repeatPlan,
     proposeDateOption,
     lockDateOption,
     reopenDatePoll,
@@ -625,6 +626,19 @@ export function PlanDetailPage() {
               </span>
             )}
           </span>
+          {(isHost || userAttendee?.status === "going") && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="ml-auto h-9 shrink-0 rounded-full px-4 text-xs font-semibold"
+              onClick={() => {
+                const next = repeatPlan(plan.id, localTodayStr());
+                if (next?.id) nav(`/plan/${next.id}?share=true`);
+              }}
+            >
+              Do it again
+            </Button>
+          )}
         </div>
       )}
 

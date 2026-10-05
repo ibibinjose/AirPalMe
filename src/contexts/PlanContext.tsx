@@ -26,6 +26,7 @@ import { completePlan as storeCompletePlan,
   downloadPlanIcs,
   getPlanGoogleCalendarUrl,
 } from "@/lib/plan-store";
+import { repeatPlanInput } from "@/lib/plan-repeat";
 import { useAuth } from "./AuthContext";
 import { completePlanRemoteCall, liveBackendEnabled, voteDateOptionRemote } from "@/lib/functions";
 import { trackContentAction } from "@/lib/analytics";
@@ -46,7 +47,7 @@ import type {
   PlanMultiDaySchedule,
 } from "@shared/plan";
 
-interface CreatePlanInput {
+export interface CreatePlanInput {
   title: string;
   type: PlanType;
   theme: PlanTheme;
@@ -113,6 +114,7 @@ interface PlanContextValue {
   ) => HangoutPlan | undefined;
   toggleCheckIn: (planId: string, attendeeId: string) => HangoutPlan | undefined;
   checkInSelf: (planId: string) => HangoutPlan | undefined;
+  repeatPlan: (planId: string, today: string) => HangoutPlan | undefined;
   proposeDateOption: (planId: string, input: { date: string; time?: string }) => HangoutPlan | undefined;
   lockDateOption: (planId: string, optionId: string) => HangoutPlan | undefined;
   reopenDatePoll: (planId: string) => HangoutPlan | undefined;
@@ -318,6 +320,21 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       return saved;
     },
     [user, mine],
+  );
+
+  // One-tap repeat: a completed plan becomes a fresh private plan on the
+  // same weekday with the same crew re-invited.
+  const repeatPlan = useCallback(
+    (planId: string, today: string) => {
+      const current = storeGetPlan(planId);
+      if (!current) return undefined;
+      if (current.status !== "completed") {
+        toast.message("Only completed plans can be repeated.");
+        return undefined;
+      }
+      return createPlan(repeatPlanInput(current, today));
+    },
+    [createPlan],
   );
 
   const updatePlan = useCallback((planId: string, patch: Partial<HangoutPlan>) => {
@@ -930,6 +947,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         reviewRsvp,
         toggleCheckIn,
         checkInSelf,
+        repeatPlan,
         proposeDateOption,
         lockDateOption,
         reopenDatePoll,
