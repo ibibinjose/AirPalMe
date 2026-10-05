@@ -23,8 +23,8 @@ export function AirPalChatView({
   onActionClick,
 }: {
   conversation: UniversalConversation;
-  propertyContext?: any;
-  onActionClick?: (action: string, payload?: any) => void;
+  propertyContext?: { wifi?: { network?: string; password?: string } };
+  onActionClick?: (action: string, payload?: string) => void;
 }) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<UniversalChatMessage[]>([]);
@@ -98,7 +98,7 @@ export function AirPalChatView({
     }
   }
 
-  function handleAction(action: string, payload?: any) {
+  function handleAction(action: string, payload?: string) {
     void triggerHaptic("medium");
     if (action === "copy_wifi") {
       const wifi = propertyContext?.wifi;

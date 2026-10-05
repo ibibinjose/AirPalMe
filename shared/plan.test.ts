@@ -9,6 +9,7 @@ import {
   PLAN_TYPES,
   PLAN_COVER_PRESETS,
   PLAN_THEMES,
+  resolvePlanTheme,
   PLAN_PLUS_ONES_MAX,
   PLAN_CAPACITY_MAX,
   attendeeSeats,
@@ -161,6 +162,13 @@ describe("invitation themes", () => {
     // Fluro's neon background needs dark text; the rest use white.
     expect(PLAN_THEMES.fluro.onThemeClass).toContain("zinc-950");
     expect(PLAN_THEMES.jetblack.onThemeClass).toBe("text-white");
+  });
+
+  it("resolves untrusted input to a real theme, defaulting to gold", () => {
+    expect(resolvePlanTheme("emerald")).toBe("emerald");
+    expect(resolvePlanTheme("nope")).toBe("gold");
+    expect(resolvePlanTheme(undefined)).toBe("gold");
+    expect(resolvePlanTheme(42)).toBe("gold");
   });
 });
 

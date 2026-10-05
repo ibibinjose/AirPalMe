@@ -1164,6 +1164,11 @@ export const PLAN_THEMES: Record<
   },
 };
 
+/** Coerce untrusted input to a real invitation theme; unknown values fall back to gold. */
+export function resolvePlanTheme(input: unknown): PlanTheme {
+  return typeof input === "string" && input in PLAN_THEMES ? (input as PlanTheme) : "gold";
+}
+
 export function planInviteUrl(planId: string, origin = ""): string {
   const base = origin.replace(/\/+$/, "");
   return `${base}/plan/${planId}`;

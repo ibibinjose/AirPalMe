@@ -13,8 +13,8 @@ export function AirPalChatModal({
   open: boolean;
   onClose: () => void;
   conversation: UniversalConversation | null;
-  propertyContext?: any;
-  onActionClick?: (action: string, payload?: any) => void;
+  propertyContext?: { wifi?: { network?: string; password?: string } };
+  onActionClick?: (action: string, payload?: string) => void;
 }) {
   useEffect(() => {
     if (!open) return;

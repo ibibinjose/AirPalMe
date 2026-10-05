@@ -29,6 +29,7 @@ import {
   clampExperienceMoney,
   isPlanManager,
   randomInviteCode,
+  resolvePlanTheme,
   sanitizeCurrencyCode,
   sanitizeDepositConfig,
   sanitizePricingTiers,
@@ -112,7 +113,7 @@ export const createPlanRemote = onCall(CALLABLE, async (request) => {
     id: planId,
     title,
     type: data.type || "custom",
-    theme: (data.theme as any) || "gold",
+    theme: resolvePlanTheme(data.theme),
     creator: {
       uid,
       name: creatorName,

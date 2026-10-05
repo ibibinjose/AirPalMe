@@ -8,8 +8,7 @@
  * there is no second booking or RSVP system.
  */
 
-export const FESTIVAL_STATUSES = ["draft", "live", "ended"] as const;
-export type FestivalStatus = (typeof FESTIVAL_STATUSES)[number];
+export type FestivalStatus = "draft" | "live" | "ended";
 
 export interface Festival {
   /** URL slug — lowercase letters, digits, hyphens. Lives at /f/:slug. */
@@ -37,26 +36,10 @@ export interface Festival {
   updatedAt: string;
 }
 
-export interface FestivalSpeaker {
-  name: string;
-  role?: string;
-}
-
-/** Optional session extras for `events` documents on a festival program. */
-export interface FestivalSessionExtras {
-  festivalSlug: string;
-  /** Program track, e.g. "Hackathon", "Main stage". */
-  track?: string;
-  /** Off-platform booking link (Humanitix, Eventbrite). Attend on AirPal stays primary. */
-  registrationUrl?: string;
-  registrationNote?: string;
-  speakers?: FestivalSpeaker[];
-}
-
-export const FESTIVAL_SLUG_RE = /^[a-z0-9-]{3,60}$/;
+const FESTIVAL_SLUG_RE = /^[a-z0-9-]{3,60}$/;
 
 /** Route-level slugs under /f/ that must never become a festival. */
-export const RESERVED_FESTIVAL_SLUGS = ["new"] as const;
+const RESERVED_FESTIVAL_SLUGS = ["new"] as const;
 
 export function isValidFestivalSlug(slug: string): boolean {
   if (!FESTIVAL_SLUG_RE.test(slug)) return false;
@@ -87,7 +70,7 @@ export function isValidFestivalDate(value: string): boolean {
   return check.getUTCFullYear() === y && check.getUTCMonth() + 1 === m && check.getUTCDate() === d;
 }
 
-export interface FestivalDay {
+interface FestivalDay {
   /** YYYY-MM-DD in the festival timezone. */
   date: string;
   /** Anchor key mirroring Spark's #day-mon … #day-sun convention. */
@@ -169,7 +152,7 @@ export function zonedDateStr(iso: string, timeZone: string): string {
   }
 }
 
-export interface FestivalSessionLike {
+interface FestivalSessionLike {
   id: string;
   startsAt: string;
 }
@@ -198,7 +181,7 @@ export function groupSessionsByDay<T extends FestivalSessionLike>(
  * Offset minutes (local − UTC) for a zoned wall time, e.g. AEST = +600.
  * Resolves DST for the actual date, so October Sydney sessions get +660.
  */
-export function tzOffsetMinutes(dateStr: string, timeStr: string, timeZone: string): number {
+function tzOffsetMinutes(dateStr: string, timeStr: string, timeZone: string): number {
   const [hh, mm] = timeStr.split(":").map(Number);
   if (!Number.isFinite(hh) || !Number.isFinite(mm)) return 0;
   const utcGuess = Date.parse(`${dateStr}T${timeStr}:00Z`);

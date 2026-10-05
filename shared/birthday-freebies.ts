@@ -3,8 +3,8 @@
  * Discover → redeem with a Mate. Not an events directory.
  */
 
-export const BIRTHDAY_REGION_CODES = ["au", "in", "us", "uae", "eu"] as const;
-export type BirthdayRegionCode = (typeof BIRTHDAY_REGION_CODES)[number];
+const BIRTHDAY_REGION_CODES = ["au", "in", "us", "uae", "eu"] as const;
+type BirthdayRegionCode = (typeof BIRTHDAY_REGION_CODES)[number];
 
 export const BIRTHDAY_REGIONS: Array<{
   code: BirthdayRegionCode;
@@ -33,7 +33,7 @@ export const BIRTHDAY_MONTHS: Array<{ value: number; label: string; short: strin
   { value: 12, label: "December", short: "Dec" },
 ];
 
-export const BIRTHDAY_OFFER_CATEGORIES = [
+const BIRTHDAY_OFFER_CATEGORIES = [
   "food",
   "beauty",
   "retail",
@@ -41,15 +41,14 @@ export const BIRTHDAY_OFFER_CATEGORIES = [
   "activity",
   "other",
 ] as const;
-export type BirthdayOfferCategory = (typeof BIRTHDAY_OFFER_CATEGORIES)[number];
+type BirthdayOfferCategory = (typeof BIRTHDAY_OFFER_CATEGORIES)[number];
 
-export const BIRTHDAY_OFFER_STATUSES = ["draft", "live", "archived"] as const;
-export type BirthdayOfferStatus = (typeof BIRTHDAY_OFFER_STATUSES)[number];
+const BIRTHDAY_OFFER_STATUSES = ["draft", "live", "archived"] as const;
+type BirthdayOfferStatus = (typeof BIRTHDAY_OFFER_STATUSES)[number];
 
-export const BIRTHDAY_OWNER_TYPES = ["admin", "business"] as const;
-export type BirthdayOwnerType = (typeof BIRTHDAY_OWNER_TYPES)[number];
+type BirthdayOwnerType = "admin" | "business";
 
-export interface BirthdayOffer {
+interface BirthdayOffer {
   id: string;
   brand: string;
   title: string;
@@ -155,66 +154,3 @@ export function validateBirthdayOfferDraft(input: Record<string, unknown>): stri
 
   return Array.from(new Set(errors));
 }
-
-export type CreateBirthdayOfferRequest = {
-  brand: string;
-  title: string;
-  description?: string;
-  rewardText: string;
-  category: BirthdayOfferCategory;
-  regions: string[];
-  birthdayMonths?: number[];
-  howToClaim: string;
-  claimUrl?: string;
-  businessId?: string;
-  placeId?: string;
-  featured?: boolean;
-  adultOnly?: boolean;
-  /** Business drafts default to draft; admins may create live. */
-  status?: BirthdayOfferStatus;
-};
-
-export type UpdateBirthdayOfferRequest = {
-  offerId: string;
-  patch: Partial<
-    Pick<
-      BirthdayOffer,
-      | "brand"
-      | "title"
-      | "description"
-      | "rewardText"
-      | "category"
-      | "regions"
-      | "birthdayMonths"
-      | "howToClaim"
-      | "claimUrl"
-      | "businessId"
-      | "placeId"
-      | "featured"
-      | "adultOnly"
-      | "status"
-    >
-  >;
-};
-
-export type ListBirthdayOffersRequest = {
-  region?: string;
-  month?: number;
-  status?: BirthdayOfferStatus | "any";
-};
-
-export type AdminSetBirthdayOfferStatusRequest = {
-  offerId: string;
-  status: BirthdayOfferStatus;
-};
-
-/** Mate meetup CTA — Life Made Easy framing. */
-export const BIRTHDAY_MATE_CTA = {
-  label: "Redeem with a Mate",
-  href: "https://airpal.me",
-  inAppHref: "/mate",
-  blurb: "Find someone to go with — Life Made Easy.",
-} as const;
-
-export const BIRTHDAY_DISCLAIMER =
-  "Offers change and may require joining a rewards programme before your birthday. Always confirm terms with the brand.";

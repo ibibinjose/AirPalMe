@@ -1,4 +1,4 @@
-import type { NearbyPlace, PrecinctDoc } from "./nearby";
+import type { NearbyPlace } from "./nearby";
 
 export const KOVALAM_PRECINCT_ID = "kovalam";
 export const TRIVANDRUM_PRECINCT_ID = "trivandrum";
@@ -8,81 +8,6 @@ export const ALLEPPEY_PRECINCT_ID = "alleppey";
 export const VARKALA_PRECINCT_ID = "varkala";
 export const WAYANAD_PRECINCT_ID = "wayanad";
 export const KUMARAKOM_PRECINCT_ID = "kumarakom";
-
-export const KERALA_PRECINCTS: PrecinctDoc[] = [
-  {
-    id: KOVALAM_PRECINCT_ID,
-    name: "Kovalam Beach",
-    city: "Kovalam",
-    citySlug: "kovalam",
-    status: "active",
-    geo: { lat: 8.4, lng: 76.98 },
-    summary: "Lighthouse Beach, Eve's Beach, and calm Arabian Sea surf south of Trivandrum.",
-  },
-  {
-    id: TRIVANDRUM_PRECINCT_ID,
-    name: "Trivandrum City",
-    city: "Trivandrum",
-    citySlug: "trivandrum",
-    status: "active",
-    geo: { lat: 8.52, lng: 76.94 },
-    summary: "Kerala's capital — Technopark, temples, and Napier museums.",
-  },
-  {
-    id: KOCHI_PRECINCT_ID,
-    name: "Fort Kochi & Islands",
-    city: "Kochi",
-    citySlug: "kochi",
-    status: "active",
-    geo: { lat: 9.93, lng: 76.27 },
-    summary: "Chinese fishing nets, Mattancherry Palace, and the Infopark tech corridor.",
-  },
-  {
-    id: MUNNAR_PRECINCT_ID,
-    name: "Munnar Tea Hills",
-    city: "Munnar",
-    citySlug: "munnar",
-    status: "active",
-    geo: { lat: 10.09, lng: 77.06 },
-    summary: "Endless tea gardens, cool air, and Eravikulam National Park.",
-  },
-  {
-    id: ALLEPPEY_PRECINCT_ID,
-    name: "Alleppey Backwaters",
-    city: "Alleppey",
-    citySlug: "alleppey",
-    status: "active",
-    geo: { lat: 9.5, lng: 76.34 },
-    summary: "Venice of the East — overnight houseboats on the canals.",
-  },
-  {
-    id: VARKALA_PRECINCT_ID,
-    name: "Varkala Cliff",
-    city: "Varkala",
-    citySlug: "varkala",
-    status: "active",
-    geo: { lat: 8.74, lng: 76.7 },
-    summary: "Red-earth cliffs dropping to the Arabian Sea and quiet beaches.",
-  },
-  {
-    id: WAYANAD_PRECINCT_ID,
-    name: "Wayanad Hills",
-    city: "Wayanad",
-    citySlug: "wayanad",
-    status: "active",
-    geo: { lat: 11.61, lng: 76.08 },
-    summary: "Spice plantations, Edakkal Caves, and waterfall treks.",
-  },
-  {
-    id: KUMARAKOM_PRECINCT_ID,
-    name: "Kumarakom Lagoon",
-    city: "Kumarakom",
-    citySlug: "kumarakom",
-    status: "active",
-    geo: { lat: 9.62, lng: 76.43 },
-    summary: "Bird sanctuary and slow lagoon life on Vembanad Lake.",
-  },
-];
 
 /**
  * Kerala seed places. Hero photos are real Wikimedia Commons files verified
