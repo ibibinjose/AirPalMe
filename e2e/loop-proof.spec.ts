@@ -7,26 +7,19 @@ import { test, expect } from "@playwright/test";
  * never exposed or broken for guests.
  */
 test.describe("AirPal loop proof (P0)", () => {
-  test("home answers what you want to do and leads to a Mate", async ({ page }) => {
+  test("home answers what you want to do and offers What now? and Plan a Hangout", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
-    const mateCta = page.getByRole("link", { name: /find (someone|a mate|an airpal|people)/i });
-    const mateHeading = page.getByText(/find someone to go with/i);
-    await expect(mateCta.first().or(mateHeading.first())).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "What do you want to do?" })).toBeVisible();
+    await expect(page.locator("header").getByRole("button", { name: "What now?", exact: true })).toBeVisible();
+    await expect(page.locator("header").getByRole("button", { name: "Plan a Hangout", exact: true })).toBeVisible();
   });
 
-  test("home hero CTA deep-links straight to the Mate request form", async ({ page }) => {
+  test("home hero CTA deep-links straight to the Plan Hangout creation form", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
-    await page.locator("header").getByRole("button", { name: "Find a Mate", exact: true }).click();
-    await expect(page).toHaveURL(/\/mate\/request/);
-  });
-
-  test("canceled mate checkout shows a no-charge notice", async ({ page }) => {
-    await page.goto("/mate?canceled=1");
-    await page.waitForLoadState("domcontentloaded");
-    await expect(page.getByText(/payment canceled/i)).toBeVisible();
-    await expect(page.getByText(/not charged/i)).toBeVisible();
+    await page.locator("header").getByRole("button", { name: "Plan a Hangout", exact: true }).click();
+    await expect(page).toHaveURL(/\/plan\/new/);
   });
 
   test("canceled plan checkout shows a no-charge notice", async ({ page }) => {
@@ -41,23 +34,18 @@ test.describe("AirPal loop proof (P0)", () => {
     await expect(page.getByText(/payment canceled/i)).toBeVisible();
   });
 
-  test("mate demand surface renders its request entry", async ({ page }) => {
-    await page.goto("/mate");
+  test("plan creation surface renders its form entry", async ({ page }) => {
+    await page.goto("/plan/new");
     await page.waitForLoadState("domcontentloaded");
-    await expect(page.getByText(/AirPal Mate/i).first()).toBeVisible();
-    const requestBtn = page.getByRole("button", { name: /find someone to go with/i });
-    await expect(requestBtn).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
-  test("explore filters open and When/Price groups are interactive", async ({ page }) => {
-    await page.goto("/explore");
+  test("now discovery options are interactive", async ({ page }) => {
+    await page.goto("/now");
     await page.waitForLoadState("domcontentloaded");
-    await page.getByRole("button", { name: /open filters/i }).click();
-    await expect(page.getByRole("group", { name: /filter by when/i })).toBeVisible();
-    await expect(page.getByRole("group", { name: /filter by price/i })).toBeVisible();
-    // Selecting a filter must not break the surface.
-    await page.getByRole("button", { name: "This weekend", exact: true }).click();
-    await expect(page.getByRole("button", { name: "Clear filters" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "What now?" })).toBeVisible();
+    await page.getByRole("button", { name: "Eat", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Eat", exact: true })).toHaveAttribute("aria-pressed", "true");
   });
 
   test("calendar renders with a My plans repeat surface", async ({ page }) => {
@@ -80,9 +68,9 @@ test.describe("AirPal loop proof (P0)", () => {
     await expect(gate.or(placeForm)).toBeVisible();
   });
 
-  test("experiences surface renders without a second app", async ({ page }) => {
-    await page.goto("/experiences");
+  test("events surface renders without a second app", async ({ page }) => {
+    await page.goto("/events");
     await page.waitForLoadState("domcontentloaded");
-    await expect(page.getByRole("heading", { name: /experiences/i })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 });

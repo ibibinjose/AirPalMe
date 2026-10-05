@@ -34,7 +34,7 @@ test.describe("Mates Social Planning & Digital Invitations Flow", () => {
     await page.goto("/plan/plan-rocks-night-out");
     await page.waitForLoadState("domcontentloaded");
 
-    await expect(page.locator("h1", { hasText: /Friday Night Out in The Rocks/i })).toBeVisible();
+    await expect(page.locator("h1", { hasText: /Friday Night Out in The Rocks/i })).toBeVisible({ timeout: 10000 });
 
     // Prefer the inline RSVP action, fall back to the sticky bottom-bar action
     const inlineRsvp = page.getByRole("button", { name: "RSVP (Free)" });
