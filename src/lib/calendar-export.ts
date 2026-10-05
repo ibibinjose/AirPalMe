@@ -8,6 +8,15 @@ export interface SimpleCalendarPayload {
   endsAt?: string; // ISO string (defaults to +1 hour)
   venue?: string;
   city?: string;
+  meetingLink?: string;
+  meetingPlatform?: "in_person" | "google_meet" | "facetime" | "zoom" | string;
+}
+
+function platformName(platform?: string, link?: string): string {
+  if (platform === "facetime" || link?.includes("facetime.apple.com") || link?.startsWith("facetime")) return "FaceTime";
+  if (platform === "google_meet" || link?.includes("meet.google.com")) return "Google Meet";
+  if (platform === "zoom" || link?.includes("zoom.us")) return "Zoom";
+  return "Video Call";
 }
 
 function normalizePayload(event: CalendarEvent | SimpleCalendarPayload): {
@@ -17,6 +26,8 @@ function normalizePayload(event: CalendarEvent | SimpleCalendarPayload): {
   startsAt: string;
   endsAt: string;
   location: string;
+  meetingLink?: string;
+  meetingPlatform?: string;
 } {
   const startsAt = event.startsAt || new Date().toISOString();
   let endsAt = event.endsAt;
@@ -25,14 +36,30 @@ function normalizePayload(event: CalendarEvent | SimpleCalendarPayload): {
     d.setHours(d.getHours() + 1);
     endsAt = d.toISOString();
   }
-  const location = [event.venue, event.city].filter(Boolean).join(", ");
+  const meetingLink = "meetingLink" in event ? event.meetingLink : undefined;
+  const meetingPlatform = "meetingPlatform" in event ? event.meetingPlatform : undefined;
+  const baseLoc = [event.venue, event.city].filter(Boolean).join(", ");
+  const location = meetingLink
+    ? baseLoc && baseLoc.toLowerCase() !== "online" && !baseLoc.includes("http")
+      ? `${baseLoc} (${meetingLink})`
+      : meetingLink
+    : baseLoc;
+
+  let desc = event.description || "Organised on AirPal.Me";
+  if (meetingLink && !desc.includes(meetingLink)) {
+    const pName = platformName(meetingPlatform, meetingLink);
+    desc = `${desc}\n\nJoin ${pName}: ${meetingLink}`;
+  }
+
   return {
     id: event.id || `airpal-${Date.now()}`,
     title: event.title || "AirPal Catch Up",
-    description: event.description || "Organised on AirPal.Me",
+    description: desc,
     startsAt,
     endsAt,
     location,
+    meetingLink,
+    meetingPlatform,
   };
 }
 
@@ -57,7 +84,7 @@ export function generateIcs(event: CalendarEvent | SimpleCalendarPayload): strin
   const description = escapeIcsText(norm.description);
   const uid = `${norm.id}@airpal.me`;
 
-  return [
+  const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//AirPal//Event Calendar//EN",
@@ -71,10 +98,14 @@ export function generateIcs(event: CalendarEvent | SimpleCalendarPayload): strin
     `SUMMARY:${summary}`,
     `DESCRIPTION:${description}`,
     `LOCATION:${escapeIcsText(norm.location)}`,
-    "STATUS:CONFIRMED",
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\r\n");
+  ];
+
+  if (norm.meetingLink) {
+    lines.push(`URL:${norm.meetingLink}`);
+  }
+
+  lines.push("STATUS:CONFIRMED", "END:VEVENT", "END:VCALENDAR");
+  return lines.join("\r\n");
 }
 
 export function generateMultipleIcs(
@@ -90,7 +121,7 @@ export function generateMultipleIcs(
     const description = escapeIcsText(norm.description);
     const uid = `${norm.id}-${Date.now()}@airpal.me`;
 
-    return [
+    const lines = [
       "BEGIN:VEVENT",
       `UID:${uid}`,
       `DTSTAMP:${dtStamp}`,
@@ -99,9 +130,14 @@ export function generateMultipleIcs(
       `SUMMARY:${summary}`,
       `DESCRIPTION:${description}`,
       `LOCATION:${escapeIcsText(norm.location)}`,
-      "STATUS:CONFIRMED",
-      "END:VEVENT",
-    ].join("\r\n");
+    ];
+
+    if (norm.meetingLink) {
+      lines.push(`URL:${norm.meetingLink}`);
+    }
+
+    lines.push("STATUS:CONFIRMED", "END:VEVENT");
+    return lines.join("\r\n");
   });
 
   return [

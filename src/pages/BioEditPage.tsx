@@ -266,6 +266,10 @@ export function BioEditPage() {
   const [type, setType] = useState<BioLinkType>("website");
   const [href, setHref] = useState("");
   const [zooHunt, setZooHunt] = useState(false);
+  const [meetingUrl, setMeetingUrl] = useState("");
+  const [preferredMeetingPlatform, setPreferredMeetingPlatform] = useState<
+    "in_person" | "google_meet" | "facetime" | "zoom"
+  >("in_person");
 
   // Mobile Live Preview Modal Sheet State
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
@@ -299,6 +303,8 @@ export function BioEditPage() {
     setServices(activeProfile.services || []);
     setDeals(activeProfile.deals?.length ? activeProfile.deals : catalogDeals(activeProfile));
     setZooHunt(Boolean(activeProfile.zooHunt));
+    setMeetingUrl(activeProfile.meetingUrl || "");
+    setPreferredMeetingPlatform(activeProfile.preferredMeetingPlatform || "in_person");
     void makeQrDataUrl(toPublicUrl(bioPath(activeProfile.handle))).then(setQr);
   }, [activeProfile]);
 
@@ -362,6 +368,8 @@ export function BioEditPage() {
         cover: cover.trim() || undefined,
         mapsPlaceId: mapsPlaceId.trim() || undefined,
         zooHunt,
+        meetingUrl: meetingUrl.trim() || undefined,
+        preferredMeetingPlatform,
         links,
         products,
         services,

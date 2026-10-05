@@ -25,6 +25,8 @@ export interface CatchUpItem {
   date?: string;
   time?: string;
   venue?: string;
+  meetingLink?: string;
+  meetingPlatform?: "in_person" | "google_meet" | "facetime" | "zoom";
   notes?: string;
   planId?: string;
   proposals?: CatchUpSlot[];
@@ -226,6 +228,8 @@ export function recordCatchUpInterest(input: {
   date?: string;
   time?: string;
   venue?: string;
+  meetingLink?: string;
+  meetingPlatform?: "in_person" | "google_meet" | "facetime" | "zoom";
   notes?: string;
   planId?: string;
 }): CatchUpItem {
@@ -243,6 +247,8 @@ export function recordCatchUpInterest(input: {
     date: input.date,
     time: input.time,
     venue: input.venue,
+    meetingLink: input.meetingLink,
+    meetingPlatform: input.meetingPlatform,
     notes: input.notes,
     planId: input.planId,
     createdAt: new Date().toISOString(),

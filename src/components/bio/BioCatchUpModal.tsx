@@ -7,13 +7,16 @@ import {
   Calendar,
   Clock,
   Coffee,
+  ExternalLink,
+  Loader2,
   MapPin,
   MessageSquare,
+  PhoneCall,
   Sparkles,
   Users,
+  Video,
   X,
   Zap,
-  Loader2,
 } from "lucide-react";
 import { Photo } from "@/components/ui/Photo";
 import { Button } from "@/components/ui/Button";
@@ -47,6 +50,8 @@ interface BioCatchUpModalProps {
   avatar?: string;
   ownerUid?: string;
   initialType?: PlanType;
+  defaultMeetingUrl?: string;
+  defaultMeetingPlatform?: "in_person" | "google_meet" | "facetime" | "zoom";
 }
 
 function localDate(offsetDays = 0) {
@@ -64,12 +69,16 @@ export function BioCatchUpModal({
   avatar,
   ownerUid,
   initialType = "catchup",
+  defaultMeetingUrl,
+  defaultMeetingPlatform,
 }: BioCatchUpModalProps) {
   const [, nav] = useLocation();
   const { createPlan, myPlans } = usePlans();
   const { user, requireUser } = useAuth();
   const { mine } = useBio();
   const [selectedType, setSelectedType] = useState<PlanType>(initialType);
+  const [meetingPlatform, setMeetingPlatform] = useState<"in_person" | "google_meet" | "facetime">("in_person");
+  const [meetingLink, setMeetingLink] = useState("");
   const [date, setDate] = useState(() => localDate(1));
   const [time, setTime] = useState("14:00");
   const [venue, setVenue] = useState("");
@@ -91,6 +100,16 @@ export function BioCatchUpModal({
   useEffect(() => {
     if (!open) return;
     setSelectedType(initialType);
+    const resolvedPlatform: "in_person" | "google_meet" | "facetime" =
+      defaultMeetingPlatform === "google_meet" || defaultMeetingPlatform === "facetime"
+        ? defaultMeetingPlatform
+        : initialType === "meeting" && defaultMeetingUrl
+          ? defaultMeetingUrl.includes("facetime")
+            ? "facetime"
+            : "google_meet"
+          : "in_person";
+    setMeetingPlatform(resolvedPlatform);
+    setMeetingLink(defaultMeetingUrl || "");
     setDate(localDate(1));
     setTime(initialType === "meeting" ? "10:00" : initialType === "nightout" ? "18:30" : "14:00");
     setVenue(city ? `${city}` : "");
@@ -102,7 +121,7 @@ export function BioCatchUpModal({
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [open, initialType, handle, city, onClose]);
+  }, [open, initialType, handle, city, defaultMeetingUrl, defaultMeetingPlatform, onClose]);
 
   const typeOptions: Array<{
     type: PlanType;
@@ -168,7 +187,20 @@ export function BioCatchUpModal({
       );
       return;
     }
-    const place = venue.trim() || city;
+    const effectiveMeetingLink =
+      meetingPlatform === "google_meet"
+        ? meetingLink.trim() || "https://meet.google.com/new"
+        : meetingPlatform === "facetime"
+          ? meetingLink.trim() || `facetime:${handle}`
+          : undefined;
+
+    const place =
+      meetingPlatform === "google_meet"
+        ? `Google Meet (${effectiveMeetingLink})`
+        : meetingPlatform === "facetime"
+          ? `FaceTime (${effectiveMeetingLink})`
+          : venue.trim() || city;
+
     setIsSubmitting(true);
     try {
       void triggerHaptic("success");
@@ -186,9 +218,9 @@ export function BioCatchUpModal({
         invited: [{ id: ownerUid || `h-${handle}`, name, handle }],
         initialStops:
           selectedType === "catchup"
-            ? [{ name: `Coffee at ${place}`, time, notes: "Catch up", icon: "coffee", address: place }]
+            ? [{ name: meetingPlatform === "in_person" ? `Coffee at ${place}` : place, time, notes: "Catch up", icon: meetingPlatform === "in_person" ? "coffee" : "drinks", address: place }]
             : selectedType === "meeting"
-              ? [{ name: `Meeting at ${place}`, time, notes: notes || "Sync", icon: "pin", address: place }]
+              ? [{ name: meetingPlatform === "in_person" ? `Meeting at ${place}` : place, time, notes: notes || "Sync", icon: "pin", address: place }]
               : [{ name: place, time, notes: "Meet here", icon: "drinks", address: place }],
       });
 
@@ -203,6 +235,8 @@ export function BioCatchUpModal({
         date,
         time,
         venue: place,
+        meetingLink: effectiveMeetingLink,
+        meetingPlatform,
         notes,
         planId: created.id,
       });
@@ -223,12 +257,21 @@ export function BioCatchUpModal({
     }
   };
 
+  const effectiveMeetingLink =
+    meetingPlatform === "google_meet"
+      ? meetingLink.trim() || "https://meet.google.com/new"
+      : meetingPlatform === "facetime"
+        ? meetingLink.trim() || undefined
+        : undefined;
+
   const eventPayload = {
     title: `${currentOption.label} with ${name}`,
-    description: `${notes || `AirPal ${currentOption.label} with @${handle}`}\nVenue: ${venue || city}\nhttps://airpal.me/@${handle}`,
+    description: `${notes || `AirPal ${currentOption.label} with @${handle}`}\nhttps://airpal.me/@${handle}`,
     startsAt: `${date}T${time || "14:00"}:00`,
-    venue: venue || city,
-    city,
+    venue: meetingPlatform === "in_person" ? (venue || city) : (meetingPlatform === "facetime" ? "FaceTime Call" : "Google Meet"),
+    city: meetingPlatform === "in_person" ? city : undefined,
+    meetingLink: effectiveMeetingLink,
+    meetingPlatform,
   };
 
   const content = (
@@ -388,18 +431,136 @@ export function BioCatchUpModal({
             </div>
           </div>
 
-          <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-mute">Where / Venue</label>
-            <div className="relative">
-              <MapPin size={14} className="absolute left-3.5 top-3.5 text-mute" />
-              <input
-                type="text"
-                value={venue}
-                onChange={(e) => setVenue(e.target.value)}
-                placeholder={city || "A café nearby"}
-                className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-[16px] sm:text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
-              />
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-mute">
+                Where / Location
+              </label>
+              {meetingPlatform !== "in_person" && (
+                <span className="text-[10px] font-bold text-brand uppercase tracking-wider">
+                  Virtual Meeting
+                </span>
+              )}
             </div>
+
+            {/* 3-way Segmented Control */}
+            <div className="grid grid-cols-3 gap-1 rounded-2xl bg-card p-1 ring-1 ring-line">
+              <button
+                type="button"
+                onClick={() => {
+                  void triggerHaptic("light");
+                  setMeetingPlatform("in_person");
+                }}
+                className={cn(
+                  "flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold transition cursor-pointer active:scale-95",
+                  meetingPlatform === "in_person"
+                    ? "bg-paper text-ink shadow-xs ring-1 ring-line/80 font-bold"
+                    : "text-mute hover:text-ink",
+                )}
+              >
+                <MapPin size={13} />
+                <span>In Person</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  void triggerHaptic("light");
+                  setMeetingPlatform("google_meet");
+                  if (!meetingLink && defaultMeetingUrl) setMeetingLink(defaultMeetingUrl);
+                }}
+                className={cn(
+                  "flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold transition cursor-pointer active:scale-95",
+                  meetingPlatform === "google_meet"
+                    ? "bg-brand/10 text-brand ring-1 ring-brand/30 shadow-xs font-bold"
+                    : "text-mute hover:text-ink",
+                )}
+              >
+                <Video size={13} />
+                <span>Google Meet</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  void triggerHaptic("light");
+                  setMeetingPlatform("facetime");
+                  if (!meetingLink && defaultMeetingUrl) setMeetingLink(defaultMeetingUrl);
+                }}
+                className={cn(
+                  "flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold transition cursor-pointer active:scale-95",
+                  meetingPlatform === "facetime"
+                    ? "bg-emerald-500/15 text-emerald-800 ring-1 ring-emerald-500/30 shadow-xs font-bold"
+                    : "text-mute hover:text-ink",
+                )}
+              >
+                <PhoneCall size={13} />
+                <span>FaceTime</span>
+              </button>
+            </div>
+
+            {meetingPlatform === "in_person" ? (
+              <div className="relative">
+                <MapPin size={14} className="absolute left-3.5 top-3.5 text-mute" />
+                <input
+                  type="text"
+                  value={venue}
+                  onChange={(e) => setVenue(e.target.value)}
+                  placeholder={city ? `Café or venue in ${city}` : "A café nearby"}
+                  className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-[16px] sm:text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
+                />
+              </div>
+            ) : meetingPlatform === "google_meet" ? (
+              <div className="space-y-1.5">
+                <div className="relative">
+                  <Video size={14} className="absolute left-3.5 top-3.5 text-brand" />
+                  <input
+                    type="url"
+                    value={meetingLink}
+                    onChange={(e) => setMeetingLink(e.target.value)}
+                    placeholder="https://meet.google.com/xxx-yyyy-zzz"
+                    className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-24 text-[16px] sm:text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      setMeetingLink("https://meet.google.com/new");
+                    }}
+                    className="absolute right-2 top-2 rounded-xl bg-brand/10 px-2.5 py-1.5 text-[11px] font-bold text-brand hover:bg-brand/20 transition cursor-pointer"
+                    title="Use instant Google Meet link"
+                  >
+                    meet.new
+                  </button>
+                </div>
+                <p className="text-[11px] text-mute flex items-center justify-between">
+                  <span>Uses Google Meet web video call.</span>
+                  <a
+                    href="https://meet.google.com/new"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand hover:underline inline-flex items-center gap-0.5"
+                  >
+                    <span>Open Meet</span>
+                    <ExternalLink size={10} />
+                  </a>
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <div className="relative">
+                  <PhoneCall size={14} className="absolute left-3.5 top-3.5 text-emerald-600" />
+                  <input
+                    type="text"
+                    value={meetingLink}
+                    onChange={(e) => setMeetingLink(e.target.value)}
+                    placeholder="https://facetime.apple.com/... or Apple ID"
+                    className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-[16px] sm:text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
+                  />
+                </div>
+                <p className="text-[11px] text-mute leading-relaxed">
+                  Paste a FaceTime Web link (works on iPhone, Mac, Windows &amp; Android) or enter an Apple ID email/phone.
+                </p>
+              </div>
+            )}
           </div>
 
           <div>

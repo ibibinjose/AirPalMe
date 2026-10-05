@@ -203,11 +203,46 @@ describe("Calendar Export (ICS & Google Calendar)", () => {
     expect(ics).toContain("END:VCALENDAR");
   });
 
+  it("embeds video meeting links (FaceTime & Google Meet) into ICS with URL property", () => {
+    const meetPayload = {
+      title: "1-on-1 Catch Up",
+      startsAt: "2026-09-15T14:00:00+10:00",
+      meetingLink: "https://meet.google.com/abc-defg-hij",
+      meetingPlatform: "google_meet",
+    };
+    const icsMeet = generateIcs(meetPayload);
+    expect(icsMeet).toContain("URL:https://meet.google.com/abc-defg-hij");
+    expect(icsMeet).toContain("LOCATION:https://meet.google.com/abc-defg-hij");
+    expect(icsMeet).toContain("Join Google Meet: https://meet.google.com/abc-defg-hij");
+
+    const facetimePayload = {
+      title: "FaceTime Coffee Sync",
+      startsAt: "2026-09-15T15:00:00+10:00",
+      meetingLink: "https://facetime.apple.com/join#v=1&p=xyz",
+      meetingPlatform: "facetime",
+    };
+    const icsFt = generateIcs(facetimePayload);
+    expect(icsFt).toContain("URL:https://facetime.apple.com/join#v=1&p=xyz");
+    expect(icsFt).toContain("Join FaceTime: https://facetime.apple.com/join#v=1&p=xyz");
+  });
+
   it("generates a valid Google Calendar URL", () => {
     const url = getGoogleCalendarUrl(MOCK_EVENTS[0]!);
     expect(url).toContain("https://calendar.google.com/calendar/render");
     expect(url).toContain("action=TEMPLATE");
     expect(url).toContain("text=The+Rocks+Weekend+Market");
+  });
+
+  it("embeds video meeting links in Google Calendar URL", () => {
+    const meetPayload = {
+      title: "1-on-1 Catch Up",
+      startsAt: "2026-09-15T14:00:00+10:00",
+      meetingLink: "https://meet.google.com/abc-defg-hij",
+      meetingPlatform: "google_meet",
+    };
+    const url = getGoogleCalendarUrl(meetPayload);
+    expect(url).toContain("https://calendar.google.com/calendar/render");
+    expect(url).toContain(encodeURIComponent("https://meet.google.com/abc-defg-hij"));
   });
 });
 

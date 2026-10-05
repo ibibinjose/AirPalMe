@@ -288,6 +288,10 @@ export type BioProfile = {
   checkOut?: string;
   /** Stay & hotel facilities / amenities list */
   facilities?: FacilityItem[];
+  /** Default Google Meet or FaceTime link for 1-on-1 catch-ups and meetings */
+  meetingUrl?: string;
+  /** Preferred meeting platform */
+  preferredMeetingPlatform?: "in_person" | "google_meet" | "facetime" | "zoom";
 };
 
 export function normalizeHandle(raw: string) {
