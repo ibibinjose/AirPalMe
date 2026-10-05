@@ -463,7 +463,7 @@ export function PlanDetailPage() {
             aria-checked={Boolean(plan.isPublic)}
             aria-label="Who can discover this plan"
             onClick={() => updatePlan(plan.id, { isPublic: !plan.isPublic })}
-            className={cn("relative h-7 w-12 shrink-0 rounded-full transition", plan.isPublic ? "bg-brand" : "bg-line")}
+            className={cn("relative h-7 w-12 shrink-0 rounded-full transition before:absolute before:-inset-3 before:content-['']", plan.isPublic ? "bg-brand" : "bg-line")}
           >
             <span
               className={cn(
@@ -498,7 +498,7 @@ export function PlanDetailPage() {
                   aria-checked={!hidden}
                   aria-label={row.label}
                   onClick={() => updatePlan(plan.id, { guestList: { ...(plan.guestList || {}), [row.key]: !hidden } })}
-                  className={cn("relative h-7 w-12 shrink-0 rounded-full transition", !hidden ? "bg-brand" : "bg-line")}
+                  className={cn("relative h-7 w-12 shrink-0 rounded-full transition before:absolute before:-inset-3 before:content-['']", !hidden ? "bg-brand" : "bg-line")}
                 >
                   <span
                     className={cn(
@@ -551,7 +551,7 @@ export function PlanDetailPage() {
               aria-label="Approve guests"
               onClick={() => updatePlan(plan.id, { requiresApproval: !plan.requiresApproval })}
               className={cn(
-                "relative h-7 w-12 shrink-0 rounded-full transition",
+                "relative h-7 w-12 shrink-0 rounded-full transition before:absolute before:-inset-3 before:content-['']",
                 plan.requiresApproval ? "bg-brand" : "bg-line",
               )}
             >
@@ -678,7 +678,7 @@ export function PlanDetailPage() {
         </div>
       )}
 
-      <div className="sticky top-0 z-20 -mx-4 mt-6 bg-paper/95 px-4 py-2 backdrop-blur">
+      <div className="sticky-pagebar z-20 -mx-4 mt-6 bg-paper/95 px-4 py-2 backdrop-blur">
         <SegmentedControl
           label="Plan sections"
           value={detailTab}
@@ -1130,7 +1130,7 @@ export function PlanDetailPage() {
                 <button
                   type="button"
                   onClick={() => void handlePrintGuide()}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 ring-line bg-paper text-mute hover:text-ink transition active:scale-95"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 ring-line bg-paper text-mute hover:text-ink transition active:scale-95"
                   title="Export Itinerary as PDF / Print Guide"
                 >
                   <Printer size={13} />
@@ -1142,7 +1142,7 @@ export function PlanDetailPage() {
                   aria-pressed={previewMode}
                   title={previewMode ? "Back to editing" : "Preview clean timeline"}
                   className={cn(
-                    "inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 transition active:scale-95",
+                    "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-xs font-semibold ring-1 transition active:scale-95",
                     previewMode ? "bg-brand text-white ring-ink" : "bg-paper text-mute ring-line hover:text-ink",
                   )}
                 >

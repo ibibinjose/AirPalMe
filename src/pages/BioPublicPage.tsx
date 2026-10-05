@@ -1988,8 +1988,8 @@ export function BioPublicPage() {
                         }
                         className={
                           on
-                            ? "h-9 shrink-0 cursor-pointer rounded-full bg-brand px-3.5 text-xs font-bold text-white shadow-xs transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                            : "h-9 shrink-0 cursor-pointer rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                            ? "min-h-[44px] shrink-0 cursor-pointer rounded-full bg-brand px-3.5 text-xs font-bold text-white shadow-xs transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                            : "min-h-[44px] shrink-0 cursor-pointer rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                         }
                       >
                         {interest.label}

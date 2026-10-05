@@ -696,7 +696,7 @@ export function PlanCreatePage() {
                     }
                   }}
                   className={cn(
-                    "h-8 rounded-full px-3.5 text-xs font-semibold border transition active:scale-95 cursor-pointer",
+                    "min-h-[44px] rounded-full px-3.5 text-xs font-semibold border transition active:scale-95 cursor-pointer",
                     date === q.value
                       ? "bg-brand text-white border-brand shadow-xs"
                       : "bg-paper text-ink/80 border-line/80 hover:bg-card hover:border-brand/40",

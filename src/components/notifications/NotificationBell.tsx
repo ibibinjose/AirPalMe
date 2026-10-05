@@ -116,7 +116,7 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="relative grid h-9 w-9 touch-manipulation place-items-center rounded-full text-brand hover:bg-card ring-1 ring-line transition"
+        className="relative grid h-9 w-9 touch-manipulation place-items-center rounded-full text-brand hover:bg-card ring-1 ring-line transition after:absolute after:-inset-1 after:content-['']"
         aria-label={total ? `${total} unread notifications` : "Notifications"}
         title="Notifications"
       >
@@ -128,7 +128,7 @@ export function NotificationBell() {
         )}
       </button>
       {open && (
-        <div className="absolute right-0 z-40 mt-2 max-h-96 w-[22rem] overflow-y-auto rounded-[22px] bg-card shadow-xl ring-1 ring-line/80">
+        <div className="absolute right-0 z-40 mt-2 max-h-96 w-[22rem] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-[22px] bg-card shadow-xl ring-1 ring-line/80">
           {canWatch && (
             <>
               <div className="flex items-center justify-between px-4 py-3">

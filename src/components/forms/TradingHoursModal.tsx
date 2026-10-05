@@ -239,7 +239,7 @@ export function TradingHoursModal({ open, onClose, value, onApply }: TradingHour
                         type="time"
                         value={daySched.openTime}
                         onChange={(e) => handleTimeChange(dayKey, "openTime", e.target.value)}
-                        className="h-8 rounded-xl border border-line bg-paper px-2 text-xs font-semibold text-ink focus:border-brand focus:outline-none"
+                        className="min-h-[44px] rounded-xl border border-line bg-paper px-2 text-xs font-semibold text-ink focus:border-brand focus:outline-none"
                       />
                       <span className="text-xs text-mute">to</span>
                       {!daySched.isLate ? (
@@ -247,7 +247,7 @@ export function TradingHoursModal({ open, onClose, value, onApply }: TradingHour
                           type="time"
                           value={daySched.closeTime}
                           onChange={(e) => handleTimeChange(dayKey, "closeTime", e.target.value)}
-                          className="h-8 rounded-xl border border-line bg-paper px-2 text-xs font-semibold text-ink focus:border-brand focus:outline-none"
+                          className="min-h-[44px] rounded-xl border border-line bg-paper px-2 text-xs font-semibold text-ink focus:border-brand focus:outline-none"
                         />
                       ) : (
                         <span className="inline-flex h-8 items-center rounded-xl bg-purple-500/10 px-2.5 text-xs font-bold text-purple-600">

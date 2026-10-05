@@ -6,6 +6,8 @@ export function Photo({
   className,
   position,
   priority = false,
+  srcSet,
+  sizes,
 }: {
   src?: string;
   alt?: string;
@@ -13,6 +15,8 @@ export function Photo({
   position?: string;
   /** Above-the-fold hero: eager load with high fetch priority (improves LCP). */
   priority?: boolean;
+  srcSet?: string;
+  sizes?: string;
 }) {
   const resolved = useMediaSrc(src);
   const current = resolved || (src && !src.startsWith("idb:") ? src : undefined);
@@ -23,6 +27,8 @@ export function Photo({
       alt={alt}
       className={className}
       style={position ? { objectPosition: position } : undefined}
+      srcSet={srcSet}
+      sizes={srcSet ? (sizes ?? "100vw") : undefined}
       referrerPolicy="no-referrer"
       loading={priority ? "eager" : "lazy"}
       decoding="async"

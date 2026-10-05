@@ -386,7 +386,7 @@ export function HelpDeskPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search room, request, item…"
-            className="h-9 w-full rounded-xl bg-paper pl-8 pr-3 text-xs text-ink outline-none ring-1 ring-line focus:ring-2 focus:ring-brand/40"
+            className="min-h-[44px] w-full rounded-xl bg-paper pl-8 pr-3 text-xs text-ink outline-none ring-1 ring-line focus:ring-2 focus:ring-brand/40"
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Self-hosted fonts (OFL-licensed DM Sans + Outfit). No third-party font
+/* System font stack everywhere (no webfont downloads). No third-party font
  * requests, so no visitor IPs leak to font CDNs. */
 /* Apple-like retheme (human-approved): system font stack everywhere, iOS
    neutral surfaces, AirPal Blue kept as the single accent. See
@@ -245,6 +245,30 @@ body.keyboard-open .keyboard-hide {
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* Skip rendering for off-screen sections/cards (mobile scroll perf). No visual
+ * change: `auto` sizes keep the scrollbar stable after first paint. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 480px;
+}
+
+/* Sticky in-page filter bars: park below the sticky shell stack (safe-area +
+ * LocalNowBar + header) instead of sliding underneath it. */
+.sticky-pagebar {
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + 90px);
+}
+@media (min-width: 640px) {
+  .sticky-pagebar {
+    top: calc(env(safe-area-inset-top, 0px) + 94px);
+  }
+}
+@media (min-width: 1024px) {
+  .sticky-pagebar {
+    top: 102px;
+  }
 }
 
 /* Safe area utilities for iOS notch and Android gestures */

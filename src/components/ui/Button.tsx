@@ -31,7 +31,7 @@ export function Button({
     <button
       className={cn(
         "inline-flex touch-manipulation select-none items-center justify-center gap-2 rounded-full font-medium transition active:scale-[0.98] disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
-        size === "sm" && "h-9 px-3.5 text-sm",
+        size === "sm" && "min-h-[44px] px-3.5 text-sm lg:h-9 lg:min-h-0",
         size === "md" && "h-11 px-5 text-[15px]",
         size === "lg" && "h-12 px-6 text-base",
         variant === "primary" &&

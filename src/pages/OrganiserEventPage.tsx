@@ -1248,7 +1248,7 @@ export function OrganiserEventPage() {
                               type="button"
                               onClick={() => setStallCategory(c.id)}
                               className={cn(
-                                "h-8 rounded-full px-3 text-xs font-semibold transition active:scale-95",
+                                "min-h-[44px] rounded-full px-3 text-xs font-semibold transition active:scale-95",
                                 on
                                   ? "bg-brand text-white shadow-xs"
                                   : "bg-paper text-mute border border-line hover:text-ink",
@@ -1478,7 +1478,7 @@ export function OrganiserEventPage() {
                     type="button"
                     onClick={() => setFlavour(id)}
                     className={cn(
-                      "h-9 rounded-full px-4 text-xs font-semibold transition active:scale-95",
+                      "min-h-[44px] rounded-full px-4 text-xs font-semibold transition active:scale-95",
                       flavour === id
                         ? "bg-brand text-white shadow-xs"
                         : "bg-paper text-mute border border-line hover:text-ink",

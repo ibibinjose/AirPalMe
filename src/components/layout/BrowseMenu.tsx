@@ -136,7 +136,7 @@ export function BrowseStrip({ path }: { path: string }) {
                 nav(link.href);
               }}
               className={cn(
-                "flex h-9 shrink-0 touch-manipulation items-center gap-1.5 rounded-full px-3.5 text-[13px] font-bold ring-1 transition active:scale-95",
+                "flex min-h-[44px] shrink-0 touch-manipulation items-center gap-1.5 rounded-full px-3.5 text-[13px] font-bold ring-1 transition active:scale-95",
                 on ? "bg-brand text-white ring-brand shadow-xs" : "bg-card text-ink ring-line",
               )}
             >
@@ -152,7 +152,7 @@ export function BrowseStrip({ path }: { path: string }) {
               void triggerHaptic("light");
               nav("/host");
             }}
-            className="flex h-9 shrink-0 touch-manipulation items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-bold text-ink ring-1 ring-line transition active:scale-95"
+            className="flex min-h-[44px] shrink-0 touch-manipulation items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-bold text-ink ring-1 ring-line transition active:scale-95"
           >
             <LayoutDashboard size={14} className="text-brand" />
             Host

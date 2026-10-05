@@ -546,7 +546,7 @@ export function BusinessPage() {
                         type="button"
                         onClick={() => setCategory(c.id)}
                         className={cn(
-                          "h-9 rounded-2xl px-3.5 text-xs font-semibold transition shadow-2xs",
+                          "min-h-[44px] rounded-2xl px-3.5 text-xs font-semibold transition shadow-2xs",
                           category === c.id
                             ? "bg-brand text-white shadow-sm ring-2 ring-brand/30"
                             : "bg-paper text-ink ring-1 ring-line hover:bg-card",

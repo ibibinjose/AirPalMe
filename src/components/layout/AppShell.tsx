@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { Suspense, lazy, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, useReducedMotion } from "framer-motion";
 import { Plus, Search } from "lucide-react";
@@ -12,7 +12,18 @@ import { BatteryWarningBanner } from "./BatteryWarningBanner";
 import { SyncStatusBar } from "./SyncStatusBar";
 import { NetworkStatusToast } from "./NetworkStatusToast";
 import { applyRouteMeta } from "@/lib/share-meta";
-import { GlobalSearchModal, openGlobalSearch } from "@/components/search/GlobalSearchModal";
+import {
+  OPEN_SEARCH_EVENT,
+  SEARCH_READY_EVENT,
+  openGlobalSearch,
+} from "@/components/search/openSearch";
+import { onIdle } from "@/lib/on-idle";
+
+// Search modal (catalog + stores) stays out of the boot bundle: mount on first
+// open request, preloaded at idle so the first tap is instant.
+const GlobalSearchModal = lazy(() =>
+  import("@/components/search/GlobalSearchModal").then((m) => ({ default: m.GlobalSearchModal })),
+);
 import { trackPageView } from "@/lib/analytics";
 import { forceUnlockBodyScroll } from "@/hooks/useScrollLock";
 import { GuestStayTools } from "@/components/stay/GuestStayTools";
@@ -61,6 +72,52 @@ export function AppShell({ children }: { children: ReactNode }) {
     disabled: bare,
   });
 
+  // Arm the lazy search modal on first open request; flush the queued open once
+  // the chunk mounts (the modal announces itself via SEARCH_READY_EVENT).
+  const [searchArmed, setSearchArmed] = useState(false);
+  const armedRef = useRef(false);
+  const pendingSearch = useRef<{ detail: unknown } | null>(null);
+  const flushingSearch = useRef(false);
+  useEffect(() => {
+    const queueOpen = (detail: unknown) => {
+      if (armedRef.current) return;
+      armedRef.current = true;
+      pendingSearch.current = { detail };
+      setSearchArmed(true);
+    };
+    const arm = (e: Event) => {
+      if (flushingSearch.current) return;
+      queueOpen((e as CustomEvent).detail);
+    };
+    // Pre-mount ⌘K/Ctrl+K: once mounted the modal owns the shortcut itself.
+    const armOnKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k" && !armedRef.current) {
+        e.preventDefault();
+        queueOpen(undefined);
+      }
+    };
+    const flush = () => {
+      const pending = pendingSearch.current;
+      if (!pending) return;
+      pendingSearch.current = null;
+      flushingSearch.current = true;
+      window.dispatchEvent(new CustomEvent(OPEN_SEARCH_EVENT, { detail: pending.detail }));
+      flushingSearch.current = false;
+    };
+    window.addEventListener(OPEN_SEARCH_EVENT, arm);
+    window.addEventListener("keydown", armOnKey);
+    window.addEventListener(SEARCH_READY_EVENT, flush);
+    const cancelPreload = onIdle(() => {
+      void import("@/components/search/GlobalSearchModal");
+    });
+    return () => {
+      window.removeEventListener(OPEN_SEARCH_EVENT, arm);
+      window.removeEventListener("keydown", armOnKey);
+      window.removeEventListener(SEARCH_READY_EVENT, flush);
+      cancelPreload();
+    };
+  }, []);
+
   const chrome = play
     ? {
         initial: { opacity: 0, y: -12 },
@@ -101,7 +158,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                         void triggerHaptic("medium");
                         openGlobalCreate();
                       }}
-                      className="grid h-9 w-9 touch-manipulation place-items-center rounded-full text-brand bg-brand/10 hover:bg-brand/20 ring-1 ring-brand/25 transition cursor-pointer"
+                      className="relative grid h-9 w-9 touch-manipulation place-items-center rounded-full text-brand bg-brand/10 hover:bg-brand/20 ring-1 ring-brand/25 transition cursor-pointer after:absolute after:-inset-1 after:content-['']"
                       aria-label="Create something new"
                       title="Create (+)"
                     >
@@ -110,7 +167,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     <button
                       type="button"
                       onClick={openGlobalSearch}
-                      className="grid h-9 w-9 touch-manipulation place-items-center rounded-full text-mute hover:bg-card hover:text-ink ring-1 ring-line transition"
+                      className="relative grid h-9 w-9 touch-manipulation place-items-center rounded-full text-mute hover:bg-card hover:text-ink ring-1 ring-line transition after:absolute after:-inset-1 after:content-['']"
                       aria-label="Search"
                       title="Search AirPal (⌘K)"
                     >
@@ -161,7 +218,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                         void triggerHaptic("medium");
                         openGlobalCreate();
                       }}
-                      className="grid h-10 w-10 touch-manipulation place-items-center rounded-full text-brand bg-brand/10 hover:bg-brand/20 ring-1 ring-brand/25 transition cursor-pointer"
+                      className="relative grid h-10 w-10 touch-manipulation place-items-center rounded-full text-brand bg-brand/10 hover:bg-brand/20 ring-1 ring-brand/25 transition cursor-pointer after:absolute after:-inset-1 after:content-['']"
                       aria-label="Create something new"
                       title="Create (+)"
                     >
@@ -170,7 +227,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     <button
                       type="button"
                       onClick={openGlobalSearch}
-                      className="grid h-10 w-10 touch-manipulation place-items-center rounded-full text-mute hover:bg-card hover:text-ink ring-1 ring-line transition"
+                      className="relative grid h-10 w-10 touch-manipulation place-items-center rounded-full text-mute hover:bg-card hover:text-ink ring-1 ring-line transition after:absolute after:-inset-1 after:content-['']"
                       aria-label="Search"
                       title="Search AirPal (⌘K)"
                     >
@@ -198,7 +255,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           <PresencePublisher />
           <DeviceMirror />
           <GuestStayTools />
-          <GlobalSearchModal />
+          {searchArmed && (
+            <Suspense fallback={null}>
+              <GlobalSearchModal />
+            </Suspense>
+          )}
           <NetworkStatusToast />
           <NotificationPopup />
         </>

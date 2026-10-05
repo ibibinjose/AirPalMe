@@ -371,7 +371,7 @@ export function ProfileMenu() {
                     aria-pressed={selected}
                     onClick={() => setEditStatus(key)}
                     className={cn(
-                      "flex h-9 items-center gap-2 rounded-xl px-2 text-left ring-1 transition active:scale-[0.98]",
+                      "flex min-h-[44px] items-center gap-2 rounded-xl px-2 text-left ring-1 transition active:scale-[0.98]",
                       selected ? "bg-paper font-bold ring-brand text-brand shadow-2xs" : "bg-card ring-line/70 text-ink/80 hover:bg-paper/50",
                     )}
                   >
@@ -390,7 +390,7 @@ export function ProfileMenu() {
                   type="button"
                   onClick={() => setEditEmoji(emo)}
                   className={cn(
-                    "grid h-7 w-7 shrink-0 place-items-center rounded-lg text-sm transition active:scale-95",
+                    "grid min-h-[44px] min-w-[44px] shrink-0 place-items-center rounded-lg text-sm transition active:scale-95",
                     editEmoji === emo ? "bg-brand/10 ring-1 ring-brand" : "hover:bg-paper",
                   )}
                 >
@@ -417,7 +417,7 @@ export function ProfileMenu() {
                 type="button"
                 onClick={() => void saveStatus(true)}
                 disabled={statusSaving}
-                className="h-8 flex-1 rounded-xl text-xs font-semibold text-mute hover:text-ink transition hover:bg-paper disabled:opacity-50"
+                className="min-h-[44px] flex-1 rounded-xl text-xs font-semibold text-mute hover:text-ink transition hover:bg-paper disabled:opacity-50"
               >
                 Clear
               </button>
@@ -425,7 +425,7 @@ export function ProfileMenu() {
                 type="button"
                 onClick={() => void saveStatus(false)}
                 disabled={statusSaving}
-                className="h-8 flex-1 rounded-xl bg-brand text-xs font-semibold text-white transition hover:bg-brand-ink active:scale-[0.98] disabled:opacity-50 shadow-2xs"
+                className="min-h-[44px] flex-1 rounded-xl bg-brand text-xs font-semibold text-white transition hover:bg-brand-ink active:scale-[0.98] disabled:opacity-50 shadow-2xs"
               >
                 {statusSaving ? "Saving…" : "Save"}
               </button>
@@ -647,7 +647,7 @@ export function ProfileMenu() {
           setOpen((v) => !v);
         }}
         className={cn(
-          "relative grid h-9 w-9 shrink-0 touch-manipulation place-items-center overflow-visible rounded-full bg-paper transition-all duration-200 sm:h-10 sm:w-10",
+          "relative grid h-9 w-9 shrink-0 touch-manipulation place-items-center overflow-visible rounded-full bg-paper transition-all duration-200 after:absolute after:-inset-1 after:content-[''] sm:h-10 sm:w-10",
           "hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-paper active:scale-95",
           open && "ring-2 ring-brand ring-offset-2 ring-offset-paper shadow-sm",
           !open && user && cn(statusInfo.ringClass, "ring-2 ring-offset-2 ring-offset-paper shadow-none"),

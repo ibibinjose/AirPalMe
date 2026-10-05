@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { Link } from "wouter";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
+import { openGlobalSearch } from "@/components/search/openSearch";
 
 /**
  * AirPal companion design primitives (§24–§28, §43 of the brief).
@@ -25,14 +25,17 @@ export function SectionHeader({
     <div className="flex items-end justify-between gap-3">
       <h2 className="font-display text-[20px] font-semibold tracking-tight">{title}</h2>
       {actionLabel && actionHref ? (
-        <Link href={actionHref} className="shrink-0 text-[14px] font-semibold text-brand">
+        <Link
+          href={actionHref}
+          className="-my-3 inline-flex min-h-[44px] shrink-0 items-center text-[14px] font-semibold text-brand"
+        >
           {actionLabel} →
         </Link>
       ) : actionLabel && onAction ? (
         <button
           type="button"
           onClick={onAction}
-          className="shrink-0 cursor-pointer text-[14px] font-semibold text-brand"
+          className="-my-3 inline-flex min-h-[44px] shrink-0 cursor-pointer items-center text-[14px] font-semibold text-brand"
         >
           {actionLabel} →
         </button>
@@ -66,7 +69,7 @@ export function SegmentedControl<T extends string>({
           type="button"
           onClick={() => onChange(o.id)}
           className={cn(
-            "h-9 flex-1 cursor-pointer touch-manipulation rounded-full px-4 text-[14px] font-semibold whitespace-nowrap transition active:scale-[0.98]",
+            "min-h-[44px] flex-1 cursor-pointer touch-manipulation rounded-full px-4 text-[14px] font-semibold whitespace-nowrap transition active:scale-[0.98]",
             value === o.id ? "bg-brand text-white shadow-[0_6px_14px_-8px_rgba(18,22,20,0.3)]" : "text-mute hover:text-ink",
           )}
         >

@@ -440,7 +440,7 @@ export function MePage() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="h-8 w-8 p-0 rounded-full text-mute hover:text-ink hover:bg-black/5"
+                            className="relative h-8 w-8 p-0 rounded-full text-mute hover:text-ink hover:bg-black/5 after:absolute after:-inset-2 after:content-['']"
                             onClick={() => {
                               updateCatchUpStatus(item.id, "dismissed");
                               setCatchUpsList((prev) => prev.filter((i) => i.id !== item.id));

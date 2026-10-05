@@ -21,9 +21,10 @@ import { useListings } from "@/contexts/ListingsContext";
 import { hrefForPlace } from "@/lib/bio-handle";
 import { formatPlanDate } from "@shared/plan";
 import { Photo } from "@/components/ui/Photo";
+import { mediaSrcSet } from "@/lib/media-srcset";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
-import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
+import { openGlobalSearch } from "@/components/search/openSearch";
 import { triggerHaptic } from "@/lib/native";
 import { getExperienceProofRemote } from "@/lib/functions";
 import {
@@ -173,7 +174,14 @@ export function HomePage() {
       {/* Hero Header Section */}
       <header className="relative -mx-4 overflow-hidden rounded-b-[32px] md:-mx-6 shadow-sm">
         <div className="absolute inset-0" aria-hidden="true">
-          <Photo src="/media/harbour.jpg" priority className="h-full w-full object-cover scale-105" alt="" />
+          <Photo
+            src="/media/harbour.jpg"
+            srcSet={mediaSrcSet("/media/harbour.jpg")}
+            sizes="100vw"
+            priority
+            className="h-full w-full object-cover scale-105"
+            alt=""
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/30" />
         </div>
         <div className="relative px-4 pb-8 pt-8 md:px-8 md:pt-14">
@@ -260,10 +268,13 @@ export function HomePage() {
       </nav>
 
       {/* Six Marketplace Pillars Grid */}
-      <section aria-label="Explore AirPal Verticals" className="mt-8">
+      <section aria-label="Explore AirPal Verticals" className="mt-8 cv-auto">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-bold tracking-tight text-ink">Life Made Easy</h2>
-          <Link href="/now" className="text-xs font-bold text-brand hover:underline">
+          <Link
+            href="/now"
+            className="-my-3 inline-flex min-h-[44px] items-center text-xs font-bold text-brand hover:underline"
+          >
             View All →
           </Link>
         </div>
@@ -305,7 +316,7 @@ export function HomePage() {
       </section>
 
       {/* Continue Your Journey / Active Plan */}
-      <section aria-label="Continue your journey" className="mt-8">
+      <section aria-label="Continue your journey" className="mt-8 cv-auto">
         <SectionHeader title="Your Plans & Trips" actionLabel="All Plans" actionHref="/plan" />
         {nextTrip ? (
           <CardShell
@@ -316,6 +327,8 @@ export function HomePage() {
             <div className="relative min-h-[200px] sm:min-h-[220px]">
               <Photo
                 src={nextTrip.heroImage || "/media/walk.jpg"}
+                srcSet={mediaSrcSet(nextTrip.heroImage || "/media/walk.jpg")}
+                sizes="100vw"
                 priority
                 className="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
               />
@@ -388,7 +401,7 @@ export function HomePage() {
       </section>
 
       {/* What's On Near You Section */}
-      <section aria-label="What's on near you" className="mt-8">
+      <section aria-label="What's on near you" className="mt-8 cv-auto">
         <SectionHeader title="Happening Near You" actionLabel="See All" actionHref="/now" />
         <div className="mt-3">
           <PillRow options={AROUND} value={around} onChange={setAround} label="What's on categories" />
@@ -427,6 +440,8 @@ export function HomePage() {
                     <div className="relative aspect-square overflow-hidden bg-paper">
                       <Photo
                         src={e.heroImage || "/media/laneway.jpg"}
+                        srcSet={mediaSrcSet(e.heroImage || "/media/laneway.jpg")}
+                        sizes="256px"
                         className="absolute inset-0 h-full w-full object-cover transition duration-300 hover:scale-105"
                       />
                       <div className="hero-scrim absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
@@ -478,6 +493,8 @@ export function HomePage() {
                 <div className="relative aspect-square overflow-hidden bg-paper">
                   <Photo
                     src={p.heroImage || p.photos?.[0] || "/media/harbour.jpg"}
+                    srcSet={mediaSrcSet(p.heroImage || p.photos?.[0] || "/media/harbour.jpg")}
+                    sizes="256px"
                     className="absolute inset-0 h-full w-full object-cover transition duration-300 hover:scale-105"
                   />
                   <div className="hero-scrim absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
@@ -506,7 +523,7 @@ export function HomePage() {
       </section>
 
       {/* For You / Smart Recommendations */}
-      <section aria-label="For you" className="mt-8">
+      <section aria-label="For you" className="mt-8 cv-auto">
         <SectionHeader title="Recommended Hangouts" actionLabel="What now?" actionHref="/now" />
         {forYou.length > 0 ? (
           <ul className="mt-3 space-y-2.5">
@@ -517,6 +534,8 @@ export function HomePage() {
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-paper ring-1 ring-line">
                       <Photo
                         src={p.heroImage || "/media/walk.jpg"}
+                        srcSet={mediaSrcSet(p.heroImage || "/media/walk.jpg")}
+                        sizes="64px"
                         className="absolute inset-0 h-full w-full object-cover"
                       />
                     </div>
@@ -560,7 +579,7 @@ export function HomePage() {
       </section>
 
       {/* Trust & Safety Assurance Banner */}
-      <section aria-label="Trust and Safety" className="mt-8">
+      <section aria-label="Trust and Safety" className="mt-8 cv-auto">
         <div className="rounded-3xl bg-card p-5 ring-1 ring-line/80 shadow-xs">
           <div className="flex items-center gap-2">
             <ShieldCheck size={20} className="text-brand" />

@@ -80,9 +80,10 @@
     <meta name="twitter:description" content="Life Made Easy. People, places, things and experiences — made easier." />
     <meta name="twitter:image" content="https://airpal.me/brand/og-share.jpg" />
     <title>AirPal.Me · Life Made Easy.</title>
-    <!-- Impact.com Universal Tracking Tag -->
+    <!-- Impact.com Universal Tracking Tag (deferred to window load: tracking only, never render-blocking) -->
     <script type="text/javascript">
-      (function (i, m, p, a, c, t) {
+      function __airpalImpact() {
+        (function (i, m, p, a, c, t) {
         c.ire_o = p;
         c[p] =
           c[p] ||
@@ -101,8 +102,14 @@
         document,
         window,
       );
-      impactStat("transformLinks");
-      impactStat("trackImpression");
+        impactStat("transformLinks");
+        impactStat("trackImpression");
+      }
+      if (document.readyState === "complete") {
+        __airpalImpact();
+      } else {
+        window.addEventListener("load", __airpalImpact, { once: true });
+      }
     </script>
   </head>
   <body>

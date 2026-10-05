@@ -33,21 +33,12 @@ import { usePlans } from "@/contexts/PlanContext";
 import { triggerHaptic, triggerHapticSelection } from "@/lib/native";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { cn } from "@/lib/cn";
-
-export interface OpenGlobalSearchOptions {
-  query?: string;
-  category?: SearchCategory;
-}
-
-export function openGlobalSearch(opts?: OpenGlobalSearchOptions | unknown): void {
-  const detail =
-    opts && typeof opts === "object" && ("query" in opts || "category" in opts)
-      ? (opts as OpenGlobalSearchOptions)
-      : undefined;
-  window.dispatchEvent(new CustomEvent("airpal-open-search", { detail }));
-}
-
-type SearchCategory = "all" | "people" | "places" | "events" | "stay" | "plan";
+import {
+  OPEN_SEARCH_EVENT,
+  SEARCH_READY_EVENT,
+  type OpenGlobalSearchOptions,
+  type SearchCategory,
+} from "./openSearch";
 
 const RECENT_KEY = "airpal.recentSearches.v1";
 type RecentItem = { title: string; href: string };
@@ -153,10 +144,13 @@ export function GlobalSearchModal() {
     }
 
     window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("airpal-open-search", handleOpenEvent);
+    window.addEventListener(OPEN_SEARCH_EVENT, handleOpenEvent);
+    // Tell the shell the modal is mounted (it lazy-loads this chunk and may
+    // hold a queued open from before the chunk resolved).
+    window.dispatchEvent(new Event(SEARCH_READY_EVENT));
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("airpal-open-search", handleOpenEvent);
+      window.removeEventListener(OPEN_SEARCH_EVENT, handleOpenEvent);
     };
   }, [open]);
 

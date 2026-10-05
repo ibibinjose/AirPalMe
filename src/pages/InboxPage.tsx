@@ -238,7 +238,7 @@ export function InboxPage() {
         <button
           type="button"
           onClick={handleStartAiChat}
-          className="flex h-10 items-center gap-1.5 rounded-full bg-brand/10 px-3.5 text-xs font-bold text-brand ring-1 ring-brand/20 transition hover:bg-brand hover:text-white active:scale-95 shadow-xs"
+          className="flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand/10 px-3.5 text-xs font-bold text-brand ring-1 ring-brand/20 transition hover:bg-brand hover:text-white active:scale-95 shadow-xs"
           title="Chat with AirPal AI"
         >
           <Sparkles size={14} className="text-amber-500" />
@@ -376,11 +376,11 @@ export function InboxPage() {
                 <button
                   type="button"
                   onClick={handleStartAiChat}
-                  className="rounded-full bg-brand px-4 py-2 text-xs font-bold text-white shadow-xs active:scale-95"
+                  className="inline-flex min-h-[44px] items-center rounded-full bg-brand px-4 py-2 text-xs font-bold text-white shadow-xs active:scale-95"
                 >
                   Chat with AirPal AI
                 </button>
-                <Link href="/plan/new" className="rounded-full bg-paper px-4 py-2 text-xs font-bold text-ink ring-1 ring-line hover:bg-card active:scale-95">
+                <Link href="/plan/new" className="inline-flex min-h-[44px] items-center rounded-full bg-paper px-4 py-2 text-xs font-bold text-ink ring-1 ring-line hover:bg-card active:scale-95">
                   Plan a Trip
                 </Link>
               </div>
@@ -411,7 +411,7 @@ export function InboxPage() {
             />
             <button
               type="submit"
-              className="shrink-0 cursor-pointer rounded-full bg-ink px-4 py-2 text-[13px] font-semibold text-white active:scale-95"
+              className="inline-flex min-h-[44px] shrink-0 cursor-pointer items-center rounded-full bg-ink px-4 py-2 text-[13px] font-semibold text-white active:scale-95"
             >
               Join
             </button>
@@ -420,7 +420,7 @@ export function InboxPage() {
           <button
             type="button"
             onClick={() => setSegment("activity")}
-            className="w-full text-center text-[14px] font-semibold text-brand hover:underline"
+            className="flex min-h-[44px] w-full items-center justify-center text-center text-[14px] font-semibold text-brand hover:underline"
           >
             See activity &amp; notifications →
           </button>
@@ -434,7 +434,7 @@ export function InboxPage() {
                 type="button"
                 disabled={markingAll || unreadActivity === 0}
                 onClick={() => void markSegmentRead(activityNotes)}
-                className="text-[13px] font-bold text-brand disabled:opacity-40"
+                className="-my-3 inline-flex min-h-[44px] items-center text-[13px] font-bold text-brand disabled:opacity-40"
               >
                 {markingAll ? "Marking…" : "Mark all read"}
               </button>
@@ -463,7 +463,7 @@ export function InboxPage() {
               </p>
               <Link
                 href="/deals"
-                className="mt-5 inline-block text-[14px] font-bold text-brand hover:underline"
+                className="mt-5 inline-flex min-h-[44px] items-center text-[14px] font-bold text-brand hover:underline"
               >
                 Browse deals
               </Link>
@@ -481,7 +481,7 @@ export function InboxPage() {
                 type="button"
                 disabled={markingAll || unreadUpdates === 0}
                 onClick={() => void markSegmentRead(updateNotes)}
-                className="text-[13px] font-bold text-brand disabled:opacity-40"
+                className="-my-3 inline-flex min-h-[44px] items-center text-[13px] font-bold text-brand disabled:opacity-40"
               >
                 {markingAll ? "Marking…" : "Mark all read"}
               </button>

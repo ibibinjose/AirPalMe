@@ -387,7 +387,7 @@ export function BusinessOnboardPage() {
                           onClick={() => set("category", c.id)}
                           aria-pressed={draft.category === c.id}
                           className={cn(
-                            "h-9 rounded-2xl px-3.5 text-xs font-semibold transition shadow-2xs",
+                            "min-h-[44px] rounded-2xl px-3.5 text-xs font-semibold transition shadow-2xs",
                             draft.category === c.id
                               ? "bg-brand text-white shadow-sm ring-2 ring-brand/30"
                               : "bg-card text-ink ring-1 ring-line hover:bg-paper",

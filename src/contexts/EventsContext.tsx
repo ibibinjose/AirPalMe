@@ -3,6 +3,7 @@ import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
 import { clearPendingIntent, peekPendingIntent } from "@/lib/pending-intent";
+import { onIdle } from "@/lib/on-idle";
 import {
   eventGatePath,
   parseStallCsv,
@@ -149,29 +150,33 @@ export function EventsProvider({ children }: { children: ReactNode }) {
   }, [refresh]);
 
   useEffect(() => {
-    const db = getFirebaseDb();
-    const uid = user?.uid || uidNow();
-    if (!db || !uid) return;
-    void Promise.all([
-      getDocs(collection(db, "users", uid, "savedEvents")),
-      getDocs(collection(db, "users", uid, "savedStalls")),
-      getDocs(collection(db, "users", uid, "calendar")),
-    ])
-      .then(([ev, st, cal]) => {
-        const eventsBy = new Map(loadSavedEvents().map((row) => [row.eventId, row]));
-        const stallsBy = new Map(loadSavedStalls().map((row) => [row.stallId, row]));
-        const statesBy = { ...loadUserEventStates() };
-        for (const row of ev.docs) eventsBy.set(row.id, row.data() as SavedEvent);
-        for (const row of st.docs) stallsBy.set(row.id, row.data() as SavedStall);
-        for (const row of cal.docs) statesBy[row.id] = row.data() as UserEventState;
-        persistSavedEvents(Array.from(eventsBy.values()));
-        persistSavedStalls(Array.from(stallsBy.values()));
-        persistUserEventStates(statesBy);
-        setSavedEvents(loadSavedEvents());
-        setSavedStalls(loadSavedStalls());
-        setUserStates(statesBy);
-      })
-      .catch(() => undefined);
+    // Saved/cloud merge is eventual-only (local cache paints first), so it waits
+    // for idle. The public `events` fetch stays immediate (EventPage gates on it).
+    return onIdle(() => {
+      const db = getFirebaseDb();
+      const uid = user?.uid || uidNow();
+      if (!db || !uid) return;
+      void Promise.all([
+        getDocs(collection(db, "users", uid, "savedEvents")),
+        getDocs(collection(db, "users", uid, "savedStalls")),
+        getDocs(collection(db, "users", uid, "calendar")),
+      ])
+        .then(([ev, st, cal]) => {
+          const eventsBy = new Map(loadSavedEvents().map((row) => [row.eventId, row]));
+          const stallsBy = new Map(loadSavedStalls().map((row) => [row.stallId, row]));
+          const statesBy = { ...loadUserEventStates() };
+          for (const row of ev.docs) eventsBy.set(row.id, row.data() as SavedEvent);
+          for (const row of st.docs) stallsBy.set(row.id, row.data() as SavedStall);
+          for (const row of cal.docs) statesBy[row.id] = row.data() as UserEventState;
+          persistSavedEvents(Array.from(eventsBy.values()));
+          persistSavedStalls(Array.from(stallsBy.values()));
+          persistUserEventStates(statesBy);
+          setSavedEvents(loadSavedEvents());
+          setSavedStalls(loadSavedStalls());
+          setUserStates(statesBy);
+        })
+        .catch(() => undefined);
+    });
   }, [user]);
 
   const myEvent = useMemo(() => {

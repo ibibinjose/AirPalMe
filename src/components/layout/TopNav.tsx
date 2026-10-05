@@ -4,7 +4,7 @@ import { Plus, Search } from "@/components/icons";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { ProfileMenu } from "@/components/auth/ProfileMenu";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
-import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
+import { openGlobalSearch } from "@/components/search/openSearch";
 import { openGlobalCreate } from "@/components/design-system/CreateFab";
 import { cn } from "@/lib/cn";
 import { enterEase } from "@/lib/motion";

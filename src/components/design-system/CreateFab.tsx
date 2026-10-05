@@ -295,7 +295,7 @@ export function CreateFab() {
                 <button
                   type="button"
                   onClick={() => handleSelect("/business")}
-                  className="inline-flex items-center gap-1 text-xs font-bold text-brand hover:underline cursor-pointer"
+                  className="-my-3 inline-flex min-h-[44px] items-center gap-1 text-xs font-bold text-brand hover:underline cursor-pointer"
                 >
                   <span>Open Business Hub</span>
                   <ArrowRight size={13} />

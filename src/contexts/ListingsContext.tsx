@@ -10,6 +10,7 @@ import {
 } from "@shared/business";
 import type { PlaceDeal } from "@shared/nearby";
 import { getFirebaseAuth, getFirebaseDb } from "@/lib/firebase";
+import { onIdle } from "@/lib/on-idle";
 import { liveBackendEnabled, upsertBusinessDealRemote, upsertBusinessListingRemote } from "@/lib/functions";
 import {
   getCachedListings,
@@ -128,30 +129,33 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
   }, [bump]);
 
   useEffect(() => {
-    const db = getFirebaseDb();
-    if (!db) {
-      setRemoteLoaded(true);
-      return;
-    }
-    void Promise.all([
-      getDocs(query(collection(db, "listings"), where("status", "==", "active")))
-        .then((snap) => {
-          const remote = snap.docs.map((d) => fromFirestore(d.id, d.data() as Record<string, unknown>));
-          const local = getCachedListings();
-          const byId = new Map<string, BusinessListing>();
-          for (const row of [...local, ...remote]) byId.set(row.id, row);
-          const merged = Array.from(byId.values());
-          merged.forEach(upsertCachedListing);
-          bump(merged);
-        })
-        .catch(() => undefined),
-      fetchPlaces()
-        .then(() => {
-          loadPlaces();
-          bump(getCachedListings());
-        })
-        .catch(() => undefined),
-    ]).finally(() => setRemoteLoaded(true));
+    // Local cache paints first; the cloud merge waits for idle (first paint first).
+    const cancelIdle = onIdle(() => {
+      const db = getFirebaseDb();
+      if (!db) {
+        setRemoteLoaded(true);
+        return;
+      }
+      void Promise.all([
+        getDocs(query(collection(db, "listings"), where("status", "==", "active")))
+          .then((snap) => {
+            const remote = snap.docs.map((d) => fromFirestore(d.id, d.data() as Record<string, unknown>));
+            const local = getCachedListings();
+            const byId = new Map<string, BusinessListing>();
+            for (const row of [...local, ...remote]) byId.set(row.id, row);
+            const merged = Array.from(byId.values());
+            merged.forEach(upsertCachedListing);
+            bump(merged);
+          })
+          .catch(() => undefined),
+        fetchPlaces()
+          .then(() => {
+            loadPlaces();
+            bump(getCachedListings());
+          })
+          .catch(() => undefined),
+      ]).finally(() => setRemoteLoaded(true));
+    });
 
     const handleReload = () => {
       bump(getCachedListings());
@@ -159,6 +163,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
     window.addEventListener("airpal:reload-data", handleReload);
     return () => {
       window.removeEventListener("airpal:reload-data", handleReload);
+      cancelIdle();
     };
   }, [bump]);
 

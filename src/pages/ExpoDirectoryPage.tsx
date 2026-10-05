@@ -81,7 +81,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
         <button
           type="button"
           onClick={handleShare}
-          className="grid h-8 w-8 place-items-center rounded-full bg-card ring-1 ring-line text-mute hover:text-ink shadow-xs transition"
+          className="relative grid h-8 w-8 place-items-center rounded-full bg-card ring-1 ring-line text-mute hover:text-ink shadow-xs transition after:absolute after:-inset-2 after:content-['']"
           title="Share Directory"
         >
           <Share2 size={14} />

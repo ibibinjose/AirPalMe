@@ -177,8 +177,8 @@ export function AddToCalendarMenu({
         onClick={handleToggle}
         className={cn(
           "inline-flex items-center justify-center gap-1.5 font-semibold transition active:scale-95 cursor-pointer touch-manipulation",
-          size === "sm" && "h-8 px-3 text-xs rounded-xl",
-          size === "md" && "h-10 px-4 text-xs rounded-full",
+          size === "sm" && "min-h-[44px] px-3 text-xs rounded-xl lg:h-8 lg:min-h-0",
+          size === "md" && "min-h-[44px] px-4 text-xs rounded-full lg:h-10 lg:min-h-0",
           size === "lg" && "h-12 px-5 text-sm rounded-full",
           variant === "primary" && "bg-brand text-white shadow-sm hover:bg-brand-ink",
           variant === "secondary" && "bg-card text-ink ring-1 ring-line shadow-xs hover:bg-paper",

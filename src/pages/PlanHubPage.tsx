@@ -27,7 +27,7 @@ import { EVENT_NEAR_M, locatedNear } from "@/lib/location-scope";
 import { triggerHaptic, shareNative } from "@/lib/native";
 import { Photo } from "@/components/ui/Photo";
 import { SearchBar } from "@/components/search/SearchBar";
-import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
+import { openGlobalSearch } from "@/components/search/openSearch";
 import { cn } from "@/lib/cn";
 import { toast } from "sonner";
 
@@ -399,7 +399,7 @@ export function PlanHubPage() {
       </div>
 
       {/* Tab Navigation & Search — sticky so long lists keep their filters */}
-      <div className="sticky top-0 z-20 -mx-4 mt-8 bg-paper/85 px-4 pt-3 backdrop-blur-xl border-b border-line/60">
+      <div className="sticky-pagebar z-20 -mx-4 mt-8 bg-paper/85 px-4 pt-3 backdrop-blur-xl border-b border-line/60">
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3">
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
             {TABS.map((t) => {
@@ -422,7 +422,7 @@ export function PlanHubPage() {
                     setTab(t.id);
                   }}
                   className={cn(
-                    "flex h-10 items-center gap-2 rounded-full px-4 text-xs font-bold transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+                    "flex min-h-[44px] items-center gap-2 rounded-full px-4 text-xs font-bold transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
                     active
                       ? "bg-brand text-white shadow-xs"
                       : "bg-card text-mute hover:text-ink ring-1 ring-line/80 hover:bg-paper",
@@ -471,7 +471,7 @@ export function PlanHubPage() {
                   setCategory(c.id);
                 }}
                 className={cn(
-                  "h-9 shrink-0 rounded-xl px-3 text-xs font-semibold ring-1 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+                  "min-h-[44px] shrink-0 rounded-xl px-3 text-xs font-semibold ring-1 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
                   category === c.id
                     ? "bg-ink text-white ring-transparent shadow-xs"
                     : "bg-card text-mute ring-line hover:text-ink hover:bg-paper",

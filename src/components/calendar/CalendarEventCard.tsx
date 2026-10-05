@@ -33,6 +33,7 @@ import {
   CATEGORY_THEMES,
 } from "@/lib/calendar-utils";
 import { cn } from "@/lib/cn";
+import { mediaSrcSet } from "@/lib/media-srcset";
 import { track } from "@/lib/analytics";
 import { triggerHaptic, shareNative } from "@/lib/native";
 import { toPublicUrl } from "@/lib/public-origin";
@@ -168,7 +169,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
         endDrag();
       }}
       className={cn(
-        "group relative flex flex-col rounded-3xl bg-card p-4 ring-1 ring-line/80 transition-all duration-200 hover:shadow-md hover:ring-line md:p-5 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2",
+        "cv-auto group relative flex flex-col rounded-3xl bg-card p-4 ring-1 ring-line/80 transition-all duration-200 hover:shadow-md hover:ring-line md:p-5 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2",
         onSelect && "cursor-pointer",
         event.isGoing && "ring-emerald-500/50 bg-gradient-to-b from-emerald-500/5 via-card to-card",
         isCurrentlyDragged && "opacity-40 ring-2 ring-brand ring-dashed scale-[0.99]",
@@ -186,6 +187,8 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
           {!imageError && (
             <img
               src={event.heroImage || "/media/laneway.jpg"}
+              srcSet={mediaSrcSet(event.heroImage || "/media/laneway.jpg")}
+              sizes="(max-width: 768px) 100vw, 50vw"
               alt={`${event.title} event banner`}
               className={cn(
                 "h-full w-full object-cover transition duration-500 group-hover:scale-105",
@@ -429,7 +432,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
               aria-pressed={event.isGoing}
               title={event.isGoing ? "You are going" : "Mark as Going"}
               className={cn(
-                "inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition active:scale-95",
+                "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-xs font-medium transition active:scale-95",
                 event.isGoing
                   ? "bg-emerald-600 text-white shadow-sm ring-1 ring-emerald-700 font-semibold"
                   : "bg-paper text-ink/80 hover:bg-emerald-50 hover:text-emerald-800 ring-1 ring-line/80",
@@ -446,7 +449,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
               aria-pressed={event.isInterested}
               title={event.isInterested ? "You are interested" : "Mark as Interested"}
               className={cn(
-                "inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition active:scale-95",
+                "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-xs font-medium transition active:scale-95",
                 event.isInterested
                   ? "bg-amber-500 text-white shadow-sm ring-1 ring-amber-600 font-semibold"
                   : "bg-paper text-ink/80 hover:bg-amber-50 hover:text-amber-800 ring-1 ring-line/80",
@@ -633,7 +636,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
                   nav(event.gatePath!);
                 }}
                 title="View market stalls & expo directory"
-                className="inline-flex h-8 items-center gap-1 rounded-full bg-brand px-2.5 text-xs font-medium text-white hover:bg-brand-ink transition shadow-xs"
+                className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-brand px-2.5 text-xs font-medium text-white hover:bg-brand-ink transition shadow-xs"
               >
                 <span>Stalls</span>
                 <ExternalLink size={11} />
