@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { ChevronDown, LayoutDashboard } from "lucide-react";
-import { BROWSE_LINKS, HOST_LINKS, type BrowseLink } from "@/lib/browse-menu";
+import {
+  BROWSE_LINKS,
+  BROWSE_SECTIONS,
+  HOST_LINKS,
+  type BrowseLink,
+} from "@/lib/browse-menu";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/cn";
 import { triggerHaptic } from "@/lib/native";
@@ -32,13 +37,15 @@ function MenuLink({ link, active, onGo }: { link: BrowseLink; active: boolean; o
   );
 }
 
-/** Desktop Browse dropdown for the top bar: parent categories + host shortcuts. */
+/** Desktop Browse dropdown for the top bar: full grouped sitemap. */
 export function BrowseMenu({ path, isHost }: { path: string; isHost: boolean }) {
   const [, nav] = useLocation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const links = isHost ? [...BROWSE_LINKS, ...HOST_LINKS] : BROWSE_LINKS;
-  const active = links.some((link) => link.match(path));
+  const sections = BROWSE_SECTIONS.filter((section) => !section.hostsOnly || isHost);
+  // The pill lights up only in discovery context — not on account/help pages
+  // that the sitemap also lists.
+  const active = [...BROWSE_LINKS, ...HOST_LINKS].some((link) => link.match(path));
 
   useEffect(() => {
     if (!open) return;
@@ -90,21 +97,19 @@ export function BrowseMenu({ path, isHost }: { path: string; isHost: boolean }) 
         <div
           role="menu"
           aria-label="Browse AirPal"
-          className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-2xl bg-card p-2 shadow-xl ring-1 ring-line"
+          className="absolute left-1/2 top-full z-50 mt-2 max-h-[70vh] w-72 -translate-x-1/2 overflow-y-auto rounded-2xl bg-card p-2 shadow-xl ring-1 ring-line"
         >
-          <p className="px-3 pb-1 pt-2 text-[10px] font-black uppercase tracking-wider text-mute">Browse AirPal</p>
-          {BROWSE_LINKS.map((link) => (
-            <MenuLink key={link.href} link={link} active={link.match(path)} onGo={go} />
-          ))}
-          {isHost && (
-            <>
-              <div className="mx-2 my-2 border-t border-line" />
-              <p className="px-3 pb-1 text-[10px] font-black uppercase tracking-wider text-mute">Host</p>
-              {HOST_LINKS.map((link) => (
+          {sections.map((section, index) => (
+            <div key={section.title}>
+              {index > 0 && <div className="mx-2 my-2 border-t border-line" />}
+              <p className="px-3 pb-1 pt-2 text-[10px] font-black uppercase tracking-wider text-mute">
+                {section.title}
+              </p>
+              {section.links.map((link) => (
                 <MenuLink key={link.href} link={link} active={link.match(path)} onGo={go} />
               ))}
-            </>
-          )}
+            </div>
+          ))}
         </div>
       )}
     </div>
