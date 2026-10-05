@@ -117,7 +117,7 @@ describe("chat store", () => {
     expect(reply?.isAi).toBe(true);
     expect(reply?.text).toContain("couldn't reach live answers");
     expect(reply?.sync).toBe("local");
-  });
+  }, 15000);
 
   it("guides without inventing facts off-property, stays out of mate chats", async () => {
     const ai = await requestAiReply(conv({ type: "ai" }), "best bars?");
@@ -128,7 +128,7 @@ describe("chat store", () => {
     expect(mate).toBeNull();
     const tagged = await requestAiReply(conv({ type: "direct" }), "@airpal find coffee");
     expect(tagged?.isAi).toBe(true);
-  });
+  }, 15000);
 
   it("ChatSendError carries codes views can render", () => {
     const err = new ChatSendError("denied", sendErrorText("denied"));

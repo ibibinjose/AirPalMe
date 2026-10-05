@@ -33,34 +33,29 @@ test.describe("Discover & Places Flow", () => {
     await expect(page.getByRole("button", { name: "See The Rocks" })).toBeVisible();
   });
 
-  test("renders discovery feed with category chips and places", async ({ page }) => {
-    await page.goto("/explore");
+  test("renders discovery feed with category chips and places on /now", async ({ page }) => {
+    await page.goto("/now");
     await page.waitForLoadState("domcontentloaded");
 
-    // Search bar
-    await expect(page.getByRole("combobox")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "What now?" })).toBeVisible();
 
-    // Category chips
-    const main = page.locator("#main-content");
-    await expect(main.getByRole("button", { name: "All", exact: true })).toBeVisible();
-    await expect(main.getByRole("button", { name: "Events", exact: true })).toBeVisible();
-    await expect(main.getByRole("button", { name: "Places", exact: true })).toBeVisible();
-    await expect(main.getByRole("button", { name: "Food & Drinks", exact: true })).toBeVisible();
-    await expect(main.getByRole("button", { name: "Mates", exact: true })).toBeVisible();
+    // Category mood chips
+    await expect(page.getByRole("button", { name: "Coffee", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Eat", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "See", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Anything", exact: true })).toBeVisible();
 
-    // At least one place card exists
-    await expect(page.locator("a[href^='/@'], a[href^='/p/']").first()).toBeVisible();
+    // A suggestion article or finding state
+    await expect(page.locator("article").or(page.getByText(/Finding something near you/i))).toBeVisible();
   });
 
-  test("filters places by category chip", async ({ page }) => {
-    await page.goto("/explore");
+  test("filters places by category chip on /now", async ({ page }) => {
+    await page.goto("/now");
     await page.waitForLoadState("domcontentloaded");
 
-    // Click Food & Drinks chip
-    await page.locator("#main-content").getByRole("button", { name: "Food & Drinks", exact: true }).click();
-
-    // Verify places are displayed under Food & Drinks filter
-    await expect(page.locator("a[href^='/@'], a[href^='/p/']").first()).toBeVisible();
+    // Click Eat chip
+    await page.getByRole("button", { name: "Eat", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Eat", exact: true })).toHaveAttribute("aria-pressed", "true");
   });
 
   test("navigates into Place detail and uses floating back button", async ({ page }) => {

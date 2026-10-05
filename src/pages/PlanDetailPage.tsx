@@ -365,17 +365,17 @@ export function PlanDetailPage() {
             if (window.history.length > 1) window.history.back();
             else nav("/plan");
           }}
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-card ring-1 ring-line text-ink hover:bg-paper transition"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-card ring-1 ring-line text-ink hover:bg-paper transition cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           aria-label="Go back"
         >
           <ArrowLeft size={18} />
         </button>
 
-        <div className="no-scrollbar flex min-w-0 flex-1 items-center justify-end gap-2 overflow-x-auto py-0.5">
+        <div className="no-scrollbar flex min-w-0 flex-1 items-center justify-end gap-2 overflow-x-auto py-1">
           {isHost && (
             <Link
               href={`/plan/${plan.id}/edit`}
-              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
+              className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
               <Pencil size={13} />
               <span className="hidden sm:inline">Edit Plan</span>
@@ -388,7 +388,7 @@ export function PlanDetailPage() {
               onClick={() => setBroadcastOpen(true)}
               aria-label="Message everyone going"
               title="Message everyone going"
-              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
+              className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
               <Megaphone size={13} />
               <span className="hidden sm:inline">Message going</span>
@@ -400,7 +400,7 @@ export function PlanDetailPage() {
             onClick={() => followPlan(plan.id)}
             aria-label={isSubscribed ? "Following event" : "Follow event"}
             className={cn(
-              "inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-xs font-medium ring-1 transition",
+              "inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full px-3.5 text-xs font-medium ring-1 transition cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
               isSubscribed
                 ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 ring-amber-500/30"
                 : "bg-card text-ink ring-line hover:bg-paper",
@@ -415,7 +415,7 @@ export function PlanDetailPage() {
             size="sm"
             variant="ghost"
             onClick={() => setQrModalOpen(true)}
-            className="gap-1.5 rounded-full h-10 px-3 text-xs font-semibold ring-1 ring-line bg-card hover:bg-line/40 text-ink shadow-xs shrink-0"
+            className="gap-1.5 rounded-full min-h-[44px] px-3.5 text-xs font-semibold ring-1 ring-line bg-card hover:bg-line/40 text-ink shadow-xs shrink-0 cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             title="In-person Dynamic QR Code"
           >
             <QrCode size={14} />
@@ -425,7 +425,7 @@ export function PlanDetailPage() {
           <Button
             size="sm"
             onClick={() => setShareOpen(true)}
-            className="gap-1.5 rounded-full h-10 px-4 text-xs font-semibold shadow-sm shrink-0"
+            className="gap-1.5 rounded-full min-h-[44px] px-4 text-xs font-semibold shadow-sm shrink-0 cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             <Share2 size={14} />
             <span>Invite Mates</span>

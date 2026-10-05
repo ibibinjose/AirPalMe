@@ -280,7 +280,7 @@ export function InboxPage() {
                       <button
                         type="button"
                         onClick={() => handleOpenChat(conv)}
-                        className="flex w-full items-center gap-3.5 px-4 py-3.5 text-left transition hover:bg-paper/60 active:bg-paper"
+                        className="flex min-h-[56px] w-full cursor-pointer items-center gap-3.5 px-4 py-3.5 text-left transition hover:bg-paper/60 active:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
                       >
                         {/* Avatar / Icon */}
                         <div className="relative shrink-0">
@@ -309,7 +309,7 @@ export function InboxPage() {
                               {conv.title}
                             </p>
                             {conv.updatedAt && smartChatTime(conv.updatedAt) ? (
-                              <span className="shrink-0 text-[11px] text-mute font-medium">
+                              <span className="shrink-0 text-[11px] text-mute font-medium tabular-nums">
                                 {smartChatTime(conv.updatedAt)}
                               </span>
                             ) : null}
@@ -321,7 +321,7 @@ export function InboxPage() {
 
                         {/* Unread badge */}
                         {hasUnread && (
-                          <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand px-1.5 text-[11px] font-black text-white shadow-xs">
+                          <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand px-1.5 text-[11px] font-black tabular-nums text-white shadow-xs">
                             {unread}
                           </span>
                         )}
@@ -346,7 +346,7 @@ export function InboxPage() {
                     <button
                       type="button"
                       onClick={() => nav(`/plan/${p.id}`)}
-                      className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition hover:bg-paper/60 active:bg-paper"
+                      className="flex min-h-[56px] w-full cursor-pointer items-center gap-3 px-4 py-3.5 text-left transition hover:bg-paper/60 active:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
                     >
                       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 font-display text-[15px] font-bold text-brand ring-1 ring-brand/20">
                         {p.title.trim()[0]?.toUpperCase() || "•"}

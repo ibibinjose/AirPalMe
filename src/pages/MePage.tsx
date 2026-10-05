@@ -64,13 +64,13 @@ function Row({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full touch-manipulation items-center justify-between gap-3 rounded-2xl ring-1 ring-line bg-card px-4 py-3 text-left transition hover:ring-brand/40 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+      className="flex min-h-[50px] w-full cursor-pointer touch-manipulation items-center justify-between gap-3 rounded-2xl ring-1 ring-line bg-card px-4 py-3.5 text-left transition hover:ring-brand/40 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
     >
       <span className="min-w-0">
         <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">{kicker}</span>
         <span className="block truncate font-medium">{title}</span>
       </span>
-      <span className="shrink-0 rounded-full border border-line px-3 py-1 text-xs font-semibold">{action}</span>
+      <span className="shrink-0 flex min-h-[32px] items-center rounded-full border border-line px-3 py-1 text-xs font-semibold">{action}</span>
     </button>
   );
 }
@@ -181,24 +181,24 @@ export function MePage() {
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 <Button
                   size="sm"
-                  className="rounded-full font-semibold"
+                  className="min-h-[44px] cursor-pointer rounded-full px-4 font-semibold shadow-xs active:scale-95"
                   disabled={!mine && !biosReady}
                   onClick={() => nav(mine ? "/bio/edit" : "/bio/setup")}
                 >
                   {mine ? "Edit profile" : biosReady ? "Choose @handle" : "Loading…"}
                 </Button>
                 {mine && (
-                  <Button size="sm" variant="ghost" className="rounded-full border border-line" onClick={() => nav(bioPath(mine.handle))}>
+                  <Button size="sm" variant="ghost" className="min-h-[44px] cursor-pointer rounded-full border border-line px-4 active:scale-95" onClick={() => nav(bioPath(mine.handle))}>
                     Public bio
                   </Button>
                 )}
-                <Button size="sm" variant="ghost" className="rounded-full border border-line" onClick={() => nav("/me/tickets")}>
+                <Button size="sm" variant="ghost" className="min-h-[44px] cursor-pointer rounded-full border border-line px-4 active:scale-95" onClick={() => nav("/me/tickets")}>
                   Tickets
                 </Button>
-                <Button size="sm" variant="ghost" className="rounded-full border border-line" onClick={() => nav("/settings")}>
+                <Button size="sm" variant="ghost" className="min-h-[44px] cursor-pointer rounded-full border border-line px-4 active:scale-95" onClick={() => nav("/settings")}>
                   Settings
                 </Button>
-                <Button size="sm" variant="ghost" className="rounded-full border border-line" onClick={() => nav("/deals")}>
+                <Button size="sm" variant="ghost" className="min-h-[44px] cursor-pointer rounded-full border border-line px-4 active:scale-95" onClick={() => nav("/deals")}>
                   Deals
                 </Button>
               </div>
@@ -217,37 +217,37 @@ export function MePage() {
               ].map((s) => (
                 <div key={s.l} className="rounded-2xl bg-paper px-1 py-2.5">
                   <dt className="sr-only">{s.l}</dt>
-                  <dd className="font-display text-[19px] font-bold">{s.v}</dd>
+                  <dd className="font-display text-[19px] font-bold tabular-nums text-ink">{s.v}</dd>
                   <dd className="text-[11px] font-medium text-mute">{s.l}</dd>
                 </div>
               ))}
             </dl>
-            <div className="mt-3 flex flex-wrap justify-center gap-2">
+            <div className="mt-3 grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2">
               <button
                 type="button"
                 onClick={() => nav("/plan")}
-                className="rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold ring-1 ring-line transition hover:ring-brand/40"
+                className="flex min-h-[44px] cursor-pointer items-center justify-center rounded-full bg-paper px-3.5 py-2 text-xs font-semibold ring-1 ring-line transition hover:ring-brand/40 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
                 Trips
               </button>
               <button
                 type="button"
                 onClick={() => nav("/me/memories")}
-                className="rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold ring-1 ring-line transition hover:ring-brand/40"
+                className="flex min-h-[44px] cursor-pointer items-center justify-center rounded-full bg-paper px-3.5 py-2 text-xs font-semibold ring-1 ring-line transition hover:ring-brand/40 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
                 Moments ({memoryCount})
               </button>
               <button
                 type="button"
                 onClick={() => nav("/calendar")}
-                className="rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold ring-1 ring-line transition hover:ring-brand/40"
+                className="flex min-h-[44px] cursor-pointer items-center justify-center rounded-full bg-paper px-3.5 py-2 text-xs font-semibold ring-1 ring-line transition hover:ring-brand/40 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
                 Events
               </button>
               <button
                 type="button"
                 onClick={() => nav("/settings")}
-                className="rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold ring-1 ring-line transition hover:ring-brand/40"
+                className="flex min-h-[44px] cursor-pointer items-center justify-center rounded-full bg-paper px-3.5 py-2 text-xs font-semibold ring-1 ring-line transition hover:ring-brand/40 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
                 Settings
               </button>
@@ -351,7 +351,7 @@ export function MePage() {
                     setCatchUpInitialType(opt.type);
                     setCatchUpModalOpen(true);
                   }}
-                  className="flex flex-col items-center rounded-2xl bg-card p-3 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98] cursor-pointer"
+                  className="flex min-h-[84px] cursor-pointer flex-col items-center justify-center rounded-2xl bg-card p-3 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
                   <span className={cn("mb-2 grid h-10 w-10 place-items-center rounded-2xl", opt.tint)}>
                     <opt.Icon size={18} />
@@ -668,8 +668,8 @@ export function MePage() {
             type="button"
             onClick={() => void logout().then(() => nav("/"))}
             className={cn(
-              "w-full rounded-full border border-red-600/50 bg-card px-4 py-3 text-sm font-semibold text-red-600 transition",
-              "hover:bg-red-600 hover:text-white active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600",
+              "flex min-h-[48px] w-full cursor-pointer items-center justify-center rounded-full border border-red-600/50 bg-card px-4 py-3 text-sm font-semibold text-red-600 transition shadow-2xs",
+              "hover:bg-red-600 hover:text-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600",
               "dark:text-red-400 dark:hover:text-white",
             )}
           >

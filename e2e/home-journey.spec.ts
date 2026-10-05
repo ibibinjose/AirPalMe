@@ -11,18 +11,18 @@ test.describe("Home journey", () => {
 
     // Hero title and subtitle
     await expect(page.getByRole("heading", { level: 1, name: "What do you want to do?" })).toBeVisible();
-    await expect(page.getByText("Find mates, places, and experiences.")).toBeVisible();
+    await expect(page.getByText("Find places, events, and plans.")).toBeVisible();
 
     // Search trigger
-    await expect(page.getByRole("button", { name: /search mates, places, events, or trips/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /search places, events, plans, or stays/i })).toBeVisible();
 
     // Quick prompts
-    await expect(page.getByRole("button", { name: "✨ Find a Mate" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "⚡ What now?" })).toBeVisible();
     await expect(page.getByRole("button", { name: "🎭 Live Tonight" })).toBeVisible();
     await expect(page.getByRole("button", { name: "🗺️ Plan a Trip" })).toBeVisible();
 
     // Primary CTA buttons
-    await expect(page.locator("header").getByRole("button", { name: "Find a Mate", exact: true })).toBeVisible();
+    await expect(page.locator("header").getByRole("button", { name: "What now?", exact: true })).toBeVisible();
     await expect(page.locator("header").getByRole("button", { name: "Plan a Hangout", exact: true })).toBeVisible();
   });
 
@@ -34,8 +34,8 @@ test.describe("Home journey", () => {
     await expect(verticalsSection).toBeVisible();
 
     // Verify key vertical pillars exist
-    await expect(verticalsSection.getByRole("button", { name: /AirPal Mate/i })).toBeVisible();
-    await expect(verticalsSection.getByRole("button", { name: /Experiences/i })).toBeVisible();
+    await expect(verticalsSection.getByRole("button", { name: /What now\?/i })).toBeVisible();
+    await expect(verticalsSection.getByRole("button", { name: /Deals/i })).toBeVisible();
     await expect(verticalsSection.getByRole("button", { name: /Stays/i })).toBeVisible();
     await expect(verticalsSection.getByRole("button", { name: /What's On/i })).toBeVisible();
     await expect(verticalsSection.getByRole("button", { name: /Trips/i })).toBeVisible();
