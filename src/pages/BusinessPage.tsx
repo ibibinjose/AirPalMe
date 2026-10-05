@@ -80,6 +80,7 @@ export function BusinessPage() {
   const [address, setAddress] = useState<AddressParts>(emptyAddress("AU"));
   const [hours, setHours] = useState("");
   const [shortWhy, setShortWhy] = useState("");
+  const [description, setDescription] = useState("");
   const [phone, setPhone] = useState("");
   const [geo, setGeo] = useState<{ lat: number; lng: number }>();
   const [locating, setLocating] = useState(false);
@@ -102,6 +103,7 @@ export function BusinessPage() {
     });
     setHours(mine.hours);
     setShortWhy(mine.shortWhy);
+    setDescription(mine.description || "");
     setPhone(mine.phone || "");
     setGeo(mine.geo);
     setCategory(mine.category);
@@ -215,11 +217,23 @@ export function BusinessPage() {
         address: formatAddress(address),
         hours,
         shortWhy,
+        description,
         phone,
         geo,
         handle: mine!.handle,
         heroImage: hero,
       });
+      if (bio?.handle && (bio.aboutText !== description || bio.shortWhy !== shortWhy || bio.name !== name)) {
+        await updateProfile({
+          handle: bio.handle,
+          name,
+          shortWhy,
+          aboutText: description,
+          hours,
+          phone,
+          geo,
+        });
+      }
       toast.success("Venue profile saved successfully");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to save place");
@@ -269,6 +283,7 @@ export function BusinessPage() {
       address: formatAddress(address),
       hours,
       shortWhy,
+      description,
       deal: badge ? { badge, detail } : mine.deal,
       handle,
       heroImage: hero || mine.heroImage,
@@ -452,6 +467,7 @@ export function BusinessPage() {
                       address: place.address,
                       hours: place.hours || hours,
                       shortWhy: place.shortWhy || shortWhy,
+                      description,
                       phone: place.phone || phone,
                       geo: place.geo,
                       handle: mine.handle,
@@ -464,6 +480,7 @@ export function BusinessPage() {
                         handle: bio.handle,
                         name: place.name,
                         shortWhy: place.shortWhy || bio.shortWhy,
+                        aboutText: description || bio.aboutText,
                         hours: place.hours || bio.hours,
                         phone: place.phone || bio.phone,
                         city: place.city || bio.city,
@@ -501,6 +518,7 @@ export function BusinessPage() {
                         address: formatAddress(address),
                         hours,
                         shortWhy,
+                        description,
                         phone,
                         geo,
                         handle: mine.handle,
@@ -609,7 +627,7 @@ export function BusinessPage() {
                   />
                 </div>
 
-                {/* Pitch & Phone */}
+                {/* Pitch, Description & Phone */}
                 <div className="border-t border-line/60 pt-4 space-y-3">
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-mute mb-1">
@@ -621,6 +639,25 @@ export function BusinessPage() {
                       placeholder="e.g. Award-winning waterfront dining in Circular Quay"
                       className={fieldInput}
                     />
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-mute">
+                        Business Description / About Venue
+                      </label>
+                      <span className="text-[10px] text-mute">{description.length}/500</span>
+                    </div>
+                    <textarea
+                      value={description}
+                      maxLength={500}
+                      rows={3}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Tell visitors about your venue's story, specialty dishes, ambiance, or services…"
+                      className={fieldTextarea}
+                    />
+                    <p className="text-[11px] text-mute mt-1">
+                      Detailed overview displayed on your public place page and digital bio profile.
+                    </p>
                   </div>
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-mute mb-1">

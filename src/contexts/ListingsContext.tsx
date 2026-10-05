@@ -32,6 +32,7 @@ export type SavePlaceInput = {
   address: string;
   hours: string;
   shortWhy: string;
+  description?: string;
   phone?: string;
   geo?: { lat: number; lng: number };
   handle?: string;
@@ -71,6 +72,7 @@ function fromFirestore(id: string, data: Record<string, unknown>): BusinessListi
     address: String(data.address || ""),
     hours: String(data.hours || "See venue"),
     shortWhy: String(data.shortWhy || ""),
+    description: data.description ? String(data.description) : undefined,
     heroImage: data.heroImage ? String(data.heroImage) : undefined,
     phone: data.phone ? String(data.phone) : undefined,
     mapsPlaceId: data.mapsPlaceId ? String(data.mapsPlaceId) : undefined,
@@ -203,6 +205,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
           address: input.address.trim(),
           hours: input.hours.trim() || "See venue",
           shortWhy: input.shortWhy.trim(),
+          description: input.description !== undefined ? input.description.trim() : existing?.description,
           phone: input.phone?.trim(),
           ownerEmail: getFirebaseAuth()?.currentUser?.email || user?.email || existing?.ownerEmail || input.name,
           ownerUid: getFirebaseAuth()?.currentUser?.uid || user?.uid || existing?.ownerUid,
@@ -238,6 +241,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
                     address: listing.address,
                     hours: listing.hours,
                     shortWhy: listing.shortWhy,
+                    description: listing.description,
                     phone: listing.phone,
                     lat: listing.geo.lat,
                     lng: listing.geo.lng,
@@ -265,6 +269,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
           address: input.address.trim(),
           hours: input.hours.trim() || "See venue",
           shortWhy: input.shortWhy.trim(),
+          description: input.description?.trim(),
           phone: input.phone?.trim(),
           ownerEmail: getFirebaseAuth()?.currentUser?.email || user?.email || input.name,
           ownerUid: getFirebaseAuth()?.currentUser?.uid || user?.uid,
@@ -298,6 +303,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
                     address: listing.address,
                     hours: listing.hours,
                     shortWhy: listing.shortWhy,
+                    description: listing.description,
                     phone: listing.phone,
                     lat: listing.geo.lat,
                     lng: listing.geo.lng,

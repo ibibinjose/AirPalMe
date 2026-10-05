@@ -116,6 +116,12 @@ export function PlacePage() {
       </div>
       <div className="px-4 pt-5">
         <p className="text-[15px] leading-relaxed">{place.insiderTip || place.shortWhy}</p>
+        {place.description && place.description.trim() !== (place.shortWhy || "").trim() && (
+          <div className="mt-4 rounded-2xl bg-paper p-4 ring-1 ring-line/60">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-mute mb-1.5">About this venue</h2>
+            <p className="text-[14px] leading-relaxed text-ink/90 whitespace-pre-line">{place.description}</p>
+          </div>
+        )}
         {place.deal && (
           <div className="mt-4 rounded-2xl bg-paper p-4 ring-1 ring-line/60" aria-label="Place deal">
             <p className="text-[13px] font-bold">{place.deal.badge}</p>

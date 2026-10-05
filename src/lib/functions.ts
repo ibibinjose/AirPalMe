@@ -132,6 +132,7 @@ export function upsertBusinessListingRemote(data: {
   address: string;
   hours?: string;
   shortWhy: string;
+  description?: string;
   phone?: string;
   lat?: number;
   lng?: number;

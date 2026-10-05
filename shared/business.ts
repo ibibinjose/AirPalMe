@@ -41,6 +41,8 @@ export type BusinessListing = {
   geo: Geo;
   hours: string;
   shortWhy: string;
+  /** Detailed business overview / story */
+  description?: string;
   heroImage?: string;
   phone?: string;
   deal?: PlaceDeal;
@@ -73,6 +75,7 @@ export function listingToPlace(listing: BusinessListing): NearbyPlace {
     name: listing.name,
     category: listing.placeCategory,
     shortWhy: listing.shortWhy,
+    description: listing.description,
     geo: listing.geo,
     hours: listing.hours,
     source: "partner",

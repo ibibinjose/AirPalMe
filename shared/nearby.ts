@@ -96,6 +96,8 @@ export type NearbyPlace = {
   name: string;
   category: PlaceCategory;
   shortWhy: string;
+  /** Detailed venue / business description */
+  description?: string;
   geo: Geo;
   hours?: string;
   /** Last host confirmation of opening hours. */

@@ -100,4 +100,24 @@ describe("identity listing sync", () => {
     expect(rows.find((row) => row.kind === "business")?.name).toBe("Imported café");
     expect(rows.find((row) => row.kind === "business")?.hours).toBe("7am–3pm");
   });
+
+  it("syncs business description to bio aboutText and bio aboutText to listing description", () => {
+    persistBios([business({ handle: "glenmore", listingId: "list-glenmore", aboutText: "Historic pub with views" })]);
+    // Bio to listing
+    syncBioToListing(loadBios().find((r) => r.handle === "glenmore")!);
+    const listing = getCachedListings().find((r) => r.id === "list-glenmore");
+    expect(listing?.description).toBe("Historic pub with views");
+
+    // Listing to bio
+    syncListingToBio({
+      id: "list-glenmore",
+      name: "The Glenmore",
+      hours: "11am–midnight",
+      shortWhy: "Rooftop pub",
+      description: "Updated historic rooftop pub with Sydney Harbour views",
+      handle: "glenmore",
+    });
+    const updatedBio = loadBios().find((r) => r.handle === "glenmore");
+    expect(updatedBio?.aboutText).toBe("Updated historic rooftop pub with Sydney Harbour views");
+  });
 });

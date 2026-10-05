@@ -414,6 +414,7 @@ export type UpsertBusinessListingRequest = {
   address: string;
   hours?: string;
   shortWhy: string;
+  description?: string;
   phone?: string;
   lat?: number;
   lng?: number;

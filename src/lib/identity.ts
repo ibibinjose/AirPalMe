@@ -27,6 +27,7 @@ export function syncBioToListing(bio: BioProfile) {
     name: bio.name,
     hours: bio.hours || base.hours,
     shortWhy: bio.shortWhy,
+    description: bio.aboutText || base.description,
     phone: bio.phone || base.phone,
     handle: bio.handle,
     heroImage: bio.cover || bio.avatar || base.heroImage,
@@ -42,6 +43,7 @@ export function syncListingToBio(listing: {
   name: string;
   hours: string;
   shortWhy: string;
+  description?: string;
   phone?: string;
   handle?: string;
   heroImage?: string;
@@ -60,6 +62,7 @@ export function syncListingToBio(listing: {
       name: listing.name,
       hours: listing.hours,
       shortWhy: listing.shortWhy,
+      aboutText: listing.description !== undefined ? (listing.description || undefined) : bio.aboutText,
       phone: listing.phone || bio.phone,
       listingId: listing.id,
       cover: listing.heroImage || bio.cover,
