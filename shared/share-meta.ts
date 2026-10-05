@@ -100,9 +100,9 @@ export function shareCardFor(
       const title = str(doc.title || doc.name);
       const venueCity = [str(doc.venue || doc.venueName), str(doc.city)].filter(Boolean).join(" · ");
       const when = str(doc.timeLabel || doc.when || doc.startsAt);
-      const detail = str(doc.shortWhy || doc.description || doc.detail);
-      const descParts = [detail, [when, venueCity].filter(Boolean).join(" · ")].filter(Boolean);
-      const description = descParts.join(" — ") || venueCity || SHARE_DEFAULTS.description;
+      const venueWhen = [when, venueCity].filter(Boolean).join(" · ");
+      const detail = str(doc.shortWhy) || str(doc.description) || str(doc.detail);
+      const description = detail || venueWhen || venueCity || SHARE_DEFAULTS.description;
       const firstPhoto = Array.isArray(doc.photos) ? doc.photos[0] : doc.photo;
       return {
         title: escapeShareText(title, 90) || SHARE_DEFAULTS.title,
@@ -155,9 +155,13 @@ export function shareCardFor(
       const inviteLine = parts.join(" ");
 
       const notes = str(doc.notes);
-      const descLine = [inviteLine, notes, isInvite ? "RSVP on AirPal.me · Life Made Easy." : "AirPal.me"]
-        .filter(Boolean)
-        .join(" — ");
+      const descLine = inviteLine || notes
+        ? [inviteLine, notes, isInvite ? "RSVP on AirPal.me · Life Made Easy." : undefined]
+            .filter(Boolean)
+            .join(" — ")
+        : isInvite
+          ? "RSVP on AirPal.me · Life Made Easy."
+          : "";
 
       const firstStopPhoto = stops.length > 0 ? (stops[0]?.photo || stops[0]?.image) : undefined;
       return {
