@@ -32,6 +32,7 @@ export function profileToRemotePatch(profile: BioProfile) {
     customStatusEmoji: profile.customStatusEmoji,
     geo: profile.geo,
     zooHunt: profile.zooHunt,
+    visibility: profile.visibility,
   };
 }
 

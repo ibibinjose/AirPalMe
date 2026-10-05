@@ -69,6 +69,8 @@ import { toZonedDateStr } from "@/lib/local-time";
 import { Photo } from "@/components/ui/Photo";
 import { Button } from "@/components/ui/Button";
 import { useBio } from "@/contexts/BioContext";
+import { useSocial } from "@/contexts/SocialContext";
+import { canViewProfile, completedExperiencesCount } from "@/lib/profile-stats";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { usePlans } from "@/contexts/PlanContext";
@@ -209,6 +211,7 @@ export function BioPublicPage() {
   const [chatModalOpen, setChatModalOpen] = useState(false);
   const [chatConversation, setChatConversation] = useState<UniversalConversation | null>(null);
   const { stalls, getEvent } = useEvents();
+  const { isFollowing, followerHandles } = useSocial();
   const local = resolvePublicBio(handle, byHandle);
   const [remote, setRemote] = useState<typeof local>();
   const [tried, setTried] = useState(!handle);
@@ -226,6 +229,12 @@ export function BioPublicPage() {
         ((p.creator?.handle && p.creator.handle.toLowerCase() === h) ||
           (target.ownerUid && p.creator?.uid === target.ownerUid)),
     );
+  }, [plans, remote, local]);
+
+  const completedCount = useMemo(() => {
+    const target = remote || local;
+    if (!target) return 0;
+    return completedExperiencesCount(plans, { uid: target.ownerUid, handle: target.handle });
   }, [plans, remote, local]);
 
   useEffect(() => {
@@ -423,6 +432,37 @@ export function BioPublicPage() {
     (user && bio.ownerEmail && bio.ownerEmail === user.email) ||
     (mine && mine.handle === bio.handle),
   );
+
+  const viewer = user
+    ? { uid: user.uid, email: user.email || undefined, handle: mine?.handle }
+    : null;
+  const canView =
+    isStay ||
+    canViewProfile(viewer, bio, {
+      isFollowing: (h) => isFollowing(h),
+      isFollower: (h) => followerHandles.has(h.trim().toLowerCase().replace(/^@/, "")),
+    });
+
+  if (!canView) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-16 text-center">
+        <div className="rounded-[32px] border border-line bg-card p-6 sm:p-8 shadow-clay">
+          <h1 className="font-display mt-2 text-2xl font-bold text-ink">{bio.name}</h1>
+          <p className="mt-1 text-sm font-medium text-mute">@{bio.handle}</p>
+          <p className="mt-3 text-sm text-mute leading-relaxed">
+            {bio.visibility === "private"
+              ? "This profile is private."
+              : "This profile is visible to friends. Follow to view it."}
+          </p>
+          {bio.visibility !== "private" && (
+            <div className="mt-6">
+              <FollowButton handle={bio.handle} name={bio.name} className="w-full" />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   const appearing = stalls.filter((s) => s.handle === bio.handle && s.status === "active");
   const unclaimed =
@@ -837,6 +877,11 @@ export function BioPublicPage() {
               )}
               {bio.languages && <span>· {bio.languages}</span>}
             </div>
+            {bio.kind === "person" && completedCount > 0 && (
+              <p className="mt-1.5 text-xs font-semibold text-ink">
+                {completedCount} completed {completedCount === 1 ? "experience" : "experiences"}
+              </p>
+            )}
 
             {/* Interactive Availability / Custom Status Pill */}
             <div className="mt-2.5">

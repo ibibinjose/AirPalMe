@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -20,6 +20,15 @@ import { formatTime12h, type PlanType, type StopIconType } from "@shared/plan";
 import { STOP_ICON_OPTIONS, STOP_ICON_CATEGORIES, getStopIconDef } from "./stopIcons";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
+import { getPlace } from "@/lib/catalog";
+import { useListings } from "@/contexts/ListingsContext";
+import type { BioClaim } from "@/lib/bio-claims";
+import {
+  claimThreadDeal,
+  loadThreadDealClaim,
+  threadDealForStop,
+  type ThreadDeal,
+} from "@/lib/thread-deals";
 
 export interface ItineraryStopData {
   id?: string;
@@ -524,6 +533,19 @@ export function ItineraryStopsManager({
   const [newNotes, setNewNotes] = useState("");
   const [showAddressNotes, setShowAddressNotes] = useState(true);
 
+  // Venue deals surfaced in-thread: resolved from live places, refreshed when
+  // listings land and whenever a code is claimed here.
+  const { version: listingsVersion } = useListings();
+  const [claimedTick, setClaimedTick] = useState(0);
+  const dealsByStop = useMemo(() => {
+    const map = new Map<string, { deal: ThreadDeal; claim: BioClaim | undefined }>();
+    stops.forEach((stop, index) => {
+      const deal = threadDealForStop({ placeId: stop.placeId }, (id) => getPlace(id));
+      if (deal) map.set(stop.placeId || stop.id || `idx-${index}`, { deal, claim: loadThreadDealClaim(deal) });
+    });
+    return map;
+  }, [stops, listingsVersion, claimedTick]);
+
   // Template suggestions for current occasion
   const templates = OCCASION_STOP_TEMPLATES[planType] || OCCASION_STOP_TEMPLATES.custom;
 
@@ -626,6 +648,7 @@ export function ItineraryStopsManager({
             const isEditing = editingIdx === index;
             const isDragOver = dragOverIdx === index && dragIdx !== null && dragIdx !== index;
             const userVoted = currentUserId && stop.voterUids?.includes(currentUserId);
+            const dealEntry = dealsByStop.get(stop.placeId || stop.id || `idx-${index}`);
 
             if (isEditing) {
               return (
@@ -791,6 +814,32 @@ export function ItineraryStopsManager({
                       <MapPin size={10} className="text-gold shrink-0" />
                       <span className="truncate">{stop.address}</span>
                     </p>
+                  )}
+                  {dealEntry && (
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                      <span
+                        title={dealEntry.deal.detail}
+                        className="rounded-full bg-gold/15 px-2 py-0.5 text-[10px] font-bold text-gold ring-1 ring-gold/30"
+                      >
+                        {dealEntry.deal.badge}
+                      </span>
+                      {dealEntry.claim ? (
+                        <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                          Code {dealEntry.claim.code}
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            claimThreadDeal(dealEntry.deal);
+                            setClaimedTick((t) => t + 1);
+                          }}
+                          className="rounded-full bg-brand px-2.5 py-1 text-[10px] font-bold text-white transition active:scale-95"
+                        >
+                          Claim deal
+                        </button>
+                      )}
+                    </div>
                   )}
                   {stop.addedByName && <p className="text-[9px] text-mute/70 mt-0.5">Added by {stop.addedByName}</p>}
                 </div>

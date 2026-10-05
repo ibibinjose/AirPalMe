@@ -121,6 +121,10 @@ export function profileFromDoc(id: string, data: Record<string, unknown>): BioPr
     geo: Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : undefined,
     offer: offer?.badge ? { badge: String(offer.badge), detail: String(offer.detail || "") } : undefined,
     starTier: STAR_TIERS.some((t) => t.name === starTierRaw) ? starTierRaw : undefined,
+    visibility:
+      data.visibility === "public" || data.visibility === "friends" || data.visibility === "private"
+        ? data.visibility
+        : undefined,
     products: sanitizeCatalog("product", data.products),
     services: sanitizeCatalog("service", data.services),
     deals: sanitizeCatalog("deal", data.deals),

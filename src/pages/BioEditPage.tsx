@@ -41,6 +41,7 @@ import {
   type BioLink,
   type BioLinkType,
   type BioProfile,
+  type BioVisibility,
 } from "@shared/bio";
 import { Button } from "@/components/ui/Button";
 import { BioCatalogEditor } from "@/components/bio/BioCatalogEditor";
@@ -249,6 +250,7 @@ export function BioEditPage() {
   const [hours, setHours] = useState("");
   const [openNow, setOpenNow] = useState(true);
   const [availabilityStatus, setAvailabilityStatus] = useState<AvailabilityStatus>("available");
+  const [visibility, setVisibility] = useState<BioVisibility>("friends");
   const [customStatus, setCustomStatus] = useState("");
   const [customStatusEmoji, setCustomStatusEmoji] = useState("☕");
   const [phone, setPhone] = useState("");
@@ -285,6 +287,7 @@ export function BioEditPage() {
     setHours(activeProfile.hours || "");
     setOpenNow(activeProfile.openNow ?? true);
     setAvailabilityStatus(activeProfile.availabilityStatus || "available");
+    setVisibility(activeProfile.visibility || "friends");
     setCustomStatus(activeProfile.customStatus || "");
     setCustomStatusEmoji(activeProfile.customStatusEmoji || "☕");
     setPhone(activeProfile.phone || "");
@@ -351,6 +354,7 @@ export function BioEditPage() {
         hours,
         openNow,
         availabilityStatus,
+        visibility,
         customStatus: customStatus.trim() || undefined,
         customStatusEmoji: customStatusEmoji.trim() || undefined,
         phone,
@@ -1061,6 +1065,42 @@ export function BioEditPage() {
                   <p className="text-[11px] text-mute">Include country code for direct WhatsApp & calling.</p>
                 </div>
               </div>
+
+              {/* Profile Visibility (personal profiles only; businesses stay public) */}
+              {!isBusiness && (
+                <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-3">
+                  <p className="text-xs font-bold uppercase tracking-wider text-gold">Who Can See This Profile</p>
+                  <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Profile visibility">
+                    {(
+                      [
+                        { id: "public", label: "Public", hint: "Everyone" },
+                        { id: "friends", label: "Friends", hint: "Connected" },
+                        { id: "private", label: "Private", hint: "Only you" },
+                      ] as Array<{ id: BioVisibility; label: string; hint: string }>
+                    ).map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={visibility === opt.id}
+                        onClick={() => setVisibility(opt.id)}
+                        className={cn(
+                          "flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-2xl border p-2 text-center transition active:scale-95",
+                          visibility === opt.id
+                            ? "bg-brand/10 border-brand text-brand shadow-xs"
+                            : "bg-paper border-line text-ink hover:bg-card",
+                        )}
+                      >
+                        <span className="text-xs font-bold">{opt.label}</span>
+                        <span className="text-[10px] font-medium opacity-70">{opt.hint}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-mute">
+                    Friends means anyone connected with you — following either way counts.
+                  </p>
+                </div>
+              )}
 
               {/* Business-Only Google Place Import Card vs Personal Hint */}
               {isBusiness ? (

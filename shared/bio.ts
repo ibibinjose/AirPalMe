@@ -115,6 +115,11 @@ export type BioCatalogItem = {
 export const BIO_KINDS = ["person", "business"] as const;
 export type BioKind = (typeof BIO_KINDS)[number];
 
+export const BIO_VISIBILITIES = ["public", "friends", "private"] as const;
+
+/** Who can see a person profile. Business storefronts stay public. */
+export type BioVisibility = (typeof BIO_VISIBILITIES)[number];
+
 /** Account-type identifier shown on profiles: every profile is either an Individual or a Business. */
 export function isBusinessKind(kind?: BioKind | null): boolean {
   return kind === "business";
@@ -271,6 +276,8 @@ export type BioProfile = {
    * never a balance. Server-written when Stars vest; clients must not set it.
    */
   starTier?: string;
+  /** Person-profile visibility. Absent = friends-only. */
+  visibility?: BioVisibility;
   /** Customized primary CTA label */
   primaryCta?: string;
   /** Opt in to Air Zoo hunts and a collectible sticker on the shop QR. */
