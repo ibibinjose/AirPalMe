@@ -1,7 +1,7 @@
 /**
  * Canonical words on AirPal. Use these in UI instead of inventing
  * Venue / Partner / Hub / Concierge / Me synonyms.
- * Freeze: docs/CANON.md. Do not relabel chrome without updating the canon.
+ * Source: docs/AIRPAL.md Part E. Do not relabel chrome without updating the single doc.
  */
 export const NAMES = {
   explore: "Explore",

@@ -2,7 +2,7 @@
 
 **Status:** Phase 1 Stay beachhead in progress (2026-09-24).  
 **Owner:** AirPal Ops / product  
-**Binding context:** `docs/BRAIN.md`, `docs/CANON.md`, `docs/host-tickets.md`
+**Binding context:** `docs/AIRPAL.md`, `docs/host-tickets.md`
 
 ---
 

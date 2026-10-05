@@ -1,7 +1,7 @@
 # AirPal UI/UX Playbook — build checklist
 
 Source: Modern UI/UX Playbook (pasted 22 Sep 2026). Rule: evolve the existing
-system; canon (`docs/CANON.md`, `AGENTS.md`) wins on conflicts. Checked items
+system; single doc (`docs/AIRPAL.md`) wins on conflicts. Checked items
 are done; unchecked are ordered next → later → needs-decision.
 
 ## Already true (no work)

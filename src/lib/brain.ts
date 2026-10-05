@@ -3,7 +3,7 @@
  *
  * Implements deterministic matching heuristics, natural language intent resolution,
  * context-aware plan synthesis, trust & reliability calculations, and data freshness
- * validation according to docs/AIRPAL_BRAIN.md and AGENTS.md.
+ * validation according to docs/AIRPAL.md.
  *
  * Principle: Intelligence is quiet, transparent, and grounded in real-world actions.
  * No opaque black-box scores — always provide clear, human-understandable reasons.

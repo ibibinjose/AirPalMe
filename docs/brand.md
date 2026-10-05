@@ -1,6 +1,6 @@
 # Brand Identity: AirPal.me
 
-Shipped tokens and chrome are frozen in **`docs/CANON.md` §2–3**. Do not restyle off-token.
+Shipped tokens and chrome are frozen in **`docs/AIRPAL.md` Part E**. Do not restyle off-token.
 
 ## 1. Brand Foundation
 

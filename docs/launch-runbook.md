@@ -37,7 +37,7 @@ Sydney time for all roster/SLA references. Never market AirPal as guaranteeing p
 ## Post-launch watch (first 14 days)
 
 - North star: Completed AirPal Experiences; watch requests → matches → bookings → completions → reviews funnel plus cancellations, reports, refunds/disputes.
-- Daily: safety inbox zero-new-emergency, failed Stripe webhooks, `abuseSignals` spikes, crash-free sessions ≥ 99% via `client_error` analytics events (`src/lib/error-report.ts`; no vendor SDK wired — see `docs/launch-plan.md`).
+- Daily: safety inbox zero-new-emergency, failed Stripe webhooks, `abuseSignals` spikes, crash-free sessions ≥ 99% via `client_error` analytics events (`src/lib/error-report.ts`; no vendor SDK wired — see `docs/AIRPAL.md` Part F).
 - Store pack: `docs/store/` (listing, app-information, reviewer-notes, permissions, play-data-safety). Native this pack: iOS **2.0.0 (11)**, Android **versionCode 6**. Human Submit-for-Review / Play upload remain.
 
 ## Contacts

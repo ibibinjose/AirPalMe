@@ -4,7 +4,7 @@
  * requests, so no visitor IPs leak to font CDNs. */
 /* Apple-like retheme (human-approved): system font stack everywhere, iOS
    neutral surfaces, AirPal Blue kept as the single accent. See
-   docs/CANON.md §2 and docs/IOS-DESIGN-GUIDE.md. */
+   docs/AIRPAL.md Part E and docs/IOS-DESIGN-GUIDE.md. */
 @theme inline {
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, ui-sans-serif, system-ui,
     sans-serif;

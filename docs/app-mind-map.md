@@ -20,7 +20,7 @@ AirPal.me (scan-first guest concierge + precinct guide, no account for guests)
 │   │   fallback = map embed, never dev card on guest surfaces
 │   └── Analytics: WQGA dictionary, anonymousSessionId, backendState live/offline_queued/local_demo/failed
 │
-├── PRIMARY CHROME: Home / Explore / Trips / Inbox / Me + global + Create (five-tab companion dock since 22 Sep 2026 — see docs/CANON.md §3; Scan lives behind + Create, Stay inside Explore/Home)
+├── PRIMARY CHROME: Home / Explore / Trips / Inbox / Me + global + Create (five-tab companion dock since 22 Sep 2026 — pre-rebuild chrome, now superseded by docs/AIRPAL.md Part B; Scan lives behind + Create, Stay inside Explore/Home)
 │   ├── /scan — camera (jsQR) + manual code + demo tiles (room/lobby/street/campus/market/bio/zoo)
 │   │   sets Stay session (stay/marker/campus) + noteQrContext, then navs to /g /q /c /e /@
 │   ├── /concierge + /stay + /stay/:id + /g/:id (StayPage → ConciergePage → StayCompendium) — room stay home
@@ -108,7 +108,7 @@ operator side (host/business/event/admin) already exists end-to-end.
   implicit; stale Wi-Fi/hours had no freshness signal.
 - Companion had no 18+ gate and no funnel events; Stripe bookings and deal
   claims were only partly measured.
-- Bottom tabs were Scan / Stay / Explore / Plan / Me (resolved 22 Sep 2026: Home / Explore / Trips / Inbox / Me + one global + Create — see docs/CANON.md §3).
+- Bottom tabs were Scan / Stay / Explore / Plan / Me (resolved 22 Sep 2026: Home / Explore / Trips / Inbox / Me + one global + Create — pre-rebuild chrome, now superseded by docs/AIRPAL.md Part B).
 
 ## 3. What to change / add (priority order)
 
