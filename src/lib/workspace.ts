@@ -9,8 +9,7 @@ const WORKSPACE = [
   // Pulse hub (/pulse) renders full chrome. Only anonymous public rating
   // links (/pulse/:token) stay minimal.
   /^\/pulse\/.+/,
-  /^\/me\/(zoo|memories|people|giveaways)/,
-  /^\/zoo/,
+  /^\/me\/memories/,
   /^\/settings/,
   /^\/bio/,
   /^\/about/,
@@ -19,7 +18,6 @@ const WORKSPACE = [
   /^\/terms/,
   /^\/cookies/,
   /^\/legal/,
-  /^\/club/,
 ];
 
 /** Minimal-chrome workspace routes: compact header, no tab bar, no footer. */

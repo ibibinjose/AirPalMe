@@ -139,10 +139,10 @@ export function PlacePage() {
                 Plan it here
               </Link>
               <Link
-                href="/mate"
+                href="/now"
                 className="inline-flex min-h-[44px] items-center rounded-full bg-card px-5 py-2 text-[14px] font-semibold ring-1 ring-line transition active:scale-95"
               >
-                Find someone to go with
+                What now?
               </Link>
             </div>
           </div>
@@ -181,9 +181,9 @@ export function PlacePage() {
         <button
           type="button"
           className="mt-4 inline-flex min-h-[48px] w-full cursor-pointer items-center justify-center text-[14px] font-semibold text-brand"
-          onClick={() => nav("/explore")}
+          onClick={() => nav("/now")}
         >
-          Explore more →
+          What now? →
         </button>
       </div>
 

@@ -41,7 +41,7 @@ import { GooglePlaceImportCard } from "@/components/business/GooglePlaceImport";
 import { bioLinksFromGooglePlace, mergeBioLinks } from "@shared/google-place";
 import { NAMES } from "@shared/names";
 import { WaveHostCard } from "@/components/wave/WaveHostCard";
-import { Cake,
+import {
   Activity,
   AlertTriangle,
   ArrowRight,
@@ -327,11 +327,11 @@ export function BusinessPage() {
             <span>Add Venue</span>
           </Link>
           <Link
-            href="/create"
+            href="/business/promotions/new"
             className="inline-flex items-center gap-1.5 rounded-xl bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
           >
             <Plus className="h-3.5 w-3.5 text-brand" />
-            <span>Create</span>
+            <span>Create offer</span>
           </Link>
           <button
             type="button"
@@ -393,17 +393,9 @@ export function BusinessPage() {
               <Activity className="h-3.5 w-3.5 text-indigo-500" />
               <span>Guest Pulse & Standees</span>
             </Link>
-            <Link href="/business/campaigns" className="inline-flex items-center gap-1.5 font-semibold text-ink/80 hover:text-brand hover:underline">
-              <Sparkles className="h-3.5 w-3.5 text-purple-500" />
-              <span>Experience Campaigns ({stats.campaigns})</span>
-            </Link>
             <Link href="/business/promotions" className="inline-flex items-center gap-1.5 font-semibold text-ink/80 hover:text-brand hover:underline">
               <Gift className="h-3.5 w-3.5 text-amber-500" />
               <span>Promotions & Giveaways</span>
-            </Link>
-            <Link href="/business/birthday-offers" className="inline-flex items-center gap-1.5 font-semibold text-ink/80 hover:text-brand hover:underline">
-              <Cake className="h-4 w-4" />
-              <span>Birthday month offers</span>
             </Link>
           </div>
           <Link href="/bio/edit" className="inline-flex items-center gap-1 font-semibold text-mute hover:text-ink">
@@ -845,12 +837,12 @@ export function BusinessPage() {
               <ArrowRight className="h-3.5 w-3.5 text-mute" />
             </Link>
             <Link
-              href="/business/campaigns"
+              href="/business/promotions"
               className="flex items-center justify-between rounded-xl bg-paper px-3.5 py-2.5 text-xs font-semibold text-ink transition hover:bg-card hover:ring-1 hover:ring-brand/30"
             >
               <span className="flex items-center gap-2">
                 <Compass className="h-4 w-4 text-purple-500" />
-                Experiences & Group Events
+                Promotions & Offers
               </span>
               <ArrowRight className="h-3.5 w-3.5 text-mute" />
             </Link>

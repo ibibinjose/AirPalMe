@@ -90,10 +90,10 @@ export function DemoAdmin() {
           {DEMO_TEARDOWN_COLLECTIONS.join(", ")} plus property menu/private/qrCodes and event stalls.
         </p>
         <Link
-          href="/Demo"
+          href="/concierge"
           className="mt-3 flex items-center gap-2 rounded-2xl bg-brand/10 p-3 text-sm font-bold text-brand ring-1 ring-brand/20 transition hover:bg-brand/15"
         >
-          View the live showcase <ArrowRight size={16} />
+          View Stay & Guide <ArrowRight size={16} />
         </Link>
       </section>
 

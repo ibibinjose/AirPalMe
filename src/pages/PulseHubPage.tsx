@@ -7,20 +7,15 @@ import {
   ArrowRight,
   CheckCircle2,
   Coffee,
-  Copy,
   Download,
-  ExternalLink,
   Headphones,
   Hotel,
   PartyPopper,
-  Printer,
   QrCode,
   Scissors,
-  Sparkles,
   Star,
   ThumbsUp,
   TrendingUp,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ImageField } from "@/components/media/ImageField";
@@ -41,13 +36,19 @@ import {
   type PropertyPulse,
 } from "@/lib/pulse-store";
 import {
+  activeLivePulse,
   buildPulsePublicUrl,
   pulseResponsesToCsv,
+  scoreDistribution,
   type PulseIssue,
   type PulseResponse,
   type PulseTemplate,
 } from "@shared/pulse";
 import { playResolutionChime } from "@/lib/ticket-alert-sound";
+import { PulseQrCard } from "@/components/pulse/PulseQrCard";
+import { PulseIssueCard } from "@/components/pulse/PulseIssueCard";
+import { PrintStandeeModal } from "@/components/pulse/PrintStandeeModal";
+import { cn } from "@/lib/cn";
 
 interface TemplateOption {
   id: PulseTemplate;
@@ -121,18 +122,41 @@ const EMOJIS = [
   { emoji: "😍", label: "Amazing", score: 5, color: "text-emerald-500" },
 ];
 
+function Metric({
+  label,
+  icon,
+  value,
+  sub,
+  valueClass,
+}: {
+  label: string;
+  icon: React.ReactNode;
+  value: React.ReactNode;
+  sub: string;
+  valueClass?: string;
+}) {
+  return (
+    <div className="rounded-2xl bg-card p-4 ring-1 ring-line shadow-2xs">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-mute">{label}</span>
+        {icon}
+      </div>
+      <p className={cn("font-display mt-2 text-2xl font-bold text-ink", valueClass)}>{value}</p>
+      <p className="mt-0.5 text-[10px] text-mute">{sub}</p>
+    </div>
+  );
+}
+
 export function PulseHubPage() {
   const { user } = useAuth();
   const [, nav] = useLocation();
 
-  // Active workspace (either assigned property or personal user workspace)
   const workspaceId = useMemo(() => {
     if (!user) return "demo_workspace";
     if (user.propertyIds && user.propertyIds.length > 0) return user.propertyIds[0]!;
     return `usr_${user.uid}`;
   }, [user]);
 
-  // Creator state
   const [selectedTemplate, setSelectedTemplate] = useState<PulseTemplate>("dining_cafe");
   const [pulseName, setPulseName] = useState("");
   const [pulseTitle, setPulseTitle] = useState(TEMPLATES[0]!.defaultTitle);
@@ -140,18 +164,15 @@ export function PulseHubPage() {
   const [pulseImage, setPulseImage] = useState<string | undefined>(undefined);
   const [busy, setBusy] = useState(false);
 
-  // Live Pulses & Responses
   const [responses, setResponses] = useState<PulseResponse[]>([]);
   const [issues, setIssues] = useState<PulseIssue[]>([]);
   const [pulses, setPulses] = useState<PropertyPulse[]>([]);
 
-  // Generated QR & Modal State
   const [activePublicToken, setActivePublicToken] = useState<string | null>(null);
   const [activeQrUrl, setActiveQrUrl] = useState<string | null>(null);
   const [previewRating, setPreviewRating] = useState<number>(5);
   const [showPrintModal, setShowPrintModal] = useState(false);
 
-  // Issue action notes
   const [resolutionNoteByIssue, setResolutionNoteByIssue] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -186,30 +207,15 @@ export function PulseHubPage() {
   const avgScore = useMemo(() => averagePrimaryScore(responses), [responses]);
   const openIssues = useMemo(() => issues.filter((i) => i.status !== "resolved"), [issues]);
   const resolvedIssues = useMemo(() => issues.filter((i) => i.status === "resolved"), [issues]);
-
-  // Score distribution calculation
-  const scoreCounts = useMemo(() => {
-    const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    responses.forEach((r) => {
-      const p = r.primaryScore;
-      if (p && p >= 1 && p <= 5) {
-        counts[p as keyof typeof counts] += 1;
-      }
-    });
-    return counts;
-  }, [responses]);
-
+  const scoreCounts = useMemo(() => scoreDistribution(responses), [responses]);
   const totalRated = responses.length || 1;
-
-  const activeLivePulse = useMemo(() => {
-    return pulses.find((p) => p.status === "live") || pulses[0];
-  }, [pulses]);
+  const livePulse = useMemo(() => activeLivePulse(pulses), [pulses]);
 
   useEffect(() => {
-    if (activeLivePulse?.activePublicToken) {
-      setActivePublicToken(activeLivePulse.activePublicToken);
+    if (livePulse?.activePublicToken) {
+      setActivePublicToken(livePulse.activePublicToken);
     }
-  }, [activeLivePulse]);
+  }, [livePulse]);
 
   async function handleCreateAndPublish() {
     if (!user) {
@@ -283,70 +289,54 @@ export function PulseHubPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg text-ink pb-24">
-      {/* Hero Header */}
-      <section className="relative overflow-hidden border-b border-line bg-card pt-12 pb-14 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/15 text-brand text-xs font-semibold ring-1 ring-brand/30 shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-brand" />
-            <span>AirPal Pulse · Real-Time In-Venue Feedback Engine</span>
-          </div>
+    <div className="mx-auto max-w-6xl px-4 pb-28 pt-6 md:px-6">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+        AirPal Pulse · Real-Time Feedback
+      </p>
+      <h1 className="font-display mt-1 text-3xl font-semibold tracking-tight">
+        Catch unhappy guests <span className="text-brand">before bad reviews</span>
+      </h1>
+      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-mute">
+        Real-time QR ratings for cafes, restaurants, hotels, events, and venues. Negative feedback routes to your
+        manager desk instantly — zero app download required.
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button
+          onClick={() => {
+            document.getElementById("pulse-builder")?.scrollIntoView({ behavior: "smooth" });
+          }}
+        >
+          Create Your Free Pulse
+          <ArrowRight size={15} aria-hidden />
+        </Button>
+        <Link
+          href="/helpdesk"
+          className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-card px-5 text-sm font-semibold text-ink ring-1 ring-line transition-colors hover:bg-paper"
+        >
+          <Headphones size={15} className="text-brand" aria-hidden />
+          <span>Universal Help Desk</span>
+        </Link>
+      </div>
 
-          <h1 className="font-display text-3xl sm:text-5xl font-black tracking-tight text-ink">
-            Catch Unhappy Guests <span className="text-brand">Before Bad Reviews</span>
-          </h1>
-
-          <p className="text-sm sm:text-base text-ink/75 max-w-2xl mx-auto leading-relaxed">
-            Real-time QR ratings for cafes, restaurants, hotels, events, and venues. 
-            Automated service recovery gates negative feedback to your manager desk instantly—zero app download required.
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <Button
-              onClick={() => {
-                const el = document.getElementById("pulse-builder");
-                el?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="bg-brand text-white hover:bg-brand/90 h-11 px-6 font-semibold shadow-xs"
-            >
-              Create Your Free Pulse
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-            <Link
-              href="/helpdesk"
-              className="inline-flex items-center gap-2 rounded-2xl bg-card px-5 h-11 text-sm font-semibold text-ink ring-1 ring-line shadow-2xs hover:bg-paper transition"
-            >
-              <Headphones className="w-4 h-4 text-brand" />
-              <span>Universal Help Desk</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-12">
-        {/* Pulse Builder Studio */}
-        <section id="pulse-builder" className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-line pb-4">
+      <div className="mt-10 space-y-12">
+        <section id="pulse-builder" className="scroll-mt-6 space-y-6">
+          <div className="flex flex-col justify-between gap-2 border-b border-line pb-4 sm:flex-row sm:items-center">
             <div>
               <h2 className="font-display text-2xl font-bold tracking-tight text-ink">Pulse Studio</h2>
-              <p className="text-xs sm:text-sm text-mute">
+              <p className="text-xs text-mute sm:text-sm">
                 Select your industry blueprint, customize the header question, and deploy a live QR code in 10 seconds.
               </p>
             </div>
-            <span className="text-xs font-semibold bg-brand/10 text-brand px-3 py-1 rounded-full ring-1 ring-brand/25">
+            <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand ring-1 ring-brand/25">
               1-Click Deploy
             </span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Form & Configuration */}
-            <div className="lg:col-span-7 space-y-6">
-              {/* Template Selector */}
+          <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+            <div className="space-y-6 lg:col-span-7">
               <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-wider text-mute">
-                  1. Select Industry Blueprint
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-mute">1. Select Industry Blueprint</p>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" role="radiogroup" aria-label="Pulse template">
                   {TEMPLATES.map((tmpl) => {
                     const Icon = tmpl.icon;
                     const isSelected = selectedTemplate === tmpl.id;
@@ -354,70 +344,77 @@ export function PulseHubPage() {
                       <button
                         key={tmpl.id}
                         type="button"
+                        role="radio"
+                        aria-checked={isSelected}
                         onClick={() => setSelectedTemplate(tmpl.id)}
-                        aria-pressed={isSelected}
-                        className={`text-left p-3.5 rounded-2xl ring-1 transition-all text-sm ${
-                          isSelected
-                            ? "ring-2 ring-brand bg-brand/5 shadow-xs"
-                            : "ring-line bg-card hover:bg-paper"
-                        }`}
+                        className={cn(
+                          "rounded-2xl p-3.5 text-left text-sm ring-1 transition-colors",
+                          isSelected ? "bg-brand/5 shadow-xs ring-2 ring-brand" : "bg-card ring-line hover:bg-paper",
+                        )}
                       >
                         <div className="flex items-center gap-2.5 font-bold text-ink">
-                          <div className={`p-2 rounded-xl ${isSelected ? "bg-brand text-white" : "bg-paper text-brand ring-1 ring-line"}`}>
-                            <Icon className="w-4 h-4" />
+                          <div
+                            className={cn(
+                              "rounded-xl p-2",
+                              isSelected ? "bg-brand text-white" : "bg-paper text-brand ring-1 ring-line",
+                            )}
+                          >
+                            <Icon size={16} aria-hidden />
                           </div>
                           <span className="text-xs font-bold">{tmpl.title}</span>
                         </div>
-                        <p className="text-[11px] text-mute mt-2 line-clamp-2 leading-relaxed">{tmpl.description}</p>
+                        <p className="mt-2 text-[11px] leading-relaxed text-mute line-clamp-2">{tmpl.description}</p>
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Customizer */}
-              <div className="p-5 rounded-[28px] bg-card/90 ring-1 ring-line space-y-4 shadow-xs">
-                <label className="text-xs font-bold uppercase tracking-wider text-mute">
+              <div className="space-y-4 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-xs">
+                <p className="text-xs font-bold uppercase tracking-wider text-mute">
                   2. Customize Question & Placement
-                </label>
+                </p>
 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-semibold text-ink mb-1">
+                    <label className="mb-1 block text-xs font-semibold text-ink" htmlFor="pulse-name">
                       Business or Pulse Name
                     </label>
                     <input
+                      id="pulse-name"
                       type="text"
                       value={pulseName}
                       onChange={(e) => setPulseName(e.target.value)}
                       placeholder="e.g. Surry Hills Cafe & Bar, Table 12, Harbour Hotel Room 302"
-                      className="w-full h-11 px-4 rounded-2xl bg-paper ring-1 ring-line text-xs sm:text-sm text-ink outline-none focus:ring-2 focus:ring-brand/40"
+                      className="h-11 w-full rounded-2xl bg-paper px-4 text-xs text-ink outline-none ring-1 ring-line focus:ring-2 focus:ring-brand/40 sm:text-sm"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-ink mb-1">
+                    <label className="mb-1 block text-xs font-semibold text-ink" htmlFor="pulse-title">
                       Header Question / Customer Prompt
                     </label>
                     <input
+                      id="pulse-title"
                       type="text"
                       value={pulseTitle}
                       onChange={(e) => setPulseTitle(e.target.value)}
                       placeholder="e.g. How was your food & dining experience today?"
-                      className="w-full h-11 px-4 rounded-2xl bg-paper ring-1 ring-line text-xs sm:text-sm text-ink outline-none focus:ring-2 focus:ring-brand/40"
+                      className="h-11 w-full rounded-2xl bg-paper px-4 text-xs text-ink outline-none ring-1 ring-line focus:ring-2 focus:ring-brand/40 sm:text-sm"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-ink mb-1">
+                    <label className="mb-1 block text-xs font-semibold text-ink" htmlFor="pulse-placement">
                       Physical Placement Tag
                     </label>
                     <input
+                      id="pulse-placement"
                       type="text"
                       value={placementLabel}
                       onChange={(e) => setPlacementLabel(e.target.value)}
                       placeholder="e.g. Table card, Bedside stand, Receipt footer, Entrance banner"
-                      className="w-full h-11 px-4 rounded-2xl bg-paper ring-1 ring-line text-xs sm:text-sm text-ink outline-none focus:ring-2 focus:ring-brand/40"
+                      className="h-11 w-full rounded-2xl bg-paper px-4 text-xs text-ink outline-none ring-1 ring-line focus:ring-2 focus:ring-brand/40 sm:text-sm"
                     />
                   </div>
 
@@ -430,54 +427,46 @@ export function PulseHubPage() {
                   />
                 </div>
 
-                <Button
-                  onClick={handleCreateAndPublish}
-                  disabled={busy}
-                  className="w-full bg-brand text-white hover:bg-brand/90 h-11 text-sm font-semibold mt-2 shadow-xs"
-                >
+                <Button onClick={handleCreateAndPublish} disabled={busy} className="mt-2 w-full">
                   {busy ? "Minting QR & Link…" : "Generate Live Pulse & QR Code"}
                 </Button>
               </div>
             </div>
 
-            {/* Right Column: Live Guest Mobile Preview Card */}
-            <div className="lg:col-span-5 space-y-4 sticky top-6">
+            <div className="space-y-4 lg:col-span-5 lg:sticky lg:top-6">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-mute">
-                  3. Live guest preview
-                </span>
-                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 motion-safe:animate-pulse" />
+                <span className="text-xs font-bold uppercase tracking-wider text-mute">3. Live guest preview</span>
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 motion-safe:animate-pulse" aria-hidden />
                   Live Reactive
                 </span>
               </div>
 
-              {/* Mobile Mockup Frame */}
-              <div className="p-4 rounded-[32px] bg-card ring-2 ring-line shadow-xl max-w-sm mx-auto">
-                <div className="w-12 h-1 bg-line rounded-full mx-auto mb-4" />
+              <div className="mx-auto max-w-sm rounded-[32px] bg-card p-4 shadow-xl ring-2 ring-line">
+                <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-line" aria-hidden />
                 {pulseImage ? (
                   <div className="relative mb-4 h-28 overflow-hidden rounded-2xl ring-1 ring-line">
                     <Photo src={pulseImage} alt="" className="h-full w-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-ink/10 to-transparent" aria-hidden />
+                    <div
+                      className="absolute inset-0 bg-gradient-to-t from-ink/60 via-ink/10 to-transparent"
+                      aria-hidden
+                    />
                     <div className="absolute inset-x-0 bottom-0 p-3 text-left">
-                      <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white">
                         {pulseName.trim() || "Your Business"}
                       </span>
                     </div>
                   </div>
                 ) : null}
-                <div className="p-4 rounded-2xl bg-paper/80 ring-1 ring-line space-y-4">
-                  <div className="text-center space-y-1">
-                    <span className="text-[10px] font-bold text-brand uppercase tracking-wider">
+                <div className="space-y-4 rounded-2xl bg-paper/80 p-4 ring-1 ring-line">
+                  <div className="space-y-1 text-center">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand">
                       {pulseName.trim() || "Your Business"}
                     </span>
-                    <h3 className="text-sm font-bold text-ink">
-                      {pulseTitle.trim() || "How was your experience?"}
-                    </h3>
+                    <h3 className="text-sm font-bold text-ink">{pulseTitle.trim() || "How was your experience?"}</h3>
                   </div>
 
-                  {/* Emoji Rating Row */}
-                  <div className="flex items-center justify-between gap-1 p-2 bg-card rounded-2xl ring-1 ring-line">
+                  <div className="flex items-center justify-between gap-1 rounded-2xl bg-card p-2 ring-1 ring-line">
                     {EMOJIS.map((item) => {
                       const active = previewRating === item.score;
                       return (
@@ -487,171 +476,119 @@ export function PulseHubPage() {
                           onClick={() => setPreviewRating(item.score)}
                           aria-pressed={active}
                           aria-label={`Preview ${item.label} rating`}
-                          className={`flex min-h-[44px] min-w-[44px] flex-col items-center justify-center rounded-xl p-1.5 transition-colors ${
-                            active
-                              ? "bg-brand/15 ring-2 ring-brand"
-                              : "hover:bg-paper opacity-75"
-                          }`}
+                          className={cn(
+                            "flex min-h-[44px] min-w-[44px] flex-col items-center justify-center rounded-xl p-1.5 transition-colors",
+                            active ? "bg-brand/15 ring-2 ring-brand" : "opacity-75 hover:bg-paper",
+                          )}
                         >
-                          <span className="text-2xl">{item.emoji}</span>
-                          <span className="text-[9px] font-semibold text-mute mt-0.5">{item.label}</span>
+                          <span className="text-2xl" aria-hidden>
+                            {item.emoji}
+                          </span>
+                          <span className="mt-0.5 text-[9px] font-semibold text-mute">{item.label}</span>
                         </button>
                       );
                     })}
                   </div>
 
-                  {/* Dynamic conditional reveal preview */}
                   {previewRating <= 2 ? (
-                    <div className="p-3.5 rounded-2xl bg-amber-500/10 ring-1 ring-amber-500/30 text-xs space-y-2 animate-in fade-in">
-                      <div className="flex items-center gap-1.5 text-amber-700 dark:text-amber-400 font-bold">
-                        <AlertCircle className="w-4 h-4 shrink-0" />
+                    <div className="space-y-2 rounded-2xl bg-amber-500/10 p-3.5 text-xs ring-1 ring-amber-500/30 animate-in fade-in">
+                      <div className="flex items-center gap-1.5 font-bold text-amber-700 dark:text-amber-400">
+                        <AlertCircle size={16} className="shrink-0" aria-hidden />
                         <span>Service Recovery Active</span>
                       </div>
-                      <p className="text-ink/80 text-[11px] leading-relaxed">
-                        Guest rates $\le 2$ $\rightarrow$ Prompts for issue categories (Food, Service, Speed, Noise) and immediately notifies front desk / manager.
+                      <p className="text-[11px] leading-relaxed text-ink/80">
+                        Guest rates ≤ 2 → Prompts for issue categories (Food, Service, Speed, Noise) and immediately
+                        notifies front desk / manager.
                       </p>
                     </div>
                   ) : (
-                    <div className="p-3.5 rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-500/30 text-xs space-y-2 animate-in fade-in">
-                      <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold">
-                        <ThumbsUp className="w-4 h-4 shrink-0" />
+                    <div className="space-y-2 rounded-2xl bg-emerald-500/10 p-3.5 text-xs ring-1 ring-emerald-500/30 animate-in fade-in">
+                      <div className="flex items-center gap-1.5 font-bold text-emerald-700 dark:text-emerald-400">
+                        <ThumbsUp size={16} className="shrink-0" aria-hidden />
                         <span>Promoter Boost Active</span>
                       </div>
-                      <p className="text-ink/80 text-[11px] leading-relaxed">
-                        Guest rates $\ge 4$ $\rightarrow$ Offers 1-click Google Review boost, tip option, or VIP club invite.
+                      <p className="text-[11px] leading-relaxed text-ink/80">
+                        Guest rates ≥ 4 → Offers 1-click Google Review boost, tip option, or VIP club invite.
                       </p>
                     </div>
                   )}
 
-                  <div className="text-center pt-1">
+                  <div className="pt-1 text-center">
                     <span className="text-[10px] text-mute">Powered by AirPal Pulse · Zero App Needed</span>
                   </div>
                 </div>
               </div>
 
-              {/* QR Code Action Output */}
               {activePublicToken && activeQrUrl && (
-                <div className="p-5 rounded-[28px] bg-emerald-500/10 ring-1 ring-emerald-500/30 space-y-3">
-                  <div className="flex items-center gap-3.5">
-                    <img
-                      src={activeQrUrl}
-                      alt="Pulse QR"
-                      className="w-20 h-20 rounded-xl ring-1 ring-line bg-white p-1.5 shadow-2xs"
-                    />
-                    <div className="space-y-1 flex-1 min-w-0">
-                      <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300">
-                        Live QR Ready for Print & Placement
-                      </div>
-                      <div className="text-[11px] font-mono text-mute truncate">
-                        {buildPulsePublicUrl(activePublicToken, publicSiteOrigin())}
-                      </div>
-                      <div className="flex flex-wrap gap-2 pt-1.5">
-                        <button
-                          type="button"
-                          onClick={handleCopyLink}
-                          className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card transition"
-                        >
-                          <Copy className="w-3 h-3" /> Copy Link
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setShowPrintModal(true)}
-                          className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition"
-                        >
-                          <Printer className="w-3 h-3" /> Print Standee
-                        </button>
-                        <a
-                          href={buildPulsePublicUrl(activePublicToken, publicSiteOrigin())}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex min-h-[44px] items-center gap-1 px-1 text-xs font-semibold text-brand hover:underline"
-                        >
-                          Test View <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <PulseQrCard
+                  qrUrl={activeQrUrl}
+                  publicUrl={buildPulsePublicUrl(activePublicToken, publicSiteOrigin())}
+                  onCopyLink={handleCopyLink}
+                  onPrint={() => setShowPrintModal(true)}
+                />
               )}
             </div>
           </div>
         </section>
 
-        {/* Live Feedback Dashboard & Issues Hub */}
-        <section id="pulse-live-hub" className="space-y-6 pt-6 border-t border-line">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <section id="pulse-live-hub" className="space-y-6 border-t border-line pt-6">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
-              <h2 className="font-display text-2xl font-bold tracking-tight flex items-center gap-2.5">
-                <Activity className="w-6 h-6 text-brand" />
+              <h2 className="font-display flex items-center gap-2.5 text-2xl font-bold tracking-tight">
+                <Activity size={24} className="text-brand" aria-hidden />
                 <span>Live Feedback & Recovery Hub</span>
               </h2>
-              <p className="text-xs sm:text-sm text-mute">
+              <p className="text-xs text-mute sm:text-sm">
                 Real-time incoming customer ratings, sentiment analysis, and service recovery tickets.
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outlined" size="sm" onClick={handleDownloadCsv} className="min-h-[44px] rounded-full text-xs">
-                <Download className="w-3.5 h-3.5 mr-1.5" />
+              <Button variant="outlined" size="sm" onClick={handleDownloadCsv}>
+                <Download size={14} aria-hidden />
                 Export CSV
               </Button>
               <Link
                 href="/helpdesk"
-                className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 min-h-[44px] text-xs font-semibold text-white shadow-xs hover:bg-brand/90 transition"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-brand/90"
               >
-                <Headphones className="w-3.5 h-3.5" />
+                <Headphones size={14} aria-hidden />
                 Help Desk Console
               </Link>
             </div>
           </div>
 
-          {/* Metric Stats Cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-4 rounded-2xl bg-card ring-1 ring-line shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-mute">Total Responses</span>
-                <QrCode size={16} className="text-brand" />
-              </div>
-              <p className="font-display text-2xl font-bold text-ink mt-2">{responses.length}</p>
-              <p className="text-[10px] text-mute mt-0.5">Scanned & submitted</p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-card ring-1 ring-line shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-mute">Average Score</span>
-                <TrendingUp size={16} className="text-emerald-500" />
-              </div>
-              <p className="font-display text-2xl font-bold text-brand mt-2">
-                {avgScore != null ? `${avgScore.toFixed(1)} / 5.0` : "5.0"}
-              </p>
-              <p className="text-[10px] text-mute mt-0.5">Customer satisfaction</p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-card ring-1 ring-line shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-mute">Open Tickets</span>
-                <AlertCircle size={16} className="text-rose-500" />
-              </div>
-              <p className={`font-display text-2xl font-bold mt-2 ${openIssues.length > 0 ? "text-rose-600 motion-safe:animate-pulse" : "text-ink"}`}>
-                {openIssues.length}
-              </p>
-              <p className="text-[10px] text-mute mt-0.5">Awaiting staff recovery</p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-card ring-1 ring-line shadow-2xs">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-mute">Resolved Cases</span>
-                <CheckCircle2 size={16} className="text-emerald-500" />
-              </div>
-              <p className="font-display text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-2">
-                {resolvedIssues.length}
-              </p>
-              <p className="text-[10px] text-mute mt-0.5">Successfully closed</p>
-            </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Metric
+              label="Total Responses"
+              icon={<QrCode size={16} className="text-brand" aria-hidden />}
+              value={responses.length}
+              sub="Scanned & submitted"
+            />
+            <Metric
+              label="Average Score"
+              icon={<TrendingUp size={16} className="text-emerald-500" aria-hidden />}
+              value={avgScore != null ? `${avgScore.toFixed(1)} / 5.0` : "5.0"}
+              valueClass="text-brand"
+              sub="Customer satisfaction"
+            />
+            <Metric
+              label="Open Tickets"
+              icon={<AlertCircle size={16} className="text-rose-500" aria-hidden />}
+              value={openIssues.length}
+              valueClass={openIssues.length > 0 ? "text-rose-600 motion-safe:animate-pulse" : undefined}
+              sub="Awaiting staff recovery"
+            />
+            <Metric
+              label="Resolved Cases"
+              icon={<CheckCircle2 size={16} className="text-emerald-500" aria-hidden />}
+              value={resolvedIssues.length}
+              valueClass="text-emerald-600 dark:text-emerald-400"
+              sub="Successfully closed"
+            />
           </div>
 
-          {/* Rating Breakdown Strip */}
           {responses.length > 0 && (
-            <div className="p-5 rounded-[28px] bg-card ring-1 ring-line shadow-2xs space-y-3">
+            <div className="space-y-3 rounded-[28px] bg-card p-5 ring-1 ring-line shadow-2xs">
               <h3 className="text-xs font-bold uppercase tracking-wider text-mute">Satisfaction Distribution</h3>
               <div className="space-y-2">
                 {[5, 4, 3, 2, 1].map((rating) => {
@@ -660,18 +597,21 @@ export function PulseHubPage() {
                   const emoji = EMOJIS.find((e) => e.score === rating)?.emoji || "⭐";
                   return (
                     <div key={rating} className="flex items-center gap-3 text-xs">
-                      <span className="w-12 font-semibold text-ink flex items-center gap-1">
-                        <span>{emoji}</span> {rating}★
+                      <span className="flex w-12 items-center gap-1 font-semibold text-ink">
+                        <span aria-hidden>{emoji}</span> {rating}★
                       </span>
-                      <div className="flex-1 h-3 rounded-full bg-paper ring-1 ring-line overflow-hidden">
+                      <div className="h-3 flex-1 overflow-hidden rounded-full bg-paper ring-1 ring-line">
                         <div
-                          className={`h-full rounded-full transition-all duration-500 ${
-                            rating >= 4 ? "bg-emerald-500" : rating === 3 ? "bg-amber-500" : "bg-rose-500"
-                          }`}
+                          className={cn(
+                            "h-full rounded-full transition-[width] duration-500",
+                            rating >= 4 ? "bg-emerald-500" : rating === 3 ? "bg-amber-500" : "bg-rose-500",
+                          )}
                           style={{ width: `${pct}%` }}
                         />
                       </div>
-                      <span className="w-12 text-right font-mono text-mute">{count} ({pct}%)</span>
+                      <span className="w-12 text-right font-mono text-mute">
+                        {count} ({pct}%)
+                      </span>
                     </div>
                   );
                 })}
@@ -679,75 +619,32 @@ export function PulseHubPage() {
             </div>
           )}
 
-          {/* Open Issues Action Board */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-display text-base font-bold flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-rose-500" />
-                <span>Service Recovery Queue ({openIssues.length})</span>
-              </h3>
-            </div>
+            <h3 className="font-display flex items-center gap-2 text-base font-bold">
+              <AlertCircle size={20} className="text-rose-500" aria-hidden />
+              <span>Service Recovery Queue ({openIssues.length})</span>
+            </h3>
 
             {openIssues.length === 0 ? (
-              <div className="p-8 rounded-[28px] bg-card ring-1 ring-line text-center space-y-2 shadow-2xs">
-                <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto" />
+              <div className="space-y-2 rounded-[28px] bg-card p-8 text-center ring-1 ring-line shadow-2xs">
+                <CheckCircle2 size={32} className="mx-auto text-emerald-500" aria-hidden />
                 <div className="font-bold text-ink">All Clear! No Open Issues</div>
-                <p className="text-xs text-mute max-w-sm mx-auto">
-                  When guests submit ratings $\le 2$ or request contact, tickets appear here and in the Help Desk in real time.
+                <p className="mx-auto max-w-sm text-xs text-mute">
+                  When guests submit ratings ≤ 2 or request contact, tickets appear here and in the Help Desk in real
+                  time.
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {openIssues.map((issue) => (
-                  <div key={issue.id} className="p-5 rounded-[28px] bg-card ring-1 ring-line space-y-3 shadow-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-rose-500/15 text-red-600 dark:text-red-400">
-                        {issue.category} · Score {issue.primaryScore ?? "?"}/5
-                      </span>
-                      <span className="text-xs text-mute">{issue.status}</span>
-                    </div>
-
-                    <div className="font-semibold text-sm text-ink leading-relaxed">{issue.summary}</div>
-
-                    {issue.contactRequested && (
-                      <div className="text-xs bg-paper p-3 rounded-xl ring-1 ring-line space-y-1">
-                        <div className="font-semibold text-brand">Guest Requested Contact:</div>
-                        <div>Name: {issue.contactName || "Guest"}</div>
-                        <div>Method: {issue.contactMethod || "Not provided"}</div>
-                      </div>
-                    )}
-
-                    <div className="space-y-2 pt-2 border-t border-line">
-                      {issue.status === "open" && (
-                        <button
-                          type="button"
-                          onClick={() => handleAcknowledge(issue.id)}
-                          className="w-full rounded-full bg-paper min-h-[44px] text-xs font-semibold text-mute hover:text-ink ring-1 ring-line transition"
-                        >
-                          Acknowledge Issue
-                        </button>
-                      )}
-
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          placeholder="Resolution note (e.g. comped drink, apologized)"
-                          value={resolutionNoteByIssue[issue.id] || ""}
-                          onChange={(e) =>
-                            setResolutionNoteByIssue({ ...resolutionNoteByIssue, [issue.id]: e.target.value })
-                          }
-                          className="flex-1 h-11 px-4 rounded-full bg-paper ring-1 ring-line text-xs text-ink outline-none focus:ring-2 focus:ring-brand/40"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleResolve(issue.id)}
-                          className="rounded-full bg-emerald-600 text-white hover:bg-emerald-700 min-h-[44px] text-xs font-semibold px-4 shadow-xs transition"
-                        >
-                          Resolve
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <PulseIssueCard
+                    key={issue.id}
+                    issue={issue}
+                    note={resolutionNoteByIssue[issue.id] || ""}
+                    onNoteChange={(value) => setResolutionNoteByIssue({ ...resolutionNoteByIssue, [issue.id]: value })}
+                    onAcknowledge={() => handleAcknowledge(issue.id)}
+                    onResolve={() => handleResolve(issue.id)}
+                  />
                 ))}
               </div>
             )}
@@ -755,53 +652,13 @@ export function PulseHubPage() {
         </section>
       </div>
 
-      {/* Printable QR Standee Modal */}
       {showPrintModal && activeQrUrl && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-sm rounded-[32px] bg-white text-zinc-900 p-8 shadow-2xl space-y-6 text-center">
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setShowPrintModal(false)}
-                aria-label="Close print preview"
-                className="grid h-11 w-11 place-items-center rounded-full text-zinc-400 hover:text-zinc-800"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="space-y-1.5">
-              <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-brand">
-                AirPal Pulse
-              </span>
-              <h3 className="font-display text-2xl font-extrabold tracking-tight">
-                {pulseName.trim() || "Your Place"}
-              </h3>
-              <p className="text-xs text-zinc-600 font-medium max-w-xs mx-auto">
-                {pulseTitle.trim() || "How was your experience today?"}
-              </p>
-            </div>
-
-            <div className="p-4 bg-zinc-50 rounded-2xl inline-block ring-1 ring-zinc-200 shadow-inner">
-              <img src={activeQrUrl} alt="Pulse QR Card" className="w-44 h-44 mx-auto rounded-lg" />
-            </div>
-
-            <div className="space-y-1">
-              <p className="text-xs font-bold text-zinc-800">Scan with Phone Camera</p>
-              <p className="text-[11px] text-zinc-500">Zero Apps · Takes 5 Seconds</p>
-            </div>
-
-            <div className="flex items-center gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="flex-1 rounded-full bg-brand text-white py-3 text-xs font-bold shadow-md hover:bg-brand-ink transition flex items-center justify-center gap-1.5"
-              >
-                <Printer size={15} /> Print Standee
-              </button>
-            </div>
-          </div>
-        </div>
+        <PrintStandeeModal
+          qrUrl={activeQrUrl}
+          businessName={pulseName.trim() || "Your Place"}
+          title={pulseTitle.trim() || "How was your experience today?"}
+          onClose={() => setShowPrintModal(false)}
+        />
       )}
     </div>
   );

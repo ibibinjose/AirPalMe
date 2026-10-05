@@ -18,16 +18,15 @@ import { NAMES } from "@shared/names";
 
 const LINKS = [
   { href: "/", label: "Home", match: (p: string) => p === "/" },
-  { href: "/explore", label: "Explore", match: (p: string) => p.startsWith("/explore") || p.startsWith("/discover") },
-  { href: "/mate", label: "Mate", match: (p: string) => p.startsWith("/mate") },
+  { href: "/now", label: "Now", match: (p: string) => p.startsWith("/now") },
   {
     href: "/plan",
     label: "Plan",
-    match: (p: string) => p.startsWith("/plan") || p.startsWith("/circle") || p.startsWith("/invite"),
+    match: (p: string) => p.startsWith("/plan") || p.startsWith("/invite"),
   },
   { href: "/pulse", label: "Pulse", match: (p: string) => p.startsWith("/pulse") },
   {
-    href: "/inbox",
+    href: "/me/inbox",
     label: "Inbox",
     match: (p: string) =>
       p.startsWith("/inbox") || p.startsWith("/chat") || p.startsWith("/messages") || p.startsWith("/me/inbox"),

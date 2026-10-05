@@ -50,10 +50,10 @@ export const CREATE_OPTIONS: CreateOption[] = [
     group: "you",
   },
   {
-    id: "mate",
-    title: "Find a Mate",
-    subtitle: "Want to do something? Find someone to go with you",
-    href: "/mate/request",
+    id: "now",
+    title: "What now?",
+    subtitle: "One suggestion for your free time, then make it a plan",
+    href: "/now",
     icon: Users,
     colorClass: "bg-emerald-500/10 text-emerald-600 ring-emerald-500/20",
     group: "you",
@@ -89,7 +89,7 @@ export const CREATE_OPTIONS: CreateOption[] = [
     id: "partner",
     title: "Business & Partner Hub",
     subtitle: "List a place, boutique stay, venue, or promotions",
-    href: "/create",
+    href: "/business",
     icon: Building2,
     colorClass: "bg-slate-500/10 text-slate-700 ring-slate-500/20",
     group: "business",
@@ -101,7 +101,7 @@ const HIDE_FAB_ROUTES = [
   /^\/plan\/new/,
   /^\/plan\/[^/]+\/edit/,
   /^\/event(\/|$)/,
-  /^\/mate\/request/,
+  /^\/now(\/|$)/,
   /^\/bio\/setup/,
   /^\/bio\/edit/,
   /^\/business\/onboard/,
@@ -294,10 +294,10 @@ export function CreateFab() {
                 <span className="text-xs text-mute">Looking for partner tools?</span>
                 <button
                   type="button"
-                  onClick={() => handleSelect("/create")}
+                  onClick={() => handleSelect("/business")}
                   className="inline-flex items-center gap-1 text-xs font-bold text-brand hover:underline cursor-pointer"
                 >
-                  <span>Open Creator Hub</span>
+                  <span>Open Business Hub</span>
                   <ArrowRight size={13} />
                 </button>
               </div>

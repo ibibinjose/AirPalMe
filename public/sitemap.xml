@@ -2,29 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://airpal.me/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
   <url><loc>https://airpal.me/start</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://airpal.me/mate</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://airpal.me/concierge</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://airpal.me/Demo</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://airpal.me/fashion</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://airpal.me/discover</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
   <url><loc>https://airpal.me/plan</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://airpal.me/circle</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://airpal.me/giveaways</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://airpal.me/promotions</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
   <url><loc>https://airpal.me/getAirPalApp</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://airpal.me/experiences</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://airpal.me/solutions</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://airpal.me/guide</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://airpal.me/events</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
   <url><loc>https://airpal.me/calendar</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://airpal.me/business</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://airpal.me/business/onboard</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://airpal.me/club</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://airpal.me/club/list</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
   <url><loc>https://airpal.me/join</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://airpal.me/partners</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://airpal.me/studio</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
-  <url><loc>https://airpal.me/marketing</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://airpal.me/about</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://airpal.me/trust</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://airpal.me/event</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
@@ -39,4 +26,6 @@
   <url><loc>https://airpal.me/privacy</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
   <url><loc>https://airpal.me/terms</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
   <url><loc>https://airpal.me/cookies</loc><changefreq>monthly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://airpal.me/now</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://airpal.me/deals</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
 </urlset>

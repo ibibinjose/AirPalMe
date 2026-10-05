@@ -494,17 +494,17 @@ export function PlanHubPage() {
               </div>
               <h2 className="font-display text-xl font-bold text-ink">Nothing saved yet</h2>
               <p className="mt-1.5 text-sm text-mute max-w-sm mx-auto">
-                Tap the heart on any event or experience in {effectiveCity} to save it here for upcoming hangouts.
+                Tap the heart on any event in {effectiveCity} to save it here for upcoming hangouts.
               </p>
               <div className="mt-6">
                 <Button
                   onClick={() => {
                     void triggerHaptic("light");
-                    nav("/explore");
+                    nav("/calendar");
                   }}
                   className="h-11 rounded-full px-6 font-bold shadow-xs"
                 >
-                  <span>Explore Events & Stays</span>
+                  <span>What&apos;s on</span>
                 </Button>
               </div>
             </div>

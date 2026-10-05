@@ -181,7 +181,7 @@ export function InboxPage() {
       await markNotificationRead(n.id);
       setNotes((rows) => rows.map((row) => (row.id === n.id ? { ...row, read: true } : row)));
     }
-    nav(n.href || "/circle");
+    nav(n.href || "/plan");
   }
 
   async function markSegmentRead(rows: PromotionNotification[]) {
@@ -459,13 +459,13 @@ export function InboxPage() {
               </span>
               <p className="font-display mt-4 text-xl font-bold text-ink">Nothing yet</p>
               <p className="mx-auto mt-1 max-w-xs text-[14px] leading-relaxed text-mute">
-                Catch-ups, meetings, waves, and rewards land here as they happen.
+                Catch-ups, meetings, waves, and deals land here as they happen.
               </p>
               <Link
-                href="/giveaways"
+                href="/deals"
                 className="mt-5 inline-block text-[14px] font-bold text-brand hover:underline"
               >
-                Browse giveaways
+                Browse deals
               </Link>
             </div>
           ) : (

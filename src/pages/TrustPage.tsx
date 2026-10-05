@@ -212,15 +212,11 @@ export function TrustPage() {
         <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-ink/80">
           <li>The public website is live: guests can browse places, stays, plans and events without an account.</li>
           <li>
-            An interactive demonstration showcase walks the full loop (
-            <Link href="/DemoHotel" className="font-semibold text-brand hover:underline">
-              demo hotel
+            A live Stay & Guide demo (
+            <Link href="/concierge" className="font-semibold text-brand hover:underline">
+              concierge
             </Link>
-            ,{" "}
-            <Link href="/Demo" className="font-semibold text-brand hover:underline">
-              showcase tour
-            </Link>
-            ) — labelled as a demonstration, not a customer.
+            ) shows the guest loop — labelled as a demonstration, not a customer.
           </li>
           <li>Reporting, blocking and human admin review are part of the product from day one.</li>
         </ul>

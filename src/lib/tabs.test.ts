@@ -3,12 +3,12 @@ import { tabFromPath } from "./tabs";
 
 describe("tabFromPath", () => {
   it("maps the companion tabs", () => {
+    expect(tabFromPath("/now")).toBe("explore");
     expect(tabFromPath("/explore")).toBe("explore");
     expect(tabFromPath("/calendar")).toBe("explore");
     expect(tabFromPath("/plan")).toBe("trips");
     expect(tabFromPath("/plan/new")).toBe("trips");
     expect(tabFromPath("/invite/abc")).toBe("trips");
-    expect(tabFromPath("/circle")).toBe("trips");
     expect(tabFromPath("/scan")).toBe("scan");
     expect(tabFromPath("/w/abcd")).toBe("scan");
     expect(tabFromPath("/me/inbox")).toBe("inbox");
@@ -28,16 +28,16 @@ describe("tabFromPath", () => {
     expect(tabFromPath("/")).toBe("home");
   });
 
-  it("maps Mate to explore fallback", () => {
+  it("falls back to explore for removed Phase 6 routes", () => {
     expect(tabFromPath("/mate")).toBe("explore");
     expect(tabFromPath("/mate/request")).toBe("explore");
+    expect(tabFromPath("/circle")).toBe("explore");
+    expect(tabFromPath("/experiences")).toBe("explore");
   });
 
   it("parks directory and account under Explore, not extra tabs", () => {
-    expect(tabFromPath("/promotions")).toBe("explore");
-    expect(tabFromPath("/giveaways")).toBe("explore");
+    expect(tabFromPath("/deals")).toBe("explore");
     expect(tabFromPath("/guide")).toBe("explore");
-    expect(tabFromPath("/experiences")).toBe("explore");
     expect(tabFromPath("/join")).toBe("explore");
   });
 });

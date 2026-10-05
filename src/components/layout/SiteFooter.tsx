@@ -9,20 +9,18 @@ import { cn } from "@/lib/cn";
 
 const NAV_EXPLORE = [
   { href: "/", label: "Discover" },
-  { href: "/mate", label: "AirPal Mate" },
-  { href: "/circle", label: "Circle" },
+  { href: "/now", label: "What now?" },
   { href: "/plan", label: "Plans" },
   { href: "/pulse", label: "AirPal Pulse" },
-  { href: "/experiences", label: "Experiences" },
+  { href: "/deals", label: "Deals" },
   { href: "/calendar", label: "Events" },
   { href: "/guide", label: "Tours" },
   { href: "/concierge", label: "Stay" },
-  { href: "/DemoHotel", label: "Live demo" },
-  { href: "/Demo", label: "Showcase tour" },
+  { href: "/getAirPalApp", label: "Get the app" },
 ];
 
 const NAV_HOSPITALITY = [
-  { href: "/create", label: "Create anything" },
+  { href: "/business/promotions/new", label: "Create offer" },
   { href: "/pulse", label: "Create a Pulse" },
   { href: "/join", label: "Partner account" },
   { href: "/business", label: "Your place" },
@@ -36,6 +34,7 @@ const NAV_LEGAL = [
   { href: "/about", label: "About" },
   { href: "/trust", label: "Trust & facts" },
   { href: "/contact", label: "Contact" },
+  { href: "/assist", label: "Support" },
   { href: "/help", label: "Help center" },
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
@@ -99,7 +98,7 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
           <div>
             <p className="text-[13px] font-semibold text-white/90">Explore</p>
             <ul className="mt-4 space-y-2.5 text-sm">
-              {NAV_EXPLORE.map((item) => (
+              {NAV_EXPLORE.filter((item) => !isNative || item.href !== "/getAirPalApp").map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className="text-white/70 transition hover:text-white">
                     {item.label}

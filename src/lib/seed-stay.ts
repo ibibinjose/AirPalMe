@@ -61,8 +61,6 @@ export function harbourStaySeeds(): HarbourStaySeed[] {
   });
 }
 
-/** Public marketing path for the Harbour stay QR showcase (shareable demo link). */
-export const DEMO_HOTEL_PUBLIC_PATH = "/DemoHotel";
 export const DEMO_HOTEL_PROPERTY_ID = "harbour-hotel";
 export const DEMO_HOTEL_ROOM_TOKEN = "tok-101-demo";
 

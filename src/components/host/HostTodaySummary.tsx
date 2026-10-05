@@ -99,12 +99,12 @@ export function HostTodaySummary({
 
         <button
           type="button"
-          onClick={() => nav("/business/campaigns")}
+          onClick={() => nav("/business/promotions")}
           className="flex items-center justify-between gap-3 rounded-[22px] bg-ink p-4 text-left text-white shadow-xs hover:bg-ink/90 transition active:scale-[0.99]"
         >
           <span>
-            <span className="block text-sm font-semibold">Fill slow nights with an Experience</span>
-            <span className="block text-xs text-white/70">AirPal recruits the guests, you host.</span>
+            <span className="block text-sm font-semibold">Fill slow nights with an offer</span>
+            <span className="block text-xs text-white/70">Promotions bring the guests, you host.</span>
           </span>
           <span aria-hidden>→</span>
         </button>

@@ -5,16 +5,10 @@ import { BIO_PUBLIC_PATH } from "@shared/bio";
 // Eager load the landing page for instant first paint; every other route splits out.
 import { HomePage } from "@/pages/HomePage";
 
-// Code-split all other pages dynamically for fast initial bundle
-const ExplorePage = lazy(() => import("@/pages/ExplorePage").then((m) => ({ default: m.ExplorePage })));
+// Phase 6 (Subtraction): only V1 routes ship. Deleted surfaces (Mate/strangers,
+// duplicate directories, P3/P4 verticals, vanity) redirect to their V1 owner or 404.
 const NowPage = lazy(() => import("@/pages/NowPage").then((m) => ({ default: m.NowPage })));
 const ConciergePage = lazy(() => import("@/pages/ConciergePage").then((m) => ({ default: m.ConciergePage })));
-const CirclePage = lazy(() => import("@/pages/CirclePage").then((m) => ({ default: m.CirclePage })));
-const CompanionPage = lazy(() => import("@/pages/CompanionPage").then((m) => ({ default: m.CompanionPage })));
-const SolutionsPage = lazy(() => import("@/pages/SolutionsPage").then((m) => ({ default: m.SolutionsPage })));
-const SolutionDetailPage = lazy(() =>
-  import("@/pages/SolutionDetailPage").then((m) => ({ default: m.SolutionDetailPage })),
-);
 const GuidePage = lazy(() => import("@/pages/GuidePage").then((m) => ({ default: m.GuidePage })));
 const TourPage = lazy(() => import("@/pages/TourPage").then((m) => ({ default: m.TourPage })));
 const ScanPage = lazy(() => import("@/pages/ScanPage").then((m) => ({ default: m.ScanPage })));
@@ -32,18 +26,13 @@ const OrganiserEventPage = lazy(() =>
 
 const MePage = lazy(() => import("@/pages/MePage").then((m) => ({ default: m.MePage })));
 const MyTicketsPage = lazy(() => import("@/pages/MyTicketsPage").then((m) => ({ default: m.MyTicketsPage })));
-const RewardsPage = lazy(() => import("@/pages/RewardsPage").then((m) => ({ default: m.RewardsPage })));
 const InboxPage = lazy(() => import("@/pages/InboxPage").then((m) => ({ default: m.InboxPage })));
-const ZooPage = lazy(() => import("@/pages/ZooPage").then((m) => ({ default: m.ZooPage })));
 const MemoryWallPage = lazy(() => import("@/pages/MemoryWallPage").then((m) => ({ default: m.MemoryWallPage })));
-const PeoplePage = lazy(() => import("@/pages/PeoplePage").then((m) => ({ default: m.PeoplePage })));
 const SettingsPage = lazy(() => import("@/pages/SettingsPage").then((m) => ({ default: m.SettingsPage })));
 const MarkerPage = lazy(() => import("@/pages/MarkerPage").then((m) => ({ default: m.MarkerPage })));
 const StayPage = lazy(() => import("@/pages/StayPage").then((m) => ({ default: m.StayPage })));
 const StayListPage = lazy(() => import("@/pages/StayListPage").then((m) => ({ default: m.StayListPage })));
 const StayProfilePage = lazy(() => import("@/pages/StayProfilePage").then((m) => ({ default: m.StayProfilePage })));
-const DemoHotelPage = lazy(() => import("@/pages/DemoHotelPage").then((m) => ({ default: m.DemoHotelPage })));
-const DemoPage = lazy(() => import("@/pages/DemoPage").then((m) => ({ default: m.DemoPage })));
 const HostPage = lazy(() => import("@/pages/HostPage").then((m) => ({ default: m.HostPage })));
 const HostPulsePage = lazy(() => import("@/pages/HostPulsePage").then((m) => ({ default: m.HostPulsePage })));
 const PulseHubPage = lazy(() => import("@/pages/PulseHubPage").then((m) => ({ default: m.PulseHubPage })));
@@ -51,7 +40,6 @@ const PulsePublicPage = lazy(() => import("@/pages/PulsePublicPage").then((m) =>
 const StartPage = lazy(() => import("@/pages/StartPage").then((m) => ({ default: m.StartPage })));
 const AuthActionPage = lazy(() => import("@/pages/AuthActionPage").then((m) => ({ default: m.AuthActionPage })));
 const PartnersPage = lazy(() => import("@/pages/PartnersPage").then((m) => ({ default: m.PartnersPage })));
-const CreatePage = lazy(() => import("@/pages/CreatePage").then((m) => ({ default: m.CreatePage })));
 const PartnerPage = lazy(() => import("@/pages/PartnerPage").then((m) => ({ default: m.PartnerPage })));
 const JoinPage = lazy(() => import("@/pages/JoinPage").then((m) => ({ default: m.JoinPage })));
 const FoundersPage = lazy(() => import("@/pages/FoundersPage").then((m) => ({ default: m.FoundersPage })));
@@ -66,13 +54,10 @@ const BioPublicPage = lazy(() => import("@/pages/BioPublicPage").then((m) => ({ 
 const BioSetupPage = lazy(() => import("@/pages/BioSetupPage").then((m) => ({ default: m.BioSetupPage })));
 const BioEditPage = lazy(() => import("@/pages/BioEditPage").then((m) => ({ default: m.BioEditPage })));
 const BioRecoverPage = lazy(() => import("@/pages/BioRecoverPage").then((m) => ({ default: m.BioRecoverPage })));
-const SearchPage = lazy(() => import("@/pages/SearchPage").then((m) => ({ default: m.SearchPage })));
 const SearchAnalyticsPage = lazy(() =>
   import("@/pages/SearchAnalyticsPage").then((m) => ({ default: m.SearchAnalyticsPage })),
 );
-const CampusPage = lazy(() => import("@/pages/CampusPage").then((m) => ({ default: m.CampusPage })));
 const AdminPage = lazy(() => import("@/pages/AdminPage").then((m) => ({ default: m.AdminPage })));
-const GiveawaysPage = lazy(() => import("@/pages/GiveawaysPage").then((m) => ({ default: m.GiveawaysPage })));
 const PromotionsPage = lazy(() => import("@/pages/PromotionsPage").then((m) => ({ default: m.PromotionsPage })));
 const PromotionDetailPage = lazy(() =>
   import("@/pages/PromotionDetailPage").then((m) => ({ default: m.PromotionDetailPage })),
@@ -92,16 +77,6 @@ const BusinessPromotionNewPage = lazy(() =>
 const BusinessPromotionDetailPage = lazy(() =>
   import("@/pages/BusinessPromotionDetailPage").then((m) => ({ default: m.BusinessPromotionDetailPage })),
 );
-const BirthdayFreebiesPage = lazy(() =>
-  import("@/pages/BirthdayFreebiesPage").then((m) => ({ default: m.BirthdayFreebiesPage })),
-);
-const BusinessBirthdayOffersPage = lazy(() =>
-  import("@/pages/BusinessBirthdayOffersPage").then((m) => ({ default: m.BusinessBirthdayOffersPage })),
-);
-const AdminBirthdayOffersPage = lazy(() =>
-  import("@/pages/AdminBirthdayOffersPage").then((m) => ({ default: m.AdminBirthdayOffersPage })),
-);
-const MyGiveawaysPage = lazy(() => import("@/pages/MyGiveawaysPage").then((m) => ({ default: m.MyGiveawaysPage })));
 const NotificationsAdminPage = lazy(() =>
   import("@/pages/NotificationsAdminPage").then((m) => ({ default: m.NotificationsAdminPage })),
 );
@@ -117,21 +92,6 @@ const UnsubscribePage = lazy(() => import("@/pages/UnsubscribePage").then((m) =>
 const PrivacyPage = lazy(() => import("@/pages/PrivacyPage").then((m) => ({ default: m.PrivacyPage })));
 const TermsPage = lazy(() => import("@/pages/TermsPage").then((m) => ({ default: m.TermsPage })));
 const CookiesPage = lazy(() => import("@/pages/CookiesPage").then((m) => ({ default: m.CookiesPage })));
-const ClubPage = lazy(() => import("@/pages/ClubPage").then((m) => ({ default: m.ClubPage })));
-const ClubListPage = lazy(() => import("@/pages/ClubListPage").then((m) => ({ default: m.ClubListPage })));
-const MatePage = lazy(() => import("@/pages/MatePage").then((m) => ({ default: m.MatePage })));
-const MateRequestPage = lazy(() => import("@/pages/MateRequestPage").then((m) => ({ default: m.MateRequestPage })));
-const StudioPage = lazy(() => import("@/pages/StudioPage").then((m) => ({ default: m.StudioPage })));
-const MarketingPage = lazy(() => import("@/pages/MarketingPage").then((m) => ({ default: m.MarketingPage })));
-const BusinessCampaignsPage = lazy(() =>
-  import("@/pages/BusinessCampaignsPage").then((m) => ({ default: m.BusinessCampaignsPage })),
-);
-const ExperiencesPage = lazy(() => import("@/pages/ExperiencesPage").then((m) => ({ default: m.ExperiencesPage })));
-const FashionPage = lazy(() => import("@/pages/FashionPage").then((m) => ({ default: m.FashionPage })));
-const FestivalPage = lazy(() => import("@/pages/FestivalPage").then((m) => ({ default: m.FestivalPage })));
-const FestivalCreatePage = lazy(() =>
-  import("@/pages/FestivalCreatePage").then((m) => ({ default: m.FestivalCreatePage })),
-);
 const PlanHubPage = lazy(() => import("@/pages/PlanHubPage").then((m) => ({ default: m.PlanHubPage })));
 const PlanCreatePage = lazy(() => import("@/pages/PlanCreatePage").then((m) => ({ default: m.PlanCreatePage })));
 const PlanDetailPage = lazy(() => import("@/pages/PlanDetailPage").then((m) => ({ default: m.PlanDetailPage })));
@@ -153,43 +113,32 @@ export function AppRoutes() {
       <Switch>
         <Route path="/" component={HomePage} />
         <Route path="/now" component={NowPage} />
-        <Route path="/search/analytics" component={SearchAnalyticsPage} />
-        <Route path="/admin/search-analytics">
-          <Redirect to="/search/analytics" />
+        {/* One composer: every legacy discovery front door lands on /now. */}
+        <Route path="/explore">
+          <Redirect to="/now" />
         </Route>
-        <Route path="/search" component={SearchPage} />
-        <Route path="/mate" component={MatePage} />
-        <Route path="/mate/request" component={MateRequestPage} />
-        <Route path="/explore" component={ExplorePage} />
         <Route path="/discover">
-          <Redirect to="/explore" />
+          <Redirect to="/now" />
         </Route>
         <Route path="/discovery">
-          <Redirect to="/explore" />
+          <Redirect to="/now" />
         </Route>
-        <Route path="/listings">
-          <Redirect to="/partners" />
+        <Route path="/search">
+          <Redirect to="/now" />
         </Route>
-        <Route path="/solutions/:id" component={SolutionDetailPage} />
-        <Route path="/solutions" component={SolutionsPage} />
+        <Route path="/admin/search-analytics" component={SearchAnalyticsPage} />
+        <Route path="/search/analytics">
+          <Redirect to="/admin/search-analytics" />
+        </Route>
         <Route path="/guide" component={GuidePage} />
         <Route path="/tour/:id" component={TourPage} />
         <Route path="/scan" component={ScanPage} />
         <Route path="/w/:code" component={WavePage} />
         <Route path="/concierge" component={ConciergePage} />
         <Route path="/stay" component={StayListPage} />
-        <Route path="/companion" component={CompanionPage} />
         <Route path="/g/:id" component={StayPage} />
         <Route path="/stay/@:handle" component={StayProfilePage} />
         <Route path="/stay/:id" component={StayPage} />
-        <Route path="/DemoHotel" component={DemoHotelPage} />
-        <Route path="/demohotel">
-          <Redirect to="/DemoHotel" />
-        </Route>
-        <Route path="/Demo" component={DemoPage} />
-        <Route path="/demo">
-          <Redirect to="/Demo" />
-        </Route>
         <Route path="/q/:city/:handle" component={MarkerPage} />
         <Route path="/q/:a" component={MarkerPage} />
         <Route path="/q">
@@ -200,8 +149,6 @@ export function AppRoutes() {
         <Route path="/e/:id/guests" component={GuestlistPage} />
         <Route path="/e/:id" component={EventPage} />
         <Route path="/ticket/:id" component={TicketPage} />
-        <Route path="/f/new" component={FestivalCreatePage} />
-        <Route path="/f/:slug" component={FestivalPage} />
         <Route path="/calendar" component={CalendarPage} />
         <Route path="/events" component={EventsPage} />
         <Route path="/plans">
@@ -217,22 +164,20 @@ export function AppRoutes() {
           <Redirect to="/event" />
         </Route>
         <Route path="/event" component={OrganiserEventPage} />
-        <Route path="/me/zoo" component={ZooPage} />
         <Route path="/me/memories" component={MemoryWallPage} />
-        <Route path="/me/people" component={PeoplePage} />
-        <Route path="/inbox" component={InboxPage} />
-        <Route path="/chat" component={InboxPage} />
-        <Route path="/messages" component={InboxPage} />
         <Route path="/me/inbox" component={InboxPage} />
+        <Route path="/inbox">
+          <Redirect to="/me/inbox" />
+        </Route>
+        <Route path="/chat">
+          <Redirect to="/me/inbox" />
+        </Route>
+        <Route path="/messages">
+          <Redirect to="/me/inbox" />
+        </Route>
         <Route path="/me/tickets" component={MyTicketsPage} />
-        <Route path="/me/rewards" component={RewardsPage} />
-        <Route path="/circle" component={CirclePage} />
         <Route path="/me" component={MePage} />
         <Route path="/settings" component={SettingsPage} />
-        <Route path="/c/:id" component={CampusPage} />
-        <Route path="/campus">
-          <Redirect to="/c/harbour-college" />
-        </Route>
         <Route path="/host/pulse" component={HostPulsePage} />
         <Route path="/host" component={HostPage} />
         <Route path="/pulse" component={PulseHubPage} />
@@ -244,19 +189,16 @@ export function AppRoutes() {
         <Route path="/auth/action" component={AuthActionPage} />
         <Route path="/join" component={JoinPage} />
         <Route path="/founders" component={FoundersPage} />
-        <Route path="/fashion" component={FashionPage} />
-        <Route path="/club/list" component={ClubListPage} />
-        <Route path="/club" component={ClubPage} />
         <Route path="/business/onboard" component={BusinessOnboardPage} />
         <Route path="/business/setup" component={BusinessShowcasePage} />
-        <Route path="/business/campaigns" component={BusinessCampaignsPage} />
-        <Route path="/business/helpdesk" component={HelpDeskPage} />
-        <Route path="/host/helpdesk" component={HelpDeskPage} />
+        <Route path="/business/helpdesk">
+          <Redirect to="/helpdesk" />
+        </Route>
+        <Route path="/host/helpdesk">
+          <Redirect to="/helpdesk" />
+        </Route>
         <Route path="/helpdesk" component={HelpDeskPage} />
         <Route path="/business" component={BusinessPage} />
-        <Route path="/experiences" component={ExperiencesPage} />
-        <Route path="/studio" component={StudioPage} />
-        <Route path="/marketing" component={MarketingPage} />
         <Route path="/bio/setup" component={BioSetupPage} />
         <Route path="/bio/edit" component={BioEditPage} />
         <Route path="/bio/recover" component={BioRecoverPage} />
@@ -268,34 +210,38 @@ export function AppRoutes() {
         </Route>
         <Route path="/partners" component={PartnersPage} />
         <Route path="/partner" component={PartnerPage} />
-        <Route path="/create" component={CreatePage} />
+        <Route path="/listings">
+          <Redirect to="/partners" />
+        </Route>
         <Route path="/admin" component={AdminPage} />
         <Route path="/admin/promotions" component={PromotionsAdminPage} />
         <Route path="/admin/promotions/:id" component={PromotionAdminDetailPage} />
         <Route path="/business/promotions/new" component={BusinessPromotionNewPage} />
         <Route path="/business/promotions/:id" component={BusinessPromotionDetailPage} />
         <Route path="/business/promotions" component={BusinessPromotionsPage} />
-        <Route path="/business/birthday-offers/new" component={BusinessBirthdayOffersPage} />
-        <Route path="/business/birthday-offers/:id" component={BusinessBirthdayOffersPage} />
-        <Route path="/business/birthday-offers" component={BusinessBirthdayOffersPage} />
-        <Route path="/admin/birthday-offers" component={AdminBirthdayOffersPage} />
-        <Route path="/birthday-freebies/:region" component={BirthdayFreebiesPage} />
-        <Route path="/birthday-freebies" component={BirthdayFreebiesPage} />
-        <Route path="/me/giveaways" component={MyGiveawaysPage} />
         <Route path="/admin/notifications" component={NotificationsAdminPage} />
-        <Route path="/giveaways/:id">
-          <PromotionDetailPage kind="giveaway" />
-        </Route>
-        <Route path="/giveaways" component={GiveawaysPage} />
-        <Route path="/promotions/:id">
-          <PromotionDetailPage kind="promotion" />
-        </Route>
-        <Route path="/promotions" component={PromotionsPage} />
+        {/* One deals surface: legacy deal homes land on /deals. */}
         <Route path="/deals/:id">
           <PromotionDetailPage kind="promotion" />
         </Route>
         <Route path="/deals" component={PromotionsPage} />
-        <Route path="/offers" component={PromotionsPage} />
+        <Route path="/offers">
+          <Redirect to="/deals" />
+        </Route>
+        <Route path="/promotions">
+          <Redirect to="/deals" />
+        </Route>
+        <Route path="/promotions/:id">{(p) => <Redirect to={`/deals/${p.id}`} />}</Route>
+        <Route path="/giveaways">
+          <Redirect to="/deals" />
+        </Route>
+        <Route path="/giveaways/:id">{(p) => <Redirect to={`/deals/${p.id}`} />}</Route>
+        <Route path="/birthday-freebies">
+          <Redirect to="/deals" />
+        </Route>
+        <Route path="/birthday-freebies/:region">
+          <Redirect to="/deals" />
+        </Route>
         <Route path="/getAirPalApp" component={GetAirPalPage} />
         <Route path="/getAirPal">
           <Redirect to="/getAirPalApp" />

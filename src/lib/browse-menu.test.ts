@@ -14,7 +14,7 @@ describe("browse menu", () => {
     expect(matched("/offers")).toEqual(["Offers & Deals"]);
     expect(matched("/deals/summer")).toEqual(["Offers & Deals"]);
     expect(matched("/promotions/1")).toEqual(["Offers & Deals"]);
-    expect(matched("/experiences")).toEqual(["Experiences"]);
+    expect(matched("/now")).toEqual(["What now?"]);
   });
 
   it("matches nothing outside the browse categories", () => {
@@ -35,7 +35,7 @@ describe("browse menu", () => {
   });
 
   it("shows the mobile strip on Home and browse-context routes only", () => {
-    for (const path of ["/", "/explore", "/stay", "/stay/@x", "/events", "/calendar", "/offers"]) {
+    for (const path of ["/", "/explore", "/now", "/stay", "/stay/@x", "/events", "/calendar", "/offers"]) {
       expect(showBrowseStrip(path)).toBe(true);
     }
     for (const path of ["/mate", "/plan", "/pulse", "/inbox", "/me", "/host", "/settings"]) {

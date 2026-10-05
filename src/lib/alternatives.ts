@@ -39,7 +39,7 @@ export const ALTERNATIVES: Record<string, AlternativeConfig> = {
     competitorDescriptor: "group-based event platform",
     headline: "A Meetup alternative for casual plans",
     intro:
-      "Meetup organises strangers into groups. AirPal.Me starts from your own circle: make a shared plan with stops, votes and RSVPs, find a verified Mate to go with you, and see what's on nearby — all on one account.",
+      "Meetup organises strangers into groups. AirPal.Me starts from your own people: make a shared plan with stops, votes and RSVPs, and see what's on nearby — all on one account.",
     useCases: [
       {
         title: "Group plans",
@@ -48,10 +48,10 @@ export const ALTERNATIVES: Record<string, AlternativeConfig> = {
         cta: "Make a plan",
       },
       {
-        title: "Find company",
-        body: "Going alone? Send a request with what, when and where; approved Mates accept, then you chat and plan together.",
-        href: "/mate",
-        cta: "Find a Mate",
+        title: "What now?",
+        body: "Tell AirPal your urge and time window — get one suggestion for right now, then make it a plan in one tap.",
+        href: "/now",
+        cta: "What now?",
       },
       {
         title: "What's on",
@@ -61,10 +61,10 @@ export const ALTERNATIVES: Record<string, AlternativeConfig> = {
       },
     ],
     criteria: [
-      { check: "Who it's for", airpal: "Your own circle plus verified locals met one-to-one" },
+      { check: "Who it's for", airpal: "Your own people — friends, family, colleagues" },
       { check: "Planning tools", airpal: "Shared plans with stops, votes, comments and RSVPs" },
-      { check: "Finding company", airpal: "Verified Mate requests; members are 18+" },
-      { check: "Local discovery", airpal: "Events, experiences and places nearby" },
+      { check: "Finding company", airpal: "Shared plans with your own people" },
+      { check: "Local discovery", airpal: "Events, deals and places nearby" },
       { check: "Guest access", airpal: "Web guests browse without an account" },
     ],
     primaryCta: { href: "/plan", label: "Make a plan" },
@@ -127,9 +127,9 @@ export const ALTERNATIVES: Record<string, AlternativeConfig> = {
       },
       {
         title: "Events for guests",
-        body: "Experiences and events near the stay that guests find on their own.",
-        href: "/experiences",
-        cta: "Browse experiences",
+        body: "Events near the stay that guests find on their own.",
+        href: "/events",
+        cta: "Browse events",
       },
     ],
     criteria: [
@@ -162,16 +162,16 @@ export const ALTERNATIVES: Record<string, AlternativeConfig> = {
         cta: "Make a plan",
       },
       {
-        title: "Find company",
-        body: "Going alone? Request a verified local Mate to join.",
-        href: "/mate",
-        cta: "Find a Mate",
+        title: "What now?",
+        body: "Tell AirPal your urge and time window — get one suggestion for right now, then make it a plan in one tap.",
+        href: "/now",
+        cta: "What now?",
       },
     ],
     criteria: [
       { check: "Ticketing", airpal: "Free and ticketed events with door check-in" },
       { check: "Group coordination", airpal: "Shared plans on the same platform" },
-      { check: "Finding company", airpal: "Verified Mate requests; members are 18+" },
+      { check: "Finding company", airpal: "Shared plans with your own people" },
       { check: "Payouts", airpal: "Released after delivery" },
       { check: "Guest access", airpal: "Web guests browse without an account" },
     ],

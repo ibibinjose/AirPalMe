@@ -1,7 +1,6 @@
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AppShell } from "@/components/layout/AppShell";
-import { ZooLayer } from "@/components/zoo/ZooLayer";
 import { SignInPrompt } from "@/components/auth/SignInPrompt";
 import { ScrollProbe } from "@/components/debug/ScrollProbe";
 import { DebugInfoOverlay } from "@/components/debug/DebugInfoOverlay";
@@ -29,7 +28,6 @@ function Boot() {
   return (
     <AppShell>
       <AppRoutes />
-      <ZooLayer />
       <SignInPrompt />
       <ScrollProbe />
       <DebugInfoOverlay />

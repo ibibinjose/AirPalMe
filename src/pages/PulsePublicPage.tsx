@@ -230,7 +230,10 @@ export function PulsePublicPage() {
         </div>
       )}
       <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-line">
-        <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${Math.round(progress * 100)}%` }} />
+        <div
+          className="h-full rounded-full bg-brand transition-[width]"
+          style={{ width: `${Math.round(progress * 100)}%` }}
+        />
       </div>
 
       {showContact ? (
@@ -240,18 +243,21 @@ export function PulsePublicPage() {
           <input
             className="h-11 w-full rounded-full border border-line bg-paper px-4 text-[15px] outline-none focus:border-brand"
             placeholder="Name"
+            aria-label="Your name (optional)"
             value={contactName}
             onChange={(e) => setContactName(e.target.value)}
           />
           <input
             className="h-11 w-full rounded-full border border-line bg-paper px-4 text-[15px] outline-none focus:border-brand"
             placeholder="Phone or email"
+            aria-label="Phone or email for follow-up (optional)"
             value={contactMethod}
             onChange={(e) => setContactMethod(e.target.value)}
           />
           <input
             className="h-11 w-full rounded-full border border-line bg-paper px-4 text-[15px] outline-none focus:border-brand"
             placeholder="Room number (optional)"
+            aria-label="Room number (optional)"
             value={roomNumber}
             onChange={(e) => setRoomNumber(e.target.value)}
           />
@@ -351,6 +357,7 @@ export function PulsePublicPage() {
               <textarea
                 className="min-h-[100px] w-full rounded-2xl border border-line bg-paper p-3 text-[15px] outline-none focus:border-brand"
                 placeholder="A short note"
+                aria-label={current.prompt}
                 maxLength={500}
                 value={String(answers.find((a) => a.questionId === current.id)?.value || "")}
                 onChange={(e) => setAnswer(current, e.target.value)}

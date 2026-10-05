@@ -45,17 +45,12 @@ function screenNameForPath(path: string): string {
   if (path === "/plan") return "Plan Hub";
   if (path === "/plan/new") return "New Plan";
   if (path.startsWith("/plan/")) return "Plan Detail";
-  if (path === "/companion") return "Travel Companion";
-  if (path === "/zoo") return "Zoo Hunt";
-  if (path === "/club") return "Clubs";
   if (path === "/settings") return "Settings";
   if (path.startsWith("/p/")) return "Place Detail";
   if (path.startsWith("/e/")) return "Event Detail";
   if (path.startsWith("/host")) return "Host Workspace";
   if (path.startsWith("/bio/")) return "Bio Profile";
-  if (path.startsWith("/campus/")) return "Campus View";
   if (path.startsWith("/marker/")) return "Street Marker";
-  if (path === "/circle") return "Guest Circle";
   if (path === "/about") return "About";
   if (path === "/contact") return "Contact";
   if (path === "/privacy") return "Privacy Policy";

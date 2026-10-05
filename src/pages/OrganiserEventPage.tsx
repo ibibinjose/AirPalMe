@@ -501,19 +501,6 @@ export function OrganiserEventPage() {
                     </button>
                   );
                 })}
-                <button
-                  type="button"
-                  onClick={() => nav("/f/new")}
-                  className="rounded-2xl p-4 text-left ring-1 transition duration-200 active:scale-[0.98] bg-paper ring-line hover:ring-brand/30 hover:bg-card"
-                >
-                  <span className="grid h-10 w-10 place-items-center rounded-xl ring-1 bg-brand/10 text-brand ring-brand/20">
-                    <CalendarDays size={18} />
-                  </span>
-                  <span className="mt-3 block text-sm font-bold">Festival week</span>
-                  <span className="mt-1 block text-[11px] leading-snug text-mute">
-                    A multi-day program of sessions. Builds at /f/new →
-                  </span>
-                </button>
               </div>
             </div>
 
@@ -1119,7 +1106,7 @@ export function OrganiserEventPage() {
             {/* Growth Campaign Banner */}
             <button
               type="button"
-              onClick={() => nav("/business/campaigns")}
+              onClick={() => nav("/business/promotions")}
               className="flex w-full items-center justify-between gap-3 rounded-3xl bg-ink p-5 text-left text-white shadow-md hover:bg-black transition active:scale-[0.99]"
             >
               <div>

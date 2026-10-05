@@ -2,7 +2,7 @@
  * Every href must be a registered internal route (see help-articles.test.ts).
  * Keep steps short, factual, and matched to shipped behavior. */
 
-export type HelpCategoryId = "plans" | "mate" | "tickets" | "safety" | "account" | "stay";
+export type HelpCategoryId = "plans" | "tickets" | "safety" | "account" | "stay";
 
 export interface HelpCategory {
   id: HelpCategoryId;
@@ -26,7 +26,6 @@ export interface HelpArticle {
 
 export const HELP_CATEGORIES: HelpCategory[] = [
   { id: "plans", label: "Plans", blurb: "Create plans, invite people, RSVP." },
-  { id: "mate", label: "AirPal Mate", blurb: "Find someone to go with — or become one." },
   { id: "tickets", label: "Tickets & payments", blurb: "Pay, balances, cancellations, refunds." },
   { id: "safety", label: "Trust & safety", blurb: "Meet safely, verify, report, block." },
   { id: "account", label: "Account", blurb: "Sign in, profile, bio, settings." },
@@ -63,41 +62,24 @@ export const HELP_ARTICLES: HelpArticle[] = [
       "The host sees who's in and can message the crew from the plan.",
       "Plans stay editable until the day — stops, times, and notes can change.",
     ],
-    links: [
-      { label: "Your plans", href: "/plan" },
-      { label: "Circle", href: "/circle" },
-    ],
+    links: [{ label: "Your plans", href: "/plan" }],
   },
   {
-    id: "request-mate",
-    title: "Find someone to go with",
-    category: "mate",
-    summary: "Going alone? File a Mate request and get matched with someone to do it with.",
+    id: "what-now",
+    title: "Decide what to do",
+    category: "plans",
+    summary: "Tell AirPal your urge and time window — get one suggestion, then make it a plan.",
     steps: [
-      "Open AirPal Mate and describe what you want to do, when, and where.",
-      "Set your party size, budget, and preferences.",
-      "Approved Mates can see open requests and accept yours.",
-      "Chat in the request thread to coordinate — no phone numbers needed.",
-      "After you meet, rate the experience to build trust for everyone.",
+      "Open What now? and say what you feel like — tonight, this weekend, right now.",
+      "Get one suggestion matched to live places near you.",
+      "Tap Make it a plan to prefill a plan with the suggestion.",
+      "Share the invite link — guests can view it without an account.",
+      "Check in when you arrive, complete it after, and do it again any time.",
     ],
     links: [
-      { label: "Find an AirPal", href: "/mate" },
-      { label: "Request a Mate", href: "/mate/request" },
+      { label: "What now?", href: "/now" },
+      { label: "New plan", href: "/plan/new" },
     ],
-  },
-  {
-    id: "become-mate",
-    title: "Become an AirPal Mate",
-    category: "mate",
-    summary: "Apply once, get approved, then accept requests and get booked.",
-    steps: [
-      "Apply from the Companion page with your profile, interests, and availability.",
-      "Complete any required identity verification.",
-      "An AirPal admin reviews every application before approval.",
-      "Once approved, open requests appear for you to accept.",
-      "Show up, deliver a great experience, and earn reviews.",
-    ],
-    links: [{ label: "Apply as a Mate", href: "/companion" }],
   },
   {
     id: "tickets-payments",
@@ -105,7 +87,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     category: "tickets",
     summary: "Pay for experiences securely. Free bookings need no payment at all.",
     steps: [
-      "Book from a plan, experience, or Mate request — free bookings confirm instantly.",
+      "Book from a plan or event — free bookings confirm instantly.",
       "Paid bookings go through secure card checkout; AirPal never sees raw card numbers.",
       "Find every booking as a pass under Tickets in your account.",
       "Cancel unpaid bookings yourself; paid refunds go back to the original card.",
@@ -113,7 +95,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     ],
     links: [
       { label: "Your tickets", href: "/me/tickets" },
-      { label: "Experiences", href: "/experiences" },
+      { label: "Events", href: "/events" },
     ],
   },
   {
@@ -158,7 +140,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     steps: [
       "Sign in with email, phone, Google, or Apple — same account on web and app.",
       "Claim your personal @handle; it stays a person, never a business.",
-      "Add a photo, bio, interests, and languages so mates know you.",
+      "Add a photo, bio, interests, and languages so friends know you.",
       "Businesses run on the same login as a separate profile.",
       "Manage privacy, notifications, and sign-in methods in Settings.",
     ],
@@ -183,7 +165,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     links: [
       { label: "Scan", href: "/scan" },
       { label: "Stay & Guide", href: "/concierge" },
-      { label: "Try the demo stay", href: "/DemoHotel" },
+      { label: "Browse stays", href: "/stay" },
     ],
   },
 ];

@@ -10,14 +10,19 @@ export function PartnersPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-10">
-      <header className="flex items-end justify-between py-5">
+      <header className="flex items-end justify-between gap-3 py-5">
         <div>
           <p className="text-[11px] uppercase tracking-[0.16em] text-gold">Partners</p>
           <h1 className="font-display text-3xl font-semibold">Places & Venues</h1>
         </div>
-        <Button size="sm" onClick={() => nav("/business/onboard")}>
-          Onboard Your Business
-        </Button>
+        <div className="flex shrink-0 items-center gap-2">
+          <Button size="sm" variant="ghost" onClick={() => nav("/partner")}>
+            Talk to Partnerships
+          </Button>
+          <Button size="sm" onClick={() => nav("/business/onboard")}>
+            Onboard Your Business
+          </Button>
+        </div>
       </header>
       {active.length === 0 ? (
         <div className="rounded-3xl border border-dashed border-line p-10 text-center">

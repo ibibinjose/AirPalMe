@@ -20,7 +20,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useStay } from "@/contexts/StayContext";
-import { useLocation } from "wouter";
 import { fetchPropertyMenu } from "@/lib/properties";
 import { submitStaffTicket } from "@/lib/tickets-store";
 import type { MenuItem } from "@shared/airpal-data";
@@ -32,7 +31,6 @@ import type { UniversalConversation } from "@shared/messaging";
 
 export function StayCompendium() {
   const { property, roomLabel } = useStay();
-  const [, nav] = useLocation();
 
   const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>({
     welcome: true,
@@ -227,17 +225,6 @@ export function StayCompendium() {
         >
           <Sparkles size={18} className="text-amber-300" />
           <span>Chat with Front Desk &amp; AirPal AI</span>
-        </button>
-
-        {/* Banner 2: Group Chat / Social Circles */}
-        <button
-          type="button"
-          onClick={() => nav("/circle")}
-          className="group relative flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f03a17] hover:bg-[#d83212] px-4 py-3.5 text-center text-sm font-black text-white shadow-md transition active:scale-[0.98]"
-        >
-          <span className="text-base">👏</span>
-          <span>Guest Group Chat</span>
-          <span className="text-base">👏</span>
         </button>
 
         {/* Call Reception — only a real published number ever dials */}

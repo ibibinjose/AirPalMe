@@ -479,16 +479,16 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
             </label>
 
             <div className="mt-2.5 flex items-center justify-between text-xs">
-              <span className="text-mute text-[11px] font-medium">Looking for mutuals in {city}?</span>
+              <span className="text-mute text-[11px] font-medium">Deciding what to do in {city}?</span>
               <button
                 type="button"
                 className="font-bold text-brand hover:underline inline-flex items-center gap-1 cursor-pointer"
                 onClick={() => {
                   onClose();
-                  nav("/circle");
+                  nav("/now");
                 }}
               >
-                <span>Open Circle Feed</span>
+                <span>What now?</span>
                 <span>→</span>
               </button>
             </div>

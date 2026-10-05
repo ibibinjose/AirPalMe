@@ -55,10 +55,10 @@ export function MyTicketsPage() {
           <Ticket size={28} className="mx-auto text-mute" />
           <p className="mt-2 font-display text-lg font-bold text-ink">No tickets yet</p>
           <p className="mx-auto mt-1 max-w-sm text-[14px] text-mute">
-            Ticketed events and experiences you book will live here — ready to scan, save, and share.
+            Ticketed events you book will live here — ready to scan, save, and share.
           </p>
-          <Link href="/explore" className="no-print mt-4 inline-flex min-h-[44px] items-center rounded-full bg-brand px-5 text-sm font-semibold text-white">
-            Find something on
+          <Link href="/calendar" className="no-print mt-4 inline-flex min-h-[44px] items-center rounded-full bg-brand px-5 text-sm font-semibold text-white">
+            What&apos;s on
           </Link>
         </div>
       ) : (

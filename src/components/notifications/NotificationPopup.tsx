@@ -63,7 +63,7 @@ export function NotificationPopup() {
             Later
           </button>
           <Link
-            href={current.href || "/me/giveaways"}
+            href={current.href || "/deals"}
             onClick={dismiss}
             className="flex-1 rounded-2xl bg-brand px-4 py-2.5 text-center text-sm font-bold text-white"
           >

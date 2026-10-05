@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  activeLivePulse,
   buildPulsePublicPath,
   categoryFromPulseAnswers,
   createPublicToken,
@@ -10,6 +11,7 @@ import {
   isValidClientKey,
   issueSummaryFromAnswers,
   PULSE_TEMPLATES,
+  scoreDistribution,
   primaryScoreFromAnswers,
   pulseImageUrlOk,
   pulseResponsesToCsv,
@@ -409,4 +411,28 @@ describe("pulse cover images", () => {
   });
 });
 
+describe("pulse hub helpers", () => {
+  it("builds a 1–5 histogram and ignores unscored rows", () => {
+    expect(
+      scoreDistribution([
+        { primaryScore: 5 },
+        { primaryScore: 5 },
+        { primaryScore: 3 },
+        { primaryScore: null },
+        {},
+        { primaryScore: 9 },
+      ]),
+    ).toEqual({ 1: 0, 2: 0, 3: 1, 4: 0, 5: 2 });
+  });
 
+  it("prefers the live pulse, else the first draft to continue", () => {
+    expect(activeLivePulse([])).toBeUndefined();
+    expect(
+      activeLivePulse([
+        { id: "draft", status: "draft" },
+        { id: "live", status: "live" },
+      ])?.id,
+    ).toBe("live");
+    expect(activeLivePulse([{ id: "only", status: "paused" }])?.id).toBe("only");
+  });
+});

@@ -176,9 +176,9 @@ export function NowPage() {
           <EmptyState
             kicker={city}
             title="No places nearby yet"
-            body="AirPal is still mapping this area. Try Explore for stays and guides."
-            action={() => navigate("/explore")}
-            actionLabel="Open Explore"
+            body="AirPal is still mapping this area. Try the Guide for stays and walks."
+            action={() => navigate("/guide")}
+            actionLabel="Open Guide"
           />
         ) : (
           <EmptyState
@@ -187,8 +187,8 @@ export function NowPage() {
             body={`No ${mood === "any" ? "places" : (NOW_MOODS.find((m) => m.id === mood)?.label.toLowerCase() ?? "places")} spots ${when === "now" ? "open right now" : "open tonight"} nearby.`}
             action={showAnything}
             actionLabel="Show anything"
-            secondary={() => navigate("/explore")}
-            secondaryLabel="Open Explore"
+            secondary={() => navigate("/guide")}
+            secondaryLabel="Open Guide"
           />
         )}
       </div>

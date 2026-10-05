@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "wouter";
-import { collection, getDocs, limit, query as fsQuery, where } from "firebase/firestore";
 import {
   Search,
   MapPin,
@@ -22,11 +21,7 @@ import { hrefForPlace, handleOfPlace, resolvePublicBio } from "@/lib/bio-handle"
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { cityMatches } from "@/lib/remote-events";
 import { EVENT_NEAR_M, locatedNear } from "@/lib/location-scope";
-import { getFirebaseDb } from "@/lib/firebase";
-import { aud, type Campaign } from "@shared/campaign";
 import { isTicketed } from "@shared/plan";
-import type { PublicMate } from "@shared/companion";
-import { loadPublicMatesRemote } from "@/lib/companion-remote";
 import { loadTours } from "@/lib/tours-store";
 import { bioPath, bioKindLabel, type BioProfile } from "@shared/bio";
 import { fetchPublicBio, loadBios } from "@/lib/bio-store";
@@ -52,7 +47,7 @@ export function openGlobalSearch(opts?: OpenGlobalSearchOptions | unknown): void
   window.dispatchEvent(new CustomEvent("airpal-open-search", { detail }));
 }
 
-type SearchCategory = "all" | "people" | "places" | "events" | "stay" | "plan" | "experiences";
+type SearchCategory = "all" | "people" | "places" | "events" | "stay" | "plan";
 
 const RECENT_KEY = "airpal.recentSearches.v1";
 type RecentItem = { title: string; href: string };
@@ -77,16 +72,15 @@ function saveRecent(item: RecentItem) {
 }
 
 const EXPLORE_GROUPS = [
-  { label: "Places", href: "/explore", icon: MapPin },
+  { label: "What now?", href: "/now", icon: Compass },
   { label: "Events", href: "/calendar", icon: CalendarDays },
   { label: "Plans", href: "/plan", icon: Users },
-  { label: "People", href: "/mate", icon: HeartHandshake },
-  { label: "Communities", href: "/club", icon: Building2 },
+  { label: "Deals", href: "/deals", icon: Sparkles },
 ];
 
 interface SearchResultItem {
   id: string;
-  category: "place" | "event" | "stay" | "plan" | "partner" | "experience" | "person";
+  category: "place" | "event" | "stay" | "plan" | "partner" | "person";
   title: string;
   subtitle: string;
   badge?: string;
@@ -105,27 +99,12 @@ export function GlobalSearchModal() {
   const { calendarEvents } = useEvents();
   const { plans } = usePlans();
   const { here, city, usingGps } = useLocalNow();
-  const [liveExperiences, setLiveExperiences] = useState<Campaign[]>([]);
-  const [publicMates, setPublicMates] = useState<PublicMate[]>([]);
   const [handleBio, setHandleBio] = useState<BioProfile | null>(null);
   const [recent, setRecent] = useState<RecentItem[]>([]);
   const { trackQuery, logResultClick } = useSearchQueryLogger({ source: "global_modal" });
   const { popularTerms } = usePopularSearches({ limit: 6 });
 
   useScrollLock(open);
-
-  // Live AirPal Experiences for search (small capped read when opened).
-  useEffect(() => {
-    if (!open) return;
-    const db = getFirebaseDb();
-    if (!db) return;
-    void getDocs(fsQuery(collection(db, "campaigns"), where("status", "==", "live"), limit(20)))
-      .then((snap) => setLiveExperiences(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Campaign, "id">) }))))
-      .catch(() => undefined);
-    void loadPublicMatesRemote()
-      .then(setPublicMates)
-      .catch(() => undefined);
-  }, [open]);
 
   // Exact @handle → public profile (handles/{handle} get). Without this, People search never finds bios.
   useEffect(() => {
@@ -202,20 +181,6 @@ export function GlobalSearchModal() {
     if (!needle.text) {
       if (activeCategory === "all") return items;
 
-      if (activeCategory === "people") {
-        for (const m of publicMates.slice(0, 10)) {
-          items.push({
-            id: `mate-${m.uid}`,
-            category: "person",
-            title: m.firstName,
-            subtitle: [m.suburb || m.city, m.interests[0]].filter(Boolean).join(" · ") || "Approved Mate",
-            badge: "Mate",
-            href: "/mate",
-            icon: HeartHandshake,
-          });
-        }
-        return items;
-      }
       if (activeCategory === "places") {
         for (const p of placesForLocation(activePlaces(), here, city, usingGps).slice(0, 10)) {
           items.push({
@@ -240,20 +205,6 @@ export function GlobalSearchModal() {
             badge: e.categoryLabel,
             href: `/calendar?event=${e.id}`,
             icon: CalendarDays,
-          });
-        }
-        return items;
-      }
-      if (activeCategory === "experiences") {
-        for (const c of liveExperiences.slice(0, 10)) {
-          items.push({
-            id: `experience-${c.id}`,
-            category: "experience",
-            title: c.title,
-            subtitle: `${c.businessName} · ${c.suburb} · ${c.date}`,
-            badge: c.priceCents > 0 ? aud(c.priceCents) : "Free",
-            href: "/experiences",
-            icon: Sparkles,
           });
         }
         return items;
@@ -384,7 +335,7 @@ export function GlobalSearchModal() {
         title: person.name,
         subtitle: person.handle ? `@${person.handle}` : person.whereMet || "People you met",
         badge: "Met",
-        href: person.handle ? bioPath(person.handle) : "/me/people",
+        href: person.handle ? bioPath(person.handle) : "/me",
         icon: HeartHandshake,
       });
     }
@@ -445,10 +396,9 @@ export function GlobalSearchModal() {
       });
     }
 
-    // 4. Match Mates Planning keywords
+    // 4. Match planning keywords
     const planKeywords = [
       "plan",
-      "mate",
       "friends",
       "night",
       "dinner",
@@ -464,7 +414,7 @@ export function GlobalSearchModal() {
         category: "plan",
         title: "New Plan",
         subtitle: "Invite link with RSVP",
-        badge: "Mates Plan",
+        badge: "Plan",
         href: "/plan/new",
         icon: Users,
       });
@@ -475,64 +425,20 @@ export function GlobalSearchModal() {
         id: "event-create",
         category: "event",
         title: "Sell tickets",
-        subtitle: "Create a public event or experience",
+        subtitle: "Create a public event",
         badge: "Tickets",
-        href: "/create",
+        href: "/event",
         icon: CalendarDays,
       });
       items.push({
         id: "join-tickets",
-        category: "experience",
+        category: "event",
         title: "Buy tickets",
-        subtitle: "Public events and experiences nearby",
+        subtitle: "Public events nearby",
         badge: "Join",
-        href: "/experiences",
+        href: "/events",
         icon: Sparkles,
       });
-    }
-
-    if (q.includes("mate") || q.includes("companion") || q.includes("someone")) {
-      items.push({
-        id: "mate-request",
-        category: "person",
-        title: "Find someone to go with",
-        subtitle: "Request an approved Mate",
-        badge: "Mate",
-        href: "/mate/request",
-        icon: HeartHandshake,
-      });
-    }
-
-    for (const m of publicMates) {
-      const hay =
-        `${m.firstName} ${m.suburb} ${m.city} ${m.interests.join(" ")} ${m.activities.join(" ")} ${m.introduction}`.toLowerCase();
-      if (q.length >= 2 && hay.includes(q)) {
-        items.push({
-          id: `mate-${m.uid}`,
-          category: "person",
-          title: m.firstName,
-          subtitle: [m.suburb || m.city, m.interests[0]].filter(Boolean).join(" · ") || "Approved Mate",
-          badge: "Mate",
-          href: "/mate",
-          icon: HeartHandshake,
-        });
-      }
-    }
-
-    // 4c. Match live AirPal Experiences
-    for (const c of liveExperiences) {
-      const hay = `${c.title} ${c.businessName} ${c.suburb} ${c.category}`.toLowerCase();
-      if (q.length >= 2 && hay.includes(q)) {
-        items.push({
-          id: `experience-${c.id}`,
-          category: "experience",
-          title: c.title,
-          subtitle: `${c.businessName} · ${c.suburb} · ${c.date}`,
-          badge: c.priceCents > 0 ? aud(c.priceCents) : "Free",
-          href: "/experiences",
-          icon: Sparkles,
-        });
-      }
     }
 
     // 5. Match open Plans (one global search replaces per-page plan search)
@@ -605,22 +511,9 @@ export function GlobalSearchModal() {
       );
     }
     if (activeCategory === "plan") return items.filter((i) => i.category === "plan");
-    if (activeCategory === "experiences") return items.filter((i) => i.category === "experience");
 
     return items;
-  }, [
-    query,
-    calendarEvents,
-    catalogVersion,
-    plans,
-    activeCategory,
-    liveExperiences,
-    publicMates,
-    handleBio,
-    here,
-    city,
-    usingGps,
-  ]);
+  }, [query, calendarEvents, catalogVersion, plans, activeCategory, handleBio, here, city, usingGps]);
 
   // Keyboard navigation within list
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -733,10 +626,9 @@ export function GlobalSearchModal() {
           {(
             [
               { id: "all", label: "All" },
-              { id: "people", label: "People & Mates" },
+              { id: "people", label: "People" },
               { id: "places", label: "Places" },
               { id: "events", label: "Events" },
-              { id: "experiences", label: "Experiences" },
               { id: "stay", label: "Stays" },
               { id: "plan", label: "Plans" },
             ] as const
@@ -776,18 +668,6 @@ export function GlobalSearchModal() {
                     </p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    void triggerHaptic("medium");
-                    setOpen(false);
-                    nav(`/search?q=${encodeURIComponent(query)}`);
-                  }}
-                  className="shrink-0 flex items-center gap-1 rounded-xl bg-brand px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-brand-ink active:scale-95 transition cursor-pointer touch-manipulation"
-                >
-                  <span>Full Page</span>
-                  <ArrowRight size={13} />
-                </button>
               </div>
             </div>
           )}

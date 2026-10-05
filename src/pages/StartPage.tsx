@@ -323,7 +323,7 @@ export function StartPage() {
     if (roleParam === "business" || business) return "/business";
     if (roleParam === "event") return "/event";
     if (isNativeApp()) return "/";
-    return "/circle";
+    return "/now";
   }
 
   useEffect(() => {
@@ -626,9 +626,9 @@ export function StartPage() {
               },
               {
                 icon: Users,
-                title: "Start Circle",
-                desc: "People nearby",
-                to: "/circle",
+                title: "What now?",
+                desc: "One suggestion",
+                to: "/now",
                 tint: "bg-amber-500/10 text-amber-700",
               },
             ].map((c) => (

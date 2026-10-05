@@ -11,16 +11,12 @@ import { SEED_BIO } from "@shared/bio";
 import { KERALA_PLACES } from "@shared/kerala-data";
 import { SEED_EVENT, SEED_STALLS } from "@shared/event";
 import { WALKING_TOURS } from "@shared/tours";
-import { HARBOUR_COLLEGE } from "@shared/campus";
-import { THE_ROCKS_ZOO } from "@shared/zoo";
 import { listingDefaults, upsertCachedListing } from "./listings";
 import { cachePlaces, loadPlaces } from "./places-store";
 import { businessCategoryForPlace, placeCategoryFor } from "@shared/business";
 import { persistBios, loadBios } from "./bio-store";
 import { upsertStoredMarker } from "./markers-store";
 import { cacheTours } from "./tours-store";
-import { cacheCampus } from "./campus-store";
-import { cacheHunts } from "./hunts-store";
 import { saveCachedProperty } from "./properties";
 import { harbourStaySeeds } from "./seed-stay";
 
@@ -254,33 +250,7 @@ export async function seedDatabase(): Promise<SeedResult> {
       }
     }
 
-    // 5. Campus
-    cacheCampus(HARBOUR_COLLEGE);
-    if (db) {
-      try {
-        void setDoc(
-          doc(db, "campuses", HARBOUR_COLLEGE.id),
-          cleanDoc({ ...HARBOUR_COLLEGE, updatedAt: new Date().toISOString() }),
-        ).catch(() => undefined);
-      } catch {
-        /* ignore */
-      }
-    }
-
-    // 6. Zoo hunts
-    cacheHunts([THE_ROCKS_ZOO]);
-    if (db) {
-      try {
-        void setDoc(
-          doc(db, "zooHunts", THE_ROCKS_ZOO.id),
-          cleanDoc({ ...THE_ROCKS_ZOO, updatedAt: new Date().toISOString() }),
-        ).catch(() => undefined);
-      } catch {
-        /* ignore */
-      }
-    }
-
-    // 7. Seed Bio
+    // 5. Seed Bio
     const existingBios = loadBios();
     if (!existingBios.some((b) => b.handle === SEED_BIO.handle)) {
       persistBios([...existingBios, SEED_BIO]);

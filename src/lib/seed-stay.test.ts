@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   DEMO_HOTEL_PROPERTY_ID,
-  DEMO_HOTEL_PUBLIC_PATH,
   DEMO_HOTEL_ROOM_TOKEN,
   demoHotelStayPath,
   HARBOUR_DEMO_WIFI_PASSWORD,
@@ -26,8 +25,7 @@ describe("harbourStaySeeds", () => {
 });
 
 describe("Demo Hotel showcase constants", () => {
-  it("points at Harbour room 101 with a shareable public path", () => {
-    expect(DEMO_HOTEL_PUBLIC_PATH).toBe("/DemoHotel");
+  it("points at Harbour room 101", () => {
     expect(DEMO_HOTEL_PROPERTY_ID).toBe("harbour-hotel");
     expect(DEMO_HOTEL_ROOM_TOKEN).toBe("tok-101-demo");
     expect(demoHotelStayPath()).toBe("/g/harbour-hotel?r=tok-101-demo");

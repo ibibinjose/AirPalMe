@@ -144,13 +144,6 @@ export function PromotionsPage() {
             </Link>
           )}
 
-          <Link
-            href="/giveaways"
-            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
-          >
-            <Sparkles size={14} className="text-gold" />
-            <span>Giveaways</span>
-          </Link>
         </div>
       </div>
 
@@ -379,7 +372,7 @@ export function PromotionsPage() {
                     )}
 
                     <Link
-                      href={`/promotions/${p.id}`}
+                      href={`/deals/${p.id}`}
                       className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand px-5 text-xs font-bold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
                     >
                       <Ticket size={13} />

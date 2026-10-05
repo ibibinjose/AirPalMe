@@ -187,7 +187,7 @@ export function FoundersPage() {
 
   const pool = foundingPoolState(used ?? 0, CAP);
   const poolKnown = used !== null;
-  const signupHref = `/start?tab=signup&next=${encodeURIComponent("/giveaways/founders-100k")}`;
+  const signupHref = `/start?tab=signup&next=${encodeURIComponent("/deals/founders-100k")}`;
   const handle = mine?.handle || "";
   const myLink = user && handle ? inviteLinkFor(handle) : "";
 

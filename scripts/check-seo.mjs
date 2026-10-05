@@ -42,7 +42,7 @@ must(llms.includes("AirPal.Me"), "llms.txt must name the brand");
 must(llms.includes("https://airpal.me/contact"), "llms.txt must give AI a contact path");
 must(llms.includes("https://airpal.me/trust"), "llms.txt must point AI at the company-facts page");
 must(llms.includes("https://airpal.me/concierge"), "llms.txt must point AI at the concierge page");
-must(llms.includes("https://airpal.me/mate"), "llms.txt must point AI at the Mate page");
+must(llms.includes("https://airpal.me/now"), "llms.txt must point AI at the What-now page");
 must(llms.includes("/alternatives/"), "llms.txt must point AI at the comparison pages");
 
 const security = read("public/.well-known/security.txt");
@@ -57,9 +57,9 @@ must(head.includes('"@type": "WebSite"'), "index.html must include WebSite JSON-
 must(head.includes('"@type": "Organization"'), "index.html must include Organization JSON-LD");
 must(head.includes("og-share.jpg"), "index.html must keep the share image");
 must(head.includes('og:image:width" content="1200"'), "index.html must size the share image");
-must(locs.includes("https://airpal.me/mate"), "sitemap.xml must list the Mate page");
+must(locs.includes("https://airpal.me/now"), "sitemap.xml must list the What-now page");
 must(locs.includes("https://airpal.me/concierge"), "sitemap.xml must list the concierge page");
-must(locs.includes("https://airpal.me/fashion"), "sitemap.xml must list the fashion page");
+must(locs.includes("https://airpal.me/plan"), "sitemap.xml must list the plans page");
 must(read("src/lib/share-meta.ts").includes("applyRouteMeta"), "share-meta must apply per-route titles");
 
 // Per-route canonicals follow client-side navigation.

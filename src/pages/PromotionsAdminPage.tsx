@@ -384,10 +384,16 @@ export function PromotionsAdminPage() {
                   )
                 )}
                 <Link
-                  href={p.kind === "giveaway" ? `/giveaways/${p.id}` : `/promotions/${p.id}`}
+                  href={`/deals/${p.id}`}
                   className="inline-flex min-h-[44px] items-center rounded-lg px-2 text-xs font-bold text-brand hover:underline"
                 >
                   view
+                </Link>
+                <Link
+                  href={`/admin/promotions/${p.id}`}
+                  className="inline-flex min-h-[44px] items-center rounded-lg px-2 text-xs font-bold text-brand hover:underline"
+                >
+                  manage
                 </Link>
               </div>
             </div>

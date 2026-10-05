@@ -2,9 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
   ArrowRight,
-  BadgeCheck,
   CalendarDays,
-  Gift,
   Hotel,
   MapPin,
   Plane,
@@ -27,8 +25,6 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
 import { openGlobalSearch } from "@/components/search/GlobalSearchModal";
 import { triggerHaptic } from "@/lib/native";
-import { loadPublicMatesRemote } from "@/lib/companion-remote";
-import type { PublicMate } from "@shared/companion";
 import { getExperienceProofRemote } from "@/lib/functions";
 import {
   ArrowCta,
@@ -40,41 +36,39 @@ import {
 } from "@/components/design-system/companions";
 import { cn } from "@/lib/cn";
 
-type AroundFilter = "events" | "food" | "places" | "community";
+type AroundFilter = "events" | "food" | "places" | "deals";
 
 const AROUND: { id: AroundFilter; label: string; color: string }[] = [
   { id: "events", label: "Events & Shows", color: "#c2410c" },
   { id: "food", label: "Dining & Drinks", color: "#b45309" },
   { id: "places", label: "Places & Stays", color: "#2b7cd3" },
-  { id: "community", label: "Community Hub", color: "#15803d" },
+  { id: "deals", label: "Deals & Offers", color: "#15803d" },
 ];
 
 const QUICK_PROMPTS = [
   { label: "⚡ What now?", href: "/now" },
   { label: "☕ Coffee & Chat", query: "coffee" },
-  { label: "✨ Find a Mate", href: "/mate" },
   { label: "🎭 Live Tonight", href: "/calendar" },
-  { label: "🏨 Boutique Stays", href: "/explore" },
+  { label: "🏨 Boutique Stays", href: "/stay" },
   { label: "🗺️ Plan a Trip", href: "/plan/new" },
-  { label: "🎁 Giveaways", href: "/giveaways" },
-  { label: "🎂 Birthday freebies", href: "/birthday-freebies/au" },
+  { label: "🎁 Deals", href: "/deals" },
 ];
 
 const VERTICALS = [
   {
-    id: "mate",
-    label: "AirPal Mate",
-    sub: "Find someone to go with",
-    href: "/mate",
+    id: "now",
+    label: "What now?",
+    sub: "One suggestion for now",
+    href: "/now",
     icon: Users,
     iconBg: "bg-brand/10 text-brand",
-    badge: "Connect",
+    badge: "Start",
   },
   {
-    id: "experiences",
-    label: "Experiences",
-    sub: "Food, art & culture",
-    href: "/experiences",
+    id: "deals",
+    label: "Deals",
+    sub: "Local offers & freebies",
+    href: "/deals",
     icon: Sparkles,
     iconBg: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
     badge: "Popular",
@@ -83,7 +77,7 @@ const VERTICALS = [
     id: "stay",
     label: "Stays",
     sub: "Hotels & boutique rooms",
-    href: "/explore",
+    href: "/stay",
     icon: Hotel,
     iconBg: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
     badge: "Verified",
@@ -107,13 +101,13 @@ const VERTICALS = [
     badge: "Trips",
   },
   {
-    id: "perks",
-    label: "Perks & Drops",
-    sub: "Freebies & rewards",
-    href: "/birthday-freebies/au",
-    icon: Gift,
+    id: "guide",
+    label: "Guide",
+    sub: "Tours & city walks",
+    href: "/guide",
+    icon: MapPin,
     iconBg: "bg-brand/10 text-brand",
-    badge: "Rewards",
+    badge: "Tours",
   },
 ];
 
@@ -125,18 +119,7 @@ export function HomePage() {
   const { city, here, today, now } = useLocalNow();
   const { version } = useListings();
   const [around, setAround] = useState<AroundFilter>("events");
-  const [publicMates, setPublicMates] = useState<PublicMate[]>([]);
   const [completedCount, setCompletedCount] = useState(0);
-
-  useEffect(() => {
-    loadPublicMatesRemote()
-      .then((mates) => {
-        if (mates && mates.length > 0) {
-          setPublicMates(mates.slice(0, 4));
-        }
-      })
-      .catch(() => undefined);
-  }, []);
 
   // Proof the loop is alive: real completed-plan count, shown only when nonzero.
   useEffect(() => {
@@ -209,7 +192,7 @@ export function HomePage() {
             What do you want to do?
           </h1>
           <p className="mt-1 text-sm sm:text-base font-medium text-white/90 max-w-lg">
-            Find mates, places, and experiences.
+            Find places, events, and plans.
           </p>
 
           {/* Quick Search Trigger */}
@@ -221,7 +204,7 @@ export function HomePage() {
             >
               <span className="flex items-center gap-2.5">
                 <Search size={18} className="text-brand" />
-                <span>Search mates, places, events, or trips…</span>
+                <span>Search places, events, plans, or stays…</span>
               </span>
               <kbd className="hidden rounded bg-paper/90 px-2 py-0.5 text-xs font-semibold text-mute ring-1 ring-line sm:inline-block">
                 ⌘K
@@ -235,12 +218,12 @@ export function HomePage() {
               size="sm"
               onClick={() => {
                 void triggerHaptic("medium");
-                nav("/mate/request");
+                nav("/now");
               }}
               className="h-11 rounded-full px-6 font-bold shadow-[0_6px_20px_rgba(18,22,20,0.15)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <Users size={16} className="mr-2" />
-              Find a Mate
+              What now?
             </Button>
             <Button
               size="sm"
@@ -280,7 +263,7 @@ export function HomePage() {
       <section aria-label="Explore AirPal Verticals" className="mt-8">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-xl font-bold tracking-tight text-ink">Life Made Easy</h2>
-          <Link href="/explore" className="text-xs font-bold text-brand hover:underline">
+          <Link href="/now" className="text-xs font-bold text-brand hover:underline">
             View All →
           </Link>
         </div>
@@ -376,7 +359,7 @@ export function HomePage() {
                   <Plane size={14} /> Ready for your next outing?
                 </div>
                 <h3 className="font-display text-lg font-bold mt-1 text-ink">Plan a hangout or trip</h3>
-                <p className="text-xs text-mute mt-0.5">Live itineraries with friends &amp; mates.</p>
+                <p className="text-xs text-mute mt-0.5">Live itineraries with friends &amp; family.</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <Button
@@ -393,10 +376,10 @@ export function HomePage() {
                 <Button
                   size="sm"
                   variant="ghost"
-                  onClick={() => nav("/mate")}
+                  onClick={() => nav("/now")}
                   className="rounded-full px-4 ring-1 ring-line"
                 >
-                  Find a Mate
+                  What now?
                 </Button>
               </div>
             </div>
@@ -404,140 +387,27 @@ export function HomePage() {
         )}
       </section>
 
-      {/* AirPal Mate MVP Spotlight (§4) */}
-      <section aria-label="AirPal Mate Spotlight" className="mt-8">
-        <div className="flex items-end justify-between">
-          <div>
-            <div className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-brand">
-              <ShieldCheck size={14} /> Trusted & Verified
-            </div>
-            <h2 className="font-display text-xl font-bold tracking-tight mt-0.5">AirPal Mate</h2>
-          </div>
-          <Link href="/mate" className="text-xs font-bold text-brand hover:underline">
-            Browse All Mates →
-          </Link>
-        </div>
-
-        <div className="mt-3 rounded-3xl bg-card p-4 sm:p-5 ring-1 ring-line shadow-xs">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-line/60 pb-4">
-            <div>
-              <p className="font-display text-base font-bold text-ink">Going somewhere? Don&apos;t go alone.</p>
-              <p className="text-xs text-mute mt-0.5">Verified local companions.</p>
-            </div>
-            <Button
-              size="sm"
-              onClick={() => {
-                void triggerHaptic("medium");
-                nav("/mate/request");
-              }}
-              className="rounded-full px-4 self-start md:self-center shadow-xs"
-            >
-              Post a Mate Request
-            </Button>
-          </div>
-
-          {/* Showcase cards */}
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {publicMates.length > 0 ? (
-              publicMates.map((m) => (
-                <CardShell
-                  key={m.uid}
-                  href={`/mate?select=${m.uid}`}
-                  label={`View Mate ${m.firstName}`}
-                  className="p-3.5 hover:ring-brand/40"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-paper ring-1 ring-line">
-                      <Photo src={m.photo || "/media/harbour.jpg"} className="h-full w-full object-cover" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1">
-                        <p className="font-display text-sm font-bold truncate text-ink">{m.firstName}</p>
-                        <BadgeCheck size={14} className="text-brand shrink-0" />
-                      </div>
-                      <p className="text-[11px] text-mute truncate flex items-center gap-0.5">
-                        <MapPin size={10} /> {m.suburb || m.city || "Sydney"}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="mt-2 text-[11px] text-mute font-medium truncate">
-                    {(m.interests || ["Events", "Coffee", "Walks"]).slice(0, 3).join(" · ")}
-                  </p>
-                </CardShell>
-              ))
-            ) : (
-              <>
-                <CardShell href="/mate" label="Dining & Drinks Companion" className="p-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="grid h-10 w-10 place-items-center rounded-full bg-amber-500/15 text-amber-600 font-bold">
-                      🍽️
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-display text-xs font-bold text-ink">Food & Cocktails</p>
-                      <p className="text-[11px] text-mute">Dinner & social companions</p>
-                    </div>
-                  </div>
-                </CardShell>
-                <CardShell href="/mate" label="Events & Gigs Companion" className="p-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="grid h-10 w-10 place-items-center rounded-full bg-rose-500/15 text-rose-600 font-bold">
-                      🎟️
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-display text-xs font-bold text-ink">Gigs & Festivals</p>
-                      <p className="text-[11px] text-mute">Never go to a show alone</p>
-                    </div>
-                  </div>
-                </CardShell>
-                <CardShell href="/mate" label="Fitness & Walks Companion" className="p-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="grid h-10 w-10 place-items-center rounded-full bg-emerald-500/15 text-emerald-600 font-bold">
-                      🏃
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-display text-xs font-bold text-ink">Fitness & Outdoors</p>
-                      <p className="text-[11px] text-mute">Hikes, running & gym mates</p>
-                    </div>
-                  </div>
-                </CardShell>
-                <CardShell href="/mate" label="Explore & Culture" className="p-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="grid h-10 w-10 place-items-center rounded-full bg-blue-500/15 text-blue-600 font-bold">
-                      🎨
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-display text-xs font-bold text-ink">Arts & City Tours</p>
-                      <p className="text-[11px] text-mute">Galleries, markets & walks</p>
-                    </div>
-                  </div>
-                </CardShell>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-
       {/* What's On Near You Section */}
       <section aria-label="What's on near you" className="mt-8">
-        <SectionHeader title="Happening Near You" actionLabel="See All" actionHref="/explore" />
+        <SectionHeader title="Happening Near You" actionLabel="See All" actionHref="/now" />
         <div className="mt-3">
           <PillRow options={AROUND} value={around} onChange={setAround} label="What's on categories" />
         </div>
 
-        {around === "community" ? (
-          <CardShell href="/circle" label="Open communities" className="mt-3 p-5 rounded-3xl">
+        {around === "deals" ? (
+          <CardShell href="/deals" label="Open deals" className="mt-3 p-5 rounded-3xl">
             <div className="flex items-start justify-between">
               <div>
                 <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
-                  Social Circles
+                  Local Offers
                 </span>
-                <p className="font-display text-lg font-bold mt-2 text-ink">Communities Around Movement</p>
-                <p className="mt-1 text-sm text-mute max-w-xl">Connect and plan activities with locals.</p>
+                <p className="font-display text-lg font-bold mt-2 text-ink">Deals Near You</p>
+                <p className="mt-1 text-sm text-mute max-w-xl">Claim local offers right inside your plan.</p>
               </div>
               <ArrowCta />
             </div>
             <div className="mt-4 flex items-center gap-2 text-xs font-bold text-brand">
-              Open Social Circle <ArrowRight size={14} />
+              Browse deals <ArrowRight size={14} />
             </div>
           </CardShell>
         ) : around === "events" ? (
@@ -627,9 +497,9 @@ export function HomePage() {
           <div className="mt-3">
             <EmptyState
               title="Nothing nearby yet."
-              body="Explore places, stays and experiences across the city."
-              action={() => nav("/explore")}
-              actionLabel="Explore"
+              body="Tell us your urge and get one suggestion for right now."
+              action={() => nav("/now")}
+              actionLabel="What now?"
             />
           </div>
         )}
@@ -637,7 +507,7 @@ export function HomePage() {
 
       {/* For You / Smart Recommendations */}
       <section aria-label="For you" className="mt-8">
-        <SectionHeader title="Recommended Hangouts" actionLabel="Explore" actionHref="/explore" />
+        <SectionHeader title="Recommended Hangouts" actionLabel="What now?" actionHref="/now" />
         {forYou.length > 0 ? (
           <ul className="mt-3 space-y-2.5">
             {forYou.map((p) => (
@@ -679,10 +549,10 @@ export function HomePage() {
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => nav("/mate")}
+                onClick={() => nav("/now")}
                 className="rounded-full px-4 ring-1 ring-line"
               >
-                Find a Mate
+                What now?
               </Button>
             </div>
           </CardShell>
@@ -701,7 +571,7 @@ export function HomePage() {
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-mute font-medium">
             <span className="flex items-center gap-1.5 text-ink font-semibold">
-              <span className="text-emerald-600 font-bold">✓</span> Identity Verified Mates
+              <span className="text-emerald-600 font-bold">✓</span> Trusted local businesses
             </span>
             <span aria-hidden="true" className="text-line select-none hidden sm:inline">
               ·

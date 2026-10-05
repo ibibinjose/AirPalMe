@@ -847,12 +847,12 @@ export function PlanDetailPage() {
             </>
           )}
 
-          {/* Going alone? Find an AirPal (§11 key CTA: Plan → Mate loop) */}
+          {/* Need company? Invite friends to this plan */}
           <button
             type="button"
             onClick={() => {
               void triggerHaptic("light");
-              nav("/mate/request");
+              nav(`/plan/${plan.id}/guests`);
             }}
             className="mt-4 flex w-full cursor-pointer items-center gap-3 rounded-3xl bg-card p-4 text-left ring-1 ring-line shadow-xs transition hover:ring-brand/30 active:scale-[0.99]"
           >
@@ -860,11 +860,11 @@ export function PlanDetailPage() {
               <Users size={20} />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-sm font-bold text-ink">Going alone? Find an AirPal</span>
-              <span className="block truncate text-xs text-mute">Get matched with someone to go with you</span>
+              <span className="block text-sm font-bold text-ink">Need company? Invite friends</span>
+              <span className="block truncate text-xs text-mute">Share the invite link with your people</span>
             </span>
             <span className="shrink-0 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-bold text-brand">
-              Find a Mate
+              Invite
             </span>
           </button>
 

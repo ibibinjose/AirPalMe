@@ -25,10 +25,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { usePlans } from "@/contexts/PlanContext";
-import { useClub } from "@/contexts/ClubContext";
-import { useZoo } from "@/contexts/ZooContext";
-import { huntProgress } from "@shared/zoo";
-import { loadHunts } from "@/lib/hunts-store";
 import { listMemories } from "@/lib/memories";
 import { listPeople } from "@/lib/people";
 import { InvitePanel } from "@/components/invite/InvitePanel";
@@ -93,11 +89,6 @@ export function MePage() {
   const { user, logout, sendVerificationEmail } = useAuth();
   const { mine, business, biosReady, updateProfile } = useBio();
   const { savedEvents, savedStalls, getEvent, stalls, calendarEvents } = useEvents();
-  const { memberByEmail } = useClub();
-  const { state: zoo } = useZoo();
-  const club = user ? memberByEmail(user.email) : undefined;
-  const hunts = loadHunts();
-  const zooProgress = huntProgress(zoo, hunts[0]?.id || "", hunts);
   const goingCount = calendarEvents.filter((e) => e.isGoing).length;
   const interestedCount = calendarEvents.filter((e) => e.isInterested).length;
   const peopleCount = listPeople().length;
@@ -207,8 +198,8 @@ export function MePage() {
                 <Button size="sm" variant="ghost" className="rounded-full border border-line" onClick={() => nav("/settings")}>
                   Settings
                 </Button>
-                <Button size="sm" variant="ghost" className="rounded-full border border-line" onClick={() => nav("/me/giveaways")}>
-                  Giveaways
+                <Button size="sm" variant="ghost" className="rounded-full border border-line" onClick={() => nav("/deals")}>
+                  Deals
                 </Button>
               </div>
             </div>
@@ -547,41 +538,9 @@ export function MePage() {
             </Section>
           )}
 
-          <Section title="Plans & Circles">
+          <Section title="Plans">
             <Row kicker="Plan" title="Make one with family and friends" action="Create" onClick={() => nav("/plan/new")} />
             <Row kicker="Trips" title="Your plans and invites" action="Open" onClick={() => nav("/plan")} />
-            <Row
-              kicker="Circle"
-              title={peopleCount > 0 ? `Audience · ${peopleCount} met` : "Your people in one place"}
-              action="Open"
-              onClick={() => nav("/circle")}
-            />
-            <Row
-              kicker="People met"
-              title={
-                peopleCount > 0
-                  ? `${peopleCount} ${peopleCount === 1 ? "person" : "people"} + catch-ups`
-                  : "Log everyone you meet"
-              }
-              action={peopleCount > 0 ? "Open" : "Add"}
-              onClick={() => nav("/me/people")}
-            />
-          </Section>
-
-          <Section title="Mate">
-            <Row
-              kicker="Find a Mate"
-              title="Want to do something? Find someone to go with you"
-              action="Open"
-              onClick={() => nav("/mate/request")}
-            />
-            <Row kicker="Matches" title="Your matches, chat and bookings" action="Open" onClick={() => nav("/mate")} />
-            <Row
-              kicker="Become a Mate"
-              title="Apply or check status — reviewed by AirPal"
-              action="Open"
-              onClick={() => nav("/companion")}
-            />
           </Section>
 
           <Section title="Wallet">
@@ -615,26 +574,13 @@ export function MePage() {
               action="Create"
               onClick={() => nav("/event/new")}
             />
-            {business && <Row kicker="Guest list" title="Email the door" action="Open" onClick={() => nav("/club/list")} />}
           </Section>
 
           <Section title="Belong">
             <Row kicker="Inbox" title="Announcements, plans, alerts" action="Open" onClick={() => nav("/me/inbox")} />
-            <Row
-              kicker="AirPal Club"
-              title={club ? "Invites and offers on" : "Join for invites and offers"}
-              action={club ? "Open" : "Join"}
-              onClick={() => nav("/club")}
-            />
           </Section>
 
           <Section title="Play & keepsakes">
-            <Row
-              kicker="Air Zoo"
-              title={zooProgress.have ? zooProgress.label : "Stickers, shops, hunts"}
-              action="Open"
-              onClick={() => nav("/me/zoo")}
-            />
             <Row
               kicker="Calendar"
               title={goingCount > 0 ? `${goingCount} Going · ${interestedCount} Interested` : "What's on & RSVP schedule"}

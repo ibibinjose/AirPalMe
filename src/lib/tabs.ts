@@ -1,5 +1,6 @@
 /**
- * Shipped dock (CANON §3): Home / Explore / Plan / Inbox / Me.
+ * Shipped dock: Home / Now / Plan / Inbox / Me (Phase 6: Explore tab retargeted
+ * to the /now composer; legacy /explore + /discover redirect there).
  * "scan" is a path bucket, not a tab — Scan lives behind + Create.
  */
 export type GuestTab = "home" | "explore" | "trips" | "scan" | "inbox" | "me";
@@ -8,16 +9,15 @@ export type GuestTab = "home" | "explore" | "trips" | "scan" | "inbox" | "me";
 export function tabFromPath(path: string): GuestTab {
   if (path.startsWith("/scan") || path.startsWith("/w/")) return "scan";
   if (path.startsWith("/me/inbox")) return "inbox";
-  if (
-    path.startsWith("/plan") ||
-    path.startsWith("/invite") ||
-    path.startsWith("/circle") ||
-    path.startsWith("/event/new") ||
-    path === "/event"
-  ) {
+  if (path.startsWith("/plan") || path.startsWith("/invite") || path.startsWith("/event/new") || path === "/event") {
     return "trips";
   }
-  if (path.startsWith("/explore") || path.startsWith("/discover") || path.startsWith("/discovery")) {
+  if (
+    path === "/now" ||
+    path.startsWith("/explore") ||
+    path.startsWith("/discover") ||
+    path.startsWith("/discovery")
+  ) {
     return "explore";
   }
   if (path.startsWith("/me") || path.startsWith("/bio") || path.startsWith("/@") || path.startsWith("/settings")) {

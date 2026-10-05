@@ -66,8 +66,8 @@ export function StudioInboxAdmin() {
           ))}
         </ul>
       )}
-      <Button className="mt-3" size="sm" variant="ghost" onClick={() => nav("/studio")}>
-        Open Studio page
+      <Button className="mt-3" size="sm" variant="ghost" onClick={() => nav("/business")}>
+        Open Business hub
       </Button>
     </section>
   );

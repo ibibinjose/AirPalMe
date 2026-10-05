@@ -29,16 +29,16 @@ export const BROWSE_LINKS: BrowseLink[] = [
     match: (p) => p.startsWith("/events") || p.startsWith("/calendar") || p.startsWith("/e/"),
   },
   {
-    href: "/offers",
+    href: "/deals",
     label: "Offers & Deals",
     icon: BadgePercent,
     match: (p) => p.startsWith("/offers") || p.startsWith("/deals") || p.startsWith("/promotions"),
   },
   {
-    href: "/experiences",
-    label: "Experiences",
+    href: "/now",
+    label: "What now?",
     icon: Sparkles,
-    match: (p) => p.startsWith("/experiences"),
+    match: (p) => p.startsWith("/now"),
   },
 ];
 
@@ -61,6 +61,7 @@ export const HOST_LINKS: BrowseLink[] = [
 
 const STRIP_PREFIXES = [
   "/explore",
+  "/now",
   "/stay",
   "/events",
   "/calendar",
@@ -68,7 +69,6 @@ const STRIP_PREFIXES = [
   "/offers",
   "/deals",
   "/promotions",
-  "/experiences",
 ];
 
 /** Mobile category strip shows on Home and browse-context routes only. */

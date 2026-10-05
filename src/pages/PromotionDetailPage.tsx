@@ -183,8 +183,8 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
       <div className="mx-auto max-w-2xl px-4 py-12 text-center">
         <p className="font-display text-xl font-bold">This campaign isn't available.</p>
         <p className="mt-1 text-sm text-mute">It may have ended or been removed.</p>
-        <Link href={kind === "giveaway" ? "/giveaways" : "/promotions"}>
-          <Button className="mt-4">Back to {kind === "giveaway" ? "giveaways" : "promotions"}</Button>
+        <Link href="/deals">
+          <Button className="mt-4">Back to deals</Button>
         </Link>
       </div>
     );
@@ -199,10 +199,10 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
     <div className="mx-auto max-w-2xl px-4 py-8 pb-28">
       <div className="flex items-center justify-between gap-3">
         <Link
-          href={kind === "giveaway" ? "/giveaways" : "/promotions"}
+          href="/deals"
           className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-ink ring-1 ring-line hover:bg-paper"
         >
-          <ArrowLeft size={14} /> {kind === "giveaway" ? "Giveaways" : "Promotions"}
+          <ArrowLeft size={14} /> Deals
         </Link>
         <button
           type="button"

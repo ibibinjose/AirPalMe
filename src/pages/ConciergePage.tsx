@@ -32,19 +32,20 @@ import { nearbyForMarker } from "@/lib/catalog";
 import { eventsTonight } from "@/lib/local-events";
 import { tonightCalendarEvents } from "@/lib/remote-events";
 import { useEvents } from "@/contexts/EventsContext";
-import { askAirPalRemote, getPropertyWifiRemote, liveBackendEnabled, placeDiningOrderRemote } from "@/lib/functions";
+import { askAirPalRemote, getPropertyWifiRemote, liveBackendEnabled } from "@/lib/functions";
 import { fetchPropertyMenu } from "@/lib/properties";
 import type { MenuItem } from "@shared/airpal-data";
-import { categoryFromGuestText, submitStaffTicket } from "@/lib/tickets-store";
 import { toast } from "sonner";
 import { useLocale } from "@/contexts/LocaleContext";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { demoModeActive, track, trackContentAction, trackFirstValue } from "@/lib/analytics";
 import { DemoBadge } from "@/components/ui/DemoBadge";
-import { isDuplicateSubmission, submissionFingerprint } from "@shared/abuse";
 import { triggerHaptic } from "@/lib/native";
 import { StayCompendium } from "@/components/stay/StayCompendium";
 import { AirPalAiReceptionist } from "@/components/stay/AirPalAiReceptionist";
+import { WifiSheet } from "@/components/concierge/WifiSheet";
+import { StaffRequestSheet } from "@/components/concierge/StaffRequestSheet";
+import { DiningSheet } from "@/components/concierge/DiningSheet";
 
 export function ConciergePage() {
   const { session, roomLabel, property, loadingProperty, marker } = useStay();
@@ -56,7 +57,6 @@ export function ConciergePage() {
   const [, nav] = useLocation();
   const bookedId = new URLSearchParams(useSearch()).get("booked") || "";
 
-  // Tonight around the guest, for Ask answers — live DB data only.
   const tonightForAsk = useMemo(() => {
     const nearby = eventsTonight(remoteNearby, now, timeZone).map((ev) => ({ title: ev.title, sub: ev.when }));
     const cal = tonightCalendarEvents(calendarEvents, now, timeZone, city).map((ev) => ({
@@ -71,17 +71,10 @@ export function ConciergePage() {
   const [answer, setAnswer] = useState<{ title: string; body: string } | null>(null);
   const [wifi, setWifi] = useState(property.wifi);
   const [menu, setMenu] = useState<MenuItem[]>([]);
-  const [ticket, setTicket] = useState("");
-  const [ticketSending, setTicketSending] = useState(false);
-  const lastTicketAt = useState(() => ({ at: 0, fingerprint: "" }))[0];
-  const [orderQty, setOrderQty] = useState<Record<string, number>>({});
-  const [orderRoom, setOrderRoom] = useState("");
-  const [ordering, setOrdering] = useState(false);
   const hasStay =
     session.kind === "stay" || session.kind === "campus" || Boolean(roomLabel) || Boolean(session.propertyId);
 
   useEffect(() => {
-    // Never invent a password: empty means "ask the desk", never a seed fallback.
     setWifi({ ...property.wifi, password: property.wifi.password || "" });
   }, [property.wifi]);
 
@@ -144,9 +137,6 @@ export function ConciergePage() {
     }
   }
 
-  // A context_view with loadStatus "ok" already fired for /g/:id — pair it
-  // with context_load_failed when the stay resolves to nothing, or the miss
-  // reads as a hit.
   const loadFailed = useRef("");
   useEffect(() => {
     if (loadingProperty || !session.propertyId) return;
@@ -218,7 +208,6 @@ export function ConciergePage() {
       <PaymentCanceledNotice />
       {bookedId ? <TicketPass bookingId={bookedId} /> : null}
       <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
-        {/* Left Column: Header Banner, AirPal Mate Priority, Room details & Quick Action Tiles (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
             {property.heroImage && <img src={property.heroImage} alt="" className="h-48 w-full object-cover" />}
@@ -270,22 +259,22 @@ export function ConciergePage() {
               <div className="min-w-0">
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-400 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-slate-950 shadow-xs mb-1">
                   <Sparkles size={11} className="text-slate-950" />
-                  AirPal Mate Priority
+                  What now?
                 </span>
                 <p className="text-[13px] font-extrabold text-white leading-snug truncate">
-                  Exploring {property.city || "Sydney"} alone?
+                  Exploring {property.city || "Sydney"}?
                 </p>
                 <p className="text-[11px] text-white/80 font-medium truncate">
-                  Find a verified local Mate to go with you.
+                  One suggestion for right now.
                 </p>
               </div>
             </div>
             <Button
               size="sm"
               className="relative shrink-0 font-extrabold gap-1.5 shadow-sm rounded-full bg-white text-brand hover:bg-amber-300 hover:text-slate-950 transition active:scale-95 px-4 min-h-[44px]"
-              onClick={() => nav("/companion")}
+              onClick={() => nav("/now")}
             >
-              <span>Find Mate</span>
+              <span>What now?</span>
               <ArrowRight size={14} />
             </Button>
           </div>
@@ -301,7 +290,6 @@ export function ConciergePage() {
 
           {!roomLabel && property.id && property.id !== "unknown" ? <StayBookCard property={property} /> : null}
 
-          {/* Quick Action Tiles */}
           <div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-gold mb-2">Guest Actions</p>
             <div className="grid grid-cols-2 gap-2.5">
@@ -321,17 +309,13 @@ export function ConciergePage() {
             </div>
           </div>
 
-          {/* Stay sections sit directly below Guest Actions: chat, call,
-              wi-fi, breakfast, check-in/out, then the Good to know guide. */}
           <div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-gold mb-2 px-1">Your stay</p>
             <StayCompendium />
           </div>
         </div>
 
-        {/* Right Column: Ask AirPal, Recommendations, Arrival Guide & Around You (7 cols) */}
         <div className="mt-6 lg:mt-0 lg:col-span-7 space-y-5">
-          {/* Ask AirPal Input Form */}
           <form
             className="apple-liquid-glass-light flex items-center gap-2 rounded-full px-4 py-2 shadow-sm transition-all focus-within:ring-2 focus-within:ring-brand focus-within:shadow-md"
             onSubmit={(e) => {
@@ -426,236 +410,24 @@ export function ConciergePage() {
         </div>
       </div>
 
-      {/* 24/7 AI Receptionist: AirPal AI */}
       <AirPalAiReceptionist />
 
-      {/* Sheets */}
-      <Sheet open={sheet === "wifi"} onClose={() => setSheet(null)} title={t("wifi")}>
-        <p className="text-[11px] font-bold uppercase tracking-wider text-mute">Network Name</p>
-        <p className="font-display text-2xl font-bold text-ink">{wifi.network || "Ask the desk"}</p>
-        {wifi.speed ? <p className="mt-1 text-xs text-mute font-medium">{wifi.speed}</p> : null}
-        {wifi.password ? (
-          <>
-            <p className="mt-4 text-[11px] font-bold uppercase tracking-wider text-mute">Password</p>
-            <p className="mt-1 font-mono text-xl font-bold text-ink">{wifi.password}</p>
-            <Button
-              className="mt-5 w-full font-bold shadow-xs"
-              onClick={() => {
-                void (async () => {
-                  try {
-                    await navigator.clipboard.writeText(wifi.password);
-                    void triggerHaptic("success");
-                    toast.success(t("copied"));
-                  } catch {
-                    toast.error("Copy failed — long-press the password to copy it manually.");
-                  }
-                })();
-              }}
-            >
-              Copy Password
-            </Button>
-          </>
-        ) : (
-          <p className="mt-4 text-xs text-mute">
-            Scan the room or lobby QR code for the live password, or ask front desk.
-          </p>
-        )}
-      </Sheet>
-
-      <Sheet open={sheet === "staff"} onClose={() => setSheet(null)} title={t("staff")}>
-        <textarea
-          value={ticket}
-          onChange={(e) => setTicket(e.target.value)}
-          placeholder="Towels, extra pillow, AC…"
-          aria-label="Describe your request for the front desk"
-          className="h-28 w-full rounded-2xl bg-paper p-3 text-[15px] outline-none ring-1 ring-line transition focus:ring-2 focus:ring-brand focus:border-brand font-medium"
-        />
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          {["Towels", "Clean", "Late checkout", "Extra night", "Room move", "Early check-in"].map((quick) => {
-            const selected = ticket === quick;
-            return (
-              <button
-                key={quick}
-                type="button"
-                aria-pressed={selected}
-                onClick={() => setTicket(quick)}
-                className={
-                  selected
-                    ? "h-10 rounded-full bg-brand text-xs font-bold text-white ring-1 ring-line transition active:scale-95 shadow-xs"
-                    : "h-10 rounded-full bg-paper text-xs font-bold text-ink ring-1 ring-line transition hover:bg-card active:scale-95 shadow-xs"
-                }
-              >
-                {quick}
-              </button>
-            );
-          })}
-        </div>
-        <Button
-          className="mt-4 w-full font-bold shadow-xs"
-          loading={ticketSending}
-          onClick={() => {
-            if (!ticket.trim() || ticketSending) return;
-            if (!property.id || property.id === "unknown" || !property.name) {
-              toast.error("This stay isn’t listed yet. Ask the desk.");
-              return;
-            }
-            const fingerprint = submissionFingerprint([property.id, roomLabel, ticket.trim()]);
-            if (fingerprint === lastTicketAt.fingerprint && isDuplicateSubmission(lastTicketAt.at)) {
-              toast.message("Already sent");
-              return;
-            }
-            lastTicketAt.fingerprint = fingerprint;
-            lastTicketAt.at = Date.now();
-            const details = ticket.trim();
-            const category = categoryFromGuestText(details);
-            setTicketSending(true);
-            void (async () => {
-              try {
-                const saved = await submitStaffTicket({
-                  propertyId: property.id,
-                  details,
-                  roomNumber: roomLabel || "Guest",
-                  category,
-                });
-                void track("support_request", {
-                  contextId: property.id,
-                  requestId: saved.id,
-                  category,
-                  priority: saved.urgency,
-                });
-                toast.success("Sent to front desk", {
-                  description: `Room ${roomLabel || "Guest"} · the host is notified.`,
-                });
-                setSheet(null);
-                setTicket("");
-              } catch (err) {
-                toast.error(err instanceof Error ? err.message : "Couldn’t send. Ask the desk.");
-              } finally {
-                setTicketSending(false);
-              }
-            })();
-          }}
-        >
-          {ticketSending ? "Sending…" : "Send Request"}
-        </Button>
-      </Sheet>
-
-      <Sheet open={sheet === "dining"} onClose={() => setSheet(null)} title={t("dining")}>
-        <p className="text-xs font-bold text-mute">
-          {property.breakfast?.hours || "Dining hours — ask the front desk"}
-        </p>
-        <div className="mt-4 space-y-3">
-          <div className="rounded-2xl ring-1 ring-line bg-paper p-4 shadow-xs">
-            <p className="font-bold text-ink">{property.breakfast?.type || "Breakfast & Dining"}</p>
-            <p className="text-xs text-mute mt-1">{property.breakfast?.location || property.address || "On site"}</p>
-            <p className="text-xs font-bold text-brand mt-1">{property.breakfast?.price || "Ask front desk"}</p>
-          </div>
-          {menu.length > 0 &&
-            menu.slice(0, 8).map((item) => {
-              const qty = orderQty[item.id] || 0;
-              return (
-                <div key={item.id} className="rounded-2xl ring-1 ring-line bg-paper p-4 shadow-xs">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-extrabold uppercase tracking-wider text-mute">{item.category}</p>
-                      <p className="font-bold text-ink">{item.name}</p>
-                      {item.description ? (
-                        <p className="mt-1 text-xs text-mute leading-relaxed">{item.description}</p>
-                      ) : null}
-                    </div>
-                    <p className="shrink-0 text-sm font-extrabold text-brand">${item.price}</p>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between gap-2">
-                    <p className="text-[11px] font-bold text-mute">
-                      {qty > 0 ? `A$${(item.price * qty).toFixed(2)}` : "Add to order"}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        aria-label={`Remove one ${item.name}`}
-                        disabled={qty === 0}
-                        onClick={() =>
-                          setOrderQty((prev) => {
-                            const next = { ...prev };
-                            if (qty <= 1) delete next[item.id];
-                            else next[item.id] = qty - 1;
-                            return next;
-                          })
-                        }
-                        className="grid h-9 w-9 touch-manipulation place-items-center rounded-full text-lg font-bold ring-1 ring-line disabled:opacity-30"
-                      >
-                        −
-                      </button>
-                      <span className="w-6 text-center text-sm font-extrabold" aria-live="polite">
-                        {qty}
-                      </span>
-                      <button
-                        type="button"
-                        aria-label={`Add one ${item.name}`}
-                        onClick={() => setOrderQty((prev) => ({ ...prev, [item.id]: Math.min(20, qty + 1) }))}
-                        className="grid h-9 w-9 touch-manipulation place-items-center rounded-full bg-brand text-lg font-bold text-white"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          {menu.length > 0 && (
-            <div className="rounded-2xl ring-1 ring-line bg-paper p-4 shadow-xs">
-              <label className="block">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-mute">Room (for delivery)</span>
-                <input
-                  value={orderRoom}
-                  onChange={(e) => setOrderRoom(e.target.value)}
-                  placeholder={roomLabel || "e.g. 101"}
-                  inputMode="text"
-                  className="mt-1 h-11 w-full rounded-2xl bg-card px-4 text-[15px] outline-none ring-1 ring-line focus:ring-2 focus:ring-brand"
-                />
-              </label>
-              <div className="mt-3 flex items-center justify-between gap-2">
-                <p className="text-sm font-extrabold">
-                  Total A$
-                  {menu.reduce((n, item) => n + item.price * (orderQty[item.id] || 0), 0).toFixed(2)}
-                </p>
-                <Button
-                  disabled={ordering || Object.keys(orderQty).length === 0}
-                  loading={ordering}
-                  onClick={() => {
-                    void (async () => {
-                      const items = Object.entries(orderQty).map(([menuItemId, qty]) => ({ menuItemId, qty }));
-                      const propId = session.propertyId || property.id;
-                      setOrdering(true);
-                      try {
-                        const res = await placeDiningOrderRemote({
-                          propertyId: propId,
-                          roomNumber: orderRoom.trim() || roomLabel || undefined,
-                          items,
-                        });
-                        setOrderQty({});
-                        trackContentAction("booking_intent", propId, { contentId: res.orderId });
-                        if (res.checkoutUrl) {
-                          window.location.assign(res.checkoutUrl);
-                        } else {
-                          toast.success("Order sent to the kitchen — pay at the desk");
-                          setSheet(null);
-                        }
-                      } catch (err) {
-                        toast.error(err instanceof Error ? err.message : "Couldn't place the order");
-                      } finally {
-                        setOrdering(false);
-                      }
-                    })();
-                  }}
-                >
-                  {ordering ? "Ordering…" : "Order & pay"}
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </Sheet>
+      <WifiSheet open={sheet === "wifi"} onClose={() => setSheet(null)} wifi={wifi} />
+      <StaffRequestSheet
+        open={sheet === "staff"}
+        onClose={() => setSheet(null)}
+        propertyId={property.id}
+        propertyName={property.name}
+        roomLabel={roomLabel || ""}
+      />
+      <DiningSheet
+        open={sheet === "dining"}
+        onClose={() => setSheet(null)}
+        property={property}
+        propertyId={session.propertyId || property.id}
+        menu={menu}
+        roomLabel={roomLabel || ""}
+      />
 
       <Sheet open={sheet === "safety"} onClose={() => setSheet(null)} title={t("help")}>
         <p className="text-sm font-bold text-ink">

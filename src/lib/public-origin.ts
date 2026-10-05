@@ -49,10 +49,6 @@ export function buildEventUrl(eventId: string): string {
   return toPublicUrl(`/e/${encodeURIComponent(eventId)}`);
 }
 
-export function buildMateUrl(mateUid?: string): string {
-  return toPublicUrl(mateUid ? `/mate?select=${encodeURIComponent(mateUid)}` : "/mate");
-}
-
 export function buildBioUrl(handle: string): string {
   const clean = handle.replace(/^@/, "").trim();
   return toPublicUrl(`/@${encodeURIComponent(clean)}`);

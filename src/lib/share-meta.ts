@@ -7,25 +7,15 @@ const DEFAULT_DESCRIPTION = "Life Made Easy. People, places, things and experien
  * pages (plans, events, bios) override these with their own setShareMeta. */
 const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> = [
   {
-    match: /^\/[Dd]emo(\/|$)/,
-    title: "AirPal.me in five minutes · Showcase tour",
-    description: "Walk the full AirPal loop — mates, plans, stays, events, business — every stop live.",
-  },
-  {
-    match: /^\/mate(\/|$)/,
-    title: "AirPal Mate · Find someone to go with you",
-    description:
-      "Going alone? Find a verified local AirPal Mate for food, culture, fitness, events and more in your city.",
-  },
-  {
     match: /^\/plan(\/|$)/,
     title: "Plans · AirPal.Me",
     description: "Make plans with family and friends — pick a place, gather the crew, go.",
   },
   {
-    match: /^\/experiences(\/|$)/,
-    title: "Experiences · AirPal.Me",
-    description: "Food, culture, fitness, art, music and local experiences near you.",
+    match: /^\/now(\/|$)/,
+    title: "What now? · AirPal.Me",
+    description:
+      "Tell AirPal.Me your urge and time window — get one suggestion for what to do right now, then make it a plan.",
   },
   {
     match: /^\/events(\/|$)/,
@@ -53,9 +43,9 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
     description: "Your guest companion — Wi-Fi, dining, the desk and what's around your stay.",
   },
   {
-    match: /^\/discover(\/|$)|^\/explore(\/|$)|^\/$|^\/circle(\/|$)/,
+    match: /^\/discover(\/|$)|^\/explore(\/|$)|^\/$/,
     title: "Discover · AirPal.Me",
-    description: "Discover places, events, experiences and people near you.",
+    description: "Discover places, events and experiences near you.",
   },
   {
     match: /^\/helpdesk(\/|$)/,
@@ -65,7 +55,7 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
   {
     match: /^\/help(\/|$)/,
     title: "Help center · AirPal.Me",
-    description: "Guides to plans, Mates, tickets, safety, and your account on AirPal.Me.",
+    description: "Guides to plans, tickets, safety, and your account on AirPal.Me.",
   },
   {
     match: /^\/business(\/|$)/,
@@ -78,24 +68,14 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
     description: "Add your place or venue to AirPal.Me and reach guests already nearby.",
   },
   {
-    match: /^\/club(\/|$)/,
-    title: "Clubs · AirPal.Me",
-    description: "Find your crowd — clubs, guest lists and community events.",
+    match: /^\/deals(\/|$)/,
+    title: "Deals · AirPal.Me",
+    description: "Local deals and offers from businesses on AirPal.Me — claim them in your plan.",
   },
   {
-    match: /^\/giveaways(\/|$)|^\/promotions(\/|$)/,
-    title: "Giveaways & Offers · AirPal.Me",
-    description: "Win experiences and claim local offers on AirPal.Me.",
-  },
-  {
-    match: /^\/guide(\/|$)|^\/solutions(\/|$)/,
+    match: /^\/guide(\/|$)/,
     title: "Guides · AirPal.Me",
     description: "Local guides and curated ways to experience the city.",
-  },
-  {
-    match: /^\/fashion(\/|$)/,
-    title: "Fashion · AirPal.Me",
-    description: "Brand fashion campaigns and drops on AirPal.Me. Rentals open with partner brands first.",
   },
   {
     match: /^\/scan(\/|$)/,
@@ -110,7 +90,7 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
   {
     match: /^\/alternatives\/meetup(\/|$)/,
     title: "Meetup alternative for casual plans · AirPal.Me",
-    description: "Blend social planning with local discovery: group plans, verified Mates, and what's on nearby.",
+    description: "Blend social planning with local discovery: group plans with friends, and what's on nearby.",
   },
   {
     match: /^\/alternatives\/touch-stay(\/|$)/,
@@ -148,20 +128,10 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
     title: "Get the AirPal app",
     description: "Take AirPal.Me anywhere — get the app for iOS and Android.",
   },
-  {
-    match: /^\/marketing(\/|$)/,
-    title: "Marketing · AirPal.Me",
-    description: "Grow with AirPal.Me — campaigns, offers and local discovery.",
-  },
-  {
-    match: /^\/studio(\/|$)/,
-    title: "Studio · AirPal.Me",
-    description: "Operate your listings, campaigns and bookings on AirPal.Me.",
-  },
 ];
 
 /** Detail pages own their tags (child effects run before AppShell's). */
-const DYNAMIC_OWNED = [/^\/@/, /^\/(plan|e|invite|p|tour|c|solutions)\/[^/]/, /^\/marketing(\/|$)/, /^\/stay\/@/];
+const DYNAMIC_OWNED = [/^\/@/, /^\/(plan|e|invite|p|tour)\/[^/]/, /^\/stay\/@/];
 
 /** Pure route → static meta lookup. Null when a dynamic page owns the tags. */
 export function routeMetaFor(pathname: string): { title: string; description: string; path: string } | null {

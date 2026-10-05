@@ -40,7 +40,7 @@ export function WavePage() {
     try {
       const res = await waveAtRemote(code);
       toast.success(`You waved at ${res.name}`);
-      nav(res.handle ? `/@${res.handle}` : "/circle");
+      nav(res.handle ? `/@${res.handle}` : "/now");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "That Wave ended");
     } finally {

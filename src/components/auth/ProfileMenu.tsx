@@ -6,10 +6,8 @@ import {
   Activity,
   Building2,
   CalendarDays,
-  Cat,
   ChevronRight,
   Compass,
-  HeartHandshake,
   Headphones,
   Images,
   Info,
@@ -21,17 +19,14 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
-  Star,
   Store,
   Ticket,
   UserRound,
-  Users,
   X,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { createSubmitGuard } from "@/lib/submit-guard";
-import { useClub } from "@/contexts/ClubContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { AvatarFace } from "@/components/auth/MeAvatar";
 import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
@@ -132,7 +127,6 @@ export function ProfileMenu() {
   const [, nav] = useLocation();
   const { user, isAdmin, isHost, logout } = useAuth();
   const { mine, business, biosReady, updateProfile } = useBio();
-  const { memberByEmail } = useClub();
   const { myEvent } = useEvents();
   const [open, setOpen] = useState(false);
   // Inline status editor lives inside the dropdown / drawer.
@@ -146,7 +140,6 @@ export function ProfileMenu() {
   const menuRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const clubMember = user?.email ? Boolean(memberByEmail(user.email)) : false;
 
   useScrollLock(open);
 
@@ -456,16 +449,14 @@ export function ProfileMenu() {
       {/* Social & Discovery Hubs */}
       <div className="mt-2 space-y-0.5">
         <Row
-          icon={HeartHandshake}
-          label="AirPal Mate"
-          hint="Find someone to do things with"
-          badge="People"
+          icon={Compass}
+          label="What now?"
+          hint="One suggestion, then a plan"
+          badge="Now"
           highlight
-          onClick={() => go("/mate")}
+          onClick={() => go("/now")}
         />
-        <Row icon={Users} label="Circle" hint="Family, friends & people nearby" onClick={() => go("/circle")} />
         <Row icon={CalendarDays} label="Plans & Invites" hint="Group plans, RSVPs & meetups" onClick={() => go("/plan")} />
-        <Row icon={Compass} label="Explore & Discovery" hint="Sydney, places, stays & eats" onClick={() => go("/explore")} />
         {mine ? (
           <Row
             icon={Sparkles}
@@ -540,7 +531,6 @@ export function ProfileMenu() {
           onClick={() => go("/event")}
         />
 
-        {clubMember && <Row icon={Users} label="AirPal Club" hint="Guest list & perks" onClick={() => go("/club")} />}
       </div>
 
       {/* Personal & Tools */}
@@ -554,15 +544,6 @@ export function ProfileMenu() {
           onClick={() => go("/me")}
         />
         <Row icon={Ticket} label="My Tickets" hint="Passes & reservations" onClick={() => go("/me/tickets")} />
-        <Row
-          icon={Star}
-          label="Stars & Rewards"
-          hint="Invite mates, earn Stars"
-          badge={mine?.starTier}
-          badgeColor="bg-gold/15 text-gold"
-          onClick={() => go("/me/rewards")}
-        />
-        {mine && <Row icon={Cat} label="Air Zoo" hint="Stickers, shops & hunts" onClick={() => go("/me/zoo")} />}
         <Row icon={Images} label="Memory Wall" hint="Keepsakes & moments" onClick={() => go("/me/memories")} />
         <Row icon={QrCode} label="Scan QR & Wave" hint="Scan marks & interact" onClick={() => go("/scan")} />
       </div>
@@ -620,23 +601,11 @@ export function ProfileMenu() {
       <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-gold">Get started</p>
       <div className="mt-1 space-y-0.5">
         <Row
-          icon={HeartHandshake}
-          label="AirPal Mate"
-          hint="Find someone to do things with"
-          highlight
-          onClick={() => go("/mate")}
-        />
-        <Row
           icon={Compass}
-          label="Explore Sydney & Stays"
-          hint="Find places, experiences & stays"
-          onClick={() => go("/explore")}
-        />
-        <Row
-          icon={Users}
-          label="Start your Circle"
-          hint="Family, friends & people nearby"
-          onClick={() => go("/circle")}
+          label="What now?"
+          hint="One suggestion, then a plan"
+          highlight
+          onClick={() => go("/now")}
         />
         <Row
           icon={Activity}

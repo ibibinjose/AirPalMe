@@ -13,6 +13,37 @@ import { useLocale } from "@/contexts/LocaleContext";
 import { useListings } from "@/contexts/ListingsContext";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { useOnDataReload } from "@/hooks/useDataReload";
+import { cn } from "@/lib/cn";
+
+function ShareGuideButton({
+  city,
+  label,
+  variant,
+  onShare,
+}: {
+  city: string;
+  label: string;
+  variant: "ghost" | "primary";
+  onShare: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onShare}
+      title={`Share ${city || "local"} curated guide`}
+      aria-label={`Share ${city || "local"} curated guide`}
+      className={cn(
+        "inline-flex min-h-[44px] shrink-0 cursor-pointer items-center gap-2 rounded-full text-xs font-semibold shadow-xs transition active:scale-95",
+        variant === "ghost"
+          ? "bg-card px-4 text-ink ring-1 ring-line hover:bg-paper hover:ring-brand/40"
+          : "bg-brand px-5 text-white hover:bg-brand-ink",
+      )}
+    >
+      <Share2 size={13} className={variant === "ghost" ? "text-gold" : undefined} aria-hidden />
+      <span>{label}</span>
+    </button>
+  );
+}
 
 export function GuidePage() {
   const [, nav] = useLocation();
@@ -50,6 +81,7 @@ export function GuidePage() {
   const handleShareGuide = () => {
     void shareCuratedGuide(city);
   };
+  const shareLabel = t("share.guide") || "Share Guide";
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-28 md:px-6">
@@ -62,16 +94,7 @@ export function GuidePage() {
             <span className="font-medium text-ink">{city || (aroundYou ? "your area" : "Sydney")}</span>
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleShareGuide}
-          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper hover:ring-brand/40 transition active:scale-95 cursor-pointer shadow-xs shrink-0"
-          title={`Share ${city || "local"} curated guide`}
-          aria-label={`Share ${city || "local"} curated guide`}
-        >
-          <Share2 size={13} className="text-gold" />
-          <span>{t("share.guide") || "Share Guide"}</span>
-        </button>
+        <ShareGuideButton city={city} label={shareLabel} variant="ghost" onShare={handleShareGuide} />
       </header>
       {!toursLoaded && tours.length === 0 ? (
         <TourCardSkeletonGrid count={2} className="grid gap-3 md:grid-cols-2" />
@@ -118,7 +141,7 @@ export function GuidePage() {
       <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-3xl bg-paper p-5 ring-1 ring-line">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <Share2 size={15} className="text-gold shrink-0" />
+            <Share2 size={15} className="text-gold shrink-0" aria-hidden />
             <h3 className="font-display text-base font-semibold text-ink">
               Exploring {city || "Sydney"} with travel companions?
             </h3>
@@ -127,14 +150,7 @@ export function GuidePage() {
             Share this curated precinct guide featuring guided walks, local sights, and hidden gems.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleShareGuide}
-          className="inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-full bg-brand px-5 text-xs font-semibold text-white shadow-xs hover:bg-brand-ink active:scale-95 transition cursor-pointer"
-        >
-          <Share2 size={13} />
-          <span>{t("share.guide") || "Share Guide"}</span>
-        </button>
+        <ShareGuideButton city={city} label={shareLabel} variant="primary" onShare={handleShareGuide} />
       </div>
     </div>
   );

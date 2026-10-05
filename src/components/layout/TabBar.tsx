@@ -14,10 +14,10 @@ import { tabFromPath, type GuestTab } from "@/lib/tabs";
 
 export { tabFromPath };
 
-/** Shipped companion dock: Home / Explore / Plan / Inbox / Me. Scan & create live on CreateFab. */
+/** Shipped companion dock: Home / Now / Plan / Inbox / Me. Scan & create live on CreateFab. */
 const TABS: { href: string; id: GuestTab; label: string; icon: typeof Compass }[] = [
   { href: "/", id: "home", label: "Home", icon: Home },
-  { href: "/explore", id: "explore", label: "Explore", icon: Compass },
+  { href: "/now", id: "explore", label: "Now", icon: Compass },
   { href: "/plan", id: "trips", label: "Plan", icon: CalendarDays },
   { href: "/me/inbox", id: "inbox", label: "Inbox", icon: Inbox },
   { href: "/me", id: "me", label: "Me", icon: AtSign },

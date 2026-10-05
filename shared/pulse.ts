@@ -816,6 +816,21 @@ export function issueSummaryFromAnswers(answers: PulseAnswer[], primaryScore?: n
   return bits.join(" · ").slice(0, 200) || "Pulse issue";
 }
 
+/** 1–5 score histogram for the satisfaction breakdown. Ignores unscored rows. */
+export function scoreDistribution(rows: Array<{ primaryScore?: number | null }>): Record<1 | 2 | 3 | 4 | 5, number> {
+  const counts: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+  for (const row of rows) {
+    const p = row.primaryScore;
+    if (p != null && p >= 1 && p <= 5) counts[p] += 1;
+  }
+  return counts as Record<1 | 2 | 3 | 4 | 5, number>;
+}
+
+/** The pulse whose QR is live, else the first one to continue working on. */
+export function activeLivePulse<T extends { status: string }>(pulses: T[]): T | undefined {
+  return pulses.find((p) => p.status === "live") || pulses[0];
+}
+
 /** CSV header + rows for host export (only contact fields the guest offered). */
 export function pulseResponsesToCsv(rows: PulseResponse[]): string {
   const header = [
@@ -857,4 +872,3 @@ export function pulseResponsesToCsv(rows: PulseResponse[]): string {
   }
   return lines.join("\n");
 }
-
