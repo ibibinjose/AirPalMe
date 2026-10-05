@@ -225,7 +225,7 @@ export function InboxPage() {
   };
 
   return (
-    <div className="mx-auto max-w-lg px-4 pb-12">
+    <div className="mx-auto max-w-lg px-4 pb-[max(6rem,calc(env(safe-area-inset-bottom,0px)+5rem))]">
       <div className="flex items-center justify-between pt-6">
         <div>
           <h1 className="font-display text-[28px] font-bold tracking-tight">Inbox</h1>
@@ -407,7 +407,7 @@ export function InboxPage() {
               autoComplete="off"
               placeholder="Enter code"
               aria-label="Enter trip invite code"
-              className="min-w-0 flex-1 bg-transparent text-[15px] font-medium placeholder:text-mute focus:outline-none"
+              className="min-w-0 flex-1 bg-transparent text-[16px] font-medium placeholder:text-mute focus:outline-none"
             />
             <button
               type="submit"

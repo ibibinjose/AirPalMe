@@ -47,6 +47,7 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { cityMatches } from "@/lib/remote-events";
 import { ROCKS_BROWSE } from "@/lib/catalog";
+import { triggerHaptic, triggerHapticSelection } from "@/lib/native";
 
 const CATEGORIES = CALENDAR_CATEGORIES;
 
@@ -380,10 +381,13 @@ function CalendarPageContent() {
           {/* Toggle Sidebar (Desktop) */}
           <button
             type="button"
-            onClick={() => setIsSidebarOpen((prev) => !prev)}
+            onClick={() => {
+              void triggerHaptic("light");
+              setIsSidebarOpen((prev) => !prev);
+            }}
             title={isSidebarOpen ? "Collapse search sidebar" : "Expand search sidebar"}
             className={cn(
-              "hidden lg:inline-flex h-10 items-center gap-1.5 rounded-full px-3.5 text-xs font-medium transition shadow-xs active:scale-95 cursor-pointer",
+              "hidden lg:inline-flex min-h-[44px] h-11 items-center gap-1.5 rounded-full px-3.5 text-xs font-medium transition shadow-xs active:scale-95 cursor-pointer",
               isSidebarOpen
                 ? "bg-card text-ink ring-1 ring-line/80 hover:bg-paper"
                 : "bg-paper text-ink ring-1 ring-line hover:bg-line",
@@ -401,9 +405,12 @@ function CalendarPageContent() {
           {/* Mobile Filters Trigger */}
           <button
             type="button"
-            onClick={() => setIsMobileDrawerOpen(true)}
+            onClick={() => {
+              void triggerHaptic("medium");
+              setIsMobileDrawerOpen(true);
+            }}
             title="Open search and filters"
-            className="inline-flex lg:hidden h-10 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-medium text-ink ring-1 ring-line/80 hover:bg-paper transition shadow-xs active:scale-95 cursor-pointer"
+            className="inline-flex lg:hidden min-h-[44px] h-11 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-medium text-ink ring-1 ring-line/80 hover:bg-paper transition shadow-xs active:scale-95 cursor-pointer"
           >
             <SlidersHorizontal size={13} className="text-brand" />
             <span>Filters</span>
@@ -414,14 +421,17 @@ function CalendarPageContent() {
             )}
           </button>
 
-          {/* View Switcher Tabs (Month, Week, Day) */}
-          <div className="inline-flex h-10 rounded-full bg-card p-1 ring-1 ring-line/80 shadow-xs">
+          {/* View Switcher Tabs (Month, Week, Day, List) */}
+          <div className="inline-flex min-h-[44px] h-11 items-center rounded-full bg-card p-1 ring-1 ring-line/80 shadow-xs">
             <button
               type="button"
               aria-label="Month View"
-              onClick={() => setViewMode("month")}
+              onClick={() => {
+                if (viewMode !== "month") void triggerHapticSelection();
+                setViewMode("month");
+              }}
               className={cn(
-                "flex items-center gap-1.5 rounded-full px-3 text-xs font-medium transition cursor-pointer",
+                "flex min-h-[36px] items-center gap-1.5 rounded-full px-3 text-xs font-medium transition active:scale-95 cursor-pointer",
                 viewMode === "month" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
               )}
             >
@@ -431,9 +441,12 @@ function CalendarPageContent() {
             <button
               type="button"
               aria-label="Week View"
-              onClick={() => setViewMode("week")}
+              onClick={() => {
+                if (viewMode !== "week") void triggerHapticSelection();
+                setViewMode("week");
+              }}
               className={cn(
-                "flex items-center gap-1.5 rounded-full px-3 text-xs font-medium transition cursor-pointer",
+                "flex min-h-[36px] items-center gap-1.5 rounded-full px-3 text-xs font-medium transition active:scale-95 cursor-pointer",
                 viewMode === "week" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
               )}
             >
@@ -443,9 +456,12 @@ function CalendarPageContent() {
             <button
               type="button"
               aria-label="Day View"
-              onClick={() => setViewMode("day")}
+              onClick={() => {
+                if (viewMode !== "day") void triggerHapticSelection();
+                setViewMode("day");
+              }}
               className={cn(
-                "flex items-center gap-1.5 rounded-full px-3 text-xs font-medium transition cursor-pointer",
+                "flex min-h-[36px] items-center gap-1.5 rounded-full px-3 text-xs font-medium transition active:scale-95 cursor-pointer",
                 viewMode === "day" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
               )}
             >
@@ -455,9 +471,12 @@ function CalendarPageContent() {
             <button
               type="button"
               aria-label="List View"
-              onClick={() => setViewMode("list")}
+              onClick={() => {
+                if (viewMode !== "list") void triggerHapticSelection();
+                setViewMode("list");
+              }}
               className={cn(
-                "flex items-center gap-1.5 rounded-full px-3 text-xs font-medium transition cursor-pointer",
+                "flex min-h-[36px] items-center gap-1.5 rounded-full px-3 text-xs font-medium transition active:scale-95 cursor-pointer",
                 viewMode === "list" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
               )}
             >
@@ -469,10 +488,13 @@ function CalendarPageContent() {
           {/* Export My Itinerary CTA */}
           <button
             type="button"
-            onClick={() => exportItinerary("all-saved")}
+            onClick={() => {
+              void triggerHaptic("light");
+              exportItinerary("all-saved");
+            }}
             title="Export your saved RSVP events to Apple, Outlook, or Google Calendar"
             className={cn(
-              "inline-flex h-10 items-center gap-1.5 rounded-full px-3.5 text-xs font-medium transition shadow-xs active:scale-95",
+              "inline-flex min-h-[44px] h-11 items-center gap-1.5 rounded-full px-3.5 text-xs font-medium transition shadow-xs active:scale-95 cursor-pointer",
               savedItineraryCount > 0
                 ? "bg-brand text-white hover:bg-brand-ink shadow-sm"
                 : "bg-card text-ink ring-1 ring-line/80 hover:bg-paper",
@@ -881,7 +903,7 @@ function CalendarPageContent() {
             onClick={() => setIsMobileDrawerOpen(false)}
             aria-hidden="true"
           />
-          <div className="fixed inset-y-0 right-0 max-w-xs w-full bg-card p-5 shadow-2xl border-l border-line overflow-y-auto z-10">
+          <div className="fixed inset-y-0 right-0 max-w-xs w-full bg-card p-5 shadow-2xl border-l border-line overflow-y-auto z-10 pb-[max(1.5rem,calc(env(safe-area-inset-bottom,0px)+1.25rem))]">
             <CalendarSidebar
               viewMode={viewMode}
               onViewModeChange={setViewMode}

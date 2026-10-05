@@ -190,7 +190,7 @@ export function ScanPage() {
   };
 
   return (
-    <div className="mx-auto flex h-full max-w-lg flex-col px-4 pb-16 pb-safe">
+    <div className="mx-auto flex h-full max-w-lg flex-col px-4 pb-[max(5rem,calc(env(safe-area-inset-bottom,0px)+5rem))]">
       <div className="relative mt-2 overflow-hidden rounded-[28px] bg-ink shadow-lg ring-1 ring-line">
         <video ref={videoRef} className="h-64 w-full object-cover md:h-80" playsInline muted />
         <canvas ref={canvasRef} className="hidden" />
@@ -265,11 +265,11 @@ export function ScanPage() {
           value={manualCode}
           onChange={(e) => setManualCode(e.target.value)}
           placeholder="Enter room # (e.g. 101), invite code, or @handle…"
-          className="h-11 flex-1 rounded-2xl bg-card px-4 text-xs md:text-sm font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand placeholder:text-mute focus-visible:border-brand"
+          className="h-11 flex-1 rounded-2xl bg-card px-4 text-[16px] md:text-sm font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand placeholder:text-mute focus-visible:border-brand"
         />
         <button
           type="submit"
-          className="h-11 rounded-2xl bg-brand px-4 text-xs md:text-sm font-semibold text-white shadow-sm hover:bg-brand-ink transition shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+          className="min-h-[44px] h-11 rounded-2xl bg-brand px-4 text-xs md:text-sm font-semibold text-white shadow-sm hover:bg-brand-ink transition active:scale-95 shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
         >
           Open
         </button>
@@ -301,7 +301,7 @@ export function ScanPage() {
                   void triggerHaptic("light");
                   nav(hrefForPlace(p));
                 }}
-                className="relative h-28 overflow-hidden rounded-3xl bg-ink"
+                className="relative h-28 overflow-hidden rounded-3xl bg-ink transition active:scale-95 cursor-pointer"
               >
                 {p.heroImage && (
                   <img

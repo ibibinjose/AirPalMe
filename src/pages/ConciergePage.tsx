@@ -204,7 +204,7 @@ export function ConciergePage() {
   ];
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-12 md:px-6">
+    <div className="mx-auto max-w-5xl px-4 pb-[max(5rem,calc(env(safe-area-inset-bottom,0px)+4rem))] md:px-6">
       <PaymentCanceledNotice />
       {bookedId ? <TicketPass bookingId={bookedId} /> : null}
       <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
@@ -297,8 +297,11 @@ export function ConciergePage() {
                 <button
                   key={t.id}
                   type="button"
-                  onClick={t.run}
-                  className="apple-liquid-glass-card hover-lift flex touch-manipulation items-center gap-3 rounded-2xl p-3.5 shadow-xs transition active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                  onClick={() => {
+                    void triggerHaptic("medium");
+                    t.run();
+                  }}
+                  className="apple-liquid-glass-card hover-lift flex min-h-[48px] touch-manipulation items-center gap-3 rounded-2xl p-3.5 shadow-xs transition active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
                 >
                   <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand">
                     <t.icon size={17} />
@@ -331,7 +334,7 @@ export function ConciergePage() {
               onChange={(e) => setAsk(e.target.value)}
               placeholder={t("askAirPal")}
               aria-label={t("askAirPal")}
-              className="h-10 w-full bg-transparent text-[15px] outline-none text-ink placeholder:text-mute font-medium"
+              className="h-10 w-full bg-transparent text-[16px] outline-none text-ink placeholder:text-mute font-medium"
             />
             <Button type="submit" size="sm" className="rounded-full px-4 font-bold shrink-0">
               Ask

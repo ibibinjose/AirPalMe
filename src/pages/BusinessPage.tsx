@@ -41,6 +41,7 @@ import { GooglePlaceImportCard } from "@/components/business/GooglePlaceImport";
 import { bioLinksFromGooglePlace, mergeBioLinks } from "@shared/google-place";
 import { NAMES } from "@shared/names";
 import { WaveHostCard } from "@/components/wave/WaveHostCard";
+import { triggerHapticSelection } from "@/lib/native";
 import {
   Activity,
   AlertTriangle,
@@ -293,7 +294,7 @@ export function BusinessPage() {
   );
 
   return (
-    <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-8">
+    <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-8 pb-[max(6rem,calc(env(safe-area-inset-bottom,0px)+5rem))]">
       {/* Top Venue Switcher & Multi-Location Toolbar */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-card px-4 py-3 ring-1 ring-line shadow-xs">
         <div className="flex items-center gap-3">
@@ -544,9 +545,12 @@ export function BusinessPage() {
                       <button
                         key={c.id}
                         type="button"
-                        onClick={() => setCategory(c.id)}
+                        onClick={() => {
+                          if (category !== c.id) void triggerHapticSelection();
+                          setCategory(c.id);
+                        }}
                         className={cn(
-                          "min-h-[44px] rounded-2xl px-3.5 text-xs font-semibold transition shadow-2xs",
+                          "min-h-[44px] rounded-2xl px-3.5 text-xs font-semibold transition active:scale-95 shadow-2xs cursor-pointer",
                           category === c.id
                             ? "bg-brand text-white shadow-sm ring-2 ring-brand/30"
                             : "bg-paper text-ink ring-1 ring-line hover:bg-card",

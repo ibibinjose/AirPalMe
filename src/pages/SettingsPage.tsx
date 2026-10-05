@@ -12,6 +12,7 @@ import { useBio } from "@/contexts/BioContext";
 import { ChangeHandleForm } from "@/components/bio/ChangeHandleForm";
 import { partnerAccountPath } from "@/lib/partner-account";
 import { NAMES } from "@shared/names";
+import { triggerHaptic } from "@/lib/native";
 
 export function SettingsPage() {
   const [, nav] = useLocation();
@@ -22,7 +23,7 @@ export function SettingsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState("");
 
   return (
-    <div className="mx-auto max-w-md px-4 pb-28">
+    <div className="mx-auto max-w-md px-4 pb-[max(7rem,calc(env(safe-area-inset-bottom,0px)+6rem))]">
       <p className="pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Account</p>
       <h1 className="font-display mt-1 text-3xl font-semibold">Settings</h1>
 
@@ -161,13 +162,14 @@ export function SettingsPage() {
             onChange={(e) => setDeleteConfirm(e.target.value)}
             placeholder="Type DELETE"
             autoComplete="off"
-            className="mt-3 w-full rounded-2xl border border-line bg-card px-4 py-3 text-sm"
+            className="mt-3 w-full rounded-2xl border border-line bg-card px-4 py-3 text-[16px] sm:text-sm outline-none focus-visible:ring-2 focus-visible:ring-brand"
           />
           <button
             type="button"
             disabled={deleteBusy || deleteConfirm !== "DELETE"}
-            className="mt-3 inline-flex min-h-[44px] items-center rounded-full bg-rose-500/10 px-4 text-sm font-semibold text-rose-700 ring-1 ring-rose-500/20 transition hover:bg-rose-500/15 disabled:opacity-40"
+            className="mt-3 inline-flex min-h-[44px] items-center rounded-full bg-rose-500/10 px-4 text-sm font-semibold text-rose-700 ring-1 ring-rose-500/20 transition hover:bg-rose-500/15 disabled:opacity-40 active:scale-95 cursor-pointer"
             onClick={() => {
+              void triggerHaptic("error");
               setDeleteBusy(true);
               void deleteAccount()
                 .then(() => {

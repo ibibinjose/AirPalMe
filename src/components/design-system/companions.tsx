@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { openGlobalSearch } from "@/components/search/openSearch";
+import { triggerHapticSelection } from "@/lib/native";
 
 /**
  * AirPal companion design primitives (§24–§28, §43 of the brief).
@@ -67,7 +68,10 @@ export function SegmentedControl<T extends string>({
           role="tab"
           aria-selected={value === o.id}
           type="button"
-          onClick={() => onChange(o.id)}
+          onClick={() => {
+            if (value !== o.id) void triggerHapticSelection();
+            onChange(o.id);
+          }}
           className={cn(
             "min-h-[44px] flex-1 cursor-pointer touch-manipulation rounded-full px-4 text-[14px] font-semibold whitespace-nowrap transition active:scale-[0.98]",
             value === o.id ? "bg-brand text-white shadow-[0_6px_14px_-8px_rgba(18,22,20,0.3)]" : "text-mute hover:text-ink",
@@ -100,10 +104,13 @@ export function PillRow<T extends string>({
           <button
             key={o.id}
             type="button"
-            onClick={() => onChange(o.id)}
+            onClick={() => {
+              if (value !== o.id) void triggerHapticSelection();
+              onChange(o.id);
+            }}
             aria-pressed={on}
             className={cn(
-              "h-10 shrink-0 cursor-pointer touch-manipulation rounded-full px-4 text-[14px] font-semibold shadow-sm transition active:scale-[0.96]",
+              "min-h-[44px] shrink-0 cursor-pointer touch-manipulation rounded-full px-4 text-[14px] font-semibold shadow-sm transition active:scale-[0.96]",
               !on && "ring-1 ring-line",
             )}
             style={

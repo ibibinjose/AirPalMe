@@ -186,7 +186,7 @@ export function PulsePublicPage() {
   const headerImage = pulse.imageUrl || pulse.propertyHeroImage;
 
   return (
-    <div className="mx-auto min-h-[100dvh] max-w-md px-4 pb-28 pt-6">
+    <div className="mx-auto min-h-[100dvh] max-w-md px-4 pb-[max(7rem,calc(env(safe-area-inset-bottom,0px)+6rem))] pt-6">
       {headerImage ? (
         <div>
           <div className="relative h-40 overflow-hidden rounded-[28px] ring-1 ring-line">
@@ -241,21 +241,21 @@ export function PulsePublicPage() {
           <h2 className="font-display text-xl font-semibold">Want someone to reach you?</h2>
           <p className="text-sm text-mute">Optional. Leave blank to stay anonymous.</p>
           <input
-            className="h-11 w-full rounded-full border border-line bg-paper px-4 text-[15px] outline-none focus:border-brand"
+            className="h-11 w-full rounded-full border border-line bg-paper px-4 text-[16px] outline-none focus:border-brand"
             placeholder="Name"
             aria-label="Your name (optional)"
             value={contactName}
             onChange={(e) => setContactName(e.target.value)}
           />
           <input
-            className="h-11 w-full rounded-full border border-line bg-paper px-4 text-[15px] outline-none focus:border-brand"
+            className="h-11 w-full rounded-full border border-line bg-paper px-4 text-[16px] outline-none focus:border-brand"
             placeholder="Phone or email"
             aria-label="Phone or email for follow-up (optional)"
             value={contactMethod}
             onChange={(e) => setContactMethod(e.target.value)}
           />
           <input
-            className="h-11 w-full rounded-full border border-line bg-paper px-4 text-[15px] outline-none focus:border-brand"
+            className="h-11 w-full rounded-full border border-line bg-paper px-4 text-[16px] outline-none focus:border-brand"
             placeholder="Room number (optional)"
             aria-label="Room number (optional)"
             value={roomNumber}
@@ -355,7 +355,7 @@ export function PulsePublicPage() {
             )}
             {current.type === "text_short" && (
               <textarea
-                className="min-h-[100px] w-full rounded-2xl border border-line bg-paper p-3 text-[15px] outline-none focus:border-brand"
+                className="min-h-[100px] w-full rounded-2xl border border-line bg-paper p-3 text-[16px] outline-none focus:border-brand"
                 placeholder="A short note"
                 aria-label={current.prompt}
                 maxLength={500}

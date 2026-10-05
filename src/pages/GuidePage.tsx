@@ -13,6 +13,7 @@ import { useLocale } from "@/contexts/LocaleContext";
 import { useListings } from "@/contexts/ListingsContext";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { useOnDataReload } from "@/hooks/useDataReload";
+import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
 function ShareGuideButton({
@@ -79,12 +80,13 @@ export function GuidePage() {
   }, [here, city, aroundYou, version]);
 
   const handleShareGuide = () => {
+    void triggerHaptic("medium");
     void shareCuratedGuide(city);
   };
   const shareLabel = t("share.guide") || "Share Guide";
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-28 md:px-6">
+    <div className="mx-auto max-w-5xl px-4 pb-[max(7rem,calc(env(safe-area-inset-bottom,0px)+6rem))] md:px-6">
       <header className="flex items-start justify-between gap-4 py-5">
         <div>
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-gold">{t("guide")}</p>

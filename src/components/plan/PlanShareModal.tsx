@@ -136,7 +136,7 @@ export function PlanShareModal({
               type="text"
               readOnly
               value={inviteUrl}
-              className="min-w-0 flex-1 bg-transparent px-2.5 text-xs text-ink outline-none select-all"
+              className="min-w-0 flex-1 bg-transparent px-2.5 text-[16px] sm:text-xs text-ink outline-none select-all"
             />
             <Button
               size="sm"

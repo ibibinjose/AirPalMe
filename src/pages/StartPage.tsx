@@ -37,7 +37,7 @@ import { PhoneLogin } from "@/components/auth/PhoneLogin";
 import { SignupFlow } from "@/components/auth/SignupFlow";
 import { SocialAuthButtons, SocialAuthDivider } from "@/components/auth/SocialAuthButtons";
 import { PhoneField } from "@/components/forms/PhoneField";
-import { isNativeApp } from "@/lib/native";
+import { isNativeApp, triggerHapticSelection } from "@/lib/native";
 import { useVirtualKeyboard } from "@/lib/keyboard";
 import { phonePasswordNeedsSms, phoneReady } from "@shared/phone-auth";
 import { MeAvatar } from "@/components/auth/MeAvatar";
@@ -335,6 +335,7 @@ export function StartPage() {
   }, [user, pendingGo, next, nav, phoneSignup, roleParam, business]);
 
   function switchMode(newMode: AuthMode) {
+    void triggerHapticSelection();
     setMode(newMode);
     setInlineError(null);
     const p = new URLSearchParams(search);
@@ -344,6 +345,7 @@ export function StartPage() {
   }
 
   function switchMethod(newMethod: AuthMethod) {
+    void triggerHapticSelection();
     setMethod(newMethod);
     setInlineError(null);
     const p = new URLSearchParams(search);
@@ -864,7 +866,7 @@ export function StartPage() {
                 onClick={() => switchMode("signin")}
                 aria-pressed={mode === "signin"}
                 className={cn(
-                  "flex-1 rounded-full min-h-[44px] text-center text-xs font-semibold transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+                  "flex-1 rounded-full min-h-[44px] text-center text-xs font-semibold transition active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
                   mode === "signin" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
                 )}
               >
@@ -875,7 +877,7 @@ export function StartPage() {
                 onClick={() => switchMode("signup")}
                 aria-pressed={mode === "signup"}
                 className={cn(
-                  "flex-1 rounded-full min-h-[44px] text-center text-xs font-semibold transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+                  "flex-1 rounded-full min-h-[44px] text-center text-xs font-semibold transition active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
                   mode === "signup" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
                 )}
               >
@@ -904,7 +906,7 @@ export function StartPage() {
                 onClick={() => switchMethod("email")}
                 aria-pressed={method === "email"}
                 className={cn(
-                  "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition cursor-pointer",
+                  "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition active:scale-[0.98] cursor-pointer",
                   method === "email"
                     ? "bg-brand text-white shadow-xs"
                     : "bg-paper text-mute hover:text-ink ring-1 ring-line/80",
@@ -918,7 +920,7 @@ export function StartPage() {
                 onClick={() => switchMethod("phone")}
                 aria-pressed={method === "phone"}
                 className={cn(
-                  "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition cursor-pointer",
+                  "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-semibold transition active:scale-[0.98] cursor-pointer",
                   method === "phone"
                     ? "bg-brand text-white shadow-xs"
                     : "bg-paper text-mute hover:text-ink ring-1 ring-line/80",

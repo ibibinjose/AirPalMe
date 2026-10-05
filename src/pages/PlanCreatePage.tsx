@@ -36,7 +36,7 @@ import { useLocalNow } from "@/hooks/useLocalNow";
 import { toZonedDateStr, zonedWeekdayIndex } from "@/lib/local-time";
 import { listPeople } from "@/lib/people";
 import { circleHandles } from "@/lib/circle";
-import { triggerHaptic } from "@/lib/native";
+import { triggerHaptic, triggerHapticSelection } from "@/lib/native";
 import { PLAN_TYPES, formatPlanDate, initialPlanDate, initialPlanTime, type PlanType } from "@shared/plan";
 import { cn } from "@/lib/cn";
 import { PlaceAddressField, type PickedPlace } from "@/components/forms/PlaceAddressField";
@@ -291,7 +291,7 @@ export function PlanCreatePage() {
   }
 
   function toggleInvite(handle: string) {
-    void triggerHaptic("light");
+    void triggerHapticSelection();
     setInvite((prev) => {
       const next = new Set(prev);
       if (next.has(handle)) next.delete(handle);
@@ -373,7 +373,7 @@ export function PlanCreatePage() {
   const activeTemplate = TEMPLATES.find((t) => t.id === type) || TEMPLATES[0]!;
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-6 pb-32">
+    <div className="mx-auto max-w-xl px-4 py-6 pb-[max(8rem,calc(env(safe-area-inset-bottom,0px)+6rem))]">
       {/* Header & Breadcrumb Navigation */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -623,7 +623,7 @@ export function PlanCreatePage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={PLAN_TYPES[type]?.defaultTitle || "e.g. Friday drinks at The Rocks"}
-                className={cn(fieldInput, "text-sm sm:text-base font-semibold py-3")}
+                className={cn(fieldInput, "text-[16px] sm:text-base font-semibold py-3")}
               />
             </label>
 
@@ -948,7 +948,7 @@ export function PlanCreatePage() {
                     value={peopleSearch}
                     onChange={(e) => setPeopleSearch(e.target.value)}
                     placeholder="Search circle by name or @handle…"
-                    className="h-full flex-1 bg-transparent text-xs text-ink outline-none placeholder:text-mute"
+                    className="h-full flex-1 bg-transparent text-[16px] sm:text-xs text-ink outline-none placeholder:text-mute"
                   />
                   {peopleSearch && (
                     <button
@@ -991,7 +991,7 @@ export function PlanCreatePage() {
                         type="button"
                         onClick={() => toggleInvite(p.handle)}
                         className={cn(
-                          "flex w-full items-center justify-between rounded-2xl p-2.5 text-left border transition active:scale-[0.99] cursor-pointer",
+                          "flex min-h-[44px] w-full items-center justify-between rounded-2xl p-2.5 text-left border transition active:scale-[0.99] cursor-pointer",
                           selected
                             ? "bg-brand/10 border-brand font-semibold shadow-2xs"
                             : "bg-paper border-line/60 hover:bg-card",

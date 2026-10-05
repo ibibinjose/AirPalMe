@@ -148,7 +148,7 @@ export function MePage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-12 pt-6 md:px-6">
+    <div className="mx-auto max-w-5xl px-4 pb-[max(6rem,calc(env(safe-area-inset-bottom,0px)+5rem))] pt-6 md:px-6">
       <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
         {/* Left Column: Avatar Hero, Handle, Quick Links & Contacts (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
