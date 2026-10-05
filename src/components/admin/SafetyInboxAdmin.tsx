@@ -7,6 +7,8 @@ import { logAdminAction } from "@/lib/admin-audit";
 import { cn } from "@/lib/cn";
 import {
   REPORT_REASON_LABELS,
+  slaAgeLabel,
+  slaState,
   sortSafetyCasesEmergenciesFirst,
   type SafetyReportStatus,
 } from "@shared/safety";
@@ -54,6 +56,10 @@ export function SafetyInboxAdmin() {
     return sortSafetyCasesEmergenciesFirst(filtered);
   }, [rows, filter]);
   const emergencyCount = useMemo(() => rows.filter((r) => r.reason === "emergency" && r.status === "new").length, [rows]);
+  const overdueCount = useMemo(
+    () => rows.filter((r) => r.status === "new" && slaState(r, Date.now()) === "overdue").length,
+    [rows],
+  );
 
   async function act(row: CaseRow, status: SafetyReportStatus) {
     const db = getFirebaseDb();
@@ -93,6 +99,11 @@ export function SafetyInboxAdmin() {
         {emergencyCount > 0 && (
           <span className="mt-1 block font-semibold text-red-600">
             {emergencyCount} new {emergencyCount === 1 ? "emergency" : "emergencies"} waiting.
+          </span>
+        )}
+        {overdueCount > 0 && (
+          <span className="mt-1 block font-semibold text-red-600">
+            {overdueCount} past SLA — review now.
           </span>
         )}
       </p>
@@ -135,11 +146,18 @@ export function SafetyInboxAdmin() {
                     {(REPORT_REASON_LABELS as Record<string, string>)[r.reason] ?? r.reason} · {r.target}
                   </span>
                   <span className="block truncate text-xs text-mute">
-                    {r.createdAt.slice(0, 10)} · plan {r.planId.slice(0, 8)}…
+                    {slaAgeLabel(r.createdAt)} old · {r.createdAt.slice(0, 10)} · plan {r.planId.slice(0, 8)}…
                   </span>
                 </span>
-                <span className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-brand ring-1 ring-brand/30">
-                  {r.status}
+                <span className="flex shrink-0 items-center gap-1.5">
+                  {r.status === "new" && slaState(r, Date.now()) === "overdue" && (
+                    <span className="rounded-full bg-red-500/15 px-2.5 py-1 text-[11px] font-bold text-red-700 ring-1 ring-red-500/40">
+                      Past SLA
+                    </span>
+                  )}
+                  <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-brand ring-1 ring-brand/30">
+                    {r.status}
+                  </span>
                 </span>
               </button>
               {openId === r.id && (

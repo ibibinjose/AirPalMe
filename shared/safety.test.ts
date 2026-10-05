@@ -5,6 +5,9 @@ import {
   isEmergencyReason,
   isReportReason,
   reportValid,
+  slaAgeLabel,
+  slaDeadlineHours,
+  slaState,
   sortSafetyCasesEmergenciesFirst,
 } from "./safety";
 
@@ -44,5 +47,33 @@ describe("safety reports", () => {
     ]);
     expect(isEmergencyReason("emergency")).toBe(true);
     expect(isEmergencyReason("harassment")).toBe(false);
+  });
+});
+
+describe("safety case SLAs", () => {
+  const NOW = Date.parse("2026-09-21T12:00:00.000Z");
+  const hoursAgo = (h: number) => new Date(NOW - h * 3600_000).toISOString();
+
+  it("gives emergencies 4 hours and everything else 24", () => {
+    expect(slaDeadlineHours("emergency")).toBe(4);
+    expect(slaDeadlineHours("harassment")).toBe(24);
+    expect(slaDeadlineHours("mystery")).toBe(24);
+  });
+
+  it("flags overdue new cases and clears handled ones", () => {
+    expect(slaState({ reason: "emergency", status: "new", createdAt: hoursAgo(5) }, NOW)).toBe("overdue");
+    expect(slaState({ reason: "emergency", status: "new", createdAt: hoursAgo(2) }, NOW)).toBe("due");
+    expect(slaState({ reason: "harassment", status: "new", createdAt: hoursAgo(25) }, NOW)).toBe("overdue");
+    expect(slaState({ reason: "harassment", status: "new", createdAt: hoursAgo(2) }, NOW)).toBe("due");
+    expect(slaState({ reason: "emergency", status: "reviewed", createdAt: hoursAgo(50) }, NOW)).toBe("ok");
+    expect(slaState({ reason: "emergency", status: "actioned", createdAt: hoursAgo(50) }, NOW)).toBe("ok");
+    expect(slaState({ reason: "emergency", status: "new", createdAt: "junk" }, NOW)).toBe("due");
+  });
+
+  it("labels case age compactly", () => {
+    expect(slaAgeLabel(new Date(NOW - 12 * 60_000).toISOString(), NOW)).toBe("12m");
+    expect(slaAgeLabel(new Date(NOW - 3 * 3600_000).toISOString(), NOW)).toBe("3h");
+    expect(slaAgeLabel(new Date(NOW - 30 * 3600_000).toISOString(), NOW)).toBe("1d");
+    expect(slaAgeLabel("junk", NOW)).toBe("—");
   });
 });

@@ -76,3 +76,30 @@ export function sortSafetyCasesEmergenciesFirst<
     return 0;
   });
 }
+
+/** Launch SLA: emergencies target review within 4 hours, everything else within a day. */
+export function slaDeadlineHours(reason: string): number {
+  return isEmergencyReason(reason) ? 4 : 24;
+}
+
+export type SlaState = "ok" | "due" | "overdue";
+
+export function slaState(
+  report: { reason: string; status: string; createdAt: string },
+  nowMs = Date.now(),
+): SlaState {
+  if (report.status !== "new") return "ok";
+  const created = new Date(report.createdAt).getTime();
+  if (!Number.isFinite(created)) return "due";
+  return nowMs - created > slaDeadlineHours(report.reason) * 3600_000 ? "overdue" : "due";
+}
+
+export function slaAgeLabel(createdAt: string, nowMs = Date.now()): string {
+  const created = new Date(createdAt).getTime();
+  if (!Number.isFinite(created)) return "—";
+  const mins = Math.max(0, Math.floor((nowMs - created) / 60_000));
+  if (mins < 60) return `${mins}m`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h`;
+  return `${Math.floor(hours / 24)}d`;
+}
