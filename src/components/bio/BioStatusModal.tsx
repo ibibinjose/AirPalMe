@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Check, Sparkles, X, Smile } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useBio } from "@/contexts/BioContext";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { AVAILABILITY_STATUSES, resolveStatusPicks, type AvailabilityStatus } from "@shared/bio";
 import { toast } from "sonner";
 import { cn } from "@/lib/cn";
@@ -44,6 +46,17 @@ export function BioStatusModal({
   const [emoji, setEmoji] = useState(initial.emoji);
   const [saving, setSaving] = useState(false);
 
+  useScrollLock(open);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
   // The modal stays mounted while closed, so resync picks when it reopens.
   useEffect(() => {
     if (open) {
@@ -58,7 +71,7 @@ export function BioStatusModal({
     }
   }, [open, currentStatus, currentCustomStatus, currentEmoji]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
   const handleSave = async () => {
     setSaving(true);
@@ -104,7 +117,7 @@ export function BioStatusModal({
     }
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-ink/65 p-4 backdrop-blur-sm sm:p-6 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
       onClick={onClose}
@@ -132,10 +145,10 @@ export function BioStatusModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-card ring-1 ring-line text-mute hover:text-ink hover:bg-paper transition"
+            className="flex h-11 w-11 touch-manipulation items-center justify-center rounded-full bg-card ring-1 ring-line text-mute hover:text-ink hover:bg-paper transition"
             aria-label="Close dialog"
           >
-            <X size={15} />
+            <X size={16} />
           </button>
         </div>
 
@@ -189,7 +202,7 @@ export function BioStatusModal({
                 onChange={(e) => setCustomText(e.target.value)}
                 placeholder="What's your status? (e.g. Available for coffee)"
                 maxLength={60}
-                className="flex-1 bg-transparent px-2 text-xs font-medium text-ink outline-none"
+                className="flex-1 bg-transparent px-2 text-[16px] sm:text-xs font-medium text-ink outline-none"
               />
               {customText && (
                 <button
@@ -275,6 +288,7 @@ export function BioStatusModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

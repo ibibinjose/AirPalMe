@@ -104,11 +104,6 @@ const safeRequestAnimationFrame = (cb: FrameRequestCallback) => {
 };
 
 function nearestScrollParent(el: HTMLElement): HTMLElement | "window" {
-  const root = document.getElementById?.("root") as HTMLElement | null;
-  if (root) {
-    const oy = root.style.overflowY || (typeof window.getComputedStyle === "function" ? window.getComputedStyle(root).overflowY : "");
-    if (oy === "auto" || oy === "scroll") return root;
-  }
   let node: HTMLElement | null = el.parentElement;
   while (node && node !== document.body && node !== document.documentElement) {
     const style = typeof window.getComputedStyle === "function" ? window.getComputedStyle(node) : null;
@@ -117,6 +112,11 @@ function nearestScrollParent(el: HTMLElement): HTMLElement | "window" {
       return node;
     }
     node = node.parentElement;
+  }
+  const root = document.getElementById?.("root") as HTMLElement | null;
+  if (root && root.contains(el)) {
+    const oy = root.style.overflowY || (typeof window.getComputedStyle === "function" ? window.getComputedStyle(root).overflowY : "");
+    if (oy === "auto" || oy === "scroll") return root;
   }
   return "window";
 }
@@ -141,12 +141,15 @@ export function ensureElementInView(
     if (!target.isConnected) return;
 
     const scroller = nearestScrollParent(target);
+    const vFrame = visibleFrame();
     const frame =
       scroller === "window"
-        ? visibleFrame()
+        ? vFrame
         : (() => {
             const r = scroller.getBoundingClientRect();
-            return { top: r.top, bottom: r.bottom, height: r.height };
+            const top = Math.max(r.top, vFrame.top);
+            const bottom = Math.min(r.bottom, vFrame.bottom);
+            return { top, bottom, height: Math.max(0, bottom - top) };
           })();
 
     const safeTop = frame.top + topClearance;

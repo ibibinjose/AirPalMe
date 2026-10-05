@@ -97,7 +97,7 @@ export function BrowseMenu({ path, isHost }: { path: string; isHost: boolean }) 
         <div
           role="menu"
           aria-label="Browse AirPal"
-          className="absolute left-1/2 top-full z-50 mt-2 max-h-[70vh] w-72 -translate-x-1/2 overflow-y-auto rounded-2xl bg-card p-2 shadow-xl ring-1 ring-line"
+          className="absolute left-1/2 top-full z-50 mt-2 max-h-[70vh] w-72 -translate-x-1/2 overflow-y-auto overscroll-contain rounded-2xl bg-card p-2 shadow-xl ring-1 ring-line"
         >
           {sections.map((section, index) => (
             <div key={section.title}>

@@ -1,4 +1,5 @@
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import { CalendarPlus, MapPin, Plus } from "lucide-react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
@@ -44,7 +45,16 @@ export function AddToTripSheet({
 
   useScrollLock(open);
 
-  if (!open) return null;
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open || typeof document === "undefined") return null;
 
   const pick = (planId: string, title: string) => {
     if (!guardRef.current.tryAcquire()) return;
@@ -59,7 +69,7 @@ export function AddToTripSheet({
     onClose();
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
       <div
@@ -110,6 +120,7 @@ export function AddToTripSheet({
           <span>{upcoming.length > 0 ? "New trip" : "Plan a trip"}</span>
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

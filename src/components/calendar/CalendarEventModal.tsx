@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   Check,
   Heart,
@@ -56,6 +57,7 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
   }, [event, onClose]);
 
   if (!event) return null;
+  if (typeof document === "undefined") return null;
 
   const relative = formatRelativeBadge(event.date);
   const walkEstimate = estimateWalkFromRocks(event.venue);
@@ -86,7 +88,7 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
     window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200">
       {/* Backdrop */}
       <button
@@ -390,6 +392,7 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
           <span>Share event with friends</span>
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

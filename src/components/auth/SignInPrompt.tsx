@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useLocation } from "wouter";
 import { LogIn, UserPlus, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -35,7 +36,7 @@ export function SignInPrompt() {
     };
   }, [signInPrompt, dismissSignInPrompt]);
 
-  if (!signInPrompt) return null;
+  if (!signInPrompt || typeof document === "undefined") return null;
 
   const next = encodeURIComponent(currentNext());
   const go = (tab: "signin" | "signup") => {
@@ -43,7 +44,7 @@ export function SignInPrompt() {
     nav(`/start?tab=${tab}&next=${next}`);
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[90] flex items-end justify-center bg-ink/60 p-4 backdrop-blur-sm sm:items-center"
       onClick={dismissSignInPrompt}
@@ -95,6 +96,7 @@ export function SignInPrompt() {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

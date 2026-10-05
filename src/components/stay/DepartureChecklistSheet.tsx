@@ -64,7 +64,7 @@ export function DepartureChecklistSheet() {
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder={t("addYours")}
-          className="h-11 flex-1 rounded-full bg-paper px-4 text-[15px] outline-none border border-line focus:border-brand"
+          className="h-11 flex-1 rounded-full bg-paper px-4 text-[16px] sm:text-[15px] outline-none border border-line focus:border-brand"
         />
         <Button type="submit" size="sm" className="h-11 w-11 shrink-0 px-0" aria-label="Add">
           <Plus size={16} />

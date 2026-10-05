@@ -1,5 +1,8 @@
+import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Printer, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 export function PrintStandeeModal({
   qrUrl,
@@ -12,9 +15,30 @@ export function PrintStandeeModal({
   title: string;
   onClose: () => void;
 }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs animate-in fade-in">
-      <div className="w-full max-w-sm space-y-6 rounded-[32px] bg-white p-8 text-center text-zinc-900 shadow-2xl">
+  useScrollLock(true);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Print standee preview"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs animate-in fade-in cursor-pointer"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-sm space-y-6 rounded-[32px] bg-white p-8 text-center text-zinc-900 shadow-2xl cursor-default"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-end">
           <button
             type="button"
@@ -51,6 +75,7 @@ export function PrintStandeeModal({
           <Printer size={15} aria-hidden /> Print Standee
         </Button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

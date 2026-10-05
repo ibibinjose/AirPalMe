@@ -1,4 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { CheckCircle, CreditCard, Lock, Minus, Plus, QrCode, Sparkles, Users, X } from "lucide-react";
 import { type HangoutPlan, type PlanPricingTier, formatTime12h, isSoldOut, spotsLeft } from "@shared/plan";
 import { Button } from "@/components/ui/Button";
@@ -44,7 +46,19 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
   const guardRef = useRef(createSubmitGuard());
   const { user, requireUser } = useAuth();
 
+  useScrollLock(isOpen);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
+  if (typeof document === "undefined") return null;
 
   const selectedTier: PlanPricingTier | undefined = (plan.pricingTiers || []).find((t) => t.id === selectedTierId);
 
@@ -120,9 +134,15 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in-50">
-      <div className="w-full max-w-lg rounded-3xl bg-card p-5 sm:p-6 shadow-2xl ring-1 ring-line space-y-4 max-h-[90vh] overflow-y-auto">
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in-50 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg rounded-3xl bg-card p-5 sm:p-6 shadow-2xl ring-1 ring-line space-y-4 max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-start justify-between pb-3 border-b border-line/60">
           <div>
@@ -343,7 +363,7 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
                     placeholder="e.g. Sarah Jenkins"
-                    className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                    className="h-10 w-full rounded-xl bg-paper px-3 text-[16px] sm:text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                   />
                 </div>
                 <div>
@@ -354,7 +374,7 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
                     value={guestEmail}
                     onChange={(e) => setGuestEmail(e.target.value)}
                     placeholder="sarah@example.com"
-                    className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                    className="h-10 w-full rounded-xl bg-paper px-3 text-[16px] sm:text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                   />
                 </div>
               </div>
@@ -366,7 +386,7 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
                   value={specialRequests}
                   onChange={(e) => setSpecialRequests(e.target.value)}
                   placeholder="e.g. Vegetarian, surf beginner, celebration arrival"
-                  className="h-10 w-full rounded-xl bg-paper px-3 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                  className="h-10 w-full rounded-xl bg-paper px-3 text-[16px] sm:text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                 />
               </div>
             </div>
@@ -426,6 +446,7 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

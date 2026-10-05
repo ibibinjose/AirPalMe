@@ -20,10 +20,33 @@ import { relativeAgo } from "@shared/time-ago";
  */
 export function NotificationBell() {
   const { user, isHost, isAdmin } = useAuth();
-  const [, nav] = useLocation();
+  const [path, nav] = useLocation();
   const [open, setOpen] = useState(false);
   const [notes, setNotes] = useState<PromotionNotification[]>([]);
   const [enabling, setEnabling] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [path]);
 
   // Front desk (hosts/admins only)
   const propertyIds = hostWatchPropertyIds(user?.propertyIds, isAdmin);
@@ -112,7 +135,7 @@ export function NotificationBell() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <button
         type="button"
         onClick={() => {
@@ -131,7 +154,7 @@ export function NotificationBell() {
         )}
       </button>
       {open && (
-        <div className="absolute right-0 z-40 mt-2 max-h-96 w-[22rem] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-3xl bg-card/95 shadow-2xl ring-1 ring-line/80 backdrop-blur-2xl">
+        <div className="absolute right-0 z-50 mt-2 max-h-96 w-[22rem] max-w-[calc(100vw-2rem)] overflow-y-auto overscroll-contain rounded-3xl bg-card/95 shadow-2xl ring-1 ring-line/80 backdrop-blur-2xl">
           {canWatch && (
             <>
               <div className="flex items-center justify-between px-4 py-3">

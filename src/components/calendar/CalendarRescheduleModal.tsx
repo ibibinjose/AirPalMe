@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X, Calendar as CalendarIcon, Clock, RotateCcw, Check, AlertTriangle, Zap, CheckCircle2 } from "lucide-react";
 import type { CalendarEvent } from "@shared/event";
 import { useEvents } from "@/contexts/EventsContext";
@@ -65,6 +66,7 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
   }, [event, selectedDate, calendarEvents]);
 
   if (!event) return null;
+  if (typeof document === "undefined") return null;
 
   const currentPreviewTimes = computeRescheduledTimes(event.startsAt, event.endsAt, selectedDate || event.date);
 
@@ -114,7 +116,7 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
     onClose();
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200">
       {/* Backdrop */}
       <button
@@ -252,7 +254,7 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full rounded-xl bg-paper px-3 py-2 text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+              className="w-full rounded-xl bg-paper px-3 py-2 text-[16px] sm:text-xs text-ink border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
             />
           </div>
 
@@ -329,6 +331,7 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

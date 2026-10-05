@@ -84,6 +84,15 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
     return () => observer.disconnect();
   }, [event]);
 
+  useEffect(() => {
+    if (!showExportMenu) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowExportMenu(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showExportMenu]);
+
   const handleShare = async (e: React.MouseEvent) => {
     e.stopPropagation();
     void triggerHaptic("light");
@@ -491,7 +500,8 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
                   setShowExportMenu(!showExportMenu);
                 }}
                 title="Add to calendar"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-mute hover:bg-paper hover:text-ink transition"
+                aria-label="Add to calendar"
+                className="inline-flex h-9 w-9 min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-full text-mute hover:bg-paper hover:text-ink transition cursor-pointer"
               >
                 <CalendarPlus size={15} />
               </button>

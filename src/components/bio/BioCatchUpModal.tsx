@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/Button";
 import { usePlans } from "@/contexts/PlanContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import {
   persistCatchUp,
@@ -76,6 +77,8 @@ export function BioCatchUpModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRemembered, setIsRemembered] = useState(() => hasCatchUpReminder(handle));
   const [myCatchups, setMyCatchups] = useState<CatchUpItem[]>([]);
+
+  useScrollLock(open);
 
   useEffect(() => {
     if (!user?.uid) {
@@ -230,7 +233,7 @@ export function BioCatchUpModal({
 
   const content = (
     <div
-      className="fixed inset-0 z-[9999] grid place-items-center overflow-y-auto bg-ink/65 p-4 backdrop-blur-sm sm:p-6 animate-in fade-in duration-200"
+      className="fixed inset-0 z-[9999] grid place-items-center overflow-y-auto bg-ink/65 p-4 backdrop-blur-sm sm:p-6 animate-in fade-in duration-200 [padding-bottom:var(--keyboard-height,0px)] transition-[padding]"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -348,7 +351,7 @@ export function BioCatchUpModal({
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
+                  className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-[16px] sm:text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
                 />
               </div>
               <div className="mt-1.5 flex gap-1.5">
@@ -379,7 +382,7 @@ export function BioCatchUpModal({
                   type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                  className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
+                  className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-[16px] sm:text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
                 />
               </div>
             </div>
@@ -394,7 +397,7 @@ export function BioCatchUpModal({
                 value={venue}
                 onChange={(e) => setVenue(e.target.value)}
                 placeholder={city || "A café nearby"}
-                className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
+                className="h-11 w-full rounded-2xl border border-line bg-card pl-9 pr-3 text-[16px] sm:text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
               />
             </div>
           </div>
@@ -408,7 +411,7 @@ export function BioCatchUpModal({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Optional notes, topic, or meetup idea"
-                className="w-full resize-none rounded-2xl border border-line bg-card py-2.5 pl-9 pr-3 text-xs outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
+                className="w-full resize-none rounded-2xl border border-line bg-card py-2.5 pl-9 pr-3 text-[16px] sm:text-xs outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:border-brand"
               />
             </div>
           </div>

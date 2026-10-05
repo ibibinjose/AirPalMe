@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Bug, Check, Copy, RotateCcw, Smartphone, Globe, X, Server } from "lucide-react";
 import { getRuntimeDiagnostics, formatDiagnosticsReport, type RuntimeDiagnostics } from "@/lib/build-info";
 import { triggerHaptic } from "@/lib/native";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 export function openDebugOverlay() {
   if (typeof window !== "undefined") {
@@ -19,6 +21,8 @@ export function DebugInfoOverlay() {
   const [isOpen, setIsOpen] = useState(false);
   const [diagnostics, setDiagnostics] = useState<RuntimeDiagnostics | null>(null);
   const [copied, setCopied] = useState(false);
+
+  useScrollLock(isOpen);
 
   useEffect(() => {
     // Check URL parameters for immediate debug mode
@@ -113,9 +117,9 @@ export function DebugInfoOverlay() {
     }
   };
 
-  if (!isOpen || !diagnostics) return null;
+  if (!isOpen || !diagnostics || typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -143,9 +147,9 @@ export function DebugInfoOverlay() {
             type="button"
             onClick={() => setIsOpen(false)}
             aria-label="Close debug overlay"
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-line/60 text-mute transition hover:bg-black/5 hover:text-ink"
+            className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-line/60 text-mute transition hover:bg-black/5 hover:text-ink cursor-pointer"
           >
-            <X size={16} />
+            <X size={18} />
           </button>
         </div>
 
@@ -261,6 +265,7 @@ export function DebugInfoOverlay() {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

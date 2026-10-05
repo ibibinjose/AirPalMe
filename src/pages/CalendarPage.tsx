@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useLocation, useSearch } from "wouter";
 import {
   CalendarDays,
@@ -250,6 +251,15 @@ function CalendarPageContent() {
   }, [calendarEvents, modalEvent]);
 
   useScrollLock(isMobileDrawerOpen);
+
+  useEffect(() => {
+    if (!isMobileDrawerOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsMobileDrawerOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isMobileDrawerOpen]);
 
   // Count tallies for filter tabs
   const counts = useMemo(() => {
@@ -891,7 +901,7 @@ function CalendarPageContent() {
       </div>
 
       {/* Mobile Filters Slide-over Drawer */}
-      {isMobileDrawerOpen && (
+      {isMobileDrawerOpen && typeof document !== "undefined" && createPortal(
         <div
           className="fixed inset-0 z-50 lg:hidden"
           role="dialog"
@@ -927,7 +937,8 @@ function CalendarPageContent() {
               idPrefix="calendar-drawer"
             />
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       {/* Event Detail Modal */}

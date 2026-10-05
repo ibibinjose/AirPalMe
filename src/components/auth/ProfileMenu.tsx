@@ -124,7 +124,7 @@ function Row({
 }
 
 export function ProfileMenu() {
-  const [, nav] = useLocation();
+  const [path, nav] = useLocation();
   const { user, isAdmin, isHost, logout } = useAuth();
   const { mine, business, biosReady, updateProfile } = useBio();
   const { myEvent } = useEvents();
@@ -148,8 +148,13 @@ export function ProfileMenu() {
   const statusInfo = AVAILABILITY_STATUSES[currentStatusKey] || AVAILABILITY_STATUSES.available;
 
   useEffect(() => {
+    setOpen(false);
+    setStatusEditing(false);
+  }, [path]);
+
+  useEffect(() => {
     if (!open) return;
-    function onDoc(e: MouseEvent) {
+    function onDoc(e: MouseEvent | PointerEvent) {
       if (
         !box.current?.contains(e.target as Node) &&
         !drawerRef.current?.contains(e.target as Node)
@@ -163,9 +168,11 @@ export function ProfileMenu() {
         triggerRef.current?.focus();
       }
     }
+    document.addEventListener("pointerdown", onDoc);
     document.addEventListener("mousedown", onDoc);
     document.addEventListener("keydown", onKey);
     return () => {
+      document.removeEventListener("pointerdown", onDoc);
       document.removeEventListener("mousedown", onDoc);
       document.removeEventListener("keydown", onKey);
     };

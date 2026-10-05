@@ -97,7 +97,7 @@ export function DiningSheet({
                 onChange={(e) => setOrderRoom(e.target.value)}
                 placeholder={roomLabel || "e.g. 101"}
                 inputMode="text"
-                className="mt-1 h-11 w-full rounded-2xl bg-card px-4 text-[15px] outline-none ring-1 ring-line focus:ring-2 focus:ring-brand"
+                className="mt-1 h-11 w-full rounded-2xl bg-card px-4 text-[16px] sm:text-[15px] outline-none ring-1 ring-line focus:ring-2 focus:ring-brand"
               />
             </label>
             <div className="mt-3 flex items-center justify-between gap-2">

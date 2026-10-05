@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useLocation } from "wouter";
 import {
   Search,
@@ -548,8 +549,9 @@ export function GlobalSearchModal() {
   };
 
   if (!open) return null;
+  if (typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex flex-col sm:items-start sm:justify-center sm:p-6 sm:pt-16 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200">
       {/* Desktop Backdrop */}
       <button
@@ -798,6 +800,7 @@ export function GlobalSearchModal() {
           <kbd className="rounded bg-card px-1.5 py-0.5 font-mono text-[10px] ring-1 ring-line">↵ Select</kbd>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

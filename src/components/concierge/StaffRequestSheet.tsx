@@ -35,7 +35,7 @@ export function StaffRequestSheet({
         onChange={(e) => setTicket(e.target.value)}
         placeholder="Towels, extra pillow, AC…"
         aria-label="Describe your request for the front desk"
-        className="h-28 w-full rounded-2xl bg-paper p-3 text-[15px] font-medium outline-none ring-1 ring-line transition focus:border-brand focus:ring-2 focus:ring-brand"
+        className="h-28 w-full rounded-2xl bg-paper p-3 text-[16px] sm:text-[15px] font-medium outline-none ring-1 ring-line transition focus:border-brand focus:ring-2 focus:ring-brand"
       />
       <div className="mt-3 grid grid-cols-3 gap-2">
         {QUICK_REQUESTS.map((quick) => {

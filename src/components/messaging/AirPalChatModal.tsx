@@ -1,6 +1,8 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { AirPalChatView } from "./AirPalChatView";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import type { UniversalConversation } from "@shared/messaging";
 
 export function AirPalChatModal({
@@ -16,6 +18,8 @@ export function AirPalChatModal({
   propertyContext?: { wifi?: { network?: string; password?: string } };
   onActionClick?: (action: string, payload?: string) => void;
 }) {
+  useScrollLock(open);
+
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -26,10 +30,11 @@ export function AirPalChatModal({
   }, [open, onClose]);
 
   if (!open || !conversation) return null;
+  if (typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-3 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-3 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
       onClick={onClose}
     >
       <div
@@ -39,10 +44,10 @@ export function AirPalChatModal({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-3.5 top-3.5 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-paper/80 text-mute hover:text-ink hover:bg-paper active:scale-95 transition"
+          className="absolute right-3.5 top-3.5 z-20 flex h-10 w-10 min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-paper/80 text-mute hover:text-ink hover:bg-paper active:scale-95 transition cursor-pointer"
           aria-label="Close chat"
         >
-          <X size={16} />
+          <X size={18} />
         </button>
 
         <AirPalChatView
@@ -51,6 +56,7 @@ export function AirPalChatModal({
           onActionClick={onActionClick}
         />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

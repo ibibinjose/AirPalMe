@@ -51,14 +51,15 @@ export function GuidePage() {
   const { t } = useLocale();
   const { here, city, usingGps, chooseLocation } = useLocalNow();
   const aroundYou = usingGps;
+  const effectiveCity = city && city !== "Choose a city" && city !== "Current location" ? city : "Sydney";
   const { version, remoteLoaded } = useListings();
-  const [tours, setTours] = useState<WalkingTour[]>(() => toursForPrecinct(city));
+  const [tours, setTours] = useState<WalkingTour[]>(() => toursForPrecinct(effectiveCity));
   const [toursLoaded, setToursLoaded] = useState(false);
   useEffect(() => {
     let alive = true;
     void fetchTours()
       .then((rows) => {
-        if (alive) setTours(toursForPrecinct(city, rows));
+        if (alive) setTours(toursForPrecinct(effectiveCity, rows));
       })
       .finally(() => {
         if (alive) setToursLoaded(true);
@@ -66,22 +67,22 @@ export function GuidePage() {
     return () => {
       alive = false;
     };
-  }, [city]);
+  }, [effectiveCity]);
 
   useOnDataReload(async () => {
     const rows = await fetchTours();
-    setTours(toursForPrecinct(city, rows));
+    setTours(toursForPrecinct(effectiveCity, rows));
   });
 
   const sights = useMemo(() => {
     const pool = activePlaces().filter((p) => p.category === "things");
-    const scoped = aroundYou ? placesAround(pool, here) : placesInCity(pool, city);
+    const scoped = aroundYou ? placesAround(pool, here) : placesInCity(pool, effectiveCity);
     return scoped.map((p) => withWalk(p, here)).sort((a, b) => a.meters - b.meters);
-  }, [here, city, aroundYou, version]);
+  }, [here, effectiveCity, aroundYou, version]);
 
   const handleShareGuide = () => {
     void triggerHaptic("medium");
-    void shareCuratedGuide(city);
+    void shareCuratedGuide(effectiveCity);
   };
   const shareLabel = t("share.guide") || "Share Guide";
 
@@ -93,10 +94,10 @@ export function GuidePage() {
           <h1 className="font-display mt-1 text-3xl font-semibold">{t("walks")}</h1>
           <p className="mt-1 text-xs text-mute">
             Curated walks &amp; sights in{" "}
-            <span className="font-medium text-ink">{city || (aroundYou ? "your area" : "Sydney")}</span>
+            <span className="font-medium text-ink">{effectiveCity}</span>
           </p>
         </div>
-        <ShareGuideButton city={city} label={shareLabel} variant="ghost" onShare={handleShareGuide} />
+        <ShareGuideButton city={effectiveCity} label={shareLabel} variant="ghost" onShare={handleShareGuide} />
       </header>
       {!toursLoaded && tours.length === 0 ? (
         <TourCardSkeletonGrid count={2} className="grid gap-3 md:grid-cols-2" />

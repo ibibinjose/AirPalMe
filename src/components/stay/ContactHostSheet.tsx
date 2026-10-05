@@ -110,7 +110,7 @@ export function ContactHostSheet() {
         value={contactDraft}
         onChange={(e) => setContactDraft(e.target.value)}
         rows={3}
-        className="mt-3 w-full rounded-2xl bg-paper p-3 text-[15px] outline-none border border-line focus:border-brand"
+        className="mt-3 w-full rounded-2xl bg-paper p-3 text-[16px] sm:text-[15px] outline-none border border-line focus:border-brand"
         placeholder="Message the property manager"
       />
       <Button className="mt-3 w-full" onClick={send}>

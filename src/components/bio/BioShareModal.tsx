@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Copy, Check, Download, Share2, X, QrCode } from "lucide-react";
 import { toast } from "sonner";
 import { makeQrDataUrl } from "@/lib/qr";
@@ -29,6 +30,15 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
 
   useEffect(() => {
     if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  useEffect(() => {
+    if (!open) return;
     let live = true;
     void makeQrDataUrl(url, 360).then((data) => {
       if (live) setQrData(data);
@@ -38,7 +48,7 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
     };
   }, [open, url]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
   async function handleCopy() {
     try {
@@ -78,8 +88,11 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
     }
   }
 
-  return (
+  return createPortal(
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Share Profile"
       className="fixed inset-0 z-50 grid place-items-center bg-ink/60 px-4 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={onClose}
     >
@@ -149,6 +162,7 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
           Done
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

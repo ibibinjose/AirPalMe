@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -182,129 +183,133 @@ export function CreateFab() {
       )}
 
       {/* Creation Modal / Bottom Sheet */}
-      <AnimatePresence>
-        {open && (
-          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => {
-                void triggerHaptic("light");
-                setOpen(false);
-              }}
-              className="fixed inset-0 bg-ink/60 backdrop-blur-sm"
-              aria-hidden="true"
-            />
-
-            {/* Sheet Container */}
-            <motion.div
-              ref={containerRef}
-              initial={{ y: "100%", opacity: 0.5 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: "100%", opacity: 0 }}
-              transition={{ type: "spring", damping: 28, stiffness: 350 }}
-              role="dialog"
-              aria-modal="true"
-              aria-label="Create on AirPal"
-              className="relative w-full max-w-lg rounded-t-[32px] sm:rounded-3xl bg-card p-5 sm:p-6 pb-[max(1.5rem,calc(env(safe-area-inset-bottom,0px)+1.25rem))] shadow-2xl ring-1 ring-line/80 max-h-[88vh] overflow-y-auto"
-            >
-              {/* Drag Handle on Mobile */}
-              <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-line/80 sm:hidden" />
-
-              {/* Header */}
-              <div className="flex items-start justify-between gap-3 pb-3 border-b border-line/60">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-brand">
-                    AirPal · Made Easy
-                  </span>
-                  <h2 className="font-display text-xl sm:text-2xl font-bold text-ink mt-0.5">
-                    What do you want to create?
-                  </h2>
-                  <p className="text-xs text-mute mt-0.5">
-                    One trusted marketplace engine connecting people, places, and experiences.
-                  </p>
-                </div>
-                <button
-                  type="button"
+      {typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {open && (
+              <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   onClick={() => {
                     void triggerHaptic("light");
                     setOpen(false);
                   }}
-                  className="grid min-h-[44px] min-w-[44px] place-items-center rounded-full text-mute hover:bg-paper hover:text-ink transition cursor-pointer"
-                  aria-label="Close"
-                >
-                  <X size={18} />
-                </button>
-              </div>
+                  className="fixed inset-0 bg-ink/60 backdrop-blur-sm"
+                  aria-hidden="true"
+                />
 
-              {/* Action Cards List */}
-              <div className="mt-4 grid gap-2.5">
-                {CREATE_GROUPS.map((group) => (
-                  <div key={group.id}>
-                    <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-mute">
-                      {group.label}
-                    </p>
-                    <div className="grid gap-2.5">
-                      {CREATE_OPTIONS.filter((opt) => opt.group === group.id).map((opt) => {
-                        const Icon = opt.icon;
-                        return (
-                          <button
-                            key={opt.id}
-                            type="button"
-                            onClick={() => handleSelect(opt.href)}
-                            className="group flex w-full items-center gap-3.5 rounded-2xl bg-paper/60 p-3.5 text-left ring-1 ring-line/70 transition-all duration-150 hover:bg-card hover:ring-brand/40 hover:shadow-xs active:scale-[0.99] cursor-pointer"
-                          >
-                            <span
-                              className={cn(
-                                "grid h-11 w-11 shrink-0 place-items-center rounded-xl ring-1 transition-transform group-hover:scale-105",
-                                opt.colorClass,
-                              )}
-                            >
-                              <Icon size={20} strokeWidth={2} />
-                            </span>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-1.5">
-                                <span className="font-display text-base font-bold text-ink group-hover:text-brand transition-colors">
-                                  {opt.title}
-                                </span>
-                                {opt.badge && (
-                                  <span className="text-[11px] font-bold text-brand">
-                                    · {opt.badge}
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-xs text-mute truncate mt-0.5">{opt.subtitle}</p>
-                            </div>
-                            <ChevronRight
-                              size={16}
-                              className="text-mute/60 group-hover:text-brand group-hover:translate-x-0.5 transition-all shrink-0"
-                            />
-                          </button>
-                        );
-                      })}
+                {/* Sheet Container */}
+                <motion.div
+                  ref={containerRef}
+                  initial={{ y: "100%", opacity: 0.5 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: "100%", opacity: 0 }}
+                  transition={{ type: "spring", damping: 28, stiffness: 350 }}
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Create on AirPal"
+                  className="relative w-full max-w-lg rounded-t-[32px] sm:rounded-3xl bg-card p-5 sm:p-6 pb-[max(1.5rem,calc(env(safe-area-inset-bottom,0px)+1.25rem))] shadow-2xl ring-1 ring-line/80 max-h-[88vh] overflow-y-auto"
+                >
+                  {/* Drag Handle on Mobile */}
+                  <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-line/80 sm:hidden" />
+
+                  {/* Header */}
+                  <div className="flex items-start justify-between gap-3 pb-3 border-b border-line/60">
+                    <div>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-brand">
+                        AirPal · Made Easy
+                      </span>
+                      <h2 className="font-display text-xl sm:text-2xl font-bold text-ink mt-0.5">
+                        What do you want to create?
+                      </h2>
+                      <p className="text-xs text-mute mt-0.5">
+                        One trusted marketplace engine connecting people, places, and experiences.
+                      </p>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void triggerHaptic("light");
+                        setOpen(false);
+                      }}
+                      className="grid min-h-[44px] min-w-[44px] place-items-center rounded-full text-mute hover:bg-paper hover:text-ink transition cursor-pointer"
+                      aria-label="Close"
+                    >
+                      <X size={18} />
+                    </button>
                   </div>
-                ))}
-              </div>
 
-              {/* Footer Hub Link */}
-              <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between">
-                <span className="text-xs text-mute">Looking for partner tools?</span>
-                <button
-                  type="button"
-                  onClick={() => handleSelect("/business")}
-                  className="-my-3 inline-flex min-h-[44px] items-center gap-1 text-xs font-bold text-brand hover:underline cursor-pointer"
-                >
-                  <span>Open Business Hub</span>
-                  <ArrowRight size={13} />
-                </button>
+                  {/* Action Cards List */}
+                  <div className="mt-4 grid gap-2.5">
+                    {CREATE_GROUPS.map((group) => (
+                      <div key={group.id}>
+                        <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-mute">
+                          {group.label}
+                        </p>
+                        <div className="grid gap-2.5">
+                          {CREATE_OPTIONS.filter((opt) => opt.group === group.id).map((opt) => {
+                            const Icon = opt.icon;
+                            return (
+                              <button
+                                key={opt.id}
+                                type="button"
+                                onClick={() => handleSelect(opt.href)}
+                                className="group flex w-full items-center gap-3.5 rounded-2xl bg-paper/60 p-3.5 text-left ring-1 ring-line/70 transition-all duration-150 hover:bg-card hover:ring-brand/40 hover:shadow-xs active:scale-[0.99] cursor-pointer"
+                              >
+                                <span
+                                  className={cn(
+                                    "grid h-11 w-11 shrink-0 place-items-center rounded-xl ring-1 transition-transform group-hover:scale-105",
+                                    opt.colorClass,
+                                  )}
+                                >
+                                  <Icon size={20} strokeWidth={2} />
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="font-display text-base font-bold text-ink group-hover:text-brand transition-colors">
+                                      {opt.title}
+                                    </span>
+                                    {opt.badge && (
+                                      <span className="text-[11px] font-bold text-brand">
+                                        · {opt.badge}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-mute truncate mt-0.5">{opt.subtitle}</p>
+                                </div>
+                                <ChevronRight
+                                  size={16}
+                                  className="text-mute/60 group-hover:text-brand group-hover:translate-x-0.5 transition-all shrink-0"
+                                />
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Footer Hub Link */}
+                  <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between">
+                    <span className="text-xs text-mute">Looking for partner tools?</span>
+                    <button
+                      type="button"
+                      onClick={() => handleSelect("/business")}
+                      className="-my-3 inline-flex min-h-[44px] items-center gap-1 text-xs font-bold text-brand hover:underline cursor-pointer"
+                    >
+                      <span>Open Business Hub</span>
+                      <ArrowRight size={13} />
+                    </button>
+                  </div>
+                </motion.div>
               </div>
-            </motion.div>
-          </div>
+            )}
+          </AnimatePresence>,
+          document.body,
         )}
-      </AnimatePresence>
     </>
   );
 }

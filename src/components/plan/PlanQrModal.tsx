@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Check, Copy, Download, Printer, QrCode, Share2, Sparkles, X } from "lucide-react";
 import { type HangoutPlan, formatPlanDate, planInviteUrl, PLAN_TYPES, EXPERIENCE_CATEGORIES } from "@shared/plan";
 import { makeQrDataUrl } from "@/lib/qr";
@@ -36,7 +37,17 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
     void makeQrDataUrl(inviteUrl, 360).then(setQrUrl);
   }, [isOpen, inviteUrl]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
+  if (typeof document === "undefined") return null;
 
   const onCopy = async () => {
     try {
@@ -89,8 +100,8 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/75 backdrop-blur-md transition-opacity" onClick={onClose} />
 
@@ -195,6 +206,7 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

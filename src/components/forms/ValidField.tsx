@@ -39,10 +39,10 @@ export function ValidField({
  * forms across bio, host, business, companion, plans, and auth match.
  */
 export const fieldInput =
-  "h-12 w-full rounded-2xl border border-line bg-card px-4 pr-10 outline-none transition placeholder:text-mute/60 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:opacity-60";
+  "h-12 w-full rounded-2xl border border-line bg-card px-4 pr-10 text-[16px] sm:text-sm outline-none transition placeholder:text-mute/60 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:opacity-60";
 
 export const fieldSelect =
-  "h-12 w-full rounded-2xl border border-line bg-card px-4 outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:opacity-60";
+  "h-12 w-full rounded-2xl border border-line bg-card px-4 text-[16px] sm:text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:opacity-60";
 
 export const fieldTextarea =
-  "min-h-28 w-full rounded-2xl border border-line bg-card p-4 outline-none transition placeholder:text-mute/60 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:opacity-60";
+  "min-h-28 w-full rounded-2xl border border-line bg-card p-4 text-[16px] sm:text-sm outline-none transition placeholder:text-mute/60 focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:opacity-60";

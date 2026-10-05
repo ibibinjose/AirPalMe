@@ -12,6 +12,7 @@ import {
 import type { CalendarEvent } from "@shared/event";
 import { toast } from "sonner";
 import { triggerHaptic } from "@/lib/native";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { cn } from "@/lib/cn";
 
 interface AddToCalendarMenuProps {
@@ -41,6 +42,8 @@ export function AddToCalendarMenu({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [coords, setCoords] = useState<Coords | null>(null);
+
+  useScrollLock(open);
 
   const updatePosition = useCallback(() => {
     if (!buttonRef.current) return;
@@ -205,7 +208,7 @@ export function AddToCalendarMenu({
             />
 
             {/* Mobile Sheet (screen < 640px) */}
-            <div className="sm:hidden fixed inset-x-0 bottom-0 z-10 rounded-t-[32px] bg-paper p-5 shadow-2xl ring-1 ring-line animate-in slide-in-from-bottom duration-200 pb-safe">
+            <div className="sm:hidden fixed inset-x-0 bottom-0 z-10 rounded-t-[32px] bg-paper p-5 shadow-2xl ring-1 ring-line animate-in slide-in-from-bottom duration-200 pb-[max(1.25rem,calc(env(safe-area-inset-bottom,0px)+1rem))]">
               <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-line" />
               <div className="flex items-center justify-between border-b border-line/60 pb-3">
                 <div className="min-w-0 pr-3">
@@ -218,10 +221,10 @@ export function AddToCalendarMenu({
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-card text-mute ring-1 ring-line hover:text-ink"
+                  className="grid h-10 w-10 min-h-[44px] min-w-[44px] touch-manipulation shrink-0 place-items-center rounded-full bg-card text-mute ring-1 ring-line hover:text-ink cursor-pointer"
                   aria-label="Close"
                 >
-                  <X size={15} />
+                  <X size={16} />
                 </button>
               </div>
 

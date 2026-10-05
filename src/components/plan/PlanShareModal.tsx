@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { Check, Copy, Download, MessageCircle, QrCode, Send, Share2, X } from "lucide-react";
 import { type HangoutPlan, formatPlanDate, pastCrew, planInviteUrl } from "@shared/plan";
 import { makeQrDataUrl } from "@/lib/qr";
@@ -71,7 +72,17 @@ export function PlanShareModal({
     void makeQrDataUrl(inviteUrl, 320).then(setQrUrl);
   }, [open, inviteUrl]);
 
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
   if (!open) return null;
+  if (typeof document === "undefined") return null;
 
   const onCopy = async () => {
     try {
@@ -106,8 +117,8 @@ export function PlanShareModal({
     window.location.href = url;
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
@@ -271,6 +282,7 @@ export function PlanShareModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

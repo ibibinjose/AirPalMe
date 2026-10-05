@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { ArrowLeft, Camera, MapPin, Trash2, Users, X } from "lucide-react";
@@ -7,6 +8,7 @@ import { Photo } from "@/components/ui/Photo";
 import { Button } from "@/components/ui/Button";
 import { PageLoading } from "@/components/ui/PageLoading";
 import { useAuth } from "@/contexts/AuthContext";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { addMemory, listMemories, removeMemory, type Memory } from "@/lib/memories";
 import { listPeople } from "@/lib/people";
 import { readFileAsImage, storeMedia } from "@/lib/image-store";
@@ -69,6 +71,17 @@ export function MemoryWallPage() {
   useEffect(() => {
     setMemories(listMemories());
   }, []);
+
+  useScrollLock(composerOpen || Boolean(lightbox));
+
+  useEffect(() => {
+    if (!composerOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeComposer();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [composerOpen]);
 
   useEffect(() => {
     if (!lightbox) return;
@@ -224,7 +237,7 @@ export function MemoryWallPage() {
         </div>
       )}
 
-      {composerOpen && draftUrl && (
+      {composerOpen && draftUrl && typeof document !== "undefined" && createPortal(
         <div
           className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 p-4 backdrop-blur-sm sm:items-center [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
           onClick={closeComposer}
@@ -275,10 +288,11 @@ export function MemoryWallPage() {
               </Button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
-      {lightbox && (
+      {lightbox && typeof document !== "undefined" && createPortal(
         <div
           className="fixed inset-0 z-50 flex items-end justify-center bg-ink/80 p-4 backdrop-blur-sm sm:items-center"
           onClick={() => setLightbox(null)}
@@ -334,7 +348,8 @@ export function MemoryWallPage() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

@@ -308,7 +308,7 @@ export function AirPalChatView({
             placeholder={`Message ${title} or type @airpal…`}
             maxLength={MESSAGE_MAX}
             aria-label="Message"
-            className="flex-1 h-11 rounded-full bg-paper/80 px-4 text-xs sm:text-sm text-ink outline-none ring-1 ring-line/80 focus:ring-2 focus:ring-brand/40 placeholder:text-mute"
+            className="flex-1 h-11 rounded-full bg-paper/80 px-4 text-[16px] sm:text-sm text-ink outline-none ring-1 ring-line/80 focus:ring-2 focus:ring-brand/40 placeholder:text-mute"
           />
 
           <button

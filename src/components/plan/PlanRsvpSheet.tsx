@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Check, HelpCircle, Minus, Plus, Smartphone, User, Users, X, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -88,7 +89,7 @@ export function PlanRsvpSheet({
 
   useScrollLock(open);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,7 +110,7 @@ export function PlanRsvpSheet({
     onClose();
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
@@ -247,7 +248,7 @@ export function PlanRsvpSheet({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Alex or Jordan"
-                className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-sm border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                className="h-11 w-full rounded-2xl bg-paper pl-10 pr-4 text-[16px] sm:text-sm border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
               />
             </div>
           </div>
@@ -260,7 +261,7 @@ export function PlanRsvpSheet({
               value={notes || ""}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. Bringing drinks, arriving by 7pm!"
-              className="h-11 w-full rounded-2xl bg-paper px-4 text-sm border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+              className="h-11 w-full rounded-2xl bg-paper px-4 text-[16px] sm:text-sm border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
             />
           </div>
 
@@ -300,7 +301,7 @@ export function PlanRsvpSheet({
                   maxLength={PLAN_ANSWER_MAX}
                   onChange={(e) => setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))}
                   placeholder="Your answer"
-                  className="h-11 w-full rounded-2xl bg-paper px-4 text-sm border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
+                  className="h-11 w-full rounded-2xl bg-paper px-4 text-[16px] sm:text-sm border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
                 />
               )}
             </div>
@@ -337,6 +338,7 @@ export function PlanRsvpSheet({
           )}
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { Flag, ShieldX } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -33,6 +33,25 @@ export function SafetyMenu({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reported, setReported] = useState(false);
+  const menuRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   async function fileReport() {
     setError(null);
@@ -108,8 +127,9 @@ export function SafetyMenu({
   }
 
   return (
-    <span className="relative shrink-0">
+    <span ref={menuRef} className="relative shrink-0">
       <button
+        type="button"
         onClick={() => {
           setOpen(!open);
           setMode("menu");
@@ -117,21 +137,23 @@ export function SafetyMenu({
         }}
         aria-label={`Safety options for ${targetName}`}
         aria-expanded={open}
-        className="rounded-full p-1.5 text-mute hover:bg-paper"
+        className="inline-flex h-10 w-10 min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center rounded-full text-mute hover:bg-paper cursor-pointer"
       >
         ···
       </button>
       {open && (
-        <span className="absolute right-0 top-8 z-30 w-64 rounded-2xl border border-line bg-card p-3 shadow-lg">
+        <span className="absolute right-0 top-10 z-30 w-64 overscroll-contain rounded-2xl border border-line bg-card p-3 shadow-lg">
           {mode === "menu" && (
             <span className="block">
               <button
+                type="button"
                 onClick={() => setMode("report")}
                 className="flex w-full items-center gap-2 rounded-xl px-2 py-2 text-left text-[13px] font-medium hover:bg-paper"
               >
                 <Flag size={14} className="text-gold" /> Report {targetName}
               </button>
               <button
+                type="button"
                 onClick={() => void blockNow()}
                 disabled={busy}
                 className="flex w-full items-center gap-2 rounded-xl px-2 py-2 text-left text-[13px] font-medium hover:bg-paper"
@@ -156,6 +178,7 @@ export function SafetyMenu({
                     {(["user", "booking"] as const).map((t) => (
                       <button
                         key={t}
+                        type="button"
                         onClick={() => setTarget(t)}
                         aria-pressed={target === t}
                         className={cn(
@@ -172,7 +195,7 @@ export function SafetyMenu({
                     <select
                       value={reason}
                       onChange={(e) => setReason(e.target.value as ReportReason)}
-                      className="mt-1 w-full rounded-xl border border-line bg-paper px-2 py-2 text-[13px] font-normal outline-none focus:border-brand"
+                      className="mt-1 w-full rounded-xl border border-line bg-paper px-2 py-2 text-[16px] sm:text-[13px] font-normal outline-none focus:border-brand"
                     >
                       {REPORT_REASONS.map((r) => (
                         <option key={r} value={r}>
@@ -186,7 +209,7 @@ export function SafetyMenu({
                     onChange={(e) => setDetails(e.target.value)}
                     rows={3}
                     placeholder="What happened, in your words (min 10 characters)…"
-                    className="mt-1.5 w-full rounded-xl border border-line bg-paper px-2 py-2 text-[13px] outline-none placeholder:text-mute focus:border-brand"
+                    className="mt-1.5 w-full rounded-xl border border-line bg-paper px-2 py-2 text-[16px] sm:text-[13px] outline-none placeholder:text-mute focus:border-brand"
                   />
                   {error && <span className="mt-1 block text-xs text-mute">{error}</span>}
                   <span className="mt-2 flex gap-1.5">
