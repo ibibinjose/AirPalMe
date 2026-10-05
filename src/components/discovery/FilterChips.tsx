@@ -17,8 +17,8 @@ export function FilterChips({ value, onChange }: { value: string; onChange: (id:
           }}
           aria-pressed={value === chip.id}
           className={cn(
-            "h-9 shrink-0 rounded-full px-4 text-sm font-medium",
-            value === chip.id ? "bg-brand text-white" : "bg-card text-ink ring-1 ring-line",
+            "min-h-[44px] shrink-0 inline-flex items-center rounded-full px-4 text-sm font-medium touch-manipulation cursor-pointer active:scale-95 transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
+            value === chip.id ? "bg-brand text-white shadow-xs" : "bg-card text-ink ring-1 ring-line hover:bg-paper",
           )}
         >
           {t(`chip.${chip.id}`)}

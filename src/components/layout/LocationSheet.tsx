@@ -131,7 +131,7 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+        <div className="flex-1 overflow-y-auto p-5 pb-[max(1.5rem,calc(env(safe-area-inset-bottom,0px)+1.25rem))] space-y-4">
           {/* Quick Share Current Location & Guide */}
           <div className="flex items-center justify-between rounded-2xl ring-1 ring-line bg-paper p-3.5 shadow-xs">
             <div className="min-w-0 pr-3">

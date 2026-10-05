@@ -514,6 +514,22 @@ body.keyboard-open .keyboard-hide {
     0 12px 32px -4px rgba(0, 0, 0, 0.35);
 }
 
+.apple-liquid-glass-nav {
+  background: rgba(242, 242, 247, 0.84);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border-bottom: 1px solid rgba(229, 229, 234, 0.75);
+  transform: translateZ(0);
+  box-shadow: 0 1px 2px 0 rgba(18, 22, 20, 0.03);
+}
+
+.apple-spring-press {
+  transition: transform 0.15s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.apple-spring-press:active {
+  transform: scale(0.96);
+}
+
 /* Dark Mode Liquid Glass Overrides */
 .dark .apple-liquid-glass-dock,
 [data-theme='dark'] .apple-liquid-glass-dock {
@@ -523,6 +539,13 @@ body.keyboard-open .keyboard-hide {
     inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.25),
     0 18px 42px -12px rgba(0, 0, 0, 0.6),
     0 4px 16px -2px rgba(0, 0, 0, 0.35);
+}
+
+.dark .apple-liquid-glass-nav,
+[data-theme='dark'] .apple-liquid-glass-nav {
+  background: rgba(15, 23, 42, 0.84);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 .dark .apple-liquid-glass-card,
@@ -567,6 +590,7 @@ body.keyboard-open .keyboard-hide {
   .apple-liquid-glass-dark,
   .apple-liquid-glass-light,
   .apple-liquid-glass-dock,
+  .apple-liquid-glass-nav,
   .apple-liquid-glass-card,
   .apple-liquid-glass-clear {
     backdrop-filter: none !important;
@@ -578,6 +602,7 @@ body.keyboard-open .keyboard-hide {
 
 @supports not (backdrop-filter: blur(10px)) {
   .apple-liquid-glass-dock,
+  .apple-liquid-glass-nav,
   .apple-liquid-glass-card,
   .apple-liquid-glass-light {
     background: #ffffff !important;

@@ -207,7 +207,10 @@ export function HomePage() {
           <div className="mt-4">
             <button
               type="button"
-              onClick={() => openGlobalSearch()}
+              onClick={() => {
+                void triggerHaptic("medium");
+                openGlobalSearch();
+              }}
               className="flex w-full min-h-[48px] items-center justify-between rounded-2xl bg-card/90 px-4 py-3 text-left text-sm font-medium text-mute ring-1 ring-line/80 shadow-md backdrop-blur-md hover:bg-card hover:text-ink transition cursor-pointer touch-manipulation active:scale-[0.99]"
             >
               <span className="flex items-center gap-2.5">

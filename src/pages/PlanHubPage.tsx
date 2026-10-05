@@ -24,7 +24,7 @@ import { PlanGridCard } from "@/components/airpal/PlanGridCard";
 import { PLAN_TYPES, formatPlanDate } from "@shared/plan";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { EVENT_NEAR_M, locatedNear } from "@/lib/location-scope";
-import { triggerHaptic, shareNative } from "@/lib/native";
+import { triggerHaptic, triggerHapticSelection, shareNative } from "@/lib/native";
 import { Photo } from "@/components/ui/Photo";
 import { SearchBar } from "@/components/search/SearchBar";
 import { openGlobalSearch } from "@/components/search/openSearch";
@@ -418,7 +418,7 @@ export function PlanHubPage() {
                   key={t.id}
                   type="button"
                   onClick={() => {
-                    void triggerHaptic("light");
+                    void triggerHapticSelection();
                     setTab(t.id);
                   }}
                   className={cn(

@@ -8,7 +8,7 @@ import { openGlobalSearch } from "@/components/search/openSearch";
 import { openGlobalCreate } from "@/components/design-system/CreateFab";
 import { cn } from "@/lib/cn";
 import { enterEase } from "@/lib/motion";
-import { triggerHaptic } from "@/lib/native";
+import { triggerHaptic, triggerHapticSelection } from "@/lib/native";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
@@ -44,12 +44,12 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
       <button
         key={link.href}
         onClick={() => {
-          void triggerHaptic("light");
+          void triggerHapticSelection();
           nav(link.href);
         }}
         aria-current={isActive ? "page" : undefined}
         className={cn(
-          "h-8.5 touch-manipulation rounded-full px-3.5 text-sm font-semibold transition-all duration-200 cursor-pointer",
+          "h-8.5 touch-manipulation rounded-full px-3.5 text-sm font-semibold transition-all duration-200 cursor-pointer active:scale-95",
           isActive
             ? "bg-brand text-white shadow-[0_4px_12px_-4px_rgba(18,22,20,0.25)]"
             : "text-mute hover:bg-paper/80 hover:text-ink",

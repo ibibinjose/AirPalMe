@@ -9,7 +9,7 @@ import { enableWebPush, listenForegroundPush, markNotificationRead, pushPrefEnab
 import { openTicketCount, subscribePropertyTickets, type StaffTicket } from "@/lib/tickets-store";
 import { enableHostTicketPush, notifyHostForeground, ticketPushPrefEnabled } from "@/lib/tickets-push";
 import { hostWatchPropertyIds } from "@/lib/host-workspace";
-import { isNativeApp } from "@/lib/native";
+import { isNativeApp, triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 import type { PromotionNotification } from "@shared/promotions";
 import { relativeAgo } from "@shared/time-ago";
@@ -115,8 +115,11 @@ export function NotificationBell() {
     <div className="relative">
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="relative grid h-9 w-9 touch-manipulation place-items-center rounded-full text-brand hover:bg-card ring-1 ring-line transition after:absolute after:-inset-1 after:content-['']"
+        onClick={() => {
+          void triggerHaptic("light");
+          setOpen((v) => !v);
+        }}
+        className="relative grid h-9 w-9 touch-manipulation place-items-center rounded-full text-brand hover:bg-card ring-1 ring-line transition-transform active:scale-95 after:absolute after:-inset-1.5 after:content-['']"
         aria-label={total ? `${total} unread notifications` : "Notifications"}
         title="Notifications"
       >
@@ -128,7 +131,7 @@ export function NotificationBell() {
         )}
       </button>
       {open && (
-        <div className="absolute right-0 z-40 mt-2 max-h-96 w-[22rem] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-[22px] bg-card shadow-xl ring-1 ring-line/80">
+        <div className="absolute right-0 z-40 mt-2 max-h-96 w-[22rem] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-3xl bg-card/95 shadow-2xl ring-1 ring-line/80 backdrop-blur-2xl">
           {canWatch && (
             <>
               <div className="flex items-center justify-between px-4 py-3">

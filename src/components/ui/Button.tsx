@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 import { triggerHaptic, type HapticStyle } from "@/lib/native";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "ghost" | "dark" | "gold" | "light" | "onDark" | "tonal" | "elevated" | "outlined";
+  variant?: "primary" | "ghost" | "dark" | "gold" | "light" | "onDark" | "tonal" | "elevated" | "outlined" | "glass";
   size?: "md" | "lg" | "sm";
   loading?: boolean;
   haptic?: HapticStyle | false;
@@ -44,6 +44,7 @@ export function Button({
         variant === "tonal" && "bg-brand/10 text-brand font-semibold hover:bg-brand/15 active:bg-brand/20",
         variant === "elevated" && "bg-card text-ink shadow-[var(--shadow-m3-1)] ring-1 ring-line hover:shadow-[var(--shadow-m3-2)]",
         variant === "outlined" && "bg-transparent text-ink border border-line hover:bg-black/[0.04]",
+        variant === "glass" && "apple-liquid-glass-light text-ink ring-1 ring-white/60 hover:ring-brand/40 shadow-xs",
         className,
       )}
       disabled={disabled || loading}

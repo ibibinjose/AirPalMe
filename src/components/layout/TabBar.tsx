@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import { enterEase } from "@/lib/motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
-import { triggerHaptic } from "@/lib/native";
+import { triggerHapticSelection } from "@/lib/native";
 import { useVirtualKeyboard } from "@/lib/keyboard";
 import { tabFromPath, type GuestTab } from "@/lib/tabs";
 
@@ -94,7 +94,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
                 aria-current={on ? "page" : undefined}
                 aria-label={tab.id === "me" ? "My bio" : tab.label}
                 onClick={() => {
-                  void triggerHaptic("light");
+                  void triggerHapticSelection();
                   nav(href);
                 }}
                 className={cn(

@@ -9,6 +9,7 @@ import { NOW_MOODS, NOW_WHENS, pickSuggestion, type NowMood, type NowWhen } from
 import { nowPlanHref } from "@/lib/now-plan";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { triggerHapticSelection } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
 type NowCompany = "solo" | "group";
@@ -40,10 +41,13 @@ function ChipGroup<T extends string>({
               key={opt.id}
               type="button"
               aria-pressed={selected}
-              onClick={() => onChange(opt.id)}
+              onClick={() => {
+                void triggerHapticSelection();
+                onChange(opt.id);
+              }}
               className={cn(
-                "min-h-[44px] cursor-pointer rounded-full px-4 text-[15px] font-medium transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
-                selected ? "bg-brand text-white" : "bg-card text-ink ring-1 ring-line",
+                "min-h-[44px] cursor-pointer rounded-full px-4 text-[15px] font-medium transition active:scale-[0.97] touch-manipulation focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
+                selected ? "bg-brand text-white shadow-xs" : "bg-card text-ink ring-1 ring-line hover:bg-paper",
               )}
             >
               {opt.label}
