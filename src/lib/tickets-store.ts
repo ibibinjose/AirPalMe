@@ -6,7 +6,7 @@ import { createStaffTicketRemote, liveBackendEnabled, resolveStaffTicketRemote }
 
 const LOCAL_PREFIX = "airpal.tickets.";
 
-/** Priority rules for staff tickets (sole home — kept here so `@shared/airpal-data` stays out of the initial bundle). */
+/** Priority rules for staff tickets (web copy — kept here so `@shared/airpal-data` stays out of the initial bundle; mirrored there for Cloud Functions — keep in sync). */
 export function resolveTicketPriority(ticket: {
   priority?: TicketPriority;
   urgency?: "normal" | "urgent";

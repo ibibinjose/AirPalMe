@@ -13,6 +13,7 @@ import { TourCardSkeletonGrid, PlaceCardSkeletonGrid } from "@/components/ui/ske
 import { useLocale } from "@/contexts/LocaleContext";
 import { useListings } from "@/contexts/ListingsContext";
 import { useLocalNow } from "@/hooks/useLocalNow";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import { useOnDataReload } from "@/hooks/useDataReload";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
@@ -75,11 +76,19 @@ export function GuidePage() {
     setTours(toursForPrecinct(effectiveCity, rows));
   });
 
+  // Skeletons only for genuinely slow loads — fast local data renders
+  // content directly with no flash-swap layout shift.
+  const toursLoading = !toursLoaded && tours.length === 0;
+  const showToursSkeleton = useDelayedLoading(toursLoading);
+
   const sights = useMemo(() => {
     const pool = activePlaces().filter((p) => p.category === "things");
     const scoped = aroundYou ? placesAround(pool, here) : placesInCity(pool, effectiveCity);
     return scoped.map((p) => withWalk(p, here)).sort((a, b) => a.meters - b.meters);
   }, [here, effectiveCity, aroundYou, version]);
+
+  const sightsLoading = !remoteLoaded && sights.length === 0;
+  const showSightsSkeleton = useDelayedLoading(sightsLoading);
 
   const handleShareGuide = () => {
     void triggerHaptic("medium");
@@ -100,8 +109,10 @@ export function GuidePage() {
         </div>
         <ShareGuideButton city={effectiveCity} label={shareLabel} variant="ghost" onShare={handleShareGuide} />
       </header>
-      {!toursLoaded && tours.length === 0 ? (
+      {showToursSkeleton ? (
         <TourCardSkeletonGrid count={2} className="grid gap-3 md:grid-cols-2" />
+      ) : toursLoading ? (
+        <div className="min-h-[320px]" aria-hidden="true" />
       ) : tours.length === 0 ? (
         <EmptyState
           title="No guided walks here yet"
@@ -121,8 +132,10 @@ export function GuidePage() {
         </div>
       )}
       <h2 className="font-display mt-10 mb-3 text-xl font-semibold">{t("see")}</h2>
-      {!remoteLoaded && sights.length === 0 ? (
+      {showSightsSkeleton ? (
         <PlaceCardSkeletonGrid count={6} className="grid-cols-2 md:grid-cols-3" />
+      ) : sightsLoading ? (
+        <div className="min-h-[480px]" aria-hidden="true" />
       ) : sights.length === 0 ? (
         <EmptyState
           title="No sights listed yet"

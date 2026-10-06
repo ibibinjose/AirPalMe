@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { categoryFromGuestText, ticketFromDoc } from "./tickets-store";
+import { resolveTicketPriority as resolveShared } from "@shared/airpal-data";
+import { categoryFromGuestText, resolveTicketPriority, ticketFromDoc } from "./tickets-store";
 
 describe("categoryFromGuestText", () => {
   it("maps guest phrasing to desk categories", () => {
@@ -26,5 +27,28 @@ describe("ticketFromDoc", () => {
     expect(row?.category).toBe("housekeeping");
     expect(row?.priority).toBe("low");
     expect(ticketFromDoc("x", { details: "  " })).toBeNull();
+  });
+});
+
+describe("resolveTicketPriority", () => {
+  const matrix = [
+    [{ priority: "high" as const, urgency: "normal" as const }, "high"],
+    [{ urgency: "urgent" as const }, "urgent"],
+    [{ category: "maintenance" }, "high"],
+    [{ category: "late_checkout" }, "medium"],
+    [{ category: "dining" }, "medium"],
+    [{ category: "reception" }, "medium"],
+    [{ category: "housekeeping" }, "low"],
+    [{}, "low"],
+  ] as const;
+  it("matches the documented rule table", () => {
+    for (const [input, expected] of matrix) {
+      expect(resolveTicketPriority({ ...input })).toBe(expected);
+    }
+  });
+  it("stays in sync with the shared copy used by Cloud Functions", () => {
+    for (const [input] of matrix) {
+      expect(resolveTicketPriority({ ...input })).toBe(resolveShared({ ...input }));
+    }
   });
 });

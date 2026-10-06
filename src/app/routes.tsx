@@ -99,8 +99,10 @@ const PlanEditPage = lazy(() => import("@/pages/PlanEditPage").then((m) => ({ de
 const HelpDeskPage = lazy(() => import("@/pages/HelpDeskPage").then((m) => ({ default: m.HelpDeskPage })));
 
 function RouteFallback() {
+  // Full-viewport reserve: keeps the footer below the fold while the route
+  // chunk loads, so the fallback→content swap never shifts visible layout.
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3 p-8" role="status" aria-live="polite">
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-3 p-8" role="status" aria-live="polite">
       <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
       <p className="text-sm text-mute">Loading</p>
     </div>

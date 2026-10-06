@@ -266,6 +266,26 @@ export interface StaffTicketActivity {
 
 export type TicketPriority = "low" | "medium" | "high" | "urgent";
 
+/**
+ * Priority rules for staff tickets (Cloud Functions + any server-side use).
+ * Mirrored in `src/lib/tickets-store.ts` for the web client, which must not
+ * import values from this module (it would land in the initial bundle).
+ * Keep both copies in sync.
+ */
+export function resolveTicketPriority(ticket: {
+  priority?: TicketPriority;
+  urgency?: "normal" | "urgent";
+  category?: string;
+  details?: string;
+}): TicketPriority {
+  if (ticket.priority) return ticket.priority;
+  if (ticket.urgency === "urgent") return "urgent";
+  if (ticket.category === "maintenance") return "high";
+  if (ticket.category === "late_checkout" || ticket.category === "dining") return "medium";
+  if (ticket.category === "reception") return "medium";
+  return "low";
+}
+
 export const PRIORITY_CONFIG: Record<
   TicketPriority,
   {

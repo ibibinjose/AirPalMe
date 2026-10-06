@@ -523,9 +523,17 @@ export function BioPublicPage() {
   const websiteLink = bio.links.find(
     (l) => l.type === "website" || l.type === "book" || l.type === "order" || l.type === "menu",
   );
+  const rawWebsite = (bio as Record<string, unknown>).website;
+  const websiteFallback =
+    typeof rawWebsite === "string" && rawWebsite.trim()
+      ? rawWebsite.startsWith("http")
+        ? rawWebsite.trim()
+        : `https://${rawWebsite.trim()}`
+      : undefined;
   const websiteUrl =
     websiteLink?.href ||
-    (bio.domain ? (bio.domain.startsWith("http") ? bio.domain : `https://${bio.domain}`) : undefined);
+    (bio.domain ? (bio.domain.startsWith("http") ? bio.domain : `https://${bio.domain}`) : undefined) ||
+    websiteFallback;
 
   // WhatsApp URL resolution
   const whatsappLink = bio.links.find((l) => l.type === "whatsapp");
@@ -933,14 +941,27 @@ export function BioPublicPage() {
             )}
           </div>
 
-          {/* Social Engagement Deck (Follow, Like, QR Share) */}
+          {/* Social Engagement Deck (Follow, Like, Website, QR Share) */}
           <div className="mt-5 flex items-center gap-2">
-            <FollowButton handle={bio.handle} name={bio.name} className="flex-1 h-10 text-xs font-semibold" />
-            <LikeButton handle={bio.handle} name={bio.name} className="flex-1 h-10 text-xs font-semibold" />
+            <FollowButton handle={bio.handle} name={bio.name} className="flex-1 min-w-0 h-10 text-xs font-semibold px-2.5 sm:px-4" />
+            <LikeButton handle={bio.handle} name={bio.name} className="flex-1 min-w-0 h-10 text-xs font-semibold px-2.5 sm:px-4" />
+            {websiteUrl ? (
+              <a
+                href={websiteUrl}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => recordTap(bio.handle, websiteLink?.type || "website")}
+                className="inline-flex h-10 items-center justify-center rounded-full bg-paper px-3 sm:px-3.5 text-xs font-semibold text-ink shadow-2xs ring-1 ring-line/80 transition hover:bg-paper/80 active:scale-95 shrink-0"
+                title={`Visit ${bio.domain || "website"}`}
+                aria-label="Website"
+              >
+                <span>www</span>
+              </a>
+            ) : null}
             <button
               type="button"
               onClick={() => setShareModalOpen(true)}
-              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-paper px-4 text-xs font-semibold text-ink shadow-2xs ring-1 ring-line/80 transition hover:bg-paper/80 active:scale-95 shrink-0"
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-paper px-3 sm:px-4 text-xs font-semibold text-ink shadow-2xs ring-1 ring-line/80 transition hover:bg-paper/80 active:scale-95 shrink-0"
               title="Share & QR Code"
             >
               <QrCode size={15} className="text-gold" />
@@ -948,8 +969,8 @@ export function BioPublicPage() {
             </button>
           </div>
 
-          {/* 1-Tap Quick Action Deck: [Chat], [Website], [WhatsApp], [Call] */}
-          <div className="mt-3 grid grid-cols-4 gap-1.5 sm:gap-2">
+          {/* 1-Tap Quick Action Deck: [Chat], [WhatsApp], [Call] */}
+          <div className="mt-3 grid grid-cols-3 gap-1.5 sm:gap-2">
             <button
               type="button"
               onClick={handleStartChat}
@@ -958,24 +979,6 @@ export function BioPublicPage() {
               <MessageSquare size={15} className="shrink-0 group-hover:scale-110 transition-transform" />
               <span className="truncate">Chat</span>
             </button>
-
-            {websiteUrl ? (
-              <a
-                href={websiteUrl}
-                target="_blank"
-                rel="noreferrer"
-                onClick={() => recordTap(bio.handle, websiteLink?.type || "website")}
-                className="group flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-paper/70 px-2 text-xs font-semibold text-ink ring-1 ring-line/80 transition-all duration-200 hover:bg-paper hover:ring-sky-500/40 active:scale-95 shadow-2xs"
-              >
-                <Globe size={15} className="text-sky-600 shrink-0 group-hover:scale-110 transition-transform" />
-                <span className="truncate">Website</span>
-              </a>
-            ) : (
-              <div className="flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-paper/30 px-2 text-xs font-medium text-mute/50 ring-1 ring-line/40 cursor-not-allowed">
-                <Globe size={15} className="opacity-40 shrink-0" />
-                <span className="truncate">Website</span>
-              </div>
-            )}
 
             {whatsappUrl ? (
               <a
@@ -1014,48 +1017,6 @@ export function BioPublicPage() {
               </div>
             )}
           </div>
-
-          {/* Invite code — every bio carries its owner's code so any visitor can join under them */}
-          {bio.ownerUid && (
-            <div className="mt-3 rounded-2xl bg-gold/10 p-3.5 ring-1 ring-gold/30 shadow-2xs">
-              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gold">
-                <Ticket size={13} aria-hidden />
-                {isOwner ? "Your invite code" : `Join with ${bio.name.split(" ")[0]}'s code`}
-              </p>
-              <div className="mt-2 flex items-center gap-2">
-                <code className="min-w-0 flex-1 truncate rounded-xl bg-card px-3 py-2 text-sm font-bold text-ink ring-1 ring-line/70">
-                  @{bio.handle}
-                </code>
-                <button
-                  type="button"
-                  onClick={() => void handleCopyInviteCode()}
-                  className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:bg-paper active:scale-95"
-                  aria-label="Copy invite code"
-                >
-                  {copiedCode ? (
-                    <Check size={14} className="text-emerald-600" />
-                  ) : (
-                    <Copy size={14} className="text-mute" />
-                  )}
-                  {copiedCode ? "Copied" : "Copy"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void handleShareInvite()}
-                  className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3.5 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95"
-                  aria-label="Share invite link"
-                >
-                  <Share2 size={14} />
-                  Invite
-                </button>
-              </div>
-              <p className="mt-1.5 text-[11px] leading-relaxed text-mute">
-                {isOwner
-                  ? "Share your code — you both earn Stars when your mate completes their first experience."
-                  : "Use this code when you join — you both earn Stars when you complete your first experience."}
-              </p>
-            </div>
-          )}
 
           {/* Business & Stay profile specific overview, facilities & actions */}
           {(bio.kind === "business" || isStay) && (
@@ -2046,6 +2007,48 @@ export function BioPublicPage() {
           )}
 
           {bio.propertyId ? <BioPulseRate propertyId={bio.propertyId} /> : null}
+
+          {/* Invite code — every bio carries its owner's code so any visitor can join under them */}
+          {bio.ownerUid && (
+            <div className="mt-8 rounded-3xl bg-gold/10 p-4 ring-1 ring-gold/30 shadow-2xs">
+              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gold">
+                <Ticket size={13} aria-hidden />
+                {isOwner ? "Your invite code" : `Join with ${bio.name.split(" ")[0]}'s code`}
+              </p>
+              <div className="mt-2.5 flex items-center gap-2">
+                <code className="min-w-0 flex-1 truncate rounded-xl bg-card px-3 py-2 text-sm font-bold text-ink ring-1 ring-line/70">
+                  @{bio.handle}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => void handleCopyInviteCode()}
+                  className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:bg-paper active:scale-95"
+                  aria-label="Copy invite code"
+                >
+                  {copiedCode ? (
+                    <Check size={14} className="text-emerald-600" />
+                  ) : (
+                    <Copy size={14} className="text-mute" />
+                  )}
+                  {copiedCode ? "Copied" : "Copy"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleShareInvite()}
+                  className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3.5 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95"
+                  aria-label="Share invite link"
+                >
+                  <Share2 size={14} />
+                  Invite
+                </button>
+              </div>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-mute">
+                {isOwner
+                  ? "Share your code — you both earn Stars when your mate completes their first experience."
+                  : "Use this code when you join — you both earn Stars when you complete your first experience."}
+              </p>
+            </div>
+          )}
 
           {/* Brand Footer & Viral @handle CTA */}
           <footer className="mt-10 flex flex-col items-center justify-center gap-2 border-t border-line/60 pt-6 text-center">

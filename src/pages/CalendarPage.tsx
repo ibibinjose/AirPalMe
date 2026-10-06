@@ -45,6 +45,7 @@ import { CalendarRescheduleModal } from "@/components/calendar/CalendarReschedul
 import { cn } from "@/lib/cn";
 import { track } from "@/lib/analytics";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { cityMatches } from "@/lib/remote-events";
 import { ROCKS_BROWSE } from "@/lib/catalog-stay";
@@ -118,6 +119,9 @@ function CalendarPageContent() {
   );
   const { reschedulingEvent, setReschedulingEvent } = useCalendarDrag();
   const [isLoading, setIsLoading] = useState(true);
+  // Skeleton only for genuinely slow loads — fast event data renders the
+  // calendar directly with no full-page flash-swap layout shift.
+  const showSkeleton = useDelayedLoading(isLoading);
 
   const searchParams = useMemo(() => new URLSearchParams(searchStr), [searchStr]);
 
@@ -344,9 +348,14 @@ function CalendarPageContent() {
     void track("calendar_export_selected_day", { date: selectedDate, count: selectedDayEvents.length });
   };
 
-  // Show loading skeleton on initial load
-  if (isLoading) {
+  // Show loading skeleton on initial load (delayed — see above)
+  if (showSkeleton) {
     return <CalendarSkeleton />;
+  }
+  if (isLoading) {
+    // Full-viewport spacer (not null) so the footer stays below the fold
+    // during fast loads — avoids a footer up/down layout shift (CLS).
+    return <div className="min-h-[100dvh]" aria-hidden="true" />;
   }
 
   return (
