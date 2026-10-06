@@ -1,11 +1,25 @@
 import { collection, doc, onSnapshot, serverTimestamp, setDoc, type Timestamp } from "firebase/firestore";
-import type { StaffTicket } from "@shared/airpal-data";
+import type { StaffTicket, TicketPriority } from "@shared/airpal-data";
 export type { StaffTicket } from "@shared/airpal-data";
-import { resolveTicketPriority } from "@shared/airpal-data";
 import { ensureAnonymousSession, getFirebaseAuth, getFirebaseDb } from "./firebase";
 import { createStaffTicketRemote, liveBackendEnabled, resolveStaffTicketRemote } from "./functions";
 
 const LOCAL_PREFIX = "airpal.tickets.";
+
+/** Priority rules for staff tickets (sole home — kept here so `@shared/airpal-data` stays out of the initial bundle). */
+export function resolveTicketPriority(ticket: {
+  priority?: TicketPriority;
+  urgency?: "normal" | "urgent";
+  category?: StaffTicket["category"] | string;
+  details?: string;
+}): TicketPriority {
+  if (ticket.priority) return ticket.priority;
+  if (ticket.urgency === "urgent") return "urgent";
+  if (ticket.category === "maintenance") return "high";
+  if (ticket.category === "late_checkout" || ticket.category === "dining") return "medium";
+  if (ticket.category === "reception") return "medium";
+  return "low";
+}
 
 function asIso(value: unknown): string {
   if (typeof value === "string" && value) return value;

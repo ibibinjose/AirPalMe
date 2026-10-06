@@ -36,7 +36,7 @@ export function PartnersPage() {
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           {active.map((v) => (
             <article key={v.id} className="overflow-hidden rounded-3xl bg-card ring-1 ring-line">
-              {v.heroImage && <Photo src={v.heroImage} className="h-32 w-full object-cover" />}
+              {v.heroImage && <Photo thumb src={v.heroImage} className="h-32 w-full object-cover" />}
               <div className="p-3">
                 <p className="font-medium leading-tight">{v.name}</p>
                 <p className="text-[12px] text-mute">{v.category}</p>

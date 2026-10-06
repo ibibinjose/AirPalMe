@@ -136,6 +136,7 @@ export function StayListPage() {
                     aria-label={`View ${stay.name}`}
                   >
                     <Photo
+                      thumb
                       src={stay.heroImage || stay.galleryImages?.[0] || "/media/harbour.jpg"}
                       className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                       alt={stay.name}

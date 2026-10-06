@@ -102,7 +102,7 @@ export function StayProfilePage() {
             className={`w-full rounded-[28px] object-cover ${gallery.length > 1 ? "col-span-3 h-64 sm:h-80" : "h-64 sm:h-80"}`}
           />
           {gallery.slice(1, 4).map((src) => (
-            <Photo key={src} src={src} alt={property.name} className="h-28 w-full rounded-3xl object-cover" />
+            <Photo thumb key={src} src={src} alt={property.name} className="h-28 w-full rounded-3xl object-cover" />
           ))}
         </div>
       )}

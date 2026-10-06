@@ -8,6 +8,7 @@ import { useStay } from "@/contexts/StayContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { hrefForPlace } from "@/lib/bio-handle";
+import { sizedImageUrl } from "@/lib/media-srcset";
 import { activePlaces, placesForLocation } from "@/lib/catalog";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { useListings } from "@/contexts/ListingsContext";
@@ -307,8 +308,10 @@ export function ScanPage() {
               >
                 {p.heroImage && (
                   <img
-                    src={p.heroImage}
+                    src={sizedImageUrl(p.heroImage, 400)}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     referrerPolicy="no-referrer"
                     className="absolute inset-0 h-full w-full object-cover"
                   />

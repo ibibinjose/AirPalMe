@@ -17,3 +17,20 @@ export function mediaSrcSet(src: string | undefined): string | undefined {
   if (!name || !full) return undefined;
   return `/media/${name}-800.webp 800w, /media/${name}-full.webp ${full}w`;
 }
+
+/**
+ * Downsize remote Unsplash images to the rendered width. Seed data ships
+ * `w=1200` originals; cards render at ~170–400px, so serving 1200px wastes
+ * ~10x bytes. Non-Unsplash URLs pass through untouched.
+ */
+export function sizedImageUrl(src: string | undefined, width: number): string | undefined {
+  if (!src) return undefined;
+  if (!src.includes("images.unsplash.com")) return src;
+  try {
+    const url = new URL(src);
+    url.searchParams.set("w", String(width));
+    return url.toString();
+  } catch {
+    return src;
+  }
+}

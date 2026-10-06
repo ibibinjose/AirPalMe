@@ -446,6 +446,7 @@ export function LocalFavorites() {
                       {selectedPlace.photo && (
                         <div className="h-28 w-full overflow-hidden rounded-lg mb-2 bg-card">
                           <Photo
+                            thumb
                             src={selectedPlace.photo}
                             alt={selectedPlace.name}
                             className="h-full w-full object-cover"
@@ -539,6 +540,7 @@ export function LocalFavorites() {
                   {/* Photo Container */}
                   <div className="relative h-32 w-full overflow-hidden rounded-2xl bg-card">
                     <Photo
+                      thumb
                       src={place.photo}
                       alt={place.name}
                       className="h-full w-full object-cover transition duration-300 group-hover:scale-105"

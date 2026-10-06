@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Geo } from "@shared/nearby";
 import { useStay } from "./StayContext";
-import { PRECINCT } from "@/lib/catalog";
+import { PRECINCT_META } from "@/lib/cities";
 import { stayOrigin } from "@/lib/highlights";
 import { DEFAULT_TZ, deviceTimeZone, formatLocalDay, formatLocalTime, toZonedDateStr } from "@/lib/local-time";
 import { loadLocalWeather, type LocalWeather, type WeatherOrigin } from "@/lib/weather";
@@ -63,7 +63,7 @@ export function LocalNowProvider({ children }: { children: ReactNode }) {
         lat: stayGeo.lat,
         lng: stayGeo.lng,
         source: "stay",
-        city: property.city || PRECINCT.city,
+        city: property.city || PRECINCT_META.city,
       };
     }
     const last = loadLastGps();

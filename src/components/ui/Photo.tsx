@@ -1,4 +1,5 @@
 import { useMediaSrc } from "@/hooks/useMediaSrc";
+import { sizedImageUrl } from "@/lib/media-srcset";
 
 export function Photo({
   src,
@@ -6,6 +7,7 @@ export function Photo({
   className,
   position,
   priority = false,
+  thumb = false,
   srcSet,
   sizes,
 }: {
@@ -15,15 +17,18 @@ export function Photo({
   position?: string;
   /** Above-the-fold hero: eager load with high fetch priority (improves LCP). */
   priority?: boolean;
+  /** Card-sized render: downsize remote images to 600px (seed originals are 1200px). */
+  thumb?: boolean;
   srcSet?: string;
   sizes?: string;
 }) {
   const resolved = useMediaSrc(src);
   const current = resolved || (src && !src.startsWith("idb:") ? src : undefined);
-  if (!current) return <div className={className} />;
+  const display = thumb ? sizedImageUrl(current, 600) : current;
+  if (!display) return <div className={className} />;
   return (
     <img
-      src={current}
+      src={display}
       alt={alt}
       className={className}
       style={position ? { objectPosition: position } : undefined}

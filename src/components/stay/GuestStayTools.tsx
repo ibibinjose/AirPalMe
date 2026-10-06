@@ -1,14 +1,23 @@
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import { CircleHelp, ClipboardCheck, MessageCircle, X } from "lucide-react";
 import { useLocation } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
 import { useStay } from "@/contexts/StayContext";
 import { useStayUi } from "@/contexts/StayUiContext";
-import { QuickAnswersSheet } from "./QuickAnswersSheet";
-import { ContactHostSheet } from "./ContactHostSheet";
-import { DepartureChecklistSheet } from "./DepartureChecklistSheet";
 import { useLocale } from "@/contexts/LocaleContext";
 import { triggerHaptic, triggerHapticSelection } from "@/lib/native";
+
+// Sheets load on demand — this widget mounts in the shell on every route,
+// but the sheets (and their datasets) are only needed on stay routes.
+const QuickAnswersSheet = lazy(() =>
+  import("./QuickAnswersSheet").then((m) => ({ default: m.QuickAnswersSheet })),
+);
+const ContactHostSheet = lazy(() =>
+  import("./ContactHostSheet").then((m) => ({ default: m.ContactHostSheet })),
+);
+const DepartureChecklistSheet = lazy(() =>
+  import("./DepartureChecklistSheet").then((m) => ({ default: m.DepartureChecklistSheet })),
+);
 
 const HIDE = [
   /^\/scan/,
@@ -104,9 +113,11 @@ export function GuestStayTools() {
           </button>
         </div>
       )}
-      <QuickAnswersSheet />
-      <ContactHostSheet />
-      <DepartureChecklistSheet />
+      <Suspense fallback={null}>
+        <QuickAnswersSheet />
+        <ContactHostSheet />
+        <DepartureChecklistSheet />
+      </Suspense>
     </>
   );
 }

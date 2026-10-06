@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { cityCenter, currencyForCity, knownCityCenter } from "./cities";
+import { cityCenter, currencyForCity, knownCityCenter, PRECINCT_META } from "./cities";
+import { THE_ROCKS_PRECINCT } from "@shared/the-rocks-data";
 
 describe("cityCenter", () => {
   it("resolves known cities loosely and falls back", () => {
@@ -26,5 +27,12 @@ describe("knownCityCenter", () => {
     expect(knownCityCenter("Bengaluru")).toEqual({ lat: 12.9716, lng: 77.5946 });
     expect(currencyForCity("Kochi")).toBe("INR");
     expect(currencyForCity("Sydney")).toBe("AUD");
+  });
+});
+
+describe("PRECINCT_META", () => {
+  it("matches the full precinct dataset (drift guard for the initial bundle)", () => {
+    expect(PRECINCT_META.city).toBe(THE_ROCKS_PRECINCT.city);
+    expect(PRECINCT_META.geo).toEqual(THE_ROCKS_PRECINCT.geo);
   });
 });

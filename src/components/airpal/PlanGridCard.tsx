@@ -45,6 +45,7 @@ export function PlanGridCard({ plan, dimmed = false }: { plan: HangoutPlan; dimm
       <div className="relative aspect-square overflow-hidden rounded-[20px] bg-paper shadow-[0_4px_16px_rgba(18,22,20,0.10)] ring-1 ring-line">
         {plan.heroImage ? (
           <Photo
+            thumb
             src={plan.heroImage}
             className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />

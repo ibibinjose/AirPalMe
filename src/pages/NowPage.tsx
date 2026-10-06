@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import {
-  ArrowLeft,
   ArrowRight,
   Clock,
   Compass,
@@ -50,65 +49,6 @@ const WHEN_ICONS: Record<NowWhen, string> = {
   tonight: "🌙",
 };
 
-function ChipGroup<T extends string>({
-  label,
-  step,
-  options,
-  value,
-  icons,
-  onChange,
-}: {
-  label: string;
-  step?: string;
-  options: Array<{ id: T; label: string }>;
-  value: T;
-  icons?: Record<T, string>;
-  onChange: (id: T) => void;
-}) {
-  return (
-    <fieldset className="space-y-2.5">
-      <legend className="flex items-center gap-2 text-sm font-semibold text-ink">
-        {step ? (
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand/10 text-[11px] font-bold text-brand">
-            {step}
-          </span>
-        ) : null}
-        <span>{label}</span>
-      </legend>
-      <div className="flex flex-wrap gap-2">
-        {options.map((opt) => {
-          const selected = opt.id === value;
-          const icon = icons ? icons[opt.id] : undefined;
-          return (
-            <button
-              key={opt.id}
-              type="button"
-              aria-pressed={selected}
-              onClick={() => {
-                void triggerHapticSelection();
-                onChange(opt.id);
-              }}
-              className={cn(
-                "group relative inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-1.5 rounded-full px-4 py-2 text-[14px] font-medium transition active:scale-[0.97] touch-manipulation focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
-                selected
-                  ? "bg-brand text-white shadow-xs"
-                  : "bg-card text-ink ring-1 ring-line/80 hover:bg-paper active:bg-paper/70",
-              )}
-            >
-              {icon ? (
-                <span aria-hidden="true" className={cn("text-sm", selected ? "opacity-100" : "opacity-75")}>
-                  {icon}
-                </span>
-              ) : null}
-              <span>{opt.label}</span>
-            </button>
-          );
-        })}
-      </div>
-    </fieldset>
-  );
-}
-
 function openLabel(open: boolean | null, when: NowWhen): string {
   if (open === true) return when === "now" ? "Open now" : "Open tonight";
   if (open === false) return "Closed now";
@@ -116,7 +56,7 @@ function openLabel(open: boolean | null, when: NowWhen): string {
 }
 
 export function NowPage() {
-  const { here, city, now, today, time, day, timeZone, usingGps } = useLocalNow();
+  const { here, city, now, today, timeZone, usingGps } = useLocalNow();
   const { version, remoteLoaded } = useListings();
   const [, navigate] = useLocation();
   const [mood, setMood] = useState<NowMood>("any");
@@ -192,80 +132,115 @@ export function NowPage() {
     <div className="mx-auto max-w-2xl px-4 pb-28 pt-4 sm:px-6 sm:pb-32 sm:pt-6">
       <LocationSheet open={locationPicker} onClose={() => setLocationPicker(false)} />
 
-      {/* Ambient Top Controls */}
-      <div className="flex items-center justify-between gap-3">
-        <Link
-          href="/"
-          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-mute transition hover:bg-card hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-        >
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          <span>Home</span>
-        </Link>
-
-        {/* Live device context pill — tap to change city */}
-        <button
-          type="button"
-          onClick={() => {
-            void triggerHapticSelection();
-            setLocationPicker(true);
-          }}
-          className="group inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 py-1.5 text-xs font-semibold text-ink ring-1 ring-line/80 shadow-xs transition hover:bg-paper active:scale-95 touch-manipulation focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-          title="Change location or precinct"
-          aria-label={`Location: ${effectiveCity}. Tap to change.`}
-        >
-          <MapPin className="h-3.5 w-3.5 text-brand" aria-hidden />
-          <span className="font-semibold text-ink">{effectiveCity}</span>
-          <span className="text-mute">·</span>
-          <span className="text-mute">
-            {day} {time}
-          </span>
-        </button>
-      </div>
-
       {/* Hero Header */}
-      <div className="mt-3">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand ring-1 ring-brand/20">
-          <Sparkles className="h-3.5 w-3.5" aria-hidden />
-          <span>Instant Hangout</span>
+      <div>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+            What now?
+          </h1>
+          <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand ring-1 ring-brand/20">
+            <Sparkles className="h-3.5 w-3.5" aria-hidden />
+            <span>Instant Hangout</span>
+          </div>
         </div>
-        <h1 className="font-display mt-2 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">What now?</h1>
         <p className="mt-1.5 text-[15px] leading-relaxed text-mute">
-          Three quick questions. We&apos;ll pick one real nearby spot and assemble your plan.
+          Pick a vibe. We&apos;ll pick one real nearby spot and assemble your plan.
         </p>
       </div>
 
-      {/* 3-Question Composer Card */}
-      <div className="mt-6 space-y-6 rounded-[32px] bg-card p-5 ring-1 ring-line/80 shadow-xs backdrop-blur-xl sm:p-7">
-        <ChipGroup
-          step="1"
-          label="What are you in the mood for?"
-          options={NOW_MOODS}
-          value={mood}
-          icons={MOOD_ICONS}
-          onChange={selectMood}
-        />
+      {/* Mood Filter Chips */}
+      <div
+        role="radiogroup"
+        aria-label="Filter by mood"
+        className="no-scrollbar mt-5 -mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0"
+      >
+        {NOW_MOODS.map((opt) => {
+          const selected = opt.id === mood;
+          const icon = MOOD_ICONS[opt.id];
+          return (
+            <button
+              key={opt.id}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              onClick={() => {
+                void triggerHapticSelection();
+                selectMood(opt.id);
+              }}
+              className={cn(
+                "group inline-flex min-h-[44px] shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition active:scale-95 touch-manipulation focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
+                selected
+                  ? "bg-brand font-semibold text-white shadow-xs"
+                  : "bg-card text-ink ring-1 ring-line/80 hover:bg-paper active:bg-paper/70",
+              )}
+            >
+              <span aria-hidden="true" className={cn("text-base", selected ? "opacity-100" : "opacity-80")}>
+                {icon}
+              </span>
+              <span>{opt.label}</span>
+            </button>
+          );
+        })}
+      </div>
 
-        <ChipGroup
-          step="2"
-          label="When?"
-          options={NOW_WHENS}
-          value={when}
-          icons={WHEN_ICONS}
-          onChange={selectWhen}
-        />
+      {/* Secondary Quick Filter Pills */}
+      <div className="mt-2.5 flex flex-wrap items-center gap-2">
+        <div
+          role="radiogroup"
+          aria-label="Filter by time"
+          className="inline-flex rounded-full bg-card p-1 ring-1 ring-line/80 shadow-2xs"
+        >
+          {NOW_WHENS.map((opt) => {
+            const selected = opt.id === when;
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => {
+                  void triggerHapticSelection();
+                  selectWhen(opt.id);
+                }}
+                className={cn(
+                  "inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition active:scale-95",
+                  selected ? "bg-brand text-white shadow-2xs" : "text-mute hover:text-ink",
+                )}
+              >
+                <span aria-hidden="true">{WHEN_ICONS[opt.id]}</span>
+                <span>{opt.label}</span>
+              </button>
+            );
+          })}
+        </div>
 
-        <div>
-          <ChipGroup
-            step="3"
-            label="Who with?"
-            options={COMPANIES}
-            value={company}
-            icons={{ solo: "👤", group: "👥" }}
-            onChange={setCompany}
-          />
-          <p className="mt-2.5 text-xs text-mute">
-            Invites and group chat arrive automatically with the plan thread.
-          </p>
+        <div
+          role="radiogroup"
+          aria-label="Filter by company"
+          className="inline-flex rounded-full bg-card p-1 ring-1 ring-line/80 shadow-2xs"
+        >
+          {COMPANIES.map((opt) => {
+            const selected = opt.id === company;
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => {
+                  void triggerHapticSelection();
+                  setCompany(opt.id);
+                }}
+                className={cn(
+                  "inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition active:scale-95",
+                  selected ? "bg-brand text-white shadow-2xs" : "text-mute hover:text-ink",
+                )}
+              >
+                <span aria-hidden="true">{opt.icon}</span>
+                <span>{opt.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 

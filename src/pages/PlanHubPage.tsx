@@ -277,6 +277,7 @@ export function PlanHubPage() {
             {nextUpcomingPlan.heroImage && (
               <div className="relative aspect-video md:aspect-4/3 md:col-span-4 overflow-hidden rounded-2xl ring-1 ring-line/40">
                 <Photo
+                  thumb
                   src={nextUpcomingPlan.heroImage}
                   alt={nextUpcomingPlan.title}
                   className="h-full w-full object-cover"

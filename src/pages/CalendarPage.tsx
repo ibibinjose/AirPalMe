@@ -47,7 +47,7 @@ import { track } from "@/lib/analytics";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { cityMatches } from "@/lib/remote-events";
-import { ROCKS_BROWSE } from "@/lib/catalog";
+import { ROCKS_BROWSE } from "@/lib/catalog-stay";
 import { triggerHaptic, triggerHapticSelection } from "@/lib/native";
 
 const CATEGORIES = CALENDAR_CATEGORIES;

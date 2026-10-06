@@ -1,4 +1,4 @@
-import { PRECINCT } from "./catalog";
+import { PRECINCT_META } from "./cities";
 import { haversineMeters } from "./geo";
 import type { Geo } from "@shared/nearby";
 
@@ -31,7 +31,7 @@ const CACHE_KEY = "airpal.local-now.v2";
 const CACHE_MS = 15 * 60 * 1000;
 const STALE_CACHE_MS = 6 * 60 * 60 * 1000;
 
-const FALLBACK = PRECINCT.geo ?? { lat: -33.85945, lng: 151.20835 };
+const FALLBACK = PRECINCT_META.geo;
 
 export type WeatherOrigin = Geo & {
   source: "gps" | "stay" | "precinct" | "city";
@@ -103,7 +103,7 @@ export function weekdayShort(iso: string, timeZone: string) {
 }
 
 function cityFromTimezone(tz: string) {
-  const part = tz.split("/").pop() || PRECINCT.city;
+  const part = tz.split("/").pop() || PRECINCT_META.city;
   return part.replace(/_/g, " ");
 }
 
@@ -181,7 +181,7 @@ async function fetchForecast(lat: number, lng: number): Promise<OpenMeteo> {
 }
 
 export function defaultWeatherOrigin(): WeatherOrigin {
-  return { ...FALLBACK, source: "precinct", city: PRECINCT.city };
+  return { ...FALLBACK, source: "precinct", city: PRECINCT_META.city };
 }
 
 export async function loadLocalWeather(origin?: WeatherOrigin): Promise<LocalWeather> {
@@ -199,7 +199,7 @@ export async function loadLocalWeather(origin?: WeatherOrigin): Promise<LocalWea
     const city =
       coords.source === "gps"
         ? await reverseCity(coords.lat, coords.lng, timezone)
-        : coords.city || (coords.source === "city" ? "Nearby" : PRECINCT.city);
+        : coords.city || (coords.source === "city" ? "Nearby" : PRECINCT_META.city);
 
     const days: ForecastDay[] = daily.time.slice(0, 3).map((date, i) => ({
       date,

@@ -33,7 +33,7 @@ import {
   CATEGORY_THEMES,
 } from "@/lib/calendar-utils";
 import { cn } from "@/lib/cn";
-import { mediaSrcSet } from "@/lib/media-srcset";
+import { mediaSrcSet, sizedImageUrl } from "@/lib/media-srcset";
 import { track } from "@/lib/analytics";
 import { triggerHaptic, shareNative } from "@/lib/native";
 import { toPublicUrl } from "@/lib/public-origin";
@@ -195,7 +195,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
           {/* Actual image */}
           {!imageError && (
             <img
-              src={event.heroImage || "/media/laneway.jpg"}
+              src={sizedImageUrl(event.heroImage, 600) || "/media/laneway.jpg"}
               srcSet={mediaSrcSet(event.heroImage || "/media/laneway.jpg")}
               sizes="(max-width: 768px) 100vw, 50vw"
               alt={`${event.title} event banner`}

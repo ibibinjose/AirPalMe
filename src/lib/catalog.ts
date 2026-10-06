@@ -1,11 +1,3 @@
-import {
-  CURRENT_PROPERTY,
-  IN_ROOM_DINING_MENU,
-  INITIAL_STAFF_TICKETS,
-  SAFETY_AND_EMERGENCY_DATA,
-} from "@shared/airpal-data";
-import { THE_ROCKS_PRECINCT } from "@shared/the-rocks-data";
-import { HARBOUR_COLLEGE } from "@shared/campus";
 import { handleFromPlaceId } from "@shared/bio";
 import type { WalkingTour } from "@shared/tours";
 import {
@@ -16,23 +8,14 @@ import {
   type PlaceCategory,
 } from "@shared/nearby";
 import { haversineMeters, walkLabel } from "./geo";
-import { CITY_RADIUS_KM, knownCityCenter } from "./cities";
+import { CITY_RADIUS_KM, knownCityCenter, PRECINCT_META } from "./cities";
 import { listedPlaces } from "./listings";
 import { getStoredMarker } from "./markers-store";
 import { loadPlaces } from "./places-store";
 import { loadTours } from "./tours-store";
 
-export const PRECINCT = THE_ROCKS_PRECINCT;
-
 /** Walk / short trip from current GPS. The Rocks is ~8 km from Ashfield — outside this. */
 export const AROUND_YOU_M = 5000;
-
-export const ROCKS_BROWSE = {
-  mode: "city" as const,
-  city: "The Rocks, Sydney",
-  lat: THE_ROCKS_PRECINCT.geo?.lat ?? -33.85945,
-  lng: THE_ROCKS_PRECINCT.geo?.lng ?? 151.20835,
-};
 
 export function placesAround<T extends { geo?: { lat: number; lng: number } }>(
   rows: T[],
@@ -51,7 +34,7 @@ export function placesAround<T extends { geo?: { lat: number; lng: number } }>(
  * Empty city returns every tour, labelled by city (used by global search).
  * Empty DB → empty list.
  */
-export function toursForPrecinct(city = PRECINCT.city, pool: WalkingTour[] = loadTours()) {
+export function toursForPrecinct(city: string = PRECINCT_META.city, pool: WalkingTour[] = loadTours()) {
   const key = city.trim().toLowerCase();
   if (!key) return pool;
   return pool.filter((t) => {
@@ -102,12 +85,6 @@ export function placesInCity<T extends { precinctId?: string; geo?: { lat: numbe
     return haversineMeters(center, p.geo) <= maxMeters;
   });
 }
-
-export const STAY = CURRENT_PROPERTY;
-export const MENU = IN_ROOM_DINING_MENU;
-export const TICKETS = INITIAL_STAFF_TICKETS;
-export const SAFETY = SAFETY_AND_EMERGENCY_DATA;
-export const CAMPUS = HARBOUR_COLLEGE;
 
 export const DISCOVER_CHIPS: Array<{ id: "all" | PlaceCategory | "tonight" | "deals"; label: string }> = [
   { id: "all", label: "All" },
@@ -163,7 +140,9 @@ export function getMarker(id: string) {
 }
 
 export function originFor(marker?: MarkerDoc) {
-  return marker?.geo || STAY.geo || STAY.coordinates || PRECINCT.geo || { lat: -33.85945, lng: 151.20835 };
+  // Harbour stay fallback as a literal (== CURRENT_PROPERTY.geo, always
+  // defined) so this hot path never pulls the stay/precinct datasets.
+  return marker?.geo || { lat: -33.85955, lng: 151.20715 };
 }
 
 export function withHandle<T extends NearbyPlace>(place: T): T {

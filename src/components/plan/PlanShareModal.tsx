@@ -231,20 +231,20 @@ export function PlanShareModal({
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-0 sm:p-4 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200">
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/75 backdrop-blur-md transition-opacity" onClick={onClose} />
 
       {/* Modal Dialog */}
-      <div className="scroll-container modal-safe relative w-full max-w-md rounded-t-[32px] sm:rounded-[32px] bg-card p-6 ring-1 ring-line shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between pb-4 border-b border-line/60">
+      <div className="scroll-container modal-safe relative w-full max-w-md rounded-t-[32px] sm:rounded-[32px] bg-zinc-950 text-white p-6 ring-1 ring-white/10 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <div>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Share Invitation</span>
-            <h2 className="font-display mt-0.5 text-xl font-bold text-ink">Invite Your Mates</h2>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-400">Share Invitation</span>
+            <h2 className="font-display mt-0.5 text-xl font-bold text-white">Invite Your Mates</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close modal"
-            className="grid h-10 w-10 min-h-[44px] min-w-[44px] place-items-center rounded-full text-mute hover:bg-paper hover:text-ink transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            className="grid h-10 w-10 min-h-[44px] min-w-[44px] place-items-center rounded-full text-zinc-400 hover:bg-zinc-900 hover:text-white transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             <X size={18} />
           </button>
@@ -252,19 +252,24 @@ export function PlanShareModal({
 
         {/* Link Copy Box with Event Preview */}
         <div className="mt-5">
-          <label className="text-xs font-semibold text-ink/80 block mb-1.5">Shareable Event Link</label>
-          <div className="flex items-center gap-2 rounded-2xl bg-paper p-1.5 ring-1 ring-line">
+          <label className="text-xs font-semibold text-zinc-300 block mb-1.5">Shareable Event Link</label>
+          <div className="flex items-center gap-2 rounded-2xl bg-zinc-900 p-1.5 ring-1 ring-white/10">
             <input
               type="text"
               readOnly
               value={inviteUrl}
-              className="min-w-0 flex-1 bg-transparent px-2.5 text-[16px] sm:text-xs text-ink outline-none select-all"
+              className="min-w-0 flex-1 bg-transparent px-2.5 text-[16px] sm:text-xs text-white outline-none select-all"
             />
             <Button
               size="sm"
               onClick={onCopy}
               aria-label={copied ? "Copied" : "Copy Link"}
-              className="shrink-0 gap-1.5 rounded-xl"
+              className={cn(
+                "shrink-0 gap-1.5 rounded-xl font-semibold cursor-pointer transition active:scale-95",
+                copied
+                  ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30"
+                  : "bg-white text-zinc-950 hover:bg-zinc-200 shadow-xs",
+              )}
             >
               {copied ? (
                 <>
@@ -282,18 +287,18 @@ export function PlanShareModal({
 
           {/* Event Card Preview showing image & graph metadata */}
           {plan.heroImage && (
-            <div className="mt-2.5 flex items-center gap-3 rounded-2xl bg-paper/70 p-2.5 ring-1 ring-line/80">
+            <div className="mt-2.5 flex items-center gap-3 rounded-2xl bg-zinc-900/90 p-2.5 ring-1 ring-white/10">
               <img
                 src={plan.heroImage}
                 alt={plan.title}
-                className="h-14 w-20 shrink-0 rounded-xl object-cover ring-1 ring-line"
+                className="h-14 w-20 shrink-0 rounded-xl object-cover ring-1 ring-white/10"
               />
               <div className="min-w-0 flex-1">
-                <span className="block truncate text-xs font-semibold text-ink">{plan.title}</span>
-                <span className="block truncate text-[11px] text-mute">
+                <span className="block truncate text-xs font-semibold text-white">{plan.title}</span>
+                <span className="block truncate text-[11px] text-zinc-400">
                   {formatPlanDate(plan.date, plan.time)} · {plan.destination || plan.city || "Sydney"}
                 </span>
-                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 mt-0.5">
+                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 mt-0.5">
                   <Check size={10} /> Link preview image attached
                 </span>
               </div>
@@ -306,7 +311,7 @@ export function PlanShareModal({
           <button
             type="button"
             onClick={onWhatsApp}
-            className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-emerald-500/10 p-3 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/20 hover:bg-emerald-500/20 transition active:scale-95 cursor-pointer"
+            className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-emerald-500/15 p-3 text-emerald-300 ring-1 ring-emerald-500/25 hover:bg-emerald-500/25 transition active:scale-95 cursor-pointer"
           >
             <MessageCircle size={20} />
             <span className="text-[11px] font-medium">WhatsApp</span>
@@ -315,7 +320,7 @@ export function PlanShareModal({
           <button
             type="button"
             onClick={onSms}
-            className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-brand/10 p-3 text-brand ring-1 ring-brand/20 hover:bg-brand/20 transition active:scale-95 cursor-pointer"
+            className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-indigo-500/15 p-3 text-indigo-300 ring-1 ring-indigo-500/25 hover:bg-indigo-500/25 transition active:scale-95 cursor-pointer"
           >
             <Share2 size={20} />
             <span className="text-[11px] font-medium">SMS / Text</span>
@@ -324,7 +329,7 @@ export function PlanShareModal({
           <button
             type="button"
             onClick={onNativeShare}
-            className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-paper p-3 text-ink ring-1 ring-line hover:bg-line/60 transition active:scale-95 cursor-pointer"
+            className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-zinc-900 p-3 text-zinc-200 ring-1 ring-white/10 hover:bg-zinc-800 transition active:scale-95 cursor-pointer"
           >
             <Share2 size={20} />
             <span className="text-[11px] font-medium">More…</span>
@@ -333,10 +338,10 @@ export function PlanShareModal({
 
         {/* Circles & Groups / Circle Mates Section */}
         {canInvite && (circleGroups.length > 0 || circleMates.length > 0) && (
-          <div className="mt-6 border-t border-line/60 pt-5">
+          <div className="mt-6 border-t border-white/10 pt-5">
             {/* Tab Selector */}
             <div className="flex items-center justify-between mb-3">
-              <div className="inline-flex rounded-xl bg-paper p-1 ring-1 ring-line">
+              <div className="inline-flex rounded-xl bg-zinc-900 p-1 ring-1 ring-white/10">
                 <button
                   type="button"
                   onClick={() => {
@@ -346,8 +351,8 @@ export function PlanShareModal({
                   className={cn(
                     "flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer",
                     activeTab === "groups"
-                      ? "bg-card text-brand shadow-2xs ring-1 ring-line"
-                      : "text-mute hover:text-ink",
+                      ? "bg-zinc-800 text-white shadow-2xs ring-1 ring-white/15"
+                      : "text-zinc-400 hover:text-white",
                   )}
                 >
                   <Users size={13} />
@@ -362,8 +367,8 @@ export function PlanShareModal({
                   className={cn(
                     "flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition cursor-pointer",
                     activeTab === "mates"
-                      ? "bg-card text-brand shadow-2xs ring-1 ring-line"
-                      : "text-mute hover:text-ink",
+                      ? "bg-zinc-800 text-white shadow-2xs ring-1 ring-white/15"
+                      : "text-zinc-400 hover:text-white",
                   )}
                 >
                   <Sparkles size={13} />
@@ -382,7 +387,7 @@ export function PlanShareModal({
                       return (
                         <li
                           key={g.id}
-                          className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-2.5 pl-3 ring-1 ring-line"
+                          className="flex items-center justify-between gap-3 rounded-2xl bg-zinc-900/90 p-2.5 pl-3 ring-1 ring-white/10"
                         >
                           <div className="flex min-w-0 items-center gap-2.5">
                             {/* Avatar Cluster */}
@@ -390,7 +395,7 @@ export function PlanShareModal({
                               {g.members.slice(0, 3).map((m, idx) => (
                                 <span
                                   key={m.id || idx}
-                                  className="grid h-8 w-8 place-items-center overflow-hidden rounded-full bg-card ring-2 ring-paper text-[11px] font-bold text-ink uppercase"
+                                  className="grid h-8 w-8 place-items-center overflow-hidden rounded-full bg-zinc-800 ring-2 ring-zinc-950 text-[11px] font-bold text-white uppercase"
                                 >
                                   {m.avatar ? (
                                     <img src={m.avatar} alt={m.name} className="h-full w-full object-cover" />
@@ -400,14 +405,14 @@ export function PlanShareModal({
                                 </span>
                               ))}
                               {g.members.length > 3 && (
-                                <span className="grid h-8 w-8 place-items-center rounded-full bg-brand/15 text-[10px] font-bold text-brand ring-2 ring-paper">
+                                <span className="grid h-8 w-8 place-items-center rounded-full bg-indigo-500/25 text-[10px] font-bold text-indigo-300 ring-2 ring-zinc-950">
                                   +{g.members.length - 3}
                                 </span>
                               )}
                             </div>
                             <div className="min-w-0">
-                              <span className="block truncate text-xs font-semibold text-ink">{g.name}</span>
-                              <span className="block truncate text-[11px] text-mute">
+                              <span className="block truncate text-xs font-semibold text-white">{g.name}</span>
+                              <span className="block truncate text-[11px] text-zinc-400">
                                 {g.members.length} mates ·{" "}
                                 {g.members
                                   .map((m) => m.name.split(" ")[0])
@@ -418,7 +423,7 @@ export function PlanShareModal({
                             </div>
                           </div>
                           {allInvited ? (
-                            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500/15 px-3 py-1.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+                            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500/20 px-3 py-1.5 text-[11px] font-semibold text-emerald-300">
                               <Check size={13} />
                               <span>Sent</span>
                             </span>
@@ -438,10 +443,10 @@ export function PlanShareModal({
                     })}
                   </ul>
                 ) : (
-                  <div className="rounded-2xl bg-paper/60 p-4 text-center border border-line/60">
-                    <Users size={24} className="mx-auto text-mute/60 mb-1.5" />
-                    <p className="text-xs font-medium text-ink">No hangout groups yet</p>
-                    <p className="text-[11px] text-mute mt-0.5">
+                  <div className="rounded-2xl bg-zinc-900/60 p-4 text-center border border-white/10">
+                    <Users size={24} className="mx-auto text-zinc-500 mb-1.5" />
+                    <p className="text-xs font-medium text-white">No hangout groups yet</p>
+                    <p className="text-[11px] text-zinc-400 mt-0.5">
                       Share the invite link with your crew — everyone who joins automatically forms a Circle group!
                     </p>
                   </div>
@@ -457,10 +462,10 @@ export function PlanShareModal({
                     {circleMates.map((c) => (
                       <li
                         key={c.id || c.name}
-                        className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-2.5 pl-3 ring-1 ring-line"
+                        className="flex items-center justify-between gap-3 rounded-2xl bg-zinc-900/90 p-2.5 pl-3 ring-1 ring-white/10"
                       >
                         <span className="flex min-w-0 items-center gap-2.5">
-                          <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-card text-xs font-bold text-ink ring-1 ring-line uppercase">
+                          <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-zinc-800 text-xs font-bold text-white ring-1 ring-white/10 uppercase">
                             {c.avatar ? (
                               <img src={c.avatar} alt={c.name} className="h-full w-full object-cover" />
                             ) : (
@@ -468,15 +473,15 @@ export function PlanShareModal({
                             )}
                           </span>
                           <span className="min-w-0">
-                            <span className="block truncate text-xs font-semibold text-ink">
+                            <span className="block truncate text-xs font-semibold text-white">
                               {c.name}
-                              {c.handle && <span className="text-mute font-normal"> (@{c.handle})</span>}
+                              {c.handle && <span className="text-zinc-400 font-normal"> (@{c.handle})</span>}
                             </span>
-                            <span className="block truncate text-[11px] text-mute">{c.info}</span>
+                            <span className="block truncate text-[11px] text-zinc-400">{c.info}</span>
                           </span>
                         </span>
                         {c.id && invited.has(c.id) ? (
-                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500/15 px-3 py-1.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-500/20 px-3 py-1.5 text-[11px] font-semibold text-emerald-300">
                             <Check size={13} />
                             <span>Sent</span>
                           </span>
@@ -495,7 +500,7 @@ export function PlanShareModal({
                             type="button"
                             onClick={onNativeShare}
                             aria-label={`Share with ${c.name}`}
-                            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-paper px-3 text-xs font-semibold text-ink ring-1 ring-line hover:bg-line/60 transition active:scale-95 cursor-pointer"
+                            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-zinc-800 px-3 text-xs font-semibold text-white ring-1 ring-white/10 hover:bg-zinc-700 transition active:scale-95 cursor-pointer"
                           >
                             <Share2 size={13} />
                             <span>Share</span>
@@ -505,8 +510,8 @@ export function PlanShareModal({
                     ))}
                   </ul>
                 ) : (
-                  <div className="rounded-2xl bg-paper/60 p-4 text-center border border-line/60">
-                    <p className="text-xs text-mute">
+                  <div className="rounded-2xl bg-zinc-900/60 p-4 text-center border border-white/10">
+                    <p className="text-xs text-zinc-400">
                       No direct mates in your Circle yet. Share via WhatsApp or SMS to invite them!
                     </p>
                   </div>
@@ -517,29 +522,29 @@ export function PlanShareModal({
         )}
 
         {/* QR Code Presentation */}
-        <div className="mt-6 rounded-3xl bg-paper p-5 ring-1 ring-line text-center">
-          <p className="text-xs font-semibold text-ink">Scan at the table with phone camera</p>
-          <p className="text-[11px] text-mute mt-0.5">
+        <div className="mt-6 rounded-3xl bg-zinc-900/90 p-5 ring-1 ring-white/10 text-center">
+          <p className="text-xs font-semibold text-white">Scan at the table with phone camera</p>
+          <p className="text-[11px] text-zinc-400 mt-0.5">
             Zero app install required · Opens instant RSVP in mobile browser
           </p>
 
-          <div className="mx-auto mt-4 grid h-48 w-48 place-items-center rounded-2xl bg-white p-3 shadow-sm ring-1 ring-line">
+          <div className="mx-auto mt-4 grid h-48 w-48 place-items-center rounded-2xl bg-white p-3 shadow-md">
             {qrUrl ? (
               <img src={qrUrl} alt="Invite QR" className="h-full w-full object-contain" />
             ) : (
-              <QrCode size={48} className="animate-pulse text-mute" />
+              <QrCode size={48} className="animate-pulse text-zinc-400" />
             )}
           </div>
 
           <div className="mt-3 flex items-center justify-center gap-2">
-            <span className="rounded-full bg-card px-3 py-1 text-xs font-mono font-semibold text-gold ring-1 ring-line">
+            <span className="rounded-full bg-zinc-800 px-3 py-1 text-xs font-mono font-semibold text-amber-400 ring-1 ring-white/10">
               Code: {plan.inviteCode}
             </span>
             {qrUrl && (
               <a
                 href={qrUrl}
                 download={`${plan.id}-qr.png`}
-                className="inline-flex items-center gap-1 rounded-full bg-card px-3 py-1 text-xs font-medium text-mute hover:text-ink ring-1 ring-line cursor-pointer"
+                className="inline-flex items-center gap-1 rounded-full bg-zinc-800 px-3 py-1 text-xs font-medium text-zinc-300 hover:text-white ring-1 ring-white/10 cursor-pointer transition active:scale-95"
               >
                 <Download size={12} />
                 <span>Save QR</span>

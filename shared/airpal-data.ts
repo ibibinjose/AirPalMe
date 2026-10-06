@@ -429,19 +429,7 @@ export const INITIAL_STAFF_PRESENCE: StaffPresence[] = [
   },
 ];
 
-export function resolveTicketPriority(ticket: {
-  priority?: TicketPriority;
-  urgency?: "normal" | "urgent";
-  category?: StaffTicket["category"] | string;
-  details?: string;
-}): TicketPriority {
-  if (ticket.priority) return ticket.priority;
-  if (ticket.urgency === "urgent") return "urgent";
-  if (ticket.category === "maintenance") return "high";
-  if (ticket.category === "late_checkout" || ticket.category === "dining") return "medium";
-  if (ticket.category === "reception") return "medium";
-  return "low";
-}
+/** Ticket priority rules live in `@/lib/tickets-store` (sole consumer) to keep this data module out of the initial bundle. */
 
 export interface StaffInternalNote {
   id: string;

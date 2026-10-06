@@ -331,3 +331,13 @@ export function knownCityCenter(name?: string): LatLng | null {
 
 /** Road-trip radius for "places in this city" filtering. */
 export const CITY_RADIUS_KM = 60;
+
+/**
+ * Tiny home-precinct identity for the initial bundle (== THE_ROCKS_PRECINCT
+ * city/geo; drift-guarded by test). Full precinct data stays in
+ * `@shared/the-rocks-data` for lazy routes.
+ */
+export const PRECINCT_META = {
+  city: "Sydney",
+  geo: { lat: -33.85945, lng: 151.20835 },
+} as const;

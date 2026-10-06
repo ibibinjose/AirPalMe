@@ -442,6 +442,7 @@ export function HomePage() {
                   >
                     <div className="relative aspect-square overflow-hidden bg-paper">
                       <Photo
+                        thumb
                         src={e.heroImage || "/media/laneway.jpg"}
                         srcSet={mediaSrcSet(e.heroImage || "/media/laneway.jpg")}
                         sizes="256px"
@@ -495,6 +496,7 @@ export function HomePage() {
               >
                 <div className="relative aspect-square overflow-hidden bg-paper">
                   <Photo
+                    thumb
                     src={p.heroImage || p.photos?.[0] || "/media/harbour.jpg"}
                     srcSet={mediaSrcSet(p.heroImage || p.photos?.[0] || "/media/harbour.jpg")}
                     sizes="256px"
@@ -536,6 +538,7 @@ export function HomePage() {
                   <div className="flex items-center gap-3.5">
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-paper ring-1 ring-line">
                       <Photo
+                        thumb
                         src={p.heroImage || "/media/walk.jpg"}
                         srcSet={mediaSrcSet(p.heroImage || "/media/walk.jpg")}
                         sizes="64px"

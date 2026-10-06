@@ -106,18 +106,18 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
       <div className="fixed inset-0 bg-black/75 backdrop-blur-md transition-opacity" onClick={onClose} />
 
       {/* Modal Dialog */}
-      <div className="scroll-container modal-safe relative w-full max-w-sm sm:max-w-md rounded-t-[32px] sm:rounded-[32px] bg-card p-6 ring-1 ring-line shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="scroll-container modal-safe relative w-full max-w-sm sm:max-w-md rounded-t-[32px] sm:rounded-[32px] bg-zinc-950 text-white p-6 ring-1 ring-white/10 shadow-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-line/60">
+        <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <div className="flex items-center gap-2">
-            <div className="grid h-9 w-9 place-items-center rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-1 ring-amber-500/20">
+            <div className="grid h-9 w-9 place-items-center rounded-2xl bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/25">
               <QrCode size={18} />
             </div>
             <div>
-              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold block">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-400 block">
                 Instant In-Person Scan
               </span>
-              <h2 className="font-display text-lg font-bold text-ink leading-tight">Share as QR Code</h2>
+              <h2 className="font-display text-lg font-bold text-white leading-tight">Share as QR Code</h2>
             </div>
           </div>
 
@@ -125,7 +125,7 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
             type="button"
             onClick={onClose}
             aria-label="Close modal"
-            className="grid h-10 w-10 min-h-[44px] min-w-[44px] place-items-center rounded-full text-mute hover:bg-paper hover:text-ink transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            className="grid h-10 w-10 min-h-[44px] min-w-[44px] place-items-center rounded-full text-zinc-400 hover:bg-zinc-900 hover:text-white transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             <X size={18} />
           </button>
@@ -155,11 +155,11 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
 
           {/* Event Context Pill */}
           <div className="mt-4 max-w-xs space-y-1">
-            <span className="inline-block rounded-full bg-paper px-3 py-1 text-[11px] font-bold text-ink ring-1 ring-line">
+            <span className="inline-block rounded-full bg-zinc-900 px-3 py-1 text-[11px] font-bold text-zinc-200 ring-1 ring-white/10">
               {occasionBadge}
             </span>
-            <h3 className="font-display text-base font-bold text-ink line-clamp-1">{plan.title}</h3>
-            <p className="text-xs text-mute">
+            <h3 className="font-display text-base font-bold text-white line-clamp-1">{plan.title}</h3>
+            <p className="text-xs text-zinc-400">
               {formatPlanDate(plan.date, plan.time)} · {plan.destination || plan.city}
             </p>
           </div>
@@ -171,16 +171,16 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
             <Button
               onClick={onCopy}
               variant="ghost"
-              className="h-11 rounded-2xl text-xs font-semibold gap-1.5 ring-1 ring-line bg-paper text-ink"
+              className="h-11 rounded-2xl text-xs font-semibold gap-1.5 ring-1 ring-white/10 bg-zinc-900 text-zinc-200 hover:bg-zinc-800 hover:text-white transition active:scale-95 cursor-pointer"
             >
-              {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+              {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
               <span>{copied ? "Copied Link" : "Copy Link"}</span>
             </Button>
 
             <Button
               onClick={onDownloadQr}
               variant="ghost"
-              className="h-11 rounded-2xl text-xs font-semibold gap-1.5 ring-1 ring-line bg-paper text-ink"
+              className="h-11 rounded-2xl text-xs font-semibold gap-1.5 ring-1 ring-white/10 bg-zinc-900 text-zinc-200 hover:bg-zinc-800 hover:text-white transition active:scale-95 cursor-pointer"
             >
               <Download size={14} />
               <span>Save Image</span>
@@ -190,7 +190,7 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
           <Button
             onClick={onPrintPdf}
             disabled={isPrinting}
-            className="w-full h-11 rounded-2xl text-xs font-bold gap-2 shadow-md bg-amber-500 text-white hover:bg-amber-600 cursor-pointer"
+            className="w-full h-11 rounded-2xl text-xs font-bold gap-2 shadow-md bg-amber-500 text-zinc-950 hover:bg-amber-400 cursor-pointer transition active:scale-95"
           >
             <Printer size={15} />
             <span>{isPrinting ? "Preparing PDF…" : "Export & Print PDF Trip Guide"}</span>
@@ -199,7 +199,7 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
           <Button
             onClick={onNativeShare}
             variant="ghost"
-            className="w-full h-9 rounded-xl text-xs font-medium text-mute hover:text-ink gap-1.5"
+            className="w-full h-9 rounded-xl text-xs font-medium text-zinc-400 hover:text-white gap-1.5 cursor-pointer"
           >
             <Share2 size={13} />
             <span>Share via WhatsApp / Messages</span>

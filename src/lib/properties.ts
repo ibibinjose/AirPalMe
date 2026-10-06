@@ -16,7 +16,7 @@ import { buildHostProperty, parseHostPropertyKind } from "@shared/host-property"
 import { isoFromUnknown } from "@shared/freshness";
 import { getFirebaseDb } from "./firebase";
 import { liveBackendEnabled, updatePropertyProfileRemote, updatePropertyWifiRemote } from "./functions";
-import { harbourStaySeeds } from "./seed-stay";
+
 
 const CACHE_KEY = "airpal.properties.v1";
 
@@ -290,7 +290,9 @@ export async function fetchProperty(id: string): Promise<PropertyInfo> {
     }
   }
 
-  // Known Harbour demo seeds only — not arbitrary fakes.
+  // Known Harbour demo seeds only — not arbitrary fakes. Dynamically imported
+  // so the stay seed dataset stays out of the initial bundle (this fn is async).
+  const { harbourStaySeeds } = await import("./seed-stay");
   const harbourSeed = harbourStaySeeds().find((s) => s.property.id === id);
   if (harbourSeed) {
     saveCachedProperty(harbourSeed.property);

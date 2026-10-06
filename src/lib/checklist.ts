@@ -1,5 +1,5 @@
 import type { PropertyInfo } from "@shared/airpal-data";
-import { CAMPUS } from "./catalog";
+import { HARBOUR_COLLEGE as CAMPUS } from "@shared/campus";
 
 export type ChecklistItem = {
   id: string;
