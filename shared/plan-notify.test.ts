@@ -8,11 +8,21 @@ import {
   planReminderKind,
   reminderAlreadySent,
   resolveRsvpStatus,
+  rsvpAllowed,
   validatePlanBroadcast,
   visibleAttendees,
 } from "./plan-notify";
 
 const going = (id: string) => ({ id, name: id, status: "going" as const, respondedAt: "2026-09-01T00:00:00Z" });
+
+describe("rsvpAllowed", () => {
+  it("locks RSVPs on cancelled and completed plans, allows live ones", () => {
+    expect(rsvpAllowed({ status: "open" })).toBe(true);
+    expect(rsvpAllowed({ status: "confirmed" })).toBe(true);
+    expect(rsvpAllowed({ status: "cancelled" })).toBe(false);
+    expect(rsvpAllowed({ status: "completed" })).toBe(false);
+  });
+});
 
 describe("plan broadcast validation", () => {
   it("accepts a short host note", () => {

@@ -207,14 +207,45 @@ describe("shareMeta", () => {
     expect(missing.body).toBe(res.body.replaceAll("/pulse/tok-9", "/pulse/nope"));
   });
 
-  it("never leaks private plan titles to unfurls", async () => {
+  it("protects unshared private plan IDs from enumeration while unfurling invite codes", async () => {
     fakes.docs["plans/plan-1"] = { title: "Secret Birthday", isPublic: false };
-    fakes.invitePlans = [{ title: "Secret Birthday", inviteCode: "ABC123", isPublic: false }];
+    fakes.invitePlans = [
+      {
+        title: "Secret Birthday",
+        inviteCode: "ABC123",
+        isPublic: false,
+        heroImage: "https://images.example/cake.jpg",
+        date: "2026-10-15",
+      },
+    ];
+    // Guessing a private plan ID directly does not reveal title
     const byId = await run("/plan/plan-1", BOT_UA);
     expect(byId.body).not.toContain("Secret Birthday");
+
+    // The shared invitation link unfurls with title, metadata, and hero image
     const byInvite = await run("/invite/abc123", BOT_UA);
-    expect(byInvite.body).not.toContain("Secret Birthday");
-    expect(byInvite.body).toContain("AirPal.me · Life Made Easy.");
+    expect(byInvite.body).toContain("Secret Birthday");
+    expect(byInvite.body).toContain("https://images.example/cake.jpg");
+
+    // Cancelled plan invites return generic card
+    fakes.invitePlans.push({ title: "Cancelled Party", inviteCode: "XYZ999", status: "cancelled" });
+    const cancelled = await run("/invite/xyz999", BOT_UA);
+    expect(cancelled.body).not.toContain("Cancelled Party");
+    expect(cancelled.body).toContain("AirPal.me · Life Made Easy.");
+  });
+
+  it("serves event cards for active events with heroImage", async () => {
+    fakes.docs["events/evt-active"] = {
+      title: "Harbour Jazz Night",
+      venueName: "Pier One",
+      city: "Sydney",
+      heroImage: "https://images.example/jazz.jpg",
+      status: "active",
+    };
+    const res = await run("/e/evt-active", BOT_UA);
+    expect(res.status).toBe(200);
+    expect(res.body).toContain('<meta property="og:title" content="Harbour Jazz Night">');
+    expect(res.body).toContain('<meta property="og:image" content="https://images.example/jazz.jpg">');
   });
 
   it("serves public plan and bio cards", async () => {

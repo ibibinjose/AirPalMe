@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { HangoutPlan, PlanStop, PlanType, PlanTheme } from "@shared/plan";
 import { isDemoContent } from "@shared/content-meta";
 import { attendeeSeats, canCancelPlanStatus, formatDateOption, headcountTaken, isPlanManager, isTicketed, normalizeAnswer, normalizePlusOnes, normalizeRating, normalizeReview, setAttendeeCheckedIn, validDateOption, waitlistQueue } from "@shared/plan";
-import { goingFits, resolveRsvpStatus } from "@shared/plan-notify";
+import { goingFits, resolveRsvpStatus, rsvpAllowed } from "@shared/plan-notify";
 import type { Geo } from "@shared/nearby";
 import { completePlan as storeCompletePlan,
   cancelPlan as storeCancelPlan,
@@ -475,6 +475,10 @@ export function PlanProvider({ children }: { children: ReactNode }) {
 
       const seats = normalizePlusOnes(plusOnes);
       const current = storeGetPlan(planId);
+      if (current && !rsvpAllowed(current)) {
+        toast.message("This plan is closed — RSVPs are locked.");
+        return undefined;
+      }
 
       // Where the tap lands: approval-gated plans park newcomers as pending,
       // full plans park them on the waitlist. Ticketed bookings always land

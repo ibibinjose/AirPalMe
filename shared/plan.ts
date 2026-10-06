@@ -1169,8 +1169,9 @@ export function resolvePlanTheme(input: unknown): PlanTheme {
   return typeof input === "string" && input in PLAN_THEMES ? (input as PlanTheme) : "gold";
 }
 
-export function planInviteUrl(planId: string, origin = ""): string {
+export function planInviteUrl(planId: string, origin = "", inviteCode?: string): string {
   const base = origin.replace(/\/+$/, "");
+  if (inviteCode) return `${base}/invite/${inviteCode}`;
   return `${base}/plan/${planId}`;
 }
 

@@ -52,6 +52,7 @@ import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { EXPERIENCE_CATEGORIES, hasTripItinerary, isSoldOut, isTicketed, type HangoutPlan } from "@shared/plan";
 import { headcountLeft, isPlanManager } from "@shared/plan";
 import { pendingRequests, waitlistPosition } from "@shared/plan";
+import { rsvpAllowed } from "@shared/plan-notify";
 import { choiceAnswerCounts, textAnswers } from "@shared/plan";
 import { checkedInCount } from "@shared/plan";
 import { PLAN_COHOSTS_MAX, coHostAttendees } from "@shared/plan";
@@ -572,8 +573,8 @@ export function PlanDetailPage() {
             onReopen={() => reopenDatePoll(plan.id)}
           />
 
-          {/* RSVP Status — hidden for ticketed experiences: booking IS the RSVP */}
-          {!ticketed && (
+          {/* RSVP Status — hidden for ticketed experiences (booking IS the RSVP) and closed plans (locked) */}
+          {!ticketed && rsvpAllowed(plan) && (
             <>
               {/* RSVP Status Highlight Strip */}
               <div className="mt-6 rounded-3xl bg-card p-4 sm:p-5 ring-1 ring-line shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -631,6 +632,7 @@ export function PlanDetailPage() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <button
                     type="button"
+                    aria-pressed={userAttendee?.status === "going"}
                     onClick={() => {
                       void triggerHaptic("success");
                       rsvpPlan(plan.id, "going", user?.displayName || "You");
@@ -649,6 +651,7 @@ export function PlanDetailPage() {
 
                   <button
                     type="button"
+                    aria-pressed={userAttendee?.status === "maybe"}
                     onClick={() => {
                       void triggerHaptic("light");
                       rsvpPlan(plan.id, "maybe", user?.displayName || "You");

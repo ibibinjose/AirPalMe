@@ -24,7 +24,7 @@ export function PlanQrModal({ plan, isOpen, onClose }: PlanQrModalProps) {
   const [isPrinting, setIsPrinting] = useState(false);
 
   const origin = publicSiteOrigin();
-  const inviteUrl = toPublicUrl(planInviteUrl(plan.id, origin));
+  const inviteUrl = toPublicUrl(planInviteUrl(plan.id, origin, plan.inviteCode));
 
   const typeInfo = PLAN_TYPES[plan.type] || PLAN_TYPES.custom;
   const occasionBadge =

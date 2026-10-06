@@ -153,6 +153,11 @@ export function goingFits(
 
 export type RsvpIntent = "going" | "maybe" | "declined";
 
+/** RSVPs only land on live plans — cancelled and completed plans are locked. */
+export function rsvpAllowed(plan: Pick<HangoutPlan, "status">): boolean {
+  return plan.status !== "cancelled" && plan.status !== "completed";
+}
+
 /**
  * Where a going tap actually lands: approval-gated plans park newcomers as
  * pending, full plans park them on the waitlist, everyone else goes straight

@@ -897,6 +897,10 @@ export function PlanCreatePage() {
             <Button
               className="h-13 w-full gap-2 rounded-2xl text-sm font-bold shadow-md active:scale-98"
               onClick={() => {
+                if (!date || (today && date < today)) {
+                  toast.error("Pick a date from today on");
+                  return;
+                }
                 void triggerHaptic("medium");
                 setStep(2);
               }}

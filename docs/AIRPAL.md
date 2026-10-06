@@ -229,6 +229,7 @@ These stay as working references. Where any of them conflicts with Parts A–G, 
 - `docs/UI-UX-GUIDE.md`, `docs/ui-playbook-checklist.md`, `docs/IOS-DESIGN-GUIDE.md`, `docs/brand.md`, `docs/birthday-freebies.md` — design and content references.
 - `docs/client-handoff.md`, `docs/launch-runbook.md` — handoff and runbook.
 - `docs/store/` — store submission pack.
+- `docs/plan-prd.md` — Plan experience PRD (Apple-Invites-beating create flow, cover artwork, one-card thread); spec reference for B3.
 - `docs/strategy.md`, `docs/APP-STORY.md`, `docs/launch-plan.md`, `docs/CANON.md`, `docs/BRAIN.md`, `docs/AIRPAL_BRAIN.md`, root `AGENTS.md` — now pointers to this file; full pre-rebuild content in git history.
 
 ---

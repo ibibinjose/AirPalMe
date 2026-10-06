@@ -70,6 +70,45 @@ describe("share meta", () => {
     expect(card.image).toBe("https://airpal.me/c.jpg");
   });
 
+  it("cards events with heroImage and title when coverImage and name are absent", () => {
+    const card = shareCardFor(
+      "event",
+      {
+        title: "Sunset Music Festival",
+        venueName: "Harbour Stage",
+        city: "Sydney",
+        heroImage: "https://images.example/hero.jpg",
+        detail: "Live electronic sets under the sky.",
+      },
+      ORIGIN,
+    );
+    expect(card.title).toBe("Sunset Music Festival");
+    expect(card.description).toContain("Live electronic sets under the sky.");
+    expect(card.image).toBe("https://images.example/hero.jpg");
+  });
+
+  it("cards plans with rich invitation copy and hero image", () => {
+    const card = shareCardFor(
+      "plan",
+      {
+        title: "Bondi Sunrise Catchup",
+        destination: "Bondi Beach",
+        city: "Sydney",
+        date: "2026-10-12",
+        time: "07:00",
+        heroImage: "https://images.example/plan-hero.jpg",
+        creator: { name: "Alex" },
+        inviteCode: "ABC123",
+      },
+      ORIGIN,
+    );
+    expect(card.title).toBe("You&#39;re invited: Bondi Sunrise Catchup");
+    expect(card.description).toContain("Join Alex");
+    expect(card.description).toContain("Bondi Beach, Sydney");
+    expect(card.description).toContain("RSVP on AirPal.me");
+    expect(card.image).toBe("https://images.example/plan-hero.jpg");
+  });
+
   it("cards pulses with property and question count", () => {
     const card = shareCardFor(
       "pulse",
@@ -120,10 +159,17 @@ describe("share meta", () => {
     const html = buildShareMetaHtml(
       { title: "T", description: "D", image: "https://airpal.me/i.jpg" },
       "https://airpal.me/e/1",
+      "event",
     );
     expect(html).toContain('<meta property="og:title" content="T">');
     expect(html).toContain('<meta property="og:image" content="https://airpal.me/i.jpg">');
+    expect(html).toContain('<meta property="og:image:secure_url" content="https://airpal.me/i.jpg">');
+    expect(html).toContain('<meta property="og:image:width" content="1200">');
+    expect(html).toContain('<meta property="og:image:height" content="630">');
+    expect(html).toContain('<meta property="og:locale" content="en_AU">');
+    expect(html).toContain('<meta property="og:type" content="event">');
     expect(html).toContain('<meta name="twitter:card" content="summary_large_image">');
+    expect(html).toContain('<meta name="twitter:site" content="@airpalme">');
     expect(html).toContain('<link rel="canonical" href="https://airpal.me/e/1">');
   });
 });

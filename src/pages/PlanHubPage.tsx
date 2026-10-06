@@ -28,6 +28,7 @@ import { triggerHaptic, triggerHapticSelection, shareNative } from "@/lib/native
 import { Photo } from "@/components/ui/Photo";
 import { SearchBar } from "@/components/search/SearchBar";
 import { openGlobalSearch } from "@/components/search/openSearch";
+import { toPublicUrl } from "@/lib/public-origin";
 import { cn } from "@/lib/cn";
 import { toast } from "sonner";
 
@@ -188,7 +189,10 @@ export function PlanHubPage() {
     e.preventDefault();
     e.stopPropagation();
     void triggerHaptic("medium");
-    const shareUrl = `${window.location.origin}/plan/${planId}`;
+    const targetPlan = plans.find((p) => p.id === planId);
+    const shareUrl = targetPlan?.inviteCode
+      ? toPublicUrl(`/invite/${targetPlan.inviteCode}`)
+      : toPublicUrl(`/plan/${planId}`);
     const shared = await shareNative({
       title: planTitle,
       text: `Join my plan "${planTitle}" on AirPal:`,

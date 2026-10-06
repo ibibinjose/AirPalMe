@@ -103,8 +103,8 @@ async function resolvePlanCardByInvite(code: string, origin: string): Promise<Sh
   if (!normalized) return genericCard(origin);
   const snap = await db.collection("plans").where("inviteCode", "==", normalized).limit(1).get();
   const doc = snap.empty ? null : (snap.docs[0]!.data() as Record<string, unknown>);
-  // Private plans must never leak titles or details to public unfurls/scrapers
-  if (!doc || doc.status === "cancelled" || doc.isPublic !== true) return genericCard(origin);
+  // The unguessable 6-character invite code is the bearer token for the invitation.
+  if (!doc || doc.status === "cancelled") return genericCard(origin);
   return shareCardFor("plan", { ...doc, _isInvite: true }, origin);
 }
 

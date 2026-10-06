@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import { Calendar, CreditCard, MapPin, Sparkles, CheckCircle2, QrCode } from "lucide-react";
 import { type HangoutPlan, PLAN_THEMES, PLAN_TYPES, formatPlanDate, isTicketed, isSoldOut } from "@shared/plan";
-import { guestListDisplay, visibleAttendees } from "@shared/plan-notify";
+import { guestListDisplay, rsvpAllowed, visibleAttendees } from "@shared/plan-notify";
 import { PLAN_TYPE_ICONS } from "./planTypeIcons";
 import { PlanQrModal } from "./PlanQrModal";
 import { triggerHaptic } from "@/lib/native";
@@ -286,7 +286,7 @@ export function InvitationCard({
               <span>Share as QR</span>
             </button>
 
-            {onOpenRsvp && (
+            {onOpenRsvp && rsvpAllowed(plan) && (
               <button
                 type="button"
                 onClick={onOpenRsvp}
