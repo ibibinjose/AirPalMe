@@ -35,7 +35,7 @@ function statusPill(status: CompanionStatus): string {
     case "more_info":
       return "bg-amber-500/10 text-amber-700 dark:text-amber-300 ring-amber-500/30";
     case "submitted":
-      return "bg-brand/10 text-brand ring-brand/30";
+      return "bg-brand/10 text-accent ring-brand/30";
     case "declined":
     case "suspended":
       return "bg-red-500/10 text-red-600 dark:text-red-400 ring-red-500/30";
@@ -82,7 +82,7 @@ export function CompanionAdmin() {
 
   return (
     <section className="mt-8 rounded-[28px] bg-card p-4 ring-1 ring-line">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">AirPal Companion</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">AirPal Companion</p>
       <h2 className="font-display mt-1 text-lg font-semibold">Applications</h2>
 
       <div className="mt-3 grid grid-cols-4 gap-2">

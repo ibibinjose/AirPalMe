@@ -119,7 +119,7 @@ export function BioStatusModal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-ink/65 p-4 backdrop-blur-sm sm:p-6 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
+      className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/65 p-4 backdrop-blur-sm sm:p-6 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -132,7 +132,7 @@ export function BioStatusModal({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-line/60 bg-gradient-to-r from-card via-paper to-card px-6 py-4">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-xl bg-gold/15 text-gold">
+            <div className="p-1.5 rounded-xl bg-gold/15 text-accent">
               <Sparkles size={16} />
             </div>
             <div>
@@ -180,7 +180,7 @@ export function BioStatusModal({
                       <span className="text-xs font-bold text-ink block truncate">{info.label}</span>
                       <span className="text-[10px] text-mute truncate block">{info.description}</span>
                     </div>
-                    {isSelected && <Check size={14} className="text-brand shrink-0" />}
+                    {isSelected && <Check size={14} className="text-accent shrink-0" />}
                   </button>
                 );
               })}

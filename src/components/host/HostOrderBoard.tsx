@@ -64,7 +64,7 @@ export function HostOrderBoard({ propertyId, orders }: { propertyId: string; ord
                   <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line/60 pb-2.5">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-sm text-ink">Room {o.roomNumber}</span>
-                      <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-semibold text-brand uppercase tracking-wider">
+                      <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-semibold text-accent uppercase tracking-wider">
                         {o.status}
                       </span>
                       {o.paymentMode === "desk" ? (
@@ -87,7 +87,7 @@ export function HostOrderBoard({ propertyId, orders }: { propertyId: string; ord
                     {o.items.map((it, idx) => (
                       <div key={idx} className="flex justify-between">
                         <span>
-                          <strong className="text-brand">{it.qty}×</strong> {it.name}
+                          <strong className="text-accent">{it.qty}×</strong> {it.name}
                         </span>
                         <span className="text-mute">{aud(it.unitCents * it.qty)}</span>
                       </div>

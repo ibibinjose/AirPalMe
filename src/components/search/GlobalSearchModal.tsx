@@ -556,7 +556,7 @@ export function GlobalSearchModal() {
       {/* Desktop Backdrop */}
       <button
         type="button"
-        className="fixed inset-0 bg-ink/60 backdrop-blur-md transition-opacity cursor-pointer hidden sm:block"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity cursor-pointer hidden sm:block"
         aria-label="Close search"
         onClick={() => setOpen(false)}
       />
@@ -569,7 +569,7 @@ export function GlobalSearchModal() {
       >
         {/* Sticky Search Header: Ergonomic touch height (48-52px) & iOS zoom-proof */}
         <div className="flex h-14 sm:h-13 shrink-0 items-center gap-2.5 sm:gap-3 border-b border-line px-3.5 sm:px-4 py-2 bg-card/95 backdrop-blur-md">
-          <Search size={20} className="shrink-0 text-brand" aria-hidden />
+          <Search size={20} className="shrink-0 text-accent" aria-hidden />
           <input
             ref={inputRef}
             type="search"
@@ -608,7 +608,7 @@ export function GlobalSearchModal() {
               void triggerHaptic("light");
               setOpen(false);
             }}
-            className="flex min-h-[44px] shrink-0 items-center px-2 py-1 text-sm font-semibold text-brand active:scale-95 sm:hidden cursor-pointer touch-manipulation"
+            className="flex min-h-[44px] shrink-0 items-center px-2 py-1 text-sm font-semibold text-accent active:scale-95 sm:hidden cursor-pointer touch-manipulation"
           >
             Cancel
           </button>
@@ -658,7 +658,7 @@ export function GlobalSearchModal() {
                     <Search size={15} />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[11px] font-bold text-brand uppercase tracking-wider">Full AirPal Search</p>
+                    <p className="text-[11px] font-bold text-accent uppercase tracking-wider">Full AirPal Search</p>
                     <p className="truncate text-xs font-semibold text-ink">
                       &ldquo;{query}&rdquo; · {results.length} {results.length === 1 ? "result" : "results"}
                     </p>
@@ -675,8 +675,8 @@ export function GlobalSearchModal() {
               {/* Popular / Trending Searches */}
               {popularTerms.length > 0 && (
                 <div className="mt-3">
-                  <p className="px-1 text-[11px] font-bold uppercase tracking-[0.14em] text-brand flex items-center gap-1.5">
-                    <TrendingUp size={13} className="text-brand" />
+                  <p className="px-1 text-[11px] font-bold uppercase tracking-[0.14em] text-accent flex items-center gap-1.5">
+                    <TrendingUp size={13} className="text-accent" />
                     <span>Popular Searches</span>
                   </p>
                   <div className="mt-2 flex flex-wrap gap-1.5 px-0.5">
@@ -691,7 +691,7 @@ export function GlobalSearchModal() {
                         }}
                         className="flex min-w-0 max-w-full items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line/80 hover:bg-card hover:ring-brand/30 transition active:scale-95 cursor-pointer touch-manipulation"
                       >
-                        <Search size={12} className="shrink-0 text-brand" />
+                        <Search size={12} className="shrink-0 text-accent" />
                         <span className="truncate">{pt.term}</span>
                       </button>
                     ))}
@@ -730,7 +730,7 @@ export function GlobalSearchModal() {
                         onClick={() => goHref(g.label, g.href)}
                         className="flex w-full items-center gap-3 rounded-2xl p-2.5 text-left transition hover:bg-paper"
                       >
-                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand">
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand/10 text-accent">
                           <g.icon size={17} />
                         </span>
                         <span className="text-[14px] font-semibold text-ink">{g.label}</span>
@@ -767,7 +767,7 @@ export function GlobalSearchModal() {
                     <div className="flex items-center gap-2">
                       <span className="truncate text-sm font-semibold text-ink">{item.title}</span>
                       {item.badge && (
-                        <span className="rounded-full bg-paper px-2 py-0.5 text-[10px] font-medium text-gold ring-1 ring-line shrink-0">
+                        <span className="rounded-full bg-paper px-2 py-0.5 text-[10px] font-medium text-accent ring-1 ring-line shrink-0">
                           {item.badge}
                         </span>
                       )}

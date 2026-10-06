@@ -74,7 +74,7 @@ export function InvitePanel({ handle, loading }: { handle?: string; loading?: bo
     <div className="rounded-[28px] ring-1 ring-line bg-card p-5">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Your Stars</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Your Stars</p>
           <p className="font-display mt-1 text-2xl font-semibold">
             ★ {balance} <span className="text-base font-medium text-mute">· {tier.name}</span>
           </p>
@@ -90,20 +90,20 @@ export function InvitePanel({ handle, loading }: { handle?: string; loading?: bo
 
       <ol className="mt-4 space-y-2 border-t border-line pt-3 text-[13px]">
         <li className="flex gap-2.5">
-          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-brand">1</span>
+          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-accent">1</span>
           <span><strong>Share</strong> your link — your @handle is the code.</span>
         </li>
         <li className="flex gap-2.5">
-          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-brand">2</span>
+          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-accent">2</span>
           <span><strong>Mate completes</strong> their first real experience.</span>
         </li>
         <li className="flex gap-2.5">
-          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-brand">3</span>
+          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-accent">3</span>
           <span><strong>You both earn</strong> — {REFERRAL_INVITER_STARS} Stars for you, {REFERRAL_INVITEE_STARS} for them. Signups alone earn nothing.</span>
         </li>
       </ol>
 
-      <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Your invite code</p>
+      <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Your invite code</p>
       <p className="font-display mt-1 text-2xl font-semibold">@{handle}</p>
 
       <div className="mt-3 flex items-center gap-2 rounded-2xl bg-paper px-3 py-2 ring-1 ring-line">
@@ -123,7 +123,7 @@ export function InvitePanel({ handle, loading }: { handle?: string; loading?: bo
 
       {overview?.invitedBy && (
         <p className="mt-4 border-t border-line pt-3 text-sm text-mute">
-          Invited by <span className="font-semibold text-brand">@{overview.invitedBy.inviterHandle}</span>
+          Invited by <span className="font-semibold text-accent">@{overview.invitedBy.inviterHandle}</span>
           {overview.invitedBy.rewardedAt ? (
             <span> — you earned {REFERRAL_INVITEE_STARS} Stars!</span>
           ) : (
@@ -161,7 +161,7 @@ export function InvitePanel({ handle, loading }: { handle?: string; loading?: bo
               <li key={t.name} className="flex items-center gap-2.5 text-sm">
                 <Star
                   size={15}
-                  className={cn("shrink-0", unlocked ? "fill-gold text-gold" : "fill-line text-line")}
+                  className={cn("shrink-0", unlocked ? "fill-gold text-accent" : "fill-line text-line")}
                 />
                 <span className={cn("min-w-0 flex-1 truncate", unlocked ? "font-semibold" : "text-mute")}>
                   {t.name}

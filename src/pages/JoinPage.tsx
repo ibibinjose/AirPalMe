@@ -36,7 +36,7 @@ export function JoinPage() {
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col rounded-3xl ring-1 ring-line bg-card p-6">
-          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand/10 text-brand">
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand/10 text-accent">
             <User size={22} />
           </span>
           <h2 className="font-display mt-4 text-xl font-bold">Just use AirPal</h2>
@@ -106,7 +106,7 @@ export function JoinPage() {
           ))}
         </ol>
         <p className="mt-4 flex items-start gap-2 text-[13px] text-mute">
-          <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-brand" />
+          <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-accent" />
           Stay host tools, events, and experiences open after the profile is live. One thing at a time.
         </p>
       </section>
@@ -114,7 +114,7 @@ export function JoinPage() {
       <p className="mt-6 text-center text-sm text-mute">
         <button
           type="button"
-          className="inline-flex min-h-[44px] items-center font-semibold text-brand hover:underline"
+          className="inline-flex min-h-[44px] items-center font-semibold text-accent hover:underline"
           onClick={() => nav("/")}
         >
           <Compass size={14} className="mr-1 inline" />

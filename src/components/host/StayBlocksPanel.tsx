@@ -80,7 +80,7 @@ export function StayBlocksPanel({ propertyId }: { propertyId: string }) {
   return (
     <section className="mt-4 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm" aria-label="Blocked nights">
       <p className="flex items-center gap-1.5 text-[13px] font-semibold">
-        <CalendarOff size={14} className="text-gold" /> Blocked nights
+        <CalendarOff size={14} className="text-accent" /> Blocked nights
       </p>
       <p className="mt-1 text-[13px] text-mute">
         Maintenance, full house, host stay — blocked nights cannot be quoted or booked.

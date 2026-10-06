@@ -31,7 +31,7 @@ export function AuditTrailAdmin() {
 
   return (
     <section className="mt-8 rounded-[28px] bg-card p-4 ring-1 ring-line">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Operating system</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Operating system</p>
       <h2 className="font-display mt-1 text-lg font-semibold">Audit trail</h2>
       {loading ? (
         <p className="mt-3 text-sm text-mute">Loading trail…</p>

@@ -79,7 +79,7 @@ export function GuestStayTools() {
                   onClick={() => run(openAnswers)}
                   className="pointer-events-auto flex h-10 items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-medium text-ink shadow-lg ring-1 ring-line"
                 >
-                  <CircleHelp size={16} className="text-gold" />
+                  <CircleHelp size={16} className="text-accent" />
                   {t("answers")}
                 </button>
                 <button
@@ -87,7 +87,7 @@ export function GuestStayTools() {
                   onClick={() => run(openChecklist)}
                   className="pointer-events-auto flex h-10 items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-medium text-ink shadow-lg ring-1 ring-line"
                 >
-                  <ClipboardCheck size={16} className="text-gold" />
+                  <ClipboardCheck size={16} className="text-accent" />
                   {t("leave")}
                 </button>
                 <button
@@ -95,7 +95,7 @@ export function GuestStayTools() {
                   onClick={() => run(() => openContact())}
                   className="pointer-events-auto flex h-10 items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-medium text-ink shadow-lg ring-1 ring-line"
                 >
-                  <MessageCircle size={16} className="text-brand" />
+                  <MessageCircle size={16} className="text-accent" />
                   {t("contactHost")}
                 </button>
               </motion.div>

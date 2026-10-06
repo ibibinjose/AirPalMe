@@ -27,7 +27,7 @@ function MenuLink({ link, active, onGo }: { link: BrowseLink; active: boolean; o
       <span
         className={cn(
           "grid h-8 w-8 shrink-0 place-items-center rounded-lg",
-          active ? "bg-white/20 text-white" : "bg-brand/10 text-brand",
+          active ? "bg-white/20 text-white" : "bg-brand/10 text-accent",
         )}
       >
         <Icon size={16} />
@@ -140,7 +140,7 @@ export function BrowseStrip({ path }: { path: string }) {
                 on ? "bg-brand text-white ring-brand shadow-xs" : "bg-card text-ink ring-line",
               )}
             >
-              <Icon size={14} className={on ? "text-white" : "text-brand"} />
+              <Icon size={14} className={on ? "text-white" : "text-accent"} />
               {link.label}
             </button>
           );
@@ -154,7 +154,7 @@ export function BrowseStrip({ path }: { path: string }) {
             }}
             className="flex min-h-[44px] shrink-0 touch-manipulation items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-bold text-ink ring-1 ring-line transition active:scale-95"
           >
-            <LayoutDashboard size={14} className="text-brand" />
+            <LayoutDashboard size={14} className="text-accent" />
             Host
           </button>
         )}

@@ -119,7 +119,7 @@ export function PlanRsvpSheet({
       <div className="scroll-container relative w-full max-w-md max-h-[min(90vh,calc(var(--visual-viewport-height,100dvh)-1.5rem))] rounded-t-[32px] sm:rounded-[32px] bg-card p-6 ring-1 ring-line shadow-2xl safe-bottom transition-all duration-200">
         <div className="flex items-center justify-between pb-3 border-b border-line/60">
           <div>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">RSVP Status</span>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">RSVP Status</span>
             <h2 className="font-display mt-0.5 text-xl font-bold text-ink">Your Response</h2>
           </div>
           <button
@@ -328,7 +328,7 @@ export function PlanRsvpSheet({
                       onClose();
                       nav(`/start?tab=phone&next=${encodeURIComponent(window.location.pathname)}`);
                     }}
-                    className="mt-1.5 text-xs font-semibold text-brand underline block"
+                    className="mt-1.5 text-xs font-semibold text-accent underline block"
                   >
                     Quick Mobile Sign In →
                   </button>

@@ -156,7 +156,7 @@ export function HostPlaceForm({
     <div className="mt-5 space-y-5">
       <form onSubmit={savePlace} className="space-y-4 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm md:p-6">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Guest stay</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Guest stay</p>
           <h2 className="font-display text-xl font-semibold tracking-tight">Place details</h2>
           <p className="mt-1 text-[13px] text-mute">
             What guests see after they scan. Saved to the live property record.
@@ -241,7 +241,7 @@ export function HostPlaceForm({
             <p className="text-[12px] font-semibold text-ink/70">Facilities</p>
             <button
               type="button"
-              className="text-xs font-semibold text-brand"
+              className="text-xs font-semibold text-accent"
               onClick={() =>
                 setFacilities((rows) => [...rows, { name: "", hours: "", floor: "", details: "", icon: "Sparkles" }])
               }
@@ -303,7 +303,7 @@ export function HostPlaceForm({
             {picks.length < 3 && (
               <button
                 type="button"
-                className="text-xs font-semibold text-brand"
+                className="text-xs font-semibold text-accent"
                 onClick={() => setPicks((rows) => [...rows, { id: `pick-${Date.now()}`, title: "", detail: "" }])}
               >
                 Add
@@ -373,7 +373,7 @@ export function HostPlaceForm({
 
       <form onSubmit={saveWifi} className="space-y-3 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm md:p-6">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Wi-Fi</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Wi-Fi</p>
           <h2 className="font-display text-xl font-semibold tracking-tight">Guest network</h2>
           <p className="mt-1 text-[13px] text-mute">
             Password stays in host secrets — never on the public property doc. {wifiFresh.confirmedLabel}.

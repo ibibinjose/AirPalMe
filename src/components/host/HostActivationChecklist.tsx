@@ -122,7 +122,7 @@ export function HostActivationChecklist({
     <section aria-label="Activation checklist" className="rounded-3xl bg-card p-4 ring-1 ring-line">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Get live</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Get live</p>
           <h2 className="font-display text-lg font-semibold">
             {doneCount}/{steps.length} ready
           </h2>

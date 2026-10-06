@@ -146,7 +146,7 @@ export function CalendarSidebar({
       icon: Sparkles,
       activeClass: "bg-brand text-white font-semibold",
       softClass: "bg-brand/10 ring-1 ring-brand/40 hover:bg-brand/20",
-      iconClass: "text-brand",
+      iconClass: "text-accent",
     },
   ];
 
@@ -155,10 +155,10 @@ export function CalendarSidebar({
       {/* Sidebar Header */}
       <div className="flex items-center justify-between pb-1 border-b border-line/70">
         <div className="flex items-center gap-2">
-          <Filter size={16} className="text-brand" />
+          <Filter size={16} className="text-accent" />
           <h2 className="font-display text-sm font-bold tracking-tight text-ink">Search & Filters</h2>
           {hasActiveFilters && (
-            <span className="rounded-full bg-brand/15 px-2 py-0.5 text-[10px] font-bold text-brand ring-1 ring-brand/30">
+            <span className="rounded-full bg-brand/15 px-2 py-0.5 text-[10px] font-bold text-accent ring-1 ring-brand/30">
               Active
             </span>
           )}
@@ -170,7 +170,7 @@ export function CalendarSidebar({
               type="button"
               onClick={onResetFilters}
               title="Reset all search filters"
-              className="inline-flex items-center gap-1 text-[11px] font-medium text-mute hover:text-brand transition cursor-pointer"
+              className="inline-flex items-center gap-1 text-[11px] font-medium text-mute hover:text-accent transition cursor-pointer"
             >
               <RotateCcw size={12} />
               <span>Reset</span>
@@ -193,7 +193,7 @@ export function CalendarSidebar({
       <div className="space-y-1.5" id={`${idPrefix}-view-mode`}>
         <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-mute">
           <span>Calendar View</span>
-          <span className="text-[10px] font-semibold capitalize text-brand">{viewMode} mode</span>
+          <span className="text-[10px] font-semibold capitalize text-accent">{viewMode} mode</span>
         </div>
         <div
           role="radiogroup"
@@ -315,7 +315,7 @@ export function CalendarSidebar({
             <button
               type="button"
               onClick={() => onCategoryChange("all")}
-              className="text-[10px] font-medium text-brand hover:underline cursor-pointer"
+              className="text-[10px] font-medium text-accent hover:underline cursor-pointer"
             >
               Clear
             </button>
@@ -381,14 +381,14 @@ export function CalendarSidebar({
         <div className="space-y-2 border-t border-line/60 pt-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-mute">
-              <Tag size={12} className="text-gold" />
+              <Tag size={12} className="text-accent" />
               <span>Tags</span>
             </div>
             {searchQuery.startsWith("#") && (
               <button
                 type="button"
                 onClick={() => onSearchChange("")}
-                className="text-[10px] font-medium text-brand hover:underline cursor-pointer"
+                className="text-[10px] font-medium text-accent hover:underline cursor-pointer"
               >
                 Clear tag
               </button>
@@ -454,7 +454,7 @@ export function CalendarSidebar({
             <button
               type="button"
               onClick={() => onFilterChange("all")}
-              className="text-[10px] font-medium text-brand hover:underline cursor-pointer"
+              className="text-[10px] font-medium text-accent hover:underline cursor-pointer"
             >
               Clear
             </button>

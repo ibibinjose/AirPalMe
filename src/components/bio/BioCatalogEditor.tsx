@@ -51,7 +51,7 @@ export function BioCatalogEditor({
   const kindIcon = (id: BioCatalogKind) => {
     switch (id) {
       case "deal":
-        return <Sparkles size={14} className="text-gold" />;
+        return <Sparkles size={14} className="text-accent" />;
       case "product":
         return <Package size={14} className="text-sky-500" />;
       case "service":
@@ -63,7 +63,7 @@ export function BioCatalogEditor({
     <div className="mt-5 space-y-4">
       {/* Category selector pills */}
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Shop & Catalog Category</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Shop & Catalog Category</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {BIO_CATALOG_KINDS.map((k) => (
             <button
@@ -189,14 +189,14 @@ export function BioCatalogEditor({
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
                     {row.badge && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gold">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent">
                         <Tag size={10} />
                         {row.badge}
                       </span>
                     )}
                     <span className="font-semibold text-sm text-ink">{row.title}</span>
                     {row.price && (
-                      <span className="rounded-md bg-paper px-2 py-0.5 text-xs font-bold text-brand">
+                      <span className="rounded-md bg-paper px-2 py-0.5 text-xs font-bold text-accent">
                         {row.price}
                       </span>
                     )}
@@ -207,7 +207,7 @@ export function BioCatalogEditor({
                       href={row.href}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] font-medium text-brand hover:underline"
+                      className="inline-flex items-center gap-1 text-[11px] font-medium text-accent hover:underline"
                     >
                       <ExternalLink size={11} />
                       <span className="truncate">{row.href}</span>

@@ -49,7 +49,7 @@ export function PingButton({ toUid, toHandle, toName }: { toUid: string; toHandl
 
   if (openPing) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3.5 py-2 text-xs font-semibold text-brand">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3.5 py-2 text-xs font-semibold text-accent">
         <Zap size={14} />
         Pinged
       </span>
@@ -98,7 +98,7 @@ export function PingButton({ toUid, toHandle, toName }: { toUid: string; toHandl
       className="gap-1.5 rounded-full border border-line bg-card px-3 text-xs font-semibold text-ink shadow-sm hover:bg-paper"
       onClick={() => void send()}
     >
-      <Zap size={14} className="text-brand" />
+      <Zap size={14} className="text-accent" />
       <span>{sending ? "Pinging…" : "Ping"}</span>
     </Button>
   );

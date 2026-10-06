@@ -325,7 +325,7 @@ export function PromotionsAdminPage() {
                 <span className="text-[11px] text-mute">
                   {p.kind} · {p.mechanicType} · legal: {p.legalReviewStatus.replace("_", " ")}
                 </span>
-                {p.featured && <Star size={13} className="text-gold" />}
+                {p.featured && <Star size={13} className="text-accent" />}
               </div>
               <p className="mt-1 text-sm font-bold">{p.title}</p>
               <p className="truncate text-xs text-mute">
@@ -385,13 +385,13 @@ export function PromotionsAdminPage() {
                 )}
                 <Link
                   href={`/deals/${p.id}`}
-                  className="inline-flex min-h-[44px] items-center rounded-lg px-2 text-xs font-bold text-brand hover:underline"
+                  className="inline-flex min-h-[44px] items-center rounded-lg px-2 text-xs font-bold text-accent hover:underline"
                 >
                   view
                 </Link>
                 <Link
                   href={`/admin/promotions/${p.id}`}
-                  className="inline-flex min-h-[44px] items-center rounded-lg px-2 text-xs font-bold text-brand hover:underline"
+                  className="inline-flex min-h-[44px] items-center rounded-lg px-2 text-xs font-bold text-accent hover:underline"
                 >
                   manage
                 </Link>

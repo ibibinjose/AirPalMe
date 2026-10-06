@@ -146,7 +146,7 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
         {/* Header */}
         <div className="flex items-start justify-between pb-3 border-b border-line/60">
           <div>
-            <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-brand">
+            <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-accent">
               <Sparkles size={13} />
               <span>Buy tickets</span>
             </div>
@@ -207,7 +207,7 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
                 </div>
                 <div>
                   <span className="text-[10px] text-mute block">{payLater ? "Due at the door:" : "Total Paid:"}</span>
-                  <span className="font-bold text-brand">{formatMoney(amountToChargeNow, currency, locale)}</span>
+                  <span className="font-bold text-accent">{formatMoney(amountToChargeNow, currency, locale)}</span>
                 </div>
                 {remainingBalance > 0 && (
                   <div>
@@ -245,7 +245,7 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
                         className={cn(
                           "flex items-center justify-between p-3.5 rounded-2xl ring-1 transition text-left active:scale-[0.99]",
                           isSelected
-                            ? "bg-brand/10 ring-brand text-brand shadow-xs"
+                            ? "bg-brand/10 ring-brand text-accent shadow-xs"
                             : "bg-paper text-ink ring-line hover:bg-paper/80",
                         )}
                       >
@@ -269,7 +269,7 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
             {/* Spots Counter */}
             <div className="flex items-center justify-between p-3.5 rounded-2xl bg-paper ring-1 ring-line">
               <div className="flex items-center gap-2">
-                <Users size={16} className="text-brand" />
+                <Users size={16} className="text-accent" />
                 <div>
                   <span className="text-xs font-bold text-ink block">Number of Guests</span>
                   <span className="text-[10px] text-mute">
@@ -319,12 +319,12 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
                     className={cn(
                       "p-3 rounded-2xl text-left ring-1 transition active:scale-95",
                       paymentChoice === "deposit"
-                        ? "bg-brand/10 ring-brand text-brand font-semibold shadow-xs"
+                        ? "bg-brand/10 ring-brand text-accent font-semibold shadow-xs"
                         : "bg-paper text-ink ring-line hover:bg-paper/80",
                     )}
                   >
                     <span className="text-xs font-bold block">Pay Deposit Now</span>
-                    <span className="text-sm font-bold text-brand">{formatMoney(totalDeposit, currency, locale)}</span>
+                    <span className="text-sm font-bold text-accent">{formatMoney(totalDeposit, currency, locale)}</span>
                     <span className="text-[10px] text-mute block mt-0.5">
                       Remaining {formatMoney(remainingBalance, currency, locale)} due{" "}
                       {plan.depositConfig.balanceDueDaysBefore || 14} days before
@@ -340,12 +340,12 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
                     className={cn(
                       "p-3 rounded-2xl text-left ring-1 transition active:scale-95",
                       paymentChoice === "full"
-                        ? "bg-brand/10 ring-brand text-brand font-semibold shadow-xs"
+                        ? "bg-brand/10 ring-brand text-accent font-semibold shadow-xs"
                         : "bg-paper text-ink ring-line hover:bg-paper/80",
                     )}
                   >
                     <span className="text-xs font-bold block">Pay in Full</span>
-                    <span className="text-sm font-bold text-brand">{formatMoney(totalPrice, currency, locale)}</span>
+                    <span className="text-sm font-bold text-accent">{formatMoney(totalPrice, currency, locale)}</span>
                     <span className="text-[10px] text-mute block mt-0.5">Instant complete settlement</span>
                   </button>
                 </div>
@@ -407,7 +407,7 @@ export function ExperienceBookingModal({ plan, isOpen, onClose, onBookingSuccess
               )}
               <div className="flex items-center justify-between font-bold text-ink text-sm border-t border-line/60 pt-1.5 mt-1">
                 <span>Total Due Now:</span>
-                <span className="text-brand text-base">{formatMoney(amountToChargeNow, currency, locale)}</span>
+                <span className="text-accent text-base">{formatMoney(amountToChargeNow, currency, locale)}</span>
               </div>
             </div>
 

@@ -12,7 +12,7 @@ export function LanguageSwitch({ className, size = "md" }: { className?: string;
       role="group"
       aria-label="Language selector"
       className={cn(
-        "flex shrink-0 items-center rounded-full bg-white p-0.5 ring-1 ring-line",
+        "flex shrink-0 items-center rounded-full bg-card p-0.5 ring-1 ring-line",
         isSm ? "h-7 sm:h-8" : "h-8 sm:h-9",
         className,
       )}

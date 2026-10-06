@@ -8,12 +8,12 @@ import type { BiometricType } from "@/lib/biometrics";
 
 function BiometricIcon({ type, size = 18 }: { type: BiometricType; size?: number }) {
   if (type === "face_id") {
-    return <ScanFace size={size} className="shrink-0 text-brand" strokeWidth={2.2} />;
+    return <ScanFace size={size} className="shrink-0 text-accent" strokeWidth={2.2} />;
   }
   if (type === "touch_id" || type === "fingerprint") {
-    return <Fingerprint size={size} className="shrink-0 text-brand" strokeWidth={2.2} />;
+    return <Fingerprint size={size} className="shrink-0 text-accent" strokeWidth={2.2} />;
   }
-  return <KeyRound size={size} className="shrink-0 text-brand" strokeWidth={2.2} />;
+  return <KeyRound size={size} className="shrink-0 text-accent" strokeWidth={2.2} />;
 }
 
 export function BiometricAuthButton({
@@ -78,7 +78,7 @@ export function BiometricAuthButton({
           </span>
           <span className="block text-[11px] text-mute">Instant unlock saved for this device</span>
         </span>
-        <span className="rounded-full bg-brand/15 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-brand">
+        <span className="rounded-full bg-brand/15 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-accent">
           Fast
         </span>
       </button>
@@ -108,7 +108,7 @@ export function BiometricAuthButton({
       disabled={scanning}
       onClick={() => void handleBiometricAuth()}
       className={cn(
-        "inline-flex items-center gap-2 rounded-full bg-brand/10 px-3.5 py-1.5 text-xs font-semibold text-brand ring-1 ring-brand/30 transition hover:bg-brand/15 active:scale-95",
+        "inline-flex items-center gap-2 rounded-full bg-brand/10 px-3.5 py-1.5 text-xs font-semibold text-accent ring-1 ring-brand/30 transition hover:bg-brand/15 active:scale-95",
         className,
       )}
     >

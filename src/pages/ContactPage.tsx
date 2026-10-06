@@ -36,23 +36,23 @@ export function ContactPage() {
   return (
     <div>
       <div className="mx-auto max-w-md px-4 pb-6 pt-8 md:px-6">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Contact</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Contact</p>
         <h1 className="font-display mt-1 text-3xl font-semibold">Write to us</h1>
         <p className="mt-3 text-[15px] leading-relaxed text-ink/80">
           For access or deletion, choose that topic. To recover an @handle that matches your registered name, trade
           mark, or domain, choose Handle / trade mark or{" "}
-          <Link href="/bio/recover" className="text-brand">
+          <Link href="/bio/recover" className="text-accent">
             recover
           </Link>
           . We aim to reply within 30 days.
         </p>
         <p className="mt-2 text-sm text-mute">
           Direct:{" "}
-          <a href={`mailto:${LEGAL.contacts}`} className="text-brand">
+          <a href={`mailto:${LEGAL.contacts}`} className="text-accent">
             {LEGAL.contacts}
           </a>
           {" · "}
-          <a href={`mailto:${LEGAL.email}`} className="text-brand">
+          <a href={`mailto:${LEGAL.email}`} className="text-accent">
             {LEGAL.email}
           </a>
         </p>
@@ -81,7 +81,7 @@ export function ContactPage() {
                 key={t.id}
                 type="button"
                 onClick={() => setTopic(t.id)}
-                className={`h-9 rounded-full px-3 text-sm ${topic === t.id ? "bg-brand text-white" : "bg-white ring-1 ring-line"}`}
+                className={`h-9 rounded-full px-3 text-sm ${topic === t.id ? "bg-brand text-white" : "bg-card ring-1 ring-line"}`}
               >
                 {t.label}
               </button>
@@ -100,7 +100,7 @@ export function ContactPage() {
         </form>
         <p className="mt-4 text-[12px] text-mute">
           We do not use this form for marketing. See the{" "}
-          <Link href="/privacy" className="text-brand">
+          <Link href="/privacy" className="text-accent">
             Privacy Policy
           </Link>
           .

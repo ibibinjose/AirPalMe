@@ -59,7 +59,7 @@ export function HostDiningPanel({ propertyId, menu }: { propertyId: string; menu
   return (
     <div className="mt-5 space-y-5">
       <section className="rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm md:p-6">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">In-room dining</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">In-room dining</p>
         <h2 className="font-display text-xl font-semibold tracking-tight">Live menu</h2>
         <p className="mt-1 text-[13px] text-mute">Guests see this on Stay → Dining. Empty means ask the desk.</p>
         {grouped.length === 0 ? (
@@ -82,7 +82,7 @@ export function HostDiningPanel({ propertyId, menu }: { propertyId: string; menu
                         {item.description ? <p className="mt-0.5 text-xs text-mute">{item.description}</p> : null}
                       </div>
                       <div className="flex shrink-0 items-center gap-3">
-                        <p className="text-sm font-semibold text-brand">${item.price}</p>
+                        <p className="text-sm font-semibold text-accent">${item.price}</p>
                         <button
                           type="button"
                           className="text-xs text-mute hover:text-ink"

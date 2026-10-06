@@ -33,9 +33,9 @@ export function BioPulseRate({ propertyId }: { propertyId: string }) {
   return (
     <section
       aria-label="Rate your experience"
-      className="mt-8 rounded-[28px] bg-ink p-6 text-white shadow-xs"
+      className="mt-8 rounded-[28px] bg-neutral-900 p-6 text-white shadow-xs"
     >
-      <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
+      <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-accent">
         <Star size={13} /> AirPal Pulse
       </p>
       <h3 className="font-display mt-2 text-xl font-bold tracking-tight">Rate your experience</h3>
@@ -45,7 +45,7 @@ export function BioPulseRate({ propertyId }: { propertyId: string }) {
       <button
         type="button"
         onClick={() => nav(`/pulse/${publicToken}`)}
-        className="mt-4 h-11 w-full rounded-full bg-white text-sm font-bold text-ink transition hover:bg-white/90 active:scale-[0.98]"
+        className="mt-4 h-11 w-full rounded-full bg-white text-sm font-bold text-zinc-950 transition hover:bg-white/90 active:scale-[0.98]"
       >
         Start rate
       </button>

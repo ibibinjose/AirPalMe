@@ -31,7 +31,7 @@ export function AuthGate({
           "Announce, or share I’m here at an event",
           "Set a status. Plan together.",
         ],
-        accentColor: "text-brand",
+        accentColor: "text-accent",
         accentBg: "bg-brand/10",
       };
     }
@@ -47,7 +47,7 @@ export function AuthGate({
           "They see your @handle, not your number",
           "Follow up in Circle if you want",
         ],
-        accentColor: "text-brand",
+        accentColor: "text-accent",
         accentBg: "bg-brand/10",
       };
     }
@@ -59,7 +59,7 @@ export function AuthGate({
         title: title || "Your inbox",
         description: lede || "Announcements from Circles you follow, plans, and results — in one quiet list.",
         benefits: ["Circle announcements from people you follow", "Plan updates in one list", "Alerts you control"],
-        accentColor: "text-brand",
+        accentColor: "text-accent",
         accentBg: "bg-brand/10",
       };
     }
@@ -75,7 +75,7 @@ export function AuthGate({
           "Invite your Circle with a link",
           "Ticketed public nights live under Create event",
         ],
-        accentColor: "text-brand",
+        accentColor: "text-accent",
         accentBg: "bg-brand/10",
       };
     }
@@ -127,7 +127,7 @@ export function AuthGate({
           "Show up in Explore and Calendar",
           "Guests pay by card — you get paid after the night",
         ],
-        accentColor: "text-brand",
+        accentColor: "text-accent",
         accentBg: "bg-brand/10",
       };
     }
@@ -160,7 +160,7 @@ export function AuthGate({
         "Make plans with people nearby",
         "Stay Wi-Fi, tickets, and saved places on one login",
       ],
-      accentColor: "text-brand",
+      accentColor: "text-accent",
       accentBg: "bg-brand/10",
     };
   }, [next, kicker, title, lede]);

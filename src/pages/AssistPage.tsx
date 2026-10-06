@@ -63,7 +63,7 @@ export function AssistPage() {
                 <Mail size={17} aria-hidden className="shrink-0 text-mute" />
                 <span className="min-w-0">
                   <span className="block text-[13px] text-mute">{row.label}</span>
-                  <span className="block truncate text-[15px] font-medium text-brand">{row.value}</span>
+                  <span className="block truncate text-[15px] font-medium text-accent">{row.value}</span>
                 </span>
               </a>
             </li>
@@ -102,7 +102,7 @@ export function AssistPage() {
           id="assist-safety"
           className="flex items-center gap-2 font-display text-xl font-bold tracking-tight text-ink"
         >
-          <ShieldCheck size={20} aria-hidden className="text-brand" />
+          <ShieldCheck size={20} aria-hidden className="text-accent" />
           Safety first
         </h2>
         <p className="mt-2 max-w-prose text-[15px] leading-relaxed text-ink/80">
@@ -111,7 +111,7 @@ export function AssistPage() {
           emergency number.
         </p>
         <p className="mt-3 text-[15px]">
-          <Link href="/help?a=meet-safely" className="font-semibold text-brand hover:underline">
+          <Link href="/help?a=meet-safely" className="font-semibold text-accent hover:underline">
             Read the safe-meeting guide
           </Link>
         </p>
@@ -142,7 +142,7 @@ export function AssistPage() {
 
       <p className="mt-10 border-t border-line pt-5 text-[13px] leading-relaxed text-mute">
         AirPal.Me is operated by SarvamDaily Pty Ltd (ABN 83 702 462 977), Sydney, Australia.{" "}
-        <Link href="/trust" className="font-semibold text-brand hover:underline">
+        <Link href="/trust" className="font-semibold text-accent hover:underline">
           Company facts and verification
         </Link>
       </p>

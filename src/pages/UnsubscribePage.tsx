@@ -54,7 +54,7 @@ export function UnsubscribePage() {
             You&apos;re off the AirPal Guestlist — no more event invites to {email.trim()}. Changed your mind? Rejoin
             from any bio anytime.
           </p>
-          <Link href="/" className="mt-4 inline-block text-sm font-semibold text-brand hover:underline">
+          <Link href="/" className="mt-4 inline-block text-sm font-semibold text-accent hover:underline">
             Back to AirPal.Me
           </Link>
         </>

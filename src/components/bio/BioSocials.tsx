@@ -170,7 +170,7 @@ export function BioSocials({
           iconColor: "text-white",
           hoverBorder: "hover:border-brand/40 hover:bg-brand/[0.02]",
           badgeBg: "bg-brand/10",
-          badgeText: "text-brand",
+          badgeText: "text-accent",
         };
 
         const Icon = cfg.icon;
@@ -204,7 +204,7 @@ export function BioSocials({
 
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h4 className="font-display text-sm sm:text-[15px] font-bold text-ink truncate group-hover:text-brand transition-colors">
+                  <h4 className="font-display text-sm sm:text-[15px] font-bold text-ink truncate group-hover:text-accent transition-colors">
                     {title}
                   </h4>
                   <span

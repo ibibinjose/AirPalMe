@@ -102,7 +102,7 @@ export function EventsPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 pb-16 md:px-6">
       <header className="pt-6">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Events</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Events</p>
         <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-ink">Events in {effectiveCity}</h1>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-mute">
           Every upcoming event in one feed — at places, in the community, or from friends.
@@ -146,7 +146,7 @@ export function EventsPage() {
           href="/calendar"
           className="inline-flex h-11 shrink-0 touch-manipulation items-center gap-1.5 rounded-full bg-card px-4 text-xs font-bold text-ink ring-1 ring-line transition-colors hover:bg-paper"
         >
-          <CalendarDays size={14} className="text-brand" />
+          <CalendarDays size={14} className="text-accent" />
           Calendar view
         </Link>
         <Link

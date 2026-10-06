@@ -164,7 +164,7 @@ export function AdminPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-brand">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-accent">
                 <Sparkles className="h-3 w-3" />
                 AirPal OS · Platform Admin
               </span>
@@ -190,7 +190,7 @@ export function AdminPage() {
               href="/helpdesk"
               className="inline-flex min-h-[44px] items-center gap-1.5 rounded-2xl bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
             >
-              <Headphones className="h-3.5 w-3.5 text-brand" />
+              <Headphones className="h-3.5 w-3.5 text-accent" />
               Help Desk
             </Link>
             <Link
@@ -211,7 +211,7 @@ export function AdminPage() {
               href="/business"
               className="inline-flex min-h-[44px] items-center gap-1.5 rounded-2xl bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
             >
-              <Users className="h-3.5 w-3.5 text-brand" />
+              <Users className="h-3.5 w-3.5 text-accent" />
               Business
             </Link>
           </div>
@@ -243,7 +243,7 @@ export function AdminPage() {
             <div className="rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs">
               <div className="flex items-center justify-between text-mute">
                 <span className="text-xs font-semibold uppercase tracking-wider">Catalog Places</span>
-                <MapPin className="h-4 w-4 text-brand" />
+                <MapPin className="h-4 w-4 text-accent" />
               </div>
               <p className="font-display mt-2 text-3xl font-bold text-ink">{totalPlaces}</p>
               <p className="text-[11px] text-mute mt-0.5">Sydney curated venues</p>
@@ -287,15 +287,15 @@ export function AdminPage() {
             >
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10 text-brand">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand/10 text-accent">
                     <Award className="h-5 w-5" />
                   </span>
-                  <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand" />
+                  <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
                 </div>
                 <h3 className="font-display mt-3 text-sm font-bold text-ink">Giveaways & Promos</h3>
                 <p className="mt-1 text-xs text-mute">Review submission queue, campaign rules, and select winners.</p>
               </div>
-              <span className="mt-4 text-[11px] font-semibold text-brand">Open Promotion Manager →</span>
+              <span className="mt-4 text-[11px] font-semibold text-accent">Open Promotion Manager →</span>
             </Link>
 
             <Link
@@ -307,12 +307,12 @@ export function AdminPage() {
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
                     <Bell className="h-5 w-5" />
                   </span>
-                  <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand" />
+                  <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
                 </div>
                 <h3 className="font-display mt-3 text-sm font-bold text-ink">Creator Broadcasts</h3>
                 <p className="mt-1 text-xs text-mute">Approve scheduled push messages and inspect delivery audits.</p>
               </div>
-              <span className="mt-4 text-[11px] font-semibold text-brand">Manage Broadcasts →</span>
+              <span className="mt-4 text-[11px] font-semibold text-accent">Manage Broadcasts →</span>
             </Link>
 
             <Link
@@ -324,12 +324,12 @@ export function AdminPage() {
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400">
                     <Search className="h-5 w-5" />
                   </span>
-                  <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand" />
+                  <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
                 </div>
                 <h3 className="font-display mt-3 text-sm font-bold text-ink">Search Analytics</h3>
                 <p className="mt-1 text-xs text-mute">Top queries, result counts, and dead-end searches.</p>
               </div>
-              <span className="mt-4 text-[11px] font-semibold text-brand">View Analytics →</span>
+              <span className="mt-4 text-[11px] font-semibold text-accent">View Analytics →</span>
             </Link>
 
             <Link
@@ -341,14 +341,14 @@ export function AdminPage() {
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                     <Headphones className="h-5 w-5" />
                   </span>
-                  <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand" />
+                  <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
                 </div>
                 <h3 className="font-display mt-3 text-sm font-bold text-ink">Universal Help Desk</h3>
                 <p className="mt-1 text-xs text-mute">
                   Multi-property guest support tickets, room service & dining alerts.
                 </p>
               </div>
-              <span className="mt-4 text-[11px] font-semibold text-brand">View All Open Tickets →</span>
+              <span className="mt-4 text-[11px] font-semibold text-accent">View All Open Tickets →</span>
             </Link>
 
             <Link
@@ -360,14 +360,14 @@ export function AdminPage() {
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
                     <QrCode className="h-5 w-5" />
                   </span>
-                  <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-brand" />
+                  <ArrowUpRight className="h-4 w-4 text-mute transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent" />
                 </div>
                 <h3 className="font-display mt-3 text-sm font-bold text-ink">Pulse & Standees</h3>
                 <p className="mt-1 text-xs text-mute">
                   Guest feedback kiosk simulator, NFC tap stands, and CSAT recovery.
                 </p>
               </div>
-              <span className="mt-4 text-[11px] font-semibold text-brand">Open Pulse Station →</span>
+              <span className="mt-4 text-[11px] font-semibold text-accent">Open Pulse Station →</span>
             </Link>
           </section>
         </div>
@@ -380,7 +380,7 @@ export function AdminPage() {
           <section className="rounded-[28px] bg-card p-5 sm:p-6 ring-1 ring-line shadow-xs">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-gold">Migration Tools</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-accent">Migration Tools</span>
                 <h2 className="font-display text-lg font-bold text-ink mt-0.5">Database Seeding & Catalog Sync</h2>
                 <p className="text-xs text-mute mt-1">
                   Synchronize bundled Sydney venues, curated stays, events, and test handles into live Cloud Firestore.
@@ -403,7 +403,7 @@ export function AdminPage() {
           <section className="rounded-[28px] bg-card p-5 sm:p-6 ring-1 ring-line shadow-xs">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand">North-Star Engine</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">North-Star Engine</p>
                 <h2 className="font-display mt-0.5 text-lg font-bold text-ink">WQGA / Active QR Context</h2>
                 <p className="mt-1 text-xs text-mute">
                   Verified qualified guest actions this week, excluding demo and duplicates. Production reports use
@@ -498,7 +498,7 @@ export function AdminPage() {
                       className="flex-1 text-left truncate pr-2"
                     >
                       <div className="flex items-center gap-1.5">
-                        <span className="font-semibold text-xs text-ink group-hover:text-brand transition-colors truncate">
+                        <span className="font-semibold text-xs text-ink group-hover:text-accent transition-colors truncate">
                           @{row.handle}
                         </span>
                         <ExternalLink className="h-3 w-3 text-mute shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -507,7 +507,7 @@ export function AdminPage() {
                     </button>
 
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className="inline-flex items-center rounded-lg bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand">
+                      <span className="inline-flex items-center rounded-lg bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-accent">
                         {row.taps} taps
                       </span>
                       <button
@@ -534,7 +534,7 @@ export function AdminPage() {
 
           {/* AirPal Club Guest List */}
           <section className="rounded-[28px] bg-card p-5 sm:p-6 ring-1 ring-line shadow-xs">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">VIP Access Control</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">VIP Access Control</p>
             <h2 className="font-display mt-0.5 text-lg font-bold text-ink">AirPal Club Members</h2>
             <div className="mt-3">
               <GuestListPanel clubId={AIRPAL_CLUB_ID} clubName="AirPal Club" />
@@ -550,7 +550,7 @@ export function AdminPage() {
             <button
               type="button"
               onClick={() => setTab("overview")}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand hover:underline"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:underline"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               Back to Cockpit Overview

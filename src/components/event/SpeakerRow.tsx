@@ -21,7 +21,7 @@ export function SpeakerRow({ speakers, compact }: { speakers: Speaker[] | undefi
             ) : (
               <span
                 aria-hidden
-                className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-brand ring-1 ring-brand/20"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-accent ring-1 ring-brand/20"
               >
                 {s.displayName.trim().charAt(0).toUpperCase() || "?"}
               </span>
@@ -29,7 +29,7 @@ export function SpeakerRow({ speakers, compact }: { speakers: Speaker[] | undefi
             <span className="min-w-0 text-[13px] leading-snug">
               <span className="font-semibold text-ink">{s.displayName}</span>
               {s.role && <span className="text-mute"> · {s.role}</span>}
-              {s.handle && <span className="text-brand"> @{s.handle}</span>}
+              {s.handle && <span className="text-accent"> @{s.handle}</span>}
             </span>
           </>
         );

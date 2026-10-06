@@ -275,7 +275,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
                     void resetEventSchedule(event.id);
                     toast.info(`Restored "${event.title}" to original date`);
                   }}
-                  className="ml-0.5 underline hover:text-black font-extrabold"
+                  className="ml-0.5 underline hover:text-ink font-extrabold"
                   title="Restore original date"
                 >
                   Reset
@@ -358,7 +358,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
                       void resetEventSchedule(event.id);
                       toast.info(`Restored "${event.title}" to original date`);
                     }}
-                    className="ml-0.5 underline font-bold hover:text-black cursor-pointer"
+                    className="ml-0.5 underline font-bold hover:text-ink cursor-pointer"
                     title="Restore original date"
                   >
                     Reset
@@ -366,11 +366,11 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
                 </span>
               )}
             </div>
-            {event.ticketPrice && <span className="text-[12px] font-medium text-gold">{event.ticketPrice}</span>}
+            {event.ticketPrice && <span className="text-[12px] font-medium text-accent">{event.ticketPrice}</span>}
           </div>
         )}
 
-        <h3 className="font-display text-lg font-semibold leading-snug text-ink group-hover:text-brand transition-colors md:text-xl">
+        <h3 className="font-display text-lg font-semibold leading-snug text-ink group-hover:text-accent transition-colors md:text-xl">
           {event.title}
         </h3>
 
@@ -387,13 +387,13 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
               onClick={openDirections}
               className="flex items-center gap-1.5 hover:text-ink transition-colors text-left"
             >
-              <MapPin size={14} className="shrink-0 text-gold" />
+              <MapPin size={14} className="shrink-0 text-accent" />
               <span className="line-clamp-1">{event.venue}</span>
             </button>
 
             {walkEstimate && (
               <span className="inline-flex items-center gap-1 text-xs text-mute/90 font-medium">
-                <Footprints size={12} className="text-brand/70" />
+                <Footprints size={12} className="text-accent/70" />
                 <span>{walkEstimate.label}</span>
               </span>
             )}
@@ -586,7 +586,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
                           setShowExportMenu(false);
                           exportItinerary("all-saved");
                         }}
-                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-medium text-brand hover:bg-brand/5 border-t border-line/60 mt-1"
+                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-medium text-accent hover:bg-brand/5 border-t border-line/60 mt-1"
                       >
                         <Sparkles size={13} />
                         <span>Export Full Itinerary (.ics)</span>
@@ -622,7 +622,7 @@ export function CalendarEventCard({ event, onSelect, compact = false, onSelectTa
                 endDrag();
               }}
               title="Drag and drop to reschedule this event"
-              className="hidden sm:inline-flex h-8 w-7 items-center justify-center rounded-full text-mute/50 hover:text-brand hover:bg-paper cursor-grab active:cursor-grabbing transition"
+              className="hidden sm:inline-flex h-8 w-7 items-center justify-center rounded-full text-mute/50 hover:text-accent hover:bg-paper cursor-grab active:cursor-grabbing transition"
             >
               <GripVertical size={14} />
             </div>

@@ -39,8 +39,8 @@ const FILTERS: Array<{ id: Filter; label: string }> = [
 const ROW_CAP = 100;
 
 const STATUS_PILL: Record<GuestStatus, string> = {
-  going: "bg-brand/10 text-brand ring-brand/25",
-  invited: "bg-brand/10 text-brand ring-brand/25",
+  going: "bg-brand/10 text-accent ring-brand/25",
+  invited: "bg-brand/10 text-accent ring-brand/25",
   "checked-in": "bg-emerald-500/10 text-emerald-700 ring-emerald-500/25",
   "no-show": "bg-amber-500/10 text-amber-700 ring-amber-500/25",
   cancelled: "bg-ink/5 text-mute ring-line",
@@ -202,7 +202,7 @@ export function GuestlistPage() {
           The guestlist is only visible to the {scope === "event" ? "event organiser" : "plan host"} and co-hosts. If
           this is yours, sign in with the host account.
         </p>
-        <Link href={header.backHref} className="mt-4 inline-block text-sm font-semibold text-brand hover:underline">
+        <Link href={header.backHref} className="mt-4 inline-block text-sm font-semibold text-accent hover:underline">
           Back to {scope === "event" ? "the event" : "the plan"}
         </Link>
       </div>
@@ -327,7 +327,7 @@ export function GuestlistPage() {
     <div className="mx-auto max-w-2xl px-4 pb-28 pt-4 md:px-6">
       <Link
         href={header.backHref}
-        className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-brand hover:underline"
+        className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-accent hover:underline"
       >
         <ArrowLeft size={16} aria-hidden /> {header.title}
       </Link>
@@ -355,7 +355,7 @@ export function GuestlistPage() {
             <p className="text-sm font-semibold">
               Capacity <span className="text-mute">{capacity ? `${counts.goingHeads} / ${capacity}` : "not set"}</span>
             </p>
-            {goingPct !== null && <p className="text-sm font-bold tabular-nums text-brand">{goingPct}%</p>}
+            {goingPct !== null && <p className="text-sm font-bold tabular-nums text-accent">{goingPct}%</p>}
           </div>
           {goingPct !== null && (
             <div
@@ -485,7 +485,7 @@ export function GuestlistPage() {
                 <div className="min-w-0 flex-1">
                   <p className="flex min-w-0 items-center gap-1.5">
                     <span className="truncate text-[15px] font-semibold">{row.name}</span>
-                    {row.verified && <BadgeCheck size={15} aria-label="Verified" className="shrink-0 text-brand" />}
+                    {row.verified && <BadgeCheck size={15} aria-label="Verified" className="shrink-0 text-accent" />}
                   </p>
                   <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-mute">
                     {row.handle && <span className="truncate">@{row.handle}</span>}
@@ -583,7 +583,7 @@ export function GuestlistPage() {
           </div>
         )}
         {scope === "plan" && (
-          <Link href={header.backHref} className="mt-3 inline-block text-sm font-semibold text-brand hover:underline">
+          <Link href={header.backHref} className="mt-3 inline-block text-sm font-semibold text-accent hover:underline">
             Manage co-hosts on the plan page
           </Link>
         )}

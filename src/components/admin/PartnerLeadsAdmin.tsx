@@ -45,7 +45,7 @@ export function PartnerLeadsAdmin() {
 
   return (
     <section className="mt-8 rounded-[28px] bg-card p-4 ring-1 ring-line">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Business development</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Business development</p>
       <h2 className="font-display mt-1 text-lg font-semibold">Partnership inquiries · {fresh.length} new</h2>
       {loading ? (
         <p className="mt-3 text-sm text-mute">Loading leads…</p>

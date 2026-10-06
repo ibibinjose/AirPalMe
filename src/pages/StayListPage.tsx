@@ -62,7 +62,7 @@ export function StayListPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 pb-10">
       <header className="py-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Stay</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Stay</p>
         <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-ink">Stays in {effectiveCity}</h1>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-mute">
           Live listings from hosts — hotels, motels, hostels and boutique stays. AirPal lists; you book direct with the
@@ -78,7 +78,7 @@ export function StayListPage() {
             aria-pressed={kind === "all"}
             className={cn(
               "min-h-[44px] rounded-full px-4 text-[13px] font-bold ring-1 transition",
-              kind === "all" ? "bg-ink text-white ring-ink" : "bg-card text-mute ring-line",
+              kind === "all" ? "bg-ink text-paper ring-ink" : "bg-card text-mute ring-line",
             )}
           >
             All
@@ -91,7 +91,7 @@ export function StayListPage() {
               aria-pressed={kind === value}
               className={cn(
                 "min-h-[44px] rounded-full px-4 text-[13px] font-bold ring-1 transition",
-                kind === value ? "bg-ink text-white ring-ink" : "bg-card text-mute ring-line",
+                kind === value ? "bg-ink text-paper ring-ink" : "bg-card text-mute ring-line",
               )}
             >
               {label}
@@ -159,12 +159,12 @@ export function StayListPage() {
                   </button>
                   <div className="flex items-center justify-between gap-2 p-4">
                     <span className="flex min-w-0 items-center gap-1 text-xs text-mute">
-                      <MapPin size={12} className="shrink-0 text-brand" />
+                      <MapPin size={12} className="shrink-0 text-accent" />
                       <span className="truncate">{stay.address || stay.city}</span>
                     </span>
                     <Link
                       href={stayProfilePath(stay)}
-                      className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-brand hover:underline"
+                      className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-accent hover:underline"
                     >
                       View stay <ArrowRight size={13} />
                     </Link>
@@ -182,8 +182,8 @@ export function StayListPage() {
         )}
       </div>
 
-      <section aria-label="List your stay" className="mt-10 rounded-[28px] bg-ink p-6 text-white sm:p-8">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-gold">For hosts</p>
+      <section aria-label="List your stay" className="mt-10 rounded-[28px] bg-neutral-900 p-6 text-white sm:p-8">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-accent">For hosts</p>
         <h2 className="font-display mt-1 text-xl font-bold tracking-tight sm:text-2xl">
           List your stay. Bookings stay yours.
         </h2>

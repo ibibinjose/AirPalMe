@@ -28,7 +28,7 @@ export function SectionHeader({
       {actionLabel && actionHref ? (
         <Link
           href={actionHref}
-          className="-my-3 inline-flex min-h-[44px] shrink-0 items-center text-[14px] font-semibold text-brand"
+          className="-my-3 inline-flex min-h-[44px] shrink-0 items-center text-[14px] font-semibold text-accent"
         >
           {actionLabel} →
         </Link>
@@ -36,7 +36,7 @@ export function SectionHeader({
         <button
           type="button"
           onClick={onAction}
-          className="-my-3 inline-flex min-h-[44px] shrink-0 cursor-pointer items-center text-[14px] font-semibold text-brand"
+          className="-my-3 inline-flex min-h-[44px] shrink-0 cursor-pointer items-center text-[14px] font-semibold text-accent"
         >
           {actionLabel} →
         </button>
@@ -132,9 +132,9 @@ export function AirPalSearchField({ placeholder = "Search AirPal" }: { placehold
     <button
       type="button"
       onClick={openGlobalSearch}
-      className="apple-liquid-glass-light flex h-[52px] w-full cursor-pointer touch-manipulation items-center gap-2.5 rounded-full px-5 text-left ring-1 ring-white/80 transition-all hover:ring-brand/40 active:scale-[0.99] shadow-sm hover:shadow-md"
+      className="apple-liquid-glass-light flex h-[52px] w-full cursor-pointer touch-manipulation items-center gap-2.5 rounded-full px-5 text-left ring-1 ring-white/80 transition-[box-shadow,ring,transform] hover:ring-brand/40 active:scale-[0.99] shadow-sm hover:shadow-md"
     >
-      <Search size={18} className="shrink-0 text-brand" />
+      <Search size={18} className="shrink-0 text-accent" />
       <span className="truncate text-[15px] font-medium text-mute">{placeholder}</span>
     </button>
   );
@@ -217,7 +217,7 @@ export function CategoryTile({
       >
         <Icon size={28} style={{ color: fg }} strokeWidth={2.2} className="transition-transform duration-200 group-hover:scale-105" />
       </span>
-      <span className="px-1 text-center text-[12px] font-semibold leading-tight text-ink group-hover:text-brand transition-colors">{label}</span>
+      <span className="px-1 text-center text-[12px] font-semibold leading-tight text-ink group-hover:text-accent transition-colors">{label}</span>
     </Link>
   );
 }
@@ -253,7 +253,7 @@ export function AvatarStack({ names }: { names: string[] }) {
       {shown.map((n, i) => (
         <span
           key={`${n}-${i}`}
-          className="grid h-9 w-9 place-items-center rounded-full bg-white font-display text-[13px] font-bold text-ink ring-2 ring-white/80"
+          className="grid h-9 w-9 place-items-center rounded-full bg-white font-display text-[13px] font-bold text-zinc-950 ring-2 ring-white/80"
           style={{ marginLeft: i === 0 ? 0 : -10 }}
         >
           {n.trim()[0]?.toUpperCase() || "•"}

@@ -179,7 +179,7 @@ export function MemoryWallPage() {
           <ArrowLeft size={16} />
         </button>
         <div className="min-w-0">
-          <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Trip keepsakes</p>
+          <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Trip keepsakes</p>
           <h1 className="font-display text-2xl font-bold leading-tight">Memory Wall</h1>
         </div>
         <Button size="sm" className="ml-auto gap-1.5 rounded-full" onClick={() => fileRef.current?.click()}>
@@ -203,7 +203,7 @@ export function MemoryWallPage() {
 
       {visible.length === 0 ? (
         <div className="mt-8 rounded-3xl bg-card p-8 text-center ring-1 ring-line">
-          <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand/10 text-brand">
+          <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand/10 text-accent">
             <Camera size={22} />
           </div>
           <p className="font-display mt-3 text-lg font-bold">No memories yet</p>
@@ -227,7 +227,7 @@ export function MemoryWallPage() {
             >
               <Photo src={m.src} className="h-full w-full object-cover" />
               {m.people.length > 0 && (
-                <span className="absolute bottom-1.5 left-1.5 inline-flex max-w-[calc(100%-12px)] items-center gap-1 truncate rounded-full bg-ink/70 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+                <span className="absolute bottom-1.5 left-1.5 inline-flex max-w-[calc(100%-12px)] items-center gap-1 truncate rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
                   <Users size={10} />
                   <span className="truncate">{m.people.slice(0, 2).join(", ")}</span>
                 </span>
@@ -239,7 +239,7 @@ export function MemoryWallPage() {
 
       {composerOpen && draftUrl && typeof document !== "undefined" && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 p-4 backdrop-blur-sm sm:items-center [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
           onClick={closeComposer}
         >
           <div
@@ -294,7 +294,7 @@ export function MemoryWallPage() {
 
       {lightbox && typeof document !== "undefined" && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-ink/80 p-4 backdrop-blur-sm sm:items-center"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 p-4 backdrop-blur-sm sm:items-center"
           onClick={() => setLightbox(null)}
           role="dialog"
           aria-modal="true"
@@ -321,7 +321,7 @@ export function MemoryWallPage() {
                         key={p}
                         type="button"
                         onClick={() => nav(bioPath(handle))}
-                        className="inline-flex min-h-[40px] items-center rounded-full bg-brand/10 px-3.5 text-xs font-semibold text-brand hover:bg-brand/15"
+                        className="inline-flex min-h-[40px] items-center rounded-full bg-brand/10 px-3.5 text-xs font-semibold text-accent hover:bg-brand/15"
                       >
                         @{handle}
                       </button>

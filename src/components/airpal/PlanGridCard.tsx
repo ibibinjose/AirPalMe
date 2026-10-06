@@ -50,7 +50,7 @@ export function PlanGridCard({ plan, dimmed = false }: { plan: HangoutPlan; dimm
             className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="absolute inset-0 grid place-items-center bg-ink">
+          <div className="absolute inset-0 grid place-items-center bg-neutral-900">
             <span className="font-display text-4xl font-bold text-white/90">
               {plan.title.trim()[0]?.toUpperCase() || "•"}
             </span>
@@ -67,7 +67,7 @@ export function PlanGridCard({ plan, dimmed = false }: { plan: HangoutPlan; dimm
           {price}
         </span>
         {when && !dimmed && (
-          <span className="absolute bottom-2.5 left-2.5 rounded-full bg-ink/70 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-sm">
+          <span className="absolute bottom-2.5 left-2.5 rounded-full bg-black/70 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-sm">
             {when}
           </span>
         )}

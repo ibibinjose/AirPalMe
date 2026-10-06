@@ -139,7 +139,7 @@ export function BusinessPromotionDetailPage() {
 
       {promo.winnerNote && (
         <p className="mt-3 flex items-center gap-2 rounded-2xl border-2 border-gold bg-card p-3 text-sm font-semibold">
-          <Trophy size={16} className="shrink-0 text-gold" /> {promo.winnerNote}
+          <Trophy size={16} className="shrink-0 text-accent" /> {promo.winnerNote}
         </p>
       )}
 

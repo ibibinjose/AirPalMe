@@ -233,7 +233,7 @@ export function StayCompendium() {
             href={`tel:${property.phone}`}
             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-card border border-line px-4 py-3.5 text-center text-sm font-bold text-ink hover:bg-paper shadow-xs transition active:scale-[0.98]"
           >
-            <PhoneCall size={16} className="text-brand" />
+            <PhoneCall size={16} className="text-accent" />
             <span>Call Reception</span>
           </a>
         ) : (
@@ -416,7 +416,7 @@ export function StayCompendium() {
                         {item.description && (
                           <p className="text-[11px] text-mute line-clamp-1 mt-0.5">{item.description}</p>
                         )}
-                        <p className="text-xs font-black text-brand mt-1">A${item.price.toFixed(2)}</p>
+                        <p className="text-xs font-black text-accent mt-1">A${item.price.toFixed(2)}</p>
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
@@ -540,7 +540,7 @@ export function StayCompendium() {
                     className="rounded-xl bg-card p-3 ring-1 ring-line block hover:bg-paper"
                   >
                     <p className="font-bold text-ink">Front Desk / Concierge</p>
-                    <p className="text-brand font-extrabold mt-1">Dial 9 or {property.phone}</p>
+                    <p className="text-accent font-extrabold mt-1">Dial 9 or {property.phone}</p>
                   </a>
                 ) : (
                   <div className="rounded-xl bg-card p-3 ring-1 ring-line">
@@ -590,7 +590,7 @@ export function StayCompendium() {
                     className="flex items-center justify-between rounded-xl bg-card p-3 ring-1 ring-line hover:bg-paper transition active:scale-95 disabled:opacity-50"
                   >
                     <span className="font-bold text-ink">{item}</span>
-                    <Plus size={13} className="text-brand" />
+                    <Plus size={13} className="text-accent" />
                   </button>
                 ))}
               </div>
@@ -703,7 +703,7 @@ export function StayCompendium() {
                   type="checkbox"
                   checked={checkInAgreed}
                   onChange={(e) => setCheckInAgreed(e.target.checked)}
-                  className="mt-0.5 rounded text-brand focus:ring-brand"
+                  className="mt-0.5 rounded text-accent focus:ring-brand"
                 />
                 <span className="text-[11px] text-mute font-medium leading-snug">
                   I confirm my ID matches this reservation and agree to the hotel house rules &amp; quiet hours.
@@ -766,7 +766,7 @@ export function StayCompendium() {
             <div className="rounded-2xl bg-paper p-3.5 ring-1 ring-line space-y-2 text-xs">
               <div className="flex items-center justify-between font-bold text-ink">
                 <span className="flex items-center gap-1.5">
-                  <Receipt size={14} className="text-brand" />
+                  <Receipt size={14} className="text-accent" />
                   <span>Stay Folio Balance</span>
                 </span>
               </div>
@@ -786,7 +786,7 @@ export function StayCompendium() {
                   type="checkbox"
                   checked={needLuggageStorage}
                   onChange={(e) => setNeedLuggageStorage(e.target.checked)}
-                  className="rounded text-brand focus:ring-brand"
+                  className="rounded text-accent focus:ring-brand"
                 />
               </label>
 
@@ -799,7 +799,7 @@ export function StayCompendium() {
                   type="checkbox"
                   checked={needAirportTaxi}
                   onChange={(e) => setNeedAirportTaxi(e.target.checked)}
-                  className="rounded text-brand focus:ring-brand"
+                  className="rounded text-accent focus:ring-brand"
                 />
               </label>
             </div>

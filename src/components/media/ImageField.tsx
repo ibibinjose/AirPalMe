@@ -104,7 +104,7 @@ export function ImageField({
             </div>
             {cornerBadge && <div className="absolute -bottom-1 -right-1 z-10">{cornerBadge}</div>}
             {busy && (
-              <div className="absolute inset-0 grid place-items-center bg-ink/40 text-white">
+              <div className="absolute inset-0 grid place-items-center bg-black/40 text-white">
                 <Loader2 size={18} className="animate-spin" />
               </div>
             )}
@@ -143,7 +143,7 @@ export function ImageField({
             )}
           >
             {busy ? (
-              <Loader2 className="animate-spin text-brand" size={18} />
+              <Loader2 className="animate-spin text-accent" size={18} />
             ) : (
               <Upload size={18} className="text-mute" />
             )}

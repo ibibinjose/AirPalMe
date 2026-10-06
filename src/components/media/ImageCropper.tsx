@@ -106,14 +106,14 @@ export function ImageCropper({
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center">
-      <button type="button" className="absolute inset-0 bg-ink/50" aria-label="Close" onClick={onCancel} />
+      <button type="button" className="absolute inset-0 bg-black/50" aria-label="Close" onClick={onCancel} />
       <div className="modal-safe relative z-10 w-full max-w-lg rounded-t-3xl bg-card p-5 shadow-2xl sm:rounded-3xl">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Photo</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Photo</p>
         <h2 className="font-display mt-1 text-2xl font-semibold">{title}</h2>
         <p className="mt-1 text-sm text-mute">Drag to position. Zoom to crop. We keep a compressed copy.</p>
         <div ref={frame} className="mt-4">
           <div
-            className="relative mx-auto touch-none overflow-hidden rounded-2xl bg-ink ring-1 ring-line"
+            className="relative mx-auto touch-none overflow-hidden rounded-2xl bg-neutral-900 ring-1 ring-line"
             style={{ width: viewW, height: viewH }}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}

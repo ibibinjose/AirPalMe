@@ -111,7 +111,7 @@ export function AccountContacts({ compact }: { compact?: boolean }) {
             <div className="mt-2 flex flex-wrap gap-3 text-sm">
               <button
                 type="button"
-                className="text-brand"
+                className="text-accent"
                 onClick={() => {
                   setPhoneEdit(true);
                   setCodeStep(false);
@@ -190,7 +190,7 @@ export function AccountContacts({ compact }: { compact?: boolean }) {
             <div className="mt-2 flex flex-wrap gap-3 text-sm">
               <button
                 type="button"
-                className="text-brand"
+                className="text-accent"
                 onClick={() => {
                   setEmailEdit(true);
                   setEmail(user.email || "");
@@ -201,7 +201,7 @@ export function AccountContacts({ compact }: { compact?: boolean }) {
               {user.email && !user.emailVerified && (
                 <button
                   type="button"
-                  className="text-brand"
+                  className="text-accent"
                   onClick={() => {
                     setBusy(true);
                     void sendVerificationEmail()

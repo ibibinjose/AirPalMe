@@ -111,7 +111,7 @@ export function GuestListPanel({ clubId, clubName }: { clubId: string; clubName:
       </ul>
 
       <div className="space-y-2">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Email invite</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Email invite</p>
         <input value={subject} onChange={(e) => setSubject(e.target.value)} className={fieldInput} />
         <textarea value={body} onChange={(e) => setBody(e.target.value)} className={`h-32 ${fieldTextarea}`} />
         <Button className="w-full" onClick={onSend}>

@@ -35,7 +35,7 @@ function StoreBadge({ store, href }: { store: "apple" | "play"; href: string }) 
       href={href}
       onClick={comingSoon ? (e) => e.preventDefault() : undefined}
       aria-label={store === "apple" ? "Download on the App Store" : "Get it on Google Play"}
-      className="group relative flex items-center gap-3 rounded-2xl ring-1 ring-line bg-ink px-5 py-3 text-white transition hover:bg-neutral-800 active:scale-[0.98]"
+      className="group relative flex items-center gap-3 rounded-2xl ring-1 ring-line bg-neutral-900 px-5 py-3 text-white transition hover:bg-neutral-800 active:scale-[0.98]"
     >
       {store === "apple" ? (
         <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden className="shrink-0">
@@ -91,7 +91,7 @@ const VERTICALS = [
     badge: "Brand campaigns first",
     description: "Brand campaigns and exclusive drops. Rentals open with partner brands — no peer-to-peer store until trust proves out.",
     icon: Shirt,
-    color: "bg-brand/10 text-brand border-brand/20",
+    color: "bg-brand/10 text-accent border-brand/20",
   },
   {
     title: "AirPal Daily",
@@ -169,7 +169,7 @@ export function GetAirPalPage() {
           className="mx-auto h-28 w-28 rounded-[2rem] bg-white object-contain p-2 shadow-xl ring-1 ring-line"
         />
 
-        <p className="mt-6 text-xs font-bold uppercase tracking-[0.24em] text-brand">iPhone · Android · Web</p>
+        <p className="mt-6 text-xs font-bold uppercase tracking-[0.24em] text-accent">iPhone · Android · Web</p>
         <h1 className="font-display mt-2 text-5xl font-bold tracking-tight text-ink md:text-6xl">Get AirPal</h1>
         <p className="mx-auto mt-4 max-w-lg text-balance text-base leading-relaxed text-mute md:text-lg">
           Your global networking app, link-in-bio, and guide to life around you — connecting{" "}
@@ -211,7 +211,7 @@ export function GetAirPalPage() {
         {/* Scan & Share Card */}
         <div className="flex h-full flex-col items-center justify-between rounded-[1.8rem] bg-card p-6 text-center shadow-xs ring-1 ring-line md:p-7">
           <div className="w-full">
-            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-xs font-bold text-brand border border-brand/20">
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-xs font-bold text-accent border border-brand/20">
               <Smartphone size={13} /> Scan on Mobile
             </span>
             <h3 className="mt-2 text-lg font-bold text-ink">Scan to open on your phone</h3>
@@ -249,7 +249,7 @@ export function GetAirPalPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-line pb-4">
           <div>
             <h3 className="text-xl font-bold text-ink flex items-center gap-2">
-              <Smartphone className="text-brand" size={20} />
+              <Smartphone className="text-accent" size={20} />
               Install as Mobile App (PWA)
             </h3>
             <p className="text-xs text-mute mt-0.5">Enjoy fullscreen view, fast loading, and home screen access.</p>
@@ -302,7 +302,7 @@ export function GetAirPalPage() {
                 </span>
                 <div>
                   <p className="text-sm font-bold text-ink flex items-center gap-1">
-                    Tap Share <Share2 size={14} className="text-brand" />
+                    Tap Share <Share2 size={14} className="text-accent" />
                   </p>
                   <p className="text-xs text-mute mt-1">Tap the share icon at the bottom center of your browser.</p>
                 </div>
@@ -314,7 +314,7 @@ export function GetAirPalPage() {
                 </span>
                 <div>
                   <p className="text-sm font-bold text-ink flex items-center gap-1">
-                    Add to Home Screen <PlusSquare size={14} className="text-brand" />
+                    Add to Home Screen <PlusSquare size={14} className="text-accent" />
                   </p>
                   <p className="text-xs text-mute mt-1">
                     Scroll down and tap &ldquo;Add to Home Screen&rdquo;, then confirm.
@@ -342,7 +342,7 @@ export function GetAirPalPage() {
                 </span>
                 <div>
                   <p className="text-sm font-bold text-ink flex items-center gap-1">
-                    Tap Menu <MoreVertical size={14} className="text-brand" />
+                    Tap Menu <MoreVertical size={14} className="text-accent" />
                   </p>
                   <p className="text-xs text-mute mt-1">Tap the 3 dots in top right corner of Chrome.</p>
                 </div>
@@ -366,7 +366,7 @@ export function GetAirPalPage() {
 
       {/* One Platform — 6 Verticals Section */}
       <div className="mt-16 text-center">
-        <p className="text-xs font-bold uppercase tracking-[0.22em] text-brand">One platform engine</p>
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent">One platform engine</p>
         <h2 className="font-display mx-auto mt-2 max-w-xl text-balance text-3xl font-bold tracking-tight text-ink md:text-4xl">
           Everything AirPal offers
         </h2>
@@ -399,7 +399,7 @@ export function GetAirPalPage() {
       <div className="mt-12 rounded-3xl ring-1 ring-line bg-card p-6 md:p-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
           <div className="flex flex-col items-center md:items-start">
-            <div className="rounded-2xl bg-brand/10 p-3 text-brand border border-brand/20">
+            <div className="rounded-2xl bg-brand/10 p-3 text-accent border border-brand/20">
               <ShieldCheck size={24} />
             </div>
             <h4 className="mt-3 font-bold text-ink text-base">Verified AirPal Mates</h4>
@@ -409,7 +409,7 @@ export function GetAirPalPage() {
           </div>
 
           <div className="flex flex-col items-center md:items-start">
-            <div className="rounded-2xl bg-gold/10 p-3 text-gold border border-gold/20">
+            <div className="rounded-2xl bg-gold/10 p-3 text-accent border border-gold/20">
               <CheckCircle2 size={24} />
             </div>
             <h4 className="mt-3 font-bold text-ink text-base">Protected Marketplace</h4>

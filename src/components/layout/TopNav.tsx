@@ -93,7 +93,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
             title="Search AirPal (⌘K)"
             aria-label="Search"
           >
-            <Search size={15} className="text-brand" />
+            <Search size={15} className="text-accent" />
             <span className="hidden xl:inline">Search</span>
             <kbd className="hidden rounded border border-line bg-paper/90 px-1.5 py-0.5 text-[10px] font-semibold text-mute xl:inline-block">
               ⌘K
@@ -117,7 +117,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
               void triggerHaptic("light");
               nav("/scan");
             }}
-            className="h-9 shrink-0 rounded-full bg-card px-3.5 text-sm font-semibold text-ink ring-1 ring-line hover:bg-paper hover:text-brand transition active:scale-95 lg:h-10 cursor-pointer"
+            className="h-9 shrink-0 rounded-full bg-card px-3.5 text-sm font-semibold text-ink ring-1 ring-line hover:bg-paper hover:text-accent transition active:scale-95 lg:h-10 cursor-pointer"
             title="Scan QR / Room"
           >
             Scan

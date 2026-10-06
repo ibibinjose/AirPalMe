@@ -34,7 +34,7 @@ export function DiningSheet({
         <div className="rounded-2xl bg-paper p-4 ring-1 ring-line shadow-xs">
           <p className="font-bold text-ink">{property.breakfast?.type || "Breakfast & Dining"}</p>
           <p className="mt-1 text-xs text-mute">{property.breakfast?.location || property.address || "On site"}</p>
-          <p className="mt-1 text-xs font-bold text-brand">{property.breakfast?.price || "Ask front desk"}</p>
+          <p className="mt-1 text-xs font-bold text-accent">{property.breakfast?.price || "Ask front desk"}</p>
         </div>
         {menu.length > 0 &&
           menu.slice(0, 8).map((item) => {
@@ -49,7 +49,7 @@ export function DiningSheet({
                       <p className="mt-1 text-xs leading-relaxed text-mute">{item.description}</p>
                     ) : null}
                   </div>
-                  <p className="shrink-0 text-sm font-extrabold text-brand">${item.price}</p>
+                  <p className="shrink-0 text-sm font-extrabold text-accent">${item.price}</p>
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-2">
                   <p className="text-[11px] font-bold text-mute">

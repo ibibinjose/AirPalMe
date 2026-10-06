@@ -201,7 +201,7 @@ export function CalendarDayView({
               </span>
               {dayEvents.length > 0 && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-paper px-2.5 py-0.5 text-xs font-semibold text-ink ring-1 ring-line/70">
-                  <Sparkles size={11} className="text-gold" />
+                  <Sparkles size={11} className="text-accent" />
                   <span>{dayEvents.length} events</span>
                 </span>
               )}

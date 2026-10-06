@@ -84,8 +84,8 @@ const TEMPLATES: TemplateItem[] = [
     desc: "Cocktails, sunset drinks, dinner, or weekend parties.",
     Icon: Users,
     bgGrad: "from-brand/10 via-brand/5 to-transparent hover:border-brand/40",
-    iconBg: "bg-brand/15 text-brand",
-    textColor: "text-brand",
+    iconBg: "bg-brand/15 text-accent",
+    textColor: "text-accent",
   },
   {
     id: "walk",
@@ -395,7 +395,7 @@ export function PlanCreatePage() {
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-brand">
+              <span className="text-xs font-bold uppercase tracking-wider text-accent">
                 Family & Friends
               </span>
               <span className="text-[10px] font-semibold text-mute">· Step {step + 1} of 3</span>
@@ -467,7 +467,7 @@ export function PlanCreatePage() {
                     <span
                       className={cn(
                         "block truncate text-xs font-bold",
-                        current ? "text-brand" : done ? "text-ink" : "text-mute",
+                        current ? "text-accent" : done ? "text-ink" : "text-mute",
                       )}
                     >
                       {s.label}
@@ -494,7 +494,7 @@ export function PlanCreatePage() {
               <p className="text-[11px] text-mute">Automatic invite will be attached</p>
             </div>
           </div>
-          <span className="rounded-full bg-brand/15 px-2.5 py-0.5 text-[10px] font-bold text-brand uppercase tracking-wider">
+          <span className="rounded-full bg-brand/15 px-2.5 py-0.5 text-[10px] font-bold text-accent uppercase tracking-wider">
             Connected
           </span>
         </div>
@@ -531,13 +531,13 @@ export function PlanCreatePage() {
                       </span>
                     </div>
 
-                    <h3 className="font-display text-base sm:text-lg font-bold text-ink group-hover:text-brand transition-colors">
+                    <h3 className="font-display text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors">
                       {t.label}
                     </h3>
                     <p className="mt-1 text-xs text-mute leading-relaxed">{t.desc}</p>
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between pt-3 border-t border-line/40 text-xs font-semibold text-brand">
+                  <div className="mt-4 flex items-center justify-between pt-3 border-t border-line/40 text-xs font-semibold text-accent">
                     <span>Start {t.label.split(" ")[0]}</span>
                     <ChevronRight
                       size={15}
@@ -565,7 +565,7 @@ export function PlanCreatePage() {
                 </span>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-display text-base sm:text-lg font-bold text-ink group-hover:text-brand transition-colors">
+                    <span className="font-display text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors">
                       Ticketed Public Event
                     </span>
                     <span className="rounded-full bg-brand px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-2xs">
@@ -577,7 +577,7 @@ export function PlanCreatePage() {
                   </p>
                 </div>
               </div>
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-card ring-1 ring-line text-brand transition-transform group-hover:translate-x-1 shadow-2xs">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-card ring-1 ring-line text-accent transition-transform group-hover:translate-x-1 shadow-2xs">
                 <ChevronRight size={18} />
               </span>
             </button>
@@ -588,7 +588,7 @@ export function PlanCreatePage() {
       {/* Solved Brain Intent Preview */}
       {solvedIntent && (
         <div className="mt-4 rounded-2xl bg-brand/5 p-4 ring-1 ring-brand/20 shadow-xs">
-          <div className="flex items-center gap-2 text-brand">
+          <div className="flex items-center gap-2 text-accent">
             <Sparkles size={16} className="shrink-0 motion-safe:animate-pulse" />
             <span className="text-xs font-bold uppercase tracking-wider">AirPal Brain Plan</span>
           </div>
@@ -598,7 +598,7 @@ export function PlanCreatePage() {
           <div className="mt-2 space-y-1.5">
             {solvedIntent.stops.map((stop, i) => (
               <div key={stop.id} className="flex items-start gap-2 text-xs text-mute">
-                <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-brand/15 text-[10px] font-bold text-brand">
+                <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-brand/15 text-[10px] font-bold text-accent">
                   {i + 1}
                 </span>
                 <span>
@@ -617,7 +617,7 @@ export function PlanCreatePage() {
           <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
             <label className="block">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold uppercase tracking-wider text-gold">
+                <span className="text-xs font-bold uppercase tracking-wider text-accent">
                   1 · Plan Title
                 </span>
                 <span className="text-[11px] font-medium text-mute">Required</span>
@@ -661,11 +661,11 @@ export function PlanCreatePage() {
           {/* Schedule: When (Date & Time) */}
           <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-accent flex items-center gap-1.5">
                 <Calendar size={14} />
                 2 · Date & Time
               </span>
-              <span className="text-[11px] font-semibold text-brand">
+              <span className="text-[11px] font-semibold text-accent">
                 {date ? formatPlanDate(date, time) : "Set Schedule"}
               </span>
             </div>
@@ -763,7 +763,7 @@ export function PlanCreatePage() {
           {/* Location: Where */}
           <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-accent flex items-center gap-1.5">
                 <MapPin size={14} />
                 3 · Location & Venue
               </span>
@@ -825,7 +825,7 @@ export function PlanCreatePage() {
               className="flex min-h-[56px] w-full cursor-pointer items-center justify-between gap-3 p-5 text-left active:scale-[0.99]"
             >
               <span className="min-w-0">
-                <span className="block text-xs font-bold uppercase tracking-wider text-gold">
+                <span className="block text-xs font-bold uppercase tracking-wider text-accent">
                   Details · Optional
                 </span>
                 <span className="mt-0.5 block truncate text-xs text-mute">
@@ -839,7 +839,7 @@ export function PlanCreatePage() {
             </button>
             {showDetails && (
               <div className="space-y-3 border-t border-line/60 p-5 pt-4">
-                <span className="text-xs font-bold uppercase tracking-wider text-gold block">
+                <span className="text-xs font-bold uppercase tracking-wider text-accent block">
                   Privacy & Visibility
                 </span>
 
@@ -858,7 +858,7 @@ export function PlanCreatePage() {
                 )}
               >
                 <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
-                  <Lock size={14} className={!isPublic ? "text-brand" : "text-mute"} />
+                  <Lock size={14} className={!isPublic ? "text-accent" : "text-mute"} />
                   <span>Private / Invite-Only</span>
                 </div>
                 <p className="text-[11px] text-mute leading-tight">
@@ -880,7 +880,7 @@ export function PlanCreatePage() {
                 )}
               >
                 <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
-                  <Globe size={14} className={isPublic ? "text-brand" : "text-mute"} />
+                  <Globe size={14} className={isPublic ? "text-accent" : "text-mute"} />
                   <span>Public Discovery</span>
                 </div>
                 <p className="text-[11px] text-mute leading-tight">
@@ -924,14 +924,14 @@ export function PlanCreatePage() {
             )}
             <div className="p-5">
             <div className="flex items-center justify-between gap-2 pb-3 border-b border-line/60">
-              <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-brand">
+              <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-accent">
                 <activeTemplate.Icon size={14} className={activeTemplate.textColor} />
                 {activeTemplate.label}
               </span>
               <span
                 className={cn(
                   "rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider",
-                  isPublic ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-brand/10 text-brand",
+                  isPublic ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-brand/10 text-accent",
                 )}
               >
                 {isPublic ? "Public Plan" : "Private Plan"}
@@ -944,7 +944,7 @@ export function PlanCreatePage() {
 
             <div className="mt-2.5 flex flex-wrap items-center gap-y-1.5 gap-x-4 text-xs font-medium text-mute">
               <span className="inline-flex items-center gap-1.5">
-                <Calendar size={13} className="text-brand shrink-0" />
+                <Calendar size={13} className="text-accent shrink-0" />
                 {formatPlanDate(date, time)}
               </span>
               <span className="inline-flex items-center gap-1.5">
@@ -959,7 +959,7 @@ export function PlanCreatePage() {
           <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
+                <p className="text-xs font-bold uppercase tracking-wider text-accent flex items-center gap-1.5">
                   <Users size={14} />
                   Invite from Circle
                 </p>
@@ -967,7 +967,7 @@ export function PlanCreatePage() {
                   Select friends to receive an instant push notification
                 </p>
               </div>
-              <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-bold text-brand">
+              <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-bold text-accent">
                 {invite.size} selected
               </span>
             </div>
@@ -1000,7 +1000,7 @@ export function PlanCreatePage() {
                   <button
                     type="button"
                     onClick={selectAllCircle}
-                    className="font-semibold text-brand hover:underline cursor-pointer"
+                    className="font-semibold text-accent hover:underline cursor-pointer"
                   >
                     Select All ({circle.length})
                   </button>
@@ -1032,7 +1032,7 @@ export function PlanCreatePage() {
                         )}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand/15 text-xs font-bold text-brand uppercase">
+                          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand/15 text-xs font-bold text-accent uppercase">
                             {p.name[0] || p.handle[0]}
                           </span>
                           <div className="min-w-0">
@@ -1071,7 +1071,7 @@ export function PlanCreatePage() {
 
           {/* Instant Share Link Banner */}
           <div className="rounded-3xl border border-line/80 bg-paper/70 p-4 shadow-2xs flex items-start gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 text-accent">
               <Share2 size={18} />
             </span>
             <div className="text-xs leading-relaxed text-ink/80">
@@ -1097,13 +1097,13 @@ export function PlanCreatePage() {
           <div className="pt-1">
             <button
               type="button"
-              className="group flex w-full items-center justify-center gap-2 rounded-2xl border border-brand/25 bg-brand/10 py-3 text-xs font-bold text-brand shadow-2xs transition-all hover:bg-brand/15 hover:border-brand/40 active:scale-[0.99] cursor-pointer"
+              className="group flex w-full items-center justify-center gap-2 rounded-2xl border border-brand/25 bg-brand/10 py-3 text-xs font-bold text-accent shadow-2xs transition-all hover:bg-brand/15 hover:border-brand/40 active:scale-[0.99] cursor-pointer"
               onClick={() => {
                 void triggerHaptic("medium");
                 nav("/event/new");
               }}
             >
-              <Ticket size={16} className="rotate-[-10deg] text-brand" />
+              <Ticket size={16} className="rotate-[-10deg] text-accent" />
               <span>Organising a public event or selling tickets? Create Event →</span>
             </button>
           </div>

@@ -238,7 +238,7 @@ export function LocalFavorites() {
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-brand border border-brand/20">
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-accent border border-brand/20">
               <Sparkles size={12} />
               {t("hostPicks") || "Host Picks"}
             </span>
@@ -267,7 +267,7 @@ export function LocalFavorites() {
               className="inline-flex h-8 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-bold text-ink border border-line transition hover:bg-paper"
               title="Switch back to stay address"
             >
-              <MapPin size={13} className="text-brand" />
+              <MapPin size={13} className="text-accent" />
               Stay Anchor
             </button>
           ) : (
@@ -293,7 +293,7 @@ export function LocalFavorites() {
           className="mb-3 flex items-center justify-between rounded-2xl bg-paper px-3.5 py-2 text-xs text-mute border border-line"
         >
           <span className="flex items-center gap-1.5 font-medium">
-            <Info size={13} className="text-brand shrink-0" />
+            <Info size={13} className="text-accent shrink-0" />
             {geoNotice}
           </span>
           <button
@@ -356,7 +356,7 @@ export function LocalFavorites() {
             onClick={() => setMaxWalkFilter(!maxWalkFilter)}
             className={cn(
               "inline-flex h-7 items-center gap-1 rounded-full px-3 text-[11px] font-bold border transition cursor-pointer",
-              maxWalkFilter ? "bg-brand/10 text-brand border-brand/30" : "bg-card text-mute border-line hover:text-ink",
+              maxWalkFilter ? "bg-brand/10 text-accent border-brand/30" : "bg-card text-mute border-line hover:text-ink",
             )}
           >
             <Navigation size={11} />
@@ -369,7 +369,7 @@ export function LocalFavorites() {
             className={cn(
               "inline-flex h-7 items-center gap-1 rounded-full px-3 text-[11px] font-bold border transition cursor-pointer",
               highRatingFilter
-                ? "bg-brand/10 text-brand border-brand/30"
+                ? "bg-brand/10 text-accent border-brand/30"
                 : "bg-card text-mute border-line hover:text-ink",
             )}
           >
@@ -454,12 +454,12 @@ export function LocalFavorites() {
                         </div>
                       )}
                       <div className="flex items-center gap-1.5 text-[11px] text-mute mb-1">
-                        <span className="flex items-center text-brand font-bold">
+                        <span className="flex items-center text-accent font-bold">
                           <Star size={11} className="fill-current mr-0.5" />
                           {selectedPlace.rating?.toFixed(1) || "—"}
                         </span>
                         <span>•</span>
-                        <span className="flex items-center text-brand font-semibold">
+                        <span className="flex items-center text-accent font-semibold">
                           <Navigation size={11} className="mr-0.5" />
                           {selectedPlace.walk}
                         </span>
@@ -509,7 +509,7 @@ export function LocalFavorites() {
           <div className="mb-3 flex items-center justify-between">
             <span className="text-xs font-bold text-ink">Showing {filteredFavorites.length} recommended spots</span>
             <span className="text-[11px] text-mute font-medium flex items-center gap-1">
-              <Navigation size={11} className="text-brand" />
+              <Navigation size={11} className="text-accent" />
               Times measured on foot
             </span>
           </div>
@@ -547,7 +547,7 @@ export function LocalFavorites() {
                     />
                     <div className="absolute top-2 left-2 flex items-center gap-1 rounded-full bg-slate-950/80 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur-md border border-white/10">
                       {isCafe ? (
-                        <Coffee size={10} className="text-brand" />
+                        <Coffee size={10} className="text-accent" />
                       ) : (
                         <Landmark size={10} className="text-indigo-400" />
                       )}
@@ -566,15 +566,15 @@ export function LocalFavorites() {
                       <div className="flex items-start justify-between gap-1">
                         <h4 className="font-display font-extrabold text-base text-ink truncate">{place.name}</h4>
                         {place.rating && (
-                          <span className="flex items-center gap-0.5 shrink-0 text-xs font-extrabold text-brand">
-                            <Star size={11} className="fill-current text-brand" />
+                          <span className="flex items-center gap-0.5 shrink-0 text-xs font-extrabold text-accent">
+                            <Star size={11} className="fill-current text-accent" />
                             {place.rating.toFixed(1)}
                           </span>
                         )}
                       </div>
 
                       <div className="mt-1 flex items-center gap-1.5 text-[11px] text-mute font-medium">
-                        <span className="font-bold text-brand">{place.walk}</span>
+                        <span className="font-bold text-accent">{place.walk}</span>
                         <span>•</span>
                         <span>{place.meters}m away</span>
                         {place.priceLevel && (

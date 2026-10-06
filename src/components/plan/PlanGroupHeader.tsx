@@ -123,7 +123,7 @@ export function PlanGroupHeader({
                     : "Guest list private"}
                 </span>
               </div>
-              <h3 className="truncate font-display text-base font-bold text-ink mt-0.5 group-hover:text-brand transition">
+              <h3 className="truncate font-display text-base font-bold text-ink mt-0.5 group-hover:text-accent transition">
                 {plan.title}
               </h3>
               <p className="truncate text-xs text-mute mt-0.5 leading-tight">{memberNamesPreview}</p>
@@ -141,7 +141,7 @@ export function PlanGroupHeader({
                 onClick={onInvite}
                 className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
               >
-                <UserPlus size={13} className="text-brand" />
+                <UserPlus size={13} className="text-accent" />
                 <span>Add Mates</span>
               </button>
             )}
@@ -165,7 +165,7 @@ export function PlanGroupHeader({
           <div className="relative w-full max-w-md rounded-3xl bg-card p-6 ring-1 ring-line shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">
                   Group Participants
                 </span>
                 <h3 className="font-display text-xl font-bold text-ink">{plan.title}</h3>
@@ -192,7 +192,7 @@ export function PlanGroupHeader({
                     className="flex items-center justify-between gap-3 rounded-2xl bg-paper p-3 ring-1 ring-line"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand/10 text-brand text-xs font-bold uppercase">
+                      <div className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand/10 text-accent text-xs font-bold uppercase">
                         {att.avatar ? (
                           <img src={att.avatar} alt={att.name} className="h-full w-full rounded-full object-cover" />
                         ) : (

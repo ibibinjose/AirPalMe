@@ -93,7 +93,7 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
       {/* Backdrop */}
       <button
         type="button"
-        className="fixed inset-0 bg-ink/60 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         aria-label="Close modal"
         onClick={onClose}
       />
@@ -151,7 +151,7 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
             </span>
           )}
           {event.isLocal && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-xs font-medium text-brand">
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-xs font-medium text-accent">
               <Sparkles size={11} /> Local Pick
             </span>
           )}
@@ -171,9 +171,9 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
             <button
               type="button"
               onClick={openDirections}
-              className="flex items-center gap-2 text-left hover:text-brand transition group"
+              className="flex items-center gap-2 text-left hover:text-accent transition group"
             >
-              <MapPin size={16} className="shrink-0 text-gold" />
+              <MapPin size={16} className="shrink-0 text-accent" />
               <span className="group-hover:underline">
                 {event.venue}, {event.city}
               </span>
@@ -182,7 +182,7 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
             <button
               type="button"
               onClick={openDirections}
-              className="inline-flex items-center gap-1 text-xs font-medium text-brand hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-medium text-accent hover:underline"
             >
               <Navigation size={12} />
               <span>Get Directions</span>
@@ -192,7 +192,7 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
           {/* Proximity walking badge */}
           {walkEstimate && (
             <div className="flex items-center gap-1.5 rounded-xl bg-paper/90 px-3 py-1.5 text-xs text-ink/90 ring-1 ring-line/60">
-              <Footprints size={14} className="text-brand shrink-0" />
+              <Footprints size={14} className="text-accent shrink-0" />
               <span>
                 <strong>{walkEstimate.minutes} min walk</strong> · {walkEstimate.label}
               </span>
@@ -202,7 +202,7 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
           {event.ticketPrice && (
             <div className="flex items-center justify-between rounded-xl bg-paper/80 px-3.5 py-2 text-xs font-medium text-ink ring-1 ring-line/60">
               <span>Admission</span>
-              <span className="font-semibold text-gold text-sm">{event.ticketPrice}</span>
+              <span className="font-semibold text-accent text-sm">{event.ticketPrice}</span>
             </div>
           )}
 
@@ -350,7 +350,7 @@ export function CalendarEventModal({ event, onClose, onSelectTag }: CalendarEven
             <button
               type="button"
               onClick={() => exportItinerary("all-saved")}
-              className="col-span-2 inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-paper px-4 text-xs font-semibold text-brand hover:bg-brand/10 transition ring-1 ring-brand/30 shadow-xs"
+              className="col-span-2 inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-paper px-4 text-xs font-semibold text-accent hover:bg-brand/10 transition ring-1 ring-brand/30 shadow-xs"
             >
               <Sparkles size={14} />
               <span>Export Full Saved Itinerary (.ics)</span>

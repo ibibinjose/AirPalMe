@@ -36,7 +36,7 @@ export type IconVariant =
 
 /** Container badge styling variants aligned with AirPal liquid glass aesthetic */
 export type IconBadgeVariant =
-  | "brand"       // bg-brand/10 text-brand ring-brand/20
+  | "brand"       // bg-brand/10 text-accent ring-brand/20
   | "brand-solid" // bg-brand text-white shadow-xs
   | "soft"        // bg-card text-ink ring-line shadow-xs
   | "glass"       // bg-card/80 backdrop-blur-md text-ink ring-line/80 shadow-xs

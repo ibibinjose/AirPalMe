@@ -64,7 +64,7 @@ export function QuickAnswersSheet() {
         <ul className="space-y-2">
           {answers.rules.map((row) => (
             <li key={row.label} className="rounded-2xl bg-paper px-4 py-3 ring-1 ring-line">
-              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-gold">{row.label}</p>
+              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-accent">{row.label}</p>
               <p className="mt-1 text-[15px] leading-snug">{row.value}</p>
             </li>
           ))}
@@ -74,11 +74,11 @@ export function QuickAnswersSheet() {
       {tab === "wifi" && (
         <div className="space-y-3">
           <div className="rounded-2xl bg-paper px-4 py-4 ring-1 ring-line">
-            <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.14em] text-gold">
+            <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.14em] text-accent">
               <Wifi size={14} /> Network
             </p>
             <p className="font-display mt-1 text-2xl">{wifi.network}</p>
-            <p className="mt-3 text-[11px] font-medium uppercase tracking-[0.14em] text-gold">
+            <p className="mt-3 text-[11px] font-medium uppercase tracking-[0.14em] text-accent">
               <KeyRound size={14} className="mr-1 inline" /> Password
             </p>
             {wifi.password ? (
@@ -107,9 +107,9 @@ export function QuickAnswersSheet() {
           <ul className="space-y-2">
             {answers.checkout.map((row) => (
               <li key={row.label} className="flex gap-3 rounded-2xl bg-paper px-4 py-3 ring-1 ring-line">
-                <Clock size={16} className="mt-0.5 shrink-0 text-gold" />
+                <Clock size={16} className="mt-0.5 shrink-0 text-accent" />
                 <div>
-                  <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-gold">{row.label}</p>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-accent">{row.label}</p>
                   <p className="mt-1 text-[15px] leading-snug">{row.value}</p>
                 </div>
               </li>
@@ -122,7 +122,7 @@ export function QuickAnswersSheet() {
       )}
 
       <button
-        className="mt-5 flex w-full items-center justify-center gap-2 text-sm text-brand"
+        className="mt-5 flex w-full items-center justify-center gap-2 text-sm text-accent"
         onClick={() => openContact()}
       >
         <Check size={14} /> {t("askTheHost")}

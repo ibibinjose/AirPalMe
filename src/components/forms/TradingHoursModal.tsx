@@ -112,7 +112,7 @@ export function TradingHoursModal({ open, onClose, value, onApply }: TradingHour
       <div className="p-5 pb-3 border-b border-line/60 bg-paper/60 backdrop-blur-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-xl bg-brand/10 text-brand">
+            <div className="grid h-8 w-8 place-items-center rounded-xl bg-brand/10 text-accent">
               <Clock size={18} />
             </div>
             <div>
@@ -120,7 +120,7 @@ export function TradingHoursModal({ open, onClose, value, onApply }: TradingHour
               <p className="text-xs text-mute">Set operating hours for each day of the week</p>
             </div>
           </div>
-          <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-gold/10 px-2.5 py-0.5 text-[11px] font-semibold text-gold">
+          <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-gold/10 px-2.5 py-0.5 text-[11px] font-semibold text-accent">
             <Sparkles size={12} /> Auto-summarized
           </span>
         </div>
@@ -128,7 +128,7 @@ export function TradingHoursModal({ open, onClose, value, onApply }: TradingHour
         {/* Quick Presets */}
         <div className="mt-3.5">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-mute mb-1.5 flex items-center gap-1">
-            <Sparkles size={12} className="text-gold" />
+            <Sparkles size={12} className="text-accent" />
             <span>Popular Presets</span>
           </p>
           <div className="flex flex-wrap gap-1.5 overflow-x-auto pb-1 scroll-container">
@@ -182,7 +182,7 @@ export function TradingHoursModal({ open, onClose, value, onApply }: TradingHour
                     <span
                       className={cn(
                         "grid h-6 w-6 place-items-center rounded-lg text-xs font-bold",
-                        isWeekend ? "bg-amber-500/10 text-amber-600" : "bg-brand/10 text-brand",
+                        isWeekend ? "bg-amber-500/10 text-amber-600" : "bg-brand/10 text-accent",
                       )}
                     >
                       {meta.abbrev}
@@ -333,7 +333,7 @@ export function TradingHoursModal({ open, onClose, value, onApply }: TradingHour
         <div>
           <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-mute mb-1">
             <span>Summary Preview</span>
-            <span className="text-brand font-medium">Ready for search & guests</span>
+            <span className="text-accent font-medium">Ready for search & guests</span>
           </div>
           <div className="rounded-xl border border-brand/20 bg-brand/[0.04] p-2.5 text-xs font-semibold text-ink leading-relaxed">
             {formattedResult || "Closed"}

@@ -189,7 +189,7 @@ export function CitySuburbRegionField({
       {/* Header with GPS button */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-mute">
-          <MapPin size={13} className="text-gold" />
+          <MapPin size={13} className="text-accent" />
           <span>{label}</span>
         </div>
 
@@ -197,7 +197,7 @@ export function CitySuburbRegionField({
           type="button"
           onClick={() => void handleUseGps()}
           disabled={locating}
-          className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 hover:bg-brand/15 px-2.5 py-1 text-xs font-semibold text-brand transition active:scale-95 border border-brand/20 shadow-xs disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 hover:bg-brand/15 px-2.5 py-1 text-xs font-semibold text-accent transition active:scale-95 border border-brand/20 shadow-xs disabled:opacity-60"
         >
           {locating ? <Loader2 size={12} className="animate-spin" /> : <Navigation size={12} />}
           <span>{locating ? "Locating…" : "Current Location"}</span>
@@ -208,7 +208,7 @@ export function CitySuburbRegionField({
       <div className="relative">
         <MapPin
           size={16}
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gold z-[1]"
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-accent z-[1]"
         />
         <input
           value={value}
@@ -262,14 +262,14 @@ export function CitySuburbRegionField({
                   type="button"
                   className={cn(
                     "flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left transition",
-                    i === active ? "bg-brand/10 text-brand" : "hover:bg-surface/60 text-ink",
+                    i === active ? "bg-brand/10 text-accent" : "hover:bg-surface/60 text-ink",
                   )}
                   onMouseDown={(e) => {
                     e.preventDefault();
                     void choose(hit);
                   }}
                 >
-                  <MapPin size={15} className="shrink-0 text-gold" />
+                  <MapPin size={15} className="shrink-0 text-accent" />
                   <div className="min-w-0 flex-1">
                     <span className="text-sm font-semibold block leading-tight">{hit.title}</span>
                     {hit.subtitle && (
@@ -287,7 +287,7 @@ export function CitySuburbRegionField({
 
       {/* Verified Status / Feedback */}
       {verifiedSource === "google" && !error && (
-        <span className="text-[11px] font-medium text-brand flex items-center gap-1">
+        <span className="text-[11px] font-medium text-accent flex items-center gap-1">
           <Check size={12} /> Matched via Google Maps
         </span>
       )}
@@ -302,7 +302,7 @@ export function CitySuburbRegionField({
       {showPresets && (
         <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
           <span className="text-[10px] font-bold uppercase tracking-wider text-mute flex items-center gap-1 mr-0.5">
-            <Sparkles size={10} className="text-gold" /> Hubs:
+            <Sparkles size={10} className="text-accent" /> Hubs:
           </span>
           {POPULAR_CITY_PRESETS.slice(0, 6).map((p) => {
             const isSelected = value.trim().toLowerCase() === p.label.toLowerCase();

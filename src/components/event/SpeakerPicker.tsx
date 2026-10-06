@@ -111,7 +111,7 @@ export function SpeakerPicker({ speakers, onChange }: Props) {
               }
             }}
             disabled={!handleInput.trim() || lookupBusy}
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand ring-1 ring-brand/20 disabled:opacity-40"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand/10 text-accent ring-1 ring-brand/20 disabled:opacity-40"
             aria-label="Add member"
           >
             <Plus size={18} />
@@ -138,15 +138,15 @@ export function SpeakerPicker({ speakers, onChange }: Props) {
             {lookedUp.photoUrl ? (
               <Photo src={lookedUp.photoUrl} alt={lookedUp.name} className="h-8 w-8 rounded-full object-cover ring-1 ring-line" />
             ) : (
-              <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-brand">
+              <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-accent">
                 {lookedUp.name.trim().charAt(0).toUpperCase()}
               </span>
             )}
             <span className="min-w-0 text-[13px]">
               <span className="font-semibold text-ink">{lookedUp.name}</span>
-              <span className="text-brand"> @{lookedUp.handle}</span>
+              <span className="text-accent"> @{lookedUp.handle}</span>
             </span>
-            <span className="ml-auto inline-flex items-center gap-1 text-[12px] font-semibold text-brand">
+            <span className="ml-auto inline-flex items-center gap-1 text-[12px] font-semibold text-accent">
               <Plus size={14} /> Add
             </span>
           </button>
@@ -193,7 +193,7 @@ export function SpeakerPicker({ speakers, onChange }: Props) {
             }}
             disabled={!guestName.trim()}
             aria-label="Add guest"
-            className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand ring-1 ring-brand/20 disabled:opacity-40"
+            className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand/10 text-accent ring-1 ring-brand/20 disabled:opacity-40"
           >
             <Plus size={18} />
           </button>
@@ -229,7 +229,7 @@ export function SpeakerPickerRow({ speaker, onRemove }: { speaker: Speaker; onRe
       {photo ? (
         <Photo src={photo} alt={name || speaker.name} className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-line" />
       ) : (
-        <span aria-hidden className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-brand">
+        <span aria-hidden className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-accent">
           {(name || speaker.name).trim().charAt(0).toUpperCase() || "?"}
         </span>
       )}
@@ -237,7 +237,7 @@ export function SpeakerPickerRow({ speaker, onRemove }: { speaker: Speaker; onRe
         <span className="font-semibold">{name || speaker.name}</span>
         {speaker.role && <span className="text-mute"> · {speaker.role}</span>}
         {speaker.handle && (
-          <span className="inline-flex items-center gap-0.5 text-brand">
+          <span className="inline-flex items-center gap-0.5 text-accent">
             {" "}
             <AtSign size={11} />
             {speaker.handle}
@@ -245,7 +245,7 @@ export function SpeakerPickerRow({ speaker, onRemove }: { speaker: Speaker; onRe
         )}
       </span>
       {onRemove && (
-        <button type="button" aria-label={`Remove ${speaker.name}`} onClick={onRemove} className="rounded-full p-1.5 text-mute hover:text-rose-700">
+        <button type="button" aria-label={`Remove ${speaker.name}`} onClick={onRemove} className="relative rounded-full p-1.5 text-mute hover:text-rose-700 after:absolute after:-inset-3 after:content-[''] cursor-pointer">
           <X size={14} />
         </button>
       )}

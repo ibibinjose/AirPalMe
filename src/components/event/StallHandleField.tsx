@@ -76,19 +76,19 @@ export function StallHandleField({ value, onChange, onAutofillName }: Props) {
           {preview.photoUrl ? (
             <Photo src={preview.photoUrl} alt={preview.name} className="h-8 w-8 rounded-full object-cover ring-1 ring-line" />
           ) : (
-            <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-brand">
+            <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-accent">
               {preview.name.trim().charAt(0).toUpperCase()}
             </span>
           )}
           <span className="min-w-0 flex-1 text-[13px]">
             <span className="font-semibold text-ink">{preview.name}</span>
-            <span className="inline-flex items-center gap-0.5 text-brand">
+            <span className="inline-flex items-center gap-0.5 text-accent">
               {" "}
               <AtSign size={11} />
               {preview.handle}
             </span>
           </span>
-          <span className="inline-flex shrink-0 items-center gap-1 text-[12px] font-semibold text-brand">
+          <span className="inline-flex shrink-0 items-center gap-1 text-[12px] font-semibold text-accent">
             <Plus size={14} /> Use name
           </span>
         </button>

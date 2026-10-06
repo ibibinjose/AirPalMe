@@ -134,7 +134,7 @@ export function PlacePage() {
             <div className="mt-3 flex flex-wrap gap-2">
               <Link
                 href={`/plan/new?title=${encodeURIComponent(place.name)}&dest=${encodeURIComponent(place.name)}`}
-                className="inline-flex min-h-[44px] items-center rounded-full bg-ink px-5 py-2 text-[14px] font-semibold text-white transition active:scale-95"
+                className="inline-flex min-h-[44px] items-center rounded-full bg-neutral-900 px-5 py-2 text-[14px] font-semibold text-white transition active:scale-95"
               >
                 Plan it here
               </Link>
@@ -173,14 +173,14 @@ export function PlacePage() {
         <button
           type="button"
           onClick={() => setTripOpen(true)}
-          className="mt-3 hidden h-12 w-full touch-manipulation items-center justify-center gap-1.5 rounded-full bg-brand/10 text-[15px] font-semibold text-brand transition hover:bg-brand/15 active:scale-[0.99] lg:flex"
+          className="mt-3 hidden h-12 w-full touch-manipulation items-center justify-center gap-1.5 rounded-full bg-brand/10 text-[15px] font-semibold text-accent transition hover:bg-brand/15 active:scale-[0.99] lg:flex"
         >
           <Plus size={17} />
           <span>Add to Trip</span>
         </button>
         <button
           type="button"
-          className="mt-4 inline-flex min-h-[48px] w-full cursor-pointer items-center justify-center text-[14px] font-semibold text-brand"
+          className="mt-4 inline-flex min-h-[48px] w-full cursor-pointer items-center justify-center text-[14px] font-semibold text-accent"
           onClick={() => nav("/now")}
         >
           What now? →
@@ -203,7 +203,7 @@ export function PlacePage() {
             <button
               type="button"
               onClick={() => setTripOpen(true)}
-              className="inline-flex h-12 cursor-pointer touch-manipulation items-center gap-1.5 rounded-full bg-brand/10 px-4 text-[14px] font-semibold text-brand transition hover:bg-brand/15 active:scale-95"
+              className="inline-flex h-12 cursor-pointer touch-manipulation items-center gap-1.5 rounded-full bg-brand/10 px-4 text-[14px] font-semibold text-accent transition hover:bg-brand/15 active:scale-95"
             >
               <Plus size={16} />
               <span>Add to Trip</span>

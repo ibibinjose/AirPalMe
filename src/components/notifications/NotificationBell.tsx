@@ -142,11 +142,11 @@ export function NotificationBell() {
           void triggerHaptic("light");
           setOpen((v) => !v);
         }}
-        className="relative grid h-9 w-9 touch-manipulation place-items-center rounded-full text-brand hover:bg-card ring-1 ring-line transition-transform active:scale-95 after:absolute after:-inset-1.5 after:content-['']"
+        className="relative grid h-9 w-9 touch-manipulation place-items-center rounded-full text-accent hover:bg-card ring-1 ring-line transition-transform active:scale-95 after:absolute after:-inset-1.5 after:content-['']"
         aria-label={total ? `${total} unread notifications` : "Notifications"}
         title="Notifications"
       >
-        {total > 0 ? <BellRing size={16} className="text-brand" /> : <Bell size={16} className="text-brand" />}
+        {total > 0 ? <BellRing size={16} className="text-accent" /> : <Bell size={16} className="text-accent" />}
         {total > 0 && (
           <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white">
             {total > 9 ? "9+" : total}
@@ -161,7 +161,7 @@ export function NotificationBell() {
                 <p className="text-[13px] font-semibold">Front desk {openTickets > 0 && `(${openTickets})`}</p>
                 <button
                   type="button"
-                  className="text-[13px] font-semibold text-brand"
+                  className="text-[13px] font-semibold text-accent"
                   onClick={() => {
                     setOpen(false);
                     nav("/host");
@@ -195,7 +195,7 @@ export function NotificationBell() {
           )}
           <div className="flex items-center justify-between px-4 py-3">
             <p className="text-[13px] font-semibold">Notifications</p>
-            <Link href="/me/inbox" onClick={() => setOpen(false)} className="text-[13px] font-semibold text-brand">
+            <Link href="/me/inbox" onClick={() => setOpen(false)} className="text-[13px] font-semibold text-accent">
               Inbox
             </Link>
           </div>

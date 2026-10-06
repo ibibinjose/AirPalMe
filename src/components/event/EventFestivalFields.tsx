@@ -33,9 +33,9 @@ export function EventFestivalFields({ values, onChange }: Props) {
   return (
     <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-bold uppercase tracking-wider text-gold">Festival program (optional)</p>
+        <p className="text-xs font-bold uppercase tracking-wider text-accent">Festival program (optional)</p>
         {slug && slugState === "ok" && (
-          <Link href={`/f/${slug}`} className="text-[11px] font-semibold text-brand hover:underline">
+          <Link href={`/f/${slug}`} className="text-[11px] font-semibold text-accent hover:underline">
             View program
           </Link>
         )}

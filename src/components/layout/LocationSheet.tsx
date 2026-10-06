@@ -91,7 +91,7 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-0 sm:p-4 bg-ink/65 backdrop-blur-xs animate-in fade-in duration-200 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
+      className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center p-0 sm:p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200 [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -136,7 +136,7 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
           <div className="flex items-center justify-between rounded-2xl ring-1 ring-line bg-paper p-3.5 shadow-xs">
             <div className="min-w-0 pr-3">
               <div className="flex items-center gap-1.5">
-                <Share2 size={14} className="text-brand" />
+                <Share2 size={14} className="text-accent" />
                 <span className="text-xs font-bold text-ink">Share Location &amp; Guide</span>
               </div>
               <p className="mt-0.5 text-[11px] text-mute leading-snug">
@@ -179,7 +179,7 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
                   "grid h-9 w-9 shrink-0 place-items-center rounded-xl transition border border-line",
                   isGpsActive
                     ? "bg-amber-400 text-slate-950 font-bold"
-                    : "bg-brand/10 text-brand group-hover:scale-105",
+                    : "bg-brand/10 text-accent group-hover:scale-105",
                 )}
               >
                 <Navigation size={17} className={cn(isGpsActive && "animate-pulse")} />
@@ -245,7 +245,7 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
             <div className="pt-2 border-t-2 border-ink/10">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-black uppercase tracking-wider text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
-                  <Compass size={14} className="text-brand" />
+                  <Compass size={14} className="text-accent" />
                   <span>Sydney precincts</span>
                 </span>
                 <span className="text-[11px] font-bold text-mute">Sydney, NSW 🇦🇺</span>
@@ -286,7 +286,7 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
           <div className="pt-3 border-t-2 border-ink/10">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-black uppercase tracking-wider text-ink flex items-center gap-1.5">
-                <Globe2 size={14} className="text-brand" />
+                <Globe2 size={14} className="text-accent" />
                 <span>All Destinations</span>
               </span>
               <span className="text-[11px] font-bold text-mute">{filteredCities.length} cities</span>
@@ -455,7 +455,7 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
             <label className="flex items-start gap-3 rounded-2xl ring-1 ring-line bg-paper p-3.5 shadow-xs cursor-pointer hover:bg-card transition">
               <input
                 type="checkbox"
-                className="mt-1 h-4 w-4 rounded text-brand focus:ring-brand accent-brand cursor-pointer"
+                className="mt-1 h-4 w-4 rounded text-accent focus:ring-brand accent-brand cursor-pointer"
                 checked={shareLocation}
                 onChange={(e) => {
                   if (!user) {
@@ -482,7 +482,7 @@ export function LocationSheet({ open, onClose }: { open: boolean; onClose: () =>
               <span className="text-mute text-[11px] font-medium">Deciding what to do in {city}?</span>
               <button
                 type="button"
-                className="font-bold text-brand hover:underline inline-flex items-center gap-1 cursor-pointer"
+                className="font-bold text-accent hover:underline inline-flex items-center gap-1 cursor-pointer"
                 onClick={() => {
                   onClose();
                   nav("/now");

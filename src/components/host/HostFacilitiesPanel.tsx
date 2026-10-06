@@ -78,7 +78,7 @@ function FacilityIconView({ icon, name }: { icon?: string; name: string }) {
   if (norm.includes("wifi")) return <Wifi size={16} className="text-cyan-500" />;
   if (norm.includes("spa") || norm.includes("wellness")) return <Sparkles size={16} className="text-fuchsia-500" />;
   if (norm.includes("dining") || norm.includes("eat")) return <Utensils size={16} className="text-orange-500" />;
-  return <Building2 size={16} className="text-brand" />;
+  return <Building2 size={16} className="text-accent" />;
 }
 
 export function HostFacilitiesPanel({
@@ -191,10 +191,10 @@ export function HostFacilitiesPanel({
       <section className="rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm sm:p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Hotel Amenities</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Hotel Amenities</p>
             <h2 className="font-display text-xl font-bold tracking-tight text-ink">Property Facilities</h2>
           </div>
-          <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-bold text-brand">
+          <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-bold text-accent">
             {facilities.length} Active
           </span>
         </div>
@@ -224,7 +224,7 @@ export function HostFacilitiesPanel({
                     <div className="flex items-center gap-2">
                       <p className="font-bold text-xs sm:text-sm text-ink truncate">{fac.name}</p>
                       {fac.floor && (
-                        <span className="text-[10px] font-semibold bg-brand/10 text-brand px-2 py-0.2 rounded-full shrink-0">
+                        <span className="text-[10px] font-semibold bg-brand/10 text-accent px-2 py-0.2 rounded-full shrink-0">
                           {fac.floor}
                         </span>
                       )}
@@ -273,7 +273,7 @@ export function HostFacilitiesPanel({
                 disabled={busy}
                 className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper/80 hover:ring-brand/30 transition active:scale-95"
               >
-                <Plus size={12} className="text-brand" />
+                <Plus size={12} className="text-accent" />
                 <span>{p.name}</span>
               </button>
             ))}

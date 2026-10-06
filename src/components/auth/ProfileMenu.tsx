@@ -74,7 +74,7 @@ function Row({
       className={cn(
         "group flex min-h-[46px] w-full touch-manipulation items-center gap-3 rounded-2xl px-3 py-2 text-left transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-[0.98]",
         highlight
-          ? "bg-brand/10 text-brand hover:bg-brand/15 font-semibold"
+          ? "bg-brand/10 text-accent hover:bg-brand/15 font-semibold"
           : danger
             ? "text-red-600 hover:bg-red-500/10 dark:text-red-400 font-medium"
             : "text-ink hover:bg-paper/80 font-medium",
@@ -87,7 +87,7 @@ function Row({
             ? "bg-brand text-white ring-brand/30 shadow-2xs"
             : danger
               ? "bg-red-500/10 text-red-600 ring-red-500/25 dark:text-red-400"
-              : "bg-paper text-ink/80 ring-line/80 group-hover:bg-card group-hover:text-brand",
+              : "bg-paper text-ink/80 ring-line/80 group-hover:bg-card group-hover:text-accent",
         )}
       >
         <Icon size={16} strokeWidth={1.9} />
@@ -95,14 +95,14 @@ function Row({
 
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-1.5">
-          <span className={cn("block truncate text-xs sm:text-[13px]", highlight && "font-bold text-brand")}>
+          <span className={cn("block truncate text-xs sm:text-[13px]", highlight && "font-bold text-accent")}>
             {label}
           </span>
           {badge && (
             <span
               className={cn(
                 "rounded-full px-2 py-0.2 text-[10px] font-bold uppercase tracking-wider",
-                badgeColor || "bg-brand/10 text-brand",
+                badgeColor || "bg-brand/10 text-accent",
               )}
             >
               {badge}
@@ -116,7 +116,7 @@ function Row({
         size={14}
         className={cn(
           "shrink-0 opacity-40 transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-0.5",
-          highlight ? "text-brand" : danger ? "text-red-500" : "text-mute",
+          highlight ? "text-accent" : danger ? "text-red-500" : "text-mute",
         )}
       />
     </button>
@@ -281,21 +281,21 @@ export function ProfileMenu() {
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-1">
-              <p className="font-display truncate text-sm font-bold text-ink group-hover/card:text-brand transition-colors">
+              <p className="font-display truncate text-sm font-bold text-ink group-hover/card:text-accent transition-colors">
                 {user.displayName || mine?.name || "Account"}
               </p>
-              <span className="text-[10px] font-semibold text-mute group-hover/card:text-brand flex items-center gap-0.5 shrink-0">
+              <span className="text-[10px] font-semibold text-mute group-hover/card:text-accent flex items-center gap-0.5 shrink-0">
                 <span>View</span>
                 <ChevronRight size={12} />
               </span>
             </div>
             {mine ? (
-              <p className="truncate text-xs font-semibold text-brand">@{mine.handle}</p>
+              <p className="truncate text-xs font-semibold text-accent">@{mine.handle}</p>
             ) : (
               <p className="truncate text-[11px] text-mute">{user.email || user.phone}</p>
             )}
             {(mine || business) && (
-              <p className="mt-0.5 truncate text-[10px] font-bold uppercase tracking-wider text-gold">
+              <p className="mt-0.5 truncate text-[10px] font-bold uppercase tracking-wider text-accent">
                 {[
                   mine && bioKindLabel(mine.kind),
                   business && bioKindLabel(business.kind ?? "business"),
@@ -356,7 +356,7 @@ export function ProfileMenu() {
         {statusEditing && mine && (
           <div className="mt-2.5 rounded-2xl bg-card p-3 ring-1 ring-line/80 shadow-xs animate-in fade-in zoom-in-95 duration-150" onKeyDown={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gold">Set Status</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-accent">Set Status</span>
               <button
                 type="button"
                 onClick={() => setStatusEditing(false)}
@@ -379,7 +379,7 @@ export function ProfileMenu() {
                     onClick={() => setEditStatus(key)}
                     className={cn(
                       "flex min-h-[44px] items-center gap-2 rounded-xl px-2 text-left ring-1 transition active:scale-[0.98]",
-                      selected ? "bg-paper font-bold ring-brand text-brand shadow-2xs" : "bg-card ring-line/70 text-ink/80 hover:bg-paper/50",
+                      selected ? "bg-paper font-bold ring-brand text-accent shadow-2xs" : "bg-card ring-line/70 text-ink/80 hover:bg-paper/50",
                     )}
                   >
                     <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", info.dotColor)} />
@@ -446,7 +446,7 @@ export function ProfileMenu() {
           className="mt-2.5 flex items-center justify-between rounded-xl border border-line/80 bg-card/60 px-2.5 py-1.5"
         >
           <div className="flex items-center gap-1.5 text-xs font-medium text-mute">
-            <Languages size={14} className="text-gold shrink-0" />
+            <Languages size={14} className="text-accent shrink-0" />
             <span>Language</span>
           </div>
           <LanguageSwitch size="sm" />
@@ -489,7 +489,7 @@ export function ProfileMenu() {
 
       {/* Workspaces & Pulse Hub */}
       <div className="my-1.5 h-px bg-line/80" />
-      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-gold">Workspaces & Business</p>
+      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent">Workspaces & Business</p>
       <div className="mt-1 space-y-0.5">
         <Row
           icon={Activity}
@@ -505,7 +505,7 @@ export function ProfileMenu() {
           label="Help Desk Operations"
           hint="Front desk, kitchen & event support"
           badge="LIVE"
-          badgeColor="bg-brand/15 text-brand"
+          badgeColor="bg-brand/15 text-accent"
           onClick={() => go("/helpdesk")}
         />
 
@@ -542,7 +542,7 @@ export function ProfileMenu() {
 
       {/* Personal & Tools */}
       <div className="my-1.5 h-px bg-line/80" />
-      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-gold">Personal & Tools</p>
+      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent">Personal & Tools</p>
       <div className="mt-1 space-y-0.5">
         <Row
           icon={UserRound}
@@ -587,7 +587,7 @@ export function ProfileMenu() {
           className="mt-3 flex items-center justify-between rounded-xl border border-line/80 bg-card/60 px-2.5 py-1.5"
         >
           <div className="flex items-center gap-1.5 text-xs font-medium text-mute">
-            <Languages size={14} className="text-gold shrink-0" />
+            <Languages size={14} className="text-accent shrink-0" />
             <span>Language</span>
           </div>
           <LanguageSwitch size="sm" />
@@ -605,7 +605,7 @@ export function ProfileMenu() {
       </div>
 
       <div className="my-1.5 h-px bg-line/80" />
-      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-gold">Get started</p>
+      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent">Get started</p>
       <div className="mt-1 space-y-0.5">
         <Row
           icon={Compass}
@@ -683,7 +683,7 @@ export function ProfileMenu() {
                     void triggerHaptic("light");
                     setOpen(false);
                   }}
-                  className="fixed inset-0 bg-ink/40 backdrop-blur-xs animate-in fade-in duration-200"
+                  className="fixed inset-0 bg-black/40 backdrop-blur-xs animate-in fade-in duration-200"
                   aria-hidden="true"
                 />
                 <div

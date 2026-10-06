@@ -24,7 +24,7 @@ export function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 pb-[max(7rem,calc(env(safe-area-inset-bottom,0px)+6rem))]">
-      <p className="pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Account</p>
+      <p className="pt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Account</p>
       <h1 className="font-display mt-1 text-3xl font-semibold">Settings</h1>
 
       {user ? (
@@ -60,7 +60,7 @@ export function SettingsPage() {
             <span className="block text-[12px] text-mute">Profile</span>
             <span className="font-medium text-ink">{mine ? `@${mine.handle}` : "Your list"}</span>
           </span>
-          <span className="text-sm font-semibold text-brand">Open</span>
+          <span className="text-sm font-semibold text-accent">Open</span>
         </button>
         <button
           type="button"
@@ -71,7 +71,7 @@ export function SettingsPage() {
             <span className="block text-[12px] text-mute">Host</span>
             <span className="font-medium text-ink">Hotel, venue, hostel, campus</span>
           </span>
-          <span className="text-sm font-semibold text-brand">Open</span>
+          <span className="text-sm font-semibold text-accent">Open</span>
         </button>
         <button
           type="button"
@@ -82,7 +82,7 @@ export function SettingsPage() {
             <span className="block text-[12px] text-mute">{NAMES.partnerAccount}</span>
             <span className="font-medium text-ink">{business ? `@${business.handle}` : "Same login. Guests find your place"}</span>
           </span>
-          <span className="text-sm font-semibold text-brand">Open</span>
+          <span className="text-sm font-semibold text-accent">Open</span>
         </button>
         <button
           type="button"
@@ -93,7 +93,7 @@ export function SettingsPage() {
             <span className="block text-[12px] text-mute">Event</span>
             <span className="font-medium text-ink">Market, expo, festival</span>
           </span>
-          <span className="text-sm font-semibold text-brand">Open</span>
+          <span className="text-sm font-semibold text-accent">Open</span>
         </button>
       </div>
 
@@ -136,7 +136,7 @@ export function SettingsPage() {
           <Link
             key={l.href}
             href={l.href}
-            className="inline-flex min-h-[38px] items-center rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold text-brand ring-1 ring-line hover:bg-card active:scale-95"
+            className="inline-flex min-h-[38px] items-center rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold text-accent ring-1 ring-line hover:bg-card active:scale-95"
           >
             {l.label}
           </Link>

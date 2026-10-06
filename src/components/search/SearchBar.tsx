@@ -91,7 +91,7 @@ function highlightMatch(text: string, query: string) {
   return (
     <>
       {before}
-      <span className="font-bold text-brand">{match}</span>
+      <span className="font-bold text-accent">{match}</span>
       {after}
     </>
   );
@@ -109,7 +109,7 @@ function getCategoryIcon(cat?: string) {
       return <Sparkles size={13} className="text-purple-600" />;
     case "places":
     default:
-      return <MapPin size={13} className="text-brand" />;
+      return <MapPin size={13} className="text-accent" />;
   }
 }
 
@@ -263,7 +263,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
           className={cn(
             "absolute top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 shrink-0",
             currentSize.iconLeft,
-            "text-mute group-focus-within:text-brand",
+            "text-mute group-focus-within:text-accent",
           )}
           aria-hidden="true"
         >
@@ -364,7 +364,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
             <span>
               {value.trim() ? "Suggested Searches" : "Trending Searches"}
             </span>
-            <span className="flex items-center gap-1 text-[10px] text-brand lowercase font-medium">
+            <span className="flex items-center gap-1 text-[10px] text-accent lowercase font-medium">
               <TrendingUp size={11} />
               <span>from search logs</span>
             </span>
@@ -388,7 +388,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
                   className={cn(
                     "flex w-full min-h-[44px] items-center justify-between rounded-xl px-3 py-2 text-left text-xs transition cursor-pointer touch-manipulation active:scale-[0.99]",
                     isSelected
-                      ? "bg-brand/10 text-brand font-semibold"
+                      ? "bg-brand/10 text-accent font-semibold"
                       : "text-ink hover:bg-paper",
                   )}
                 >
@@ -439,10 +439,10 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
                   e.preventDefault();
                   handleFullSearch();
                 }}
-                className="flex w-full min-h-[40px] items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-semibold text-brand hover:bg-brand/10 transition cursor-pointer"
+                className="flex w-full min-h-[40px] items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-semibold text-accent hover:bg-brand/10 transition cursor-pointer"
               >
                 <span className="flex items-center gap-2 truncate">
-                  <Search size={13} className="text-brand shrink-0" />
+                  <Search size={13} className="text-accent shrink-0" />
                   <span className="truncate">
                     Search all AirPal for &ldquo;{value.trim()}&rdquo;
                   </span>
@@ -462,10 +462,10 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
           <button
             type="button"
             onClick={() => handleFullSearch()}
-            className="flex w-full min-h-[44px] items-center justify-between rounded-xl bg-brand/10 px-3.5 py-2 text-xs font-semibold text-brand ring-1 ring-brand/20 active:scale-[0.98] transition cursor-pointer"
+            className="flex w-full min-h-[44px] items-center justify-between rounded-xl bg-brand/10 px-3.5 py-2 text-xs font-semibold text-accent ring-1 ring-brand/20 active:scale-[0.98] transition cursor-pointer"
           >
             <span className="flex items-center gap-2 truncate">
-              <Search size={14} className="shrink-0 text-brand" />
+              <Search size={14} className="shrink-0 text-accent" />
               <span className="truncate">Full search for &ldquo;{value.trim()}&rdquo;</span>
             </span>
             <span className="flex items-center gap-1 shrink-0 text-[11px] font-bold">

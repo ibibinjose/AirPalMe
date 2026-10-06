@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { subscribeConversations, createConversationRecord, getLocalConversations } from "@/lib/chat-store";
 import type { UniversalConversation, ConversationType } from "@shared/messaging";
 import { AirPalChatModal } from "@/components/messaging/AirPalChatModal";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { triggerHaptic } from "@/lib/native";
 
 function ConversationTypeIcon({ type }: { type: ConversationType }) {
@@ -31,7 +32,7 @@ function ConversationTypeIcon({ type }: { type: ConversationType }) {
       return <Plane size={16} className="text-indigo-500" />;
     case "direct":
     default:
-      return <User size={16} className="text-brand" />;
+      return <User size={16} className="text-accent" />;
   }
 }
 
@@ -59,7 +60,7 @@ function NotificationRows({
                 aria-hidden
               />
               <span className="min-w-0 flex-1">
-                <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-brand">
+                <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] text-accent">
                   {presentation.label}
                 </span>
                 <span className={cn("mt-0.5 block text-[15px] leading-5", n.read ? "text-ink" : "font-bold text-ink")}>
@@ -86,6 +87,8 @@ export function InboxPage() {
   const { myPlans } = usePlans();
   const [notes, setNotes] = useState<PromotionNotification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [retryToken, setRetryToken] = useState(0);
   const [segment, setSegment] = useState<"messages" | "updates" | "pings" | "activity">("messages");
   const [markingAll, setMarkingAll] = useState(false);
 
@@ -137,6 +140,8 @@ export function InboxPage() {
       setLoading(false);
       return;
     }
+    setLoadError(false);
+    setLoading(true);
     const q = query(
       collection(db, "promotion_notifications"),
       where("uid", "==", user.uid),
@@ -147,17 +152,45 @@ export function InboxPage() {
       q,
       (snap) => {
         setNotes(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<PromotionNotification, "id">) })));
+        setLoadError(false);
         setLoading(false);
       },
       () => {
         setNotes([]);
+        setLoadError(true);
         setLoading(false);
       },
     );
-  }, [user]);
+  }, [user, retryToken]);
 
   if (!authReady || loading) {
-    return <div className="mx-auto max-w-md px-4 py-16 text-center text-sm text-mute">Loading…</div>;
+    return (
+      <div className="mx-auto max-w-md space-y-3 px-4 py-8" aria-label="Loading inbox">
+        <div className="h-8 w-32 motion-safe:animate-pulse rounded-xl bg-card ring-1 ring-line" />
+        <div className="h-11 motion-safe:animate-pulse rounded-full bg-card ring-1 ring-line" />
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="flex items-center gap-3 rounded-3xl bg-card p-4 ring-1 ring-line">
+            <div className="h-10 w-10 shrink-0 motion-safe:animate-pulse rounded-2xl bg-paper" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="h-3.5 w-3/4 motion-safe:animate-pulse rounded bg-paper" />
+              <div className="h-3 w-1/2 motion-safe:animate-pulse rounded bg-paper" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (loadError) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-8">
+        <EmptyState
+          title="Couldn't load your inbox"
+          body="Check your connection and try again — your messages are safe."
+          action={() => setRetryToken((t) => t + 1)}
+          actionLabel="Try again"
+        />
+      </div>
+    );
   }
   if (!user) {
     return (
@@ -238,7 +271,7 @@ export function InboxPage() {
         <button
           type="button"
           onClick={handleStartAiChat}
-          className="flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand/10 px-3.5 text-xs font-bold text-brand ring-1 ring-brand/20 transition hover:bg-brand hover:text-white active:scale-95 shadow-xs"
+          className="flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand/10 px-3.5 text-xs font-bold text-accent ring-1 ring-brand/20 transition hover:bg-brand hover:text-white active:scale-95 shadow-xs"
           title="Chat with AirPal AI"
         >
           <Sparkles size={14} className="text-amber-500" />
@@ -314,7 +347,7 @@ export function InboxPage() {
                               </span>
                             ) : null}
                           </div>
-                          <p className={cn("mt-0.5 line-clamp-1 text-[13px]", hasUnread ? "font-semibold text-brand" : "text-mute")}>
+                          <p className={cn("mt-0.5 line-clamp-1 text-[13px]", hasUnread ? "font-semibold text-accent" : "text-mute")}>
                             {conv.lastMessage || "Start conversation"}
                           </p>
                         </div>
@@ -348,7 +381,7 @@ export function InboxPage() {
                       onClick={() => nav(`/plan/${p.id}`)}
                       className="flex min-h-[56px] w-full cursor-pointer items-center gap-3 px-4 py-3.5 text-left transition hover:bg-paper/60 active:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"
                     >
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 font-display text-[15px] font-bold text-brand ring-1 ring-brand/20">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 font-display text-[15px] font-bold text-accent ring-1 ring-brand/20">
                         {p.title.trim()[0]?.toUpperCase() || "•"}
                       </span>
                       <span className="min-w-0 flex-1">
@@ -366,7 +399,7 @@ export function InboxPage() {
           ) : universalChats.length === 0 ? (
             <div className="text-center rounded-[24px] bg-card ring-1 ring-line/80 px-4 py-10 shadow-xs">
               <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-paper text-mute ring-1 ring-line">
-                <MessageCircle size={22} className="text-brand" />
+                <MessageCircle size={22} className="text-accent" />
               </span>
               <p className="font-display mt-4 text-xl font-bold text-ink">No conversations yet</p>
               <p className="mx-auto mt-1 max-w-xs text-[14px] leading-relaxed text-mute">
@@ -411,7 +444,7 @@ export function InboxPage() {
             />
             <button
               type="submit"
-              className="inline-flex min-h-[44px] shrink-0 cursor-pointer items-center rounded-full bg-ink px-4 py-2 text-[13px] font-semibold text-white active:scale-95"
+              className="inline-flex min-h-[44px] shrink-0 cursor-pointer items-center rounded-full bg-neutral-900 px-4 py-2 text-[13px] font-semibold text-white active:scale-95"
             >
               Join
             </button>
@@ -420,7 +453,7 @@ export function InboxPage() {
           <button
             type="button"
             onClick={() => setSegment("activity")}
-            className="flex min-h-[44px] w-full items-center justify-center text-center text-[14px] font-semibold text-brand hover:underline"
+            className="flex min-h-[44px] w-full items-center justify-center text-center text-[14px] font-semibold text-accent hover:underline"
           >
             See activity &amp; notifications →
           </button>
@@ -434,7 +467,7 @@ export function InboxPage() {
                 type="button"
                 disabled={markingAll || unreadActivity === 0}
                 onClick={() => void markSegmentRead(activityNotes)}
-                className="-my-3 inline-flex min-h-[44px] items-center text-[13px] font-bold text-brand disabled:opacity-40"
+                className="-my-3 inline-flex min-h-[44px] items-center text-[13px] font-bold text-accent disabled:opacity-40"
               >
                 {markingAll ? "Marking…" : "Mark all read"}
               </button>
@@ -447,7 +480,7 @@ export function InboxPage() {
               onClick={() => void enablePush()}
               className="mt-3 w-full rounded-[20px] bg-brand/10 px-4 py-3.5 text-left ring-1 ring-brand/20 transition hover:bg-brand/15 active:scale-95"
             >
-              <span className="block text-[15px] font-semibold text-brand">Turn on alerts</span>
+              <span className="block text-[15px] font-semibold text-accent">Turn on alerts</span>
               <span className="block text-[13px] text-mute">Giveaways, rewards, messages, and plan updates.</span>
             </button>
           )}
@@ -455,7 +488,7 @@ export function InboxPage() {
           {activityNotes.length === 0 ? (
             <div className="mt-10 text-center">
               <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-paper text-mute ring-1 ring-line">
-                <Bell size={22} className="text-brand" />
+                <Bell size={22} className="text-accent" />
               </span>
               <p className="font-display mt-4 text-xl font-bold text-ink">Nothing yet</p>
               <p className="mx-auto mt-1 max-w-xs text-[14px] leading-relaxed text-mute">
@@ -463,7 +496,7 @@ export function InboxPage() {
               </p>
               <Link
                 href="/deals"
-                className="mt-5 inline-flex min-h-[44px] items-center text-[14px] font-bold text-brand hover:underline"
+                className="mt-5 inline-flex min-h-[44px] items-center text-[14px] font-bold text-accent hover:underline"
               >
                 Browse deals
               </Link>
@@ -481,7 +514,7 @@ export function InboxPage() {
                 type="button"
                 disabled={markingAll || unreadUpdates === 0}
                 onClick={() => void markSegmentRead(updateNotes)}
-                className="-my-3 inline-flex min-h-[44px] items-center text-[13px] font-bold text-brand disabled:opacity-40"
+                className="-my-3 inline-flex min-h-[44px] items-center text-[13px] font-bold text-accent disabled:opacity-40"
               >
                 {markingAll ? "Marking…" : "Mark all read"}
               </button>
@@ -491,7 +524,7 @@ export function InboxPage() {
           {updateNotes.length === 0 ? (
             <div className="mt-10 text-center">
               <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-paper text-mute ring-1 ring-line">
-                <Sparkles size={22} className="text-brand" />
+                <Sparkles size={22} className="text-accent" />
               </span>
               <p className="font-display mt-4 text-xl font-bold text-ink">No updates yet</p>
               <p className="mx-auto mt-1 max-w-xs text-[14px] leading-relaxed text-mute">

@@ -143,7 +143,7 @@ export function BusinessBookingsSection() {
                   {b.campaignId ? " · Experience" : b.listingId ? " · Listing" : ""}
                 </span>
               </span>
-              <span className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-brand">
+              <span className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-accent">
                 {STATUS_LABEL[b.status] ?? b.status}
               </span>
             </span>

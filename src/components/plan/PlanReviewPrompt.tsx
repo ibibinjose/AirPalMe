@@ -11,7 +11,7 @@ export function PlanReviewPrompt({ onSubmit }: { onSubmit: (input: { rating: num
 
   return (
     <div className="mt-4 rounded-3xl bg-card p-6 ring-1 ring-gold/30 shadow-xs">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">How was it?</p>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">How was it?</p>
       <h2 className="font-display text-xl font-bold text-ink">Rate this experience</h2>
       <div className="mt-3 flex items-center gap-1.5" role="radiogroup" aria-label="Star rating">
         {[1, 2, 3, 4, 5].map((s) => (
@@ -29,7 +29,7 @@ export function PlanReviewPrompt({ onSubmit }: { onSubmit: (input: { rating: num
           >
             <Star
               size={26}
-              className={cn(s <= rating ? "fill-gold text-gold" : "fill-line text-line")}
+              className={cn(s <= rating ? "fill-gold text-accent" : "fill-line text-line")}
             />
           </button>
         ))}

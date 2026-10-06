@@ -26,15 +26,15 @@ export function YourRoomCard({
           {roomType && (
             <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-mute">
               <span className="inline-flex items-center gap-1 text-ink font-semibold">
-                <BedDouble size={14} className="text-brand" /> {roomType.bedConfig}
+                <BedDouble size={14} className="text-accent" /> {roomType.bedConfig}
               </span>
               <span className="inline-flex items-center gap-1 text-ink font-semibold">
-                <Users size={14} className="text-brand" /> Capacity {roomType.capacity} Guests
+                <Users size={14} className="text-accent" /> Capacity {roomType.capacity} Guests
               </span>
             </p>
           )}
         </div>
-        <span className="shrink-0 rounded-2xl bg-ink ring-1 ring-line px-3.5 py-2 font-display text-base font-extrabold text-white shadow-xs">
+        <span className="shrink-0 rounded-2xl bg-neutral-900 ring-1 ring-line px-3.5 py-2 font-display text-base font-extrabold text-white shadow-xs">
           Room {roomNumber}
         </span>
       </div>
@@ -54,7 +54,7 @@ export function YourRoomCard({
 
       {(checkIn || checkOut) && (
         <p className="mt-3 flex items-center gap-1.5 border-t border-line/80 pt-3 text-xs font-bold text-ink">
-          <Clock size={15} className="shrink-0 text-brand" />
+          <Clock size={15} className="shrink-0 text-accent" />
           {checkIn ? `Check-in ${checkIn}` : ""}
           {checkIn && checkOut ? " · " : ""}
           {checkOut ? `Check-out ${checkOut}` : ""}

@@ -86,7 +86,7 @@ export function HereCheckIn({
         onClick={() => (hereNow ? void stop() : mine?.handle ? setOpen(true) : nav("/bio/setup"))}
         className="flex w-full items-center gap-3 rounded-[20px] bg-paper px-4 py-3.5 text-left"
       >
-        <span className="grid h-10 w-10 place-items-center rounded-full bg-brand/10 text-brand">
+        <span className="grid h-10 w-10 place-items-center rounded-full bg-brand/10 text-accent">
           <MapPin size={18} />
         </span>
         <span className="min-w-0 flex-1">
@@ -95,7 +95,7 @@ export function HereCheckIn({
             {hereNow ? minePin.placeName : `Share I’m here · ${placeName}`}
           </span>
         </span>
-        <span className="text-[15px] font-semibold text-brand">{hereNow ? "Stop" : "Share"}</span>
+        <span className="text-[15px] font-semibold text-accent">{hereNow ? "Stop" : "Share"}</span>
       </button>
       <CircleHereBoard pins={pins} myHandle={mine?.handle} />
       <CircleHereSheet

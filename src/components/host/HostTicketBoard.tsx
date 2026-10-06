@@ -22,7 +22,7 @@ const TICKET_CATEGORIES: Record<StaffTicket["category"], { label: string; icon: 
       icon: Wrench,
       badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
     },
-    dining: { label: "Dining", icon: UtensilsCrossed, badgeClass: "bg-brand/10 text-brand" },
+    dining: { label: "Dining", icon: UtensilsCrossed, badgeClass: "bg-brand/10 text-accent" },
     late_checkout: {
       label: "Late Checkout",
       icon: Clock,
@@ -72,7 +72,7 @@ export function HostTicketBoard({ propertyId, tickets }: { propertyId: string; t
           {openTicketCount(tickets) > 1 && (
             <button
               type="button"
-              className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-brand/10 px-4 text-xs font-semibold text-brand hover:bg-brand/15 transition"
+              className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-brand/10 px-4 text-xs font-semibold text-accent hover:bg-brand/15 transition"
               onClick={() => {
                 void (async () => {
                   stopTicketAlarm();

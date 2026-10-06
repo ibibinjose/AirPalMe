@@ -57,7 +57,7 @@ export function DemoAdmin() {
     <div className="space-y-4">
       <section className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-xs sm:p-6">
         <div className="flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-2xl bg-brand/10 text-brand">
+          <span className="grid h-9 w-9 place-items-center rounded-2xl bg-brand/10 text-accent">
             <FlaskConical size={18} />
           </span>
           <div>
@@ -91,7 +91,7 @@ export function DemoAdmin() {
         </p>
         <Link
           href="/concierge"
-          className="mt-3 flex items-center gap-2 rounded-2xl bg-brand/10 p-3 text-sm font-bold text-brand ring-1 ring-brand/20 transition hover:bg-brand/15"
+          className="mt-3 flex items-center gap-2 rounded-2xl bg-brand/10 p-3 text-sm font-bold text-accent ring-1 ring-brand/20 transition hover:bg-brand/15"
         >
           View Stay & Guide <ArrowRight size={16} />
         </Link>

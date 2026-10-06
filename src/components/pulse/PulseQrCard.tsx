@@ -39,7 +39,7 @@ export function PulseQrCard({
               href={publicUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex min-h-[44px] items-center gap-1 px-1 text-xs font-semibold text-brand hover:underline"
+              className="inline-flex min-h-[44px] items-center gap-1 px-1 text-xs font-semibold text-accent hover:underline"
             >
               Test View <ExternalLink size={12} aria-hidden />
             </a>

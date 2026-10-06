@@ -5,7 +5,12 @@
 /* Apple-like retheme (human-approved): system font stack everywhere, iOS
    neutral surfaces, AirPal Blue kept as the single accent. See
    docs/AIRPAL.md Part E and docs/IOS-DESIGN-GUIDE.md. */
-@theme inline {
+/* NOTE: plain `@theme` (not `inline`) so utilities reference the CSS variables
+ * below at runtime. That is what makes automatic dark mode possible: the
+ * `prefers-color-scheme: dark` block further down re-points the same
+ * semantic variables, and every `bg-card` / `text-ink` / `ring-line` utility
+ * follows without per-component `dark:` overrides. Do not re-add `inline`. */
+@theme {
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, ui-sans-serif, system-ui,
     sans-serif;
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, ui-sans-serif, system-ui,
@@ -18,6 +23,11 @@
   --color-brand: #1805db;
   --color-brand-ink: #0e0394;
   --color-gold: #1805db;
+  /* Brand-hued text/icons that stay legible on both schemes: AirPal Blue in
+   * light mode, lightened periwinkle in dark mode (like iOS systemBlue).
+   * Use `text-accent` instead of `text-brand`/`text-gold` for text and icons.
+   * Fills (`bg-brand`) keep the fixed brand with white text. */
+  --color-accent: #1805db;
 
   /* AirPal celebration palette — solid, vivid, never gradient-washed. */
   --color-rose: #f43f5e;
@@ -54,7 +64,7 @@
   box-sizing: border-box;
 }
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
   /* Dynamic virtual keyboard & visual viewport properties */
   --keyboard-height: 0px;
   --visual-viewport-height: 100dvh;
@@ -69,6 +79,61 @@
   --z-toast: 70;
   --z-tooltip: 80;
   --z-prompt: 90;
+}
+
+/* Automatic dark mode: re-point the semantic @theme variables (iOS dark
+ * system palette). Unlayered author CSS wins over Tailwind's `@layer theme`,
+ * so every utility referencing these variables follows automatically.
+ * Brand/celebration accents stay fixed — they are vivid on both schemes. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #000000;
+    --color-card: #1c1c1e;
+    --color-ink: #ffffff;
+    --color-mute: #98989d;
+    --color-line: #38383a;
+    --color-surface-lowest: #0c0c0e;
+    --color-surface-low: #131316;
+    --color-surface: #1c1c1e;
+    --color-surface-high: #2c2c2e;
+    --color-surface-highest: #3a3a3c;
+    --color-primary-container: rgba(120, 110, 255, 0.22);
+    --color-on-primary-container: #cfc9ff;
+    --color-accent: #8b83ff;
+    --shadow-clay:
+      0 1px 2px rgba(0, 0, 0, 0.5),
+      0 12px 28px -16px rgba(0, 0, 0, 0.65);
+  }
+
+  /* Liquid Glass follows the OS scheme automatically (same values as the
+   * `.dark` manual-override selectors below, which stay for a future toggle). */
+  :root .apple-liquid-glass-dock {
+    background: rgba(15, 23, 42, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow:
+      inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.25),
+      0 18px 42px -12px rgba(0, 0, 0, 0.6),
+      0 4px 16px -2px rgba(0, 0, 0, 0.35);
+  }
+  :root .apple-liquid-glass-nav {
+    background: rgba(15, 23, 42, 0.84);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  }
+  :root .apple-liquid-glass-card {
+    background: rgba(22, 27, 46, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.18),
+      0 8px 24px -8px rgba(0, 0, 0, 0.5);
+  }
+  :root .apple-liquid-glass-light {
+    background: rgba(30, 41, 59, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow:
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.2),
+      0 12px 32px -6px rgba(0, 0, 0, 0.4);
+  }
 }
 html {
   scroll-behavior: smooth;
@@ -605,7 +670,7 @@ body.keyboard-open .keyboard-hide {
   .apple-liquid-glass-nav,
   .apple-liquid-glass-card,
   .apple-liquid-glass-light {
-    background: #ffffff !important;
+    background: var(--color-card, #ffffff) !important;
     border-color: var(--color-line, #e4e7ee) !important;
   }
   .apple-liquid-glass,

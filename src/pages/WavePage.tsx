@@ -50,7 +50,7 @@ export function WavePage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-10 pb-28 text-center">
-      <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-brand/10 text-brand">
+      <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-brand/10 text-accent">
         <Hand size={24} />
       </span>
       <p className="mt-4 text-[13px] font-semibold uppercase tracking-[0.16em] text-mute">Wave</p>

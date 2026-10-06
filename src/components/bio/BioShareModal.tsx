@@ -93,7 +93,7 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
       role="dialog"
       aria-modal="true"
       aria-label="Share Profile"
-      className="fixed inset-0 z-50 grid place-items-center bg-ink/60 px-4 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 grid place-items-center bg-black/60 px-4 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
@@ -109,7 +109,7 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
           <X size={18} />
         </button>
 
-        <div className="flex items-center justify-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
+        <div className="flex items-center justify-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">
           <QrCode size={14} />
           <span>Share Profile</span>
         </div>

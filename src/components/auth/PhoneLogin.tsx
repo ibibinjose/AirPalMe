@@ -220,7 +220,7 @@ export function PhoneLogin({
                   setCode("");
                   resetPhoneLogin();
                 }}
-                className="inline-flex items-center gap-1 text-xs font-medium text-brand hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-medium text-accent hover:underline"
               >
                 <ArrowLeft size={12} /> Change
               </button>
@@ -249,7 +249,7 @@ export function PhoneLogin({
                 type="button"
                 className={cn(
                   "inline-flex items-center gap-1 text-xs font-medium",
-                  wait > 0 || busy ? "text-mute cursor-not-allowed" : "text-brand hover:underline",
+                  wait > 0 || busy ? "text-mute cursor-not-allowed" : "text-accent hover:underline",
                 )}
                 disabled={busy || wait > 0}
                 onClick={() => void sendCode()}

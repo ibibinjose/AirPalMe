@@ -186,13 +186,13 @@ export function AddToCalendarMenu({
           variant === "primary" && "bg-brand text-white shadow-sm hover:bg-brand-ink",
           variant === "secondary" && "bg-card text-ink ring-1 ring-line shadow-xs hover:bg-paper",
           variant === "ghost" && "bg-transparent text-ink hover:bg-card/80",
-          variant === "pill" && "bg-brand/10 text-brand ring-1 ring-brand/20 hover:bg-brand/15",
+          variant === "pill" && "bg-brand/10 text-accent ring-1 ring-brand/20 hover:bg-brand/15",
           buttonClassName,
         )}
         aria-haspopup="dialog"
         aria-expanded={open}
       >
-        <CalendarIcon size={size === "sm" ? 13 : 15} className="text-gold shrink-0" />
+        <CalendarIcon size={size === "sm" ? 13 : 15} className="text-accent shrink-0" />
         <span>{label}</span>
         <ChevronDown size={13} className={cn("text-mute transition-transform duration-200", open && "rotate-180")} />
       </button>
@@ -203,7 +203,7 @@ export function AddToCalendarMenu({
           <div className="fixed inset-0 z-[99999]">
             {/* Backdrop click to dismiss */}
             <div
-              className="fixed inset-0 bg-ink/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-150"
+              className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-150"
               onClick={() => setOpen(false)}
             />
 
@@ -212,7 +212,7 @@ export function AddToCalendarMenu({
               <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-line" />
               <div className="flex items-center justify-between border-b border-line/60 pb-3">
                 <div className="min-w-0 pr-3">
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gold">
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-accent">
                     <Sparkles size={11} />
                     <span>Sync with Calendar</span>
                   </div>
@@ -267,7 +267,7 @@ export function AddToCalendarMenu({
               >
                 <div className="px-3 py-2 border-b border-line/60">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gold">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-accent">
                       <Sparkles size={11} />
                       <span>Sync with Calendar</span>
                     </div>

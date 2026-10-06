@@ -25,7 +25,7 @@ function statusPill(status: MateRequestStatus): string {
     case "cancelled":
       return "bg-red-500/10 text-red-600 ring-red-500/30";
     default:
-      return "bg-brand/10 text-brand ring-brand/30";
+      return "bg-brand/10 text-accent ring-brand/30";
   }
 }
 
@@ -172,7 +172,7 @@ export function MateRequestsAdmin() {
 
   return (
     <section className="mt-8 rounded-[28px] bg-card p-4 ring-1 ring-line">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Marketplace · matching & fees</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Marketplace · matching & fees</p>
       <h2 className="font-display mt-1 text-lg font-semibold">Mate requests</h2>
       <p className="mt-1 text-sm text-mute">
         Approved Mates can accept from /mate. This queue is the backup — match by hand when needed.

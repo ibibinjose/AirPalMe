@@ -412,7 +412,7 @@ function CalendarPageContent() {
                 : "bg-paper text-ink ring-1 ring-line hover:bg-line",
             )}
           >
-            <SlidersHorizontal size={13} className="text-brand" />
+            <SlidersHorizontal size={13} className="text-accent" />
             <span>{isSidebarOpen ? "Hide Filters" : "Show Filters"}</span>
             {hasActiveFilters && (
               <span className="rounded-full bg-brand px-1.5 py-0.2 text-[10px] font-bold text-white">
@@ -431,7 +431,7 @@ function CalendarPageContent() {
             title="Open search and filters"
             className="inline-flex lg:hidden min-h-[44px] h-11 items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-medium text-ink ring-1 ring-line/80 hover:bg-paper transition shadow-xs active:scale-95 cursor-pointer"
           >
-            <SlidersHorizontal size={13} className="text-brand" />
+            <SlidersHorizontal size={13} className="text-accent" />
             <span>Filters</span>
             {hasActiveFilters && (
               <span className="rounded-full bg-brand px-1.5 py-0.2 text-[10px] font-bold text-white">
@@ -603,7 +603,7 @@ function CalendarPageContent() {
                   </span>
                 )}
                 {searchQuery && (
-                  <span className="inline-flex items-center gap-1 rounded-md bg-brand/10 px-2 py-0.5 font-medium text-brand ring-1 ring-brand/30">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-brand/10 px-2 py-0.5 font-medium text-accent ring-1 ring-brand/30">
                     {searchQuery.startsWith("#") ? "Tag: " : "Search: "}
                     <strong>{searchQuery}</strong>
                     <button
@@ -628,7 +628,7 @@ function CalendarPageContent() {
                   setCategory("all");
                   setSearchQuery("");
                 }}
-                className="inline-flex min-h-[44px] items-center px-1 text-[11px] font-semibold text-brand hover:underline cursor-pointer"
+                className="inline-flex min-h-[44px] items-center px-1 text-[11px] font-semibold text-accent hover:underline cursor-pointer"
               >
                 Clear all
               </button>
@@ -639,7 +639,7 @@ function CalendarPageContent() {
           {viewMode === "month" && selectedDate && (
             <div className="mb-5 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-brand/10 px-4 py-2.5 text-ink ring-1 ring-line">
               <div className="flex items-center gap-2 text-xs">
-                <CalendarDays size={15} className="text-brand" />
+                <CalendarDays size={15} className="text-accent" />
                 <span>
                   Showing schedule for <strong className="font-semibold text-ink">{selectedDateLabel}</strong>
                 </span>
@@ -725,7 +725,7 @@ function CalendarPageContent() {
 
                 {(selectedDate ? selectedDayEvents : filteredEvents).length === 0 && (
                   <div className="rounded-3xl bg-card p-8 text-center ring-1 ring-line/80">
-                    <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-paper text-gold ring-1 ring-line">
+                    <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-paper text-accent ring-1 ring-line">
                       {filter === "going" ? (
                         <Check size={22} />
                       ) : filter === "interested" ? (
@@ -756,7 +756,7 @@ function CalendarPageContent() {
                     {usingGps && filter === "all" && (
                       <button
                         type="button"
-                        className="mt-3 text-[13px] font-semibold text-brand"
+                        className="mt-3 text-[13px] font-semibold text-accent"
                         onClick={() => chooseLocation(ROCKS_BROWSE)}
                       >
                         See The Rocks
@@ -865,7 +865,7 @@ function CalendarPageContent() {
               <button
                 type="button"
                 onClick={() => nav("/plan/new")}
-                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white transition active:scale-95"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-neutral-900 px-4 py-2 text-xs font-semibold text-white transition active:scale-95"
               >
                 <PlusCircle size={13} />
                 <span>New plan</span>

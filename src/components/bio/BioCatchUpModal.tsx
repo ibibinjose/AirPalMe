@@ -276,7 +276,7 @@ export function BioCatchUpModal({
 
   const content = (
     <div
-      className="fixed inset-0 z-[9999] grid place-items-center overflow-y-auto bg-ink/65 p-4 backdrop-blur-sm sm:p-6 animate-in fade-in duration-200 [padding-bottom:var(--keyboard-height,0px)] transition-[padding]"
+      className="fixed inset-0 z-[9999] grid place-items-center overflow-y-auto bg-black/65 p-4 backdrop-blur-sm sm:p-6 animate-in fade-in duration-200 [padding-bottom:var(--keyboard-height,0px)] transition-[padding]"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -300,13 +300,13 @@ export function BioCatchUpModal({
               {avatar ? (
                 <Photo src={avatar} className="h-full w-full object-cover" />
               ) : (
-                <span className="grid h-full w-full place-items-center bg-ink font-display text-lg font-bold text-white">
+                <span className="grid h-full w-full place-items-center bg-neutral-900 font-display text-lg font-bold text-white">
                   {name[0]}
                 </span>
               )}
             </div>
             <div>
-              <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-gold">
+              <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-accent">
                 <Sparkles size={10} />
                 Meet &amp; Hangout
               </p>
@@ -437,7 +437,7 @@ export function BioCatchUpModal({
                 Where / Location
               </label>
               {meetingPlatform !== "in_person" && (
-                <span className="text-[10px] font-bold text-brand uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-accent uppercase tracking-wider">
                   Virtual Meeting
                 </span>
               )}
@@ -471,7 +471,7 @@ export function BioCatchUpModal({
                 className={cn(
                   "flex items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-semibold transition cursor-pointer active:scale-95",
                   meetingPlatform === "google_meet"
-                    ? "bg-brand/10 text-brand ring-1 ring-brand/30 shadow-xs font-bold"
+                    ? "bg-brand/10 text-accent ring-1 ring-brand/30 shadow-xs font-bold"
                     : "text-mute hover:text-ink",
                 )}
               >
@@ -511,7 +511,7 @@ export function BioCatchUpModal({
             ) : meetingPlatform === "google_meet" ? (
               <div className="space-y-1.5">
                 <div className="relative">
-                  <Video size={14} className="absolute left-3.5 top-3.5 text-brand" />
+                  <Video size={14} className="absolute left-3.5 top-3.5 text-accent" />
                   <input
                     type="url"
                     value={meetingLink}
@@ -525,7 +525,7 @@ export function BioCatchUpModal({
                       void triggerHaptic("light");
                       setMeetingLink("https://meet.google.com/new");
                     }}
-                    className="absolute right-2 top-2 rounded-xl bg-brand/10 px-2.5 py-1.5 text-[11px] font-bold text-brand hover:bg-brand/20 transition cursor-pointer"
+                    className="absolute right-2 top-2 rounded-xl bg-brand/10 px-2.5 py-1.5 text-[11px] font-bold text-accent hover:bg-brand/20 transition cursor-pointer"
                     title="Use instant Google Meet link"
                   >
                     meet.new
@@ -537,7 +537,7 @@ export function BioCatchUpModal({
                     href="https://meet.google.com/new"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brand hover:underline inline-flex items-center gap-0.5"
+                    className="text-accent hover:underline inline-flex items-center gap-0.5"
                   >
                     <span>Open Meet</span>
                     <ExternalLink size={10} />

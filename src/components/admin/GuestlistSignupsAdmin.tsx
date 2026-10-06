@@ -144,7 +144,7 @@ export function GuestlistSignupsAdmin() {
 
   return (
     <section className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-xs sm:p-6">
-      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Audience</p>
+      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">Audience</p>
       <h2 className="font-display text-lg font-bold text-ink">AirPal Guestlist</h2>
       <p className="mt-1 text-sm text-mute">
         {total} subscribed{city.trim() || interest ? " (filtered)" : ""} · unsubscribed stay out automatically.

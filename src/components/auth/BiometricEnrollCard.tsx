@@ -76,7 +76,7 @@ export function BiometricEnrollCard({
   return (
     <div className={cn("rounded-2xl bg-card p-4 ring-1 ring-line shadow-2xs", compact ? "mt-3" : "mt-4")}>
       <div className="flex items-center gap-3">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand ring-1 ring-brand/20">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand/10 text-accent ring-1 ring-brand/20">
           <Icon size={20} strokeWidth={2.2} />
         </span>
         <div className="min-w-0 flex-1">

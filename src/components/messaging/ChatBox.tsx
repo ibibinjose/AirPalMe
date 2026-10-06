@@ -193,7 +193,7 @@ export function ChatBox({
   return (
     <div className="rounded-xl bg-paper p-3 ring-1 ring-line">
       <p className="mb-2 flex items-start gap-1.5 text-[11px] leading-4 text-mute">
-        <ShieldCheck size={12} className="mt-0.5 shrink-0 text-gold" />
+        <ShieldCheck size={12} className="mt-0.5 shrink-0 text-accent" />
         Keep this chat on AirPal. Don&apos;t share phone numbers or emails.
       </p>
       {peerUid && peerName && user && (
@@ -211,7 +211,7 @@ export function ChatBox({
                 void triggerHaptic("light");
                 onAction?.(a.id);
               }}
-              className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-[11px] font-semibold text-brand ring-1 ring-brand/20 transition hover:bg-brand/20 active:scale-95"
+              className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-[11px] font-semibold text-accent ring-1 ring-brand/20 transition hover:bg-brand/20 active:scale-95"
             >
               <span>{a.label}</span>
             </button>
@@ -227,7 +227,7 @@ export function ChatBox({
         {loadError && (
           <p className="py-3 text-center text-[13px]">
             <span className="font-semibold">Couldn’t load messages.</span>{" "}
-            <button type="button" onClick={() => setReloadKey((k) => k + 1)} className="font-semibold text-brand">
+            <button type="button" onClick={() => setReloadKey((k) => k + 1)} className="font-semibold text-accent">
               Retry
             </button>
           </p>

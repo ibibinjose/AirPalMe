@@ -148,8 +148,8 @@ export function AboutPage() {
 
           {/* Floating Badges */}
           <div className="absolute left-4 top-4 sm:left-6 sm:top-6 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-paper/90 px-3.5 py-1 text-xs font-bold text-brand shadow-md backdrop-blur-md">
-              <Sparkles size={13} className="text-gold" />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-paper/90 px-3.5 py-1 text-xs font-bold text-accent shadow-md backdrop-blur-md">
+              <Sparkles size={13} className="text-accent" />
               <span>Life Made Easy</span>
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-paper/80 px-3 py-1 text-xs font-semibold text-ink/80 shadow-md backdrop-blur-md">
@@ -159,7 +159,7 @@ export function AboutPage() {
           </div>
 
           <div className="absolute inset-x-4 bottom-4 sm:inset-x-6 sm:bottom-6 text-white">
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">The AirPal Mission</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-accent">The AirPal Mission</p>
             <h1 className="font-display mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-4xl lg:text-5xl max-w-3xl leading-tight">
               People, places, things and experiences — made easier.
             </h1>
@@ -173,7 +173,7 @@ export function AboutPage() {
             unforgettable stays, local activities, and real-time community discovery.
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-semibold text-mute">
-            <span className="rounded-full bg-brand/10 px-3 py-1 text-brand">ME = Made Easy</span>
+            <span className="rounded-full bg-brand/10 px-3 py-1 text-accent">ME = Made Easy</span>
             <span>·</span>
             <span>One Unified Platform</span>
             <span>·</span>
@@ -186,7 +186,7 @@ export function AboutPage() {
       <div className="mt-12">
         <div className="mb-6 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-gold">Platform Ecosystem</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-accent">Platform Ecosystem</p>
             <h2 className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
               One Engine. Six Verticals.
             </h2>
@@ -206,7 +206,7 @@ export function AboutPage() {
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="grid h-10 w-10 place-items-center rounded-2xl bg-brand/10 text-brand ring-1 ring-brand/20 transition-transform group-hover:scale-105">
+                    <span className="grid h-10 w-10 place-items-center rounded-2xl bg-brand/10 text-accent ring-1 ring-brand/20 transition-transform group-hover:scale-105">
                       <Icon size={20} strokeWidth={2} />
                     </span>
                     <span className="rounded-full bg-paper px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-mute ring-1 ring-line/60">
@@ -214,7 +214,7 @@ export function AboutPage() {
                     </span>
                   </div>
 
-                  <h3 className="font-display mt-4 text-base font-bold text-ink group-hover:text-brand transition-colors">
+                  <h3 className="font-display mt-4 text-base font-bold text-ink group-hover:text-accent transition-colors">
                     {item.title}
                   </h3>
                   <p className="mt-1.5 text-xs text-mute leading-relaxed line-clamp-3">{item.desc}</p>
@@ -224,7 +224,7 @@ export function AboutPage() {
                   <Link
                     href={item.href}
                     onClick={() => void triggerHaptic("light")}
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-brand hover:underline"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:underline"
                   >
                     <span>{item.cta}</span>
                     <ArrowRight size={13} className="transition-transform group-hover:translate-x-1" />
@@ -238,7 +238,7 @@ export function AboutPage() {
 
       {/* AirPal Stay: guest companion + host OS */}
       <div className="mt-12">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-gold">AirPal Stay</p>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-accent">AirPal Stay</p>
         <h2 className="font-display mt-1 text-2xl font-bold tracking-tight text-ink sm:text-3xl">
           The guest companion — and the operating system behind it.
         </h2>
@@ -252,7 +252,7 @@ export function AboutPage() {
             const Icon = pt.icon;
             return (
               <div key={pt.title} className="rounded-[28px] bg-card p-5 ring-1 ring-line/80 shadow-xs">
-                <span className="grid h-10 w-10 place-items-center rounded-2xl bg-brand/10 text-brand ring-1 ring-brand/20">
+                <span className="grid h-10 w-10 place-items-center rounded-2xl bg-brand/10 text-accent ring-1 ring-brand/20">
                   <Icon size={20} strokeWidth={2} />
                 </span>
                 <h3 className="font-display mt-4 text-base font-bold text-ink">{pt.title}</h3>
@@ -262,8 +262,8 @@ export function AboutPage() {
           })}
         </div>
 
-        <div className="mt-4 rounded-[28px] bg-ink p-6 text-white sm:p-8">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-gold">For Hosts</p>
+        <div className="mt-4 rounded-[28px] bg-neutral-900 p-6 text-white sm:p-8">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-accent">For Hosts</p>
           <h3 className="font-display mt-1 text-xl font-bold tracking-tight sm:text-2xl">
             Run everything from one place.
           </h3>
@@ -292,14 +292,14 @@ export function AboutPage() {
 
       {/* Trust & Safety Highlights */}
       <div className="mt-12 rounded-[32px] bg-paper/60 p-6 sm:p-8 ring-1 ring-line/80 backdrop-blur-md shadow-2xs">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-gold">Built on Trust</p>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-accent">Built on Trust</p>
         <h2 className="font-display mt-1 text-xl font-bold text-ink sm:text-2xl">
           Trust & Safety Are Core Product Features
         </h2>
         <Link
           href="/trust"
           onClick={() => void triggerHaptic("light")}
-          className="mt-2 inline-block text-xs font-bold text-brand hover:underline"
+          className="mt-2 inline-block text-xs font-bold text-accent hover:underline"
         >
           Company facts, verification & what AirPal.Me isn&apos;t →
         </Link>
@@ -309,7 +309,7 @@ export function AboutPage() {
             const Icon = pt.icon;
             return (
               <div key={pt.title} className="flex flex-col gap-2">
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-card text-brand ring-1 ring-line">
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-card text-accent ring-1 ring-line">
                   <Icon size={18} />
                 </span>
                 <h4 className="text-sm font-bold text-ink">{pt.title}</h4>
@@ -324,7 +324,7 @@ export function AboutPage() {
       <div className="mt-12 rounded-[32px] bg-card p-6 sm:p-8 ring-1 ring-line shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="max-w-2xl">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-gold">Australian Roots</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-accent">Australian Roots</p>
             <h3 className="font-display mt-1 text-lg font-bold text-ink sm:text-xl">Born in The Rocks, Sydney.</h3>
             <p className="mt-2 text-xs sm:text-sm text-mute leading-relaxed">
               We started amidst sandstone lanes, harbour weather, and historic hospitality. Built in{" "}

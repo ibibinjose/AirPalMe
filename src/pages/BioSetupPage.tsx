@@ -318,7 +318,7 @@ export function BioSetupPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-8 pb-28">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">
+      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
         {asBusiness ? "Host" : "AirPal.Me/@"}
       </p>
       <h1 className="font-display mt-1 text-3xl font-semibold">{asBusiness ? "List your place" : "Your handle"}</h1>
@@ -374,7 +374,7 @@ export function BioSetupPage() {
           </ValidField>
           <button
             type="button"
-            className="inline-flex min-h-[44px] items-center text-[12px] font-semibold text-brand"
+            className="inline-flex min-h-[44px] items-center text-[12px] font-semibold text-accent"
             onClick={() => setHandle(randomHexHandle(8))}
           >
             Use a hexadecimal id
@@ -460,7 +460,7 @@ export function BioSetupPage() {
             />
             <span>
               Registered business, I’m authorised, and this handle may move to the name / mark / domain owner.{" "}
-              <Link href="/terms" className="text-brand">
+              <Link href="/terms" className="text-accent">
                 Terms
               </Link>
             </span>
@@ -487,7 +487,7 @@ export function BioSetupPage() {
 
             {geo && (
               <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 font-mono bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-line">
-                <MapPin className="size-4 text-brand shrink-0" />
+                <MapPin className="size-4 text-accent shrink-0" />
                 <span className="truncate">{formatGps(geo.lat, geo.lng)}</span>
               </div>
             )}
@@ -597,7 +597,7 @@ export function BioSetupPage() {
       {!asBusiness && (
         <button
           type="button"
-          className="mt-5 w-full text-center text-sm text-brand"
+          className="mt-5 w-full text-center text-sm text-accent"
           onClick={() => nav("/bio/setup?kind=business")}
         >
           Register the business — Google listings live there

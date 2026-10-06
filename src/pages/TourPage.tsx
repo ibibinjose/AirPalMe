@@ -45,7 +45,7 @@ export function TourPage() {
         >
           <ArrowLeft size={16} />
         </button>
-        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-gold">
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-accent">
           {step + 1} / {tour.stops.length} · {tour.duration}
         </p>
         <button
@@ -58,7 +58,7 @@ export function TourPage() {
           title={`Share "${tour.title}" walk`}
           aria-label={`Share "${tour.title}" walk`}
         >
-          <Share2 size={12} className="text-gold" />
+          <Share2 size={12} className="text-accent" />
           <span>Share</span>
         </button>
       </div>
@@ -106,7 +106,7 @@ export function TourPage() {
         )}
       </div>
       <a
-        className="mt-4 flex min-h-[48px] items-center justify-center rounded-full bg-card text-sm font-semibold text-brand ring-1 ring-line transition hover:bg-paper active:scale-[0.99]"
+        className="mt-4 flex min-h-[48px] items-center justify-center rounded-full bg-card text-sm font-semibold text-accent ring-1 ring-line transition hover:bg-paper active:scale-[0.99]"
         href={mapsUrl({ lat: stop.lat, lng: stop.lng }, stop.name)}
         target="_blank"
         rel="noreferrer"

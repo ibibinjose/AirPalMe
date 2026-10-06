@@ -85,7 +85,7 @@ export function ContactHostSheet() {
             className={
               msg.from === "guest"
                 ? "ml-8 rounded-2xl rounded-br-md bg-brand px-3 py-2 text-[14px] text-white"
-                : "mr-8 rounded-2xl rounded-bl-md bg-white px-3 py-2 text-[14px] ring-1 ring-line"
+                : "mr-8 rounded-2xl rounded-bl-md bg-card px-3 py-2 text-[14px] ring-1 ring-line"
             }
           >
             {msg.text}

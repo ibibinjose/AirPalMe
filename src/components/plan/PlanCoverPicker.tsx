@@ -28,7 +28,7 @@ export function PlanCoverPicker({
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-xs font-bold uppercase tracking-wider text-gold">Cover</span>
+        <span className="text-xs font-bold uppercase tracking-wider text-accent">Cover</span>
         <span className="text-[11px] font-medium text-mute">Artwork or your own photo</span>
       </div>
       <div className="grid grid-cols-5 gap-2" role="radiogroup" aria-label="Plan cover artwork">

@@ -35,7 +35,7 @@ export function Sheet({
     <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200">
       <button
         type="button"
-        className="absolute inset-0 bg-ink/50 backdrop-blur-xs"
+        className="absolute inset-0 bg-black/50 backdrop-blur-xs"
         aria-label="Close"
         onClick={onClose}
       />

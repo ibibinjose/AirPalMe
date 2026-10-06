@@ -56,7 +56,7 @@ export function CampaignInboxAdmin() {
 
   return (
     <section className="mt-8 rounded-[28px] bg-card p-4 ring-1 ring-line">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">B2B · revenue engine</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">B2B · revenue engine</p>
       <h2 className="font-display mt-1 text-lg font-semibold">Experience campaigns</h2>
       <p className="mt-1 text-sm text-mute">
         Businesses fund experiences; the team takes them live and recruits guests.
@@ -95,7 +95,7 @@ export function CampaignInboxAdmin() {
                     {r.businessName} · {r.suburb} · {r.date} · budget {aud(r.budgetCents)} · ticket {aud(r.priceCents)}
                   </span>
                 </span>
-                <span className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-brand ring-1 ring-brand/30">
+                <span className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-accent ring-1 ring-brand/30">
                   {r.status}
                 </span>
               </button>

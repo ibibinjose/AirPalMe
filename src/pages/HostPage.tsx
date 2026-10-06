@@ -166,7 +166,7 @@ export function HostPage() {
   if (showCreate) {
     return (
       <div className="mx-auto max-w-md px-4 py-8">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Host</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Host</p>
         <h1 className="font-display mt-1 text-3xl font-semibold">List your place</h1>
         <p className="mt-2 text-sm text-mute">
           Create a hotel, venue, hostel, or campus workspace. Or list a local shop, or an event.
@@ -227,7 +227,7 @@ export function HostPage() {
         <header className="flex flex-col gap-3 pt-5 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">
                 {property.city || "Host"} · {propertyKindLabel(property.kind)}
               </p>
               {property.name ? (
@@ -262,7 +262,7 @@ export function HostPage() {
           </Button>
           <Button
             variant="ghost"
-            className="h-11 px-4 text-xs text-brand font-semibold"
+            className="h-11 px-4 text-xs text-accent font-semibold"
             onClick={() => nav(`/stay/${property.id}`)}
           >
             Preview Guest Stay →

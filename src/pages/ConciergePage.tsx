@@ -154,7 +154,7 @@ export function ConciergePage() {
     return (
       <div className="mx-auto max-w-lg px-4 pb-28">
         <PaymentCanceledNotice />
-        <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
+        <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-neutral-900 shadow-xs">
           {property.heroImage ? (
             <img src={property.heroImage} alt="" className="h-72 w-full object-cover" />
           ) : (
@@ -213,7 +213,7 @@ export function ConciergePage() {
       {bookedId ? <TicketPass bookingId={bookedId} /> : null}
       <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
         <div className="lg:col-span-5 space-y-4">
-          <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-ink shadow-xs">
+          <div className="relative mt-2 overflow-hidden rounded-[28px] ring-1 ring-line bg-neutral-900 shadow-xs">
             {property.heroImage ? (
               <img src={property.heroImage} alt="" className="h-48 w-full object-cover" />
             ) : (
@@ -302,7 +302,7 @@ export function ConciergePage() {
           {!roomLabel && property.id && property.id !== "unknown" ? <StayBookCard property={property} /> : null}
 
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-gold mb-2">Guest Actions</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-accent mb-2">Guest Actions</p>
             <div className="grid grid-cols-2 gap-2.5">
               {tiles.map((t) => (
                 <button
@@ -312,9 +312,9 @@ export function ConciergePage() {
                     void triggerHaptic("medium");
                     t.run();
                   }}
-                  className="apple-liquid-glass-card hover-lift flex min-h-[48px] touch-manipulation items-center gap-3 rounded-2xl p-3.5 shadow-xs transition active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
+                  className="hover-lift flex min-h-[48px] touch-manipulation items-center gap-3 rounded-2xl bg-card p-3.5 shadow-xs ring-1 ring-line transition active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
                 >
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-brand/10 text-accent">
                     <t.icon size={17} />
                   </span>
                   <span className="truncate text-sm font-bold text-ink">{t.label}</span>
@@ -324,14 +324,14 @@ export function ConciergePage() {
           </div>
 
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-gold mb-2 px-1">Your stay</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-accent mb-2 px-1">Your stay</p>
             <StayCompendium />
           </div>
         </div>
 
         <div className="mt-6 lg:mt-0 lg:col-span-7 space-y-5">
           <form
-            className="apple-liquid-glass-light flex items-center gap-2 rounded-full px-4 py-2 shadow-sm transition-all focus-within:ring-2 focus-within:ring-brand focus-within:shadow-md"
+            className="apple-liquid-glass-light flex items-center gap-2 rounded-full px-4 py-2 shadow-sm transition-[box-shadow,ring] focus-within:ring-2 focus-within:ring-brand focus-within:shadow-md"
             onSubmit={(e) => {
               e.preventDefault();
               if (!ask.trim()) return;
@@ -339,7 +339,7 @@ export function ConciergePage() {
               void runAsk();
             }}
           >
-            <Sparkles size={18} className="shrink-0 text-brand" />
+            <Sparkles size={18} className="shrink-0 text-accent" />
             <input
               value={ask}
               onChange={(e) => setAsk(e.target.value)}
@@ -354,11 +354,11 @@ export function ConciergePage() {
 
           {property.staffPicks && property.staffPicks.length > 0 && (
             <section className="rounded-3xl ring-1 ring-line bg-card p-5 shadow-xs">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-gold">Host recommends</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-accent">Host recommends</p>
               <ul className="mt-3 space-y-2.5">
                 {property.staffPicks?.map((pick) => (
                   <li key={pick.id} className="flex items-start gap-2.5">
-                    <Sparkles size={16} className="mt-0.5 shrink-0 text-brand" />
+                    <Sparkles size={16} className="mt-0.5 shrink-0 text-accent" />
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-ink">{pick.title}</p>
                       {pick.detail ? <p className="text-xs text-mute mt-0.5">{pick.detail}</p> : null}
@@ -381,7 +381,7 @@ export function ConciergePage() {
                 onClick={() => nav(`/pulse/${pulseToken}`)}
               >
                 <span>
-                  <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">Pulse</span>
+                  <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">Pulse</span>
                   <span className="block text-sm font-semibold">How is your stay?</span>
                 </span>
                 <span aria-hidden>→</span>
@@ -451,7 +451,7 @@ export function ConciergePage() {
           {property.address || "Contact staff at front desk for emergency procedures"}
         </p>
         {property.phone && (
-          <a className="mt-4 block font-bold text-brand text-sm" href={`tel:${property.phone}`}>
+          <a className="mt-4 block font-bold text-accent text-sm" href={`tel:${property.phone}`}>
             {property.phone}
           </a>
         )}

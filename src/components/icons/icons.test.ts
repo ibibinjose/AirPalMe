@@ -33,9 +33,11 @@ describe("AirPal Central Icon Library", () => {
   });
 
   it("maps brand variants to exact index.css color utility classes", () => {
-    expect(VARIANT_CLASS_MAP.brand).toBe("text-brand");
+    // Brand-hued icons use the adaptive accent token (AirPal Blue in light
+    // mode, lightened in dark mode) — never fixed text-brand.
+    expect(VARIANT_CLASS_MAP.brand).toBe("text-accent");
     expect(VARIANT_CLASS_MAP.rose).toBe("text-rose");
-    expect(resolveIconVariantClass("brand")).toBe("text-brand");
+    expect(resolveIconVariantClass("brand")).toBe("text-accent");
     expect(resolveIconVariantClass("brand-ink")).toBe("text-brand-ink");
     expect(resolveIconVariantClass("ink")).toBe("text-ink");
     expect(resolveIconVariantClass("mute")).toBe("text-mute");
@@ -48,7 +50,7 @@ describe("AirPal Central Icon Library", () => {
 
   it("provides liquid glass badge variants and container dimensions", () => {
     expect(BADGE_VARIANT_MAP.brand).toContain("bg-brand/10");
-    expect(BADGE_VARIANT_MAP.brand).toContain("text-brand");
+    expect(BADGE_VARIANT_MAP.brand).toContain("text-accent");
     expect(BADGE_VARIANT_MAP.glass).toContain("backdrop-blur-md");
     expect(BADGE_SIZE_MAP.md.container).toContain("h-10 w-10");
     expect(BADGE_SIZE_MAP.lg.container).toContain("h-12 w-12");

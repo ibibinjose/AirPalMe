@@ -517,11 +517,11 @@ export function PlanDetailPage() {
       {brainHealth && plan.status !== "completed" && plan.status !== "cancelled" && (
         <div className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-xs font-bold text-brand uppercase tracking-wider">
+            <span className="flex items-center gap-1.5 text-xs font-bold text-accent uppercase tracking-wider">
               <Sparkles size={14} className="motion-safe:animate-pulse" />
               AirPal Brain · Experience Readiness
             </span>
-            <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-bold text-brand">
+            <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-bold text-accent">
               {brainHealth.healthScore}%
             </span>
           </div>
@@ -726,7 +726,7 @@ export function PlanDetailPage() {
               <span className="block text-sm font-bold text-ink">Need company? Invite friends</span>
               <span className="block truncate text-xs text-mute">Share the invite link with your people</span>
             </span>
-            <span className="shrink-0 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-bold text-brand">
+            <span className="shrink-0 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-bold text-accent">
               Invite
             </span>
           </button>
@@ -937,7 +937,7 @@ export function PlanDetailPage() {
                 onClick={() => exportIcs(plan)}
                 className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
               >
-                <CalendarPlus size={16} className="text-brand" />
+                <CalendarPlus size={16} className="text-accent" />
                 <span>Apple / Outlook (.ics)</span>
               </button>
 
@@ -946,7 +946,7 @@ export function PlanDetailPage() {
                 onClick={() => openGoogleCalendar(plan)}
                 className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
               >
-                <Calendar size={16} className="text-brand" />
+                <Calendar size={16} className="text-accent" />
                 <span>Google Calendar</span>
               </button>
 
@@ -981,7 +981,7 @@ export function PlanDetailPage() {
           <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
             <div className="flex items-center justify-between gap-3 mb-4">
               <div>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">
                   Co-Planning Itinerary
                 </span>
                 <h2 className="font-display text-xl font-bold text-ink">Planned Stops & Venues</h2>
@@ -1093,7 +1093,7 @@ export function PlanDetailPage() {
           {/* Host Controls: co-hosts */}
           {isHost && (
             <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Crew</span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">Crew</span>
               <h2 className="font-display text-xl font-bold text-ink">Co-hosts</h2>
               <p className="mt-0.5 text-[13px] text-mute">Co-hosts can manage, message, check in and lock dates.</p>
               {cohostRows.length > 0 && (
@@ -1164,7 +1164,7 @@ export function PlanDetailPage() {
           {/* Host Controls: door guestlist */}
           {isHost && plan && (
             <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Door</span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">Door</span>
               <h2 className="font-display text-xl font-bold text-ink">Guestlist</h2>
               <p className="mt-0.5 text-[13px] text-mute">
                 RSVPs and ticket buyers land here. Check guests in, add walk-ins, close the list after.
@@ -1181,7 +1181,7 @@ export function PlanDetailPage() {
           {/* Host Controls: join requests */}
           {isHost && pendingList.length > 0 && (
             <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Requests</span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">Requests</span>
               <h2 className="font-display text-xl font-bold text-ink">Requests to join</h2>
               <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
                 {pendingList.map((att) => (
@@ -1237,7 +1237,7 @@ export function PlanDetailPage() {
           {/* Host Controls: guest answers */}
           {isHost && (plan.guestQuestions || []).length > 0 && (
             <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Guest answers</span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">Guest answers</span>
               <h2 className="font-display text-xl font-bold text-ink">What the crew said</h2>
               <div className="mt-4 space-y-4">
                 {(plan.guestQuestions || []).map((q) => {
@@ -1283,7 +1283,7 @@ export function PlanDetailPage() {
           {/* Host Controls: crew reviews */}
           {isHost && crewReviews.length > 0 && (
             <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Crew reviews</span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">Crew reviews</span>
               <h2 className="font-display text-xl font-bold text-ink">
                 ★ {ratingSummary.average} · {ratingSummary.count} rating{ratingSummary.count === 1 ? "" : "s"}
               </h2>
@@ -1305,7 +1305,7 @@ export function PlanDetailPage() {
           <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Guest List</span>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">Guest List</span>
                 <h2 className="font-display text-xl font-bold text-ink">Mates Attending</h2>
               </div>
               <div className="flex items-center gap-2">
@@ -1320,7 +1320,7 @@ export function PlanDetailPage() {
                       </span>
                     )}
                     {isHost && goingAttendees.length > 0 && (
-                      <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-semibold text-brand ring-1 ring-brand/20">
+                      <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-semibold text-accent ring-1 ring-brand/20">
                         {checkedInCount(plan)}/{goingAttendees.length} checked in
                       </span>
                     )}
@@ -1349,7 +1349,7 @@ export function PlanDetailPage() {
                         {att.plusOnes ? <span className="text-mute font-normal"> +{att.plusOnes}</span> : null}
                         {att.handle && <span className="text-mute font-normal"> (@{att.handle})</span>}
                         {plan.coHostUids?.includes(att.id) && (
-                          <span className="ml-1.5 rounded-full bg-brand/10 px-2 py-0.2 text-[10px] font-medium text-brand">
+                          <span className="ml-1.5 rounded-full bg-brand/10 px-2 py-0.2 text-[10px] font-medium text-accent">
                             Co-host
                           </span>
                         )}

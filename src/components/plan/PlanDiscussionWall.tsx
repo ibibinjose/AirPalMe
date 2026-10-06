@@ -107,7 +107,7 @@ export function PlanDiscussionWall({
     <div className="rounded-[24px] bg-card p-4 ring-1 ring-line shadow-[0_4px_16px_rgba(18,22,20,0.08)] sm:p-6">
       <div className="flex items-center justify-between pb-4 border-b border-line/60">
         <div className="flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand/10 text-brand ring-1 ring-brand/20">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand/10 text-accent ring-1 ring-brand/20">
             <MessageSquare size={17} />
           </span>
           <div>
@@ -152,7 +152,7 @@ export function PlanDiscussionWall({
       <div className="mt-4 space-y-3 max-h-96 overflow-y-auto pr-1">
         {visible.length === 0 ? (
           <div className="rounded-2xl bg-paper px-4 py-8 text-center ring-1 ring-line">
-            <Sparkles size={24} className="mx-auto text-gold mb-2" />
+            <Sparkles size={24} className="mx-auto text-accent mb-2" />
             <p className="text-xs font-semibold text-ink">
               {filter ? `No ${filter.toLowerCase()} updates yet` : "No messages yet"}
             </p>
@@ -190,7 +190,7 @@ export function PlanDiscussionWall({
                       {comment.authorHandle && (
                         <span className="text-mute font-normal"> (@{comment.authorHandle})</span>
                       )}
-                      {isMe && <span className="ml-1 text-[10px] text-brand font-medium">(You)</span>}
+                      {isMe && <span className="ml-1 text-[10px] text-accent font-medium">(You)</span>}
                     </p>
                     <span className="text-[10px] text-mute shrink-0">
                       {new Date(comment.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
@@ -237,7 +237,7 @@ export function PlanDiscussionWall({
           <div className="flex items-center gap-3 rounded-2xl bg-paper p-2.5 ring-1 ring-line">
             <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl ring-1 ring-line bg-card">
               {uploadingPhoto ? (
-                <div className="flex h-full w-full items-center justify-center text-brand">
+                <div className="flex h-full w-full items-center justify-center text-accent">
                   <Loader2 size={18} className="animate-spin" />
                 </div>
               ) : (
@@ -310,7 +310,7 @@ export function PlanDiscussionWall({
               photoUrl ? "bg-emerald-500/15 text-emerald-600 ring-emerald-500/30" : "bg-paper text-mute ring-line hover:text-ink",
             )}
           >
-            {uploadingPhoto ? <Loader2 size={17} className="animate-spin text-brand" /> : <Camera size={17} />}
+            {uploadingPhoto ? <Loader2 size={17} className="animate-spin text-accent" /> : <Camera size={17} />}
           </button>
 
           {/* Optional Paste URL Toggle */}

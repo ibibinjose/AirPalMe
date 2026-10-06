@@ -150,7 +150,7 @@ export function SafetyMenu({
                 onClick={() => setMode("report")}
                 className="flex w-full items-center gap-2 rounded-xl px-2 py-2 text-left text-[13px] font-medium hover:bg-paper"
               >
-                <Flag size={14} className="text-gold" /> Report {targetName}
+                <Flag size={14} className="text-accent" /> Report {targetName}
               </button>
               <button
                 type="button"

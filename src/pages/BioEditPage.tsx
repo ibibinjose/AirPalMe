@@ -314,7 +314,7 @@ export function BioEditPage() {
     return (
       <div className="grid min-h-[50vh] place-items-center px-6 text-center">
         <div className="rounded-[28px] bg-card p-8 shadow-clay ring-1 ring-line max-w-sm w-full">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand mb-4">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-accent mb-4">
             <UserRound size={28} />
           </div>
           <p className="font-display text-2xl font-bold text-ink">No @ handle yet</p>
@@ -417,7 +417,7 @@ export function BioEditPage() {
           "flex items-center justify-between px-4 py-2 border-b text-[11px] font-bold uppercase tracking-wider",
           isBusiness
             ? "bg-amber-500/10 text-amber-900 dark:text-amber-300 border-amber-500/20"
-            : "bg-brand/10 text-brand border-brand/20",
+            : "bg-brand/10 text-accent border-brand/20",
         )}
       >
         <span className="flex items-center gap-1.5">
@@ -468,7 +468,7 @@ export function BioEditPage() {
               {avatar ? (
                 <Photo src={avatar} className="h-full w-full object-cover" />
               ) : (
-                <span className="grid h-full w-full place-items-center bg-ink font-display text-2xl font-bold text-white">
+                <span className="grid h-full w-full place-items-center bg-neutral-900 font-display text-2xl font-bold text-white">
                   {(name || "A")[0]}
                 </span>
               )}
@@ -493,7 +493,7 @@ export function BioEditPage() {
               <span
                 className={cn(
                   "rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider",
-                  isBusiness ? "bg-amber-500/15 text-amber-800 dark:text-amber-300" : "bg-brand/10 text-brand",
+                  isBusiness ? "bg-amber-500/15 text-amber-800 dark:text-amber-300" : "bg-brand/10 text-accent",
                 )}
               >
                 {categoryTag}
@@ -533,7 +533,7 @@ export function BioEditPage() {
             <p className="mt-2 inline-flex flex-wrap items-center gap-1.5 text-xs text-mute font-medium">
               {city && (
                 <>
-                  <MapPin size={12} className="text-gold shrink-0" />
+                  <MapPin size={12} className="text-accent shrink-0" />
                   <span>{city}</span>
                 </>
               )}
@@ -587,7 +587,7 @@ export function BioEditPage() {
         {deals.length > 0 && (
           <div className="mt-4 rounded-2xl bg-gradient-to-br from-paper to-card p-3 border border-gold/30">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gold flex items-center gap-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-accent flex items-center gap-1">
                 <Sparkles size={11} /> Featured Offer
               </span>
               <span className="text-[10px] text-mute">{deals[0].badge || "Offer"}</span>
@@ -637,7 +637,7 @@ export function BioEditPage() {
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">@{activeProfile.handle}</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">@{activeProfile.handle}</p>
               <BioKindBadge kind={activeProfile.kind} />
             </div>
             <h1 className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
@@ -654,7 +654,7 @@ export function BioEditPage() {
             className="gap-1.5 rounded-full border border-line bg-card px-4 font-semibold text-ink shadow-xs hover:bg-paper"
             onClick={() => nav(bioPath(activeProfile.handle))}
           >
-            <ExternalLink size={14} className="text-brand" />
+            <ExternalLink size={14} className="text-accent" />
             <span>View Public Profile</span>
           </Button>
 
@@ -679,7 +679,7 @@ export function BioEditPage() {
             <div
               className={cn(
                 "flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl shadow-xs",
-                isBusiness ? "bg-amber-500/15 text-amber-800 dark:text-amber-300" : "bg-brand/10 text-brand",
+                isBusiness ? "bg-amber-500/15 text-amber-800 dark:text-amber-300" : "bg-brand/10 text-accent",
               )}
             >
               {isBusiness ? <Store size={20} /> : <UserRound size={20} />}
@@ -692,7 +692,7 @@ export function BioEditPage() {
                 <span
                   className={cn(
                     "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase",
-                    isBusiness ? "bg-amber-500/10 text-amber-800 dark:text-amber-300" : "bg-brand/10 text-brand",
+                    isBusiness ? "bg-amber-500/10 text-amber-800 dark:text-amber-300" : "bg-brand/10 text-accent",
                   )}
                 >
                   Active Editor
@@ -744,7 +744,7 @@ export function BioEditPage() {
                 className="gap-1.5 rounded-full border border-line bg-paper text-xs font-semibold text-ink hover:bg-card shadow-xs"
                 onClick={() => nav("/bio/setup?kind=business")}
               >
-                <Plus size={13} className="text-brand" />
+                <Plus size={13} className="text-accent" />
                 <span>Add Business Place</span>
               </Button>
             )}
@@ -757,7 +757,7 @@ export function BioEditPage() {
                 className="gap-1.5 rounded-full border border-line bg-paper text-xs font-semibold text-ink hover:bg-card shadow-xs"
                 onClick={() => nav("/bio/setup")}
               >
-                <Plus size={13} className="text-brand" />
+                <Plus size={13} className="text-accent" />
                 <span>Claim Personal @handle</span>
               </Button>
             )}
@@ -819,7 +819,7 @@ export function BioEditPage() {
               {/* Media Section: Cover & Avatar */}
               <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-bold uppercase tracking-wider text-gold">Media & Photos</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-accent">Media & Photos</p>
                   <span className="text-[11px] text-mute">{isBusiness ? "Storefront & Logo" : "Cover & Avatar"}</span>
                 </div>
                 <div className="space-y-4">
@@ -850,7 +850,7 @@ export function BioEditPage() {
 
               {/* Basic Info Section */}
               <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">Basic Profile Info</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-accent">Basic Profile Info</p>
 
                 {/* Display Name */}
                 <div className="space-y-1.5">
@@ -945,7 +945,7 @@ export function BioEditPage() {
 
               {/* Personal Preferences OR Business Actions */}
               <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">
+                <p className="text-xs font-bold uppercase tracking-wider text-accent">
                   {isBusiness ? "Customer Action & Engagement" : "Connections & Preferences"}
                 </p>
 
@@ -1010,7 +1010,7 @@ export function BioEditPage() {
 
               {/* Location & Hours Section */}
               <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">Location & Hours</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-accent">Location & Hours</p>
 
                 {/* City / Location */}
                 <CitySuburbRegionField value={city} onChange={setCity} inputClassName={fieldInput} />
@@ -1037,7 +1037,7 @@ export function BioEditPage() {
                           className={cn(
                             "flex items-center gap-2 rounded-2xl p-2.5 text-left border text-xs font-semibold transition active:scale-95",
                             availabilityStatus === stKey
-                              ? "bg-brand/10 border-brand text-brand shadow-xs"
+                              ? "bg-brand/10 border-brand text-accent shadow-xs"
                               : "bg-paper border-line text-ink hover:bg-card",
                           )}
                         >
@@ -1079,11 +1079,11 @@ export function BioEditPage() {
               {/* Meet & Hangout · Virtual Video Meetings (Google Meet / FaceTime) */}
               <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-4">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
-                    <Sparkles size={12} className="text-gold" />
+                  <p className="text-xs font-bold uppercase tracking-wider text-accent flex items-center gap-1.5">
+                    <Sparkles size={12} className="text-accent" />
                     <span>Meet &amp; Hangout · Video Call Links</span>
                   </p>
-                  <span className="text-[10px] font-bold text-brand bg-brand/10 rounded-full px-2.5 py-0.5">
+                  <span className="text-[10px] font-bold text-accent bg-brand/10 rounded-full px-2.5 py-0.5">
                     Your AirPal Link
                   </span>
                 </div>
@@ -1110,7 +1110,7 @@ export function BioEditPage() {
                           className={cn(
                             "flex min-h-[48px] flex-col items-center justify-center gap-1 rounded-2xl border p-2 text-center transition active:scale-95 cursor-pointer",
                             preferredMeetingPlatform === opt.id
-                              ? "bg-brand/10 border-brand text-brand shadow-xs font-bold"
+                              ? "bg-brand/10 border-brand text-accent shadow-xs font-bold"
                               : "bg-paper border-line text-ink hover:bg-card",
                           )}
                         >
@@ -1149,7 +1149,7 @@ export function BioEditPage() {
               {/* Profile Visibility (personal profiles only; businesses stay public) */}
               {!isBusiness && (
                 <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-3">
-                  <p className="text-xs font-bold uppercase tracking-wider text-gold">Who Can See This Profile</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-accent">Who Can See This Profile</p>
                   <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Profile visibility">
                     {(
                       [
@@ -1167,7 +1167,7 @@ export function BioEditPage() {
                         className={cn(
                           "flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-2xl border p-2 text-center transition active:scale-95",
                           visibility === opt.id
-                            ? "bg-brand/10 border-brand text-brand shadow-xs"
+                            ? "bg-brand/10 border-brand text-accent shadow-xs"
                             : "bg-paper border-line text-ink hover:bg-card",
                         )}
                       >
@@ -1230,7 +1230,7 @@ export function BioEditPage() {
                   {/* Category Buttons */}
                   <div className="rounded-3xl border border-line bg-card p-5 shadow-xs space-y-4">
                     <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">
                         Actions & Preset Links
                       </p>
                       <div className="mt-2 flex flex-wrap gap-2">
@@ -1259,7 +1259,7 @@ export function BioEditPage() {
                     </div>
 
                     <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">
                         Social Media Networks
                       </p>
                       <div className="mt-2 flex flex-wrap gap-2">
@@ -1382,7 +1382,7 @@ export function BioEditPage() {
                                 href={l.href}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="mt-0.5 block truncate text-xs font-medium text-brand hover:underline"
+                                className="mt-0.5 block truncate text-xs font-medium text-accent hover:underline"
                               >
                                 {l.href}
                               </a>
@@ -1416,7 +1416,7 @@ export function BioEditPage() {
           {tab === "shop" && (
             <div className="mt-6 rounded-3xl border border-line bg-card p-5 shadow-xs">
               <div className="mb-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">
+                <p className="text-xs font-bold uppercase tracking-wider text-accent">
                   {isBusiness ? "Business Menu, Deals & Products" : "Personal Shop & Recommendations"}
                 </p>
                 <p className="text-xs text-mute mt-0.5">
@@ -1433,7 +1433,7 @@ export function BioEditPage() {
           {tab === "share" && (
             <div className="mt-6 space-y-6">
               <div className="rounded-3xl border border-line bg-card p-6 text-center shadow-xs space-y-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">
+                <p className="text-xs font-bold uppercase tracking-wider text-accent">
                   {isBusiness ? "Place QR Code & Share Link" : "Personal Profile QR & Share Link"}
                 </p>
 
@@ -1454,7 +1454,7 @@ export function BioEditPage() {
                     type="checkbox"
                     checked={zooHunt}
                     onChange={(e) => setZooHunt(e.target.checked)}
-                    className="h-4 w-4 rounded border-line text-brand focus:ring-brand"
+                    className="h-4 w-4 rounded border-line text-accent focus:ring-brand"
                   />
                   <span>Air Zoo Hunt — display collectible Aussie sticker on QR</span>
                 </label>
@@ -1503,7 +1503,7 @@ export function BioEditPage() {
                   <a
                     href={qr}
                     download={`airpal-${activeProfile.handle}-qr.png`}
-                    className="inline-flex h-10 items-center justify-center gap-2 rounded-full px-4 text-xs font-semibold text-brand hover:underline"
+                    className="inline-flex h-10 items-center justify-center gap-2 rounded-full px-4 text-xs font-semibold text-accent hover:underline"
                   >
                     <Download size={14} />
                     <span>Download QR Code Image</span>
@@ -1522,7 +1522,7 @@ export function BioEditPage() {
         <div className="hidden lg:block lg:col-span-5">
           <div className="sticky top-6">
             <p className="mb-2 text-xs font-bold uppercase tracking-wider text-mute flex items-center gap-1.5">
-              <Eye size={14} className="text-gold" />
+              <Eye size={14} className="text-accent" />
               <span>Real-Time Live Profile Preview</span>
             </p>
             {renderLivePreviewCard()}
@@ -1535,7 +1535,7 @@ export function BioEditPage() {
         <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60 backdrop-blur-xs lg:hidden">
           <div className="relative max-h-[90vh] overflow-y-auto rounded-t-3xl bg-paper p-5 shadow-2xl animate-in slide-in-from-bottom duration-300">
             <div className="flex items-center justify-between pb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-accent flex items-center gap-1.5">
                 <Eye size={14} /> Live Profile Preview
               </span>
               <button

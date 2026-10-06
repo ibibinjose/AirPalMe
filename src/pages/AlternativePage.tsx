@@ -13,7 +13,7 @@ export function AlternativePage() {
   if (!config) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:py-12">
-        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">Compare</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-accent">Compare</p>
         <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
           We haven&apos;t written that comparison
         </h1>
@@ -23,7 +23,7 @@ export function AlternativePage() {
         <ul className="mt-4 space-y-2">
           {ALTERNATIVE_SLUGS.map((key) => (
             <li key={key}>
-              <Link href={`/alternatives/${key}`} className="font-semibold text-brand hover:underline">
+              <Link href={`/alternatives/${key}`} className="font-semibold text-accent hover:underline">
                 {ALTERNATIVES[key]!.headline} →
               </Link>
             </li>
@@ -35,7 +35,7 @@ export function AlternativePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:py-12">
-      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">{config.competitor} alternative</p>
+      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-accent">{config.competitor} alternative</p>
       <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-ink sm:text-4xl">{config.headline}</h1>
 
       <div className="mt-6 rounded-[28px] bg-card p-6 ring-1 ring-line sm:p-8">
@@ -57,7 +57,7 @@ export function AlternativePage() {
               <p className="mt-1 text-sm leading-relaxed text-ink/80">{useCase.body}</p>
               <Link
                 href={useCase.href}
-                className="mt-1.5 inline-block text-sm font-semibold text-brand hover:underline"
+                className="mt-1.5 inline-block text-sm font-semibold text-accent hover:underline"
               >
                 {useCase.cta} →
               </Link>
@@ -93,15 +93,15 @@ export function AlternativePage() {
       </section>
 
       <section aria-label="Availability status" className="mt-10 rounded-[28px] bg-paper p-6 ring-1 ring-line sm:p-8">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-gold">Early access · Sydney · October 2026</p>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-accent">Early access · Sydney · October 2026</p>
         <p className="mt-2 text-sm leading-relaxed text-ink/80">
           Everything above is live in the product today. We publish no customer counts, ratings or customer stories yet
           — this page grows only with real, permissioned evidence. Running a stay, venue or event?{" "}
-          <Link href="/business" className="font-semibold text-brand hover:underline">
+          <Link href="/business" className="font-semibold text-accent hover:underline">
             List your place
           </Link>{" "}
           or{" "}
-          <Link href="/contact" className="font-semibold text-brand hover:underline">
+          <Link href="/contact" className="font-semibold text-accent hover:underline">
             talk to us
           </Link>
           .

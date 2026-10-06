@@ -49,7 +49,7 @@ export function ChangeHandleForm({
     <form onSubmit={(e) => void onSubmit(e)} className={compact ? "space-y-2" : "space-y-3"}>
       {!compact && (
         <>
-          <p className="text-xs font-bold uppercase tracking-wider text-gold">@handle</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-accent">@handle</p>
           <p className="text-sm text-mute">
             Current <span className="font-semibold text-ink">@{current}</span>. Changing it updates your public page
             and account. Old links to the previous handle stop working.

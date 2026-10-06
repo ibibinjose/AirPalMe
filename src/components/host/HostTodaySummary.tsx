@@ -58,10 +58,10 @@ export function HostTodaySummary({
       {property.roomTypes && property.roomTypes.length > 0 && (
         <section className="mt-4 rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Room types</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Room types</p>
             <button
               type="button"
-              className="inline-flex min-h-[44px] items-center px-1 text-xs font-medium text-brand"
+              className="inline-flex min-h-[44px] items-center px-1 text-xs font-medium text-accent"
               onClick={onManageRooms}
             >
               Manage rooms →
@@ -100,7 +100,7 @@ export function HostTodaySummary({
         <button
           type="button"
           onClick={() => nav("/business/promotions")}
-          className="flex items-center justify-between gap-3 rounded-[22px] bg-ink p-4 text-left text-white shadow-xs hover:bg-ink/90 transition active:scale-[0.99]"
+          className="flex items-center justify-between gap-3 rounded-[22px] bg-neutral-900 p-4 text-left text-white shadow-xs hover:bg-neutral-800 transition active:scale-[0.99]"
         >
           <span>
             <span className="block text-sm font-semibold">Fill slow nights with an offer</span>

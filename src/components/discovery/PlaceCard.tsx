@@ -54,7 +54,7 @@ export function PlaceCard({ place, walk }: { place: NearbyPlace; walk?: string }
               open
                 ? "bg-emerald-500/90 text-white"
                 : onPhoto
-                  ? "bg-ink/70 text-white/85"
+                  ? "bg-black/70 text-white/85"
                   : "bg-paper text-mute ring-1 ring-line",
             )}
           >

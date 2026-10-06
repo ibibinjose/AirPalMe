@@ -40,7 +40,7 @@ export function PlanDatePoll({
             <Lock size={18} />
           </span>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Date locked in</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">Date locked in</p>
             <p className="text-sm font-bold text-ink">{formatDateOption({ date: plan.date, time: plan.time })}</p>
           </div>
         </div>
@@ -66,11 +66,11 @@ export function PlanDatePoll({
   return (
     <div className="mt-6 rounded-3xl bg-card p-4 sm:p-5 ring-1 ring-line shadow-xs">
       <div className="flex items-center gap-3">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand ring-1 ring-brand/20">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand/10 text-accent ring-1 ring-brand/20">
           <CalendarDays size={18} />
         </span>
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">When works?</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">When works?</p>
           <h2 className="font-display text-base font-bold text-ink">Vote a date — host locks it in</h2>
         </div>
       </div>

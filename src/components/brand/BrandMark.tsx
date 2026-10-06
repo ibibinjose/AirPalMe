@@ -20,13 +20,13 @@ export function BrandMark({
       {!compact && (
         <div className="flex flex-col text-left justify-center min-w-0">
           <span className="font-display text-[20px] sm:text-[22px] font-bold leading-none tracking-tight truncate">
-            AirPal<span className={invert ? "text-white/70" : "text-brand"}>.me</span>
+            AirPal<span className={invert ? "text-white/70" : "text-accent"}>.me</span>
           </span>
           {withTagline && (
             <span
               className={cn(
                 "text-[10px] font-semibold tracking-wider uppercase mt-0.5 leading-none",
-                invert ? "text-white/75" : "text-gold",
+                invert ? "text-white/75" : "text-accent",
               )}
             >
               {BRAND_TAGLINE}

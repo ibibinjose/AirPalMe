@@ -41,7 +41,7 @@ export function TradingHoursScheduleView({
             className,
           )}
         >
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand/10 text-accent">
             <Clock size={20} />
           </span>
           <div className="min-w-0 flex-1">
@@ -86,7 +86,7 @@ export function TradingHoursScheduleView({
           <span>{hours}</span>
           <ChevronDown
             size={12}
-            className="text-mute group-hover:text-brand transition-transform group-hover:translate-y-0.5"
+            className="text-mute group-hover:text-accent transition-transform group-hover:translate-y-0.5"
           />
         </button>
       )}
@@ -96,7 +96,7 @@ export function TradingHoursScheduleView({
           type="button"
           onClick={() => setSheetOpen(true)}
           className={cn(
-            "inline-flex items-center gap-1.5 text-xs font-semibold text-brand hover:underline",
+            "inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:underline",
             className,
           )}
         >
@@ -109,7 +109,7 @@ export function TradingHoursScheduleView({
         <div className={cn("space-y-2 rounded-2xl border border-line bg-card p-3.5", className)}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-mute">
-              <Clock size={13} className="text-gold" />
+              <Clock size={13} className="text-accent" />
               <span>Trading Hours (7 Days)</span>
             </div>
             {openStatus != null && (
@@ -130,7 +130,7 @@ export function TradingHoursScheduleView({
                 key={item.dayKey}
                 className={cn(
                   "flex items-center justify-between rounded-xl px-2.5 py-1.5 transition",
-                  item.isToday ? "bg-brand/10 font-bold text-brand ring-1 ring-brand/20" : "text-ink",
+                  item.isToday ? "bg-brand/10 font-bold text-accent ring-1 ring-brand/20" : "text-ink",
                 )}
               >
                 <div className="flex items-center gap-1.5">
@@ -165,7 +165,7 @@ export function TradingHoursScheduleView({
           <div className="space-y-4">
             <div className="flex items-center justify-between rounded-2xl bg-brand/[0.04] p-3 border border-brand/20">
               <div>
-                <p className="text-xs font-bold text-brand uppercase tracking-wider">Today ({todayItem.dayName})</p>
+                <p className="text-xs font-bold text-accent uppercase tracking-wider">Today ({todayItem.dayName})</p>
                 <p className="text-sm font-semibold text-ink">{todayItem.hoursText}</p>
               </div>
               {openStatus != null && (
@@ -190,7 +190,7 @@ export function TradingHoursScheduleView({
                   className={cn(
                     "flex items-center justify-between p-3 text-xs transition",
                     item.isToday
-                      ? "bg-brand/10 font-bold text-brand"
+                      ? "bg-brand/10 font-bold text-accent"
                       : "hover:bg-surface/50 text-ink",
                   )}
                 >

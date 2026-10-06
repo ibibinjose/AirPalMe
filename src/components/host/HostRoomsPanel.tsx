@@ -127,7 +127,7 @@ export function HostRoomsPanel({
 
       {showForm && (
         <section className="rounded-[28px] bg-card/90 p-5 ring-1 ring-line shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">New room type</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">New room type</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <ValidField label="Type name" ok={draft.name.trim().length >= 2}>
               <input
@@ -232,7 +232,7 @@ export function HostRoomsPanel({
 
       {types.length === 0 && !showForm ? (
         <div className="rounded-[28px] bg-card/90 p-8 text-center ring-1 ring-line">
-          <BedDouble size={22} className="mx-auto text-gold" />
+          <BedDouble size={22} className="mx-auto text-accent" />
           <p className="mt-2 font-medium">List your first rooms</p>
           <p className="mt-1 text-sm text-mute">
             Room types power the guest stay page, occupancy counts, and per-room QR codes.
@@ -250,7 +250,7 @@ export function HostRoomsPanel({
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="font-display text-lg font-semibold">{t.name}</h3>
-                  <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-semibold text-brand">
+                  <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-semibold text-accent">
                     {t.category}
                   </span>
                 </div>

@@ -450,7 +450,7 @@ export function OrganiserEventPage() {
         >
           <motion.header variants={landingItem}>
             <div className="flex items-center gap-2">
-              <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-brand">
+              <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-accent">
                 AirPal Organiser
               </span>
               <span className="text-xs text-mute font-medium">Life Made Easy</span>
@@ -467,7 +467,7 @@ export function OrganiserEventPage() {
           <motion.form variants={landingItem} className="mt-6 space-y-6" onSubmit={onCreate}>
             {/* Flavour Card Selector */}
             <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-gold">1. What kind of event?</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-accent">1. What kind of event?</p>
               <div className="grid gap-2.5 sm:grid-cols-2">
                 {EVENT_FLAVOURS.map((id) => {
                   const meta = FLAVOUR_META[id];
@@ -489,7 +489,7 @@ export function OrganiserEventPage() {
                       <span
                         className={cn(
                           "grid h-10 w-10 place-items-center rounded-xl ring-1",
-                          on ? "bg-white/15 text-white ring-white/25" : "bg-brand/10 text-brand ring-brand/20",
+                          on ? "bg-white/15 text-white ring-white/25" : "bg-brand/10 text-accent ring-brand/20",
                         )}
                       >
                         <Icon size={18} />
@@ -506,7 +506,7 @@ export function OrganiserEventPage() {
 
             {/* Basic Info & Media */}
             <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-gold">2. Name & Banner</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-accent">2. Name & Banner</p>
 
               <div>
                 <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
@@ -545,9 +545,9 @@ export function OrganiserEventPage() {
             {/* Google Place & Location Pinning */}
             <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">3. Google Place & Venue</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-accent">3. Google Place & Venue</p>
                 <span className="text-[11px] text-mute flex items-center gap-1">
-                  <MapPin size={12} className="text-brand" /> Google Maps Linked
+                  <MapPin size={12} className="text-accent" /> Google Maps Linked
                 </span>
               </div>
 
@@ -624,7 +624,7 @@ export function OrganiserEventPage() {
                     href={mapsPlaceUrl(geo, venue || name)}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-brand font-semibold hover:underline inline-flex items-center gap-1"
+                    className="text-accent font-semibold hover:underline inline-flex items-center gap-1"
                   >
                     View map <ExternalLink size={12} />
                   </a>
@@ -634,7 +634,7 @@ export function OrganiserEventPage() {
 
             {/* Schedule & Timing */}
             <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-gold">4. Date & Times</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-accent">4. Date & Times</p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
@@ -665,9 +665,9 @@ export function OrganiserEventPage() {
             {/* Host & Collaborators Section */}
             <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">5. Host & Collaborators</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-accent">5. Host & Collaborators</p>
                 <span className="text-[11px] text-mute flex items-center gap-1">
-                  <Users size={12} className="text-brand" /> AirPal Handles
+                  <Users size={12} className="text-accent" /> AirPal Handles
                 </span>
               </div>
               <p className="text-xs text-mute leading-relaxed">
@@ -753,9 +753,9 @@ export function OrganiserEventPage() {
                         setHostHandle(business.handle);
                         toast.success(`Filled business: ${business.name} (@${business.handle})`);
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-brand transition shadow-xs"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-accent transition shadow-xs"
                     >
-                      <Building2 size={12} className="text-brand" />
+                      <Building2 size={12} className="text-accent" />
                       <span>Business (@{business.handle})</span>
                     </button>
                   )}
@@ -768,9 +768,9 @@ export function OrganiserEventPage() {
                         setHostHandle(mine.handle);
                         toast.success(`Filled personal: ${mine.name} (@${mine.handle})`);
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-brand transition shadow-xs"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-accent transition shadow-xs"
                     >
-                      <User size={12} className="text-brand" />
+                      <User size={12} className="text-accent" />
                       <span>My Handle (@{mine.handle})</span>
                     </button>
                   )}
@@ -826,14 +826,14 @@ export function OrganiserEventPage() {
                         key={handle}
                         className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-xs font-semibold text-ink border border-line shadow-xs group"
                       >
-                        <AtSign size={12} className="text-brand" />
+                        <AtSign size={12} className="text-accent" />
                         <span>{handle}</span>
                         <a
                           href={bioPath(handle)}
                           target="_blank"
                           rel="noreferrer"
                           title="Preview profile"
-                          className="text-mute hover:text-brand transition p-0.5"
+                          className="text-mute hover:text-accent transition p-0.5"
                         >
                           <ExternalLink size={11} />
                         </a>
@@ -855,7 +855,7 @@ export function OrganiserEventPage() {
             {/* Rich Description Option */}
             <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-3">
               <div className="flex justify-between items-center">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">6. Event Description & Story</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-accent">6. Event Description & Story</p>
                 <span className="text-[11px] text-mute">{description.length}/1000</span>
               </div>
               <textarea
@@ -870,7 +870,7 @@ export function OrganiserEventPage() {
 
             {/* Publish Status */}
             <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-gold">7. Status</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-accent">7. Status</p>
               <div className="grid grid-cols-2 gap-2">
                 {(
                   [
@@ -946,7 +946,7 @@ export function OrganiserEventPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
                   {EVENT_FLAVOUR_LABELS[myEvent.flavour]}
                 </p>
                 <span
@@ -980,7 +980,7 @@ export function OrganiserEventPage() {
                 className="gap-1.5 rounded-full border border-line bg-paper text-xs font-semibold shadow-xs hover:bg-card"
                 onClick={() => nav(myEvent.gatePath)}
               >
-                <ExternalLink size={13} className="text-brand" />
+                <ExternalLink size={13} className="text-accent" />
                 <span>Guest Directory</span>
               </Button>
             </div>
@@ -989,13 +989,13 @@ export function OrganiserEventPage() {
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-mute border-t border-line/60 pt-3">
             {whenLabel && (
               <span className="inline-flex items-center gap-1.5 font-medium text-ink">
-                <CalendarDays size={14} className="text-brand" />
+                <CalendarDays size={14} className="text-accent" />
                 {whenLabel}
               </span>
             )}
             {(myEvent.venue || myEvent.city || myEvent.address) && (
               <span className="inline-flex items-center gap-1.5 text-mute">
-                <MapPin size={14} className="text-gold" />
+                <MapPin size={14} className="text-accent" />
                 {[myEvent.venue, myEvent.city].filter(Boolean).join(" · ")}
               </span>
             )}
@@ -1094,7 +1094,7 @@ export function OrganiserEventPage() {
             {/* Description Preview Card */}
             {myEvent.description && (
               <div className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs space-y-2">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
+                <p className="text-xs font-bold uppercase tracking-wider text-accent flex items-center gap-1.5">
                   <FileText size={14} /> Description & Guest Story
                 </p>
                 <p className="text-xs sm:text-sm text-ink/85 leading-relaxed whitespace-pre-line">
@@ -1107,7 +1107,7 @@ export function OrganiserEventPage() {
             <button
               type="button"
               onClick={() => nav("/business/promotions")}
-              className="flex w-full items-center justify-between gap-3 rounded-3xl bg-ink p-5 text-left text-white shadow-md hover:bg-black transition active:scale-[0.99]"
+              className="flex w-full items-center justify-between gap-3 rounded-3xl bg-neutral-900 p-5 text-left text-white shadow-md hover:bg-black transition active:scale-[0.99]"
             >
               <div>
                 <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-400">
@@ -1291,7 +1291,7 @@ export function OrganiserEventPage() {
                   </form>
 
                   <div className="flex flex-col sm:flex-row gap-2">
-                    <label className="flex h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-ink text-xs sm:text-sm font-semibold text-white hover:bg-black transition shadow-xs">
+                    <label className="flex h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-neutral-900 text-xs sm:text-sm font-semibold text-white hover:bg-black transition shadow-xs">
                       <Upload size={15} />
                       Import CSV Directory
                       <input
@@ -1343,11 +1343,11 @@ export function OrganiserEventPage() {
                                 {STALL_CATEGORIES.find((c) => c.id === s.category)?.label || s.category}
                                 {s.handle ? ` · @${s.handle}` : ""}
                               </span>
-                              <span className="text-[11px] font-semibold text-brand group-hover:underline">Edit</span>
+                              <span className="text-[11px] font-semibold text-accent group-hover:underline">Edit</span>
                             </div>
                             <p className="font-semibold text-sm text-ink mt-0.5">{s.name}</p>
                             {s.shortWhy && <p className="text-xs text-mute">{s.shortWhy}</p>}
-                            {s.offer && <p className="text-xs font-semibold text-gold mt-1">🏷️ {s.offer}</p>}
+                            {s.offer && <p className="text-xs font-semibold text-accent mt-1">🏷️ {s.offer}</p>}
                           </button>
                         </li>
                       ))}
@@ -1362,7 +1362,7 @@ export function OrganiserEventPage() {
         {/* TAB 3: PRINT GATE QR */}
         {tab === "print" && (
           <div className="mt-5 rounded-3xl bg-card p-6 text-center ring-1 ring-line shadow-clay space-y-4">
-            <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand/10 text-brand ring-1 ring-brand/20">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand/10 text-accent ring-1 ring-brand/20">
               <QrCode size={26} />
             </span>
             <div>
@@ -1493,9 +1493,9 @@ export function OrganiserEventPage() {
             {/* Google Place & Location Search */}
             <div className="space-y-4 pt-2 border-t border-line/60">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">Google Place & Venue Pinning</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-accent">Google Place & Venue Pinning</p>
                 <span className="text-[11px] text-mute flex items-center gap-1">
-                  <MapPin size={12} className="text-brand" /> Verified Location
+                  <MapPin size={12} className="text-accent" /> Verified Location
                 </span>
               </div>
 
@@ -1569,7 +1569,7 @@ export function OrganiserEventPage() {
                     href={mapsPlaceUrl(geo, venue || name)}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-brand font-semibold hover:underline inline-flex items-center gap-1"
+                    className="text-accent font-semibold hover:underline inline-flex items-center gap-1"
                   >
                     Directions map <ExternalLink size={12} />
                   </a>
@@ -1580,9 +1580,9 @@ export function OrganiserEventPage() {
             {/* Host & Collaborators Section */}
             <div className="space-y-4 pt-2 border-t border-line/60">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">Host & Collaborators</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-accent">Host & Collaborators</p>
                 <span className="text-[11px] text-mute flex items-center gap-1">
-                  <Users size={12} className="text-brand" /> AirPal Handles
+                  <Users size={12} className="text-accent" /> AirPal Handles
                 </span>
               </div>
               <p className="text-xs text-mute leading-relaxed">
@@ -1668,9 +1668,9 @@ export function OrganiserEventPage() {
                         setHostHandle(business.handle);
                         toast.success(`Filled business: ${business.name} (@${business.handle})`);
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-brand transition shadow-xs"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-accent transition shadow-xs"
                     >
-                      <Building2 size={12} className="text-brand" />
+                      <Building2 size={12} className="text-accent" />
                       <span>Business (@{business.handle})</span>
                     </button>
                   )}
@@ -1683,9 +1683,9 @@ export function OrganiserEventPage() {
                         setHostHandle(mine.handle);
                         toast.success(`Filled personal: ${mine.name} (@${mine.handle})`);
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-brand transition shadow-xs"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-accent transition shadow-xs"
                     >
-                      <User size={12} className="text-brand" />
+                      <User size={12} className="text-accent" />
                       <span>My Handle (@{mine.handle})</span>
                     </button>
                   )}
@@ -1741,14 +1741,14 @@ export function OrganiserEventPage() {
                         key={handle}
                         className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-xs font-semibold text-ink border border-line shadow-xs group"
                       >
-                        <AtSign size={12} className="text-brand" />
+                        <AtSign size={12} className="text-accent" />
                         <span>{handle}</span>
                         <a
                           href={bioPath(handle)}
                           target="_blank"
                           rel="noreferrer"
                           title="Preview profile"
-                          className="text-mute hover:text-brand transition p-0.5"
+                          className="text-mute hover:text-accent transition p-0.5"
                         >
                           <ExternalLink size={11} />
                         </a>
@@ -1770,7 +1770,7 @@ export function OrganiserEventPage() {
             {/* Rich Description & Story Option */}
             <div className="space-y-3 pt-2 border-t border-line/60">
               <div className="flex justify-between items-center">
-                <p className="text-xs font-bold uppercase tracking-wider text-gold">Event Description & Details</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-accent">Event Description & Details</p>
                 <span className="text-[11px] text-mute">{description.length}/1000</span>
               </div>
               <textarea

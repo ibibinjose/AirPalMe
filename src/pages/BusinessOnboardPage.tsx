@@ -67,7 +67,7 @@ function Stepper({ step }: { step: number }) {
                   done
                     ? "bg-brand text-white shadow-sm"
                     : current
-                      ? "bg-brand/15 text-brand ring-2 ring-brand/30"
+                      ? "bg-brand/15 text-accent ring-2 ring-brand/30"
                       : "bg-paper text-mute ring-1 ring-line",
                 )}
               >
@@ -325,14 +325,14 @@ export function BusinessOnboardPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 py-6 sm:py-8">
-      <Link href="/business" className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand hover:underline">
+      <Link href="/business" className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:underline">
         <ArrowLeft className="h-3.5 w-3.5" /> Back to Business Studio
       </Link>
 
       <div className="mt-3 rounded-[32px] bg-card p-6 sm:p-8 ring-1 ring-line shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-line/60 pb-5">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">{NAMES.partnerAccount}</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">{NAMES.partnerAccount}</span>
             <h1 className="font-display mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-ink">
               Register a Business Venue
             </h1>
@@ -340,7 +340,7 @@ export function BusinessOnboardPage() {
               Import directly from Google Places, verify your contact details, and go live on AirPal.
             </p>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-bold text-brand">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-bold text-accent">
             <Sparkles className="h-3.5 w-3.5" /> Step {step + 1} of 4
           </span>
         </div>
@@ -500,14 +500,14 @@ export function BusinessOnboardPage() {
                     <div className="overflow-hidden rounded-2xl ring-1 ring-line bg-card">
                       {draft.heroImage && <img src={draft.heroImage} alt="" className="h-32 w-full object-cover" />}
                       <div className="p-4">
-                        <span className="inline-flex items-center gap-1 rounded-md bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand uppercase">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-accent uppercase">
                           <Globe2 className="h-3 w-3" /> Imported from Google
                         </span>
                         <p className="font-display mt-2 text-lg font-bold text-ink">{draft.venue.venueName}</p>
                         {draft.address && <p className="mt-0.5 text-xs text-mute">{draft.address}</p>}
                         <button
                           type="button"
-                          className="mt-3 text-xs font-semibold text-brand hover:underline"
+                          className="mt-3 text-xs font-semibold text-accent hover:underline"
                           onClick={() => setChangeListing(true)}
                         >
                           Change Google Listing
@@ -569,15 +569,15 @@ export function BusinessOnboardPage() {
                             onClick={() => set("venue", { mode: "listed", venueId: v.id, venueName: v.name })}
                             className={cn(
                               "flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-xs transition",
-                              draft.venue.venueId === v.id ? "bg-brand/10 text-brand font-semibold" : "hover:bg-paper",
+                              draft.venue.venueId === v.id ? "bg-brand/10 text-accent font-semibold" : "hover:bg-paper",
                             )}
                           >
-                            <Store className="h-4 w-4 shrink-0 text-gold" />
+                            <Store className="h-4 w-4 shrink-0 text-accent" />
                             <span className="min-w-0 flex-1">
                               <span className="block truncate font-semibold text-ink">{v.name}</span>
                               {v.address && <span className="block truncate text-[11px] text-mute">{v.address}</span>}
                             </span>
-                            {draft.venue.venueId === v.id && <BadgeCheck className="h-4 w-4 shrink-0 text-brand" />}
+                            {draft.venue.venueId === v.id && <BadgeCheck className="h-4 w-4 shrink-0 text-accent" />}
                           </button>
                         </li>
                       ))}
@@ -647,7 +647,7 @@ export function BusinessOnboardPage() {
                   )}
                   <div className="flex justify-between gap-3 border-t border-line/60 pt-2">
                     <dt className="text-mute flex items-center gap-1.5">
-                      <ShieldCheck className="h-3.5 w-3.5 text-brand" /> Verification Status
+                      <ShieldCheck className="h-3.5 w-3.5 text-accent" /> Verification Status
                     </dt>
                     <dd className="text-right font-semibold text-ink">
                       {domainOk ? "Email matches Google domain" : "Directory Owner Claim"}

@@ -24,7 +24,7 @@ export function PromotionTerms({ promotion, defaultOpen = false }: { promotion: 
         className="flex w-full items-center gap-2 p-4 text-left"
         aria-expanded={open}
       >
-        <FileText size={18} className="shrink-0 text-brand" />
+        <FileText size={18} className="shrink-0 text-accent" />
         <span className="flex-1 text-sm font-bold">Official promotion terms</span>
         <ChevronDown size={16} className={cn("transition-transform", open && "rotate-180")} />
       </button>

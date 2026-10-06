@@ -25,7 +25,7 @@ export function VerifyEmailBanner({ email, onSend }: { email?: string; onSend: (
       <p className="mt-1 text-[13px] text-mute">We sent a link. It can take a minute. Check spam too.</p>
       <button
         type="button"
-        className="mt-2 text-sm text-brand disabled:opacity-50"
+        className="mt-2 text-sm text-accent disabled:opacity-50"
         disabled={busy}
         onClick={() => void send()}
       >

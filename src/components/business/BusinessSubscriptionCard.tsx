@@ -69,7 +69,7 @@ export function BusinessSubscriptionCard() {
 
   return (
     <section className="rounded-[28px] bg-card p-4 ring-1 ring-line" aria-label="Partner subscription">
-      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">AirPal Partner</p>
+      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">AirPal Partner</p>
       <h2 className="font-display mt-1 text-lg font-semibold">
         {active ? "Partner active" : "Grow this place"}
       </h2>
@@ -79,7 +79,7 @@ export function BusinessSubscriptionCard() {
           : `Your place, offers, and bookings stay free. Partner${label ? ` (${label})` : ""} unlocks campaigns that fill seats.`}
       </p>
       {active && (
-        <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-brand">
+        <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-accent">
           <BadgeCheck size={12} /> Partner place
         </p>
       )}

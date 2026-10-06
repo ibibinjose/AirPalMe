@@ -78,7 +78,7 @@ export function StayBookCard({ property }: { property: PropertyInfo }) {
   return (
     <section className="rounded-3xl bg-card p-4 ring-1 ring-line shadow-xs" aria-label="Book this stay">
       <p className="flex items-center gap-1.5 text-[13px] font-semibold">
-        <BedDouble size={15} className="text-gold" /> Book this stay
+        <BedDouble size={15} className="text-accent" /> Book this stay
       </p>
       <p className="mt-0.5 text-[12px] text-mute">Live room-nights with the host — paid through AirPal.</p>
       <div className="mt-3 grid gap-2">

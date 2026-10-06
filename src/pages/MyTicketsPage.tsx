@@ -47,7 +47,7 @@ export function MyTicketsPage() {
       >
         <ArrowLeft size={15} /> Me
       </Link>
-      <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand">AirPal Wallet</p>
+      <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">AirPal Wallet</p>
       <h1 className="mt-1 font-display text-3xl font-bold text-ink">My tickets</h1>
 
       {tickets.length === 0 ? (

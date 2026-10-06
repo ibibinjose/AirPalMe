@@ -56,7 +56,7 @@ export function LocalNowBar() {
           title="Select location & precinct"
           aria-label={`Current location: ${placeLabel}. Tap to select location`}
         >
-          <MapPin size={12} className="shrink-0 text-gold" />
+          <MapPin size={12} className="shrink-0 text-accent" />
           <span
             className="truncate text-[12px] font-semibold sm:text-[13px]"
             title={source === "gps" ? t("nearYou") : placeLabel}
@@ -80,7 +80,7 @@ export function LocalNowBar() {
           title={`Share ${city || "current location"} guide`}
           aria-label={`Share ${city || "current location"} guide`}
         >
-          <Share2 size={11} className="text-gold" />
+          <Share2 size={11} className="text-accent" />
         </button>
 
         <span className="h-3.5 w-px shrink-0 bg-line" />
@@ -95,7 +95,7 @@ export function LocalNowBar() {
         <div className={cn("flex min-w-0 flex-1 items-center gap-1.5", loading && "opacity-50")}>
           {weather ? (
             <>
-              <span className="shrink-0 text-gold">
+              <span className="shrink-0 text-accent">
                 <SkyIcon code={weather.code} isDay={weather.isDay} />
               </span>
               <span className="font-display text-[13px] font-semibold leading-none sm:text-[14px]">

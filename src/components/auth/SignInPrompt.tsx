@@ -46,7 +46,7 @@ export function SignInPrompt() {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[90] flex items-end justify-center bg-ink/60 p-4 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-[90] flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center"
       onClick={dismissSignInPrompt}
       role="dialog"
       aria-modal="true"
@@ -56,7 +56,7 @@ export function SignInPrompt() {
         className="modal-safe w-full max-w-sm rounded-[28px] bg-paper p-6 text-center shadow-2xl ring-1 ring-line motion-safe:animate-[sheet-up_0.22s_ease-out]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand/10 text-brand">
+        <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand/10 text-accent">
           <LogIn size={22} />
         </div>
         <h2 className="font-display mt-3 text-xl font-bold">Sign in to continue</h2>
@@ -73,7 +73,7 @@ export function SignInPrompt() {
           <button
             type="button"
             onClick={() => go("signin")}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-white transition hover:bg-brand-ink active:scale-[0.99]"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-neutral-900 text-sm font-semibold text-white transition hover:bg-brand-ink active:scale-[0.99]"
           >
             <LogIn size={16} />
             Sign in with email or phone

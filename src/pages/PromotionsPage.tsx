@@ -129,7 +129,7 @@ export function PromotionsPage() {
               href="/business/promotions"
               className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
             >
-              <Store size={14} className="text-brand" />
+              <Store size={14} className="text-accent" />
               <span>My Deals</span>
             </Link>
           )}
@@ -150,7 +150,7 @@ export function PromotionsPage() {
       {/* Hero Section */}
       <div className="rounded-3xl bg-card p-6 md:p-8 ring-1 ring-line shadow-xs">
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-brand/15 px-3 py-1 text-xs font-bold text-brand uppercase tracking-wider ring-1 ring-brand/25">
+          <span className="rounded-full bg-brand/15 px-3 py-1 text-xs font-bold text-accent uppercase tracking-wider ring-1 ring-brand/25">
             AirPal Deals & Perks
           </span>
           <span className="rounded-full bg-paper px-2.5 py-1 text-xs font-semibold text-mute ring-1 ring-line">
@@ -240,12 +240,12 @@ export function PromotionsPage() {
       {/* Content Stream */}
       {loading ? (
         <div className="mt-12 flex flex-col items-center justify-center py-12 text-center text-mute space-y-2">
-          <Loader2 size={24} className="animate-spin text-brand" />
+          <Loader2 size={24} className="animate-spin text-accent" />
           <p className="text-xs font-medium">Loading local deals & perks…</p>
         </div>
       ) : filtered.length === 0 ? (
         <div className="mt-8 rounded-3xl bg-card p-8 md:p-12 text-center ring-1 ring-line shadow-xs">
-          <div className="grid h-16 w-16 place-items-center rounded-3xl bg-brand/10 text-brand mx-auto mb-3 ring-1 ring-brand/20">
+          <div className="grid h-16 w-16 place-items-center rounded-3xl bg-brand/10 text-accent mx-auto mb-3 ring-1 ring-brand/20">
             <BadgePercent size={32} />
           </div>
           <h2 className="font-display text-xl font-bold text-ink">
@@ -273,7 +273,7 @@ export function PromotionsPage() {
                 disabled={seeding}
                 className="gap-1.5 rounded-full px-4"
               >
-                {seeding ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="text-gold" />}
+                {seeding ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="text-accent" />}
                 <span>Seed Sample Deals</span>
               </Button>
             )}
@@ -334,7 +334,7 @@ export function PromotionsPage() {
                   <div className="space-y-1.5 text-[11px] text-mute border-t border-line/60 pt-3">
                     {p.locationText && (
                       <div className="flex items-center gap-1.5 truncate">
-                        <MapPin size={13} className="text-brand shrink-0" />
+                        <MapPin size={13} className="text-accent shrink-0" />
                         <span className="truncate font-medium text-ink/90">{p.locationText}</span>
                       </div>
                     )}

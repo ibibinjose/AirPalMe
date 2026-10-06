@@ -145,7 +145,7 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
             value: String(bDone),
             hint: "ready for payout",
             tab: "marketplace",
-            badgeClass: "bg-brand/10 text-brand",
+            badgeClass: "bg-brand/10 text-accent",
           },
           {
             label: "Recent GMV",
@@ -189,7 +189,7 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
             value: String(searchQueries),
             hint: "top queries tracked",
             tab: "search",
-            badgeClass: "bg-brand/10 text-brand",
+            badgeClass: "bg-brand/10 text-accent",
           },
           {
             label: "Audit Logs",
@@ -244,7 +244,7 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
               </span>
             )}
           </div>
-          <p className="font-display mt-1 text-2xl font-bold tracking-tight text-ink group-hover:text-brand transition-colors tabular-nums">
+          <p className="font-display mt-1 text-2xl font-bold tracking-tight text-ink group-hover:text-accent transition-colors tabular-nums">
             {k.value}
           </p>
           <p className="text-[11px] text-mute mt-0.5 truncate">{k.hint}</p>

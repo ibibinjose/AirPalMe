@@ -127,7 +127,7 @@ export function AirPalChatView({
               ) : conversation.photo ? (
                 <Photo src={conversation.photo} className="h-full w-full object-cover" />
               ) : (
-                <div className="grid h-full w-full place-items-center bg-ink text-white font-bold text-sm">
+                <div className="grid h-full w-full place-items-center bg-neutral-900 text-white font-bold text-sm">
                   {title[0]?.toUpperCase() || "•"}
                 </div>
               )}
@@ -139,7 +139,7 @@ export function AirPalChatView({
             <div className="flex items-center gap-1.5">
               <h3 className="font-display text-sm font-bold text-ink truncate">{title}</h3>
               {conversation.type === "ai" && (
-                <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand">
+                <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent">
                   24/7 AI
                 </span>
               )}
@@ -163,7 +163,7 @@ export function AirPalChatView({
               setText("@airpal ");
               inputRef.current?.focus();
             }}
-            className="inline-flex h-8 items-center gap-1 rounded-full bg-brand/10 px-2.5 text-[11px] font-bold text-brand hover:bg-brand/15 active:scale-95 transition"
+            className="inline-flex h-8 items-center gap-1 rounded-full bg-brand/10 px-2.5 text-[11px] font-bold text-accent hover:bg-brand/15 active:scale-95 transition"
             title="Ask AirPal AI Assistant"
           >
             <Sparkles size={12} />
@@ -176,7 +176,7 @@ export function AirPalChatView({
       <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3.5 no-scrollbar">
         {messages.length === 0 && !thinking ? (
           <div className="flex h-full flex-col items-center justify-center text-center p-6">
-            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-paper ring-1 ring-line text-brand">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-paper ring-1 ring-line text-accent">
               <Bot size={24} />
             </div>
             <p className="mt-3 font-display text-sm font-bold text-ink">Start the conversation</p>
@@ -209,7 +209,7 @@ export function AirPalChatView({
                       ) : msg.senderPhoto ? (
                         <Photo src={msg.senderPhoto} className="h-full w-full object-cover" />
                       ) : (
-                        <div className="grid h-full w-full place-items-center bg-ink text-white font-bold text-xs">
+                        <div className="grid h-full w-full place-items-center bg-neutral-900 text-white font-bold text-xs">
                           {senderName[0]?.toUpperCase() || "•"}
                         </div>
                       )}
@@ -231,7 +231,7 @@ export function AirPalChatView({
                       <div className="flex items-center gap-1.5 mb-1">
                         <span className="text-[11px] font-bold text-ink/75">{senderName}</span>
                         {isAi && (
-                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-brand bg-brand/10 px-1.5 py-0.2 rounded-full">
+                          <span className="text-[9px] font-extrabold uppercase tracking-wider text-accent bg-brand/10 px-1.5 py-0.2 rounded-full">
                             AI
                           </span>
                         )}
@@ -250,7 +250,7 @@ export function AirPalChatView({
                         key={i}
                         type="button"
                         onClick={() => handleAction(act.action, act.payload)}
-                        className="inline-flex items-center gap-1 rounded-full bg-brand/10 hover:bg-brand/20 text-brand px-3 py-1 text-[11px] font-semibold ring-1 ring-brand/20 transition active:scale-95"
+                        className="inline-flex items-center gap-1 rounded-full bg-brand/10 hover:bg-brand/20 text-accent px-3 py-1 text-[11px] font-semibold ring-1 ring-brand/20 transition active:scale-95"
                       >
                         <span>{act.label}</span>
                       </button>

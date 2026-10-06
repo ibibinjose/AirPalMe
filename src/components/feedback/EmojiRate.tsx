@@ -80,7 +80,7 @@ export function EmojiRate({ target, eventId, stallId, stallName, propertyId, win
 
   return (
     <section className="mt-6 rounded-[28px] bg-card p-4 ring-1 ring-line">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Rate</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Rate</p>
       <p className="font-display mt-1 text-lg">{sent ? "Thanks" : "How was it?"}</p>
       <div className="mt-3 grid grid-cols-4 gap-2">
         {RATE_MOODS.map((m) => (
@@ -119,7 +119,7 @@ export function EmojiRate({ target, eventId, stallId, stallName, propertyId, win
       )}
       {sent && winbackTitle && (
         <div className="mt-3 rounded-2xl bg-brand/10 px-4 py-3 text-center ring-1 ring-brand/20">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-brand">Come back soon</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-accent">Come back soon</p>
           <p className="mt-0.5 text-sm font-bold text-ink">{winbackTitle}</p>
           {winbackDetail ? <p className="mt-0.5 text-xs text-mute">{winbackDetail}</p> : null}
         </div>

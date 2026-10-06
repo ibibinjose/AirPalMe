@@ -192,7 +192,7 @@ export function ScanPage() {
 
   return (
     <div className="mx-auto flex h-full max-w-lg flex-col px-4 pb-[max(5rem,calc(env(safe-area-inset-bottom,0px)+5rem))]">
-      <div className="relative mt-2 overflow-hidden rounded-[28px] bg-ink shadow-lg ring-1 ring-line">
+      <div className="relative mt-2 overflow-hidden rounded-[28px] bg-neutral-900 shadow-lg ring-1 ring-line">
         <video ref={videoRef} className="h-64 w-full object-cover md:h-80" playsInline muted />
         <canvas ref={canvasRef} className="hidden" />
         <input
@@ -250,7 +250,7 @@ export function ScanPage() {
             disabled={uploading}
             className="inline-flex min-h-[44px] items-center gap-1.5 rounded-2xl bg-black/60 px-3.5 py-2 text-xs font-semibold text-white shadow-md backdrop-blur-md hover:bg-black/80 transition active:scale-95 border border-white/20 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
-            <ImageIcon size={14} className="text-brand" />
+            <ImageIcon size={14} className="text-accent" />
             <span>{uploading ? "Scanning Photo…" : "Scan Photo"}</span>
           </button>
           <span className="text-[11px] font-semibold text-white/80 backdrop-blur-xs bg-black/40 px-2.5 py-1 rounded-full">
@@ -304,7 +304,7 @@ export function ScanPage() {
                   void triggerHaptic("light");
                   nav(hrefForPlace(p));
                 }}
-                className="relative h-28 overflow-hidden rounded-3xl bg-ink transition active:scale-95 cursor-pointer"
+                className="relative h-28 overflow-hidden rounded-3xl bg-neutral-900 transition active:scale-95 cursor-pointer"
               >
                 {p.heroImage && (
                   <img

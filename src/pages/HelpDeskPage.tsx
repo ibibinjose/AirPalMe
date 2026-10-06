@@ -260,11 +260,11 @@ export function HelpDeskPage() {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-6">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="grid h-10 w-10 place-items-center rounded-2xl bg-brand/10 text-brand ring-1 ring-brand/20 shadow-xs">
+            <div className="grid h-10 w-10 place-items-center rounded-2xl bg-brand/10 text-accent ring-1 ring-brand/20 shadow-xs">
               <Headphones size={20} />
             </div>
             <div>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">AirPal Operations</span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">AirPal Operations</span>
               <h1 className="font-display text-2xl font-bold tracking-tight text-ink md:text-3xl">
                 Universal Help Desk
               </h1>
@@ -289,7 +289,7 @@ export function HelpDeskPage() {
             className="flex items-center gap-1.5 rounded-full bg-paper px-3.5 py-2 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card transition"
             title={soundOn ? "Mute alarm sound" : "Unmute alarm sound"}
           >
-            {soundOn ? <Volume2 size={15} className="text-brand" /> : <VolumeX size={15} className="text-mute" />}
+            {soundOn ? <Volume2 size={15} className="text-accent" /> : <VolumeX size={15} className="text-mute" />}
             <span>{soundOn ? "Alarm On" : "Muted"}</span>
           </button>
 
@@ -309,7 +309,7 @@ export function HelpDeskPage() {
         <div className="rounded-2xl bg-card p-4 ring-1 ring-line shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-mute">Open Tickets</span>
-            <ConciergeBell size={16} className="text-brand" />
+            <ConciergeBell size={16} className="text-accent" />
           </div>
           <p className="font-display mt-2 text-2xl font-bold text-ink">{activeTicketCount}</p>
           <p className="mt-0.5 text-[11px] text-mute">Guest requests awaiting action</p>
@@ -398,7 +398,7 @@ export function HelpDeskPage() {
             type="button"
             onClick={() => setStatusFilter("active")}
             className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-              statusFilter === "active" ? "bg-ink text-white" : "bg-card text-mute hover:text-ink ring-1 ring-line"
+              statusFilter === "active" ? "bg-ink text-paper" : "bg-card text-mute hover:text-ink ring-1 ring-line"
             }`}
           >
             Active Queue ({activeTicketCount + activeOrdersCount})
@@ -416,7 +416,7 @@ export function HelpDeskPage() {
             type="button"
             onClick={() => setStatusFilter("resolved")}
             className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-              statusFilter === "resolved" ? "bg-ink text-white" : "bg-card text-mute hover:text-ink ring-1 ring-line"
+              statusFilter === "resolved" ? "bg-ink text-paper" : "bg-card text-mute hover:text-ink ring-1 ring-line"
             }`}
           >
             Resolved Archive
@@ -427,7 +427,7 @@ export function HelpDeskPage() {
           <button
             type="button"
             onClick={handleResolveAll}
-            className="flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand hover:bg-brand/15 transition"
+            className="flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-accent hover:bg-brand/15 transition"
           >
             <CheckCheck size={14} /> Resolve All Visible ({filteredTickets.filter((t) => t.status !== "resolved").length})
           </button>
@@ -441,7 +441,7 @@ export function HelpDeskPage() {
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-bold text-ink uppercase tracking-wider flex items-center gap-2">
-                <ConciergeBell size={16} className="text-brand" />
+                <ConciergeBell size={16} className="text-accent" />
                 <span>Guest Service Requests ({filteredTickets.length})</span>
               </h2>
             </div>
@@ -550,7 +550,7 @@ export function HelpDeskPage() {
                       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-2.5">
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-sm text-ink">Room {order.roomNumber}</span>
-                          <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-semibold text-brand uppercase tracking-wider">
+                          <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-semibold text-accent uppercase tracking-wider">
                             {order.status}
                           </span>
                           {order.paymentMode === "desk" ? (
@@ -576,7 +576,7 @@ export function HelpDeskPage() {
                         {order.items.map((it, idx) => (
                           <div key={idx} className="flex justify-between">
                             <span>
-                              <strong className="text-brand">{it.qty}×</strong> {it.name}
+                              <strong className="text-accent">{it.qty}×</strong> {it.name}
                             </span>
                             <span className="text-mute">
                               A${((it.unitCents * it.qty) / 100).toFixed(2)}
@@ -626,7 +626,7 @@ export function HelpDeskPage() {
                   Event & Festival Operations ({allEvents.length})
                 </h2>
               </div>
-              <Link href="/events" className="text-xs font-semibold text-brand hover:underline">
+              <Link href="/events" className="text-xs font-semibold text-accent hover:underline">
                 View All Events →
               </Link>
             </div>
@@ -655,12 +655,12 @@ export function HelpDeskPage() {
           <div className="mt-8 rounded-2xl bg-card p-5 ring-1 ring-line shadow-xs">
             <div className="flex items-center justify-between border-b border-line pb-3">
               <div className="flex items-center gap-2">
-                <Building2 size={16} className="text-gold" />
+                <Building2 size={16} className="text-accent" />
                 <h2 className="text-sm font-bold text-ink uppercase tracking-wider">
                   Venue & Store Inquiries ({businessListing.name})
                 </h2>
               </div>
-              <Link href="/business" className="text-xs font-semibold text-brand hover:underline">
+              <Link href="/business" className="text-xs font-semibold text-accent hover:underline">
                 Manage Venue →
               </Link>
             </div>
@@ -671,7 +671,7 @@ export function HelpDeskPage() {
               </div>
               <Link
                 href="/business"
-                className="rounded-full bg-brand/10 px-3.5 py-1.5 text-xs font-semibold text-brand hover:bg-brand/15 transition"
+                className="rounded-full bg-brand/10 px-3.5 py-1.5 text-xs font-semibold text-accent hover:bg-brand/15 transition"
               >
                 Door List & Inquiries
               </Link>
@@ -686,7 +686,7 @@ export function HelpDeskPage() {
           <div className="w-full max-w-md rounded-[28px] bg-card p-6 ring-1 ring-line shadow-xl">
             <div className="flex items-center justify-between border-b border-line pb-3">
               <div className="flex items-center gap-2">
-                <ConciergeBell size={18} className="text-brand" />
+                <ConciergeBell size={18} className="text-accent" />
                 <h3 className="font-display font-semibold text-lg text-ink">Log Service Request</h3>
               </div>
               <button

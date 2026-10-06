@@ -39,7 +39,7 @@ const PULSE_STATUS_STYLES: Record<string, string> = {
 
 const ISSUE_STATUS_STYLES: Record<string, string> = {
   open: "bg-amber-500/10 text-amber-600",
-  acknowledged: "bg-brand/10 text-brand",
+  acknowledged: "bg-brand/10 text-accent",
   resolved: "bg-emerald-500/10 text-emerald-600",
 };
 
@@ -294,7 +294,7 @@ export function HostPulsePage() {
   if (!authReady) {
     return (
       <div className="mx-auto flex max-w-md flex-col items-center gap-3 px-4 py-16 text-center">
-        <Loader2 size={28} className="text-brand motion-safe:animate-spin" />
+        <Loader2 size={28} className="text-accent motion-safe:animate-spin" />
         <p className="text-sm font-medium text-mute">Loading Pulse…</p>
       </div>
     );
@@ -327,7 +327,7 @@ export function HostPulsePage() {
     <div className="mx-auto max-w-6xl px-4 pb-28 pt-6 md:px-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">AirPal Pulse</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">AirPal Pulse</p>
           <h1 className="font-display mt-1 text-3xl font-semibold">During stay</h1>
           <p className="mt-1 text-sm text-mute">Capture → alert → resolve. Real responses only — no fake totals.</p>
         </div>
@@ -364,7 +364,7 @@ export function HostPulsePage() {
                 ) : null}
                 <div className="min-w-0">
                   <p className="text-xs font-medium text-mute">Public link</p>
-                  <p className="break-all text-sm font-medium text-brand">{qrUrl}</p>
+                  <p className="break-all text-sm font-medium text-accent">{qrUrl}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
                       type="button"

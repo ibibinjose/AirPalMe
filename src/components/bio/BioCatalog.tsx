@@ -18,8 +18,8 @@ function ItemCard({
       <div>
         <div className="flex items-center justify-between gap-2">
           {item.badge ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand">
-              <Sparkles size={10} className="shrink-0 text-brand" />
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent">
+              <Sparkles size={10} className="shrink-0 text-accent" />
               {item.badge}
             </span>
           ) : (
@@ -30,7 +30,7 @@ function ItemCard({
           )}
 
           {item.price && (
-            <span className="shrink-0 rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-white shadow-2xs">
+            <span className="shrink-0 rounded-full bg-neutral-900 px-2.5 py-0.5 text-xs font-bold text-white shadow-2xs">
               {item.price}
             </span>
           )}
@@ -64,7 +64,7 @@ function ItemCard({
             onClaim(item);
           }}
         >
-          <Sparkles size={12} className="text-gold" />
+          <Sparkles size={12} className="text-accent" />
           <span>Show code at till</span>
         </button>
       )}
@@ -116,7 +116,7 @@ export function BioCatalogSection({
   return (
     <section id={id} className="mt-7 scroll-mt-24">
       <div className="flex items-center justify-between mb-2.5">
-        <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
+        <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">
           {label}
         </h3>
         <span className="text-[11px] font-medium text-mute">

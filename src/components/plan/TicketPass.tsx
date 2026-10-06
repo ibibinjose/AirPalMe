@@ -58,7 +58,7 @@ export function TicketPass({ bookingId }: { bookingId: string }) {
             </p>
           </div>
         </div>
-        <Link href="/me/tickets" className="mt-3 inline-block text-[13px] font-semibold text-brand">
+        <Link href="/me/tickets" className="mt-3 inline-block text-[13px] font-semibold text-accent">
           View all tickets →
         </Link>
       </div>
@@ -68,7 +68,7 @@ export function TicketPass({ bookingId }: { bookingId: string }) {
   return (
     <div className="mt-4">
       <AirPalTicketPass booking={booking} guestName={user?.displayName || undefined} />
-      <Link href="/me/tickets" className="mt-2 inline-block text-[13px] font-semibold text-brand">
+      <Link href="/me/tickets" className="mt-2 inline-block text-[13px] font-semibold text-accent">
         View all tickets →
       </Link>
     </div>

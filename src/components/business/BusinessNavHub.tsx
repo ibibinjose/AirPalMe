@@ -31,7 +31,7 @@ export function BusinessNavHub({
       <div className="rounded-3xl ring-1 ring-line bg-card p-4 shadow-xs">
         <div className="flex items-center justify-between border-b border-line pb-3">
           <div>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Your place</span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Your place</span>
             <h2 className="font-display mt-0.5 text-lg font-semibold text-ink">{businessName || "Your place"}</h2>
           </div>
           <Link
@@ -64,10 +64,10 @@ export function BusinessNavHub({
 
         {/* Workspace Quick Actions */}
         <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 border-t border-line/60 pt-3 text-xs font-semibold">
-          <Link href="/helpdesk" className="inline-flex items-center gap-1 text-brand hover:underline">
+          <Link href="/helpdesk" className="inline-flex items-center gap-1 text-accent hover:underline">
             <span>🎧</span> Help Desk & Operations <ChevronRight size={12} />
           </Link>
-          <Link href="/business/promotions" className="inline-flex items-center gap-1 text-ink/75 hover:text-brand hover:underline">
+          <Link href="/business/promotions" className="inline-flex items-center gap-1 text-ink/75 hover:text-accent hover:underline">
             <Gift size={13} /> Promotions
           </Link>
         </div>

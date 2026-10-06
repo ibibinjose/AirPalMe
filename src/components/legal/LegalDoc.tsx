@@ -16,7 +16,7 @@ export function LegalDoc({
   return (
     <div>
       <article className="mx-auto max-w-2xl px-4 pb-6 pt-8 md:px-6">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">{kicker}</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">{kicker}</p>
         <h1 className="font-display mt-1 text-3xl font-semibold md:text-4xl">{title}</h1>
         <p className="mt-2 text-sm text-mute">
           Effective {LEGAL.updated} · {LEGAL.location}
@@ -25,11 +25,11 @@ export function LegalDoc({
         <div className="legal-prose mt-8">{children}</div>
         <p className="mt-12 text-sm text-mute">
           Questions?{" "}
-          <Link href="/contact" className="text-brand">
+          <Link href="/contact" className="text-accent">
             Contact us
           </Link>{" "}
           or write to{" "}
-          <a href={`mailto:${LEGAL.email}`} className="text-brand">
+          <a href={`mailto:${LEGAL.email}`} className="text-accent">
             {LEGAL.email}
           </a>
           .

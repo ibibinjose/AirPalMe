@@ -290,11 +290,11 @@ export function PulseHubPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-28 pt-6 md:px-6">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">
         AirPal Pulse · Real-Time Feedback
       </p>
       <h1 className="font-display mt-1 text-3xl font-semibold tracking-tight">
-        Catch unhappy guests <span className="text-brand">before bad reviews</span>
+        Catch unhappy guests <span className="text-accent">before bad reviews</span>
       </h1>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-mute">
         Real-time QR ratings for cafes, restaurants, hotels, events, and venues. Negative feedback routes to your
@@ -313,7 +313,7 @@ export function PulseHubPage() {
           href="/helpdesk"
           className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-card px-5 text-sm font-semibold text-ink ring-1 ring-line transition-colors hover:bg-paper"
         >
-          <Headphones size={15} className="text-brand" aria-hidden />
+          <Headphones size={15} className="text-accent" aria-hidden />
           <span>Universal Help Desk</span>
         </Link>
       </div>
@@ -327,7 +327,7 @@ export function PulseHubPage() {
                 Select your industry blueprint, customize the header question, and deploy a live QR code in 10 seconds.
               </p>
             </div>
-            <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand ring-1 ring-brand/25">
+            <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-accent ring-1 ring-brand/25">
               1-Click Deploy
             </span>
           </div>
@@ -356,7 +356,7 @@ export function PulseHubPage() {
                           <div
                             className={cn(
                               "rounded-xl p-2",
-                              isSelected ? "bg-brand text-white" : "bg-paper text-brand ring-1 ring-line",
+                              isSelected ? "bg-brand text-white" : "bg-paper text-accent ring-1 ring-line",
                             )}
                           >
                             <Icon size={16} aria-hidden />
@@ -460,7 +460,7 @@ export function PulseHubPage() {
                 ) : null}
                 <div className="space-y-4 rounded-2xl bg-paper/80 p-4 ring-1 ring-line">
                   <div className="space-y-1 text-center">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-accent">
                       {pulseName.trim() || "Your Business"}
                     </span>
                     <h3 className="text-sm font-bold text-ink">{pulseTitle.trim() || "How was your experience?"}</h3>
@@ -535,7 +535,7 @@ export function PulseHubPage() {
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
               <h2 className="font-display flex items-center gap-2.5 text-2xl font-bold tracking-tight">
-                <Activity size={24} className="text-brand" aria-hidden />
+                <Activity size={24} className="text-accent" aria-hidden />
                 <span>Live Feedback & Recovery Hub</span>
               </h2>
               <p className="text-xs text-mute sm:text-sm">
@@ -560,7 +560,7 @@ export function PulseHubPage() {
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Metric
               label="Total Responses"
-              icon={<QrCode size={16} className="text-brand" aria-hidden />}
+              icon={<QrCode size={16} className="text-accent" aria-hidden />}
               value={responses.length}
               sub="Scanned & submitted"
             />
@@ -568,7 +568,7 @@ export function PulseHubPage() {
               label="Average Score"
               icon={<TrendingUp size={16} className="text-emerald-500" aria-hidden />}
               value={avgScore != null ? `${avgScore.toFixed(1)} / 5.0` : "5.0"}
-              valueClass="text-brand"
+              valueClass="text-accent"
               sub="Customer satisfaction"
             />
             <Metric

@@ -55,7 +55,7 @@ export function StayProfilePage() {
   if (found === false) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-12 text-center sm:px-6">
-        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">Stay</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-accent">Stay</p>
         <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-ink">
           No stay found{handle ? ` for @${handle}` : ""}
         </h1>
@@ -110,7 +110,7 @@ export function StayProfilePage() {
       <div className="mt-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-2 text-xs font-bold">
-            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-brand ring-1 ring-brand/20">
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-accent ring-1 ring-brand/20">
               <Hotel size={13} /> {stayKindLabel(property.kind) || "Stay"}
             </span>
             {price && <span className="rounded-full bg-paper px-3 py-1 text-ink ring-1 ring-line">{price}</span>}
@@ -118,7 +118,7 @@ export function StayProfilePage() {
           <h1 className="font-display mt-2 text-3xl font-bold tracking-tight text-ink sm:text-4xl">{property.name}</h1>
           {property.tagline && <p className="mt-1 text-[15px] text-mute">{property.tagline}</p>}
           <p className="mt-2 flex items-center gap-1.5 text-sm text-mute">
-            <MapPin size={14} className="shrink-0 text-brand" />
+            <MapPin size={14} className="shrink-0 text-accent" />
             <span className="truncate">{property.address || property.city}</span>
           </p>
         </div>
@@ -213,7 +213,7 @@ export function StayProfilePage() {
                 className="flex items-center justify-between gap-3 rounded-3xl bg-card p-4 ring-1 ring-line"
               >
                 <span className="flex min-w-0 items-center gap-2.5">
-                  <BedDouble size={17} className="shrink-0 text-brand" />
+                  <BedDouble size={17} className="shrink-0 text-accent" />
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-bold text-ink">{room.name}</span>
                     <span className="block truncate text-xs text-mute">
@@ -251,7 +251,7 @@ export function StayProfilePage() {
               >
                 <p className="truncate text-sm font-bold text-ink">{place.name}</p>
                 <p className="mt-0.5 truncate text-xs capitalize text-mute">{place.category}</p>
-                {place.walk && <p className="mt-1 text-xs font-semibold text-brand">{place.walk}</p>}
+                {place.walk && <p className="mt-1 text-xs font-semibold text-accent">{place.walk}</p>}
                 {place.deal && (
                   <p className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-0.5 text-[11px] font-bold text-ink">
                     <Sparkles size={11} /> {place.deal.badge}
@@ -264,7 +264,7 @@ export function StayProfilePage() {
       )}
 
       <section aria-label="Stay & Guide add-on" className="mt-8 rounded-[28px] bg-paper p-6 ring-1 ring-line">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-gold">Additional service</p>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-accent">Additional service</p>
         <h2 className="font-display mt-1 text-lg font-bold text-ink">Plus Stay & Guide in every room</h2>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-ink/80">
           Every room includes the QR Stay & Guide, all in one — Wi-Fi, dining, housekeeping and local tips with no
@@ -272,7 +272,7 @@ export function StayProfilePage() {
         </p>
         <Link
           href="/concierge"
-          className="mt-3 inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-bold text-white transition hover:opacity-90 active:scale-[0.98]"
+          className="mt-3 inline-flex h-11 items-center rounded-full bg-neutral-900 px-6 text-sm font-bold text-white transition hover:opacity-90 active:scale-[0.98]"
         >
           See Stay & Guide
         </Link>

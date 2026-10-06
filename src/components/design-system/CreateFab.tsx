@@ -46,7 +46,7 @@ export const CREATE_OPTIONS: CreateOption[] = [
     subtitle: "Coordinate an activity, hangout, or trip with mates",
     href: "/plan/new",
     icon: CalendarPlus,
-    colorClass: "bg-brand/10 text-brand ring-brand/20",
+    colorClass: "bg-brand/10 text-accent ring-brand/20",
     badge: "Popular",
     group: "you",
   },
@@ -92,7 +92,7 @@ export const CREATE_OPTIONS: CreateOption[] = [
     subtitle: "List a place, boutique stay, venue, or promotions",
     href: "/business",
     icon: Building2,
-    colorClass: "bg-slate-500/10 text-slate-700 ring-slate-500/20",
+    colorClass: "bg-slate-500/10 text-slate-700 ring-slate-500/20 dark:text-slate-300",
     group: "business",
   },
 ];
@@ -168,8 +168,8 @@ export function CreateFab() {
             aria-label={open ? "Close create menu" : "Create something new"}
             aria-expanded={open}
             className={cn(
-              "group flex h-13 w-13 items-center justify-center rounded-full text-white shadow-[0_8px_24px_-4px_rgba(18,22,20,0.2)] transition-all duration-200 active:scale-95 cursor-pointer touch-manipulation focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
-              open ? "bg-ink hover:bg-black" : "bg-brand hover:bg-brand-ink",
+              "group flex h-13 w-13 items-center justify-center rounded-full text-white shadow-[0_8px_24px_-4px_rgba(18,22,20,0.2)] transition-[background-color,transform] duration-200 active:scale-95 cursor-pointer touch-manipulation focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
+              open ? "bg-neutral-900 hover:bg-black" : "bg-brand hover:bg-brand-ink",
             )}
           >
             <motion.div
@@ -197,7 +197,7 @@ export function CreateFab() {
                     void triggerHaptic("light");
                     setOpen(false);
                   }}
-                  className="fixed inset-0 bg-ink/60 backdrop-blur-sm"
+                  className="fixed inset-0 bg-black/60 backdrop-blur-sm"
                   aria-hidden="true"
                 />
 
@@ -219,7 +219,7 @@ export function CreateFab() {
                   {/* Header */}
                   <div className="flex items-start justify-between gap-3 pb-3 border-b border-line/60">
                     <div>
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-brand">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-accent">
                         AirPal · Made Easy
                       </span>
                       <h2 className="font-display text-xl sm:text-2xl font-bold text-ink mt-0.5">
@@ -269,11 +269,11 @@ export function CreateFab() {
                                 </span>
                                 <div className="min-w-0 flex-1">
                                   <div className="flex items-center gap-1.5">
-                                    <span className="font-display text-base font-bold text-ink group-hover:text-brand transition-colors">
+                                    <span className="font-display text-base font-bold text-ink group-hover:text-accent transition-colors">
                                       {opt.title}
                                     </span>
                                     {opt.badge && (
-                                      <span className="text-[11px] font-bold text-brand">
+                                      <span className="text-[11px] font-bold text-accent">
                                         · {opt.badge}
                                       </span>
                                     )}
@@ -282,7 +282,7 @@ export function CreateFab() {
                                 </div>
                                 <ChevronRight
                                   size={16}
-                                  className="text-mute/60 group-hover:text-brand group-hover:translate-x-0.5 transition-all shrink-0"
+                                  className="text-mute/60 group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0"
                                 />
                               </button>
                             );
@@ -298,7 +298,7 @@ export function CreateFab() {
                     <button
                       type="button"
                       onClick={() => handleSelect("/business")}
-                      className="-my-3 inline-flex min-h-[44px] items-center gap-1 text-xs font-bold text-brand hover:underline cursor-pointer"
+                      className="-my-3 inline-flex min-h-[44px] items-center gap-1 text-xs font-bold text-accent hover:underline cursor-pointer"
                     >
                       <span>Open Business Hub</span>
                       <ArrowRight size={13} />

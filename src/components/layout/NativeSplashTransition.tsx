@@ -63,9 +63,9 @@ export function NativeSplashTransition({ holdDuration = 250, fadeDuration = 350 
           />
         </div>
         <div className="font-display text-2xl font-bold tracking-tight text-ink">
-          AirPal<span className="text-brand">.me</span>
+          AirPal<span className="text-accent">.me</span>
         </div>
-        <div className="text-[11px] font-semibold tracking-widest uppercase text-gold mt-1.5">{BRAND_TAGLINE}</div>
+        <div className="text-[11px] font-semibold tracking-widest uppercase text-accent mt-1.5">{BRAND_TAGLINE}</div>
       </div>
     </div>
   );

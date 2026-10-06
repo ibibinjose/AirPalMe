@@ -27,7 +27,7 @@ export function PulseIssueCard({
 
       {issue.contactRequested && (
         <div className="space-y-1 rounded-xl bg-paper p-3 text-xs ring-1 ring-line">
-          <div className="font-semibold text-brand">Guest Requested Contact:</div>
+          <div className="font-semibold text-accent">Guest Requested Contact:</div>
           <div>Name: {issue.contactName || "Guest"}</div>
           <div>Method: {issue.contactMethod || "Not provided"}</div>
         </div>

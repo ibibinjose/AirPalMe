@@ -51,7 +51,7 @@ export function FestivalAdmin() {
 
   return (
     <section className="mt-8 rounded-[28px] bg-card p-4 ring-1 ring-line">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Discovery · transaction layer</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Discovery · transaction layer</p>
       <h2 className="font-display mt-1 text-lg font-semibold">Festival programs</h2>
       <p className="mt-1 text-sm text-mute">
         Week-long programs. Sessions reuse the events engine — attending, calendar, and reviews included.

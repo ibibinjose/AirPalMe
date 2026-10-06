@@ -46,7 +46,7 @@ export function SwipeChoice({
       <motion.span
         style={reduceMotion ? undefined : { opacity: leftStamp }}
         aria-hidden
-        className="absolute left-4 top-3.5 rounded-full bg-ink px-2.5 py-1 text-[11px] font-bold text-white"
+        className="absolute left-4 top-3.5 rounded-full bg-neutral-900 px-2.5 py-1 text-[11px] font-bold text-white"
       >
         ← {leftLabel}
       </motion.span>

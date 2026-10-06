@@ -242,7 +242,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
             {relative.label}
           </span>
           {event.isLocal && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-medium text-brand">
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-medium text-accent">
               <Sparkles size={11} /> Local Event
             </span>
           )}
@@ -258,9 +258,9 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
           <button
             type="button"
             onClick={openDirections}
-            className="flex items-center gap-2 text-mute hover:text-brand transition text-left"
+            className="flex items-center gap-2 text-mute hover:text-accent transition text-left"
           >
-            <MapPin size={15} className="shrink-0 text-gold" />
+            <MapPin size={15} className="shrink-0 text-accent" />
             <span>
               {[event.venue, event.room].filter(Boolean).join(" · ")}, {event.city}
             </span>
@@ -272,7 +272,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
           )}
           {event.ticketPrice && (
             <p className="text-xs font-medium text-mute">
-              Admission: <strong className="text-gold">{event.ticketPrice}</strong>
+              Admission: <strong className="text-accent">{event.ticketPrice}</strong>
             </p>
           )}
           {isPaid && (
@@ -294,7 +294,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
             className={cn(
               "inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full text-[13px] font-semibold transition active:scale-[0.98]",
               event.isInterested
-                ? "bg-ink text-white"
+                ? "bg-ink text-paper"
                 : "bg-card text-mute ring-1 ring-line hover:text-ink",
             )}
           >
@@ -316,7 +316,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
             className={cn(
               "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-95",
               event.isLiked
-                ? "bg-ink text-white"
+                ? "bg-ink text-paper"
                 : "bg-card text-mute ring-1 ring-line hover:text-ink",
             )}
           >
@@ -327,7 +327,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
         <button
           type="button"
           onClick={() => setTripOpen(true)}
-          className="mt-2.5 flex h-11 w-full touch-manipulation items-center justify-center gap-1.5 rounded-full bg-brand/10 text-sm font-semibold text-brand transition hover:bg-brand/15 active:scale-[0.99]"
+          className="mt-2.5 flex h-11 w-full touch-manipulation items-center justify-center gap-1.5 rounded-full bg-brand/10 text-sm font-semibold text-accent transition hover:bg-brand/15 active:scale-[0.99]"
         >
           <Plus size={16} />
           <span>Add to Trip</span>
@@ -430,7 +430,7 @@ function NearbyEventDetailView({ event: ev }: { event: NearbyEvent }) {
         <img src={ev.heroImage} alt="" referrerPolicy="no-referrer" className="h-72 w-full object-cover" />
       )}
       <div className="px-4 pt-5">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">{ev.when}</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">{ev.when}</p>
         <h1 className="font-display mt-1 text-3xl font-semibold">{ev.title}</h1>
         <p className="mt-3 text-[15px] leading-relaxed">{ev.insiderTip || ev.detail}</p>
         <p className="mt-2 text-sm text-mute">{[ev.venueName, ev.ticketPrice].filter(Boolean).join(" · ")}</p>

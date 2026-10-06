@@ -88,7 +88,7 @@ function RoleHero({
 }) {
   return (
     <div className="mb-6 text-center">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">{kicker}</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">{kicker}</p>
       <h1 className="font-display mt-2 text-3xl font-bold leading-tight">{title}</h1>
       <p className="mx-auto mt-2 max-w-sm text-sm text-mute">{sub}</p>
       <div className="mt-4 space-y-2 text-left">
@@ -107,7 +107,7 @@ function RoleHero({
       <button
         type="button"
         onClick={() => document.getElementById("auth-card")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-        className="mt-3 inline-flex min-h-[44px] items-center px-2 text-xs font-semibold text-brand hover:underline"
+        className="mt-3 inline-flex min-h-[44px] items-center px-2 text-xs font-semibold text-accent hover:underline"
       >
         {cta}
       </button>
@@ -301,7 +301,7 @@ export function StartPage() {
         title: "Sign in to AirPal Club",
         signupTitle: "Join AirPal Club",
         desc: "Unlock member invites, guest list perks, and save favourite stalls & events.",
-        color: "text-brand",
+        color: "text-accent",
         bg: "bg-brand/10",
       };
     }
@@ -311,7 +311,7 @@ export function StartPage() {
       title: "Welcome back",
       signupTitle: "Create your AirPal account",
       desc: "One login for your Circle, plans, stays, and a public @handle.",
-      color: "text-brand",
+      color: "text-accent",
       bg: "bg-brand/10",
     };
   }, [roleParam, next]);
@@ -520,7 +520,7 @@ export function StartPage() {
             <MeAvatar faceClassName="h-16 w-16 text-xl" />
           </div>
           <h1 className="font-display mt-4 text-2xl font-semibold">{user.displayName || "Your Account"}</h1>
-          {mine?.handle ? <p className="mt-0.5 text-xs font-bold text-brand">@{mine.handle}</p> : null}
+          {mine?.handle ? <p className="mt-0.5 text-xs font-bold text-accent">@{mine.handle}</p> : null}
           <p className="text-xs text-mute mt-1">{user.email || user.phone || "Signed in"}</p>
 
           {next && (
@@ -545,7 +545,7 @@ export function StartPage() {
           )}
 
           <div className="mt-6 space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold text-left">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent text-left">
               Quick Navigation
             </p>
             <Button
@@ -603,7 +603,7 @@ export function StartPage() {
     >
       {isGuestStart && (
         <div className="mb-6 text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">Life Made Easy</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">Life Made Easy</p>
           <h1 className="font-display mt-2 text-3xl font-bold leading-tight">
             Find a place. Make&nbsp;a&nbsp;plan. Meet&nbsp;your&nbsp;people.
           </h1>
@@ -624,7 +624,7 @@ export function StartPage() {
                 title: "Make plans",
                 desc: "Family & friends",
                 to: "/plan",
-                tint: "bg-brand/10 text-brand",
+                tint: "bg-brand/10 text-accent",
               },
               {
                 icon: Users,
@@ -651,7 +651,7 @@ export function StartPage() {
           <button
             type="button"
             onClick={() => nav("/")}
-            className="mt-3 inline-flex min-h-[44px] items-center px-2 text-xs font-semibold text-brand hover:underline"
+            className="mt-3 inline-flex min-h-[44px] items-center px-2 text-xs font-semibold text-accent hover:underline"
           >
             Browse first, join later →
           </button>
@@ -675,7 +675,7 @@ export function StartPage() {
               icon: BadgePercent,
               title: "Publish offers",
               desc: "Deals guests show at the till",
-              tint: "bg-brand/10 text-brand",
+              tint: "bg-brand/10 text-accent",
             },
             {
               icon: QrCode,
@@ -703,7 +703,7 @@ export function StartPage() {
               icon: ShieldCheck,
               title: "Approve every guest",
               desc: "Manual approval, your rules",
-              tint: "bg-brand/10 text-brand",
+              tint: "bg-brand/10 text-accent",
             },
             {
               icon: MapPin,
@@ -727,7 +727,7 @@ export function StartPage() {
               desc: "Your page on AirPal.Me",
               tint: "bg-emerald-500/10 text-emerald-700",
             },
-            { icon: Store, title: "Sell stalls", desc: "Vendors book & pay online", tint: "bg-brand/10 text-brand" },
+            { icon: Store, title: "Sell stalls", desc: "Vendors book & pay online", tint: "bg-brand/10 text-accent" },
             { icon: Users, title: "Track RSVPs", desc: "Know who's coming", tint: "bg-amber-500/10 text-amber-700" },
           ]}
         />
@@ -745,7 +745,7 @@ export function StartPage() {
               desc: "Propose dates & places",
               tint: "bg-emerald-500/10 text-emerald-700",
             },
-            { icon: Users, title: "Vote on stops", desc: "Everyone gets a say", tint: "bg-brand/10 text-brand" },
+            { icon: Users, title: "Vote on stops", desc: "Everyone gets a say", tint: "bg-brand/10 text-accent" },
             {
               icon: Ticket,
               title: "Keep everyone posted",
@@ -782,9 +782,9 @@ export function StartPage() {
 
       {mode === "signup" && inviterHandle && (
         <p className="mb-4 rounded-2xl ring-1 ring-line bg-card px-4 py-3 text-center text-sm">
-          You’re invited by <span className="font-semibold text-brand">@{inviterHandle}</span> — your signup lands you
+          You’re invited by <span className="font-semibold text-accent">@{inviterHandle}</span> — your signup lands you
           in the{" "}
-          <Link href="/founders" className="font-semibold text-brand hover:underline">
+          <Link href="/founders" className="font-semibold text-accent hover:underline">
             Founders 100K pool
           </Link>
         </p>
@@ -801,7 +801,7 @@ export function StartPage() {
             <button
               type="button"
               onClick={() => switchMode("signin")}
-              className="mb-4 inline-flex items-center gap-1.5 text-xs font-medium text-brand hover:underline"
+              className="mb-4 inline-flex items-center gap-1.5 text-xs font-medium text-accent hover:underline"
             >
               <ArrowLeft size={14} /> Back to Sign In
             </button>
@@ -889,7 +889,7 @@ export function StartPage() {
             {mode === "signup" && (
               <div className="mt-3.5 rounded-2xl bg-paper/70 p-3 ring-1 ring-line/70">
                 <div className="flex items-center justify-between text-[11px] font-semibold mb-1.5">
-                  <span className="text-brand">Step 1 of 2: Create Free Account</span>
+                  <span className="text-accent">Step 1 of 2: Create Free Account</span>
                   <span className="text-mute font-medium">~30 sec setup</span>
                 </div>
                 <div className="flex gap-1.5 h-1">
@@ -942,7 +942,7 @@ export function StartPage() {
                       <button
                         type="button"
                         onClick={() => switchMode("signin")}
-                        className="mt-1 font-semibold text-brand underline block cursor-pointer"
+                        className="mt-1 font-semibold text-accent underline block cursor-pointer"
                       >
                         Sign in with this email instead →
                       </button>
@@ -951,7 +951,7 @@ export function StartPage() {
                       <button
                         type="button"
                         onClick={() => switchMode("reset")}
-                        className="mt-1 font-semibold text-brand underline block cursor-pointer"
+                        className="mt-1 font-semibold text-accent underline block cursor-pointer"
                       >
                         Forgot your password? Reset it here →
                       </button>
@@ -1061,7 +1061,7 @@ export function StartPage() {
                         <button
                           type="button"
                           onClick={() => switchMode("reset")}
-                          className="text-xs font-medium text-brand hover:underline cursor-pointer"
+                          className="text-xs font-medium text-accent hover:underline cursor-pointer"
                         >
                           Forgot password?
                         </button>
@@ -1228,15 +1228,15 @@ export function StartPage() {
                     type="checkbox"
                     checked={signupAdultConfirmed}
                     onChange={(e) => setSignupAdultConfirmed(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-line text-brand focus:ring-brand cursor-pointer"
+                    className="mt-0.5 h-4 w-4 rounded border-line text-accent focus:ring-brand cursor-pointer"
                   />
                   <span className="text-xs text-mute leading-snug">
                     I confirm I am 18 years or older and agree to the{" "}
-                    <Link href="/terms" className="font-semibold text-brand hover:underline">
+                    <Link href="/terms" className="font-semibold text-accent hover:underline">
                       Terms of Service
                     </Link>{" "}
                     and{" "}
-                    <Link href="/privacy" className="font-semibold text-brand hover:underline">
+                    <Link href="/privacy" className="font-semibold text-accent hover:underline">
                       Privacy Policy
                     </Link>
                     .
@@ -1317,14 +1317,14 @@ export function StartPage() {
                     <input
                       type="checkbox"
                       defaultChecked
-                      className="h-3.5 w-3.5 rounded border-line text-brand focus:ring-brand cursor-pointer"
+                      className="h-3.5 w-3.5 rounded border-line text-accent focus:ring-brand cursor-pointer"
                     />
                     <span>Remember me</span>
                   </label>
                   <button
                     type="button"
                     onClick={() => switchMode("reset")}
-                    className="font-semibold text-brand hover:underline cursor-pointer"
+                    className="font-semibold text-accent hover:underline cursor-pointer"
                   >
                     Forgot password?
                   </button>
@@ -1349,7 +1349,7 @@ export function StartPage() {
                   <button
                     type="button"
                     onClick={() => switchMode("signup")}
-                    className="font-semibold text-brand hover:underline"
+                    className="font-semibold text-accent hover:underline"
                   >
                     Create an account
                   </button>
@@ -1360,7 +1360,7 @@ export function StartPage() {
                   <button
                     type="button"
                     onClick={() => switchMode("signin")}
-                    className="font-semibold text-brand hover:underline"
+                    className="font-semibold text-accent hover:underline"
                   >
                     Sign in
                   </button>
@@ -1384,7 +1384,7 @@ export function StartPage() {
       <div className="mt-6 text-center">
         <p className="text-xs text-mute">
           Explore partner options:{" "}
-          <Link href="/join" className="text-brand font-medium hover:underline">
+          <Link href="/join" className="text-accent font-medium hover:underline">
             Become a Host, Business or Organiser
           </Link>
         </p>

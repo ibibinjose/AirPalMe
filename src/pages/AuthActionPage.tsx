@@ -95,7 +95,7 @@ export function AuthActionPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-8 pb-28">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Account</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Account</p>
       <h1 className="font-display mt-1 text-3xl font-semibold">{title}</h1>
 
       {phase === "loading" && <PageLoading label="Checking the link…" />}
@@ -147,11 +147,11 @@ export function AuthActionPage() {
       )}
 
       <p className="mt-6 text-[12px] text-mute">
-        <Link href="/start?tab=signin" className="text-brand">
+        <Link href="/start?tab=signin" className="text-accent">
           Sign in
         </Link>
         {" · "}
-        <Link href="/privacy" className="text-brand">
+        <Link href="/privacy" className="text-accent">
           Privacy
         </Link>
       </p>

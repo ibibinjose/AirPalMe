@@ -69,7 +69,7 @@ const QUICK_STARTERS = [
     label: "Night Out",
     desc: "Drinks, music & vibes",
     type: "nightout" as const,
-    color: "bg-brand/10 text-brand",
+    color: "bg-brand/10 text-accent",
   },
   {
     icon: Footprints,
@@ -222,7 +222,7 @@ export function PlanHubPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-accent">
               <MapPin size={12} className="shrink-0" />
               <span>{effectiveCity}</span>
             </span>
@@ -258,10 +258,10 @@ export function PlanHubPage() {
         <div className="mt-6 overflow-hidden rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs transition-all hover:shadow-md md:p-6">
           <div className="flex items-center justify-between gap-3 pb-3 border-b border-line/60">
             <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand/15 text-brand">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand/15 text-accent">
                 <Sparkles size={13} />
               </span>
-              <span className="text-xs font-bold uppercase tracking-wider text-brand">
+              <span className="text-xs font-bold uppercase tracking-wider text-accent">
                 Spotlight · Your Next Plan
               </span>
             </div>
@@ -293,7 +293,7 @@ export function PlanHubPage() {
 
                 <div className="mt-2.5 flex flex-wrap items-center gap-y-2 gap-x-4 text-xs font-medium text-mute md:text-sm">
                   <span className="inline-flex items-center gap-1.5">
-                    <Calendar size={14} className="text-brand" />
+                    <Calendar size={14} className="text-accent" />
                     {formatPlanDate(nextUpcomingPlan.date, nextUpcomingPlan.time)}
                   </span>
                   {(nextUpcomingPlan.destination || nextUpcomingPlan.city) && (
@@ -478,7 +478,7 @@ export function PlanHubPage() {
                 className={cn(
                   "min-h-[44px] shrink-0 rounded-xl px-3 text-xs font-semibold ring-1 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
                   category === c.id
-                    ? "bg-ink text-white ring-transparent shadow-xs"
+                    ? "bg-ink text-paper ring-transparent shadow-xs"
                     : "bg-card text-mute ring-line hover:text-ink hover:bg-paper",
                 )}
               >
@@ -536,7 +536,7 @@ export function PlanHubPage() {
                         {event ? `${event.timeLabel}${event.venue ? ` · ${event.venue}` : ""}` : "Saved event"}
                       </span>
                     </span>
-                    <span className="shrink-0 text-xs font-bold text-brand flex items-center gap-1">
+                    <span className="shrink-0 text-xs font-bold text-accent flex items-center gap-1">
                       View <ArrowRight size={13} />
                     </span>
                   </button>
@@ -546,7 +546,7 @@ export function PlanHubPage() {
           )
         ) : displayedPlans.length === 0 ? (
           <div className="rounded-3xl bg-card p-8 md:p-12 text-center ring-1 ring-line shadow-xs">
-            <div className="mx-auto mb-3.5 grid h-14 w-14 place-items-center rounded-2xl bg-brand/10 text-brand">
+            <div className="mx-auto mb-3.5 grid h-14 w-14 place-items-center rounded-2xl bg-brand/10 text-accent">
               <Compass size={28} />
             </div>
             <h2 className="font-display text-xl font-bold text-ink">

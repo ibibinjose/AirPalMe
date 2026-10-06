@@ -12,7 +12,7 @@ export function PartnersPage() {
     <div className="mx-auto max-w-5xl px-4 pb-10">
       <header className="flex flex-col items-start gap-3 py-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.16em] text-gold">Partners</p>
+          <p className="text-[11px] uppercase tracking-[0.16em] text-accent">Partners</p>
           <h1 className="font-display text-3xl font-semibold">Places & Venues</h1>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">

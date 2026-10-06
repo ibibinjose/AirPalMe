@@ -51,7 +51,7 @@ export function PrintStandeeModal({
         </div>
 
         <div className="space-y-1.5">
-          <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-brand">AirPal Pulse</span>
+          <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-accent">AirPal Pulse</span>
           <h3 className="font-display text-2xl font-extrabold tracking-tight">{businessName}</h3>
           <p className="mx-auto max-w-xs text-xs font-medium text-zinc-600">{title}</p>
         </div>

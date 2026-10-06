@@ -207,7 +207,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
         <button
           type="button"
           onClick={share}
-          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-brand ring-1 ring-line hover:bg-paper"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-accent ring-1 ring-line hover:bg-paper"
         >
           <Share2 size={14} /> Share
         </button>
@@ -217,7 +217,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
         <img src={art} alt={promo.title} className="mt-4 h-56 w-full rounded-3xl ring-1 ring-line object-cover" />
       ) : (
         <div className="mt-4 grid h-40 w-full place-items-center rounded-3xl ring-1 ring-line bg-paper">
-          <Gift size={44} className="text-brand" />
+          <Gift size={44} className="text-accent" />
         </div>
       )}
 
@@ -226,7 +226,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
 
       {promo.winnerNote && (
         <p className="mt-3 flex items-center gap-1.5 rounded-2xl border-2 border-gold bg-card p-3 text-sm font-semibold">
-          <Trophy size={16} className="text-gold" /> {promo.winnerNote}
+          <Trophy size={16} className="text-accent" /> {promo.winnerNote}
         </p>
       )}
 

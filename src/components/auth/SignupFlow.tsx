@@ -263,7 +263,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
             </Button>
             <button
               type="button"
-              className="w-full text-center text-xs font-medium text-brand disabled:text-mute"
+              className="w-full text-center text-xs font-medium text-accent disabled:text-mute"
               disabled={wait > 0 || busy}
               onClick={() => void sendCode()}
             >
@@ -389,7 +389,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
                 type="checkbox"
                 checked={adultConsent}
                 onChange={(e) => setAdultConsent(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded text-brand focus:ring-brand accent-[#1805db]"
+                className="mt-0.5 h-4 w-4 rounded text-accent focus:ring-brand accent-[#1805db]"
                 aria-required
               />
               <span className="text-xs leading-relaxed text-ink">
@@ -406,7 +406,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
                   type="checkbox"
                   checked={enableBiometrics}
                   onChange={(e) => setEnableBiometrics(e.target.checked)}
-                  className="h-4 w-4 rounded text-brand focus:ring-brand accent-[#1805db]"
+                  className="h-4 w-4 rounded text-accent focus:ring-brand accent-[#1805db]"
                 />
                 <div className="min-w-0 flex-1">
                   <span className="block text-xs font-bold text-ink">
@@ -416,7 +416,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
                     Never need passwords or SMS codes on this device
                   </span>
                 </div>
-                <ScanFace size={18} className="text-brand shrink-0" />
+                <ScanFace size={18} className="text-accent shrink-0" />
               </label>
             )}
 

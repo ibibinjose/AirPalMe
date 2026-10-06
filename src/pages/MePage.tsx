@@ -69,7 +69,7 @@ function Row({
       className="flex min-h-[50px] w-full cursor-pointer touch-manipulation items-center justify-between gap-3 rounded-2xl ring-1 ring-line bg-card px-4 py-3.5 text-left transition hover:ring-brand/40 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
     >
       <span className="min-w-0">
-        <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">{kicker}</span>
+        <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">{kicker}</span>
         <span className="block truncate font-medium">{title}</span>
       </span>
       <span className="shrink-0 flex min-h-[32px] items-center rounded-full border border-line px-3 py-1 text-xs font-semibold">{action}</span>
@@ -209,7 +209,7 @@ export function MePage() {
 
           {/* Travel identity — a reason to build a profile */}
           <div className="rounded-[28px] ring-1 ring-line bg-card p-5 shadow-xs">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Travel identity</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">Travel identity</p>
             <dl className="mt-3 grid grid-cols-4 gap-2 text-center">
               {[
                 { v: String(tripCount), l: "Trips" },
@@ -281,8 +281,8 @@ export function MePage() {
           {/* 🌟 MEET & HANGOUT + PUBLIC ACTIVITIES HUB */}
           <section className="overflow-hidden rounded-[28px] bg-gradient-to-br from-paper via-card to-paper/80 p-5 ring-1 ring-brand/30 shadow-xs">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand flex items-center gap-1.5">
-                <Sparkles size={13} className="text-brand" />
+              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent flex items-center gap-1.5">
+                <Sparkles size={13} className="text-accent" />
                 <span>Meet &amp; Hangout · Hub</span>
               </span>
               {mine ? (
@@ -305,11 +305,11 @@ export function MePage() {
                   Propose coffee, sync meetings, or group hangouts. Sync any confirmed plan to your phone calendar.
                 </p>
                 {mine?.meetingUrl && (
-                  <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-brand">
+                  <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-accent">
                     {mine.preferredMeetingPlatform === "facetime" || mine.meetingUrl.includes("facetime") ? (
                       <PhoneCall size={12} className="text-emerald-700" />
                     ) : (
-                      <Video size={12} className="text-brand" />
+                      <Video size={12} className="text-accent" />
                     )}
                     <span>
                       {mine.preferredMeetingPlatform === "facetime" || mine.meetingUrl.includes("facetime")
@@ -413,7 +413,7 @@ export function MePage() {
                             {item.requesterPhoto ? (
                               <Photo src={item.requesterPhoto} className="h-full w-full object-cover" />
                             ) : (
-                              <span className="grid h-full w-full place-items-center bg-ink font-bold text-sm text-white">
+                              <span className="grid h-full w-full place-items-center bg-neutral-900 font-bold text-sm text-white">
                                 {item.requesterName[0]}
                               </span>
                             )}
@@ -424,7 +424,7 @@ export function MePage() {
                               {item.requesterHandle && (
                                 <Link
                                   href={`/@${item.requesterHandle}`}
-                                  className="text-[11px] text-mute hover:text-brand truncate"
+                                  className="text-[11px] text-mute hover:text-accent truncate"
                                 >
                                   @{item.requesterHandle}
                                 </Link>
@@ -458,7 +458,7 @@ export function MePage() {
                                 "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-xs font-semibold transition active:scale-95 touch-manipulation focus-visible:outline-2 focus-visible:outline-brand",
                                 item.meetingPlatform === "facetime" || item.meetingLink.includes("facetime")
                                   ? "bg-emerald-500/15 text-emerald-800 ring-1 ring-emerald-500/30 hover:bg-emerald-500/25"
-                                  : "bg-brand/10 text-brand ring-1 ring-brand/30 hover:bg-brand/20",
+                                  : "bg-brand/10 text-accent ring-1 ring-brand/30 hover:bg-brand/20",
                               )}
                               title={
                                 item.meetingPlatform === "facetime" || item.meetingLink.includes("facetime")
@@ -469,7 +469,7 @@ export function MePage() {
                               {item.meetingPlatform === "facetime" || item.meetingLink.includes("facetime") ? (
                                 <PhoneCall size={13} className="text-emerald-700" />
                               ) : (
-                                <Video size={13} className="text-brand" />
+                                <Video size={13} className="text-accent" />
                               )}
                               <span>
                                 {item.meetingPlatform === "facetime" || item.meetingLink.includes("facetime")
@@ -508,14 +508,14 @@ export function MePage() {
             {/* Public Plans & Hangouts Section */}
             <div className="mt-5 border-t border-line/70 pt-4">
               <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-brand">
-                  <Sparkles size={13} className="text-brand" />
+                <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-accent">
+                  <Sparkles size={13} className="text-accent" />
                   <span>Your Public Plans &amp; Hangouts ({myPublicPlans.length})</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => nav("/plan/new")}
-                  className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold text-brand hover:bg-brand/20 transition"
+                  className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold text-accent hover:bg-brand/20 transition"
                 >
                   <Plus size={11} />
                   <span>New Plan</span>
@@ -561,7 +561,7 @@ export function MePage() {
                   <button
                     type="button"
                     onClick={() => nav("/plan/new")}
-                    className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-brand underline"
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-accent underline"
                   >
                     Create a public hangout plan →
                   </button>
@@ -651,7 +651,7 @@ export function MePage() {
               <button
                 type="button"
                 onClick={() => nav("/calendar")}
-                className="rounded-full border border-line px-3 py-1 text-xs font-semibold transition hover:ring-brand/40 hover:text-brand"
+                className="rounded-full border border-line px-3 py-1 text-xs font-semibold transition hover:ring-brand/40 hover:text-accent"
               >
                 Open Calendar →
               </button>
@@ -664,7 +664,7 @@ export function MePage() {
                     onClick={() => nav(`/calendar?event=${e.eventId}`)}
                     className="w-full rounded-2xl ring-1 ring-line bg-card px-4 py-3 text-left transition hover:ring-brand/40 active:scale-[0.99]"
                   >
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">
                       {EVENT_FLAVOUR_LABELS[e.flavour]}
                     </p>
                     <p className="font-medium text-ink">{e.name}</p>
@@ -674,7 +674,7 @@ export function MePage() {
               {savedEvents.length === 0 && (
                 <p className="rounded-2xl border-2 border-dashed border-line px-4 py-5 text-center text-sm text-mute">
                   No saved events yet. Browse the{" "}
-                  <button type="button" onClick={() => nav("/calendar")} className="font-medium text-brand underline">
+                  <button type="button" onClick={() => nav("/calendar")} className="font-medium text-accent underline">
                     Event Calendar
                   </button>
                   .
@@ -696,11 +696,11 @@ export function MePage() {
                     }}
                     className="w-full rounded-2xl ring-1 ring-line bg-card px-4 py-3 text-left transition hover:ring-brand/40 active:scale-[0.99]"
                   >
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">
                       {[s.booth || "—", s.location].filter(Boolean).join(" · ")} · {getEvent(s.eventId)?.name || s.eventId}
                     </p>
                     <p className="font-medium text-ink">{s.name}</p>
-                    {s.offer && <p className="text-[13px] text-gold">{s.offer}</p>}
+                    {s.offer && <p className="text-[13px] text-accent">{s.offer}</p>}
                   </button>
                 </li>
               ))}

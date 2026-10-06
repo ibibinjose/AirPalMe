@@ -161,7 +161,7 @@ export function CalendarAgendaView({ events, onSelectEvent, onResetFilters, onSe
                   </div>
                 </div>
               ) : (
-                <div className="mb-4 flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-brand bg-brand/15 p-3.5 text-center text-xs font-bold text-brand shadow-xs animate-in fade-in">
+                <div className="mb-4 flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-brand bg-brand/15 p-3.5 text-center text-xs font-bold text-accent shadow-xs animate-in fade-in">
                   <ArrowDownCircle size={18} className="animate-bounce" />
                   <span>
                     Slot Available: Drop "{draggedEvent?.title}" to move here ({group.displayDate})

@@ -267,7 +267,7 @@ export function BookingsSection() {
                         : ""}
                   </span>
                 </span>
-                <span className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-brand">
+                <span className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-semibold text-accent">
                   {STATUS_LABEL[b.status] ?? b.status}
                 </span>
               </span>
@@ -358,7 +358,7 @@ export function BookingsSection() {
                         aria-pressed={stars === s}
                         className="cursor-pointer touch-manipulation p-1"
                       >
-                        <Star size={20} className={s <= stars ? "fill-gold text-gold" : "text-mute"} />
+                        <Star size={20} className={s <= stars ? "fill-gold text-accent" : "text-mute"} />
                       </button>
                     ))}
                   </span>

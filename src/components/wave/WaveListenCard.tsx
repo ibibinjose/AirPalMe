@@ -92,7 +92,7 @@ export function WaveListenCard() {
   return (
     <section className="mt-4 rounded-[20px] bg-paper p-4">
       <div className="flex items-start gap-3">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand/10 text-brand">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand/10 text-accent">
           <Hand size={18} />
         </span>
         <div className="min-w-0 flex-1">

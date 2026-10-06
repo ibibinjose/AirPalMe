@@ -25,9 +25,9 @@ export function NativeOpenScreen() {
           className="h-20 w-20 rounded-[22px] bg-white object-contain p-2 shadow-md ring-1 ring-black/5"
         />
         <h1 className="font-display mt-5 text-[2.15rem] font-bold leading-none tracking-tight text-ink">
-          AirPal<span className="text-brand">.me</span>
+          AirPal<span className="text-accent">.me</span>
         </h1>
-        <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">{BRAND_TAGLINE}</p>
+        <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">{BRAND_TAGLINE}</p>
         <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-mute">
           Find a place. Make a plan. Meet your people — {BRAND.publicPositioning}
         </p>
@@ -70,7 +70,7 @@ export function NativeOpenScreen() {
                 void triggerHaptic("light");
                 nav("/start?tab=signup");
               }}
-              className="w-full py-2 text-sm font-semibold text-brand"
+              className="w-full py-2 text-sm font-semibold text-accent"
             >
               Create a free account
             </button>

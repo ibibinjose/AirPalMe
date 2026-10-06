@@ -78,7 +78,7 @@ export function AddToTripSheet({
         aria-label="Add to trip"
         className="scroll-container relative max-h-[min(80vh,calc(var(--visual-viewport-height,100dvh)-1.5rem))] w-full max-w-md overflow-y-auto rounded-t-[32px] bg-card p-5 ring-1 ring-line shadow-2xl safe-bottom sm:rounded-[32px] sm:p-6"
       >
-        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Add to trip</p>
+        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">Add to trip</p>
         <h2 className="font-display mt-0.5 truncate text-xl font-bold text-ink">{stop.name}</h2>
 
         {upcoming.length > 0 ? (
@@ -90,7 +90,7 @@ export function AddToTripSheet({
                   onClick={() => pick(p.id, p.title)}
                   className="flex w-full items-center gap-3 rounded-2xl bg-paper p-3 text-left ring-1 ring-line transition hover:ring-brand/40 active:scale-[0.99]"
                 >
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand/10 text-accent">
                     <MapPin size={17} />
                   </span>
                   <span className="min-w-0 flex-1">

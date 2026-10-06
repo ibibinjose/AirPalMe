@@ -310,7 +310,7 @@ export function SearchAnalyticsPage() {
             </div>
             <p className="mt-1 text-xs sm:text-sm text-mute">
               Real-time Firestore query analytics to track trending terms, user intent, and search relevance.
-              {loading && <span className="ml-2 inline-block text-xs font-semibold text-brand motion-safe:animate-pulse">Syncing...</span>}
+              {loading && <span className="ml-2 inline-block text-xs font-semibold text-accent motion-safe:animate-pulse">Syncing...</span>}
               {!loading && queryLogs.length > 0 && (
                 <span className="ml-2 text-xs font-semibold text-emerald-600">
                   · {queryLogs.length} recent sessions logged
@@ -327,7 +327,7 @@ export function SearchAnalyticsPage() {
               disabled={refreshing}
               className="rounded-full bg-card ring-1 ring-line text-xs font-semibold gap-1.5 shadow-xs"
             >
-              <RefreshCw size={13} className={cn(refreshing && "animate-spin text-brand")} />
+              <RefreshCw size={13} className={cn(refreshing && "animate-spin text-accent")} />
               <span>Refresh</span>
             </Button>
             <Button
@@ -370,7 +370,7 @@ export function SearchAnalyticsPage() {
             <span className="text-[11px] font-bold uppercase tracking-wider text-mute">
               Top Trending Query
             </span>
-            <p className="font-display mt-1 text-lg sm:text-xl font-bold text-brand truncate" title={topTerm}>
+            <p className="font-display mt-1 text-lg sm:text-xl font-bold text-accent truncate" title={topTerm}>
               &ldquo;{topTerm}&rdquo;
             </p>
             <p className="mt-1 text-[11px] text-mute font-medium">Highest search frequency</p>
@@ -383,7 +383,7 @@ export function SearchAnalyticsPage() {
             <p className="font-display mt-1 text-2xl sm:text-3xl font-extrabold text-ink">
               74.2%
             </p>
-            <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-brand">
+            <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-accent">
               <Sparkles size={12} />
               <span>High intent matches</span>
             </p>
@@ -464,7 +464,7 @@ export function SearchAnalyticsPage() {
                     Daily queries by vertical across {timeRange === "7d" ? "the past week" : "recent weeks"}
                   </p>
                 </div>
-                <span className="flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-bold text-brand">
+                <span className="flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-bold text-accent">
                   <Calendar size={12} />
                   <span>Daily Aggregate</span>
                 </span>
@@ -644,7 +644,7 @@ export function SearchAnalyticsPage() {
           {/* Quick Real-Time Simulator & Test Queries (7 cols) */}
           <div className="lg:col-span-7 rounded-3xl bg-card p-5 sm:p-6 ring-1 ring-line shadow-xs flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-brand">
+              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-accent">
                 <Sparkles size={14} />
                 <span>Interactive Query Generator</span>
               </div>
@@ -672,7 +672,7 @@ export function SearchAnalyticsPage() {
                     onClick={() => void handleQuickTest(item.term, item.cat)}
                     className="flex items-center gap-1.5 rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card hover:ring-brand/40 transition active:scale-95 cursor-pointer touch-manipulation"
                   >
-                    <Search size={12} className="text-brand" />
+                    <Search size={12} className="text-accent" />
                     <span>{item.term}</span>
                     <span className="text-[10px] text-mute uppercase font-bold">({item.cat})</span>
                   </button>
@@ -765,7 +765,7 @@ export function SearchAnalyticsPage() {
                       </td>
                       <td className="py-3 text-mute font-medium">
                         <span className="flex items-center gap-1">
-                          <MapPin size={11} className="text-brand" />
+                          <MapPin size={11} className="text-accent" />
                           <span>{item.city || "Sydney"}</span>
                         </span>
                       </td>
@@ -776,7 +776,7 @@ export function SearchAnalyticsPage() {
                         <button
                           type="button"
                           onClick={() => nav(`/search?q=${encodeURIComponent(item.term)}`)}
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-brand hover:underline cursor-pointer"
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-accent hover:underline cursor-pointer"
                         >
                           <span>Search</span>
                           <ArrowUpRight size={12} />

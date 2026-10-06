@@ -46,7 +46,7 @@ export function CatchUpSlotActions({ item }: { item: CatchUpItem }) {
           type="button"
           disabled={Boolean(busy)}
           onClick={() => void run("accept", slot.id)}
-          className="inline-flex min-h-[44px] cursor-pointer touch-manipulation items-center rounded-full bg-brand/10 px-3 text-[12px] font-semibold text-brand ring-1 ring-brand/20 transition-colors hover:bg-brand/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex min-h-[44px] cursor-pointer touch-manipulation items-center rounded-full bg-brand/10 px-3 text-[12px] font-semibold text-accent ring-1 ring-brand/20 transition-colors hover:bg-brand/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy === slot.id ? "Locking…" : slot.label}
         </button>

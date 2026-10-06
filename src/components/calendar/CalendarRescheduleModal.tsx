@@ -121,7 +121,7 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
       {/* Backdrop */}
       <button
         type="button"
-        className="fixed inset-0 bg-ink/60 backdrop-blur-xs transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         aria-label="Close modal"
         onClick={onClose}
       />
@@ -134,7 +134,7 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
         {/* Header */}
         <div className="flex items-start justify-between gap-3 pb-3 border-b border-line/60">
           <div>
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-brand uppercase tracking-wider mb-1">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-accent uppercase tracking-wider mb-1">
               <CalendarIcon size={14} />
               <span>Reschedule Event</span>
             </div>
@@ -174,7 +174,7 @@ export function CalendarRescheduleModal({ event, onClose }: CalendarRescheduleMo
               <button
                 type="button"
                 onClick={handleReset}
-                className="inline-flex items-center gap-1 text-xs font-semibold text-brand hover:underline"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
               >
                 <RotateCcw size={11} />
                 <span>Reset to original date</span>

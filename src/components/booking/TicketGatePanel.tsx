@@ -156,7 +156,7 @@ export function TicketGatePanel({
               {ticket.displayPaid ? "Paid" : "Unpaid"}
             </span>
             {ticket.admittedAt ? (
-              <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-bold text-brand ring-1 ring-brand/20">
+              <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[11px] font-bold text-accent ring-1 ring-brand/20">
                 Admitted {ticket.admittedAt.slice(11, 16) || ticket.admittedAt}
               </span>
             ) : ticket.valid ? (

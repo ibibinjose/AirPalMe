@@ -225,7 +225,7 @@ export function GooglePlaceImportCard({
             {[preview.phone, preview.website.replace(/^https?:\/\//, "")].filter(Boolean).join(" · ")}
           </p>
         </div>
-        {already && <BadgeCheck size={18} className="shrink-0 text-brand" />}
+        {already && <BadgeCheck size={18} className="shrink-0 text-accent" />}
       </div>
       <div className="border-t border-line px-3 py-2 text-[12px] text-mute">
         {preview.hours ? preview.hours.split("; ").slice(0, 2).join(" · ") : "Hours not listed"}
@@ -249,7 +249,7 @@ export function GooglePlaceImportCard({
           <p className="text-[12px] text-mute">
             {fromGoogle ? "Copied from Google." : "Address, hours, and phone copied when listed."}
           </p>
-          <button type="button" className="text-[12px] font-semibold text-brand" onClick={clear}>
+          <button type="button" className="text-[12px] font-semibold text-accent" onClick={clear}>
             Change
           </button>
         </div>
@@ -269,7 +269,7 @@ export function GooglePlaceImportCard({
 
   return (
     <div className="rounded-2xl ring-1 ring-line bg-paper p-4">
-      <p className="text-[11px] font-bold uppercase tracking-wider text-brand">
+      <p className="text-[11px] font-bold uppercase tracking-wider text-accent">
         {fromGoogle ? "From Google" : "Public listing"}
       </p>
       <h3 className="font-display mt-1 text-lg font-bold">Import or sync the listing</h3>
@@ -295,7 +295,7 @@ export function PersonalProfileListingHint({
 }) {
   return (
     <div data-testid="personal-listing-hint" className="rounded-2xl bg-paper p-4 ring-1 ring-line">
-      <p className="text-[11px] font-bold uppercase tracking-wider text-brand">Your place</p>
+      <p className="text-[11px] font-bold uppercase tracking-wider text-accent">Your place</p>
       <h3 className="font-display mt-1 text-lg font-bold">Import the listing on the business profile</h3>
       <p className="mt-1 text-[13px] leading-relaxed text-mute">
         This page is you. Google and directory listings belong on the business profile, so a café or shop does not

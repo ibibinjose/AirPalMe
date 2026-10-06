@@ -62,7 +62,7 @@ export function ArrivalGuide() {
   return (
     <section className="mt-5 overflow-hidden rounded-[28px] bg-card ring-1 ring-line">
       <div className="px-4 pt-4">
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">{copy.kicker}</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">{copy.kicker}</p>
         <div className="mt-1 flex items-baseline justify-between gap-3">
           <h2 className="font-display text-2xl font-semibold">{copy.title}</h2>
           {eta && phase !== "in" && (
@@ -77,7 +77,7 @@ export function ArrivalGuide() {
 
       <div className="space-y-2 p-3">
         <article className="rounded-2xl bg-paper px-4 py-3 ring-1 ring-line">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-gold">{t("checkIn")}</p>
+          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-accent">{t("checkIn")}</p>
           <p className="mt-1 font-display text-lg">{formatWhen(checkInAt)}</p>
           <p className="mt-1 text-[14px] leading-snug text-ink/90">{copy.checkin}</p>
           <p className="mt-2 flex items-start gap-1.5 text-[13px] text-mute">
@@ -120,7 +120,7 @@ export function ArrivalGuide() {
 
         {parking && (
           <article className="rounded-2xl bg-paper px-4 py-3 ring-1 ring-line">
-            <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-gold">
+            <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-accent">
               <Car size={12} /> {t("parking")}
             </p>
             <p className="mt-1 font-medium">{parking.name}</p>
@@ -134,7 +134,7 @@ export function ArrivalGuide() {
               target="_blank"
               rel="noreferrer"
               onClick={() => trackMapClick({ propertyId: property.id, placeId: parking.id, source: "arrival" })}
-              className="mt-3 flex h-9 items-center justify-center gap-1 rounded-full bg-ink text-[13px] font-semibold text-white"
+              className="mt-3 flex h-9 items-center justify-center gap-1 rounded-full bg-neutral-900 text-[13px] font-semibold text-white"
             >
               <Navigation size={12} />
               {t("walkToGarage")}
@@ -144,9 +144,9 @@ export function ArrivalGuide() {
 
         {bags && phase !== "in" && (
           <article className="flex gap-3 rounded-2xl bg-paper px-4 py-3 ring-1 ring-line">
-            <Luggage size={16} className="mt-0.5 shrink-0 text-gold" />
+            <Luggage size={16} className="mt-0.5 shrink-0 text-accent" />
             <div>
-              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-gold">{t("bags")}</p>
+              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-accent">{t("bags")}</p>
               <p className="mt-1 text-[14px] leading-snug">{bags.details || `${bags.name} · ${bags.hours}`}</p>
             </div>
           </article>
@@ -154,7 +154,7 @@ export function ArrivalGuide() {
       </div>
 
       {phase === "open" && (
-        <button type="button" onClick={openAnswers} className="w-full border-t border-line py-3 text-sm text-brand">
+        <button type="button" onClick={openAnswers} className="w-full border-t border-line py-3 text-sm text-accent">
           {t("wifiAndQr")}
         </button>
       )}

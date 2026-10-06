@@ -158,7 +158,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                         void triggerHaptic("medium");
                         openGlobalCreate();
                       }}
-                      className="relative grid h-9 w-9 touch-manipulation place-items-center rounded-full text-brand bg-brand/10 hover:bg-brand/20 ring-1 ring-brand/25 transition cursor-pointer after:absolute after:-inset-1 after:content-['']"
+                      className="relative grid h-9 w-9 touch-manipulation place-items-center rounded-full text-accent bg-brand/10 hover:bg-brand/20 ring-1 ring-brand/25 transition cursor-pointer after:absolute after:-inset-1 after:content-['']"
                       aria-label="Create something new"
                       title="Create (+)"
                     >
@@ -218,7 +218,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                         void triggerHaptic("medium");
                         openGlobalCreate();
                       }}
-                      className="relative grid h-10 w-10 touch-manipulation place-items-center rounded-full text-brand bg-brand/10 hover:bg-brand/20 ring-1 ring-brand/25 transition-transform active:scale-95 cursor-pointer after:absolute after:-inset-1 after:content-['']"
+                      className="relative grid h-10 w-10 touch-manipulation place-items-center rounded-full text-accent bg-brand/10 hover:bg-brand/20 ring-1 ring-brand/25 transition-transform active:scale-95 cursor-pointer after:absolute after:-inset-1 after:content-['']"
                       aria-label="Create something new"
                       title="Create (+)"
                     >

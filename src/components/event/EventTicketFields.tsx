@@ -41,7 +41,7 @@ export function EventTicketFields({ values, onChange }: Props) {
     "h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20 placeholder:text-mute/60";
   return (
     <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
-      <p className="text-xs font-bold uppercase tracking-wider text-gold">Tickets</p>
+      <p className="text-xs font-bold uppercase tracking-wider text-accent">Tickets</p>
       <div className="grid grid-cols-2 gap-2">
         {(
           [

@@ -80,11 +80,11 @@ export function PlanAlbum({
     <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand ring-1 ring-brand/20">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-brand/10 text-accent ring-1 ring-brand/20">
             <Images size={18} />
           </span>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Moments</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">Moments</p>
             <h2 className="font-display text-xl font-bold text-ink">
               Shared album{photos.length > 0 ? ` · ${photos.length}` : ""}
             </h2>

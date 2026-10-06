@@ -126,9 +126,9 @@ function BizCircle({
   onClick?: () => void;
 }) {
   const circle =
-    "grid h-12 w-12 sm:h-14 sm:w-14 place-items-center rounded-2xl sm:rounded-full bg-card text-brand ring-1 ring-line/80 shadow-xs transition-shadow duration-150 hover:shadow-md active:scale-95";
+    "grid h-12 w-12 sm:h-14 sm:w-14 place-items-center rounded-2xl sm:rounded-full bg-card text-accent ring-1 ring-line/80 shadow-xs transition-shadow duration-150 hover:shadow-md active:scale-95";
   const wrap = "flex min-w-[56px] sm:min-w-[64px] touch-manipulation flex-col items-center gap-1.5 group";
-  const caption = "text-[11px] sm:text-xs font-semibold text-ink/90 group-hover:text-brand transition-colors";
+  const caption = "text-[11px] sm:text-xs font-semibold text-ink/90 group-hover:text-accent transition-colors";
 
   if (href) {
     return (
@@ -186,7 +186,7 @@ function FacilityIcon({ name, icon }: { name: string; icon?: string }) {
   if (norm.includes("spa") || norm.includes("sauna") || norm.includes("massage") || norm.includes("wellness")) {
     return <Sparkles size={18} className="text-fuchsia-500" />;
   }
-  return <Building2 size={18} className="text-brand" />;
+  return <Building2 size={18} className="text-accent" />;
 }
 
 export function BioPublicPage() {
@@ -399,7 +399,7 @@ export function BioPublicPage() {
       return (
         <div className="mx-auto max-w-md px-4 py-16 text-center">
           <div className="rounded-[32px] border border-line bg-card p-6 sm:p-8 shadow-clay">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-brand/10 text-brand shadow-inner">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-brand/10 text-accent shadow-inner">
               <Sparkles size={32} />
             </div>
             <h1 className="font-display mt-5 text-2xl sm:text-3xl font-bold text-ink">@{handle} is available!</h1>
@@ -734,7 +734,7 @@ export function BioPublicPage() {
                 {avatar ? (
                   <Photo src={avatar} className="h-full w-full object-cover" />
                 ) : (
-                  <span className="grid h-full w-full place-items-center bg-ink font-display text-3xl font-bold text-white">
+                  <span className="grid h-full w-full place-items-center bg-neutral-900 font-display text-3xl font-bold text-white">
                     {bio.name[0]}
                   </span>
                 )}
@@ -821,7 +821,7 @@ export function BioPublicPage() {
                       });
                     }}
                   >
-                    <ContactRound size={14} className="text-brand" />
+                    <ContactRound size={14} className="text-accent" />
                     <span className="hidden sm:inline">Save Contact</span>
                   </Button>
                 </div>
@@ -841,7 +841,7 @@ export function BioPublicPage() {
                     });
                   }}
                 >
-                  <ContactRound size={14} className="text-brand" />
+                  <ContactRound size={14} className="text-accent" />
                   <span>Save Contact</span>
                 </Button>
               )}
@@ -853,13 +853,13 @@ export function BioPublicPage() {
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">{bio.name}</h1>
               {bio.categoryTag && (
-                <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-brand">
+                <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-accent">
                   {bio.categoryTag}
                 </span>
               )}
               {bio.kind === "person" && bio.starTier && (
                 <span
-                  className="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-gold"
+                  className="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-accent"
                   title={`AirPal ${bio.starTier} — earned by bringing mates to real experiences`}
                 >
                   <span aria-hidden>★</span> {bio.starTier}
@@ -873,7 +873,7 @@ export function BioPublicPage() {
               {bio.pronouns && <span>· {bio.pronouns}</span>}
               {bio.city && (
                 <span className="inline-flex items-center gap-1">
-                  <MapPin size={12} className="text-gold shrink-0" aria-hidden />
+                  <MapPin size={12} className="text-accent shrink-0" aria-hidden />
                   {bio.city}
                 </span>
               )}
@@ -935,7 +935,7 @@ export function BioPublicPage() {
                 id="bio-about"
                 className="mt-4 scroll-mt-24 rounded-3xl bg-paper/60 p-4 sm:p-5 border border-line/80 shadow-2xs"
               >
-                <p className="text-[10px] font-bold uppercase tracking-wider text-gold mb-1.5">About Story</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-accent mb-1.5">About Story</p>
                 <p className="text-xs sm:text-sm leading-relaxed text-ink/80 whitespace-pre-line">{bio.aboutText}</p>
               </div>
             )}
@@ -964,7 +964,7 @@ export function BioPublicPage() {
               className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-paper px-3 sm:px-4 text-xs font-semibold text-ink shadow-2xs ring-1 ring-line/80 transition hover:bg-paper/80 active:scale-95 shrink-0"
               title="Share & QR Code"
             >
-              <QrCode size={15} className="text-gold" />
+              <QrCode size={15} className="text-accent" />
               <span>QR</span>
             </button>
           </div>
@@ -974,7 +974,7 @@ export function BioPublicPage() {
             <button
               type="button"
               onClick={handleStartChat}
-              className="group flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-brand/10 px-2 text-xs font-bold text-brand ring-1 ring-brand/30 transition-all duration-200 hover:bg-brand hover:text-white active:scale-95 shadow-2xs"
+              className="group flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-brand/10 px-2 text-xs font-bold text-accent ring-1 ring-brand/30 transition-all duration-200 hover:bg-brand hover:text-white active:scale-95 shadow-2xs"
             >
               <MessageSquare size={15} className="shrink-0 group-hover:scale-110 transition-transform" />
               <span className="truncate">Chat</span>
@@ -1029,7 +1029,7 @@ export function BioPublicPage() {
                   {bio.hours && <span className="text-mute font-normal"> · {bio.hours}</span>}
                 </p>
                 {isStay && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold text-brand">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold text-accent">
                     <Sparkles size={11} />
                     Verified Stay
                   </span>
@@ -1045,7 +1045,7 @@ export function BioPublicPage() {
                 <button
                   type="button"
                   onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                  className="min-h-[44px] shrink-0 rounded-full bg-ink px-4 text-xs font-semibold text-white transition active:scale-95"
+                  className="min-h-[44px] shrink-0 rounded-full bg-neutral-900 px-4 text-xs font-semibold text-white transition active:scale-95"
                 >
                   Overview
                 </button>
@@ -1053,7 +1053,7 @@ export function BioPublicPage() {
                   <button
                     type="button"
                     onClick={() => document.getElementById("bio-stay")?.scrollIntoView({ behavior: "smooth" })}
-                    className="min-h-[44px] shrink-0 rounded-full bg-brand/10 px-4 text-xs font-bold text-brand ring-1 ring-brand/30 transition hover:bg-brand/15 active:scale-95"
+                    className="min-h-[44px] shrink-0 rounded-full bg-brand/10 px-4 text-xs font-bold text-accent ring-1 ring-brand/30 transition hover:bg-brand/15 active:scale-95"
                   >
                     Stay &amp; AI
                   </button>
@@ -1159,7 +1159,7 @@ export function BioPublicPage() {
                   {/* Stay & Guide hero banner */}
                   <div className="overflow-hidden rounded-3xl bg-card p-5 ring-1 ring-brand/30 shadow-xs">
                     <div className="flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-brand">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-accent">
                         <Sparkles size={11} />
                         Stay &amp; Guide
                       </span>
@@ -1188,7 +1188,7 @@ export function BioPublicPage() {
                         href={`/stay/${stayTargetId}?open=answers`}
                         className="flex h-11 items-center justify-center gap-2 rounded-full bg-paper px-5 text-xs font-bold text-ink ring-1 ring-line/80 shadow-2xs transition hover:bg-paper/80 active:scale-95"
                       >
-                        <Sparkles size={14} className="text-gold" />
+                        <Sparkles size={14} className="text-accent" />
                         <span>Ask AirPal AI 24/7</span>
                       </Link>
                     </div>
@@ -1198,7 +1198,7 @@ export function BioPublicPage() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     <div className="rounded-2xl bg-paper/70 p-3.5 ring-1 ring-line/80 shadow-2xs">
                       <div className="flex items-center gap-1.5 text-mute text-[10px] font-bold uppercase tracking-wider">
-                        <Clock size={12} className="text-brand" />
+                        <Clock size={12} className="text-accent" />
                         <span>Check-In</span>
                       </div>
                       <p className="mt-1 font-display text-sm sm:text-base font-bold text-ink">{stayCheckIn}</p>
@@ -1225,7 +1225,7 @@ export function BioPublicPage() {
 
                     <div className="rounded-2xl bg-paper/70 p-3.5 ring-1 ring-line/80 shadow-2xs">
                       <div className="flex items-center gap-1.5 text-mute text-[10px] font-bold uppercase tracking-wider">
-                        <Sparkles size={12} className="text-gold" />
+                        <Sparkles size={12} className="text-accent" />
                         <span>Front Desk</span>
                       </div>
                       <p className="mt-1 font-display text-xs sm:text-sm font-bold text-ink">24/7 AI &amp; Staff</p>
@@ -1241,7 +1241,7 @@ export function BioPublicPage() {
                     >
                       <div className="flex items-center justify-between mb-3.5">
                         <div>
-                          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand">
+                          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-accent">
                             🏢 Hotel Facilities
                           </span>
                           <h4 className="font-display text-base sm:text-lg font-bold text-ink mt-0.5">
@@ -1266,7 +1266,7 @@ export function BioPublicPage() {
                                     <FacilityIcon name={fac.name} icon={fac.icon} />
                                   </span>
                                   <div>
-                                    <p className="font-bold text-xs sm:text-sm text-ink group-hover:text-brand transition-colors">
+                                    <p className="font-bold text-xs sm:text-sm text-ink group-hover:text-accent transition-colors">
                                       {fac.name}
                                     </p>
                                     {fac.floor && <p className="text-[11px] text-mute font-medium">{fac.floor}</p>}
@@ -1303,7 +1303,7 @@ export function BioPublicPage() {
                       onClick={() => maps && recordTap(bio.handle, "maps")}
                       className="flex items-center gap-3 p-4 transition hover:bg-paper"
                     >
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 text-accent">
                         <MapPin size={18} />
                       </span>
                       <span className="min-w-0 flex-1 text-sm font-medium text-ink">{bio.city}</span>
@@ -1321,7 +1321,7 @@ export function BioPublicPage() {
                       onClick={() => recordTap(bio.handle, "call")}
                       className="flex items-center gap-3 p-4 transition hover:bg-paper"
                     >
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 text-brand">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 text-accent">
                         <Phone size={18} />
                       </span>
                       <span className="min-w-0 flex-1 text-sm font-medium text-ink">{bio.phone}</span>
@@ -1337,8 +1337,8 @@ export function BioPublicPage() {
           {isOwner && (
             <div className="mt-6 rounded-3xl bg-gradient-to-br from-paper/90 via-card to-paper/60 p-5 ring-1 ring-brand/30 shadow-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand flex items-center gap-1.5">
-                  <Sparkles size={12} className="text-brand" />
+                <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent flex items-center gap-1.5">
+                  <Sparkles size={12} className="text-accent" />
                   <span>Meet &amp; Hangout · Your AirPal Link</span>
                 </span>
                 <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/15 rounded-full px-2.5 py-0.5">
@@ -1434,7 +1434,7 @@ export function BioPublicPage() {
                               {item.requesterPhoto ? (
                                 <Photo src={item.requesterPhoto} className="h-full w-full object-cover" />
                               ) : (
-                                <span className="grid h-full w-full place-items-center bg-ink font-bold text-sm text-white">
+                                <span className="grid h-full w-full place-items-center bg-neutral-900 font-bold text-sm text-white">
                                   {item.requesterName[0]}
                                 </span>
                               )}
@@ -1445,7 +1445,7 @@ export function BioPublicPage() {
                                 {item.requesterHandle && (
                                   <Link
                                     href={`/@${item.requesterHandle}`}
-                                    className="text-[11px] text-mute hover:text-brand truncate"
+                                    className="text-[11px] text-mute hover:text-accent truncate"
                                   >
                                     @{item.requesterHandle}
                                   </Link>
@@ -1481,7 +1481,7 @@ export function BioPublicPage() {
                                   "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold transition active:scale-95 touch-manipulation focus-visible:outline-2 focus-visible:outline-brand",
                                   item.meetingPlatform === "facetime" || item.meetingLink.includes("facetime")
                                     ? "bg-emerald-500/15 text-emerald-800 ring-1 ring-emerald-500/30 hover:bg-emerald-500/25"
-                                    : "bg-brand/10 text-brand ring-1 ring-brand/30 hover:bg-brand/20",
+                                    : "bg-brand/10 text-accent ring-1 ring-brand/30 hover:bg-brand/20",
                                 )}
                                 title={
                                   item.meetingPlatform === "facetime" || item.meetingLink.includes("facetime")
@@ -1492,7 +1492,7 @@ export function BioPublicPage() {
                                 {item.meetingPlatform === "facetime" || item.meetingLink.includes("facetime") ? (
                                   <PhoneCall size={13} className="text-emerald-700" />
                                 ) : (
-                                  <Video size={13} className="text-brand" />
+                                  <Video size={13} className="text-accent" />
                                 )}
                                 <span>
                                   {item.meetingPlatform === "facetime" || item.meetingLink.includes("facetime")
@@ -1535,8 +1535,8 @@ export function BioPublicPage() {
             !(bio.kind === "business" && ((bio.products || []).length > 0 || (bio.services || []).length > 0)) && (
               <div className="mt-6 rounded-3xl bg-gradient-to-br from-paper/90 via-card to-paper/60 p-5 ring-1 ring-line/80 shadow-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold flex items-center gap-1.5">
-                    <Sparkles size={12} className="text-gold" />
+                  <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent flex items-center gap-1.5">
+                    <Sparkles size={12} className="text-accent" />
                     <span>Meet &amp; Hangout</span>
                   </span>
                   <button
@@ -1628,8 +1628,8 @@ export function BioPublicPage() {
           {userPlans.length > 0 && (
             <div className="mt-7">
               <div className="flex items-center justify-between mb-3 px-0.5">
-                <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand flex items-center gap-1.5">
-                  <Sparkles size={13} className="text-brand" />
+                <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent flex items-center gap-1.5">
+                  <Sparkles size={13} className="text-accent" />
                   <span>Public Plans &amp; Hangouts</span>
                 </h3>
                 <span className="text-[10px] font-bold text-mute uppercase tracking-wider">
@@ -1676,7 +1676,7 @@ export function BioPublicPage() {
           {appearing.length > 0 && (
             <div className="mt-7">
               <div className="flex items-center justify-between mb-2.5 px-0.5">
-                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">What’s On</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">What’s On</p>
                 <span className="text-[10px] font-bold text-mute uppercase tracking-wider">
                   {appearing.length} {appearing.length === 1 ? "Event" : "Events"}
                 </span>
@@ -1702,7 +1702,7 @@ export function BioPublicPage() {
                         onClick={() => nav(`/e/${s.eventId}`)}
                         className="min-w-0 flex-1 text-left active:scale-[0.99] cursor-pointer"
                       >
-                        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-gold">Appearing at</p>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-accent">Appearing at</p>
                         <p className="font-display text-sm font-bold text-ink mt-0.5">
                           {event?.name || "Event / Market"}
                         </p>
@@ -1739,7 +1739,7 @@ export function BioPublicPage() {
               className="mt-7 scroll-mt-24 overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card to-paper p-5 ring-1 ring-gold/40 shadow-sm"
             >
               <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-accent">
                   <Sparkles size={11} />
                   {liveOffer.badge}
                 </span>
@@ -1761,7 +1761,7 @@ export function BioPublicPage() {
                   })
                 }
               >
-                <Ticket size={15} className="text-gold" />
+                <Ticket size={15} className="text-accent" />
                 Claim Live Offer
               </Button>
             </div>
@@ -1791,7 +1791,7 @@ export function BioPublicPage() {
           {/* Custom Outbound Links Stack */}
           {stacked.length > 0 && (
             <div className="mt-7">
-              <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold mb-2.5">Featured Links</h3>
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent mb-2.5">Featured Links</h3>
               <ul className="space-y-2.5">
                 {stacked
                   .filter((link) => isSafeBioHref(link.href))
@@ -1817,7 +1817,7 @@ export function BioPublicPage() {
           {bio.links && socialLinks(bio.links).some((l) => isSafeBioHref(l.href)) && (
             <div className="mt-8 pt-5 border-t border-line/60">
               <div className="flex items-center justify-between mb-3 px-0.5">
-                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Follow &amp; Connect</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">Follow &amp; Connect</p>
                 <span className="text-[10px] font-medium text-mute uppercase tracking-wider">Social Channels</span>
               </div>
               <BioSocials links={bio.links} onTap={(kind) => recordTap(bio.handle, kind)} />
@@ -1837,7 +1837,7 @@ export function BioPublicPage() {
                 }}
                 className="flex h-11 items-center justify-center gap-2 rounded-full bg-paper text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:bg-paper/80 shadow-2xs active:scale-95"
               >
-                <MapPin size={15} className="text-gold" />
+                <MapPin size={15} className="text-accent" />
                 <span>Open in Maps</span>
               </a>
             </div>
@@ -1901,7 +1901,7 @@ export function BioPublicPage() {
               }}
             >
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-gold">AirPal Guestlist</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-accent">AirPal Guestlist</p>
                 <h4 className="font-display text-base font-bold text-ink mt-0.5">VIP Invites &amp; Secret Spots</h4>
                 <p className="text-[11.5px] text-mute mt-0.5">Get notified for exclusive gatherings, door perks, and secret drops.</p>
               </div>
@@ -2011,7 +2011,7 @@ export function BioPublicPage() {
           {/* Invite code — every bio carries its owner's code so any visitor can join under them */}
           {bio.ownerUid && (
             <div className="mt-8 rounded-3xl bg-gold/10 p-4 ring-1 ring-gold/30 shadow-2xs">
-              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-gold">
+              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-accent">
                 <Ticket size={13} aria-hidden />
                 {isOwner ? "Your invite code" : `Join with ${bio.name.split(" ")[0]}'s code`}
               </p>
@@ -2035,7 +2035,7 @@ export function BioPublicPage() {
                 <button
                   type="button"
                   onClick={() => void handleShareInvite()}
-                  className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3.5 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95"
+                  className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-neutral-900 px-3.5 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95"
                   aria-label="Share invite link"
                 >
                   <Share2 size={14} />
@@ -2055,12 +2055,12 @@ export function BioPublicPage() {
             <Link href="/" className="inline-flex items-center gap-2 transition hover:opacity-80">
               <BrandMark compact />
               <span className="font-display text-base font-bold tracking-tight">
-                AirPal<span className="text-brand">.me</span>
+                AirPal<span className="text-accent">.me</span>
               </span>
             </Link>
             <p className="text-xs text-mute">
               AirPal bio for people, venues &amp; creators ·{" "}
-              <Link href="/bio/setup" className="font-semibold text-ink underline hover:text-brand">
+              <Link href="/bio/setup" className="font-semibold text-ink underline hover:text-accent">
                 Claim your free @handle
               </Link>
             </p>
@@ -2078,17 +2078,17 @@ export function BioPublicPage() {
       {/* Claim Redemption Modal */}
       {claim && (
         <div
-          className="fixed inset-0 z-50 grid place-items-center bg-ink/60 px-6 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 grid place-items-center bg-black/60 px-6 backdrop-blur-sm animate-in fade-in duration-200"
           onClick={() => setClaim(null)}
         >
           <div
             className="w-full max-w-sm rounded-[32px] bg-card p-6 text-center shadow-2xl ring-1 ring-line animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold">{claim.badge}</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-accent">{claim.badge}</p>
             <p className="font-mono mt-3 text-4xl font-bold tracking-widest text-ink">{claim.code}</p>
             <p className="mt-2 text-xs font-medium text-mute leading-relaxed">{claim.detail}</p>
-            <div className="mt-4 rounded-2xl bg-gold/10 p-3 text-xs text-gold-dark font-medium">
+            <div className="mt-4 rounded-2xl bg-gold/10 p-3 text-xs text-accent font-medium">
               Active offer · Show this code to your server or at the till.
             </div>
             <button

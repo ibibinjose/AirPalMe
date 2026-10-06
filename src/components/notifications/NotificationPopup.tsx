@@ -58,7 +58,7 @@ export function NotificationPopup() {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[70] grid place-items-center bg-ink/65 p-4 backdrop-blur-sm animate-in fade-in duration-150"
+      className="fixed inset-0 z-[70] grid place-items-center bg-black/65 p-4 backdrop-blur-sm animate-in fade-in duration-150"
       role="dialog"
       aria-modal="true"
       aria-label={current.title}
@@ -68,7 +68,7 @@ export function NotificationPopup() {
         className="relative w-full max-w-sm rounded-[28px] ring-1 ring-line bg-card p-6 text-center shadow-2xl animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gold/15 text-gold">
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gold/15 text-accent">
           <PartyPopper size={26} />
         </span>
         <h2 className="font-display mt-3 text-2xl font-bold leading-tight">{current.title}</h2>

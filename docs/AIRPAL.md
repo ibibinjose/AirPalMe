@@ -139,7 +139,7 @@ Users, profiles, handles, plans (with guestlists and invites), plan messages, bu
 
 ### E1. Design system
 
-AirPal Blue `#1805db` (pressed `#0e0394`); page mist `#eef1f6`; cards `#ffffff`; text `#121614`; secondary `#6a726c`; hairlines `#e5e7eb`. Tokens live in `src/index.css` `@theme` — do not invent a new palette. Fonts: DM Sans (UI), Outfit (display), self-hosted in `public/fonts/`, no Google Fonts CDN.
+AirPal Blue `#1805db` (pressed `#0e0394`); page mist `#eef1f6`; cards `#ffffff`; text `#121614`; secondary `#6a726c`; hairlines `#e5e7eb`. Tokens live in `src/index.css` `@theme` — do not invent a new palette. Dark mode is automatic: semantic tokens re-point under `prefers-color-scheme` (iOS dark palette) while brand accents stay fixed; `@theme` must stay non-`inline` so utilities follow the variables at runtime. Fonts: DM Sans (UI), Outfit (display), self-hosted in `public/fonts/`, no Google Fonts CDN.
 
 Cards: white on mist, `bg-card ring-1 ring-line` with clay shadow, radius about 28px — premium, not childish. Touch targets at least 44px. Mobile bottom dock: floating light pill with `pb-safe` for home indicators. Desktop: 12-column grid where screens already use it. Reuse `Button`, `ValidField`, `Photo`, `ImageField`. Shared words in `shared/names.ts`. Brand accent script only, never the whole interface.
 

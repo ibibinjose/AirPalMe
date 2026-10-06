@@ -159,7 +159,7 @@ export function CalendarMonthGrid({
               </h2>
               {monthEventsCount > 0 && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-paper px-2.5 py-0.5 text-xs font-semibold text-ink ring-1 ring-line/70">
-                  <Sparkles size={11} className="text-gold" />
+                  <Sparkles size={11} className="text-accent" />
                   <span>{monthEventsCount} events</span>
                 </span>
               )}
@@ -175,7 +175,7 @@ export function CalendarMonthGrid({
             role="radiogroup"
             aria-label="Color tag mode"
           >
-            <Tag size={12} className="text-brand ml-1.5 hidden sm:inline" aria-hidden="true" />
+            <Tag size={12} className="text-accent ml-1.5 hidden sm:inline" aria-hidden="true" />
             <button
               type="button"
               role="radio"

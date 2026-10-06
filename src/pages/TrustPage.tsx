@@ -17,7 +17,7 @@ const FACTS: Array<{ term: string; body: React.ReactNode }> = [
           href={ABN_LOOKUP}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-1 font-semibold text-brand hover:underline"
+          className="inline-flex items-center gap-1 font-semibold text-accent hover:underline"
         >
           Check on ABN Lookup <ExternalLink size={13} />
         </a>
@@ -29,7 +29,7 @@ const FACTS: Array<{ term: string; body: React.ReactNode }> = [
     term: "Support",
     body: (
       <span>
-        <Link href="/contact" className="font-semibold text-brand hover:underline">
+        <Link href="/contact" className="font-semibold text-accent hover:underline">
           Contact page
         </Link>{" "}
         <span className="text-mute">
@@ -41,7 +41,7 @@ const FACTS: Array<{ term: string; body: React.ReactNode }> = [
   {
     term: "Website",
     body: (
-      <a href="https://airpal.me/" className="font-semibold text-brand hover:underline">
+      <a href="https://airpal.me/" className="font-semibold text-accent hover:underline">
         https://airpal.me/
       </a>
     ),
@@ -70,12 +70,12 @@ export function TrustPage() {
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }} />
       ))}
 
-      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">Trust & company facts</p>
+      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-accent">Trust & company facts</p>
       <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-ink sm:text-4xl">Is AirPal.Me legit?</h1>
 
       {/* Answer capsule */}
-      <div className="mt-6 rounded-[28px] bg-ink p-6 text-white sm:p-8">
-        <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-gold">
+      <div className="mt-6 rounded-[28px] bg-neutral-900 p-6 text-white sm:p-8">
+        <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-accent">
           <ShieldCheck size={14} /> The short answer
         </p>
         <p className="mt-3 text-base leading-relaxed text-white/90 sm:text-lg">
@@ -116,15 +116,15 @@ export function TrustPage() {
           AirPal.Me is the guest companion for stays and the local-discovery platform for going out — and the operating
           system for the people who run those places. Guests get one place for everything about their stay or plan;
           hosts and businesses get one place to run it.{" "}
-          <Link href="/about" className="font-semibold text-brand hover:underline">
+          <Link href="/about" className="font-semibold text-accent hover:underline">
             About
           </Link>
           {" · "}
-          <Link href="/concierge" className="font-semibold text-brand hover:underline">
+          <Link href="/concierge" className="font-semibold text-accent hover:underline">
             Stay & Guide
           </Link>
           {" · "}
-          <Link href="/business" className="font-semibold text-brand hover:underline">
+          <Link href="/business" className="font-semibold text-accent hover:underline">
             For business
           </Link>
         </p>
@@ -180,11 +180,11 @@ export function TrustPage() {
             <h3 className="text-[15px] font-bold text-ink">Data</h3>
             <p className="mt-1 text-sm leading-relaxed text-ink/80">
               Hosted on Google Firebase infrastructure. The full picture is in our{" "}
-              <Link href="/privacy" className="font-semibold text-brand hover:underline">
+              <Link href="/privacy" className="font-semibold text-accent hover:underline">
                 privacy policy
               </Link>{" "}
               and{" "}
-              <Link href="/terms" className="font-semibold text-brand hover:underline">
+              <Link href="/terms" className="font-semibold text-accent hover:underline">
                 terms
               </Link>
               .
@@ -202,7 +202,7 @@ export function TrustPage() {
 
       {/* Proof module: real evidence only */}
       <section aria-labelledby="trust-live" className="mt-10 rounded-[28px] bg-paper p-6 ring-1 ring-line sm:p-8">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-gold">Where AirPal.Me is live</p>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-accent">Where AirPal.Me is live</p>
         <h2 id="trust-live" className="font-display mt-1 text-xl font-bold tracking-tight text-ink sm:text-2xl">
           Early access · Sydney · October 2026
         </h2>
@@ -213,7 +213,7 @@ export function TrustPage() {
           <li>The public website is live: guests can browse places, stays, plans and events without an account.</li>
           <li>
             A live Stay & Guide demo (
-            <Link href="/concierge" className="font-semibold text-brand hover:underline">
+            <Link href="/concierge" className="font-semibold text-accent hover:underline">
               concierge
             </Link>
             ) shows the guest loop — labelled as a demonstration, not a customer.
@@ -223,11 +223,11 @@ export function TrustPage() {
         <p className="mt-4 text-sm leading-relaxed text-ink/80">
           No customer counts, ratings or testimonials are published yet. This section grows only with real, permissioned
           evidence. Running a stay, venue or college in Sydney and want to pilot with us?{" "}
-          <Link href="/business" className="font-semibold text-brand hover:underline">
+          <Link href="/business" className="font-semibold text-accent hover:underline">
             List your place
           </Link>{" "}
           or{" "}
-          <Link href="/contact" className="font-semibold text-brand hover:underline">
+          <Link href="/contact" className="font-semibold text-accent hover:underline">
             talk to us
           </Link>
           .

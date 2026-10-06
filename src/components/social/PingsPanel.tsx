@@ -90,7 +90,7 @@ export function PingsPanel() {
   if (received.length === 0 && sent.length === 0) {
     return (
       <div className="mt-4 rounded-[20px] bg-card px-4 py-10 text-center ring-1 ring-line/80">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-brand/10 text-brand">
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-brand/10 text-accent">
           <Zap size={22} />
         </span>
         <p className="font-display mt-4 text-xl font-semibold">No pings yet</p>
@@ -105,7 +105,7 @@ export function PingsPanel() {
     <div className="mt-4 space-y-4">
       {received.filter((p) => isOpenPing(p.status)).length > 0 && (
         <section aria-label="Pinged you">
-          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Pinged you</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">Pinged you</p>
           <ul className="mt-2 overflow-hidden rounded-[20px] bg-card ring-1 ring-line/80">
             {received
               .filter((p) => isOpenPing(p.status))
@@ -133,7 +133,7 @@ export function PingsPanel() {
                       type="button"
                       disabled={busyId === p.id}
                       onClick={() => makePlan(p)}
-                      className="h-9 rounded-full bg-brand/10 px-4 text-[13px] font-semibold text-brand transition hover:bg-brand/15 active:scale-95 disabled:opacity-50"
+                      className="h-9 rounded-full bg-brand/10 px-4 text-[13px] font-semibold text-accent transition hover:bg-brand/15 active:scale-95 disabled:opacity-50"
                     >
                       Make a plan
                     </button>
@@ -154,13 +154,13 @@ export function PingsPanel() {
 
       {sent.filter((p) => isOpenPing(p.status)).length > 0 && (
         <section aria-label="Your pings">
-          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-gold">Your pings</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">Your pings</p>
           <ul className="mt-2 overflow-hidden rounded-[20px] bg-card ring-1 ring-line/80">
             {sent
               .filter((p) => isOpenPing(p.status))
               .map((p, i) => (
                 <li key={p.id} className={cn("flex items-center gap-3 px-4 py-3.5", i > 0 && "border-t border-line/70")}>
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand/10 text-brand">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand/10 text-accent">
                     <Zap size={16} />
                   </span>
                   <span className="min-w-0 flex-1">

@@ -95,7 +95,7 @@ const PRIZES: PrizeItem[] = [
     line: "Every member in the 100K pool keeps their permanent Gold Founder badge and member number forever — proof that you were here from day one when AirPal was born.",
     bullets: ["Permanent Gold Founder profile badge", "Your personal founder number forever", "2× bonus referral points stacking", "VIP early access to new feature drops"],
     icon: BadgeCheck,
-    color: "from-brand/10 to-brand/5 border-brand/20 text-brand",
+    color: "from-brand/10 to-brand/5 border-brand/20 text-accent",
   },
 ];
 
@@ -247,7 +247,7 @@ export function FoundersPage() {
           <div className="flex items-center gap-3 text-slate-500">
             <span>{poolKnown ? `${fmt(pool.left)} Spots Left` : "100,000 spots"}</span>
             <span className="hidden sm:inline">·</span>
-            <span className="hidden sm:inline text-brand font-bold">100% Free Entry 🎉</span>
+            <span className="hidden sm:inline text-accent font-bold">100% Free Entry 🎉</span>
           </div>
         </div>
       </div>
@@ -266,7 +266,7 @@ export function FoundersPage() {
 
               <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-black leading-[1.02] tracking-tight text-slate-900">
                 First 100K in. <br />
-                <span className="text-brand">Come join the crew! 🎉</span>
+                <span className="text-accent">Come join the crew! 🎉</span>
               </h1>
 
               <p className="max-w-xl text-base sm:text-lg leading-relaxed text-slate-600 font-normal">
@@ -319,7 +319,7 @@ export function FoundersPage() {
                     </span>
                   </div>
                   {poolKnown && (
-                    <span className="font-mono text-xs font-bold text-brand bg-brand/10 px-3 py-1 rounded-full">
+                    <span className="font-mono text-xs font-bold text-accent bg-brand/10 px-3 py-1 rounded-full">
                       {pool.percent}% FULL
                     </span>
                   )}
@@ -386,7 +386,7 @@ export function FoundersPage() {
                     <div className="grid grid-cols-2 gap-3 pt-1">
                       <div className="rounded-2xl border border-slate-200 bg-white p-3.5 shadow-2xs">
                         <p className="text-[10px] font-bold text-slate-500 uppercase">PASS NUMBER</p>
-                        <p className="font-mono text-base font-black text-brand">
+                        <p className="font-mono text-base font-black text-accent">
                           {myFounder !== null ? `#${String(myFounder).padStart(6, "0")}` : user ? "PENDING" : "#······"}
                         </p>
                       </div>
@@ -446,7 +446,7 @@ export function FoundersPage() {
       <section className="relative z-10 bg-white py-14 border-b border-slate-200">
         <div className="mx-auto max-w-6xl px-5">
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <p className="text-xs font-extrabold uppercase tracking-widest text-brand">POOL ROADMAP</p>
+            <p className="text-xs font-extrabold uppercase tracking-widest text-accent">POOL ROADMAP</p>
             <h2 className="font-display text-2xl sm:text-3xl font-black text-slate-900 mt-1">
               The Road to the Grand Draw
             </h2>
@@ -459,7 +459,7 @@ export function FoundersPage() {
                 className="relative rounded-2xl border border-slate-200 bg-slate-50/70 p-5 shadow-xs transition hover:bg-white hover:shadow-sm"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="font-display text-lg font-black text-brand">
+                  <span className="font-display text-lg font-black text-accent">
                     {m.top}
                   </span>
                   <span className="text-xs font-bold text-slate-400">0{idx + 1}</span>
@@ -502,11 +502,11 @@ export function FoundersPage() {
                 >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="font-display text-3xl font-black text-brand">
+                      <span className="font-display text-3xl font-black text-accent">
                         {p.n}
                       </span>
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-bold text-slate-800">
-                        <IconComp size={14} className="text-brand" />
+                        <IconComp size={14} className="text-accent" />
                         {p.badge}
                       </span>
                     </div>
@@ -515,7 +515,7 @@ export function FoundersPage() {
                       <h3 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">
                         {p.name}
                       </h3>
-                      <p className="text-xs sm:text-sm font-bold text-brand mt-1">
+                      <p className="text-xs sm:text-sm font-bold text-accent mt-1">
                         {p.highlight}
                       </p>
                     </div>
@@ -540,7 +540,7 @@ export function FoundersPage() {
                         href={p.link}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-brand hover:underline"
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:underline"
                       >
                         <span>{p.linkText || "Official Website"}</span>
                         <ExternalLink size={12} />
@@ -583,7 +583,7 @@ export function FoundersPage() {
       <section className="relative z-10 bg-white py-16 md:py-24">
         <div className="mx-auto max-w-6xl px-5">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="text-xs font-extrabold uppercase tracking-widest text-brand">EFFORTLESS ENTRY</p>
+            <p className="text-xs font-extrabold uppercase tracking-widest text-accent">EFFORTLESS ENTRY</p>
             <h2 className="font-display text-3xl sm:text-5xl font-black text-slate-900 mt-1">
               Three Steps. Zero Catch.
             </h2>
@@ -640,7 +640,7 @@ export function FoundersPage() {
             <Button
               size="lg"
               onClick={() => nav(signupHref)}
-              className="gap-2 shrink-0 bg-ink px-8 py-4 text-base font-bold text-white hover:bg-black"
+              className="gap-2 shrink-0 bg-neutral-900 px-8 py-4 text-base font-bold text-white hover:bg-black"
             >
               <span>Join the 100K</span>
               <ArrowRight size={18} />
@@ -762,7 +762,7 @@ export function FoundersPage() {
       <section className="relative z-10 bg-slate-50 py-16 md:py-24">
         <div className="mx-auto max-w-4xl px-5">
           <div className="text-center max-w-xl mx-auto mb-12">
-            <p className="text-xs font-extrabold uppercase tracking-widest text-brand">FREQUENTLY ASKED</p>
+            <p className="text-xs font-extrabold uppercase tracking-widest text-accent">FREQUENTLY ASKED</p>
             <h2 className="font-display text-3xl sm:text-4xl font-black text-slate-900 mt-1">
               Everything You Need to Know
             </h2>
@@ -780,12 +780,12 @@ export function FoundersPage() {
                     type="button"
                     onClick={() => setOpenFaq(isOpen ? null : i)}
                     aria-expanded={isOpen}
-                    className="flex w-full items-center justify-between p-5 text-left text-sm sm:text-base font-bold text-slate-900 hover:text-brand transition"
+                    className="flex w-full items-center justify-between p-5 text-left text-sm sm:text-base font-bold text-slate-900 hover:text-accent transition"
                   >
                     <span>{faq.q}</span>
                     <ChevronDown
                       size={18}
-                      className={cn("text-slate-400 transition-transform duration-200", isOpen && "rotate-180 text-brand")}
+                      className={cn("text-slate-400 transition-transform duration-200", isOpen && "rotate-180 text-accent")}
                     />
                   </button>
                   {isOpen && (
@@ -808,11 +808,11 @@ export function FoundersPage() {
               <strong>Official Notice:</strong> 100% Free Entry · Open to Australian residents aged 18+ · Capped at 100,000 eligible entries · Winners drawn at random from the founding pool and announced in-app · Entry does not guarantee winning · The July suitcase prize is purchased at retail and is not sponsored by July.
             </p>
             <div className="flex items-center gap-4 shrink-0 font-medium">
-              <Link href="/terms" className="text-slate-600 hover:text-brand hover:underline">
+              <Link href="/terms" className="text-slate-600 hover:text-accent hover:underline">
                 Terms
               </Link>
               <span>·</span>
-              <Link href="/privacy" className="text-slate-600 hover:text-brand hover:underline">
+              <Link href="/privacy" className="text-slate-600 hover:text-accent hover:underline">
                 Privacy
               </Link>
             </div>

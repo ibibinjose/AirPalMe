@@ -63,7 +63,7 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
     <footer
       role="contentinfo"
       className={cn(
-        "mt-16 rounded-t-[28px] bg-ink text-white",
+        "mt-16 rounded-t-[28px] bg-neutral-900 text-white",
         "border-t border-white/10",
         hasTabBar
           ? "pb-[calc(6rem+env(safe-area-inset-bottom,0px))] lg:pb-8"
@@ -86,7 +86,7 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
           {isNative && (
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/8 px-3 py-1.5 text-xs font-medium text-white/80 select-none ring-1 ring-white/10">
-                <Smartphone size={12} className="text-gold" />
+                <Smartphone size={12} className="text-accent" />
                 <span className="capitalize">{platform === "ios" ? "iOS App" : "Android App"}</span>
               </span>
             </div>

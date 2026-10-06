@@ -42,7 +42,7 @@ export function StudioInboxAdmin() {
 
   return (
     <section className="mt-8 rounded-[28px] bg-card p-4 ring-1 ring-line">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">Studio · team inbox</p>
+      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Studio · team inbox</p>
       <h2 className="font-display mt-1 text-lg font-semibold">Walkthrough bookings</h2>
       {loading ? (
         <p className="mt-3 text-sm text-mute">Loading bookings…</p>

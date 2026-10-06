@@ -635,7 +635,7 @@ export function ItineraryStopsManager({
       <div className="space-y-2.5">
         {stops.length === 0 ? (
           <div className="rounded-2xl bg-paper/60 p-6 text-center ring-1 ring-dashed ring-line">
-            <Sparkles size={24} className="mx-auto text-gold mb-2" />
+            <Sparkles size={24} className="mx-auto text-accent mb-2" />
             <p className="text-xs sm:text-sm font-semibold text-ink">No itinerary stops added yet</p>
             <p className="text-xs text-mute mt-0.5 max-w-sm mx-auto">
               Add venue stops or choose from the occasion templates below to build your schedule.
@@ -658,7 +658,7 @@ export function ItineraryStopsManager({
                 >
                   <div className="flex items-center justify-between pb-1.5 border-b border-line/50">
                     <span className="text-xs font-bold text-ink flex items-center gap-1.5">
-                      <Pencil size={13} className="text-brand" />
+                      <Pencil size={13} className="text-accent" />
                       Editing Stop #{index + 1}
                     </span>
                     <div className="flex items-center gap-1.5">
@@ -713,7 +713,7 @@ export function ItineraryStopsManager({
                   {/* Address & Notes in Edit Mode */}
                   <div className="grid gap-2 sm:grid-cols-2 pt-1">
                     <div className="relative">
-                      <MapPin size={13} className="absolute left-3 top-2.5 text-gold" />
+                      <MapPin size={13} className="absolute left-3 top-2.5 text-accent" />
                       <input
                         type="text"
                         value={editAddress}
@@ -811,7 +811,7 @@ export function ItineraryStopsManager({
                   {stop.notes && <p className="truncate text-[11px] text-mute mt-0.5">{stop.notes}</p>}
                   {stop.address && (
                     <p className="flex items-center gap-1 text-[10px] text-mute/80 truncate mt-0.5">
-                      <MapPin size={10} className="text-gold shrink-0" />
+                      <MapPin size={10} className="text-accent shrink-0" />
                       <span className="truncate">{stop.address}</span>
                     </p>
                   )}
@@ -819,7 +819,7 @@ export function ItineraryStopsManager({
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                       <span
                         title={dealEntry.deal.detail}
-                        className="rounded-full bg-gold/15 px-2 py-0.5 text-[10px] font-bold text-gold ring-1 ring-gold/30"
+                        className="rounded-full bg-gold/15 px-2 py-0.5 text-[10px] font-bold text-accent ring-1 ring-gold/30"
                       >
                         {dealEntry.deal.badge}
                       </span>
@@ -866,7 +866,7 @@ export function ItineraryStopsManager({
                   <button
                     type="button"
                     onClick={() => handleOpenMaps(stop.name, stop.address)}
-                    className="grid h-8 w-8 place-items-center rounded-full bg-card text-mute ring-1 ring-line transition hover:text-brand cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                    className="grid h-8 w-8 place-items-center rounded-full bg-card text-mute ring-1 ring-line transition hover:text-accent cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                     title="Open in Maps"
                     aria-label={`Open ${stop.name} in Maps`}
                   >
@@ -934,8 +934,8 @@ export function ItineraryStopsManager({
       {isEditable && templates.length > 0 && (
         <div className="rounded-2xl bg-paper/50 p-3 ring-1 ring-line/70">
           <div className="flex items-center gap-1.5 mb-2">
-            <Sparkles size={13} className="text-gold" />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-gold">
+            <Sparkles size={13} className="text-accent" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-accent">
               Quick-Add Itinerary Templates:
             </span>
           </div>
@@ -948,7 +948,7 @@ export function ItineraryStopsManager({
                   key={idx}
                   type="button"
                   onClick={() => handleApplyTemplate(tmpl)}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-xs font-medium text-ink ring-1 ring-line hover:bg-brand/10 hover:text-brand hover:ring-brand/40 transition active:scale-95"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-xs font-medium text-ink ring-1 ring-line hover:bg-brand/10 hover:text-accent hover:ring-brand/40 transition active:scale-95"
                 >
                   <TemplateIcon size={12} className={iconDef.colorClass} />
                   <span>+ {tmpl.name}</span>
@@ -964,13 +964,13 @@ export function ItineraryStopsManager({
         <div className="rounded-3xl bg-card p-4 sm:p-5 ring-1 ring-line/80 shadow-xs space-y-3.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-1.5">
-              <Plus size={14} className="text-brand" />
+              <Plus size={14} className="text-accent" />
               Add a new stop:
             </span>
             <button
               type="button"
               onClick={() => setShowAddressNotes((v) => !v)}
-              className="text-[11px] font-medium text-mute hover:text-brand transition flex items-center gap-1"
+              className="text-[11px] font-medium text-mute hover:text-accent transition flex items-center gap-1"
             >
               <span>{showAddressNotes ? "Hide address & notes" : "+ Add address & notes"}</span>
               <ChevronDown
@@ -1051,7 +1051,7 @@ export function ItineraryStopsManager({
           {showAddressNotes && (
             <div className="grid gap-2 sm:grid-cols-2 pt-2 border-t border-line/60 animate-in fade-in-50">
               <div className="relative">
-                <MapPin size={14} className="absolute left-3.5 top-3 text-gold" />
+                <MapPin size={14} className="absolute left-3.5 top-3 text-accent" />
                 <input
                   type="text"
                   value={newAddress}

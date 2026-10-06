@@ -133,7 +133,7 @@ export function DebugInfoOverlay() {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-line px-5 py-3.5 bg-paper/60">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10 text-brand">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10 text-accent">
               <Bug size={16} />
             </div>
             <div>
@@ -159,10 +159,10 @@ export function DebugInfoOverlay() {
           <div className="rounded-xl border border-line/80 bg-paper/50 p-4">
             <div className="flex items-center justify-between mb-3">
               <span className="font-semibold text-ink uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                <Server size={13} className="text-brand" />
+                <Server size={13} className="text-accent" />
                 Build Version (build.gradle)
               </span>
-              <span className="rounded-full bg-brand/10 px-2.5 py-0.5 font-mono text-[11px] font-bold text-brand">
+              <span className="rounded-full bg-brand/10 px-2.5 py-0.5 font-mono text-[11px] font-bold text-accent">
                 v{diagnostics.versionName}
               </span>
             </div>
@@ -180,9 +180,9 @@ export function DebugInfoOverlay() {
                 <span className="text-[10px] uppercase tracking-wider text-mute/80 block">Platform</span>
                 <span className="capitalize text-ink font-medium flex items-center gap-1 mt-0.5">
                   {diagnostics.isNative ? (
-                    <Smartphone size={12} className="text-gold" />
+                    <Smartphone size={12} className="text-accent" />
                   ) : (
-                    <Globe size={12} className="text-gold" />
+                    <Globe size={12} className="text-accent" />
                   )}
                   {diagnostics.platform} ({diagnostics.isNative ? "Native" : "Web"})
                 </span>

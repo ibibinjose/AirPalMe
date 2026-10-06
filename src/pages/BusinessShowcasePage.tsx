@@ -126,7 +126,7 @@ export function BusinessShowcasePage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-8">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">You&apos;re live</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">You&apos;re live</p>
       <h1 className="font-display mt-1 text-3xl font-bold tracking-tight">Add 3 things</h1>
       <p className="mt-1 text-sm text-mute">
         One product, one service, one offer for {placeName}. Skip any you don&apos;t have yet.
@@ -135,7 +135,7 @@ export function BusinessShowcasePage() {
       <form className="mt-6 space-y-4" onSubmit={(e) => void finish(e)}>
         {SLOTS.map((slot, i) => (
           <section key={slot.kind} className="rounded-2xl border border-line bg-card p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-brand">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-accent">
               {i + 1}. {slot.label}
             </p>
             <p className="mt-0.5 text-[12px] text-mute">{slot.hint}</p>

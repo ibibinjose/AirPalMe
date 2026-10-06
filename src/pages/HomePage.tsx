@@ -62,7 +62,7 @@ const VERTICALS = [
     sub: "One suggestion for now",
     href: "/now",
     icon: Users,
-    iconBg: "bg-brand/10 text-brand",
+    iconBg: "bg-brand/10 text-accent",
     badge: "Start",
   },
   {
@@ -107,7 +107,7 @@ const VERTICALS = [
     sub: "Tours & city walks",
     href: "/guide",
     icon: MapPin,
-    iconBg: "bg-brand/10 text-brand",
+    iconBg: "bg-brand/10 text-accent",
     badge: "Tours",
   },
 ];
@@ -214,7 +214,7 @@ export function HomePage() {
               className="flex w-full min-h-[48px] items-center justify-between rounded-2xl bg-card/90 px-4 py-3 text-left text-sm font-medium text-mute ring-1 ring-line/80 shadow-md backdrop-blur-md hover:bg-card hover:text-ink transition cursor-pointer touch-manipulation active:scale-[0.99]"
             >
               <span className="flex items-center gap-2.5">
-                <Search size={18} className="text-brand" />
+                <Search size={18} className="text-accent" />
                 <span>Search places, events, plans, or stays…</span>
               </span>
               <kbd className="hidden rounded bg-paper/90 px-2 py-0.5 text-xs font-semibold text-mute ring-1 ring-line sm:inline-block">
@@ -276,7 +276,7 @@ export function HomePage() {
           <h2 className="font-display text-xl font-bold tracking-tight text-ink">Life Made Easy</h2>
           <Link
             href="/now"
-            className="-my-3 inline-flex min-h-[44px] items-center text-xs font-bold text-brand hover:underline"
+            className="-my-3 inline-flex min-h-[44px] items-center text-xs font-bold text-accent hover:underline"
           >
             View All →
           </Link>
@@ -307,7 +307,7 @@ export function HomePage() {
                   {v.badge && <span className="text-[10px] font-bold text-mute">{v.badge}</span>}
                 </div>
                 <div className="mt-4">
-                  <p className="font-display text-[15px] font-bold text-ink leading-snug group-hover:text-brand transition-colors">
+                  <p className="font-display text-[15px] font-bold text-ink leading-snug group-hover:text-accent transition-colors">
                     {v.label}
                   </p>
                   <p className="text-[11px] text-mute line-clamp-1 mt-0.5">{v.sub}</p>
@@ -371,7 +371,7 @@ export function HomePage() {
           <div className="mt-3 rounded-3xl bg-gradient-to-br from-card via-card to-paper p-5 ring-1 ring-line/80 shadow-xs">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="max-w-md">
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand uppercase tracking-wider">
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-accent uppercase tracking-wider">
                   <Plane size={14} /> Ready for your next outing?
                 </div>
                 <h3 className="font-display text-lg font-bold mt-1 text-ink">Plan a hangout or trip</h3>
@@ -422,7 +422,7 @@ export function HomePage() {
               </div>
               <ArrowCta />
             </div>
-            <div className="mt-4 flex items-center gap-2 text-xs font-bold text-brand">
+            <div className="mt-4 flex items-center gap-2 text-xs font-bold text-accent">
               Browse deals <ArrowRight size={14} />
             </div>
           </CardShell>
@@ -455,7 +455,7 @@ export function HomePage() {
                             <span className="font-display block text-[15px] font-bold leading-none text-ink">
                               {dayNum}
                             </span>
-                            <span className="block text-[10px] font-bold uppercase tracking-wider text-brand">
+                            <span className="block text-[10px] font-bold uppercase tracking-wider text-accent">
                               {month}
                             </span>
                           </span>
@@ -509,7 +509,7 @@ export function HomePage() {
                 </div>
                 <div className="p-3">
                   <p className="flex items-center gap-1 truncate text-[12px] text-mute">
-                    <MapPin size={12} className="text-brand shrink-0" /> {p.shortWhy || city || "Nearby"}
+                    <MapPin size={12} className="text-accent shrink-0" /> {p.shortWhy || city || "Nearby"}
                   </p>
                 </div>
               </CardShell>
@@ -546,7 +546,7 @@ export function HomePage() {
                       />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gold">
+                      <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">
                         Because you&apos;re {p.city ? `near ${p.city}` : "exploring"}
                       </p>
                       <p className="font-display mt-0.5 truncate text-[16px] font-bold text-ink">{p.title}</p>
@@ -588,7 +588,7 @@ export function HomePage() {
       <section aria-label="Trust and Safety" className="mt-8 cv-auto">
         <div className="rounded-3xl bg-card p-5 ring-1 ring-line/80 shadow-xs">
           <div className="flex items-center gap-2">
-            <ShieldCheck size={20} className="text-brand" />
+            <ShieldCheck size={20} className="text-accent" />
             <h3 className="font-display text-base font-bold text-ink">AirPal Trust & Safety</h3>
           </div>
           <p className="text-xs text-mute mt-1 max-w-xl leading-relaxed">

@@ -13,7 +13,7 @@ export function TripItinerary({ plan }: { plan: HangoutPlan }) {
   return (
     <section className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs" aria-label="Trip itinerary">
       <div className="flex items-center gap-2.5">
-        <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand/10 text-brand ring-1 ring-brand/20">
+        <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand/10 text-accent ring-1 ring-brand/20">
           <CalendarDays size={17} />
         </span>
         <div>
@@ -26,7 +26,7 @@ export function TripItinerary({ plan }: { plan: HangoutPlan }) {
       <ol className="mt-4 space-y-3">
         {days.map((d) => (
           <li key={d.dayNumber} className="rounded-2xl bg-paper p-4 ring-1 ring-line/60">
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gold">
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">
               Day {d.dayNumber}
               {d.date ? ` · ${d.date}` : ""}
             </p>

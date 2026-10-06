@@ -107,12 +107,12 @@ export function PartnerPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 pb-24 pt-6 md:px-6 md:pt-10">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Partner with AirPal</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Partner with AirPal</p>
       <h1 className="mt-1 font-display text-4xl font-bold text-ink">Let&apos;s talk.</h1>
       <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-ink/80">
         Tell us a little about your property or business and we&apos;ll get back to you fast. It takes under a
         minute — or just email us, your call. Already curious who&apos;s here?{" "}
-        <Link href="/partners" className="font-semibold text-brand">
+        <Link href="/partners" className="font-semibold text-accent">
           See our partners
         </Link>
         .
@@ -120,7 +120,7 @@ export function PartnerPage() {
 
       <form onSubmit={onSubmit} className="mt-6 rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs sm:p-7">
         <p className="text-[13px] font-bold text-ink">
-          Who are you? <span className="text-brand">*</span>
+          Who are you? <span className="text-accent">*</span>
         </p>
         <div className="mt-2 grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Partner type">
           {PARTNER_SEGMENTS.map((s) => {
@@ -138,7 +138,7 @@ export function PartnerPage() {
                   on ? "bg-brand text-white ring-brand shadow-sm" : "bg-paper text-ink ring-line hover:ring-brand/40",
                 )}
               >
-                <span className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-xl ring-1", on ? "bg-white/15 ring-white/25" : "bg-brand/10 text-brand ring-brand/20")}>
+                <span className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-xl ring-1", on ? "bg-white/15 ring-white/25" : "bg-brand/10 text-accent ring-brand/20")}>
                   <Icon size={18} />
                 </span>
                 <span>
@@ -151,7 +151,7 @@ export function PartnerPage() {
         </div>
 
         <p className="mt-5 text-[13px] font-bold text-ink">
-          How did you find us? <span className="text-brand">*</span>
+          How did you find us? <span className="text-accent">*</span>
         </p>
         <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Discovery source">
           {PARTNER_SOURCES.map((s) => {
@@ -165,7 +165,7 @@ export function PartnerPage() {
                 onClick={() => setSource(s.id)}
                 className={cn(
                   "rounded-full px-4 py-2 text-[13px] font-semibold ring-1 transition",
-                  on ? "bg-ink text-white ring-ink" : "bg-paper text-mute ring-line hover:text-ink",
+                  on ? "bg-ink text-paper ring-ink" : "bg-paper text-mute ring-line hover:text-ink",
                 )}
               >
                 {s.label}
@@ -177,19 +177,19 @@ export function PartnerPage() {
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-[13px] font-bold text-ink">
-              Company name <span className="text-brand">*</span>
+              Company name <span className="text-accent">*</span>
             </label>
             <input value={company} onChange={(e) => setCompany(e.target.value)} className={input} maxLength={120} />
           </div>
           <div>
             <label className="mb-1.5 block text-[13px] font-bold text-ink">
-              Your name <span className="text-brand">*</span>
+              Your name <span className="text-accent">*</span>
             </label>
             <input value={name} onChange={(e) => setName(e.target.value)} className={input} maxLength={80} />
           </div>
           <div>
             <label className="mb-1.5 block text-[13px] font-bold text-ink">
-              Work email <span className="text-brand">*</span>
+              Work email <span className="text-accent">*</span>
             </label>
             <input value={email} onChange={(e) => setEmail(e.target.value)} inputMode="email" className={input} maxLength={120} />
           </div>
@@ -201,7 +201,7 @@ export function PartnerPage() {
 
         <div className="mt-3">
           <label className="mb-1.5 block text-[13px] font-bold text-ink">
-            Your message <span className="text-brand">*</span>
+            Your message <span className="text-accent">*</span>
           </label>
           <textarea
             value={message}
@@ -226,7 +226,7 @@ export function PartnerPage() {
         </Button>
         <p className="mt-3 text-center text-[13px] text-mute">
           Prefer email? We reply fast:{" "}
-          <a href={`mailto:${LEGAL.contacts}`} className="font-semibold text-brand">
+          <a href={`mailto:${LEGAL.contacts}`} className="font-semibold text-accent">
             {LEGAL.contacts}
           </a>
         </p>
@@ -239,7 +239,7 @@ export function PartnerPage() {
           <li><strong className="text-ink">2. You apply & verify</strong> — one application, reviewed by a human.</li>
           <li><strong className="text-ink">3. You go live & get paid</strong> — list, sell, and receive payouts after each event.</li>
         </ol>
-        <Link href="/business/onboard" className="mt-4 inline-block rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white">
+        <Link href="/business/onboard" className="mt-4 inline-block rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white">
           Skip the wait — apply now
         </Link>
       </section>

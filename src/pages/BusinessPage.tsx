@@ -161,10 +161,10 @@ export function BusinessPage() {
     return (
       <div className="mx-auto min-h-[60vh] max-w-2xl px-4 py-12">
         <div className="rounded-[32px] bg-card p-6 sm:p-10 text-center ring-1 ring-line shadow-xs">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-brand/10 text-brand ring-1 ring-brand/20">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-brand/10 text-accent ring-1 ring-brand/20">
             <Building2 className="h-8 w-8" />
           </div>
-          <span className="inline-block mt-4 text-[11px] font-bold uppercase tracking-[0.16em] text-gold">
+          <span className="inline-block mt-4 text-[11px] font-bold uppercase tracking-[0.16em] text-accent">
             {NAMES.partnerAccount}
           </span>
           <h1 className="font-display mt-2 text-2xl sm:text-3xl font-bold text-ink">Launch Your Business on AirPal</h1>
@@ -174,7 +174,7 @@ export function BusinessPage() {
 
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
             <div className="rounded-2xl bg-paper p-4 ring-1 ring-line/60">
-              <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-brand/10 text-xs font-bold text-brand">1</span>
+              <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-brand/10 text-xs font-bold text-accent">1</span>
               <h3 className="font-semibold text-xs text-ink mt-2.5">Import Place</h3>
               <p className="text-[11px] text-mute mt-1">Pull hours, photos, and address in one click.</p>
             </div>
@@ -324,14 +324,14 @@ export function BusinessPage() {
             href="/business/onboard"
             className="inline-flex items-center gap-1.5 rounded-xl bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
           >
-            <Plus className="h-3.5 w-3.5 text-brand" />
+            <Plus className="h-3.5 w-3.5 text-accent" />
             <span>Add Venue</span>
           </Link>
           <Link
             href="/business/promotions/new"
             className="inline-flex items-center gap-1.5 rounded-xl bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
           >
-            <Plus className="h-3.5 w-3.5 text-brand" />
+            <Plus className="h-3.5 w-3.5 text-accent" />
             <span>Create offer</span>
           </Link>
           <button
@@ -365,7 +365,7 @@ export function BusinessPage() {
             <div>
               <h1 className="font-display text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">{mine.name}</h1>
               <p className="text-xs text-white/80 flex items-center gap-1.5 mt-0.5">
-                <MapPin className="h-3.5 w-3.5 text-brand" />
+                <MapPin className="h-3.5 w-3.5 text-accent" />
                 {address.city || "Sydney"}, Australia · Category: <span className="capitalize font-semibold">{category}</span>
               </p>
             </div>
@@ -376,7 +376,7 @@ export function BusinessPage() {
                 onClick={() => nav(hrefForPlace(listingToPlace(mine)))}
                 className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-ink backdrop-blur-md hover:bg-white transition shadow-sm"
               >
-                <Eye className="h-3.5 w-3.5 text-brand" />
+                <Eye className="h-3.5 w-3.5 text-accent" />
                 Guest View
               </button>
             </div>
@@ -386,15 +386,15 @@ export function BusinessPage() {
         {/* Global Business Quick Action Bar */}
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line/60 bg-paper/50 px-5 py-3 text-xs">
           <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-            <Link href="/helpdesk" className="inline-flex items-center gap-1.5 font-semibold text-brand hover:underline">
+            <Link href="/helpdesk" className="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline">
               <Headphones className="h-3.5 w-3.5" />
               <span>Universal Help Desk</span>
             </Link>
-            <Link href="/pulse" className="inline-flex items-center gap-1.5 font-semibold text-ink/80 hover:text-brand hover:underline">
+            <Link href="/pulse" className="inline-flex items-center gap-1.5 font-semibold text-ink/80 hover:text-accent hover:underline">
               <Activity className="h-3.5 w-3.5 text-indigo-500" />
               <span>Guest Pulse & Standees</span>
             </Link>
-            <Link href="/business/promotions" className="inline-flex items-center gap-1.5 font-semibold text-ink/80 hover:text-brand hover:underline">
+            <Link href="/business/promotions" className="inline-flex items-center gap-1.5 font-semibold text-ink/80 hover:text-accent hover:underline">
               <Gift className="h-3.5 w-3.5 text-amber-500" />
               <span>Promotions & Giveaways</span>
             </Link>
@@ -436,7 +436,7 @@ export function BusinessPage() {
                     <h2 className="font-display text-base font-bold text-ink">Google Place Sync</h2>
                     <p className="text-xs text-mute">Instantly import hours, GPS coordinates, photos, and address</p>
                   </div>
-                  <Globe2 className="h-4 w-4 text-brand" />
+                  <Globe2 className="h-4 w-4 text-accent" />
                 </div>
                 <GooglePlaceImportCard
                   importedPlaceId={mine.mapsPlaceId}
@@ -600,7 +600,7 @@ export function BusinessPage() {
                       }}
                       className="gap-1.5"
                     >
-                      <MapPin className="h-3.5 w-3.5 text-brand" />
+                      <MapPin className="h-3.5 w-3.5 text-accent" />
                       {locating ? "Locating…" : geo ? `GPS Pinned (${formatGps(geo.lat, geo.lng)})` : "Use My Location"}
                     </Button>
                   </div>
@@ -692,7 +692,7 @@ export function BusinessPage() {
               <div>
                 <div className="flex items-center justify-between">
                   <h2 className="font-display text-base font-bold text-ink">Publish Neighbourhood Offer</h2>
-                  <Tag className="h-4 w-4 text-brand" />
+                  <Tag className="h-4 w-4 text-accent" />
                 </div>
                 <p className="text-xs text-mute mt-0.5">
                   Exclusive perks appear prominently on the Explore map, What&apos;s On, and your verified page.
@@ -715,7 +715,7 @@ export function BusinessPage() {
                       }}
                       className="flex flex-col items-start rounded-2xl bg-paper p-3 text-left ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
                     >
-                      <span className="inline-flex items-center gap-1 rounded-lg bg-brand/10 px-2 py-0.5 text-xs font-bold text-brand">
+                      <span className="inline-flex items-center gap-1 rounded-lg bg-brand/10 px-2 py-0.5 text-xs font-bold text-accent">
                         <Percent className="h-3 w-3" />
                         {p.badge}
                       </span>
@@ -767,7 +767,7 @@ export function BusinessPage() {
           {/* Live Guest Preview Card */}
           <section className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-xs">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand">Live Guest View</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">Live Guest View</span>
               <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
                 Live on What&apos;s on
               </span>
@@ -783,7 +783,7 @@ export function BusinessPage() {
               <button
                 type="button"
                 onClick={() => nav(hrefForPlace(listingToPlace(mine)))}
-                className="font-semibold text-brand hover:underline inline-flex items-center gap-1"
+                className="font-semibold text-accent hover:underline inline-flex items-center gap-1"
               >
                 Open Place Page <ExternalLink className="h-3 w-3" />
               </button>
@@ -794,7 +794,7 @@ export function BusinessPage() {
           {!(business?.products?.length || business?.services?.length || business?.deals?.length) && (
             <section className="rounded-[28px] bg-card p-5 ring-1 ring-brand/20 shadow-xs">
               <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-brand/10 text-brand">
+                <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-brand/10 text-accent">
                   <Sparkles className="h-4 w-4" />
                 </span>
                 <h3 className="font-display text-sm font-bold text-ink">Boost Your Visibility</h3>
@@ -825,7 +825,7 @@ export function BusinessPage() {
               className="flex items-center justify-between rounded-xl bg-paper px-3.5 py-2.5 text-xs font-semibold text-ink transition hover:bg-card hover:ring-1 hover:ring-brand/30"
             >
               <span className="flex items-center gap-2">
-                <Headphones className="h-4 w-4 text-brand" />
+                <Headphones className="h-4 w-4 text-accent" />
                 Universal Help Desk
               </span>
               <ArrowRight className="h-3.5 w-3.5 text-mute" />

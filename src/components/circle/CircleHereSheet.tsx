@@ -143,7 +143,7 @@ export function CircleHereSheet({
                   onClick={() => setToHandle(p.handle)}
                   className={cn(
                     "flex w-full items-center justify-between px-3 py-2.5 text-left text-[15px]",
-                    toHandle === p.handle && "font-semibold text-brand",
+                    toHandle === p.handle && "font-semibold text-accent",
                   )}
                 >
                   <span>{p.name}</span>

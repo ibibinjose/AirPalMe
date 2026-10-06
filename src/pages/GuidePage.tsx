@@ -42,7 +42,7 @@ function ShareGuideButton({
           : "bg-brand px-5 text-white hover:bg-brand-ink",
       )}
     >
-      <Share2 size={13} className={variant === "ghost" ? "text-gold" : undefined} aria-hidden />
+      <Share2 size={13} className={variant === "ghost" ? "text-accent" : undefined} aria-hidden />
       <span>{label}</span>
     </button>
   );
@@ -100,7 +100,7 @@ export function GuidePage() {
     <div className="mx-auto max-w-5xl px-4 pb-[max(7rem,calc(env(safe-area-inset-bottom,0px)+6rem))] md:px-6">
       <header className="flex items-start justify-between gap-4 py-5">
         <div>
-          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-gold">{t("guide")}</p>
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-accent">{t("guide")}</p>
           <h1 className="font-display mt-1 text-3xl font-semibold">{t("walks")}</h1>
           <p className="mt-1 text-xs text-mute">
             Curated walks &amp; sights in{" "}
@@ -158,7 +158,7 @@ export function GuidePage() {
       <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-3xl bg-paper p-5 ring-1 ring-line">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <Share2 size={15} className="text-gold shrink-0" aria-hidden />
+            <Share2 size={15} className="text-accent shrink-0" aria-hidden />
             <h3 className="font-display text-base font-semibold text-ink">
               Exploring {city || "Sydney"} with travel companions?
             </h3>

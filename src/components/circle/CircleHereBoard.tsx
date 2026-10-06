@@ -19,7 +19,7 @@ export function CircleHereBoard({
       <ul className="mt-2 divide-y divide-line/70">
         {pins.map((p) => (
           <li key={p.handle} className="flex items-center gap-3 py-2.5">
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-brand/10 text-brand">
+            <span className="grid h-10 w-10 place-items-center rounded-full bg-brand/10 text-accent">
               <MapPin size={16} />
             </span>
             <button type="button" className="min-w-0 flex-1 text-left" onClick={() => onOpen?.(p)}>
@@ -35,7 +35,7 @@ export function CircleHereBoard({
                 href={mapsUrl(p.geo, p.placeName)}
                 target="_blank"
                 rel="noreferrer"
-                className="text-[13px] font-semibold text-brand"
+                className="text-[13px] font-semibold text-accent"
               >
                 Maps
               </a>

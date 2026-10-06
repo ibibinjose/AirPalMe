@@ -125,7 +125,7 @@ export function MarkerPage() {
         >
           <ArrowLeft size={16} />
         </button>
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">{marker?.city || PRECINCT.name}</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">{marker?.city || PRECINCT.name}</p>
       </div>
       <h1 className="font-display mt-1 text-3xl font-semibold">{marker?.label || "Nearby"}</h1>
       <div className="mt-4">
@@ -175,7 +175,7 @@ export function MarkerPage() {
                 <img src={ev.image} alt="" referrerPolicy="no-referrer" className="h-36 w-full object-cover" />
               )}
               <div className="bg-card p-3 ring-1 ring-line">
-                <p className="text-[11px] text-gold">{ev.sub}</p>
+                <p className="text-[11px] text-accent">{ev.sub}</p>
                 <p className="font-display text-lg">{ev.title}</p>
               </div>
             </button>
@@ -210,7 +210,7 @@ export function MarkerPage() {
           }}
         >
           <div className="flex items-center gap-2 rounded-full bg-paper px-3 ring-1 ring-line">
-            <Sparkles size={16} className="text-brand" />
+            <Sparkles size={16} className="text-accent" />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}

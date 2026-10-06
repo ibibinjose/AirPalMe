@@ -19,7 +19,7 @@ export function resolveIconSize(size?: IconSize): number {
 }
 
 export const VARIANT_CLASS_MAP: Record<IconVariant, string> = {
-  brand: "text-brand",
+  brand: "text-accent",
   "brand-ink": "text-brand-ink",
   ink: "text-ink",
   mute: "text-mute",
@@ -44,7 +44,7 @@ export function resolveIconVariantClass(variant?: IconVariant): string {
 }
 
 export const BADGE_VARIANT_MAP: Record<IconBadgeVariant, string> = {
-  brand: "bg-brand/10 text-brand ring-1 ring-brand/20",
+  brand: "bg-brand/10 text-accent ring-1 ring-brand/20",
   "brand-solid": "bg-brand text-white shadow-xs",
   soft: "bg-card text-ink ring-1 ring-line shadow-xs",
   glass: "bg-card/80 backdrop-blur-md text-ink ring-1 ring-line/80 shadow-xs",

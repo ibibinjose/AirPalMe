@@ -35,16 +35,16 @@ export function ExperienceReviews({ planId }: { planId: string }) {
 
   return (
     <section className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs" aria-label="Guest reviews">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Completed experiences</p>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">Completed experiences</p>
       <h2 className="font-display text-xl font-bold text-ink">
-        Guest reviews · {avg.toFixed(1)} <Star size={15} className="inline fill-gold text-gold" />
+        Guest reviews · {avg.toFixed(1)} <Star size={15} className="inline fill-gold text-accent" />
       </h2>
       <ul className="mt-4 space-y-3">
         {rows.map((r) => (
           <li key={r.id} className="rounded-2xl bg-paper p-3 ring-1 ring-line/60">
             <p className="flex items-center gap-1" aria-label={`${r.rating} out of 5 stars`}>
               {[1, 2, 3, 4, 5].map((s) => (
-                <Star key={s} size={13} className={s <= r.rating ? "fill-gold text-gold" : "text-line"} />
+                <Star key={s} size={13} className={s <= r.rating ? "fill-gold text-accent" : "text-line"} />
               ))}
               <span className="ml-1 text-[12px] font-semibold text-mute">{r.guestName}</span>
             </p>

@@ -318,14 +318,14 @@ export function SearchQueriesDashboardTab() {
                 <h2 className="font-display text-lg sm:text-xl font-bold tracking-tight text-ink">
                   Top 10 Search Queries
                 </h2>
-                <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold text-brand">
+                <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold text-accent">
                   Last {daysSpan} Days
                 </span>
               </div>
               <p className="mt-1 text-xs sm:text-sm text-mute">
                 Top search terms tracked in Firestore across all search surfaces
                 {loading && (
-                  <span className="ml-2 inline-block text-xs font-semibold text-brand animate-pulse">
+                  <span className="ml-2 inline-block text-xs font-semibold text-accent animate-pulse">
                     Syncing Firestore…
                   </span>
                 )}
@@ -341,7 +341,7 @@ export function SearchQueriesDashboardTab() {
               disabled={refreshing}
               className="rounded-full bg-paper ring-1 ring-line text-xs font-semibold gap-1.5 shadow-2xs hover:bg-card"
             >
-              <RefreshCw size={13} className={cn(refreshing && "animate-spin text-brand")} />
+              <RefreshCw size={13} className={cn(refreshing && "animate-spin text-accent")} />
               <span>Refresh</span>
             </Button>
             <Button
@@ -507,7 +507,7 @@ export function SearchQueriesDashboardTab() {
           <span className="text-[10px] font-bold uppercase tracking-wider text-mute">
             #1 Top Query
           </span>
-          <p className="font-display mt-1 text-lg sm:text-xl font-bold text-brand truncate" title={topQueryName}>
+          <p className="font-display mt-1 text-lg sm:text-xl font-bold text-accent truncate" title={topQueryName}>
             &ldquo;{topQueryName}&rdquo;
           </p>
           <p className="mt-1 text-[11px] text-mute font-medium">
@@ -532,7 +532,7 @@ export function SearchQueriesDashboardTab() {
           <p className="font-display mt-1 text-2xl sm:text-3xl font-extrabold text-ink">
             {uniqueQueryCount}
           </p>
-          <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-brand">
+          <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-accent">
             <Sparkles size={12} />
             <span>Top 10 charted below</span>
           </p>
@@ -603,7 +603,7 @@ export function SearchQueriesDashboardTab() {
                     return (
                       <div className="rounded-2xl border border-line bg-card p-3 shadow-lg text-xs">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="grid h-5 w-5 place-items-center rounded-full bg-brand/10 text-[10px] font-bold text-brand">
+                          <span className="grid h-5 w-5 place-items-center rounded-full bg-brand/10 text-[10px] font-bold text-accent">
                             #{item.rank}
                           </span>
                           <span className="font-bold text-ink">{item.query}</span>
@@ -615,7 +615,7 @@ export function SearchQueriesDashboardTab() {
                           </p>
                           <p>
                             Share:{" "}
-                            <strong className="text-brand font-bold">{percent}%</strong> of top 10
+                            <strong className="text-accent font-bold">{percent}%</strong> of top 10
                           </p>
                           <p className="capitalize">Vertical: {item.category}</p>
                         </div>
@@ -674,7 +674,7 @@ export function SearchQueriesDashboardTab() {
                     return (
                       <div className="rounded-2xl border border-line bg-card p-3 shadow-lg text-xs">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="grid h-5 w-5 place-items-center rounded-full bg-brand/10 text-[10px] font-bold text-brand">
+                          <span className="grid h-5 w-5 place-items-center rounded-full bg-brand/10 text-[10px] font-bold text-accent">
                             #{item.rank}
                           </span>
                           <span className="font-bold text-ink">{item.query}</span>
@@ -686,7 +686,7 @@ export function SearchQueriesDashboardTab() {
                           </p>
                           <p>
                             Share:{" "}
-                            <strong className="text-brand font-bold">{percent}%</strong> of top 10
+                            <strong className="text-accent font-bold">{percent}%</strong> of top 10
                           </p>
                           <p className="capitalize">Vertical: {item.category}</p>
                         </div>
@@ -752,7 +752,7 @@ export function SearchQueriesDashboardTab() {
                           item.rank === 1
                             ? "bg-brand text-white"
                             : item.rank <= 3
-                            ? "bg-brand/10 text-brand"
+                            ? "bg-brand/10 text-accent"
                             : "bg-paper text-mute",
                         )}
                       >
@@ -792,7 +792,7 @@ export function SearchQueriesDashboardTab() {
                       <button
                         type="button"
                         onClick={() => nav(`/search?q=${encodeURIComponent(item.query)}`)}
-                        className="inline-flex items-center gap-1 text-[11px] font-bold text-brand hover:underline cursor-pointer"
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-accent hover:underline cursor-pointer"
                       >
                         <span>Search</span>
                         <ArrowUpRight size={12} />

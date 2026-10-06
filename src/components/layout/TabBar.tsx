@@ -72,7 +72,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
   return (
     <motion.nav
       className={cn(
-        "fixed-element fixed inset-x-0 bottom-0 z-40 lg:hidden keyboard-hide transition-all duration-200 ease-out pointer-events-none",
+        "fixed-element fixed inset-x-0 bottom-0 z-40 lg:hidden keyboard-hide transition-[opacity,transform] duration-200 ease-out pointer-events-none",
         isKeyboardOpen && "translate-y-full opacity-0",
       )}
       aria-hidden={isKeyboardOpen}
@@ -98,7 +98,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
                   nav(href);
                 }}
                 className={cn(
-                  "relative flex h-12 min-w-0 flex-1 touch-manipulation flex-col items-center justify-center gap-0.5 transition-all duration-200 cursor-pointer active:scale-90",
+                  "relative flex h-12 min-w-0 flex-1 touch-manipulation flex-col items-center justify-center gap-0.5 transition-[color,transform] duration-200 cursor-pointer active:scale-90",
                   on ? "font-bold text-white" : "font-medium text-ink/60 hover:text-ink",
                 )}
               >

@@ -40,7 +40,7 @@ export function PullToRefreshContainer({ state, children, className }: PullToRef
               : isRefreshing
                 ? "bg-card/95 text-ink ring-brand/40"
                 : isThresholdMet
-                  ? "bg-card/95 text-brand ring-brand/50 scale-105"
+                  ? "bg-card/95 text-accent ring-brand/50 scale-105"
                   : "bg-card/90 text-mute ring-line/80",
           )}
         >
@@ -51,7 +51,7 @@ export function PullToRefreshContainer({ state, children, className }: PullToRef
             </>
           ) : isRefreshing ? (
             <>
-              <RefreshCw size={13} className="animate-spin text-brand" />
+              <RefreshCw size={13} className="animate-spin text-accent" />
               <span>Reloading data...</span>
             </>
           ) : (
@@ -62,7 +62,7 @@ export function PullToRefreshContainer({ state, children, className }: PullToRef
                   transform: `rotate(${arrowRotation}deg)`,
                   transition: isPulling ? "none" : "transform 0.2s ease-out",
                 }}
-                className={cn("transition-colors", isThresholdMet ? "text-brand" : "text-mute")}
+                className={cn("transition-colors", isThresholdMet ? "text-accent" : "text-mute")}
               />
               <span>{isThresholdMet ? "Release to reload" : "Pull to refresh"}</span>
             </>

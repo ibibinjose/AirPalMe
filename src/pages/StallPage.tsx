@@ -54,7 +54,7 @@ export function StallPage() {
         </button>
         <BioHandleButton handle={handle} />
       </div>
-      <p className="mt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-gold">
+      <p className="mt-4 text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
         {stallUnitDisplay(event.flavour, stall.booth)} · {stall.category}
         {stall.location ? ` · ${stall.location}` : ""}
       </p>
@@ -62,7 +62,7 @@ export function StallPage() {
       {stall.shortWhy && <p className="mt-3 text-[15px] leading-relaxed">{stall.shortWhy}</p>}
       {stall.offer && (
         <p className="mt-4 rounded-2xl bg-card px-4 py-3 text-[15px] ring-1 ring-line">
-          <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-gold">Offer</span>
+          <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-accent">Offer</span>
           <span className="mt-1 block">{stall.offer}</span>
         </p>
       )}

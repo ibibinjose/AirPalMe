@@ -138,7 +138,7 @@ export function NowPage() {
           <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
             What now?
           </h1>
-          <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-brand ring-1 ring-brand/20">
+          <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-accent ring-1 ring-brand/20">
             <Sparkles className="h-3.5 w-3.5" aria-hidden />
             <span>Instant Hangout</span>
           </div>
@@ -255,9 +255,9 @@ export function NowPage() {
             <p className="mt-3.5 text-[15px] font-medium text-mute">Finding something near you…</p>
           </div>
         ) : suggestion ? (
-          <article className="overflow-hidden rounded-[32px] bg-card ring-1 ring-line/80 shadow-xs transition-all duration-300">
+          <article className="overflow-hidden rounded-[32px] bg-card ring-1 ring-line/80 shadow-xs transition-shadow duration-300">
             {/* Place Hero Visual */}
-            <div className="relative aspect-[16/9] w-full overflow-hidden bg-mist sm:aspect-[21/9]">
+            <div className="relative aspect-[16/9] w-full overflow-hidden bg-paper sm:aspect-[21/9]">
               <Photo
                 src={placeImg}
                 alt={suggestion.place.name}
@@ -329,7 +329,7 @@ export function NowPage() {
               {/* Why this rationale callout */}
               {suggestion.reasons.length > 0 ? (
                 <div className="mt-3.5 inline-flex items-center gap-2 rounded-xl bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line/60">
-                  <Sparkles className="h-3.5 w-3.5 text-brand" aria-hidden />
+                  <Sparkles className="h-3.5 w-3.5 text-accent" aria-hidden />
                   <span>Why this: {suggestion.reasons.join(" · ")}</span>
                 </div>
               ) : null}
@@ -367,7 +367,7 @@ export function NowPage() {
                         href={mapsUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-brand hover:underline"
+                        className="inline-flex items-center gap-1 text-accent hover:underline"
                       >
                         <Navigation className="h-3 w-3" aria-hidden />
                         <span>Maps</span>
@@ -380,7 +380,7 @@ export function NowPage() {
                   <div className="pt-1">
                     <Link
                       href={venueBioUrl}
-                      className="inline-flex items-center gap-1 font-medium text-brand hover:underline"
+                      className="inline-flex items-center gap-1 font-medium text-accent hover:underline"
                     >
                       <Compass className="h-3.5 w-3.5" aria-hidden />
                       <span>View venue profile</span>

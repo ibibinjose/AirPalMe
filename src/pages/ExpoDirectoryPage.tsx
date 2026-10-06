@@ -114,7 +114,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
       )}
 
       {!event.coverImage && (
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-gold">
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
           {EVENT_FLAVOUR_LABELS[event.flavour]}
         </p>
       )}
@@ -127,7 +127,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-mute border-y border-line/60 py-2.5">
         <span className="inline-flex items-center gap-1">
-          <MapPin size={13} className="text-gold" />
+          <MapPin size={13} className="text-accent" />
           {[event.venue, event.city].filter(Boolean).join(" · ")}
         </span>
         <div className="flex items-center gap-2">
@@ -136,7 +136,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
               href={mapsUrl}
               target="_blank"
               rel="noreferrer"
-              className="text-brand font-semibold hover:underline inline-flex items-center gap-1"
+              className="text-accent font-semibold hover:underline inline-flex items-center gap-1"
             >
               <Navigation size={11} />
               <span>Directions</span>
@@ -154,7 +154,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
           {(event.hostName || event.hostHandle) && (
             <div className="flex items-center justify-between gap-2 text-xs">
               <div className="flex items-center gap-2 min-w-0">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-xl bg-brand/10 text-brand ring-1 ring-brand/20">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-xl bg-brand/10 text-accent ring-1 ring-brand/20">
                   {event.hostType === "business" ? <Building2 size={14} /> : <User size={14} />}
                 </span>
                 <div className="min-w-0">
@@ -171,7 +171,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
                 <button
                   type="button"
                   onClick={() => nav(bioPath(event.hostHandle!))}
-                  className="shrink-0 inline-flex min-h-[44px] items-center gap-1 rounded-full bg-brand/10 px-3.5 text-xs font-semibold text-brand hover:bg-brand hover:text-white transition"
+                  className="shrink-0 inline-flex min-h-[44px] items-center gap-1 rounded-full bg-brand/10 px-3.5 text-xs font-semibold text-accent hover:bg-brand hover:text-white transition"
                 >
                   <span>@{event.hostHandle}</span>
                   <ExternalLink size={11} />
@@ -183,7 +183,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
           {event.collaboratorHandles && event.collaboratorHandles.length > 0 && (
             <div className="pt-2 border-t border-line/60">
               <span className="block text-[10px] font-bold uppercase tracking-wider text-mute mb-1.5 flex items-center gap-1">
-                <Users size={11} className="text-gold" /> Co-hosts & Collaborators
+                <Users size={11} className="text-accent" /> Co-hosts & Collaborators
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {event.collaboratorHandles.map((handle) => (
@@ -191,11 +191,11 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
                     key={handle}
                     type="button"
                     onClick={() => nav(bioPath(handle))}
-                    className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-paper px-3.5 text-xs font-semibold text-ink border border-line hover:border-brand hover:text-brand transition shadow-2xs group"
+                    className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-paper px-3.5 text-xs font-semibold text-ink border border-line hover:border-brand hover:text-accent transition shadow-2xs group"
                   >
-                    <span className="text-mute group-hover:text-brand">@</span>
+                    <span className="text-mute group-hover:text-accent">@</span>
                     <span>{handle}</span>
-                    <ExternalLink size={10} className="text-mute group-hover:text-brand" />
+                    <ExternalLink size={10} className="text-mute group-hover:text-accent" />
                   </button>
                 ))}
               </div>
@@ -212,7 +212,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
             onClick={() => setShowDesc(!showDesc)}
             className="flex items-center justify-between w-full font-semibold text-ink text-left"
           >
-            <span className="flex items-center gap-1 text-[11px] uppercase tracking-wider text-gold">
+            <span className="flex items-center gap-1 text-[11px] uppercase tracking-wider text-accent">
               <Info size={13} /> About This Event
             </span>
             <span className="text-mute text-[11px]">{showDesc ? "Less" : "More"}</span>
@@ -259,7 +259,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
       {/* My visit list — saved stalls for this event */}
       {visitList.length > 0 && (
         <div className="mt-4 rounded-2xl bg-brand/[0.04] p-3 ring-1 ring-brand/20">
-          <p className="px-1 text-[11px] font-bold uppercase tracking-wider text-brand">
+          <p className="px-1 text-[11px] font-bold uppercase tracking-wider text-accent">
             My visit list · {visitList.length}
           </p>
           <ul className="mt-2 space-y-1.5">
@@ -276,7 +276,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
                       {[s.booth ? `Stall ${s.booth}` : "", s.location].filter(Boolean).join(" · ")}
                     </span>
                   </span>
-                  <span className="shrink-0 text-[11px] font-semibold text-brand">Visit →</span>
+                  <span className="shrink-0 text-[11px] font-semibold text-accent">Visit →</span>
                 </button>
               </li>
             ))}
@@ -300,14 +300,14 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
                   {STALL_CATEGORIES.find((c) => c.id === s.category)?.label || s.category}
                   {s.location ? ` · ${s.location}` : ""}
                 </span>
-                <span className="font-semibold text-sm text-ink group-hover:text-brand transition-colors">
+                <span className="font-semibold text-sm text-ink group-hover:text-accent transition-colors">
                   {s.name}
                 </span>
                 {s.shortWhy && <span className="mt-0.5 block text-xs text-mute">{s.shortWhy}</span>}
-                {s.offer && <span className="mt-0.5 block text-xs font-semibold text-gold">🏷️ {s.offer}</span>}
+                {s.offer && <span className="mt-0.5 block text-xs font-semibold text-accent">🏷️ {s.offer}</span>}
               </span>
               <span className="shrink-0 text-right text-xs font-medium text-mute group-hover:text-ink">
-                {isSaved(s.id) && <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-brand">Saved</span>}
+                {isSaved(s.id) && <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-accent">Saved</span>}
                 {s.handle ? `@${s.handle}` : "View"}
               </span>
             </button>
@@ -322,7 +322,7 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
 
       <button
         type="button"
-        className="mt-6 w-full text-center text-xs font-semibold text-brand hover:underline"
+        className="mt-6 w-full text-center text-xs font-semibold text-accent hover:underline"
         onClick={() => nav("/event")}
       >
         Organiser Workspace & Stalls Manager →

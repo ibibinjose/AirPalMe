@@ -153,7 +153,7 @@ export function PulsePublicPage() {
   if (error || !pulse) {
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">AirPal Pulse</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">AirPal Pulse</p>
         <h1 className="font-display mt-2 text-2xl font-semibold">Link unavailable</h1>
         <p className="mt-2 text-sm text-mute">{error || "This Pulse is not accepting responses."}</p>
       </div>
@@ -163,7 +163,7 @@ export function PulsePublicPage() {
   if (done) {
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">AirPal Pulse</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">AirPal Pulse</p>
         <h1 className="font-display mt-2 text-3xl font-semibold">{done.issueCreated ? "We've got it" : "Thank you"}</h1>
         <p className="mt-3 text-sm text-mute">
           {done.issueCreated
@@ -213,7 +213,7 @@ export function PulsePublicPage() {
         </div>
       ) : (
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">
             AirPal Pulse
           </p>
           <h1 className="font-display mt-1 text-2xl font-semibold">{pulse.title}</h1>
@@ -282,7 +282,7 @@ export function PulsePublicPage() {
                       aria-label={`${value} of 5`}
                       onClick={() => chooseAndAdvance(current, value, emoji)}
                       className={`grid h-14 place-items-center rounded-2xl text-2xl ring-1 ${
-                        selected ? "bg-ink text-white ring-ink" : "bg-card ring-line"
+                        selected ? "bg-ink text-paper ring-ink" : "bg-card ring-line"
                       }`}
                     >
                       {emoji}
@@ -310,7 +310,7 @@ export function PulsePublicPage() {
                         type="button"
                         onClick={() => chooseAndAdvance(current, v)}
                       className={`h-12 rounded-full text-sm font-medium ring-1 ${
-                        selected ? "bg-ink text-white ring-ink" : "bg-card ring-line"
+                        selected ? "bg-ink text-paper ring-ink" : "bg-card ring-line"
                       }`}
                     >
                       {v ? "Yes" : "No"}
@@ -343,7 +343,7 @@ export function PulsePublicPage() {
                         type="button"
                         onClick={() => chooseAndAdvance(current, opt)}
                       className={`flex w-full items-center rounded-2xl px-4 py-3 text-left text-sm font-medium ring-1 ${
-                        selected ? "bg-ink text-white ring-ink" : "bg-card ring-line"
+                        selected ? "bg-ink text-paper ring-ink" : "bg-card ring-line"
                       }`}
                     >
                       {opt}
@@ -373,7 +373,7 @@ export function PulsePublicPage() {
                       type="button"
                       onClick={() => chooseAndAdvance(current, n)}
                       className={`h-11 rounded-xl text-sm font-medium ring-1 ${
-                        selected ? "bg-ink text-white ring-ink" : "bg-card ring-line"
+                        selected ? "bg-ink text-paper ring-ink" : "bg-card ring-line"
                       }`}
                     >
                       {n}

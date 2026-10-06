@@ -40,14 +40,14 @@ export function TradingHoursField({
       {/* Label and 7-Day Helper Button */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-mute">
-          <Clock size={13} className="text-gold" />
+          <Clock size={13} className="text-accent" />
           <span>{label}</span>
         </div>
 
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 hover:bg-brand/15 px-2.5 py-1 text-xs font-semibold text-brand transition active:scale-95 border border-brand/20 shadow-xs"
+          className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 hover:bg-brand/15 px-2.5 py-1 text-xs font-semibold text-accent transition active:scale-95 border border-brand/20 shadow-xs"
         >
           <Calendar size={12} />
           <span>7-Day Schedule Helper</span>
@@ -66,7 +66,7 @@ export function TradingHoursField({
           type="button"
           onClick={() => setModalOpen(true)}
           title="Open 7-day schedule helper"
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 grid h-7 w-7 place-items-center rounded-xl text-mute hover:text-brand hover:bg-brand/10 transition"
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 grid h-7 w-7 place-items-center rounded-xl text-mute hover:text-accent hover:bg-brand/10 transition"
         >
           <Calendar size={15} />
         </button>
@@ -76,7 +76,7 @@ export function TradingHoursField({
       {showQuickPresets && (
         <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
           <span className="text-[10px] font-bold uppercase tracking-wider text-mute flex items-center gap-1 mr-0.5">
-            <Sparkles size={10} className="text-gold" /> Presets:
+            <Sparkles size={10} className="text-accent" /> Presets:
           </span>
           {TRADING_HOURS_PRESETS.slice(0, 4).map((p) => {
             const formatted = format7DaySchedule(p.build());

@@ -91,7 +91,7 @@ export function PlanManageSheet({
         <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-line/80 sm:hidden" />
         <div className="flex items-center justify-between border-b border-line/60 pb-3">
           <div>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">
               Host controls
             </span>
             <h2 className="font-display mt-0.5 text-xl font-bold text-ink">Manage plan</h2>
@@ -116,7 +116,7 @@ export function PlanManageSheet({
             }}
             className="flex min-h-[52px] w-full items-center gap-3 rounded-2xl bg-paper px-4 text-left ring-1 ring-line transition hover:bg-card active:scale-[0.99]"
           >
-            <Pencil size={16} className="shrink-0 text-brand" />
+            <Pencil size={16} className="shrink-0 text-accent" />
             <span className="flex-1 text-sm font-semibold text-ink">Edit plan</span>
             <ChevronRight size={16} className="shrink-0 text-mute" />
           </button>
@@ -129,7 +129,7 @@ export function PlanManageSheet({
             }}
             className="flex min-h-[52px] w-full items-center gap-3 rounded-2xl bg-paper px-4 text-left ring-1 ring-line transition hover:bg-card active:scale-[0.99]"
           >
-            <Megaphone size={16} className="shrink-0 text-brand" />
+            <Megaphone size={16} className="shrink-0 text-accent" />
             <span className="flex-1 text-sm font-semibold text-ink">Message everyone going</span>
             <ChevronRight size={16} className="shrink-0 text-mute" />
           </button>
@@ -138,7 +138,7 @@ export function PlanManageSheet({
         <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-paper px-4 py-3 ring-1 ring-line">
           <span className="inline-flex min-w-0 items-center gap-2 text-xs font-medium text-ink">
             {plan.isPublic ? (
-              <Radar size={14} className="shrink-0 text-brand" />
+              <Radar size={14} className="shrink-0 text-accent" />
             ) : (
               <Lock size={14} className="shrink-0 text-mute" />
             )}
@@ -152,7 +152,7 @@ export function PlanManageSheet({
         </div>
 
         <div className="mt-4 rounded-2xl bg-paper px-4 py-2 ring-1 ring-line">
-          <p className="pt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Who's going</p>
+          <p className="pt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">Who's going</p>
           {(
             [
               { key: "hideNames", label: "Guest names", hint: "Show who else is coming" },
@@ -219,7 +219,7 @@ export function PlanManageSheet({
         </div>
 
         <div className="mt-4 rounded-2xl bg-paper px-4 py-2 ring-1 ring-line">
-          <p className="pt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-gold">Guest questions</p>
+          <p className="pt-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">Guest questions</p>
           <PlanQuestionManager
             questions={plan.guestQuestions || []}
             onAdd={(q) =>

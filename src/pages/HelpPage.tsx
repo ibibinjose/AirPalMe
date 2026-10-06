@@ -53,11 +53,11 @@ export function HelpPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 pb-28">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">Knowledge Hub</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Knowledge Hub</p>
       <h1 className="font-display mt-2 text-3xl font-bold tracking-tight">How can we help?</h1>
       <p className="mt-1 text-sm leading-6 text-mute">
         Short guides to plans, tickets, safety, and your account. Still stuck?{" "}
-        <Link href="/assist" className="font-semibold text-brand hover:underline">
+        <Link href="/assist" className="font-semibold text-accent hover:underline">
           Contact support
         </Link>
         .
@@ -90,7 +90,7 @@ export function HelpPage() {
 
       {filtered.length === 0 ? (
         <div className="mt-6 rounded-3xl bg-card p-8 text-center ring-1 ring-line shadow-xs">
-          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand/10 text-brand ring-1 ring-brand/20">
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand/10 text-accent ring-1 ring-brand/20">
             <LifeBuoy size={26} />
           </div>
           <h2 className="font-display mt-3 text-lg font-bold text-ink">No guides match “{query.trim()}”</h2>
@@ -128,7 +128,7 @@ export function HelpPage() {
                   className="flex min-h-[44px] w-full cursor-pointer items-center gap-3 p-4 text-left"
                 >
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[11px] font-bold uppercase tracking-[0.12em] text-brand">
+                    <span className="block text-[11px] font-bold uppercase tracking-[0.12em] text-accent">
                       {cat?.label}
                     </span>
                     <span className="font-display mt-0.5 block text-[17px] font-bold leading-snug text-ink">
@@ -151,7 +151,7 @@ export function HelpPage() {
                         <li key={i} className="flex gap-2.5 text-sm leading-6 text-ink">
                           <span
                             aria-hidden
-                            className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-brand"
+                            className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-accent"
                           >
                             {i + 1}
                           </span>
@@ -162,7 +162,7 @@ export function HelpPage() {
                     <div className="mt-4 flex flex-wrap gap-2">
                       {article.links.map((link) => (
                         <Link key={link.href + link.label} href={link.href}>
-                          <span className="inline-flex min-h-[44px] cursor-pointer items-center gap-1 rounded-full bg-paper px-4 text-[13px] font-semibold text-brand ring-1 ring-line transition hover:bg-brand/10">
+                          <span className="inline-flex min-h-[44px] cursor-pointer items-center gap-1 rounded-full bg-paper px-4 text-[13px] font-semibold text-accent ring-1 ring-line transition hover:bg-brand/10">
                             {link.label} <ArrowRight size={13} />
                           </span>
                         </Link>
@@ -176,7 +176,7 @@ export function HelpPage() {
         </ul>
       )}
 
-      <div className="mt-8 rounded-3xl bg-ink p-6 text-center text-white shadow-xs">
+      <div className="mt-8 rounded-3xl bg-neutral-900 p-6 text-center text-white shadow-xs">
         <h2 className="font-display text-xl font-bold">Still stuck?</h2>
         <p className="mx-auto mt-1 max-w-sm text-[13px] leading-6 text-white/70">
           Tell us what broke — a human reads every message.
