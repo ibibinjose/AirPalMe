@@ -7,6 +7,11 @@ const DEFAULT_DESCRIPTION = "Life Made Easy. People, places, things and experien
  * pages (plans, events, bios) override these with their own setShareMeta. */
 const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> = [
   {
+    match: /^\/pass(\/|$)/,
+    title: "AirPal Pass · Events, Deals & Experiences",
+    description: "Discover what's happening. Get access. Save money. Your pass to events, deals and experiences.",
+  },
+  {
     match: /^\/plan(\/|$)/,
     title: "Plans · AirPal.Me",
     description: "Make plans with family and friends — pick a place, gather the crew, go.",

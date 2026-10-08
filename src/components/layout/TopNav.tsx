@@ -2,6 +2,7 @@ import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Plus, Search } from "@/components/icons";
 import { BrandMark } from "@/components/brand/BrandMark";
+import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 import { ProfileMenu } from "@/components/auth/ProfileMenu";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { openGlobalSearch } from "@/components/search/openSearch";
@@ -68,16 +69,19 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
       transition={{ duration: 0.55, ease: enterEase, delay: 0.12 }}
     >
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:px-6">
-        <button
-          onClick={() => {
-            void triggerHaptic("light");
-            nav("/");
-          }}
-          className="shrink-0 text-left transition hover:opacity-90 cursor-pointer"
-          aria-label="AirPal Home"
-        >
-          <BrandMark />
-        </button>
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            onClick={() => {
+              void triggerHaptic("light");
+              nav("/");
+            }}
+            className="shrink-0 text-left transition hover:opacity-90 cursor-pointer"
+            aria-label="AirPal Home"
+          >
+            <BrandMark />
+          </button>
+          <EcosystemSwitcher currentPath={path} variant="header" />
+        </div>
         <nav className="flex items-center justify-center gap-1 rounded-full bg-card/60 p-1 ring-1 ring-line/70 backdrop-blur-md">
           {LINKS.slice(0, 2).map(renderLink)}
           <BrowseMenu path={path} isHost={isHost} />

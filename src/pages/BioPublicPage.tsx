@@ -2059,9 +2059,15 @@ export function BioPublicPage() {
               </span>
             </Link>
             <p className="text-xs text-mute">
-              AirPal bio for people, venues &amp; creators ·{" "}
+              AirPal.Me · Personal life &amp; digital identity ·{" "}
               <Link href="/bio/setup" className="font-semibold text-ink underline hover:text-accent">
                 Claim your free @handle
+              </Link>
+            </p>
+            <p className="text-[11px] text-mute/80">
+              Discover events, tickets &amp; perks on{" "}
+              <Link href="/pass" className="font-semibold text-ink underline hover:text-accent">
+                AirPal Pass →
               </Link>
             </p>
             <button

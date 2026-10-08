@@ -23,6 +23,7 @@ describe("browse menu", () => {
   it("matches each parent category to its discovery surfaces", () => {
     expect(matched("/stay")).toEqual(["Stay"]);
     expect(matched("/stay/@harbour-hotel")).toEqual(["Stay"]);
+    expect(matched("/pass")).toEqual(["AirPal Pass"]);
     expect(matched("/events")).toEqual(["Events"]);
     expect(matched("/calendar")).toEqual(["Events"]);
     expect(matched("/offers")).toEqual(["Offers & Deals"]);
@@ -49,7 +50,7 @@ describe("browse menu", () => {
   });
 
   it("shows the mobile strip on Home and browse-context routes only", () => {
-    for (const path of ["/", "/explore", "/now", "/stay", "/stay/@x", "/events", "/calendar", "/offers"]) {
+    for (const path of ["/", "/explore", "/now", "/pass", "/stay", "/stay/@x", "/events", "/calendar", "/offers"]) {
       expect(showBrowseStrip(path)).toBe(true);
     }
     for (const path of ["/mate", "/plan", "/pulse", "/inbox", "/me", "/host", "/settings"]) {

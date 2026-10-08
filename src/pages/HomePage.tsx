@@ -10,6 +10,7 @@ import {
   Search,
   ShieldCheck,
   Sparkles,
+  Ticket,
   Users,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -27,6 +28,8 @@ import { Button } from "@/components/ui/Button";
 import { openGlobalSearch } from "@/components/search/openSearch";
 import { triggerHaptic } from "@/lib/native";
 import { getExperienceProofRemote } from "@/lib/functions";
+import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
+import { getDailyOutfitRecommendation } from "@/lib/outfit";
 import {
   ArrowCta,
   AvatarStack,
@@ -57,6 +60,15 @@ const QUICK_PROMPTS = [
 
 const VERTICALS = [
   {
+    id: "pass",
+    label: "AirPal Pass",
+    sub: "Events, access & perks",
+    href: "/pass",
+    icon: Ticket,
+    iconBg: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
+    badge: "Access",
+  },
+  {
     id: "now",
     label: "What now?",
     sub: "One suggestion for now",
@@ -71,7 +83,7 @@ const VERTICALS = [
     sub: "Local offers & freebies",
     href: "/deals",
     icon: Sparkles,
-    iconBg: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
+    iconBg: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
     badge: "Popular",
   },
   {
@@ -117,10 +129,15 @@ export function HomePage() {
   const { user } = useAuth();
   const { myPlans, publicPlans } = usePlans();
   const { calendarEvents } = useEvents();
-  const { city, here, today, now } = useLocalNow();
+  const { city, here, today, now, weather } = useLocalNow();
   const { version } = useListings();
   const [around, setAround] = useState<AroundFilter>("events");
   const [completedCount, setCompletedCount] = useState(0);
+
+  const outfitAdvice = useMemo(() => {
+    if (!weather) return null;
+    return getDailyOutfitRecommendation(weather.temp, weather.code, weather.isDay);
+  }, [weather]);
 
   // Proof the loop is alive: real completed-plan count, shown only when nonzero.
   useEffect(() => {
@@ -171,6 +188,19 @@ export function HomePage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 md:px-6">
+      {/* Top Switcher Bar */}
+      <div className="pt-3 pb-2 flex items-center justify-between gap-3">
+        <EcosystemSwitcher currentPath="/" variant="header" />
+        <Link
+          href="/pass"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 py-2 text-xs font-bold text-ink ring-1 ring-line shadow-xs hover:bg-paper transition"
+        >
+          <Ticket size={14} className="text-amber-500" />
+          <span className="hidden sm:inline">Explore</span>
+          <span>AirPal Pass →</span>
+        </Link>
+      </div>
+
       {/* Hero Header Section */}
       <header className="relative -mx-4 overflow-hidden rounded-b-[32px] md:-mx-6 shadow-sm">
         <div className="absolute inset-0" aria-hidden="true">
@@ -184,7 +214,7 @@ export function HomePage() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/30" />
         </div>
-        <div className="relative px-4 pb-8 pt-8 md:px-8 md:pt-14">
+        <div className="relative px-4 pb-8 pt-8 md:px-8 md:pt-12">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md ring-1 ring-white/30">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -197,11 +227,25 @@ export function HomePage() {
           </div>
 
           <h1 className="font-display mt-3 text-[30px] sm:text-[40px] font-bold leading-[1.05] tracking-tight text-white max-w-2xl">
-            What do you want to do?
+            Plan your day. Organise your life.
           </h1>
           <p className="mt-1 text-sm sm:text-base font-medium text-white/90 max-w-lg">
-            Find places, events, and plans.
+            My life, organised by AirPal.
           </p>
+
+          {/* Daily Weather & Outfit Recommendation Capsule */}
+          {weather && outfitAdvice && (
+            <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl bg-white/15 p-3 text-xs text-white ring-1 ring-white/25 backdrop-blur-md max-w-xl">
+              <span className="font-bold inline-flex items-center gap-1.5">
+                <span>{outfitAdvice.icon}</span>
+                <span>{weather.temp}°C {outfitAdvice.vibe}</span>
+              </span>
+              <span className="text-white/60">·</span>
+              <span className="text-white/90 font-medium">{outfitAdvice.outfit}</span>
+              <span className="text-white/60">·</span>
+              <span className="text-white/80 italic">{outfitAdvice.accessory}</span>
+            </div>
+          )}
 
           {/* Quick Search Trigger */}
           <div className="mt-4">
@@ -401,6 +445,35 @@ export function HomePage() {
             </div>
           </div>
         )}
+      </section>
+
+      {/* AirPal Pass Discovery Showcase */}
+      <section aria-label="AirPal Pass Showcase" className="mt-8 cv-auto">
+        <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-950 via-neutral-900 to-amber-950 p-6 md:p-8 text-white shadow-md">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="max-w-xl">
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 px-3 py-1 text-xs font-bold text-amber-300 ring-1 ring-amber-400/30">
+                <Ticket size={13} /> AirPal Pass · Experiences &amp; Access
+              </div>
+              <h3 className="font-display text-2xl font-bold mt-2 text-white">
+                Discover what's happening. Get access. Save money.
+              </h3>
+              <p className="text-xs sm:text-sm text-white/80 mt-1">
+                Concerts, Indian cultural festivals, live gigs, and dining perks across {city || "Sydney"}.
+                Share the same AirPal account — zero extra signups.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <Link
+                href="/pass"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-amber-500 px-6 py-2.5 text-xs font-bold text-neutral-950 shadow-md transition hover:bg-amber-400 active:scale-95"
+              >
+                <span>Open AirPal Pass</span>
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* What's On Near You Section */}

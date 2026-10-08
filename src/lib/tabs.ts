@@ -14,6 +14,7 @@ export function tabFromPath(path: string): GuestTab {
   }
   if (
     path === "/now" ||
+    path.startsWith("/pass") ||
     path.startsWith("/explore") ||
     path.startsWith("/discover") ||
     path.startsWith("/discovery")

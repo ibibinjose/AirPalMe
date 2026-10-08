@@ -18,6 +18,7 @@ const EventPage = lazy(() => import("@/pages/EventPage").then((m) => ({ default:
 const TicketPage = lazy(() => import("@/pages/TicketPage").then((m) => ({ default: m.TicketPage })));
 const CalendarPage = lazy(() => import("@/pages/CalendarPage").then((m) => ({ default: m.CalendarPage })));
 const EventsPage = lazy(() => import("@/pages/EventsPage").then((m) => ({ default: m.EventsPage })));
+const PassPage = lazy(() => import("@/pages/PassPage").then((m) => ({ default: m.PassPage })));
 const StallPage = lazy(() => import("@/pages/StallPage").then((m) => ({ default: m.StallPage })));
 const GuestlistPage = lazy(() => import("@/pages/GuestlistPage").then((m) => ({ default: m.GuestlistPage })));
 const OrganiserEventPage = lazy(() =>
@@ -153,6 +154,16 @@ export function AppRoutes() {
         <Route path="/ticket/:id" component={TicketPage} />
         <Route path="/calendar" component={CalendarPage} />
         <Route path="/events" component={EventsPage} />
+        <Route path="/pass" component={PassPage} />
+        <Route path="/pass/events">
+          <Redirect to="/events" />
+        </Route>
+        <Route path="/pass/deals">
+          <Redirect to="/deals" />
+        </Route>
+        <Route path="/pass/tickets">
+          <Redirect to="/me/tickets" />
+        </Route>
         <Route path="/plans">
           <Redirect to="/plan" />
         </Route>

@@ -1,5 +1,6 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import {
   Calendar,
   Check,
@@ -8,11 +9,17 @@ import {
   HeartHandshake,
   PhoneCall,
   Plus,
+  QrCode,
   Sparkles,
+  Ticket,
   Users,
   Video,
   X,
 } from "lucide-react";
+import { getFirebaseDb } from "@/lib/firebase";
+import { useLocalNow } from "@/contexts/LocalNowContext";
+import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
+import { getDailyOutfitRecommendation } from "@/lib/outfit";
 import { ImageField } from "@/components/media/ImageField";
 import { Photo } from "@/components/ui/Photo";
 import { EVENT_FLAVOUR_LABELS } from "@shared/event";
@@ -99,6 +106,27 @@ export function MePage() {
   const tripCount = myPlans.length;
   const savedCount = savedEvents.length + savedStalls.length;
 
+  const { weather, city } = useLocalNow();
+  const outfitAdvice = useMemo(() => {
+    if (!weather) return null;
+    return getDailyOutfitRecommendation(weather.temp, weather.code, weather.isDay);
+  }, [weather]);
+
+  const [ticketCount, setTicketCount] = useState<number>(0);
+  useEffect(() => {
+    const db = getFirebaseDb();
+    if (!db || !user?.uid) return;
+    let cancelled = false;
+    void getDocs(query(collection(db, "bookings"), where("customerUid", "==", user.uid)))
+      .then((snap) => {
+        if (!cancelled) setTicketCount(snap.size);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.uid]);
+
   const [catchUpModalOpen, setCatchUpModalOpen] = useState(false);
   const [catchUpInitialType, setCatchUpInitialType] = useState<PlanType>("catchup");
   const [catchUpsList, setCatchUpsList] = useState<CatchUpItem[]>([]);
@@ -151,6 +179,18 @@ export function MePage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-[max(6rem,calc(env(safe-area-inset-bottom,0px)+5rem))] pt-6 md:px-6">
+      {/* Ecosystem Lens Switcher */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <EcosystemSwitcher currentPath="/me" variant="header" />
+        <Link
+          href="/pass"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 py-2 text-xs font-bold text-ink ring-1 ring-line shadow-xs hover:bg-paper transition"
+        >
+          <Ticket size={14} className="text-amber-500" />
+          <span>AirPal Pass ({ticketCount}) →</span>
+        </Link>
+      </div>
+
       <div className="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
         {/* Left Column: Avatar Hero, Handle, Quick Links & Contacts (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
@@ -255,6 +295,68 @@ export function MePage() {
               </button>
             </div>
           </div>
+
+          {/* AirPal Passbook & Digital Wallet Card */}
+          <div className="overflow-hidden rounded-[28px] ring-1 ring-line/80 bg-gradient-to-br from-card via-card to-paper p-5 shadow-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">
+                AirPal Pass · Wallet
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 dark:text-amber-400">
+                <Ticket size={12} /> {ticketCount} Active
+              </span>
+            </div>
+            <p className="font-display mt-2 text-lg font-bold text-ink">
+              Your Universal Experience Pass
+            </p>
+            <p className="text-xs text-mute mt-0.5">
+              Concerts, cultural festivals, and member perks — scannable at the door with one AirPal identity.
+            </p>
+            <div className="mt-4 flex items-center gap-2">
+              <Button
+                size="sm"
+                className="flex-1 min-h-[44px] rounded-full font-bold shadow-xs active:scale-95 cursor-pointer"
+                onClick={() => nav("/me/tickets")}
+              >
+                <QrCode size={14} className="mr-1.5" />
+                Open Passbook
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="min-h-[44px] rounded-full border border-line px-4 font-semibold active:scale-95 cursor-pointer"
+                onClick={() => nav("/pass")}
+              >
+                Browse Pass
+              </Button>
+            </div>
+          </div>
+
+          {/* Daily Weather & Outfit Recommendation (AirPal.Me Companion) */}
+          {weather && outfitAdvice && (
+            <div className="rounded-[28px] ring-1 ring-line bg-card p-5 shadow-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">
+                  Daily Companion · {city || "Sydney"}
+                </span>
+                <span className="text-xs font-bold text-ink">
+                  {weather.temp}°C
+                </span>
+              </div>
+              <div className="mt-2 flex items-center gap-2.5">
+                <span className="text-2xl" aria-hidden="true">{outfitAdvice.icon}</span>
+                <div>
+                  <p className="font-display text-sm font-bold text-ink">{outfitAdvice.vibe}</p>
+                  <p className="text-xs text-mute">{outfitAdvice.summary}</p>
+                </div>
+              </div>
+              <div className="mt-3 rounded-2xl bg-paper p-3 text-xs">
+                <p className="font-semibold text-ink">👕 Recommended Outfit:</p>
+                <p className="text-mute mt-0.5">{outfitAdvice.outfit}</p>
+                <p className="mt-1.5 text-accent font-medium">✨ {outfitAdvice.accessory}</p>
+              </div>
+            </div>
+          )}
 
           {mine && (
             <div className="rounded-[28px] ring-1 ring-line bg-card p-5 shadow-xs">

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { useLocation, useSearch } from "wouter";
+import { useLocation, useSearch, Link } from "wouter";
 import {
   CalendarDays,
   CalendarRange,
@@ -8,6 +8,7 @@ import {
   Heart,
   Sparkles,
   Star,
+  Ticket,
   X,
   LayoutGrid,
   Download,
@@ -16,6 +17,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { toast } from "sonner";
+import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 import { useEvents } from "@/contexts/EventsContext";
 import type { CalendarEvent, CalendarEventCategory } from "@shared/event";
 import {
@@ -360,6 +362,18 @@ function CalendarPageContent() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-24 pt-4 md:px-6 md:pt-6">
+      {/* Ecosystem Lens Switcher */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <EcosystemSwitcher currentPath="/calendar" variant="header" />
+        <Link
+          href="/pass"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 py-2 text-xs font-bold text-ink ring-1 ring-line shadow-xs hover:bg-paper transition"
+        >
+          <Ticket size={14} className="text-amber-500" />
+          <span>Tickets &amp; Passes on AirPal Pass →</span>
+        </Link>
+      </div>
+
       {/* Image header — laneway backdrop, controls float below the title */}
       <div className="relative mb-6 overflow-hidden rounded-[28px]">
         <div className="absolute inset-0" aria-hidden="true">

@@ -4,6 +4,7 @@ import { tabFromPath } from "./tabs";
 describe("tabFromPath", () => {
   it("maps the companion tabs", () => {
     expect(tabFromPath("/now")).toBe("explore");
+    expect(tabFromPath("/pass")).toBe("explore");
     expect(tabFromPath("/explore")).toBe("explore");
     expect(tabFromPath("/calendar")).toBe("explore");
     expect(tabFromPath("/plan")).toBe("trips");

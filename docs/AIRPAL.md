@@ -12,9 +12,22 @@
 
 ## Part A — Product
 
-### A1. Brand
+### A1. Brand and Ecosystem Architecture
 
-AirPal.me — Life Made Easy. ME = Made Easy; the `.me` is intentional and stays. One trusted platform on one shared engine, with eventual verticals (people, places, experiences, things, discovery, trips). Never position AirPal publicly as unrelated apps.
+**AIRPAL** is the master brand ("Life Made Easy"). To eliminate bloat and keep positioning crystal-clear, products are separated at the UX level into two focused surfaces powered by one universal engine and account:
+
+- **1. AirPal.Me — Personal Life & Identity**
+  - *Core job:* "Plan your day. Organise your life. Share who you are."
+  - *Positioning:* "My life, organised by AirPal."
+  - *Features:* Personal profile & digital bio (`/@handle`), daily planner & "What now?" suggestions (`/now`), local weather & daily outfit recommendations, calendar schedule (`/calendar`), friends' plans (`/plan`), and private memories.
+
+- **2. AirPal Pass — Events, Deals & Experiences**
+  - *Core job:* "Discover what's happening. Get access. Save money."
+  - *Positioning:* "Your pass to experiences."
+  - *Features:* Live concerts, Indian cultural festivals & community gigs, dining perks & member deals (`/deals`), scannable digital QR tickets & passbook (`/me/tickets`), organiser door scanner (`/scan`), and event hosting tools (`/event`).
+
+- **Shared Universal Identity:** Both surfaces share the exact same AirPal account, Firebase Auth, and database. Passes and tickets booked in AirPal Pass automatically populate the user's AirPal.Me daily schedule.
+
 
 ### A2. Promise and loop
 

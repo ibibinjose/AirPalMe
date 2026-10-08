@@ -48,7 +48,7 @@ export interface BrowseSection {
  * points at a real discovery surface — no dead menu items.
  */
 export const BROWSE_LINKS: BrowseLink[] = [
-  { href: "/stay", label: "Stay", icon: Hotel, match: (p) => p.startsWith("/stay") },
+  { href: "/pass", label: "AirPal Pass", icon: Ticket, match: (p) => p.startsWith("/pass") },
   {
     href: "/events",
     label: "Events",
@@ -67,6 +67,7 @@ export const BROWSE_LINKS: BrowseLink[] = [
     icon: Sparkles,
     match: (p) => p.startsWith("/now"),
   },
+  { href: "/stay", label: "Stay", icon: Hotel, match: (p) => p.startsWith("/stay") },
 ];
 
 /** Host shortcuts: everything a host needs, one tap from the browse menu. */
@@ -186,6 +187,7 @@ export const BROWSE_SECTIONS: BrowseSection[] = [
 const STRIP_PREFIXES = [
   "/explore",
   "/now",
+  "/pass",
   "/stay",
   "/events",
   "/calendar",
