@@ -1,11 +1,11 @@
 ---
 name: airpal-brain-reviewer
-description: Evaluates product features, architecture, UI, and code changes against docs/AIRPAL_BRAIN.md (§18 Feature Evaluation Framework) and AGENTS.md to protect the North Star (Completed Experiences per Active User) and enforce P0-P4 priority gates.
+description: Evaluates product features, architecture, UI, and code changes against docs/AIRPAL.md and AGENTS.md to protect the North Star (Completed Experiences per Active User), enforce the dual-product ecosystem architecture (AirPal.Me + AirPal Pass), and prevent bloat or parallel account systems.
 ---
 
 # AirPal Brain Reviewer Skill
 
-This skill enforces the product gates defined in **`docs/AIRPAL_BRAIN.md`**, **`AGENTS.md`**, and **`docs/CANON.md`**.
+This skill enforces product integrity defined in **`docs/AIRPAL.md`** (the binding source of truth) and **`AGENTS.md`**.
 
 ## Core Operating Principle
 > **"Don't optimize for users. Optimize for completed experiences."**
@@ -14,37 +14,43 @@ This skill enforces the product gates defined in **`docs/AIRPAL_BRAIN.md`**, **`
 
 ---
 
-## Conflict Hierarchy
-When documents or requirements conflict, resolve in this strict order:
-1. **Safety, Security, Privacy, and Payment Integrity** (`AGENTS.md`)
-2. **Shipped Chrome, Auth, and Identity Freeze** (`docs/CANON.md`)
-3. **Brain on Expansion & Prioritization** (`docs/AIRPAL_BRAIN.md`)
-4. Older vertical plans or feature requests
+## Brand Architecture & Invariants
+
+**AIRPAL** is the master brand ("Life Made Easy") with two distinct UX lenses powered by a unified account and database engine:
+
+1. **AirPal.Me (Personal Life & Identity):**
+   * *Core Job:* "Plan your day. Organise your life. Share who you are."
+   * *Surfaces:* Profile/bio (`/@handle`), daily planner (`/now`), outfit advice, personal calendar (`/calendar`), friends' hangout threads (`/plan`).
+2. **AirPal Pass (Events, Deals & Experiences):**
+   * *Core Job:* "Discover what's happening. Get access. Save money."
+   * *Surfaces:* What's on (`/pass`, `/events`), scannable digital passbook (`/me/tickets`), member dining perks (`/deals`), door scanner (`/scan`), organiser tools (`/event`).
+
+**Invariants:**
+* **One Universal Identity:** Under no circumstances create separate user accounts, login databases, or siloed user systems between AirPal.Me and AirPal Pass.
+* **Deterministic Intelligence:** Real weather, pure deterministic outfit advice (`src/lib/outfit.ts`), honest open-now hours, and live Firestore events. No hallucinated data or fake providers.
 
 ---
 
-## §18 Feature Evaluation Framework
+## Conflict Hierarchy
+When documents or requirements conflict, resolve in this strict order:
+1. **Safety, Security, Privacy, and Payment Integrity** (`docs/AIRPAL.md` Part C)
+2. **Binding Rebuild Truth** (`docs/AIRPAL.md` Parts A–G)
+3. **Shipped Chrome, Auth, and Design System** (`docs/AIRPAL.md` Part E)
+4. Older vertical plans or reference docs
+
+---
+
+## Feature Evaluation Framework
 Before creating any new screen, route, Firestore collection, integration, or feature, evaluate against the 6 gates:
 
 1. **Discovery:** Does it help someone discover what to do in their city?
-2. **Connection:** Does it help them find a trusted person/mate to do it with?
+2. **Connection:** Does it help them connect with friends or trusted groups?
 3. **Planning:** Does it help them turn intent into a concrete, executable plan (time + place)?
-4. **Completion:** Does it help them actually show up and complete the real-world experience?
+4. **Completion:** Does it help them show up and complete the real-world experience?
 5. **Trust & Safety:** Does it increase trust, identity verification, or safety?
 6. **Business Value:** Does it create measurable value or facilitate legitimate marketplace transactions?
 
 *Decision Rule:* If the answer is NO to most of these questions, do NOT build it.
-
----
-
-## Priority Gates (§14)
-- **P0 Transaction (Open / Must Prove First):** Plan → Connect → Experience → Complete (Sydney beachhead).
-- **P1 Usability:** Discovery, matching, messaging, calendar, notifications, reviews, repeat retention.
-- **P2 Monetization:** Bookings, platform commission, business partnerships, provider payouts.
-- **P3 Expansion (Gated):** Stay as marketplace, Travel, Fashion, Daily as media layer.
-- **P4 Infrastructure (Gated):** B2B Studio, SaaS, advertising, second native apps.
-
-*Gate Rule:* Never start P3/P4 while P0 is unproven. If a proposal adds a new vertical, a separate standalone app, or vanity social metrics without driving completed experiences, REJECT or DEFER it.
 
 ---
 
@@ -54,14 +60,5 @@ Reject changes that turn AirPal into:
 - An uncurated events directory or news feed
 - A generic hotel/Airbnb clone without the experience connection layer
 - An online e-commerce clothing store
-- An AI chatbot with a marketplace attached (AI must be quiet intelligence proposing concrete plans)
+- An AI chatbot with a marketplace attached (AI must propose concrete, actionable plans)
 - Multiple fragmented apps or user systems (Must maintain one platform, one identity)
-
----
-
-## Review Procedure for Changes
-When reviewing or proposing changes:
-1. **Gate Check:** Does this change directly advance the P0/P1 transaction loop?
-2. **Canon Check:** Does it preserve the frozen design tokens (AirPal Blue `#1805db`, 5-tab dock, NativeAuthGate vs website guest browsing, Firestore bios)?
-3. **Safety & Privacy Check:** Are home addresses, verification docs, phone numbers, and moderation notes kept strictly private?
-4. **Verification:** Does the change pass `npm test` and `npm run verify`?

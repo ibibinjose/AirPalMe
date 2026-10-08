@@ -78,11 +78,24 @@ Done (memory and repeat):
 
 ### B2. V1 includes
 
-- Now composer, one assembled suggestion, invite-by-link with RSVP, one live thread per plan, private memories with repeat.
-- Public user profiles (minimum): photo, name, handle, short bio, social links (display only), completed-experiences count, upcoming public plans (display only — joining stays invite-link only), and a visibility switch (public / friends-only / private; default friends-only). A card you tap from an invite, not a destination you browse. Detail reference: `AirPalBio.md`.
-- Business profiles (minimum): one public page per business — what it is, where it is, honest open-now hours, its listings, its current deals. Claimed and edited through a simple form. No dashboard in V1.
-- Deals and offers (minimum): attachments on business profiles, surfaced inside relevant suggestions at the right time. Claimed in the live thread (show-a-code or tap-to-redeem) with one-line expiry and terms. No deals feed, wallet, flash sales, or sponsored placement.
-- Listings (minimum): one bookable or askable thing under a business (dish, service, set menu, class slot) — title, price, short description, availability. Attachable to a plan. Request-and-confirm in V1; no live inventory or checkout.
+**1. AirPal.Me — Personal Life & Identity:**
+- **Now Composer & Day Planner (`/now`):** One assembled plan suggestion over live places with honest open-now hours, mood/time filtering, live weather context, and pure deterministic outfit recommendations (`src/lib/outfit.ts`).
+- **Personal Profiles & Handles (`/@handle`):** Public digital bio, social links, completed-experience counter, upcoming public plans, and visibility controls. Managed via `/bio/setup` and `/bio/edit`. Detail reference: `AirPalBio.md`.
+- **Hangouts & Day Plans (`/plan`):** Invite-by-link with lightweight RSVP, one live thread per plan, stop management, and private memories with one-tap repeat.
+- **Personal Life Calendar (`/calendar`):** Local agenda and personal schedule with seamless 1-tap passbook cross-links.
+
+**2. AirPal Pass — Events, Deals & Experiences:**
+- **Experience Hub (`/pass`):** Curated discovery across All Access, Indian Cultural & Festivals (Diwali, Dandiya), Concerts & Gigs, Dining Deals, and Nightlife.
+- **Passbook Wallet (`/me/tickets`):** Scannable digital QR pass cards, booking status, and Apple Wallet + Google Wallet pass export (`src/lib/wallet.ts`, `docs/WALLET.md`).
+- **Member Dining Deals (`/deals`):** Live business partner promotions, discount vouchers, and claim & redemption codes.
+- **Organiser & Door Operations (`/scan` + `/event`):** High-speed QR door check-in scanner for staff and event hosting tools.
+
+**3. Business Profiles & Listings (depth only):**
+- Business profiles: public page per venue (open-now hours, listings, active deals). Claimed and edited via simple form.
+- Listings: bookable or askable items (dishes, services, set menus, class slots) attachable to plans.
+
+**4. Ecosystem Lens Switcher (`EcosystemSwitcher`):**
+- Tactile segmented header control allowing users to switch between AirPal.Me and AirPal Pass while maintaining a single, shared user account.
 
 ### B3. V1 excludes (explicit)
 
@@ -204,6 +217,14 @@ User profiles and business pages per B2, listings attachable to plans, deals att
 
 The V1 core was buried in ~150 pre-teardown routes. Phase 6 cut `routes.tsx` to the V1 list and deleted 29 pages: Mate/MateRequest/Companion/Circle/Club/ClubList/Campus/Create/Studio/Marketing/Solutions/SolutionDetail/Experiences/Fashion/Festival/FestivalCreate/Zoo/Rewards/People/MyGiveaways/Giveaways/BirthdayFreebies/BusinessBirthdayOffers/AdminBirthdayOffers/Demo/DemoHotel/Explore/Search/BusinessCampaigns, plus `data/solutions.ts`. Stranger-meeting physics is fully unshipped; discovery collapses to `/now`; deals collapse to `/deals`. Compat redirects kept: `/explore` `/discover` `/discovery` `/search` → `/now`; `/inbox` `/chat` `/messages` → `/me/inbox`; `/offers` `/promotions` `/giveaways` `/birthday-freebies` → `/deals`; `/business/helpdesk` `/host/helpdesk` → `/helpdesk`; `/search/analytics` → `/admin/search-analytics`. Mobile dock second tab retargeted Explore → Now (`/now`); tab id stays `explore`. SEO contract follows the cut: prerender drops `/mate` `/solutions` `/experiences` and adds `/now`; sitemap/llms/checks point at `/now` and `/plan` instead of `/mate` and `/fashion`. Follow-up cleanup removed the orphaned chains end to end: zoo system (context, layer, sheets, stores, shared lib, seeds, assets, provider), campus store + seeds (campus data stays — live stay place), explore-filters, birthday offer client + callables + seed (age-gate helper stays), DemoBanner, FestivalManagePanel, EventTile, CircleAnnounceSheet, shared create/studio/print-kit; workspace chrome trimmed to live routes. Kept deliberately: club guestlist chain (live event door ops), companion/mate-request admin chain (G6 gated-return machinery), scan session parsing (live QR infra). Validation: typecheck clean, full suite green, `npm run verify` exit 0.
 
+### G5c. Phase 7 — Master Brand Dual-Product Architecture (October 2026)
+
+Following Phase 6 subtraction, product UX was reorganized under master brand **AIRPAL** into two dedicated, bloat-free lenses powered by one shared engine and account:
+- **AirPal.Me:** Personal life, schedule, and identity. Features: `/now` AI Day Planner with mood/when suggestions, live weather and deterministic outfit recommendations (`src/lib/outfit.ts`), public digital identity `/@handle`, personal calendar `/calendar`, and hangout co-planning `/plan`.
+- **AirPal Pass:** Event discovery, tickets, and dining perks. Features: `/pass` experience hub (All Access, Indian Cultural & Festivals, Concerts & Gigs, Nightlife), `/me/tickets` digital passbook wallet (QR passes + Apple Wallet / Google Wallet via `docs/WALLET.md`), `/deals` member dining discounts, `/scan` door check-in scanner, and `/event` organiser management.
+- **Ecosystem Switcher (`EcosystemSwitcher.tsx`):** Tactile header control with spring physics and haptics, allowing seamless switching between `AirPal.Me` and `AirPal Pass`.
+- **Universal Engine Invariant:** 100% unified user profile, Firebase Auth, and database engine. Tickets booked on AirPal Pass seamlessly appear in the user's AirPal.Me calendar and dashboard. Validation: 1,015/1,015 tests pass, `npm run verify` exit 0, `npm run cap:sync` synced to iOS & Android.
+
 ### G6. What returns later, and on what evidence
 
 Nothing here returns on opinion. Each needs its evidence gate plus its trust machinery built first:
@@ -234,12 +255,14 @@ Scope creep past B3 (each addition must pass G7). Migration of existing users, h
 These stay as working references. Where any of them conflicts with Parts A–G, Parts A–G win; update or retire the reference when you touch its area.
 
 - `AirPalBio.md` — detailed bio/profile blueprint; profile detail reference for B2.
-- `docs/app-mind-map.md` — pre-rebuild tree and route map; valid until the rebuild lands.
+- `docs/app-mind-map.md` — master brand AIRPAL, AirPal.Me, and AirPal Pass ecosystem mind map and route architecture.
 - `docs/analytics-event-dictionary.md`, `docs/analytics-checklist.md`, `analytics-instrumentation-implementation-plan.md` — event contract and instrumentation.
 - `docs/maps.md`, `docs/local-now.md`, `docs/freshness.md` — maps, zoned time, re-verify SLAs.
 - `docs/phone-login.md`, `docs/email-setup.md` — auth plumbing.
-- `docs/host-tickets.md`, `docs/managed-payments.md`, `docs/pulse-product.md`, `docs/WALLET.md` — surface references for later phases.
-- `docs/UI-UX-GUIDE.md`, `docs/ui-playbook-checklist.md`, `docs/IOS-DESIGN-GUIDE.md`, `docs/brand.md`, `docs/birthday-freebies.md` — design and content references.
+- `docs/host-tickets.md`, `docs/managed-payments.md`, `docs/pulse-product.md` — surface references for operator and payment operations.
+- `docs/WALLET.md` — Apple Wallet & Google Wallet pass integration for AirPal Pass tickets and AirPal.Me identity cards.
+- `docs/UI-UX-GUIDE.md`, `docs/ui-playbook-checklist.md`, `docs/IOS-DESIGN-GUIDE.md`, `docs/birthday-freebies.md` — design guidelines and checklist.
+- `docs/brand.md` — brand foundation, slogans, and color tokens for AIRPAL, AirPal.Me, and AirPal Pass.
 - `docs/client-handoff.md`, `docs/launch-runbook.md` — handoff and runbook.
 - `docs/store/` — store submission pack.
 - `docs/plan-prd.md` — Plan experience PRD (Apple-Invites-beating create flow, cover artwork, one-card thread); spec reference for B3.

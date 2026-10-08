@@ -1,4 +1,4 @@
-# Wallet passes (Apple + Google)
+# Wallet Passes (Apple + Google) — AirPal Pass & AirPal.Me
 
 Status: Apple signer is `pass.me.airpal.wallet` (team `26WGXSNG58`).
 The Pass Type ID certificate and encrypted key are Functions secrets;
@@ -7,10 +7,17 @@ Functions pin secret versions at deploy time. Google uses the
 `wallet-passes` service account. `GOOGLE_WALLET_ISSUER_ID` is `3388000000023208916`
 (configured in Google Pay & Wallet Console).
 
+## Ecosystem Integration
+
+- **AirPal Pass:** Event tickets, festival passes, and member vouchers booked on AirPal Pass
+  render in the digital Passbook (`/me/tickets` and `/pass`) and sync to Apple Wallet and Google Wallet.
+- **AirPal.Me:** Personal identity cards from `/@handle` can also be added to Apple Wallet / Google Pay
+  for quick offline contact sharing.
+
 ## Pass design (both wallets)
 
 Luma-style event ticket on AirPal Blue (`#1805db`), white text,
-"AirPal.me" branding: date/time header, big event title, LOCATION row,
+"AirPal Pass" / "AirPal.Me" branding: date/time header, big event title, LOCATION row,
 GUEST + HOST row, QR barcode of the same gate URL as the on-screen
 ticket (`/e/:id?ticket=`, `/plan/:id?ticket=`, or `/ticket/:id`).
 Profile cards read `name` and `shortWhy` (city on the front when set),
