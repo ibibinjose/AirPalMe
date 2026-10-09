@@ -5,7 +5,7 @@ description: Apple platform development and Human Interface Guidelines (HIG) eng
 
 # Apple Platform Skills — Web, Mobile, iOS & Android
 
-Comprehensive Apple platform design and engineering standard adapted for AirPal's Vite SPA + Capacitor 8 architecture (`me.airpal.app`), synthesizing the official Apple Human Interface Guidelines (HIG), WWDC Liquid Glass specifications, Game Feel haptic choreography, and App Store readiness standards from the Apple platform skills library.
+Comprehensive Apple platform design and engineering standard adapted for AirPal's Vite SPA + Capacitor 8 architecture (two shells: `me.airpal.app` + `me.airpal.pass`), synthesizing the official Apple Human Interface Guidelines (HIG), WWDC Liquid Glass specifications, Game Feel haptic choreography, and App Store readiness standards from the Apple platform skills library.
 
 ---
 

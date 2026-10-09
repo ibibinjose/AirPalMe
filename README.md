@@ -2,7 +2,7 @@
 
 **Life Made Easy.** Turn "I want to do something" into a completed real-world experience.
 
-Production: [https://airpal.me](https://airpal.me) · Firebase `airpalme-app` · Native Capacitor `me.airpal.app`.
+Production: [https://airpal.me](https://airpal.me) · Firebase `airpalme-app` · Native Capacitor shells `me.airpal.app` (AirPal) + `me.airpal.pass` (AirPal Pass, tickets/events only) from one codebase (`src/lib/app-flavor.ts`); web stays one all-in-one app.
 
 ---
 

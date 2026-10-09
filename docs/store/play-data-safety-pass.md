@@ -2,17 +2,17 @@
 
 App does **not** sell data. Encryption in transit: yes (HTTPS + HSTS). Users can request deletion: Settings → Delete account, or AirPalMe@gmail.com / hello@airpal.me.
 
-Pass browses without an account; sign-in is needed only to hold tickets.
+The native Pass app requires an account on open (same gate as AirPal); the website browses without one.
 
 ## Data collected
 
 | Type             | Collected | Optional            | Purpose                           | Shared                                                  |
 | ---------------- | --------- | ------------------- | --------------------------------- | ------------------------------------------------------- |
 | Precise location | Yes       | Yes                 | App functionality (nearby events) | No                                                      |
-| Email            | Yes       | Until they sign in  | Account (ticket holders)          | Firebase Auth                                           |
-| Phone            | Yes       | Until they sign in  | Account (ticket holders)          | Firebase Auth                                           |
-| Name             | Yes       | Until they sign in  | Account / tickets                 | Firebase; shown to organisers on scanned passes         |
-| User IDs         | Yes       | Until they sign in  | Account                           | Firebase                                                |
+| Email            | Yes       | Account required    | Account (ticket holders)          | Firebase Auth                                           |
+| Phone            | Yes       | Account required    | Account (ticket holders)          | Firebase Auth                                           |
+| Name             | Yes       | Account required    | Account / tickets                 | Firebase; shown to organisers on scanned passes         |
+| User IDs         | Yes       | Account required    | Account                           | Firebase                                                |
 | App interactions | Yes       | Yes                 | Tickets, claims, scans            | No third-party ads                                      |
 | Purchase history | Yes       | If they buy tickets | App functionality                 | Stripe (payment processor) — no card numbers in the app |
 

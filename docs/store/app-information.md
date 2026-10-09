@@ -11,7 +11,7 @@ Privacy https://airpal.me/privacy · Terms https://airpal.me/terms · Contact ht
 
 Native app is **18+**. Website guests can browse. Native iOS/Android require an account.
 
-This pack: iOS **2.0.0 (12)** · Android **versionCode 6** · Apple ID **6811351322**. TestFlight: select **2.0.0 (12)**, not 1.0 (`docs/store/testflight.md`).
+This pack: iOS **2.0.0 (16)** · Android **versionCode 8** · Apple ID **6811351322**. TestFlight: select **2.0.0 (16)**, not 1.0 (`docs/store/testflight.md`).
 
 ---
 
@@ -31,8 +31,8 @@ This pack: iOS **2.0.0 (12)** · Android **versionCode 6** · Apple ID **6811351
 | Content Rights | See below |
 | Age Ratings | See below |
 | Encryption | Already set in Xcode: `ITSAppUsesNonExemptEncryption` = **NO**. Do **not** upload export docs. |
-| App Store Server Notifications | Leave **empty**. No IAP, no auto-renewable subscriptions. |
-| App-Specific Shared Secret | Do **not** create. No subscriptions. |
+| App Store Server Notifications | Leave **empty**. No Apple IAP (business-plan subscriptions check out via Stripe web checkout, not the App Store). |
+| App-Specific Shared Secret | Do **not** create. No App Store subscriptions. |
 | Vietnam Game License | Skip. Not a game. |
 | Regulated Medical Device | **No.** Not Medical / Health & Fitness as primary. Age-rating medical answers are None. |
 | Digital Services Act | Keep **trader**. Contact AirPalMe@gmail.com · SarvamDaily Pty Ltd, New South Wales, Australia. |
@@ -41,7 +41,7 @@ This pack: iOS **2.0.0 (12)** · Android **versionCode 6** · Apple ID **6811351
 ### Content Rights (Edit)
 
 1. Does this app contain, show, or access third-party content? **Yes**  
-   Users publish bios, listings, plans, photos, and reviews. Directory import may copy a public Google/OSM listing the host confirms.
+   Users publish bios, listings, plans, and photos, plus post-experience reviews (private to the completed record, never public). Directory import may copy a public Google/OSM listing the host confirms.
 2. Do you have the necessary rights for this content? **Yes**  
    Users grant a licence in Terms. Report / block / admin takedown is in the app. Third-party maps/photos follow their terms.
 
@@ -63,10 +63,10 @@ Tap **Set Up Age Ratings**. For each row pick **None / Infrequent / Frequent** (
 | Item | Answer | Why |
 | --- | --- | --- |
 | Unrestricted Web Access | **None** | No in-app browser. External links open Safari. |
-| User-Generated Content | **Frequent** | Bios, listings, plans, photos, reviews are the product. |
-| Social Media | **Infrequent** | Public bios, follow/like, Discover, Circle. Not a public social feed as the primary product. Marketplace + people layer. |
+| User-Generated Content | **Frequent** | Bios, listings, plans, photos are the product; post-experience reviews stay private. |
+| Social Media | **Infrequent** | Public bios, follow/like, Circle. Not a public social feed as the primary product. Marketplace + people layer. |
 | Social Media Disabled for Users Under 13 | **Yes** | Whole app is 18+. Under-13 cannot create an account. |
-| Messaging and Chat | **Frequent** | Match chat, plan comments, Circle messages. Tied to a marketplace/plan interaction. |
+| Messaging and Chat | **Frequent** | Plan group chat, Circle messages, profile chat. Tied to a marketplace/plan interaction. |
 | Advertising | **None** | No ad SDK, no third-party ads. Featured listings are first-party catalogue, not an ad network. |
 
 ### Mature Themes
@@ -168,7 +168,7 @@ Review notes: paste `docs/store/reviewer-notes.md`.
 | Financial features | Payments for **real-world** bookings via Stripe. Not a digital goods store. No IAP. |
 | Health | **No** regulated device |
 | Government / political | **No** |
-| UGC | **Yes**. Users create bios, listings, plans, reviews. Moderation: report, block, admin review. |
+| UGC | **Yes**. Users create bios, listings, plans (reviews stay private to completed records). Moderation: report, block, admin review. |
 | Location | Precise location **optional**, when in use, for nearby places. |
 
 ### Play — IARC / content rating
@@ -198,6 +198,6 @@ When IARC asks:
 ## After you Save
 
 1. App Store Connect → **Age Ratings** Save, then **Content Rights** Save.  
-2. Version page: support URL, privacy URL, review notes, screenshots, build **11** (after the location-purpose-string upload).  
+2. Version page: support URL, privacy URL, review notes, screenshots, build **16**.  
 3. Play Console: Data safety + Target audience 18+ + UGC declaration.  
 4. Submit for Review / Send for review. This machine cannot click Submit.

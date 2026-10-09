@@ -1,34 +1,64 @@
 # Existing surfaces (reuse these)
 
-Inspect the path before creating a sibling. Shared domain types live in `shared/` and are imported as `@shared/...`.
+Inspect the path before creating a sibling. Shared domain types live in `shared/` and are imported as `@shared/...`. Binding truth: `docs/AIRPAL.md`. Re-audited October 2026 (post Phase 6 teardown + two-app shells).
 
 ## App shell
 
-| Surface       | Path                                                  |
-| ------------- | ----------------------------------------------------- |
-| Routes        | `src/app/routes.tsx`                                  |
-| Providers     | `src/app/providers.tsx`                               |
-| Bottom tabs   | `src/components/layout/TabBar.tsx`, `src/lib/tabs.ts` |
-| Global search | `src/components/search/GlobalSearchModal.tsx`         |
+| Surface       | Path                                                                    |
+| ------------- | ----------------------------------------------------------------------- |
+| Routes        | `src/app/routes.tsx`                                                    |
+| Providers     | `src/app/providers.tsx`                                                 |
+| Bottom tabs   | `src/components/layout/TabBar.tsx`, `src/lib/tabs.ts`                   |
+| App flavor    | `src/lib/app-flavor.ts` (`me.airpal.app` vs `me.airpal.pass`)           |
+| Global search | `src/components/search/GlobalSearchModal.tsx`                           |
+| Auth gate     | `src/components/auth/NativeAuthGate.tsx`, `src/lib/native-auth-gate.ts` |
 
-Shipped tabs: What's on / Plan / Scan / Stay / Me (`src/lib/tabs.ts`). Circle is under Plan. Mate is `/mate`, not a tab. Do not dump every vertical into the tab bar. Freeze: `docs/CANON.md`.
+Shipped dock: Home / Now / Plan / Inbox / Me (+ CreateFab for Scan & create). Pass shell dock: Pass / Events / Tickets / Scan / Me. Do not dump every vertical into the tab bar.
 
-## Mate loop
+## Plan loop (the P0 transaction)
 
-| Piece         | Path                                         | Collection                               |
-| ------------- | -------------------------------------------- | ---------------------------------------- |
-| Demand home   | `src/pages/MatePage.tsx`                     | `mate_requests`                          |
-| Request form  | `src/pages/MateRequestPage.tsx`              | `mate_requests`                          |
-| Request types | `shared/mate-request.ts`                     |                                          |
-| Supply apply  | `src/pages/CompanionPage.tsx`                | `companion_applications`                 |
-| Supply types  | `shared/companion.ts`                        |                                          |
-| Live supply   | `src/lib/companion-remote.ts`                | `companion_applications`, `mates_public` |
-| Supply admin  | `src/components/admin/CompanionAdmin.tsx`    |                                          |
-| Match admin   | `src/components/admin/MateRequestsAdmin.tsx` |                                          |
-| Chat UI       | `src/components/messaging/ChatBox.tsx`       | `request_chats/{id}/messages`            |
-| Chat types    | `shared/messaging.ts`                        |                                          |
-| Bookings UI   | `src/components/booking/BookingsSection.tsx` | `bookings`                               |
-| Booking types | `shared/booking.ts`                          |                                          |
+| Piece          | Path                                                                         | Collection                                  |
+| -------------- | ---------------------------------------------------------------------------- | ------------------------------------------- |
+| Plan hub       | `src/pages/PlanHubPage.tsx`, `shared/plan.ts`                                | `plans`                                     |
+| Create wizard  | `src/pages/PlanCreatePage.tsx`                                               | `plans`                                     |
+| Thread         | `src/pages/PlanDetailPage.tsx`, `src/components/plan/InvitationCard.tsx`     | `plans`, plan messages                      |
+| Edit / manage  | `src/pages/PlanEditPage.tsx`, `src/components/plan/PlanManageSheet.tsx`      |                                             |
+| Invite / RSVP  | `src/components/plan/PlanShareModal.tsx`, `PlanRsvpSheet.tsx`, `PlanQrModal` | guestList, invites                          |
+| Circle invite  | `src/lib/circle.ts` (lib only — no Circle page)                              | `follows`, `likes`, `presence`, `referrals` |
+| Plan callables | `functions/src/plans.ts`                                                     |                                             |
+| Spec           | `docs/plan-prd.md`                                                           |                                             |
+
+## Companion / mate-request admin chain (G6-gated — no consumer UI)
+
+Consumer Mate surfaces (`/mate`, `/companion`, Mate/MateRequest/Companion pages) were deleted in Phase 6. What remains is gated-return machinery only:
+
+| Piece         | Path                                         | Collection               |
+| ------------- | -------------------------------------------- | ------------------------ |
+| Request types | `shared/mate-request.ts`                     |                          |
+| Supply types  | `shared/companion.ts`                        |                          |
+| Live supply   | `src/lib/companion-remote.ts`                | `companion_applications` |
+| Supply admin  | `src/components/admin/CompanionAdmin.tsx`    |                          |
+| Match admin   | `src/components/admin/MateRequestsAdmin.tsx` |                          |
+
+Never rebuild consumer Mate UI from these. Strangers return only per canon G6 evidence gates.
+
+## Tickets / events / deals (Pass)
+
+| Piece             | Path                                                                                   | Collection                                               |
+| ----------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Pass hub          | `src/pages/PassPage.tsx`                                                               |                                                          |
+| Events catalog    | `src/pages/EventsPage.tsx`, `src/pages/EventPage.tsx`                                  | `events`                                                 |
+| Organiser create  | `src/pages/OrganiserEventPage.tsx` (`/event`, `/event/new`)                            | `events`                                                 |
+| Passbook          | `src/pages/MyTicketsPage.tsx`, `src/pages/TicketPage.tsx`                              | `bookings`                                               |
+| Door scanner      | `src/pages/ScanPage.tsx`                                                               | scans                                                    |
+| Bookings UI       | `src/components/booking/BookingsSection.tsx`, `TicketPass.tsx`, `TicketSalesPanel.tsx` | `bookings`                                               |
+| Booking types     | `shared/booking.ts`                                                                    |                                                          |
+| Events/tickets fn | `functions/src/events.ts`, `functions/src/tickets.ts`                                  |                                                          |
+| Promotions        | `src/pages/PromotionsPage.tsx`, `PromotionDetailPage.tsx` (giveaway                    | promotion kinds), `src/pages/BusinessPromotionsPage.tsx` | `promotions` |
+| Deal callables    | `functions/src/deals.ts`                                                               |                                                          |
+| Wallet passes     | `src/lib/wallet.ts`, `functions/src/wallet.ts`, `functions/src/google-wallet.ts`       |                                                          |
+
+`/promotions`, `/giveaways`, `/offers`, `/birthday-freebies` redirect to `/deals`; `/events` + `/deals` are the live discovery surfaces.
 
 ## Trust
 
@@ -40,40 +70,36 @@ Shipped tabs: What's on / Plan / Scan / Stay / Me (`src/lib/tabs.ts`). Circle is
 | Audit write       | `src/lib/admin-audit.ts`                    | `admin_audits`             |
 | Audit admin       | `src/components/admin/AuditTrailAdmin.tsx`  |                            |
 
-## Business / Experiences / Studio
+## Business
 
-| Piece                   | Path                                                                      | Collection                           |
-| ----------------------- | ------------------------------------------------------------------------- | ------------------------------------ |
-| Business dashboard      | `src/pages/BusinessPage.tsx`                                              | `listings`                           |
-| Onboard                 | `src/pages/BusinessOnboardPage.tsx`                                       | partner claims                       |
-| Showcase (add 3 things) | `src/pages/BusinessShowcasePage.tsx`                                      | bio catalog                          |
-| Google import           | `src/components/business/GooglePlaceImport.tsx`, `shared/google-place.ts` | Places API (New)                     |
-| Onboard types           | `shared/business-onboarding.ts`                                           |                                      |
-| Listing types           | `shared/business.ts`                                                      | `listings`, `partnerVenues`          |
-| Campaigns UI            | `src/pages/BusinessCampaignsPage.tsx`                                     | `campaigns`, `campaign_rsvps`        |
-| Campaign types          | `shared/campaign.ts`                                                      |                                      |
-| Campaign admin          | `src/components/admin/CampaignInboxAdmin.tsx`                             |                                      |
-| Guest experiences       | `src/pages/ExperiencesPage.tsx`                                           | `campaigns`, public `plans`          |
-| Create event            | `src/pages/EventCreatePage.tsx`                                           | `plans` (invite + free/paid tickets) |
-| Ticket pass / sales     | `src/components/plan/TicketPass.tsx`, `TicketSalesPanel.tsx`              | `bookings`                           |
-| Studio lead form        | `src/pages/StudioPage.tsx`                                                | `studio_walkthroughs`                |
-| Listing callables       | `functions/src/listings.ts`                                               |                                      |
-| Deal / claim callables  | `functions/src/deals.ts`                                                  |                                      |
+| Piece              | Path                                                                      | Collection                  |
+| ------------------ | ------------------------------------------------------------------------- | --------------------------- |
+| Business workspace | `src/pages/BusinessPage.tsx`                                              | `listings`                  |
+| Onboard            | `src/pages/BusinessOnboardPage.tsx`                                       | partner claims              |
+| Showcase           | `src/pages/BusinessShowcasePage.tsx`                                      | bio catalog                 |
+| Google import      | `src/components/business/GooglePlaceImport.tsx`, `shared/google-place.ts` | Places API (New)            |
+| Onboard types      | `shared/business-onboarding.ts`                                           |                             |
+| Listing types      | `shared/business.ts`                                                      | `listings`, `partnerVenues` |
+| Subscriptions      | `src/components/business/BusinessSubscriptionCard.tsx`                    | Stripe                      |
+| Listing callables  | `functions/src/listings.ts`                                               |                             |
 
-## Stay / Daily / Plans / Circle
+`BusinessCampaignsPage`, `ExperiencesPage`, `EventCreatePage`, `StudioPage` were deleted in Phase 6 — do not reference them as live.
 
-| Piece                 | Path                                                                               | Collection                                         |
-| --------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------- |
-| Discover (Daily-like) | `src/pages/DiscoverPage.tsx`                                                       | `places`, `nearbyEvents`                           |
-| Concierge / Stay      | `src/pages/ConciergePage.tsx`, `src/pages/StayPage.tsx`                            | `properties`                                       |
-| Host                  | `src/pages/HostPage.tsx`                                                           | `properties`                                       |
-| Plans                 | `src/pages/PlanHubPage.tsx`, `shared/plan.ts`                                      | `plans`                                            |
-| Plan callables        | `functions/src/plans.ts`                                                           |                                                    |
-| Circle                | `src/pages/CirclePage.tsx`, `src/lib/circle.ts`                                    | `follows`, `likes`, `presence`, `referrals`        |
-| Circle announce       | `src/components/circle/CircleAnnounceSheet.tsx`                                    | `broadcasts` (`audience: circle`)                  |
-| I’m here              | `src/components/circle/CircleHereSheet.tsx`, `shared/here.ts`                      | `here_pins`, `here_at/{place}/pins`, `here_shares` |
-| Wave                  | `src/components/wave/WaveHostCard.tsx`, `src/pages/WavePage.tsx`, `shared/wave.ts` | `waves`, `wave_here`, `wave_hits`                  |
-| Inbox                 | `src/pages/InboxPage.tsx`, `src/components/notifications/NotificationBell.tsx`     | `promotion_notifications`                          |
+## Now / Stay / Circle / Wave
+
+| Piece            | Path                                                                               | Collection                                  |
+| ---------------- | ---------------------------------------------------------------------------------- | ------------------------------------------- |
+| Now composer     | `src/pages/NowPage.tsx` (`/now`; `/explore` `/discover` `/search` redirect here)   | `places`, live events                       |
+| Concierge / Stay | `src/pages/ConciergePage.tsx`, `src/pages/StayPage.tsx`                            | `properties`                                |
+| Host             | `src/pages/HostPage.tsx`                                                           | `properties`                                |
+| Circle (lib)     | `src/lib/circle.ts` (no page)                                                      | `follows`, `likes`, `presence`, `referrals` |
+| I’m here         | `src/components/circle/CircleHereSheet.tsx`, `shared/here.ts`                      | `here_pins`, `here_shares`                  |
+| Wave             | `src/components/wave/WaveHostCard.tsx`, `src/pages/WavePage.tsx`, `shared/wave.ts` | `waves`, `wave_here`, `wave_hits`           |
+| Inbox            | `src/pages/InboxPage.tsx`, `src/components/notifications/NotificationBell.tsx`     | `promotion_notifications`                   |
+| Chat UI          | `src/components/messaging/ChatBox.tsx`, `AirPalChatModal.tsx`                      | conversation messages                       |
+| Chat types       | `shared/messaging.ts`                                                              |                                             |
+
+`DiscoverPage`, `CirclePage`, `CircleAnnounceSheet` were deleted in Phase 6.
 
 ## Auth / admin / money
 
@@ -82,6 +108,7 @@ Shipped tabs: What's on / Plan / Scan / Stay / Me (`src/lib/tabs.ts`). Circle is
 | Auth                                  | `src/contexts/AuthContext.tsx`, `src/pages/StartPage.tsx`               |
 | Admin home                            | `src/pages/AdminPage.tsx`                                               |
 | Stripe (Checkout + Connect + webhook) | `functions/src/stripe.ts`, `src/components/connect/PayoutSetupCard.tsx` |
+| Managed payments                      | `functions/src/managed-payments.ts`                                     |
 | Rules                                 | `firestore.rules`, `storage.rules`                                      |
 | Function barrel                       | `functions/src/index.ts`                                                |
 | Client callable wrappers              | `src/lib/functions.ts`                                                  |
@@ -91,4 +118,4 @@ Shipped tabs: What's on / Plan / Scan / Stay / Me (`src/lib/tabs.ts`). Circle is
 - Domain validation in `shared/*.ts` with `*.test.ts` next to it. UI does not invent status strings.
 - Privileged writes (approval, payouts, property ACL, Connect) go through `functions/src`. Client writes only what rules already allow.
 - Live Firestore + honest empty states. Seeds are migration sources, never rendered as real supply.
-- Sydney clock: `src/hooks/useLocalNow.ts`, `src/lib/local-time.ts`.
+- Sydney clock: `src/contexts/LocalNowContext.tsx` (+ `src/hooks/useLocalNow.ts`), `src/lib/local-time.ts`.

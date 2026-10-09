@@ -15,6 +15,7 @@ test.describe("Join & business profile", () => {
 
   test("partner account uses the same login, then onboard", async ({ page }) => {
     await page.goto("/join");
+    await page.waitForLoadState("domcontentloaded");
     await page.getByRole("button", { name: /Open a partner account/i }).click();
     await expect(page).toHaveURL(/\/start\?role=business/);
     await expect(page.getByText("Partner account", { exact: true }).first()).toBeVisible();

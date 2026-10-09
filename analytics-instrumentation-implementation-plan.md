@@ -1,5 +1,8 @@
 # AirPal.me Analytics Instrumentation and North-Star Metric Implementation Plan
 
+> **Status: implemented** (see `docs/analytics-checklist.md` — all code boxes checked; contract in `shared/analytics.ts`, dictionary in `docs/analytics-event-dictionary.md`).
+> **Terminology note:** this plan calls WQGA/Context the "north-star metric". Per binding canon (`docs/AIRPAL.md` A3) the product north star is **Completed Experiences per Active User** — WQGA/Context is the QR-context diagnostic shown in Admin → Telemetry. Read "north-star" below as WQGA.
+
 **Repository:** `ibibinjose/NewAirPalMe`  
 **Baseline:** `main` at `5cd4024fdb6d28e3db5cd20cc6492bb792e73655`  
 **Primary goal:** Measure whether each active QR context creates useful guest outcomes for the operator who deployed it.

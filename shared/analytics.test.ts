@@ -5,7 +5,7 @@ import {
   isQualifiedAction,
   isSeedContextId,
   loopMs,
-  northStarFromEvents,
+  wqgaFromEvents,
   validateAnalyticsEvent,
   WINNABLE_LOOP_TARGET_MS,
   winnableLoopMet,
@@ -174,7 +174,7 @@ describe("winnable loop (scan QR → first value in 60s)", () => {
   });
 });
 
-describe("eligibility and north-star", () => {
+describe("eligibility and WQGA diagnostic", () => {
   it("does not count page views, demo events, or duplicate first_value", () => {
     expect(
       isQualifiedAction(
@@ -289,7 +289,7 @@ describe("eligibility and north-star", () => {
         properties: { actionType: "wifi_reveal", contextId: "harbour-hotel" },
       }),
     ];
-    const result = northStarFromEvents(events, now);
+    const result = wqgaFromEvents(events, now);
     expect(result.id).toBe("weekly_qualified_guest_actions_per_active_qr_context");
     expect(result.activeQrContexts).toBe(2);
     expect(result.qualifiedActions).toBe(3);

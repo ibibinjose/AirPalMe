@@ -8,16 +8,16 @@ AirPal answers “what’s around / what’s on / is it open” from a **zoned c
 
 `useLocalNow()`:
 
-| Field          | Meaning                                                                                 |
-| -------------- | --------------------------------------------------------------------------------------- |
-| `now`          | Ticking `Date`                                                                          |
-| `timeZone`     | Open-Meteo timezone for `here`, else the device zone                                    |
-| `today`        | `YYYY-MM-DD` in `timeZone`                                                              |
-| `time` / `day` | Top-bar clock                                                                           |
-| `city`         | Reverse-geocoded GPS city, or stay/precinct city                                        |
-| `here`         | GPS if it has drifted from stay (~2.5 km), else stay/precinct. Weather, Explore, Guide. |
-| `anchor`       | Stay pin while the guest is in a stay/marker/campus session. Concierge walk times.      |
-| `weather`      | Current + 3-day forecast (Open-Meteo)                                                   |
+| Field          | Meaning                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------- |
+| `now`          | Ticking `Date`                                                                              |
+| `timeZone`     | Open-Meteo timezone for `here`, else the device zone                                        |
+| `today`        | `YYYY-MM-DD` in `timeZone`                                                                  |
+| `time` / `day` | Top-bar clock                                                                               |
+| `city`         | Reverse-geocoded GPS city, or stay/precinct city                                            |
+| `here`         | GPS if it has drifted from stay (~2.5 km), else stay/precinct. Weather, time, Now/Discover. |
+| `anchor`       | Stay pin while the guest is in a stay/marker/campus session. Concierge walk times.          |
+| `weather`      | Current + 3-day forecast (Open-Meteo)                                                       |
 
 GPS is optional. If it is denied or slow, stay geo (scanned property) is used; if there is no stay, The Rocks precinct.
 

@@ -2,7 +2,7 @@
 
 > Adopted from human-supplied Apple design rules. Goal: AirPal on iPhone feels inevitable and familiar — like a first-party app — while staying AirPal.
 >
-> Brand resolutions (where HIG and AirPal identity meet): AirPal Blue `#1805db` stays the single accent (used sparingly, per HIG); `ring-1 ring-line` card borders stay as the shipped AirPal card language instead of pure spacing-grouped lists; DM Sans/Outfit stay the brand fonts (no SF Pro swap — brand consistency beats font-native feel). Everything else below applies, especially on iOS: safe areas, touch targets, system behaviors (no iOS zoom, no tap delay, no tap highlight), bottom sheets for modals, calm motion.
+> Brand resolutions (where HIG and AirPal identity meet): AirPal Blue `#1805db` stays the single accent (used sparingly, per HIG); `ring-1 ring-line` card borders stay as the shipped AirPal card language instead of pure spacing-grouped lists; type ships on the system stack (`--font-sans` / `--font-display` in `src/index.css` — SF Pro on iOS), so this guide's "SF Pro or system font stack" rule and the shipped app agree. Everything else below applies, especially on iOS: safe areas, touch targets, system behaviors (no iOS zoom, no tap delay, no tap highlight), bottom sheets for modals, calm motion.
 
 ## Design Principles
 

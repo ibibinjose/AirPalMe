@@ -258,7 +258,8 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
           <button
             type="button"
             onClick={openDirections}
-            className="flex items-center gap-2 text-mute hover:text-accent transition text-left"
+            aria-label={`Get directions to ${event.venue}, ${event.city}`}
+            className="flex min-h-[44px] items-center gap-2 text-mute hover:text-accent transition text-left"
           >
             <MapPin size={15} className="shrink-0 text-accent" />
             <span>
@@ -292,7 +293,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
                 toast.success(`Saved "${event.title}" to Interested`);
             }}
             className={cn(
-              "inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full text-[13px] font-semibold transition active:scale-[0.98]",
+              "inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full text-[13px] font-semibold transition active:scale-[0.98]",
               event.isInterested
                 ? "bg-ink text-paper"
                 : "bg-card text-mute ring-1 ring-line hover:text-ink",
@@ -314,7 +315,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
               if (toggleLiked(event.id) && !event.isLiked) toast.success(`Liked "${event.title}"`);
             }}
             className={cn(
-              "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition active:scale-95",
+              "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition active:scale-95",
               event.isLiked
                 ? "bg-ink text-paper"
                 : "bg-card text-mute ring-1 ring-line hover:text-ink",

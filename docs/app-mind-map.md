@@ -16,14 +16,14 @@ AIRPAL (Master Brand — "Life Made Easy")
 │   ├── Cloud Functions (Privileged mutations, wallet signing, push alerts)
 │   ├── LocalNow Clock (Zoned Sydney/local clock, weather, honest open-now hours)
 │   ├── Pure Outfit Engine (Deterministic weather & outfit advice in src/lib/outfit.ts)
-│   └── Native Layer (Capacitor 8 me.airpal.app with haptics, geolocation, camera)
+│   └── Native Layer (Capacitor 8; two shells from one bundle — me.airpal.app + me.airpal.pass — with haptics, geolocation, camera)
 │
 ├── 1. AIRPAL.ME — PERSONAL LIFE & IDENTITY
 │   │   Core Job: "Plan your day. Organise your life. Share who you are."
 │   │
 │   ├── / — Home companion hub with live weather, outfit capsule, and daily plans
 │   ├── /now — AI Day Planner ("What now?"): mood/when picker, live outfit vibe, 1 curated nearby spot
-│   ├── /@:handle — Digital identity & link-in-bio (BioPublicPage)
+│   ├── /@handle — Digital identity & link-in-bio (BioPublicPage)
 │   │   ├── /bio/setup, /bio/edit — Handle claiming, bio customization, links & catalog
 │   ├── /calendar — Personal life calendar & local event schedule (month, week, day, agenda)
 │   ├── /plan — Hangout co-planning with friends (live threads, RSVP, stops, invite links)

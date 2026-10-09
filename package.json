@@ -33,6 +33,7 @@
     "deploy": "npm run verify && npx -y firebase-tools@latest deploy --project airpalme-app",
     "deploy:hosting": "npm run build && npx -y firebase-tools@latest deploy --only hosting --project airpalme-app",
     "deploy:functions": "npm run functions:build && npx -y firebase-tools@latest deploy --only functions --project airpalme-app",
+    "deploy:rules": "npx -y firebase-tools@latest deploy --only firestore --project airpalme-app",
     "cap:sync": "npm run build && npx cap sync",
     "cap:ios": "npx cap open ios",
     "cap:android": "npx cap open android",

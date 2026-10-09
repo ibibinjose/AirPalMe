@@ -4,6 +4,8 @@ Prepared by Bibin Jose, 16 September 2026.
 
 This file is the handoff and the agreed scope in one place. No passwords. Reset yours from the login page.
 
+> **Addendum — October 2026 (this file below is the frozen 16 Sept 2026 record; what changed since):** native now ships as **two apps from one codebase** — AirPal (`me.airpal.app`) + AirPal Pass (`me.airpal.pass`, tickets/events only) — not one shell; web stays one all-in-one app at airpal.me. The **Explore surface collapsed into `/now`** (legacy `/explore` `/discover` `/search` redirect there). Store copy packs are drafted (`docs/store/`, incl. `-pass` twins) but human submission is still pending. Current versions: iOS 2.0.0 (16), Android versionCode 8. Binding truth: `docs/AIRPAL.md`.
+
 ---
 
 # AirPal.me handoff

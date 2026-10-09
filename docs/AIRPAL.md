@@ -100,7 +100,7 @@ Done (memory and repeat):
 
 ### B3. V1 excludes (explicit)
 
-Mate discovery, matching, requests, paid supply, and booking-a-person in any form. Identity verification funnels and admin supply approvals. Public reviews and reputation. Deals posted by users (user-as-seller). Browsing directories of any kind (no events/places/deals/listing feeds as destinations). Business dashboards, campaigns tooling, Fashion/Travel/Daily as products. Paid paths of any kind — free plans only. (Stay host operations returned early at human request — see G6.) Social graph mechanics (followers, posts, feeds, DMs from profiles).
+Mate discovery, matching, requests, paid supply, and booking-a-person in any form. Identity verification funnels and admin supply approvals. Public reviews and reputation. Deals posted by users (user-as-seller). Generic browsing directories beyond the curated Pass discovery in B2 (no uncurated places/listing feeds as destinations). Business dashboards, campaigns tooling, Fashion/Travel/Daily as products. Hangout plans stay free; paid event-ticket checkout is live via Stripe (Functions-only money, EventPage `buyTicket`). (Stay host operations returned early at human request — see G6.) Social feeds and posts; bio follow/like buttons and profile chat (`AirPalChatModal` from `/@handle`) are live, feeds are not.
 
 ### B4. Invariants that keep V1 calm
 
@@ -148,7 +148,7 @@ Users, profiles, handles, plans (with guestlists and invites), plan messages, bu
 
 - Calendar dates use zoned helpers (`toZonedDateStr` / LocalNow clock). Never UTC-slice "today".
 - Maps: build-time `VITE_GOOGLE_MAPS_API_KEY`, referrer-restricted; missing key shows an embed, never dev cards on guest surfaces. `VITE_*` bakes at build — rebuild to change.
-- Marketing routes prerender to static HTML at build (`scripts/prerender-routes.mjs` + `prerender-routes.json`): per-route title/description/self-referencing canonical plus a static body. Client copy in `src/lib/share-meta.ts` must match (parity test `src/lib/prerender.test.ts`; `scripts/check-seo.mjs` enforces invariants).
+- Marketing routes prerender to static HTML at build (`scripts/prerender-routes.mjs` + `scripts/prerender-routes.json`): per-route title/description/self-referencing canonical plus a static body. Client copy in `src/lib/share-meta.ts` must match (parity test `src/lib/prerender.test.ts`; `scripts/check-seo.mjs` enforces invariants).
 - Provider order in `src/app/providers.tsx` matters. Live Firestore reads with honest empty states. Freshness SLAs on hours/schedules; null means don't guess.
 - Env: Firebase `VITE_FIREBASE_*`, Maps key, `PLATFORM_ADMIN_EMAILS`. Never commit `.env` or any secret.
 
@@ -166,7 +166,7 @@ Users, profiles, handles, plans (with guestlists and invites), plan messages, bu
 
 ### E1. Design system
 
-AirPal Blue `#1805db` (pressed `#0e0394`); page mist `#eef1f6`; cards `#ffffff`; text `#121614`; secondary `#6a726c`; hairlines `#e5e7eb`. Tokens live in `src/index.css` `@theme` — do not invent a new palette. Dark mode is automatic: semantic tokens re-point under `prefers-color-scheme` (iOS dark palette) while brand accents stay fixed; `@theme` must stay non-`inline` so utilities follow the variables at runtime. Fonts: DM Sans (UI), Outfit (display), self-hosted in `public/fonts/`, no Google Fonts CDN.
+AirPal Blue `#1805db` (pressed `#0e0394`); page mist `#eef1f6`; cards `#ffffff`; text `#121614`; secondary `#6a726c`; hairlines `#e5e7eb`. Tokens live in `src/index.css` `@theme` — do not invent a new palette. Dark mode is automatic: semantic tokens re-point under `prefers-color-scheme` (iOS dark palette) while brand accents stay fixed; `@theme` must stay non-`inline` so utilities follow the variables at runtime. Fonts: system stack via `--font-sans` / `--font-display` in `src/index.css` (-apple-system / SF Pro on iOS, Segoe UI / Roboto elsewhere). No webfont downloads, no Google Fonts CDN.
 
 Cards: white on mist, `bg-card ring-1 ring-line` with clay shadow, radius about 28px — premium, not childish. Touch targets at least 44px. Mobile bottom dock: floating light pill with `pb-safe` for home indicators. Desktop: 12-column grid where screens already use it. Reuse `Button`, `ValidField`, `Photo`, `ImageField`. Shared words in `shared/names.ts`. Brand accent script only, never the whole interface.
 
@@ -180,7 +180,7 @@ Every screen answers what this is, why care, and what next. One primary CTA. Sho
 
 ### F1. Sequence
 
-Soft launch one city at a time (Sydney first): TestFlight + Play internal → closed track, prove the loop, then expand city by city. Store pack lives in `docs/store/` (listing copy, reviewer notes, permissions, data-safety answers, icon + graphics; screenshots regenerate via `npm run screenshots`). Public launch (Product Hunt + local/community channels per city) only after the exit gate holds.
+Soft launch one city at a time (Sydney first): TestFlight + Play internal → closed track, prove the loop, then expand city by city. Store pack lives in `docs/store/` (listing copy, reviewer notes, permissions, data-safety answers, icon + graphics, plus `-pass` twins for AirPal Pass; screenshots regenerate via `npm run screenshots` and `npm run screenshots:pass`). Public launch (Product Hunt + local/community channels per city) only after the exit gate holds.
 
 ### F2. Soft-launch exit gate
 
@@ -230,12 +230,12 @@ Following Phase 6 subtraction, product UX was reorganized under master brand **A
 
 Nothing here returns on opinion. Each needs its evidence gate plus its trust machinery built first:
 
-- Paid paths and payouts: after free completions repeat weekly; Stripe + Connect + fee config + refund/dispute workflow required.
+- Paid paths: live, not later — guest checkout (experience/booking/stay sessions), Connect onboarding + transfers + login links, subscriptions + portal, refunds, and dispute webhooks all ship in `functions/src/stripe.ts`. Still gated: scaling paid supply (user-as-seller stays excluded) and proving the tickets/QR-entry loop on real events before Pass store launch.
 - Reviews and reputation: only after paid or completed-transaction loops exist; tied to completed experiences, both sides, reportable and moderated.
 - Mate / stranger matching / booking-a-person: only after V1 repeat rate holds for weeks AND identity verification, admin approvals, safety check-ins, and human moderation are built. Never on automation alone.
 - User-posted deals: only after business deals loop works, with its own seller-trust design.
 - Stay host operations: returned early at human request (October 2026); `/host` rebuilt with full parity on the same data, no model change.
-- AirPal Pass native apps: build as shells over the same engines now; store launch only after the V1 acceptance test (B5) holds and the tickets/QR-entry loop is proven on real events.
+- AirPal Pass native app: shells built (October 2026, `me.airpal.pass` over the same engines via `src/lib/app-flavor.ts`); store launch only after the V1 acceptance test (B5) holds and the tickets/QR-entry loop is proven on real events.
 - Fashion, Travel, Daily as products, Studio: only after the V1 loop repeats; each must pass the feature test (G7) first.
 
 ### G7. Feature test (every new surface must pass)
@@ -263,11 +263,12 @@ These stay as working references. Where any of them conflicts with Parts A–G, 
 - `docs/phone-login.md`, `docs/email-setup.md` — auth plumbing.
 - `docs/host-tickets.md`, `docs/managed-payments.md`, `docs/pulse-product.md` — surface references for operator and payment operations.
 - `docs/WALLET.md` — Apple Wallet & Google Wallet pass integration for AirPal Pass tickets and AirPal.Me identity cards.
-- `docs/UI-UX-GUIDE.md`, `docs/ui-playbook-checklist.md`, `docs/IOS-DESIGN-GUIDE.md`, `docs/birthday-freebies.md` — design guidelines and checklist.
+- `docs/UI-UX-GUIDE.md`, `docs/ui-playbook-checklist.md`, `docs/IOS-DESIGN-GUIDE.md` — design guidelines and checklist.
+- `docs/birthday-freebies.md` — RETIRED surface record (routes redirect to `/deals`; shared helpers + signup age gate kept).
 - `docs/brand.md` — brand foundation, slogans, and color tokens for AIRPAL, AirPal.Me, and AirPal Pass.
 - `docs/client-handoff.md`, `docs/launch-runbook.md` — handoff and runbook.
 - `docs/store/` — store submission pack.
-- `docs/plan-prd.md` — Plan experience PRD (Apple-Invites-beating create flow, cover artwork, one-card thread); spec reference for B3.
+- `docs/plan-prd.md` — Plan experience PRD (Apple-Invites-beating create flow, cover artwork, one-card thread); spec reference for B1/B2.
 - `docs/two-app-plan.md` — two-native-apps / one-web-app plan (AirPal + AirPal Pass shells, identities, store/ops checklist).
 - `docs/strategy.md`, `docs/APP-STORY.md`, `docs/launch-plan.md`, `docs/CANON.md`, `docs/BRAIN.md`, `docs/AIRPAL_BRAIN.md`, root `AGENTS.md` — now pointers to this file; full pre-rebuild content in git history.
 

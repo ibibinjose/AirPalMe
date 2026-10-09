@@ -52,4 +52,4 @@ Tokens and chrome are frozen in **`docs/AIRPAL.md` Part E**. Do not restyle off-
   * Amber / Gold `#f59e0b` / `#d97706` for AirPal Pass tickets, member badges, and VIP passes.
   * Emerald `#10b981` for active perks, verified badges, and completed experiences.
   * Purple `#8b5cf6` for cultural and festive celebrations.
-* **Fonts**: Outfit (Display headings), DM Sans (UI / body). Self-hosted, zero external CDN dependencies.
+* **Fonts**: system stack via `--font-sans` / `--font-display` in `src/index.css` (-apple-system / SF Pro on iOS, Segoe UI / Roboto elsewhere). No webfont downloads, zero external CDN dependencies.

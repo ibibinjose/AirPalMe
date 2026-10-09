@@ -4,8 +4,8 @@ export const ANALYTICS_SCHEMA_VERSION = 1 as const;
 export const ANALYTICS_AGGREGATION_VERSION = 1 as const;
 export const ANALYTICS_MAX_BYTES = 8192;
 export const ANALYTICS_MAX_STRING = 200;
-export const NORTH_STAR_METRIC_ID = "weekly_qualified_guest_actions_per_active_qr_context";
-export const NORTH_STAR_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+export const WQGA_METRIC_ID = "weekly_qualified_guest_actions_per_active_qr_context";
+export const WQGA_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
  * Winnable guest loop target: scan room QR → Wi-Fi + tonight + answered
@@ -454,8 +454,8 @@ export function isQualifiedAction(event: AnalyticsEvent): boolean {
   }
 }
 
-export type NorthStarResult = {
-  id: typeof NORTH_STAR_METRIC_ID;
+export type WqgaResult = {
+  id: typeof WQGA_METRIC_ID;
   windowMs: number;
   from: string;
   to: string;
@@ -472,11 +472,11 @@ export type NorthStarResult = {
   byContext: Array<{ contextId: string; scans: number; qualifiedActions: number }>;
 };
 
-export function northStarFromEvents(
+export function wqgaFromEvents(
   events: AnalyticsEvent[],
   now = Date.now(),
-  windowMs = NORTH_STAR_WINDOW_MS,
-): NorthStarResult {
+  windowMs = WQGA_WINDOW_MS,
+): WqgaResult {
   const from = now - windowMs;
   const seenDedupe = new Set<string>();
   let localDemoExcluded = 0;
@@ -534,7 +534,7 @@ export function northStarFromEvents(
   const uniqueSessions = sessions.size;
 
   return {
-    id: NORTH_STAR_METRIC_ID,
+    id: WQGA_METRIC_ID,
     windowMs,
     from: new Date(from).toISOString(),
     to: new Date(now).toISOString(),

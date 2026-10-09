@@ -4,9 +4,9 @@ import {
   calendarDay,
   isQualifiedAction,
   isProductionEligible,
-  northStarFromEvents,
+  wqgaFromEvents,
   type AnalyticsEvent,
-  type NorthStarResult,
+  type WqgaResult,
 } from "./analytics";
 
 export type AnalyticsDailyFact = {
@@ -134,6 +134,6 @@ export function aggregateDailyFacts(
     .sort((a, b) => a.periodStart.localeCompare(b.periodStart) || a.contextId.localeCompare(b.contextId));
 }
 
-export function northStarFromFacts(events: AnalyticsEvent[], now?: number): NorthStarResult {
-  return northStarFromEvents(events, now);
+export function wqgaFromFacts(events: AnalyticsEvent[], now?: number): WqgaResult {
+  return wqgaFromEvents(events, now);
 }

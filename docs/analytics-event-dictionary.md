@@ -5,9 +5,11 @@ Collector: `src/lib/analytics.ts`.
 Contract: `shared/analytics.ts`.  
 Business ledger: callable `recordAnalyticsBatch` → `analyticsEvents/{eventId}`.
 
-## North-star
+## QR-context diagnostic (WQGA/Context)
 
-**WQGA/Context** = verified qualified guest actions in week W ÷ active QR contexts in week W.
+> Product north star per canon (`docs/AIRPAL.md`) is **Completed Experiences per Active User**. WQGA is the QR-context diagnostic, not the north star.
+>
+> **WQGA/Context** = verified qualified guest actions in week W ÷ active QR contexts in week W.
 
 A context is active in W if it is a known published context and recorded at least one eligible `qr_scan` or `context_view` that day/week. Seed/demo (`backendState: local_demo`), failed, duplicate, and quota-rejected events are excluded.
 
@@ -30,7 +32,7 @@ Always report numerator, denominator, and the per-context distribution — never
 
 ## Events
 
-| Event                 | When it fires                                                                                                                          | Counts toward north-star              |
+| Event                 | When it fires                                                                                                                          | Counts toward WQGA                    |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
 | `session_started`     | First page in a browser session; emitted once per session — route changes do not emit additional session events                       | No                                    |
 | `qr_scan`             | Printed QR or in-app scan landing                                                                                                      | No                                    |
@@ -39,7 +41,7 @@ Always report numerator, denominator, and the per-context distribution — never
 | `first_value`         | First useful action in a session/context/day                                                                                           | Yes, max once per session/context/day |
 | `content_action`      | Map (`actionType=map_open`), Wi-Fi reveal, profile open, booking intent, place open, experience completed (`experience_completed`)     | Yes for allowlisted `actionType`      |
 | `ask_submitted`       | Guest submitted Ask AirPal                                                                                                             | No                                    |
-| `ask_answered`        | Answer shown                                                                                                                           | Yes if `answerStatus=shown`           |
+| `ask_answered`        | Answer shown                                                                                                                           | Yes if `answerStatus=shown` (WQGA)    |
 | `offer_view`          | Offer shown                                                                                                                            | No                                    |
 | `offer_claim`         | Claim succeeded; uses server `claimId`                                                                                                 | Yes                                   |
 | `offer_redeem`        | Staff redeemed; server `claimId`                                                                                                       | Yes                                   |
@@ -152,7 +154,7 @@ Enumerated values (enforced by `isQualifiedAction`, not by the validator — unk
 
 - `valueType`: `wifi` `answer` `map` `profile` `faq` `offer` `save` `support` `booking` `place`
 - `actionType`: `map_open` `wifi_reveal` `profile_open` `booking_intent` `place_open`
-- `answerStatus`: counts toward the north-star only when `shown`
+- `answerStatus`: counts toward WQGA only when `shown`
 - `contextType`: `property` `room` `marker` `campus` `event` `business` `bio`
 - `source`: `qr` `direct` `share` `referral` `internal` `unknown`
 - `backendState`: `live` `offline_queued` `local_demo` `failed`
@@ -193,5 +195,5 @@ Mark each property required in Amplitude exactly when it is required in the Prop
 
 ## KPI formula (code)
 
-`shared/analytics.ts` → `isQualifiedAction`, `northStarFromEvents`.  
+`shared/analytics.ts` → `isQualifiedAction`, `wqgaFromEvents`.  
 Daily rollup → `shared/analytics-aggregate.ts`.

@@ -4,7 +4,7 @@ App Store version string is **2.0.0**. Build number this pack: **16** (share lin
 
 If TestFlight still shows **1.0**, you are on an old version. Apple keeps 1.0 until you enable the 2.0.0 build for testers.
 
-## After this upload (build 12)
+## After this upload (build 16)
 
 1. App Store Connect → **AirPal** → **TestFlight**.
 2. Wait until **2.0.0 (16)** is **Ready to Test** (processing can take 5–20 minutes).

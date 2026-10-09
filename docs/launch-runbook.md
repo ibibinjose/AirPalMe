@@ -10,7 +10,7 @@ Sydney time for all roster/SLA references. Never market AirPal as guaranteeing p
 - Firestore rules + indexes deployed: `npm run deploy:rules` (covers the `safety_reports` status+createdAt composite and admin block reads).
 - Secrets: `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` bound via Secret Manager (prod). `ALLOW_SANDBOX_BOOKINGS` must be unset/false in prod. Never commit `.env`.
 - Legal pages live: /privacy, /terms, /cookies, /contact, /about; `LEGAL.updated` bumped on copy change.
-- Website guests can browse Stay/Explore/Scan without auth. Native iOS/Android require sign-in on the opening screen. No PII in analytics.
+- Website guests can browse Stay/Now/Scan without auth. Native iOS/Android require an account past the legal/onboarding public paths (`src/lib/native-auth-gate.ts`). No PII in analytics.
 
 ## Safety SLA (human review, no autonomous closures)
 
@@ -19,7 +19,7 @@ Sydney time for all roster/SLA references. Never market AirPal as guaranteeing p
 - Every report keeps status `new → reviewed → actioned` with a case note; every status change writes `admin_audits` via `logAdminAction`.
 - In-danger-now copy: always direct people to local emergency services first (000 in Australia).
 - Blocks: users block privately; platform admins have read-only list/get for block-evasion triage. Only the blocker can update/delete a block.
-- Mate supply: admin approval mandatory (Draft → Submitted → Under Review → Approved/Rejected, plus Suspended/Removed). Police-clearance fields are minimum evidence; regulated-claim flags (`flagsRegulatedClaims`) route to closer review. No KYC-vendor automation is wired — do not claim otherwise.
+- Companion/mate-request supply is NOT live — the admin approval chain (Draft → Submitted → Under Review → Approved/Rejected, plus Suspended/Removed) is G6 gated-return machinery only. If it ever returns: approval mandatory, police-clearance fields are minimum evidence, regulated-claim flags (`flagsRegulatedClaims`) route to closer review. No KYC-vendor automation is wired — do not claim otherwise.
 
 ## Incidents
 
@@ -31,14 +31,14 @@ Sydney time for all roster/SLA references. Never market AirPal as guaranteeing p
 ## Deploy / rollback
 
 - Hosting: `npm run deploy:hosting`. Functions: `npm run deploy:functions`. Rules only: `npm run deploy:rules`.
-- `VITE_*` bakes at build — rebuild + `npm run cap:sync` for native (app id `me.airpal.app`) to pick up key changes.
+- `VITE_*` bakes at build — rebuild + `npm run cap:sync` for native (app ids `me.airpal.app` + `me.airpal.pass`) to pick up key changes.
 - Rollback: redeploy the last green Hosting revision / Functions version from Firebase console; note it in `admin_audits` if admin action was involved.
 
 ## Post-launch watch (first 14 days)
 
-- North star: Completed AirPal Experiences; watch requests → matches → bookings → completions → reviews funnel plus cancellations, reports, refunds/disputes.
+- North star: Completed AirPal Experiences; watch plans → RSVPs → tickets → scans/completions funnel plus cancellations, reports, refunds/disputes. (No matching or public reviews in V1.)
 - Daily: safety inbox zero-new-emergency, failed Stripe webhooks, `abuseSignals` spikes, crash-free sessions ≥ 99% via `client_error` analytics events (`src/lib/error-report.ts`; no vendor SDK wired — see `docs/AIRPAL.md` Part F).
-- Store pack: `docs/store/` (listing, app-information, reviewer-notes, permissions, play-data-safety). Native this pack: iOS **2.0.0 (11)**, Android **versionCode 6**. Human Submit-for-Review / Play upload remain.
+- Store pack: `docs/store/` (listing, app-information, reviewer-notes, permissions, play-data-safety, plus `-pass` twins for AirPal Pass). Native this pack: iOS **2.0.0 (16)**, Android **versionCode 8 (2.0.0)**. Human Submit-for-Review / Play upload remain.
 
 ## Contacts
 

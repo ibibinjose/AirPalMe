@@ -61,24 +61,33 @@ export function TicketGatePanel({
   const [admitting, setAdmitting] = useState(false);
   const guardRef = useRef(createSubmitGuard());
 
-  const verify = useCallback(async () => {
-    setFailed(false);
-    try {
-      const res = await verifyTicketRemote({ ticketId });
-      setTicket(res);
-    } catch (err) {
-      if (isSilentDenial(err)) {
-        setDenied(true);
-        return;
+  const verify = useCallback(
+    async (isCancelled?: () => boolean) => {
+      setFailed(false);
+      try {
+        const res = await verifyTicketRemote({ ticketId });
+        if (isCancelled?.()) return;
+        setTicket(res);
+      } catch (err) {
+        if (isCancelled?.()) return;
+        if (isSilentDenial(err)) {
+          setDenied(true);
+          return;
+        }
+        setFailed(true);
       }
-      setFailed(true);
-    }
-  }, [ticketId]);
+    },
+    [ticketId],
+  );
 
   useEffect(() => {
+    let cancelled = false;
     setTicket(null);
     setDenied(false);
-    void verify();
+    void verify(() => cancelled);
+    return () => {
+      cancelled = true;
+    };
   }, [verify]);
 
   async function admit() {

@@ -1,6 +1,5 @@
-# AirPal.Bio — Public Bio & Networking Profile (`/@handle`)
-> **Specification, Architecture & Implementation Blueprint**  
-> Build a standalone, high-performance networking, contact sharing, and bio page identical to `AirPal.me/@handle`.
+# AirPal Bio — Public Bio & Networking Profile (`/@handle`)
+> **Specification, Architecture & Implementation Blueprint** for the shipped bio surface at `airpal.me/@handle` (`src/pages/BioPublicPage.tsx`). There is no separate `airpal.bio` domain or standalone app — bios live inside AirPal.Me (web + native shells).
 
 ---
 
@@ -8,7 +7,7 @@
 
 **AirPal.Bio** is a personal and professional identity surface designed for seamless in-person networking, contact exchange, meeting coordination, and digital presence. 
 
-Every user or verified venue/business claims a unique `@handle` (e.g. `airpal.bio/@alex` or `airpal.me/@alex`) that serves as:
+Every user or verified venue/business claims a unique `@handle` (e.g. `airpal.me/@alex`) that serves as:
 1. **Digital Business Card**: Instant contact saving (.vcf / vCard 3.0) directly into native iOS and Android Contacts apps without requiring the recipient to install an app.
 2. **Real-Time Availability Hub**: Live status rings (🟢 Available, 🔴 Busy, ⛔ DND, 🟡 BRB, 🟠 Away, ⚪ Offline) with custom activity text (e.g. `"☕ Grabbing coffee in Surry Hills"`).
 3. **Meet & Catch-Up Engine**: Frictionless inbound proposal system for 1-on-1 coffees (`Catch Up`), business chats (`Meeting`), or group plans (`Hangout`) with instant calendar export (Apple, Google, Outlook, iCal).
@@ -22,7 +21,7 @@ Every user or verified venue/business claims a unique `@handle` (e.g. `airpal.bi
 
 AirPal.Bio follows the **Liquid Glass** aesthetic:
 - **Primary Color**: AirPal Blue (`#1805db` / `rgb(24, 5, 219)`)
-- **Accent Color**: AirPal Gold (`#cfa844` / `text-gold` / `#b8860b`)
+- **Accent Color**: AirPal Blue accent (`text-accent`); the legacy `--color-gold` token resolves to brand blue in the shipped theme, so `text-gold` samples below render blue, not gold.
 - **Backgrounds**: Multi-layered glassmorphic cards (`bg-card/95 backdrop-blur-xl ring-1 ring-line/80 shadow-clay`) over subtle gradient meshes.
 - **Card Framing**: Rounded pill containers (`rounded-3xl` / `rounded-full`), generous touch targets ($\ge 44\text{px}$ touch targets), high-contrast typography.
 - **Responsive Width**: Centered mobile-first canvas (`max-w-2xl mx-auto pb-safe`).
@@ -413,7 +412,7 @@ BioPublicPage (Container: max-w-2xl mx-auto)
 ├── Glass Card Wrapper (bg-card/95 backdrop-blur-xl rounded-[36px] shadow-clay)
 │   ├── Cover Photo / Atmospheric Gradient Header (h-48 sm:h-60)
 │   │   └── Floating Navigation Dock
-│   │       ├── Back Button & Brand Mark ("AirPal.bio")
+│   │       ├── Back Button & Brand Mark (AirPal)
 │   │       └── Quick Share & Handle Badge ("@handle")
 │   │
 │   └── Profile Content Body (px-5 sm:px-8 pb-8)
@@ -466,17 +465,18 @@ To guarantee perfect previews when sharing links on WhatsApp, iMessage, LinkedIn
 
 ```typescript
 export function getBioMetaTags(bio: BioProfile, publicUrl: string) {
-  const shareImg = bio.cover || bio.avatar || "https://airpal.bio/brand/og-share.jpg";
+  const shareImg = bio.cover || bio.avatar || "https://airpal.me/brand/og-share.jpg";
   const bioDescription =
     bio.shortWhy ||
+    bio.offer?.detail ||
     bio.customStatus ||
-    `Connect with ${bio.name} (@${bio.handle}) on AirPal.Bio — Networking & Contact Sharing Made Easy.`;
+    `Connect with ${bio.name} (@${bio.handle}) on AirPal.Me — Life Made Easy.`;
 
   return {
-    title: `${bio.name} (@${bio.handle}) · AirPal.Bio`,
+    title: `${bio.name} (@${bio.handle}) · AirPal.Me`,
     meta: [
       { name: "description", content: bioDescription.slice(0, 160) },
-      { property: "og:title", content: `${bio.name} (@${bio.handle}) · AirPal.Bio` },
+      { property: "og:title", content: `${bio.name} (@${bio.handle}) · AirPal.Me` },
       { property: "og:description", content: bioDescription.slice(0, 160) },
       { property: "og:image", content: shareImg },
       { property: "og:url", content: publicUrl },
@@ -507,12 +507,12 @@ export function getBioMetaTags(bio: BioProfile, publicUrl: string) {
 
 ## 7. Handle Claiming & 404 State
 
-When a visitor lands on an unreserved or uncreated handle (e.g. `airpal.bio/@newmate`):
+When a visitor lands on an unreserved or uncreated handle (e.g. `airpal.me/@newmate`):
 - Show a friendly **"Available Handle"** card:
   - Header: `@{handle} is available!`
-  - Subtitle: `"This AirPal handle hasn't been set up yet. Be the first to claim @{handle} and launch your digital business card."`
-  - Primary CTA: `"Claim @{handle}"` $\to$ redirects to the signup/onboarding flow with prefilled handle.
-  - Secondary CTA: `"Explore AirPal"` $\to$ redirects to discovery home.
+  - Subtitle: `"This AirPal handle hasn't been set up yet. Be the first to claim @{handle} and launch your public bio page."`
+  - Primary CTA: `"Claim @{handle}"` $\to$ `/bio/setup?handle={handle}` (signup/onboarding with prefilled handle).
+  - Secondary CTA: `"Explore AirPal"` $\to$ `/` home.
 
 ---
 

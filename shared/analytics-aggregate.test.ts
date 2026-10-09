@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aggregateDailyFacts, dailyFactId, northStarFromFacts } from "./analytics-aggregate";
+import { aggregateDailyFacts, dailyFactId, wqgaFromFacts } from "./analytics-aggregate";
 import type { AnalyticsEvent } from "./analytics";
 
 function event(partial: Partial<AnalyticsEvent> & Pick<AnalyticsEvent, "eventName" | "contextId">): AnalyticsEvent {
@@ -43,7 +43,7 @@ describe("daily aggregation", () => {
     expect(dailyFactId("prop_a", "2026-09-10")).toBe("prop_a_2026-09-10_1");
   });
 
-  it("excludes local_demo from north-star and keeps a known WQGA/Context", () => {
+  it("excludes local_demo from WQGA and keeps a known WQGA/Context", () => {
     const now = Date.parse("2026-09-11T12:00:00.000Z");
     const events: AnalyticsEvent[] = [
       event({
@@ -68,7 +68,7 @@ describe("daily aggregation", () => {
         properties: { contextType: "property", contextId: "harbour-hotel" },
       }),
     ];
-    const star = northStarFromFacts(events, now);
+    const star = wqgaFromFacts(events, now);
     expect(star.activeQrContexts).toBe(1);
     expect(star.qualifiedActions).toBe(1);
     expect(star.value).toBe(1);

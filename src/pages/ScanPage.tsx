@@ -263,7 +263,11 @@ export function ScanPage() {
 
       {/* Manual Code / PIN Entry */}
       <form onSubmit={handleManualSubmit} className="mt-4 flex gap-2">
+        <label htmlFor="scan-manual-code" className="sr-only">
+          Room number, invite code, or handle
+        </label>
         <input
+          id="scan-manual-code"
           type="text"
           value={manualCode}
           onChange={(e) => setManualCode(e.target.value)}

@@ -9,7 +9,7 @@ Apple Team: ZEN KAPITAL PTY LTD (`26WGXSNG58`) · Apple ID **Confirm: create the
 Support: AirPalMe@gmail.com · hello@airpal.me  
 Privacy https://airpal.me/privacy · Terms https://airpal.me/terms · Contact https://airpal.me/contact
 
-Native app is **18+** (accounts). Pass browses events and deals without an account; sign-in is needed only to hold tickets.
+Native app is **18+** (accounts). Native iOS/Android require an account on open (same gate as AirPal); the website browses events and deals without one.
 
 Same AirPal account as the AirPal app and https://airpal.me.
 
@@ -17,23 +17,23 @@ Same AirPal account as the AirPal app and https://airpal.me.
 
 ## App Store Connect — Localizable + General
 
-| Field                          | Paste                                                                                                 |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------- |
-| Name (English Australia, ≤30)  | `AirPal Pass`                                                                                         |
-| Subtitle (≤30)                 | `Tickets, events & deals`                                                                             |
-| Bundle ID                      | `me.airpal.pass` (locked, via `ios/App/Pass.xcconfig`)                                                |
-| SKU                            | `me.airpal.pass`                                                                                      |
-| Apple ID                       | Confirm after creating the app record                                                                 |
-| Primary Language               | English (Australia)                                                                                   |
-| Primary Category               | **Entertainment**                                                                                     |
-| Secondary Category             | **Lifestyle**                                                                                         |
-| License Agreement              | Keep **Apple’s Standard License Agreement**. In-app Terms at https://airpal.me/terms apply at signup. |
-| Content Rights                 | See below                                                                                             |
-| Age Ratings                    | See below                                                                                             |
-| Encryption                     | `ITSAppUsesNonExemptEncryption` = **NO** (shared target). Do **not** upload export docs.              |
-| App Store Server Notifications | Leave **empty**. No IAP, no auto-renewable subscriptions.                                             |
-| App-Specific Shared Secret     | Do **not** create. No subscriptions.                                                                  |
-| Digital Services Act           | Keep **trader**. Contact AirPalMe@gmail.com · SarvamDaily Pty Ltd, New South Wales, Australia.        |
+| Field                          | Paste                                                                                                                           |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| Name (English Australia, ≤30)  | `AirPal Pass`                                                                                                                   |
+| Subtitle (≤30)                 | `Tickets, events & deals`                                                                                                       |
+| Bundle ID                      | `me.airpal.pass` (locked, via `ios/App/Pass.xcconfig`)                                                                          |
+| SKU                            | `me.airpal.pass`                                                                                                                |
+| Apple ID                       | Confirm after creating the app record                                                                                           |
+| Primary Language               | English (Australia)                                                                                                             |
+| Primary Category               | **Entertainment**                                                                                                               |
+| Secondary Category             | **Lifestyle**                                                                                                                   |
+| License Agreement              | Keep **Apple’s Standard License Agreement**. In-app Terms at https://airpal.me/terms apply at signup.                           |
+| Content Rights                 | See below                                                                                                                       |
+| Age Ratings                    | See below                                                                                                                       |
+| Encryption                     | `ITSAppUsesNonExemptEncryption` = **NO** (shared target). Do **not** upload export docs.                                        |
+| App Store Server Notifications | Leave **empty**. No Apple IAP (Stripe business-plan subscriptions exist in shared code but have no entry in the Pass shell UI). |
+| App-Specific Shared Secret     | Do **not** create. No App Store subscriptions.                                                                                  |
+| Digital Services Act           | Keep **trader**. Contact AirPalMe@gmail.com · SarvamDaily Pty Ltd, New South Wales, Australia.                                  |
 
 ### Content Rights (Edit)
 
@@ -121,7 +121,7 @@ Copyright: `2026 SarvamDaily Pty Ltd`
 App Privacy (nutrition label) — align with `docs/store/play-data-safety-pass.md`:
 
 - Precise Location — optional, App Functionality, not used for tracking
-- Email, Phone, Name, User ID — Account (only when they sign in to hold tickets)
+- Email, Phone, Name, User ID — Account (native requires sign-in on open)
 - Product Interaction — App Functionality / Analytics (no ads)
 - Purchase History — App Functionality (Stripe; no card numbers in the app)
 - Not collected: Photos library, Contacts, Health, Browsing History, Advertising Data

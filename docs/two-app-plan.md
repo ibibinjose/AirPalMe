@@ -1,5 +1,7 @@
 # AirPal + AirPal Pass — two native apps, one web app
 
+**Status (Oct 2026):** Phase 0/A/B in-repo work done — both shells scaffold, build, and boot (see As-built notes). Remaining is user-side: Firebase console Pass registration + config regen, signed release builds, screenshots, store records. Pass store launch stays gated on B5 + the tickets/QR-entry loop.
+
 ## Goal
 
 Ship two separate native apps (iOS + Android) from the single AirPal codebase — **AirPal** (personal: plans, Me, memories) and **AirPal Pass** (tickets/events only) — while web stays one app at `https://airpal.me` serving both. One account, one identity, one booking engine, one chat engine, one Firebase project (`airpalme-app`). Binding direction: `docs/AIRPAL.md` (A1, D1, D2, G6).
@@ -18,7 +20,7 @@ Single codebase, build-time flavor — not two repos, not runtime-only switching
 
 Key decisions:
 
-- **Pass app ID `me.airpal.pass`** (proposed, family-consistent with `me.airpal.app` in `capacitor.config.ts`). Finalize before Firebase app registration and store reservation; changing IDs later is expensive.
+- **Pass app ID `me.airpal.pass`** (FINALIZED — baked into Android flavors, iOS `Pass.xcconfig`, AASA/assetlinks, and the `google-services.json` scaffold stub). Changing IDs later is expensive.
 - **Pass scope = tickets & events only** (per user answer): `/pass` entry plus the existing `/events`, `/e/:id`, `/e/:id/guests`, `/ticket/:id`, `/me/tickets`, `/scan`, `/event`, and event-attached `/deals` routes (`src/app/routes.tsx`). `/pass/events`, `/pass/deals`, `/pass/tickets` redirects already exist.
 - **Web unchanged**: one `dist/` build, one Firebase Hosting site (`firebase.json`). The in-flight `EcosystemSwitcher` stays as the web cross-surface switch.
 - **Universal links path-scoped**: both apps share the `airpal.me` domain (WebView hostname must stay `airpal.me` for Auth/phone parity), so `apple-app-site-association` and `assetlinks.json` claim ticket/event paths for Pass and everything else for AirPal. Unscoped claiming by both apps leaves routing undefined.
@@ -31,28 +33,28 @@ Non-goals: second Firebase project, separate web deploys or domains, new auth sy
 
 ### Phase 0 — Rebase onto in-flight ecosystem work
 
-- Owner: web surfaces. Coordinate with the concurrent change (uncommitted: `EcosystemSwitcher.tsx`, `PassPage` routes, `TopNav`, `NowPage`, e2e specs). Confirm `/pass` start screen and tab contract before scaffolding flavors.
+- DONE (Oct 2026): rebased onto the landed ecosystem work (`EcosystemSwitcher.tsx`, `PassPage` routes, `TopNav`, `NowPage`, e2e specs). `/pass` start screen and tab contract confirmed.
 - Dependency: none. Blocks: Phase A.
 
 ### Phase A — Flavor scaffold (both shells boot)
 
 - Add flavor flag + per-flavor app name, start route (`/` for AirPal, `/pass` for Pass), and tab set scoping.
-- Capacitor: parameterize `capacitor.config.ts` by flavor (or per-flavor config) + per-flavor `cap sync` scripts.
-- Android: `productFlavors` in `android/app/build.gradle` with distinct `applicationId`, name, icon.
-- iOS: second target/scheme in `ios/App` with distinct bundle ID, display name, icons; shared codebase.
+- Capacitor: DONE as runtime flavor resolution — `capacitor.config.ts` stays untouched, one `dist/` serves both shells (`src/lib/app-flavor.ts`).
+- Android: DONE — `airpal`/`pass` productFlavors in `android/app/build.gradle` with distinct `applicationId`, name, icon.
+- iOS: DONE as single target + `Pass.xcconfig`/`AirPal.xcconfig` (`-xcconfig` at archive time) — no second target, no pbxproj fork.
 - Per-app splash, icons, display names under existing design tokens.
 - Dependency: Phase 0. Blocks: Phase B.
 
 ### Phase B — Backend registrations, links, push
 
-- Register two Android + two iOS apps in `airpalme-app`; wire per-flavor `google-services.json` / `GoogleService-Info.plist`.
-- Extend `apple-app-site-association` + `assetlinks.json` with Pass IDs and path scoping; verify `shareMeta` parity for pass paths.
-- Per-app push registration; confirm one account receives notifications in both apps.
+- Register two Android + two iOS apps in `airpalme-app` — USER-SIDE (console); in-repo scaffold done (`google-services.json` Pass stub, per-flavor manifests). Regen configs after registering, then wire `GoogleService-Info.plist`.
+- Extend `apple-app-site-association` + `assetlinks.json` with Pass IDs and path scoping (DONE in-repo; Play SHA-256 placeholders still need pasting) + verify `shareMeta` parity for pass paths (DONE — `/deals/:id` promotion cards).
+- Per-app push registration; confirm one account receives notifications in both apps. (Pending native push plugin + console apps.)
 - Dependency: Phase A (IDs frozen). Blocks: Phase C.
 
 ### Phase C — Store listings and launch gates
 
-- Second listings in `docs/store/` + `store/`: copy, icons, per-flavor screenshots (`scripts/screenshots.mjs`), data-safety answers, reviewer notes.
+- Second listings in `docs/store/` + `store/`: copy, data-safety answers, reviewer notes DONE (`listing-pass.md`, `app-information-pass.md`, `reviewer-notes-pass.md`, `play-data-safety-pass.md`); icons are scaffold (final art needed); per-flavor screenshots USER-SIDE (`npm run screenshots:pass` on a Mac).
 - Decide versioning: joint vs independent release trains.
 - F1/F2 gates apply per app; Pass store launch additionally needs the G6 tickets/QR-entry loop proven on real events.
 - Dependency: Phase B. Blocks: store submission.
@@ -77,7 +79,7 @@ Non-goals: second Firebase project, separate web deploys or domains, new auth sy
 - **Dual universal-link claiming**: must be path-scoped or routing is undefined when both apps are installed.
 - **Double store cost**: two listings = two reviews, two screenshot sets, two release trains to maintain.
 - **ID finality**: confirm `me.airpal.pass` before any Firebase/store registration.
-- Open: Pass tab set detail; per-flavor screenshot capture runs.
+- Decided: Pass tab set = Pass / Events / Tickets / Scan / Me (`PASS_TABS` in `TabBar.tsx`). Open: per-flavor screenshot capture runs (user-side).
 - Decided: joint versioning — both flavors share `versionCode`/`versionName` from `defaultConfig` (one codebase, one train); split only if store review forces divergence.
 
 ## As-built notes (Phase A/B in-repo, October 2026)
@@ -86,4 +88,5 @@ Non-goals: second Firebase project, separate web deploys or domains, new auth sy
 - Android: `airpal`/`pass` product flavors + per-flavor manifests/strings; iOS: single target + `ios/App/Pass.xcconfig` (`-xcconfig` at archive time), no pbxproj fork.
 - Follow-ups closed in-repo: `/deals/:id` link previews (`promotion` share card, live/approved gate), screenshots script refreshed to live routes with `--flavor=pass` support (`screenshots-pass/`), scaffold Pass icons (Android amber launcher tint, iOS `AppIcon-Pass` placeholder — final art still needed before store submission).
 - Built 10 Oct 2026: Gradle `:app:assembleAirpalDebug` + `:app:assemblePassDebug` green; Xcode simulator builds green for base (no xcconfig), AirPal.xcconfig, and Pass.xcconfig. Verified identities: me.airpal.app / "AirPal" and me.airpal.pass / "AirPal Pass"; APK App Links scoped per flavor. google-services.json carries a scaffold Pass client (copied IDs; inert — web SDK + skipNativeAuth) until Firebase console regen replaces the file.
-- Native compiles and e2e could not run in the sandboxed agent (no network/sockets/simulator). User-side: `cd android && ./gradlew :app:assembleAirpalDebug :app:assemblePassDebug`, Xcode archive with `Pass.xcconfig`, `npm run test:e2e:pass`.
+- Boot-tested Android 10 Oct 2026 (API 35 emulator): both APKs install, launch to the native auth gate, zero fatals; permission dialogs show distinct names (AirPal / AirPal Pass). iOS Simulator runtime is broken on this Mac, so the two .apps are verified packaged (bundle ID + display name read from the bundles) but not booted.
+- Debug builds, emulator boot, and e2e (126/126 + 3/3 Pass) all ran green 10 Oct 2026. Still user-side: signed release builds (`bundleAirpalRelease`/`bundlePassRelease`, Xcode archives with both xcconfigs), Firebase Pass registration, screenshots, store records.

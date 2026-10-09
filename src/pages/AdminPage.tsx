@@ -9,7 +9,7 @@ import { activePlaces } from "@/lib/catalog";
 import { useEvents } from "@/contexts/EventsContext";
 import { listBioDirectoryRemote, liveBackendEnabled, runAnalyticsAggregationRemote } from "@/lib/functions";
 import { loadAnalyticsBuffer } from "@/lib/analytics";
-import { northStarFromEvents } from "@shared/analytics";
+import { wqgaFromEvents } from "@shared/analytics";
 import { tapCount } from "@/lib/bio-store";
 import { bioPath } from "@shared/bio";
 import { isFirebaseConfigured } from "@/lib/firebase";
@@ -66,7 +66,7 @@ export function AdminPage() {
   const [handleSort, setHandleSort] = useState<"taps" | "alpha">("taps");
 
   const buffer = loadAnalyticsBuffer();
-  const northStar = northStarFromEvents(buffer);
+  const wqga = wqgaFromEvents(buffer);
   const clientErrors = buffer.filter((e) => e.eventName === "client_error").length;
   const locked = authReady && liveBackendEnabled() && !isAdmin;
   const [tab, setTab] = useState<AdminTab>("overview");
@@ -399,11 +399,11 @@ export function AdminPage() {
             </div>
           </section>
 
-          {/* North-Star WQGA Telemetry */}
+          {/* WQGA diagnostic telemetry (QR-context health — not the product north star) */}
           <section className="rounded-[28px] bg-card p-5 sm:p-6 ring-1 ring-line shadow-xs">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">North-Star Engine</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">QR Telemetry</p>
                 <h2 className="font-display mt-0.5 text-lg font-bold text-ink">WQGA / Active QR Context</h2>
                 <p className="mt-1 text-xs text-mute">
                   Verified qualified guest actions this week, excluding demo and duplicates. Production reports use
@@ -432,11 +432,11 @@ export function AdminPage() {
 
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                { n: northStar.value.toFixed(2), l: "WQGA/Context", h: "Target: > 1.50" },
-                { n: String(northStar.qualifiedActions), l: "Qualified Actions", h: "Verified intent" },
-                { n: String(northStar.activeQrContexts), l: "Active QR Contexts", h: "Physical touchpoints" },
+                { n: wqga.value.toFixed(2), l: "WQGA/Context", h: "Target: > 1.50" },
+                { n: String(wqga.qualifiedActions), l: "Qualified Actions", h: "Verified intent" },
+                { n: String(wqga.activeQrContexts), l: "Active QR Contexts", h: "Physical touchpoints" },
                 {
-                  n: `${Math.round(northStar.firstValueRate * 100)}%`,
+                  n: `${Math.round(wqga.firstValueRate * 100)}%`,
                   l: "First-Value Rate",
                   h: "Conversion efficiency",
                 },
@@ -449,8 +449,8 @@ export function AdminPage() {
               ))}
             </div>
             <p className="mt-3 text-[11px] text-mute">
-              Demo excluded: {northStar.localDemoExcluded} · Duplicates excluded: {northStar.duplicatesExcluded} ·
-              Unique sessions: {northStar.uniqueSessions}
+              Demo excluded: {wqga.localDemoExcluded} · Duplicates excluded: {wqga.duplicatesExcluded} ·
+              Unique sessions: {wqga.uniqueSessions}
             </p>
           </section>
 

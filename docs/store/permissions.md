@@ -2,7 +2,7 @@
 
 AirPal only asks for access it actually uses. Microphone, contacts, always-on location, and Face ID are **not** requested.
 
-App ID: `me.airpal.app` · Team: `26WGXSNG58`
+App IDs: `me.airpal.app` (AirPal) · `me.airpal.pass` (AirPal Pass) · Team: `26WGXSNG58`
 
 ## What the app uses
 

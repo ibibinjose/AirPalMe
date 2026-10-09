@@ -1,59 +1,24 @@
-# Birthday Month Freebies
+# Birthday Month Freebies (RETIRED surface)
 
-Curated loyalty / birthday rewards by region — AirPal-native Mate meetup fuel.
+> **Phase 6 removed this surface.** The consumer pages, business/admin UI, and
+> Cloud Functions callables are gone; `/birthday-freebies` and
+> `/birthday-freebies/:region` redirect to `/deals`. This file records what
+> remains so a return can be scoped (it would need its own PRD and brain
+> gates — it does not come back by uncommenting routes).
 
-## Brain alignment
+## What was removed
 
-- **Discover → Go with Mate.** Offers are conversation starters and plans, not an events directory.
-- Framing: **Life Made Easy** / Mate — never “not a dating app.”
-- **Sydney / AU** is the beachhead; IN, US, UAE, EU are traveler-useful catalogs (not a multi-country P0 pivot).
-- CTA on every offer: redeem with a Mate / find someone to go with → `/mate` or https://airpal.me.
+- Consumer UI (`/birthday-freebies`, region pages) → redirect to `/deals`.
+- Business UI (`/business/birthday-offers/*`) and admin UI (`/admin/birthday-offers`) → gone.
+- Callables `createBirthdayOffer` / `updateBirthdayOffer` / `listBirthdayOffers` / `adminSetBirthdayOfferStatus` / `seedBirthdayFreebies` → implementations gone; name constants removed from `shared/airpal-security.ts` and the `birthday_offers` rules stub deleted (Oct 2026). A return rebuilds all three.
+- Seed module → gone.
 
-## Consumer
+## What remains (live)
 
-| Route | Purpose |
-| --- | --- |
-| `/birthday-freebies` | Default region AU |
-| `/birthday-freebies/:region` | `au` \| `in` \| `us` \| `uae` \| `eu` |
+- `shared/birthday-freebies.ts` (+ `.test.ts`) — pure helpers only: `BIRTHDAY_REGIONS`, `BIRTHDAY_MONTHS`, `monthFromBirthDate`, `isBirthdayRegionCode`, `offerVisibleFor`, `validateBirthdayOfferDraft`.
+- Signup age gate — `adultConsent` + `birthdayMonth` (1–12, full DOB not persisted) in `SignupFlow` / `AuthContext`. The 18+ checkbox stays regardless of this surface.
 
-Month selector defaults to the signed-in user’s `birthdayMonth` (1–12) or the current month. Adult-only offers are gated behind `adultConsent` / signed-in adult.
-
-## Account fields
-
-On `completeAccountSignup`:
-
-- Requires `adultConsent: true` **and** valid 18+ `birthDate`.
-- Stores `birthdayMonth` (1–12 only — full DOB is not persisted).
-- Stores `adultConsent`, `adultConsentAt`, plus legacy `adultConfirmed` / `adultConfirmedAt`.
-
-Signup UI: required checkbox **“I confirm I am 18 years of age or older”** after DOB; submit disabled until checked.
-
-## Callables
-
-| Callable | Who | Notes |
-| --- | --- | --- |
-| `createBirthdayOffer` | Business or admin | Business creates `draft`; admin may set `live` |
-| `updateBirthdayOffer` | Owner or admin | Admin-only to set `live` |
-| `listBirthdayOffers` | Public (live) | Owners also see own drafts; admin `status: "any"` |
-| `adminSetBirthdayOfferStatus` | Platform admin | `draft` \| `live` \| `archived` |
-| `seedBirthdayFreebies` | Platform admin | Upserts `shared/birthday-freebies-seed.ts` by `seedKey` |
-
-Firestore collection: `birthday_offers`. Client writes denied; public read for `status == live`.
-
-## Business / Admin UI
-
-- Business: `/business/birthday-offers`, `/new`, `/:id`
-- Admin: `/admin/birthday-offers` (list, edit, live/archive, seed catalog)
-
-## Shared module
-
-`shared/birthday-freebies.ts` — regions, months, `BirthdayOffer`, `monthFromBirthDate`, `offerVisibleFor`, `validateBirthdayOfferDraft`.
-
-Disclaimer: offers change; join rewards before birthday.
-
-## How to test
+## How to verify
 
 1. `npx vitest run shared/birthday-freebies.test.ts`
-2. Signup: DOB + Adult 18+ tick required; user doc gets `birthdayMonth` + `adultConsentAt`.
-3. Admin: open `/admin/birthday-offers` → **Seed catalog** → browse `/birthday-freebies/au`.
-4. Business: `/business/birthday-offers/new` → create draft → admin sets live.
+2. Visit `/birthday-freebies/au` → lands on `/deals`.

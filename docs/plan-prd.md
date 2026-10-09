@@ -58,7 +58,7 @@ V1 beachhead: Sydney, people you already know. No guest may ever see another gue
 
 1. **Three questions, then done.** What → When/Where → Who. Same shape as `/now`.
 2. **Defaults over fields.** Every optional input has a safe default (private, no cap, no approval). Options hide in Details / Manage — never in the core path.
-3. **One card, one thread.** The plan page reads as a single invitation; tabs (Overview / Plan / Map / People / Chat) organize depth without new destinations.
+3. **One card, one thread.** The plan page reads as a single invitation; tabs (Overview / Plan / Map / People / Chat & AI) organize depth without new destinations.
 4. **Proof over promises.** Completion ("we're done") is the only success event. RSVPs don't count.
 5. **No dark patterns.** Honest counts, honest open/closed states, clear cancellation. Zero fake data anywhere.
 

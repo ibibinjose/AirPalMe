@@ -1,6 +1,6 @@
 # AirPal Pulse — Phase 0 product lock
 
-**Status:** Phase 1 Stay beachhead in progress (2026-09-24).  
+**Status:** Phase 1 Stay slice shipped (Oct 2026) — `/pulse`, `/pulse/:publicToken`, `/host/pulse` + callables (`createPulse`, `submitPulseResponse`, `setPulseStatus`, `recordPulseFollowup`) live.  
 **Owner:** AirPal Ops / product  
 **Binding context:** `docs/AIRPAL.md`, `docs/host-tickets.md`
 
@@ -47,8 +47,8 @@ Alternate reserved if needed later: `/x/:publicToken` (do not ship both).
 
 Why:
 
-- Strongest existing DNA: guest QR stay session (`/g/...`, `/DemoHotel`), staff tickets, host alerts + FCM, print/QR helpers, property membership
-- Matches Demo Hotel showcase already on `main`
+- Strongest existing DNA: guest QR stay session (`/g/...`, `/w/...`), staff tickets, host alerts + FCM, print/QR helpers, property membership
+- Matches the Stay/Guide showcase already on `main`
 - Proves Capture → Alert → Resolve without inventing Org → Business → Location tenancy on day one
 
 **Explicitly deferred for MVP:** café-first table QR network, NFC tag factory, employee Pulse, AI themeing, Zapier/webhooks UI, review-site diversion, multi-org enterprise ACL.
@@ -169,7 +169,7 @@ A hotel host must be able to:
 11. Optionally send follow-up “how was the fix?”
 12. See the lifecycle on the host Pulse dashboard (real data)
 
-Demo Hotel (`/DemoHotel`) may deep-link or show a “How is your stay?” entry once Pulse exists — not before.
+Stay/Guide may deep-link or show a “How is your stay?” entry into a deployed Pulse.
 
 ---
 
@@ -181,7 +181,7 @@ Demo Hotel (`/DemoHotel`) may deep-link or show a “How is your stay?” entry 
 | **1** | Stay MVP vertical slice (§6–§8) |
 | **2** | NFC / AirPal Tags + deployment placements (table/room) |
 | **3** | Café / venue templates + BizScout partner attach |
-| **4** | Ecosystem triggers (post-booking, post-Mate, post-event, post-deal) |
+| **4** | Ecosystem triggers (post-booking, post-plan, post-event, post-deal) |
 | **5** | Smart alerts, escalation timers, scheduled reports, labelled AI analysis |
 
 ---
@@ -204,9 +204,9 @@ Document in `docs/analytics-event-dictionary.md` before shipping UI that claims 
 
 - Convert severe Pulse issues into existing `tickets` vs dedicated `pulseIssues` with optional “create staff ticket”
 - Primary score: NPS vs CSAT vs 1–5 star for Stay template default
-- Whether Demo Hotel shows Pulse CTA on first Pulse deploy
+- Whether Stay/Guide shows Pulse CTA on first Pulse deploy
 
-Default if unspecified at build time: **dedicated `pulseIssues` + optional “Create staff ticket”**, **1–5 + emoji**, Demo Hotel CTA **on**.
+Default if unspecified at build time: **dedicated `pulseIssues` + optional “Create staff ticket”**, **1–5 + emoji**, Stay/Guide CTA **on**.
 
 ---
 

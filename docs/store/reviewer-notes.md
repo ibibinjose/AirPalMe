@@ -1,6 +1,6 @@
 # Reviewer notes (paste into App Store Connect / Play Console)
 
-**App:** AirPal (`me.airpal.app`) 2.0.0 (iOS build 13)  
+**App:** AirPal (`me.airpal.app`) 2.0.0 (iOS build 16, Android versionCode 8)  
 **Seller:** SarvamDaily Pty Ltd trading as AirPal.Me · ABN 83 702 462 977  
 **Apple Team:** ZEN KAPITAL PTY LTD (`26WGXSNG58`)  
 **Support:** AirPalMe@gmail.com · hello@airpal.me  
@@ -13,7 +13,7 @@ The native app opens on a branded screen and requires an account. Create one in 
 1. Open AirPal.
 2. Tap **Continue with Apple**, **Continue with Google**, or **Create a free account**.
 3. Email signup: password 8+ characters with a letter and a number. Phone SMS: use a Firebase test number if you cannot receive SMS.
-4. After sign-in you land on home (What do you need? / What’s on).
+4. After sign-in you land on home (What’s on near you, plans, tickets).
 
 Website https://airpal.me still browses without an account. Privacy and Terms are reachable from the opening screen before sign-in.
 
@@ -40,7 +40,7 @@ No in-app digital goods and no IAP. Bookings for real-world experiences checkout
 
 ## Content
 
-User-generated listings, plans, and reviews. Report/block is in the profile menu and match chat. 17+ / 18+.
+User-generated listings and plans, plus private post-experience reviews (never public). Report/block is in the profile menu, plan threads, and profile chat. 17+ / 18+.
 
 ## Demo
 

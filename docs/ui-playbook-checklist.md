@@ -6,9 +6,9 @@ are done; unchecked are ordered next → later → needs-decision.
 
 ## Already true (no work)
 
-- [x] Tabs are Home / Explore / Trips / Inbox / Me (+ global + Create) — playbook §2's recommendation already shipped; its "current nav" description was stale
+- [x] Dock is Home / Now / Plan / Inbox / Me (+ CreateFab for Scan & create) — Explore tab retargeted to the `/now` composer in Phase 6 (tab id stays `explore`); Pass shell docks Pass / Events / Tickets / Scan / Me
 - [x] `CardShell`, `CategoryTile`, `AirPalSearchField`, `AvatarStack`, `ArrowCta`, `StickyAction`, liquid-glass dock, 44px targets
-- [x] One marketplace engine; Mate stays activity-first, never dating UI
+- [x] One marketplace engine; never dating UI (the Mate/stranger surface itself was deleted in Phase 6 — strangers deferred per canon G6)
 - [x] Vite SPA + Capacitor + Firebase kept; no rewrite
 - [x] Screenshot tooling (`scripts/screenshots.mjs`) + per-flow Playwright specs (`e2e/`)
 
@@ -18,15 +18,15 @@ are done; unchecked are ordered next → later → needs-decision.
 - [x] Events imagery: calendar header banner, card fallbacks (`CalendarPage.tsx`, `CalendarEventCard.tsx`)
 - [x] Business profile Google-style block (`BioPublicPage.tsx`)
 - [x] Home journey e2e test (`e2e/home-journey.spec.ts`) — §24 example, adapted to shipped UI; also fixed stale tab test to shipped dock (16 pass, chromium + mobile)
-- [ ] Explore content-first: demote pill row, lead with content (`ExplorePage.tsx`)
+- [x] Explore content-first — SUPERSEDED: `ExplorePage.tsx` deleted in Phase 6; discovery is the `/now` composer (`/explore` `/discover` `/search` redirect there)
 - [ ] Card-size discipline: Small / Medium / Hero only, via `CardShell` + companions — no new shapes
-- [x] Contextual primary CTA: event/place detail gets `Add to Trip` with contextual confirm (`AddedToTripSheet` + `addStop{silent}` + "Added to X Trip"; `e2e/add-to-trip.spec.ts` green both projects)
+- [x] Contextual primary CTA: event/place detail gets `Add to Trip` with contextual confirm (`AddToTripSheet` + plan-name confirm; `e2e/add-to-trip.spec.ts` green both projects)
 - [ ] Inbox action-centering pass (no new tabs without sign-off)
 
 ## Later (new surfaces — one at a time, each needs its own turn)
 
 - [x] PlanCreate progressive wizard (§9) — Podz-style stepper: template cards → details → who; `?with=` prefill skips to details; create handoff stays share-first as the Ready action
-- [ ] PlanDetail tab hierarchy: Overview / Plan / Map / People (§10)
+- [x] PlanDetail tab hierarchy: Overview / Plan(n) / Map(n) / People(n) / Chat & AI (§10) — shipped
 - [ ] Active Trip Mode (§11)
 - [ ] Journey templates: Root Escape / Sacred Journey as trip templates, not apps (§16–17)
 - [ ] Stay Mode home (§19)

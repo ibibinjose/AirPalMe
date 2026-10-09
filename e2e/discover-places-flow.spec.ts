@@ -39,11 +39,11 @@ test.describe("Discover & Places Flow", () => {
 
     await expect(page.getByRole("heading", { level: 1, name: "What now?" })).toBeVisible();
 
-    // Category mood chips
-    await expect(page.getByRole("button", { name: "Coffee", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Eat", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "See", exact: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Anything", exact: true })).toBeVisible();
+    // Category mood chips (radio group since the /now filter rework)
+    await expect(page.getByRole("radio", { name: "Coffee", exact: true })).toBeVisible();
+    await expect(page.getByRole("radio", { name: "Eat", exact: true })).toBeVisible();
+    await expect(page.getByRole("radio", { name: "See", exact: true })).toBeVisible();
+    await expect(page.getByRole("radio", { name: "Anything", exact: true })).toBeVisible();
 
     // A suggestion article or finding state
     await expect(page.locator("article").or(page.getByText(/Finding something near you/i))).toBeVisible();
@@ -54,8 +54,8 @@ test.describe("Discover & Places Flow", () => {
     await page.waitForLoadState("domcontentloaded");
 
     // Click Eat chip
-    await page.getByRole("button", { name: "Eat", exact: true }).click();
-    await expect(page.getByRole("button", { name: "Eat", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("radio", { name: "Eat", exact: true }).click();
+    await expect(page.getByRole("radio", { name: "Eat", exact: true })).toHaveAttribute("aria-checked", "true");
   });
 
   test("navigates into Place detail and uses floating back button", async ({ page }) => {

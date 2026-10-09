@@ -1,14 +1,14 @@
 # Analytics implementation checklist
 
 Source of truth: `analytics-instrumentation-implementation-plan.md`.  
-North-star: **Weekly Qualified Guest Actions per Active QR Context (WQGA/Context)**.  
+Product north star per canon (`docs/AIRPAL.md`): **Completed Experiences per Active User**. This plan tracks **WQGA/Context** (Weekly Qualified Guest Actions per Active QR Context) as the QR-context diagnostic in Admin → Telemetry.  
 Architecture: Option C — GA4/Firebase Analytics for UX diagnostics + server ledger for business facts.
 
 Mark items only when code, tests, and rules match the plan. Do not invent events that have no product flow.
 
 ## Phase 0 — contract and decisions
 
-- [x] North-star definition: WQGA/Context
+- [x] QR-context diagnostic definition: WQGA/Context (Admin telemetry; product north star stays Completed Experiences per canon)
 - [x] Architecture: hybrid server ledger + optional GA4
 - [x] Event dictionary: `docs/analytics-event-dictionary.md`
 - [x] Privacy: no passwords, free-text questions, email, phone, tokens, or full URLs in events

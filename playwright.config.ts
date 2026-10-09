@@ -2,6 +2,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
+  // pass-shell.spec.ts needs VITE_APP_FLAVOR=pass; it runs under playwright.pass.config.ts.
+  testIgnore: "**/pass-shell.spec.ts",
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,

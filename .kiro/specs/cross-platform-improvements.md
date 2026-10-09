@@ -1,6 +1,6 @@
 # Cross-Platform App Improvements
 
-**Status:** Design  
+**Status:** Code fixes landed (Oct 2026) — safe-area utilities (`.safe-bottom`/`.safe-top`), `touch-action` fix, Keyboard plugin config, Android back handler, and manifest shortcuts all ship; applies to both native shells (AirPal + AirPal Pass). Physical-device testing checklist below is still open.  
 **Created:** 2026-09-13  
 **Priority:** High
 

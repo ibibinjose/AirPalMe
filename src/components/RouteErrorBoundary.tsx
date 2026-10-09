@@ -33,31 +33,55 @@ export class RouteErrorBoundary extends React.Component<
 
   private retry = () => this.setState({ err: null });
 
+  private reload = () => location.reload();
+
   render() {
     if (this.state.err) {
+      // Chunk-load failures (usually a fresh deploy) cache the rejected import
+      // in React, so an in-place retry can never recover — reload is the only
+      // fix. Render errors get a cheap retry first.
+      const message = `${this.state.err.name}: ${this.state.err.message}`;
+      const isChunkError =
+        /ChunkLoadError|Loading chunk|Failed to fetch dynamically imported module|Importing a module script failed/i.test(
+          message,
+        );
       return (
         <div className="mx-auto w-full max-w-md px-4 pt-16 pb-28 text-center">
           <div className="rounded-[28px] bg-card p-8 ring-1 ring-line shadow-clay">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Error</p>
             <p className="font-display mt-2 text-2xl font-bold">This page broke</p>
             <p className="mt-2 text-sm text-mute">
-              Try again — the rest of the app is fine. If it keeps happening, reload.
+              {isChunkError
+                ? "This page didn't load — the app may have updated. Reload to get the latest version."
+                : "Try again — the rest of the app is fine. If it keeps happening, reload."}
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <button
-                type="button"
-                onClick={this.retry}
-                className="h-11 rounded-full bg-brand px-5 text-sm font-semibold text-white shadow-sm hover:bg-brand-ink transition"
-              >
-                Try again
-              </button>
-              <button
-                type="button"
-                onClick={() => location.reload()}
-                className="inline-flex h-11 items-center rounded-full bg-paper px-5 text-sm font-semibold ring-1 ring-line hover:bg-card transition"
-              >
-                Reload
-              </button>
+              {isChunkError ? (
+                <button
+                  type="button"
+                  onClick={this.reload}
+                  className="h-11 rounded-full bg-brand px-5 text-sm font-semibold text-white shadow-sm hover:bg-brand-ink transition"
+                >
+                  Reload page
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={this.retry}
+                    className="h-11 rounded-full bg-brand px-5 text-sm font-semibold text-white shadow-sm hover:bg-brand-ink transition"
+                  >
+                    Try again
+                  </button>
+                  <button
+                    type="button"
+                    onClick={this.reload}
+                    className="inline-flex h-11 items-center rounded-full bg-paper px-5 text-sm font-semibold ring-1 ring-line hover:bg-card transition"
+                  >
+                    Reload
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

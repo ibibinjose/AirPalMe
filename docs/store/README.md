@@ -1,11 +1,11 @@
 # AirPal store submission pack
 
-App: **AirPal** · ID `me.airpal.app` · version **2.0.0** (iOS build **12**, Android versionCode 6)  
+App: **AirPal** · ID `me.airpal.app` · version **2.0.0** (iOS build **16**, Android versionCode 8)  
 App: **AirPal Pass** · ID `me.airpal.pass` · same version trains (Pass store launch gated — `docs/two-app-plan.md` Phase C). Listing: `docs/store/listing-pass.md` · Reviewer notes: `docs/store/reviewer-notes-pass.md`
 
 TestFlight: use **2.0.0**, not 1.0. Steps: `docs/store/testflight.md`. Xcode yellows: `docs/store/ios-compiler-warnings.md`.
 
-Pack 21 Sep 2026 (rebuild): iOS **2.0.0 (12)** IPA `ios/App/build/export/AirPal.Me.ipa`. Android **versionCode 6** AAB `android/app/build/outputs/bundle/release/app-release.aab`. App Information paste: `docs/store/app-information.md`.
+Pack October 2026 (two-app): iOS **2.0.0 (16)** (`AirPal.xcconfig` / `Pass.xcconfig` archives). Android **versionCode 8 (2.0.0)** AABs per flavor (`bundleAirpalRelease` / `bundlePassRelease`). App Information paste: `docs/store/app-information.md` (+ `-pass` twin).
 
 Legal entity: **SarvamDaily Pty Ltd** trading as **AirPal.Me** · ABN **83 702 462 977** · Apple Team ID **26WGXSNG58**
 Web: https://airpal.me · Privacy: https://airpal.me/privacy · Terms: https://airpal.me/terms · Contact: https://airpal.me/contact
@@ -17,7 +17,7 @@ Support email: AirPalMe@gmail.com (App Store / Play contact) · hello@airpal.me 
 - Camera → QR scan. Location (when in use) → nearby places. Photos → profile/listing images. NFC/Bluetooth optional for Wave. Full table: `docs/store/permissions.md`.
 - Paid paths are real-world services only: experience bookings and stay food orders check out with Stripe card payment (live when `STRIPE_SECRET_KEY` is set, sandbox otherwise). No digital goods or in-app currency, so no in-app-purchase conflict — still, re-read both stores' payments policies before release.
 - Reviewer path: open the app → create an account on the opening screen (Apple / Google / email / phone). Paste `docs/store/reviewer-notes.md` into the review notes field. Account deletion: Settings → Delete account (type DELETE).
-- Content: user-generated venues, plans, and reviews. Safety tooling in-app: safety reports, blocks, manual claim review, admin audit log.
+- Content: user-generated venues and plans, plus private post-experience reviews (never public surfaces). Safety tooling in-app: safety reports, blocks, manual claim review, admin audit log.
 
 ## Data safety (Play) / privacy labels (App Store) — fill verbatim
 
@@ -42,7 +42,7 @@ Support email: AirPalMe@gmail.com (App Store / Play contact) · hello@airpal.me 
    cd android && ./gradlew :app:bundleAirpalRelease :app:bundlePassRelease   # → android/app/build/outputs/bundle/{airpal,pass}/release/*.aab
    # iOS: archive scheme App with -xcconfig ios/App/AirPal.xcconfig (AirPal) or ios/App/Pass.xcconfig (Pass)
    ```
-   This pack (21 Sep 2026): signed AAB **versionCode 6** at that path; iOS IPA **2.0.0 (11)** at `ios/App/build/export/AirPal.Me.ipa` (includes `NSLocationAlwaysAndWhenInUseUsageDescription`). Upload the AAB to Play Console. Select build **11** in App Store Connect (upload if it is not Processing yet). Then paste Play App Signing SHA-256 (item 1) and redeploy hosting.
+   This pack (October 2026): signed AABs **versionCode 8** per flavor at that path; iOS **2.0.0 (16)** via the xcconfig archives above. Upload the AAB to Play Console. Select build **16** in App Store Connect (upload if it is not Processing yet). Then paste Play App Signing SHA-256 (item 1) and redeploy hosting.
 5. **App Information / questionnaires** → paste `docs/store/app-information.md` into App Store Connect App Information (name, subtitle, categories, content rights, age ratings) and Play Console listing + IARC + Data safety (`docs/store/play-data-safety.md`). 17+ App Store / 18+ Play. No ads. No IAP server URLs. Pass equivalents: `docs/store/app-information-pass.md`, `docs/store/play-data-safety-pass.md`.
 6. **Pass App ID (Apple Developer)** → register `me.airpal.pass`, enable **Sign in with Apple**, **Associated Domains**, and **NFC Tag Reading** (matches `App.entitlements`), then create the AirPal Pass App Store app record. Android needs no portal step beyond the second Play listing.
 
@@ -90,5 +90,5 @@ card until you add photos to `public/media/`.
 
 - Web PWA: manifest, 192/512 icons, apple-touch-icon, offline page, service worker, no-cache for `sw.js`, immutable assets, full CSP/HSTS headers — `firebase.json`.
 - Deep links: Android App Links intent-filter (autoVerify) + iOS `applinks:airpal.me` entitlement; verification files staged under `public/.well-known/` with correct Content-Type headers.
-- Android: location, camera, NFC, BLE (scan neverForLocation), optional hardware so Play does not filter devices; App Links + `airpal://` scheme; queries for Maps/tel/mail. No `google-services.json` required — Firebase is the web SDK.
+- Android: location, camera, NFC, BLE (scan neverForLocation), optional hardware so Play does not filter devices; App Links + `airpal://` scheme; queries for Maps/tel/mail. `google-services.json` ships both app IDs (AirPal + Pass stub — regen from the Firebase console after registering `me.airpal.pass`); data/Auth flows use the web SDK.
 - iOS: camera/photo/when-in-use location/NFC usage strings, custom URL schemes, associated domains (airpal.me, www, firebaseapp), NFC NDEF entitlement, `ITSAppUsesNonExemptEncryption`, privacy manifest collected-data types. Enable NFC Tag Reading on the App ID in Apple Developer.

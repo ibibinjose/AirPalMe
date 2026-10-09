@@ -1,4 +1,6 @@
-# AirPal — store listing copy
+# AirPal — store listing copy (LEGACY single-app version)
+
+> **Superseded.** Current submission copy lives in [`docs/store/listing.md`](../docs/store/listing.md) (AirPal) and [`docs/store/listing-pass.md`](../docs/store/listing-pass.md) (AirPal Pass). This file is kept for the `store/screenshots/` + `store/icons/` asset map below, which still describes the files in this folder.
 
 App name: **AirPal** · Subtitle (iOS, max 30 chars): `Scan. Discover. Stay.`
 Bundle IDs: iOS `me.airpal.app` (confirm in Xcode) · Android `me.airpal.app`

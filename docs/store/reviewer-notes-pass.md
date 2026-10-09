@@ -8,15 +8,16 @@
 
 Same AirPal account as the AirPal app — one account, tickets everywhere.
 
-## How to review
+## How to review (sign-in required on iOS/Android)
 
-The app opens on Pass (events, deals, passbook) and browses without an account. Sign-in is needed only to hold tickets.
+The native app opens on a branded screen and requires an account — same gate as the AirPal app (`NativeAuthGate`; only legal/onboarding paths are public). Create one in the app — no demo login is needed.
 
-1. Open AirPal Pass — browse events, deals, and the passbook.
-2. Tap **Open Wallet** or any Get Pass flow, then sign in: **Continue with Apple**, **Continue with Google**, or email.
+1. Open AirPal Pass — after sign-in you land on Pass (events, deals, passbook).
+2. Sign in: **Continue with Apple**, **Continue with Google**, or email.
 3. Email signup: password 8+ characters with a letter and a number.
+4. Tap **Open Wallet** or any **Get Pass** flow to hold a pass.
 
-Website https://airpal.me shows the same events. Privacy and Terms are reachable before sign-in.
+Website https://airpal.me shows the same events and browses without an account. Privacy and Terms are reachable before sign-in.
 
 ## Account deletion (Guideline 5.1.1)
 
@@ -42,4 +43,4 @@ Event listings and deals from organisers and local businesses. 17+ / 18+.
 
 ## Demo
 
-No demo login. Browse freely, create an account to hold a pass, then delete it from Settings when finished.
+No demo login. Create an account, hold a pass, review, then delete it from Settings when finished.
