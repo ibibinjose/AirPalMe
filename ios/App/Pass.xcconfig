@@ -2,7 +2,7 @@
 // Usage: xcodebuild -scheme App -xcconfig Pass.xcconfig ... (see docs/two-app-plan.md Phase B).
 // No pbxproj fork: the web bundle is flavor-agnostic and resolves the shell at runtime.
 PRODUCT_BUNDLE_IDENTIFIER = me.airpal.pass
-INFOPLIST_KEY_CFBundleDisplayName = AirPal Pass
+APP_DISPLAY_NAME = AirPal Pass
 ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon-Pass
 // AppIcon-Pass is a scaffold placeholder (amber-tinted AirPal mark) so the two
 // shells are visually distinct. Replace with final Pass icon art before store

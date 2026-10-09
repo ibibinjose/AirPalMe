@@ -40,7 +40,7 @@ Support email: AirPalMe@gmail.com (App Store / Play contact) · hello@airpal.me 
    ```sh
    npm run build && npx cap sync
    cd android && ./gradlew :app:bundleAirpalRelease :app:bundlePassRelease   # → android/app/build/outputs/bundle/{airpal,pass}/release/*.aab
-   # iOS Pass: archive scheme App with -xcconfig ios/App/Pass.xcconfig (bundle me.airpal.pass, display name "AirPal Pass")
+   # iOS: archive scheme App with -xcconfig ios/App/AirPal.xcconfig (AirPal) or ios/App/Pass.xcconfig (Pass)
    ```
    This pack (21 Sep 2026): signed AAB **versionCode 6** at that path; iOS IPA **2.0.0 (11)** at `ios/App/build/export/AirPal.Me.ipa` (includes `NSLocationAlwaysAndWhenInUseUsageDescription`). Upload the AAB to Play Console. Select build **11** in App Store Connect (upload if it is not Processing yet). Then paste Play App Signing SHA-256 (item 1) and redeploy hosting.
 5. **App Information / questionnaires** → paste `docs/store/app-information.md` into App Store Connect App Information (name, subtitle, categories, content rights, age ratings) and Play Console listing + IARC + Data safety (`docs/store/play-data-safety.md`). 17+ App Store / 18+ Play. No ads. No IAP server URLs. Pass equivalents: `docs/store/app-information-pass.md`, `docs/store/play-data-safety-pass.md`.

@@ -1,0 +1,5 @@
+// AirPal (me.airpal.app) build overrides for the single shared Xcode target.
+// Usage: xcodebuild -scheme App -xcconfig AirPal.xcconfig ...
+// (Plain GUI builds also work: Info.plist defaults the display name to AirPal.)
+PRODUCT_BUNDLE_IDENTIFIER = me.airpal.app
+APP_DISPLAY_NAME = AirPal
