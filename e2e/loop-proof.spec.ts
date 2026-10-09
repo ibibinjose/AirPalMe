@@ -10,7 +10,7 @@ test.describe("AirPal loop proof (P0)", () => {
   test("home answers what you want to do and offers What now? and Plan a Hangout", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
-    await expect(page.getByRole("heading", { level: 1, name: "What do you want to do?" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /Plan your day\. Organise your life\./i })).toBeVisible();
     await expect(page.locator("header").getByRole("button", { name: "What now?", exact: true })).toBeVisible();
     await expect(page.locator("header").getByRole("button", { name: "Plan a Hangout", exact: true })).toBeVisible();
   });
@@ -44,8 +44,8 @@ test.describe("AirPal loop proof (P0)", () => {
     await page.goto("/now");
     await page.waitForLoadState("domcontentloaded");
     await expect(page.getByRole("heading", { level: 1, name: "What now?" })).toBeVisible();
-    await page.getByRole("button", { name: "Eat", exact: true }).click();
-    await expect(page.getByRole("button", { name: "Eat", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("radio", { name: /Eat/i }).click();
+    await expect(page.getByRole("radio", { name: /Eat/i })).toHaveAttribute("aria-checked", "true");
   });
 
   test("calendar renders with a My plans repeat surface", async ({ page }) => {

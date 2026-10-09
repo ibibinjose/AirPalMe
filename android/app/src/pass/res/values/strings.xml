@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AirPal Pass</string>
+    <string name="title_activity_main">AirPal Pass</string>
+    <string name="package_name">me.airpal.pass</string>
+    <string name="custom_url_scheme">me.airpal.pass</string>
+    <string name="airpal_url_scheme">airpal</string>
+</resources>

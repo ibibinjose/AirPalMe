@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { tabFromPath } from "./tabs";
+import { passTabFromPath, tabFromPath } from "./tabs";
 
 describe("tabFromPath", () => {
   it("maps the companion tabs", () => {
@@ -40,5 +40,22 @@ describe("tabFromPath", () => {
     expect(tabFromPath("/deals")).toBe("explore");
     expect(tabFromPath("/guide")).toBe("explore");
     expect(tabFromPath("/join")).toBe("explore");
+  });
+});
+
+describe("passTabFromPath (Pass dock)", () => {
+  it("maps pass surfaces to pass tabs", () => {
+    expect(passTabFromPath("/pass")).toBe("pass");
+    expect(passTabFromPath("/pass/deals")).toBe("pass");
+    expect(passTabFromPath("/deals")).toBe("pass");
+    expect(passTabFromPath("/event")).toBe("pass");
+    expect(passTabFromPath("/events")).toBe("events");
+    expect(passTabFromPath("/e/abc")).toBe("events");
+    expect(passTabFromPath("/e/abc/guests")).toBe("events");
+    expect(passTabFromPath("/me/tickets")).toBe("tickets");
+    expect(passTabFromPath("/ticket/abc")).toBe("tickets");
+    expect(passTabFromPath("/scan")).toBe("scan");
+    expect(passTabFromPath("/me")).toBe("me");
+    expect(passTabFromPath("/@handle")).toBe("me");
   });
 });

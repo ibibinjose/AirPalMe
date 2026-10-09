@@ -27,6 +27,7 @@
   - *Features:* Live concerts, Indian cultural festivals & community gigs, dining perks & member deals (`/deals`), scannable digital QR tickets & passbook (`/me/tickets`), organiser door scanner (`/scan`), and event hosting tools (`/event`).
 
 - **Shared Universal Identity:** Both surfaces share the exact same AirPal account, Firebase Auth, and database. Passes and tickets booked in AirPal Pass automatically populate the user's AirPal.Me daily schedule.
+- **Packaging (October 2026):** native ships as two separate apps from one codebase — AirPal (`me.airpal.app`) and AirPal Pass (`me.airpal.pass`, tickets/events only) — while web stays one app at airpal.me. Never position them as unrelated companies or separate accounts. Build plan: `docs/two-app-plan.md`.
 
 
 ### A2. Promise and loop
@@ -133,11 +134,11 @@ Carried over from the pre-rebuild rules. These survive every redesign because th
 
 ### D1. Stack
 
-Vite SPA + React + TypeScript + Tailwind v4 + Lucide + Firebase (Auth, Firestore, Storage, Functions in us-central1) + Capacitor 8 (`me.airpal.app`). Canonical Firebase project `airpalme-app`; production web `https://airpal.me`. Do not migrate to Next.js/App Router, a second user system, a second booking engine, a new component library, or a new CSS framework.
+Vite SPA + React + TypeScript + Tailwind v4 + Lucide + Firebase (Auth, Firestore, Storage, Functions in us-central1) + Capacitor 8 with two native shells from one codebase: AirPal (`me.airpal.app`) and AirPal Pass (`me.airpal.pass`, tickets/events only). Canonical Firebase project `airpalme-app`; production web `https://airpal.me` (one SPA serving both). Do not migrate to Next.js/App Router, a second user system, a second booking engine, a new component library, or a new CSS framework.
 
 ### D2. Architecture rules
 
-Shared pure types and logic live in `shared/`. Callables live in `functions/src/` with client wrappers in `src/lib/functions.ts`. Privileged mutations go through Cloud Functions. Never weaken `firestore.rules` to make development work. One account, one identity, one booking engine, one chat engine — no parallels per vertical.
+Shared pure types and logic live in `shared/`. Callables live in `functions/src/` with client wrappers in `src/lib/functions.ts`. Privileged mutations go through Cloud Functions. Never weaken `firestore.rules` to make development work. One account, one identity, one booking engine, one chat engine — no parallels per vertical. The two native apps are shells over these same engines, never forks.
 
 ### D3. V1 data model (essentials)
 
@@ -234,6 +235,7 @@ Nothing here returns on opinion. Each needs its evidence gate plus its trust mac
 - Mate / stranger matching / booking-a-person: only after V1 repeat rate holds for weeks AND identity verification, admin approvals, safety check-ins, and human moderation are built. Never on automation alone.
 - User-posted deals: only after business deals loop works, with its own seller-trust design.
 - Stay host operations: returned early at human request (October 2026); `/host` rebuilt with full parity on the same data, no model change.
+- AirPal Pass native apps: build as shells over the same engines now; store launch only after the V1 acceptance test (B5) holds and the tickets/QR-entry loop is proven on real events.
 - Fashion, Travel, Daily as products, Studio: only after the V1 loop repeats; each must pass the feature test (G7) first.
 
 ### G7. Feature test (every new surface must pass)
@@ -266,6 +268,7 @@ These stay as working references. Where any of them conflicts with Parts A–G, 
 - `docs/client-handoff.md`, `docs/launch-runbook.md` — handoff and runbook.
 - `docs/store/` — store submission pack.
 - `docs/plan-prd.md` — Plan experience PRD (Apple-Invites-beating create flow, cover artwork, one-card thread); spec reference for B3.
+- `docs/two-app-plan.md` — two-native-apps / one-web-app plan (AirPal + AirPal Pass shells, identities, store/ops checklist).
 - `docs/strategy.md`, `docs/APP-STORY.md`, `docs/launch-plan.md`, `docs/CANON.md`, `docs/BRAIN.md`, `docs/AIRPAL_BRAIN.md`, root `AGENTS.md` — now pointers to this file; full pre-rebuild content in git history.
 
 ---

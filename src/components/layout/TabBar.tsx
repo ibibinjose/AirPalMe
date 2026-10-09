@@ -1,4 +1,4 @@
-import { AtSign, CalendarDays, Compass, Home, Inbox } from "@/components/icons";
+import { AtSign, CalendarDays, Compass, Home, Inbox, QrCode, ScanLine, Ticket } from "@/components/icons";
 import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -9,8 +9,9 @@ import { enterEase } from "@/lib/motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { triggerHapticSelection } from "@/lib/native";
+import { isPassApp } from "@/lib/app-flavor";
 import { useVirtualKeyboard } from "@/lib/keyboard";
-import { tabFromPath, type GuestTab } from "@/lib/tabs";
+import { passTabFromPath, tabFromPath, type GuestTab, type PassTab } from "@/lib/tabs";
 
 export { tabFromPath };
 
@@ -20,6 +21,15 @@ const TABS: { href: string; id: GuestTab; label: string; icon: typeof Compass }[
   { href: "/now", id: "explore", label: "Now", icon: Compass },
   { href: "/plan", id: "trips", label: "Plan", icon: CalendarDays },
   { href: "/me/inbox", id: "inbox", label: "Inbox", icon: Inbox },
+  { href: "/me", id: "me", label: "Me", icon: AtSign },
+];
+
+/** Pass shell dock: Pass / Events / Tickets / Scan / Me. AirPal shell keeps TABS. */
+const PASS_TABS: { href: string; id: PassTab; label: string; icon: typeof Compass }[] = [
+  { href: "/pass", id: "pass", label: "Pass", icon: Ticket },
+  { href: "/events", id: "events", label: "Events", icon: CalendarDays },
+  { href: "/me/tickets", id: "tickets", label: "Tickets", icon: QrCode },
+  { href: "/scan", id: "scan", label: "Scan", icon: ScanLine },
   { href: "/me", id: "me", label: "Me", icon: AtSign },
 ];
 
@@ -64,7 +74,9 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
   const [, nav] = useLocation();
   const { user } = useAuth();
   const { mine } = useBio();
-  const active = tabFromPath(path);
+  const passShell = isPassApp();
+  const tabs = passShell ? PASS_TABS : TABS;
+  const active = passShell ? passTabFromPath(path) : tabFromPath(path);
   const { isKeyboardOpen } = useVirtualKeyboard();
   const meHref = !user ? "/start" : mine?.handle ? `/@${mine.handle}` : "/bio/setup";
   const inboxUnread = useInboxUnread(user?.uid);
@@ -83,7 +95,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
     >
       <div className="relative mx-auto max-w-md pointer-events-auto px-4">
         <div className="apple-liquid-glass-dock relative mb-[max(0.75rem,env(safe-area-inset-bottom,0px))] flex items-center justify-between rounded-full p-1.5 text-ink">
-          {TABS.map((tab) => {
+          {tabs.map((tab) => {
             const on = active === tab.id;
             const href = tab.id === "me" ? meHref : tab.href;
             const Icon = tab.icon;

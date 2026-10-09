@@ -2,7 +2,6 @@ import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Plus, Search } from "@/components/icons";
 import { BrandMark } from "@/components/brand/BrandMark";
-import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 import { ProfileMenu } from "@/components/auth/ProfileMenu";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { openGlobalSearch } from "@/components/search/openSearch";
@@ -80,7 +79,6 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
           >
             <BrandMark />
           </button>
-          <EcosystemSwitcher currentPath={path} variant="header" />
         </div>
         <nav className="flex items-center justify-center gap-1 rounded-full bg-card/60 p-1 ring-1 ring-line/70 backdrop-blur-md">
           {LINKS.slice(0, 2).map(renderLink)}
@@ -121,7 +119,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
               void triggerHaptic("light");
               nav("/scan");
             }}
-            className="h-9 shrink-0 rounded-full bg-card px-3.5 text-sm font-semibold text-ink ring-1 ring-line hover:bg-paper hover:text-accent transition active:scale-95 lg:h-10 cursor-pointer"
+            className="hidden xl:inline-flex h-9 shrink-0 items-center rounded-full bg-card px-3.5 text-sm font-semibold text-ink ring-1 ring-line hover:bg-paper hover:text-accent transition active:scale-95 lg:h-10 cursor-pointer"
             title="Scan QR / Room"
           >
             Scan
@@ -132,7 +130,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
                 void triggerHaptic("light");
                 nav("/host");
               }}
-              className="h-9 shrink-0 rounded-full bg-card px-4 text-sm font-semibold ring-1 ring-line hover:bg-paper transition lg:h-10 cursor-pointer"
+              className="hidden xl:inline-flex h-9 shrink-0 items-center rounded-full bg-card px-4 text-sm font-semibold ring-1 ring-line hover:bg-paper transition lg:h-10 cursor-pointer"
             >
               Host
             </button>
@@ -143,7 +141,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
                 nav(partnerAccountPath({ signedIn: Boolean(user), hasPlace: Boolean(business) }));
               }}
               aria-label={NAMES.partnerAccount}
-              className="h-9 shrink-0 rounded-full bg-card px-4 text-sm font-semibold ring-1 ring-line hover:bg-paper transition active:scale-95 lg:h-10 cursor-pointer"
+              className="hidden xl:inline-flex h-9 shrink-0 items-center rounded-full bg-card px-4 text-sm font-semibold ring-1 ring-line hover:bg-paper transition active:scale-95 lg:h-10 cursor-pointer"
             >
               {NAMES.partnerAccount}
             </button>

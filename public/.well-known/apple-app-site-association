@@ -3,13 +3,31 @@
     "apps": [],
     "details": [
       {
+        "appID": "26WGXSNG58.me.airpal.pass",
+        "paths": [
+          "/pass*",
+          "/event*",
+          "/e/*",
+          "/ticket/*",
+          "/me/tickets*",
+          "/deals*",
+          "/scan*"
+        ]
+      },
+      {
         "appID": "26WGXSNG58.me.airpal.app",
         "paths": [
           "/*",
+          "NOT /pass*",
+          "NOT /event*",
+          "NOT /e/*",
+          "NOT /ticket/*",
+          "NOT /me/tickets*",
+          "NOT /deals*",
+          "NOT /scan*",
           "/b/*",
           "/plan/*",
           "/invite/*",
-          "/e/*",
           "/concierge/*"
         ]
       }

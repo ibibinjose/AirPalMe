@@ -169,12 +169,18 @@ export function NowPage() {
 
         {/* Live Weather & Outfit Context */}
         {weather && outfitAdvice && (
-          <div className="mt-3 flex items-center gap-2.5 rounded-2xl bg-card p-3 text-xs ring-1 ring-line shadow-xs">
-            <span className="text-xl shrink-0" aria-hidden="true">{outfitAdvice.icon}</span>
-            <div className="min-w-0">
-              <span className="font-bold text-ink">{weather.temp}°C {outfitAdvice.vibe} in {effectiveCity}</span>
-              <span className="text-mute mx-1">·</span>
-              <span className="text-mute">{outfitAdvice.outfit}</span>
+          <div className="mt-3 flex items-center gap-3 rounded-2xl bg-card p-3.5 text-xs ring-1 ring-line/80 shadow-xs">
+            <span className="text-2xl shrink-0" aria-hidden="true">{outfitAdvice.icon}</span>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-bold text-ink">{weather.temp}°C {outfitAdvice.vibe} in {effectiveCity}</span>
+                {outfitAdvice.accessory && (
+                  <span className="inline-flex items-center rounded-full bg-paper px-2 py-0.5 text-[10px] font-semibold text-accent ring-1 ring-line">
+                    {outfitAdvice.accessory}
+                  </span>
+                )}
+              </div>
+              <p className="text-mute mt-0.5 truncate">{outfitAdvice.outfit}</p>
             </div>
           </div>
         )}
@@ -235,7 +241,7 @@ export function NowPage() {
                   selectWhen(opt.id);
                 }}
                 className={cn(
-                  "inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition active:scale-95",
+                  "inline-flex min-h-[40px] sm:min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-semibold transition active:scale-95 touch-manipulation",
                   selected ? "bg-brand text-white shadow-2xs" : "text-mute hover:text-ink",
                 )}
               >
@@ -264,7 +270,7 @@ export function NowPage() {
                   setCompany(opt.id);
                 }}
                 className={cn(
-                  "inline-flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition active:scale-95",
+                  "inline-flex min-h-[40px] sm:min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-semibold transition active:scale-95 touch-manipulation",
                   selected ? "bg-brand text-white shadow-2xs" : "text-mute hover:text-ink",
                 )}
               >

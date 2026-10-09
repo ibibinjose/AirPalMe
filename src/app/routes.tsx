@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import { Redirect, Route, Switch } from "wouter";
 import { BIO_PUBLIC_PATH } from "@shared/bio";
+import { isPassApp } from "@/lib/app-flavor";
 
 // Eager load the landing page for instant first paint; every other route splits out.
 import { HomePage } from "@/pages/HomePage";
@@ -114,7 +115,7 @@ export function AppRoutes() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Switch>
-        <Route path="/" component={HomePage} />
+        <Route path="/">{isPassApp() ? <Redirect to="/pass" /> : <HomePage />}</Route>
         <Route path="/now" component={NowPage} />
         {/* One composer: every legacy discovery front door lands on /now. */}
         <Route path="/explore">

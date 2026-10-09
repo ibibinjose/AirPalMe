@@ -2,6 +2,7 @@ import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Sparkles, Ticket } from "lucide-react";
 import { ECOSYSTEM } from "@/lib/brand";
+import { isPassApp } from "@/lib/app-flavor";
 import { triggerHapticSelection } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
@@ -40,6 +41,8 @@ export function EcosystemSwitcher({
   className,
 }: EcosystemSwitcherProps) {
   const [location, nav] = useLocation();
+  // Native Pass shell is pass-only: no cross-surface switcher (web unaffected).
+  if (isPassApp()) return null;
   const path = currentPath ?? location;
   const activeMode = getEcosystemMode(path);
 
@@ -101,7 +104,7 @@ export function EcosystemSwitcher({
       aria-label="AirPal Ecosystem Selector"
       className={cn(
         "relative inline-flex items-center rounded-full bg-card/85 p-1 ring-1 ring-line/80 shadow-xs backdrop-blur-md",
-        variant === "header" ? "h-10" : "h-11",
+        variant === "header" ? "min-h-[44px] h-11" : "min-h-[44px] h-11",
         className,
       )}
     >
@@ -112,7 +115,7 @@ export function EcosystemSwitcher({
         aria-selected={activeMode === "me"}
         onClick={() => handleSelect("me")}
         className={cn(
-          "relative z-10 flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-bold transition-colors cursor-pointer select-none touch-manipulation min-h-[36px]",
+          "relative z-10 flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-bold transition-colors cursor-pointer select-none touch-manipulation min-h-[38px] sm:min-h-[36px]",
           activeMode === "me" ? "text-white" : "text-mute hover:text-ink",
         )}
       >
@@ -142,7 +145,7 @@ export function EcosystemSwitcher({
         aria-selected={activeMode === "pass"}
         onClick={() => handleSelect("pass")}
         className={cn(
-          "relative z-10 flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-bold transition-colors cursor-pointer select-none touch-manipulation min-h-[36px]",
+          "relative z-10 flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-bold transition-colors cursor-pointer select-none touch-manipulation min-h-[38px] sm:min-h-[36px]",
           activeMode === "pass" ? "text-white" : "text-mute hover:text-ink",
         )}
       >

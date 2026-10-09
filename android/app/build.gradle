@@ -22,6 +22,17 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    flavorDimensions "app"
+    productFlavors {
+        airpal {
+            dimension "app"
+            applicationId "me.airpal.app"
+        }
+        pass {
+            dimension "app"
+            applicationId "me.airpal.pass"
+        }
+    }
     signingConfigs {
         release {
             if (keystorePropertiesFile.exists()) {

@@ -101,6 +101,13 @@ export async function openAppleWalletPass(url: string, title?: string): Promise<
       );
       return false;
     }
+    if (getNativePlatform() === "ios") {
+      // In iOS WKWebView / Capacitor, opening with target '_system' delegates
+      // the .pkpass mime type to iOS Safari, which automatically displays
+      // the native PKAddPassesViewController "Add to Apple Wallet" sheet.
+      window.open(url, "_system");
+      return true;
+    }
     const a = document.createElement("a");
     a.href = url;
     a.rel = "noopener noreferrer";

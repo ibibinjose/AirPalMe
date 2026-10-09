@@ -1,0 +1,7 @@
+// AirPal Pass (me.airpal.pass) build overrides for the single shared Xcode target.
+// Usage: xcodebuild -scheme App -xcconfig Pass.xcconfig ... (see docs/two-app-plan.md Phase B).
+// No pbxproj fork: the web bundle is flavor-agnostic and resolves the shell at runtime.
+PRODUCT_BUNDLE_IDENTIFIER = me.airpal.pass
+INFOPLIST_KEY_CFBundleDisplayName = AirPal Pass
+// Follow-ups (Phase B/C): per-flavor GoogleService-Info.plist handling, push
+// entitlements, and final AppIcon-Pass art (Pass currently reuses the AirPal AppIcon).

@@ -15,7 +15,7 @@ test.describe("Global Navigation & Profile Flow", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
-    await expect(page.getByRole("heading", { level: 1, name: "What do you want to do?" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /Plan your day\. Organise your life\./i })).toBeVisible();
     await expect(page.getByRole("button", { name: /search places, events, plans, or stays/i })).toBeVisible();
   });
 
@@ -59,13 +59,14 @@ test.describe("Global Navigation & Profile Flow", () => {
   });
 
   test("unauthenticated profile menu provides entry to auth and partner tracks", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 
     // Open profile menu
-    const menuTrigger = page.getByRole("button", { name: /menu and sign in/i });
+    const menuTrigger = page.getByRole("button", { name: /menu and sign in/i }).filter({ visible: true }).first();
     await expect(menuTrigger).toBeVisible();
-    await menuTrigger.click();
+    await menuTrigger.click({ force: true });
 
     // Dropdown options (filter visible since desktop and mobile markup coexist in DOM)
     await expect(page.getByText("Welcome to AirPal").filter({ visible: true })).toBeVisible();

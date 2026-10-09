@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Scaffold tint so the two shells are visually distinct; final Pass icon art is a design follow-up. -->
+<resources>
+    <color name="ic_launcher_background">#D97706</color>
+</resources>

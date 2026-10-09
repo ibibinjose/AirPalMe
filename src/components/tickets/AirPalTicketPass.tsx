@@ -64,8 +64,8 @@ export function AirPalTicketPass({ booking, guestName, hostName, showActions = t
   return (
     <article className="ticket-pass overflow-hidden rounded-3xl bg-brand text-white shadow-xs">
       <div className="flex items-start justify-between px-5 pt-4">
-        <p className="font-display text-2xl font-bold tracking-tight">
-          airpal<span className="text-accent">.me</span>
+        <p className="font-display text-2xl font-bold tracking-tight text-white">
+          airpal<span className="text-amber-300"> pass</span>
         </p>
         <p className="text-right text-[13px] font-semibold leading-tight opacity-90">
           {booking.date}

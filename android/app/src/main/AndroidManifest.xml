@@ -99,14 +99,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- App Links: https://airpal.me and www. Requires assetlinks.json + Play signing SHA-256. -->
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="airpal.me" />
-                <data android:scheme="https" android:host="www.airpal.me" />
-            </intent-filter>
+            <!-- App Links live in per-flavor manifests (src/airpal, src/pass) — merged here at build. -->
 
             <!-- Custom scheme for native share / Wave QR. -->
             <intent-filter>
@@ -114,7 +107,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="airpal" />
-                <data android:scheme="me.airpal.app" />
+                <data android:scheme="${applicationId}" />
             </intent-filter>
 
             <!-- NFC NDEF Wave greeting: https://airpal.me/w/{code} -->

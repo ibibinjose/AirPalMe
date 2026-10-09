@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AirPal shell: host-wide App Links (merged with the main manifest at build). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity android:name=".MainActivity">
+            <!-- App Links: https://airpal.me and www. Requires assetlinks.json + Play signing SHA-256. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="airpal.me" />
+                <data android:scheme="https" android:host="www.airpal.me" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

@@ -10,8 +10,8 @@ test.describe("Home journey", () => {
     await page.waitForLoadState("domcontentloaded");
 
     // Hero title and subtitle
-    await expect(page.getByRole("heading", { level: 1, name: "What do you want to do?" })).toBeVisible();
-    await expect(page.getByText("Find places, events, and plans.")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /Plan your day\. Organise your life\./i })).toBeVisible();
+    await expect(page.getByText(/My life, organised by AirPal\./i)).toBeVisible();
 
     // Search trigger
     await expect(page.getByRole("button", { name: /search places, events, plans, or stays/i })).toBeVisible();

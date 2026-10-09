@@ -1,6 +1,7 @@
 # AirPal store submission pack
 
-App: **AirPal** · ID `me.airpal.app` · version **2.0.0** (iOS build **12**, Android versionCode 6)
+App: **AirPal** · ID `me.airpal.app` · version **2.0.0** (iOS build **12**, Android versionCode 6)  
+App: **AirPal Pass** · ID `me.airpal.pass` · same version trains (Pass store launch gated — `docs/two-app-plan.md` Phase C). Listing: `docs/store/listing-pass.md` · Reviewer notes: `docs/store/reviewer-notes-pass.md`
 
 TestFlight: use **2.0.0**, not 1.0. Steps: `docs/store/testflight.md`. Xcode yellows: `docs/store/ios-compiler-warnings.md`.
 
@@ -32,13 +33,14 @@ Support email: AirPalMe@gmail.com (App Store / Play contact) · hello@airpal.me 
 
 ## Needs-you (cannot be done from this checkout)
 
-1. **Play App Signing SHA-256** → paste into `public/.well-known/assetlinks.json` (replacing `REPLACE_WITH_PLAY_APP_SIGNING_SHA256`), redeploy hosting.
+1. **Play App Signing SHA-256** → paste into `public/.well-known/assetlinks.json` (replacing `REPLACE_WITH_PLAY_APP_SIGNING_SHA256`, plus `REPLACE_WITH_PASS_PLAY_APP_SIGNING_SHA256` for the Pass listing), redeploy hosting.
 2. **Apple Team ID** → `26WGXSNG58` is in `apple-app-site-association`. Redeploy hosting after any change. Universal Links then verify automatically.
 3. **Screenshots + feature graphic + descriptions** → `docs/store/listing.md` has the copy; upload in Play Console / App Store Connect yourself.
 4. **Signing & upload** → run these on your Mac (builds need your keychain/keys; they cannot run in a sandboxed agent):
    ```sh
    npm run build && npx cap sync
-   cd android && ./gradlew :app:bundleRelease   # → android/app/build/outputs/bundle/release/app-release.aab
+   cd android && ./gradlew :app:bundleAirpalRelease :app:bundlePassRelease   # → android/app/build/outputs/bundle/{airpal,pass}/release/*.aab
+   # iOS Pass: archive scheme App with -xcconfig ios/App/Pass.xcconfig (bundle me.airpal.pass, display name "AirPal Pass")
    ```
    This pack (21 Sep 2026): signed AAB **versionCode 6** at that path; iOS IPA **2.0.0 (11)** at `ios/App/build/export/AirPal.Me.ipa` (includes `NSLocationAlwaysAndWhenInUseUsageDescription`). Upload the AAB to Play Console. Select build **11** in App Store Connect (upload if it is not Processing yet). Then paste Play App Signing SHA-256 (item 1) and redeploy hosting.
 5. **App Information / questionnaires** → paste `docs/store/app-information.md` into App Store Connect App Information (name, subtitle, categories, content rights, age ratings) and Play Console listing + IARC + Data safety (`docs/store/play-data-safety.md`). 17+ App Store / 18+ Play. No ads. No IAP server URLs.

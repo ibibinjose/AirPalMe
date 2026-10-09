@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite --port 3000 --host 0.0.0.0",
+    "dev:pass": "VITE_APP_FLAVOR=pass vite --port 3001 --host 0.0.0.0",
     "start": "npm run dev",
     "build": "tsc --noEmit && vite build && node scripts/prerender-routes.mjs",
     "preview": "vite preview --port 3000 --host 0.0.0.0",
@@ -17,6 +18,7 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "test:e2e:pass": "playwright test --config=playwright.pass.config.ts",
     "functions:test": "npm --prefix functions run test",
     "functions:build": "npm --prefix functions run build",
     "ci:install": "npm ci && npm --prefix functions ci",

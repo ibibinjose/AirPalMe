@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pass shell: pass-path-scoped App Links (merged with the main manifest at build). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity android:name=".MainActivity">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="airpal.me" />
+                <data android:scheme="https" android:host="www.airpal.me" />
+                <data android:pathPrefix="/pass" />
+                <data android:pathPrefix="/events" />
+                <data android:pathPrefix="/event" />
+                <data android:pathPrefix="/e/" />
+                <data android:pathPrefix="/ticket/" />
+                <data android:pathPrefix="/me/tickets" />
+                <data android:pathPrefix="/scan" />
+                <data android:pathPrefix="/deals" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
