@@ -10,7 +10,7 @@ export type AdminTab =
   | "experiences"
   | "search"
   | "safety"
-  | "studio"
+  | "partners"
   | "system"
   | "audit"
   | "audience"
@@ -23,7 +23,7 @@ export const ADMIN_TABS: { id: AdminTab; label: string }[] = [
   { id: "experiences", label: "Experiences" },
   { id: "search", label: "Search" },
   { id: "safety", label: "Safety" },
-  { id: "studio", label: "Studio" },
+  { id: "partners", label: "Partners" },
   { id: "system", label: "System" },
   { id: "audit", label: "Audit" },
   { id: "audience", label: "Audience" },
@@ -53,7 +53,7 @@ async function countAll(col: string): Promise<number> {
   return snap.data().count;
 }
 
-/** Platform overview: live marketplace KPIs. Money is pre-Stripe until payments land. */
+/** Platform overview: live marketplace KPIs. GMV sums recent bookings' priceCents. */
 export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => void }) {
   const [kpis, setKpis] = useState<Kpi[] | null>(null);
 
@@ -75,7 +75,7 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
           cPending,
           cLive,
           sNew,
-          wNew,
+          pNew,
           audits,
           searchQueries,
         ] = await Promise.all([
@@ -88,11 +88,11 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
           countIn("campaigns", "status", "pending"),
           countIn("campaigns", "status", "live"),
           countIn("safety_reports", "status", "new"),
-          countIn("studio_walkthroughs", "status", "new"),
+          countIn("partner_leads", "status", "new"),
           countAll("admin_audits"),
           countAll("popular_searches"),
         ]);
-        // GMV over recent bookings — indicative only, pre-Stripe.
+        // GMV over recent bookings — indicative only (last 100, priceCents).
         let gmv = 0;
         try {
           const db = getFirebaseDb();
@@ -178,10 +178,10 @@ export function AdminOverview({ onSelectTab }: { onSelectTab: (t: AdminTab) => v
             urgent: sNew > 0,
           },
           {
-            label: "Studio Leads",
-            value: String(wNew),
+            label: "Partner Leads",
+            value: String(pNew),
             hint: "partner inquiries",
-            tab: "studio",
+            tab: "partners",
             badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
           },
           {

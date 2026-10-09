@@ -259,13 +259,18 @@ async function transferProviderShare(booking: Booking): Promise<{
     return { payoutStatus: "held", transferId: "", stripeAccountId: accountId, reason: "onboarding" };
   }
   const fees = quoteFees(booking.priceCents, await loadFeeConfig());
-  const transfer = await stripe.transfers.create({
-    amount: fees.providerCents,
-    currency: "aud",
-    destination: accountId,
-    source_transaction: booking.stripeChargeId,
-    metadata: { bookingId: booking.id, providerUid: booking.providerUid },
-  });
+  // Same key on every attempt for this booking: concurrent releases and
+  // crash-then-retry both collapse onto one transfer instead of double-paying.
+  const transfer = await stripe.transfers.create(
+    {
+      amount: fees.providerCents,
+      currency: "aud",
+      destination: accountId,
+      source_transaction: booking.stripeChargeId,
+      metadata: { bookingId: booking.id, providerUid: booking.providerUid },
+    },
+    { idempotencyKey: payoutIdempotencyKey(booking.id) },
+  );
   const now = new Date().toISOString();
   await db.collection("payouts").doc(transfer.id).set({
     id: transfer.id,
@@ -312,6 +317,23 @@ function checkoutReturnUrls(origin: string, booking: Booking, bookingId: string)
 }
 
 /** Checkout totals must be finite positive dollars before a Stripe session exists. */
+/** Stable per booking: retries replay the original transfer instead of double-paying. */
+export function payoutIdempotencyKey(bookingId: string): string {
+  return `payout-${bookingId}`;
+}
+
+/** Stable per booking: retries replay the original refund instead of double-refunding. */
+export function refundIdempotencyKey(bookingId: string): string {
+  return `refund-${bookingId}`;
+}
+
+/** A dispute retry must not reverse an already-reversed transfer (webhook 500 loop). */
+export function needsTransferReversal(b: Pick<Booking, "status" | "payoutStatus" | "stripeTransferId">): boolean {
+  if (!b.stripeTransferId) return false;
+  if (b.status === "disputed" && b.payoutStatus === "reversed") return false;
+  return true;
+}
+
 export function assertChargeableAmount(totalAmount: number): void {
   if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
     throw new HttpsError("failed-precondition", "This experience has no chargeable amount.");
@@ -1351,10 +1373,15 @@ export const refundPaidBooking = onCall(STRIPE_CALLABLE, async (request) => {
   const now = new Date().toISOString();
   if (stripeLiveConfigured() && (booking.stripeChargeId || booking.stripePaymentIntentId)) {
     const stripe = makeStripe();
-    await stripe.refunds.create({
-      ...(booking.stripeChargeId ? { charge: booking.stripeChargeId } : { payment_intent: booking.stripePaymentIntentId as string }),
-      metadata: { bookingId, providerUid: booking.providerUid },
-    });
+    await stripe.refunds.create(
+      {
+        ...(booking.stripeChargeId
+          ? { charge: booking.stripeChargeId }
+          : { payment_intent: booking.stripePaymentIntentId as string }),
+        metadata: { bookingId, providerUid: booking.providerUid },
+      },
+      { idempotencyKey: refundIdempotencyKey(bookingId) },
+    );
   }
   await ref.update({
     paymentStatus: "refunded",
@@ -1373,7 +1400,14 @@ async function reverseTransferForDispute(chargeId: string): Promise<void> {
   const docSnap = bookings.docs[0]!;
   const booking = docSnap.data() as Booking;
   const transferId = booking.stripeTransferId;
-  if (!transferId || !stripeLiveConfigured()) {
+  if (!transferId || !needsTransferReversal(booking)) {
+    await docSnap.ref.update({
+      status: "disputed",
+      updatedAt: new Date().toISOString(),
+    });
+    return;
+  }
+  if (!stripeLiveConfigured()) {
     await docSnap.ref.update({
       status: "disputed",
       updatedAt: new Date().toISOString(),

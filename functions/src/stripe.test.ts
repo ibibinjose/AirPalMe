@@ -37,6 +37,9 @@ vi.mock("firebase-functions/v2/https", () => ({
 
 import {
   assertChargeableAmount,
+  needsTransferReversal,
+  payoutIdempotencyKey,
+  refundIdempotencyKey,
   sandboxBookingsAllowed,
   stayCheckoutReturnUrls,
   stripeLiveConfigured,
@@ -99,5 +102,26 @@ describe("assertChargeableAmount", () => {
         expect.objectContaining({ code: "failed-precondition" }),
       );
     }
+  });
+});
+
+describe("money idempotency keys", () => {
+  it("pins one stable key per booking so retries replay instead of duplicating", () => {
+    expect(payoutIdempotencyKey("bk-1")).toBe(payoutIdempotencyKey("bk-1"));
+    expect(refundIdempotencyKey("bk-1")).toBe(refundIdempotencyKey("bk-1"));
+    expect(payoutIdempotencyKey("bk-1")).not.toBe(payoutIdempotencyKey("bk-2"));
+    expect(payoutIdempotencyKey("bk-1")).not.toBe(refundIdempotencyKey("bk-1"));
+  });
+});
+
+describe("needsTransferReversal", () => {
+  it("reverses once, then stands down on webhook retries", () => {
+    expect(
+      needsTransferReversal({ status: "confirmed", payoutStatus: "transferred", stripeTransferId: "tr-1" }),
+    ).toBe(true);
+    expect(
+      needsTransferReversal({ status: "disputed", payoutStatus: "reversed", stripeTransferId: "tr-1" }),
+    ).toBe(false);
+    expect(needsTransferReversal({ status: "confirmed", payoutStatus: "held" })).toBe(false);
   });
 });

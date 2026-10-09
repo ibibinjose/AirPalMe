@@ -504,23 +504,6 @@ match /dining_orders/{orderId} {
       allow delete: if false;
     }
 
-    // AirPal Studio walkthrough bookings: owner + admins can read; team triages.
-    match /studio_walkthroughs/{bookingId} {
-      allow read: if signedIn() && (
-        resource.data.ownerUid == request.auth.uid ||
-        platformAdmin()
-      );
-      allow create: if signedIn()
-        && !isAnonymous()
-        && request.resource.data.ownerUid == request.auth.uid
-        && request.resource.data.keys().hasAny(['updatedAt']);
-      allow update: if signedIn() && platformAdmin();
-      allow delete: if signedIn() && (
-        resource.data.ownerUid == request.auth.uid ||
-        platformAdmin()
-      );
-    }
-
     // §20 operating system: every admin action writes here. Admins only.
     match /admin_audits/{auditId} {
       allow create: if signedIn() && platformAdmin()

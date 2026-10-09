@@ -16,6 +16,7 @@ const { fakes, FakeHttpsError } = vi.hoisted(() => {
       events: {} as Record<string, Record<string, unknown>>,
       plans: {} as Record<string, Record<string, unknown>>,
       writes: [] as { id: string; data: Record<string, unknown> }[],
+      transactions: 0,
       audits: [] as unknown[],
       rateLimited: [] as string[],
       guestlistMarks: [] as unknown[][],
@@ -45,6 +46,13 @@ vi.mock("./admin", () => ({
         },
       }),
     }),
+    runTransaction: async (fn: (tx: unknown) => Promise<unknown>) => {
+      fakes.transactions += 1;
+      return fn({
+        get: (ref: { get: () => Promise<unknown> }) => ref.get(),
+        set: (ref: { set: (data: unknown) => Promise<void> }, data: unknown) => ref.set(data),
+      });
+    },
   },
 }));
 
@@ -109,6 +117,7 @@ describe("gate scan", () => {
     fakes.events = {};
     fakes.plans = {};
     fakes.writes.length = 0;
+    fakes.transactions = 0;
     fakes.audits.length = 0;
     fakes.rateLimited.length = 0;
     fakes.guestlistMarks.length = 0;
@@ -208,6 +217,17 @@ describe("gate scan", () => {
     expect(fakes.writes).toEqual([]);
     expect(fakes.audits).toEqual([]);
     expect(fakes.guestlistMarks).toEqual([]);
+  });
+
+  it("admitTicket decides inside one transaction and keeps the first stamp on rescan", async () => {
+    fakes.bookings = { "bk-1": { ...PAID_BOOKING } };
+    const first = await run(admitTicket, "org-1", { ticketId: "bk-1" });
+    const second = await run(admitTicket, "org-1", { ticketId: "bk-1" });
+    expect(fakes.transactions).toBe(2);
+    expect(second).toEqual({ ticketId: "bk-1", admittedAt: first.admittedAt, already: true });
+    expect(fakes.writes).toHaveLength(1);
+    expect(fakes.audits).toHaveLength(1);
+    expect(fakes.guestlistMarks).toHaveLength(1);
   });
 
   it("admitTicket refuses cancelled tickets without writing", async () => {

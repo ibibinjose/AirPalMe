@@ -98,6 +98,48 @@ must(existsSync(resolve(root, "firebase.json")), "firebase.json missing");
   }
 }
 
+// Multiple equality filters on different fields also need a composite index
+// (single-field indexes never combine). Same silent failed-precondition.
+{
+  const defined = JSON.parse(indexes).indexes || [];
+  const coversPair = (group, first, second) =>
+    defined.some(
+      (entry) =>
+        entry.collectionGroup === group &&
+        entry.fields.length >= 2 &&
+        entry.fields[0].fieldPath === first &&
+        "order" in entry.fields[0] &&
+        entry.fields[1].fieldPath === second &&
+        "order" in entry.fields[1],
+    );
+  const scan = (dir, admin) => {
+    for (const file of walk(dir)) {
+      const text = readFileSync(file, "utf8");
+      // Adjacent where() pairs: query(..., where(A), where(B)) or ref.where(A).where(B).
+      const pairRe = admin
+        ? /\.where\("([^"]+)",\s*"=="[^)]*\)\.where\("([^"]+)",\s*"==""/g
+        : /where\("([^"]+)",\s*"=="[^)]*?\)\s*,\s*where\("([^"]+)",\s*"=="/g;
+      let match;
+      while ((match = pairRe.exec(text))) {
+        const [, first, second] = match;
+        if (first === second) continue;
+        const before = text.slice(Math.max(0, match.index - 800), match.index);
+        const collAt = admin ? before.lastIndexOf('.collection("') : before.lastIndexOf("collection(");
+        if (collAt < 0) continue;
+        const strings = [...before.slice(collAt, collAt + 200).matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+        if (!strings.length) continue;
+        const group = admin ? strings[0] : strings[strings.length - 1];
+        must(
+          coversPair(group, first, second),
+          `${file.replace(root + "/", "")}: query on "${group}" needs composite index (${first}, ${second}) in firestore.indexes.json`,
+        );
+      }
+    }
+  };
+  scan(resolve(root, "src"), false);
+  scan(resolve(root, "functions", "src"), true);
+}
+
 if (problems.length) {
   console.error("Firebase rules check failed:");
   for (const problem of problems) console.error(`- ${problem}`);

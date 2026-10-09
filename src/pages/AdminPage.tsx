@@ -17,7 +17,6 @@ import { GuestListPanel } from "@/components/club/GuestListPanel";
 import { CompanionAdmin } from "@/components/admin/CompanionAdmin";
 import { DemoAdmin } from "@/components/admin/DemoAdmin";
 import { MateRequestsAdmin } from "@/components/admin/MateRequestsAdmin";
-import { StudioInboxAdmin } from "@/components/admin/StudioInboxAdmin";
 import { PartnerLeadsAdmin } from "@/components/admin/PartnerLeadsAdmin";
 import { SafetyInboxAdmin } from "@/components/admin/SafetyInboxAdmin";
 import { CampaignInboxAdmin } from "@/components/admin/CampaignInboxAdmin";
@@ -560,12 +559,7 @@ export function AdminPage() {
 
           {tab === "mates" && <CompanionAdmin />}
           {tab === "marketplace" && <MateRequestsAdmin />}
-          {tab === "studio" && (
-            <div className="space-y-6">
-              <StudioInboxAdmin />
-              <PartnerLeadsAdmin />
-            </div>
-          )}
+          {tab === "partners" && <PartnerLeadsAdmin />}
           {tab === "safety" && <SafetyInboxAdmin />}
           {tab === "search" && <SearchQueriesDashboardTab />}
           {tab === "experiences" && (

@@ -94,16 +94,27 @@ export const admitTicket = onCall(CALLABLE, async (request) => {
   await enforceRateLimit(uid, "gate", false);
   const ticketId = ticketIdFromRequest(request.data as AdmitTicketRequest | undefined);
   const { ref, booking } = await loadEntitledTicket(ticketId, uid, request.auth?.token as AccessClaims | undefined);
-  if (booking.admittedAt) {
-    const already: AdmitTicketResponse = { ticketId, admittedAt: booking.admittedAt, already: true };
+  // Atomic admit: two door scanners hitting the same QR concurrently must not
+  // both pass the admittedAt check. The transaction serializes the decision.
+  const result = await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists) throw new HttpsError("not-found", "Ticket not found.");
+    const current = { id: snap.id, ...(snap.data() as Omit<Booking, "id">) };
+    if (current.admittedAt) {
+      return { admittedAt: current.admittedAt, already: true };
+    }
+    const check = ticketAdmitCheck(current);
+    if (!check.valid) {
+      throw new HttpsError("failed-precondition", ticketAdmitReasonLabel(check.reason));
+    }
+    const now = new Date().toISOString();
+    tx.set(ref, { admittedAt: now, admittedByUid: uid, updatedAt: now }, { merge: true });
+    return { admittedAt: now, already: false };
+  });
+  if (result.already) {
+    const already: AdmitTicketResponse = { ticketId, admittedAt: result.admittedAt, already: true };
     return already;
   }
-  const check = ticketAdmitCheck(booking);
-  if (!check.valid) {
-    throw new HttpsError("failed-precondition", ticketAdmitReasonLabel(check.reason));
-  }
-  const now = new Date().toISOString();
-  await ref.set({ admittedAt: now, admittedByUid: uid, updatedAt: now }, { merge: true });
   await writeAudit({
     collection: "bookings",
     docId: ticketId,
@@ -116,6 +127,6 @@ export const admitTicket = onCall(CALLABLE, async (request) => {
   } else if (booking.planId) {
     await markTicketCheckedIn("plan", String(booking.planId), ticketId, String(booking.customerUid || ""));
   }
-  const admitted: AdmitTicketResponse = { ticketId, admittedAt: now, already: false };
+  const admitted: AdmitTicketResponse = { ticketId, admittedAt: result.admittedAt, already: false };
   return admitted;
 });
