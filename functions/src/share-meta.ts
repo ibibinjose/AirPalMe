@@ -145,6 +145,14 @@ async function resolvePropertyCard(id: string, origin: string): Promise<ShareCar
   );
 }
 
+async function resolvePromotionCard(id: string, origin: string): Promise<ShareCard> {
+  const doc = await getDocData("promotions", id);
+  if (!doc || doc.kind !== "promotion") return genericCard(origin);
+  const status = str(doc.status).toLowerCase();
+  if (status !== "live" && status !== "approved") return genericCard(origin);
+  return shareCardFor("promotion", doc, origin);
+}
+
 async function resolveDemoHotelCard(origin: string): Promise<ShareCard> {
   const doc = await getDocData("properties", "harbour-hotel");
   if (!doc) return shareCardFor("demoHotel", {}, origin);
@@ -158,6 +166,7 @@ async function resolveCard(pathname: string, origin: string): Promise<ShareCard 
   if ((match = /^\/e\/([^/]+)/.exec(path))) return resolveEventCard(match[1]!, origin);
   if ((match = /^\/p\/([^/]+)/.exec(path))) return resolvePlaceCard(match[1]!, origin);
   if ((match = /^\/pulse\/([^/]+)/.exec(path))) return resolvePulseCard(match[1]!, origin);
+  if ((match = /^\/deals\/([^/]+)/.exec(path))) return resolvePromotionCard(match[1]!, origin);
   if ((match = /^\/invite\/([^/]+)/.exec(path))) return resolvePlanCardByInvite(match[1]!, origin);
   if ((match = /^\/plan\/([^/]+)/.exec(path))) {
     const id = match[1]!;

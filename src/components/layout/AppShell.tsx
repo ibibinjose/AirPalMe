@@ -12,6 +12,7 @@ import { BatteryWarningBanner } from "./BatteryWarningBanner";
 import { SyncStatusBar } from "./SyncStatusBar";
 import { NetworkStatusToast } from "./NetworkStatusToast";
 import { applyRouteMeta } from "@/lib/share-meta";
+import { isPassApp } from "@/lib/app-flavor";
 import {
   OPEN_SEARCH_EVENT,
   SEARCH_READY_EVENT,
@@ -56,6 +57,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     forceUnlockBodyScroll();
   }, [path]);
   const workspace = isWorkspacePath(path);
+  const homePath = isPassApp() || path.startsWith("/pass") ? "/pass" : "/";
   // Plan detail + invite links own the bottom slot with their Share/RSVP bar —
   // rendering the tab bar too would stack two fixed bars on mobile.
   // (/plan/new keeps the tab bar: it has no action bar of its own.)
@@ -147,7 +149,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <header className="overflow-visible border-b border-line bg-paper">
                 <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-3 sm:px-4 md:h-16 md:px-6">
                   <div className="flex items-center gap-2 min-w-0">
-                    <Link href="/" className="flex items-center min-w-0">
+                    <Link href={homePath} className="flex items-center min-w-0">
                       <BrandMark compact={false} />
                     </Link>
                   </div>
@@ -207,7 +209,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   className="apple-liquid-glass-nav flex h-14 items-center justify-between px-3.5 sm:px-4 lg:hidden transition-colors"
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <Link href="/" className="flex items-center min-w-0" aria-label="AirPal Home">
+                    <Link href={homePath} className="flex items-center min-w-0" aria-label="AirPal Home">
                       <BrandMark compact={false} />
                     </Link>
                   </div>

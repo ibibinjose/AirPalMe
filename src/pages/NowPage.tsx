@@ -241,7 +241,7 @@ export function NowPage() {
                   selectWhen(opt.id);
                 }}
                 className={cn(
-                  "inline-flex min-h-[40px] sm:min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-semibold transition active:scale-95 touch-manipulation",
+                  "inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-semibold transition active:scale-95 touch-manipulation",
                   selected ? "bg-brand text-white shadow-2xs" : "text-mute hover:text-ink",
                 )}
               >
@@ -270,7 +270,7 @@ export function NowPage() {
                   setCompany(opt.id);
                 }}
                 className={cn(
-                  "inline-flex min-h-[40px] sm:min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-semibold transition active:scale-95 touch-manipulation",
+                  "inline-flex min-h-[44px] cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-semibold transition active:scale-95 touch-manipulation",
                   selected ? "bg-brand text-white shadow-2xs" : "text-mute hover:text-ink",
                 )}
               >
@@ -356,7 +356,7 @@ export function NowPage() {
                 <button
                   type="button"
                   onClick={handleShareSuggestion}
-                  className="inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-paper text-mute ring-1 ring-line/80 transition hover:bg-card hover:text-ink active:scale-95 touch-manipulation focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                  className="relative inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-paper text-mute ring-1 ring-line/80 transition hover:bg-card hover:text-ink active:scale-95 touch-manipulation focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand after:absolute after:-inset-1 after:content-['']"
                   aria-label="Share this suggestion"
                   title="Share suggestion"
                 >

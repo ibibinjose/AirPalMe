@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { listGuestlistSignupsRemote } from "@/lib/functions";
 import { GUESTLIST_INTERESTS } from "@shared/airpal-guestlist";
+import { toZonedDateStr } from "@/lib/local-time";
 
 interface SignupRow {
   email: string;
@@ -131,7 +132,7 @@ export function GuestlistSignupsAdmin() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `airpal-guestlist-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `airpal-guestlist-${toZonedDateStr(new Date())}.csv`;
       a.click();
       URL.revokeObjectURL(url);
       toast.success(`Exported ${all.length} signups.`);

@@ -1,7 +1,8 @@
 import { Suspense, lazy } from "react";
-import { Redirect, Route, Switch } from "wouter";
+import { Redirect, Route, Switch, useLocation } from "wouter";
 import { BIO_PUBLIC_PATH } from "@shared/bio";
 import { isPassApp } from "@/lib/app-flavor";
+import { RouteErrorBoundary } from "@/components/RouteErrorBoundary";
 
 // Eager load the landing page for instant first paint; every other route splits out.
 import { HomePage } from "@/pages/HomePage";
@@ -104,7 +105,11 @@ function RouteFallback() {
   // Full-viewport reserve: keeps the footer below the fold while the route
   // chunk loads, so the fallback→content swap never shifts visible layout.
   return (
-    <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-3 p-8" role="status" aria-live="polite">
+    <div
+      className="flex min-h-[100dvh] flex-col items-center justify-center gap-3 p-8"
+      role="status"
+      aria-live="polite"
+    >
       <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
       <p className="text-sm text-mute">Loading</p>
     </div>
@@ -112,173 +117,178 @@ function RouteFallback() {
 }
 
 export function AppRoutes() {
+  const [location] = useLocation();
   return (
-    <Suspense fallback={<RouteFallback />}>
-      <Switch>
-        <Route path="/">{isPassApp() ? <Redirect to="/pass" /> : <HomePage />}</Route>
-        <Route path="/now" component={NowPage} />
-        {/* One composer: every legacy discovery front door lands on /now. */}
-        <Route path="/explore">
-          <Redirect to="/now" />
-        </Route>
-        <Route path="/discover">
-          <Redirect to="/now" />
-        </Route>
-        <Route path="/discovery">
-          <Redirect to="/now" />
-        </Route>
-        <Route path="/search">
-          <Redirect to="/now" />
-        </Route>
-        <Route path="/admin/search-analytics" component={SearchAnalyticsPage} />
-        <Route path="/search/analytics">
-          <Redirect to="/admin/search-analytics" />
-        </Route>
-        <Route path="/guide" component={GuidePage} />
-        <Route path="/tour/:id" component={TourPage} />
-        <Route path="/scan" component={ScanPage} />
-        <Route path="/w/:code" component={WavePage} />
-        <Route path="/concierge" component={ConciergePage} />
-        <Route path="/stay" component={StayListPage} />
-        <Route path="/g/:id" component={StayPage} />
-        <Route path="/stay/@:handle" component={StayProfilePage} />
-        <Route path="/stay/:id" component={StayPage} />
-        <Route path="/q/:city/:handle" component={MarkerPage} />
-        <Route path="/q/:a" component={MarkerPage} />
-        <Route path="/q">
-          <Redirect to="/q/syd-rocks-argyle" />
-        </Route>
-        <Route path="/p/:id" component={PlacePage} />
-        <Route path="/e/:eventId/s/:stallId" component={StallPage} />
-        <Route path="/e/:id/guests" component={GuestlistPage} />
-        <Route path="/e/:id" component={EventPage} />
-        <Route path="/ticket/:id" component={TicketPage} />
-        <Route path="/calendar" component={CalendarPage} />
-        <Route path="/events" component={EventsPage} />
-        <Route path="/pass" component={PassPage} />
-        <Route path="/pass/events">
-          <Redirect to="/events" />
-        </Route>
-        <Route path="/pass/deals">
-          <Redirect to="/deals" />
-        </Route>
-        <Route path="/pass/tickets">
-          <Redirect to="/me/tickets" />
-        </Route>
-        <Route path="/plans">
-          <Redirect to="/plan" />
-        </Route>
-        <Route path="/plan/new" component={PlanCreatePage} />
-        <Route path="/plan/:id/edit" component={PlanEditPage} />
-        <Route path="/plan/:id/guests" component={GuestlistPage} />
-        <Route path="/plan/:id" component={PlanDetailPage} />
-        <Route path="/plan" component={PlanHubPage} />
-        <Route path="/invite/:code" component={PlanDetailPage} />
-        <Route path="/event/new">
-          <Redirect to="/event" />
-        </Route>
-        <Route path="/event" component={OrganiserEventPage} />
-        <Route path="/me/memories" component={MemoryWallPage} />
-        <Route path="/me/inbox" component={InboxPage} />
-        <Route path="/inbox">
-          <Redirect to="/me/inbox" />
-        </Route>
-        <Route path="/chat">
-          <Redirect to="/me/inbox" />
-        </Route>
-        <Route path="/messages">
-          <Redirect to="/me/inbox" />
-        </Route>
-        <Route path="/me/tickets" component={MyTicketsPage} />
-        <Route path="/me" component={MePage} />
-        <Route path="/settings" component={SettingsPage} />
-        <Route path="/host/pulse" component={HostPulsePage} />
-        <Route path="/host" component={HostPage} />
-        <Route path="/pulse" component={PulseHubPage} />
-        <Route path="/pulse/:publicToken" component={PulsePublicPage} />
-        <Route path="/start" component={StartPage} />
-        <Route path="/reset">
-          <Redirect to="/start?tab=reset" />
-        </Route>
-        <Route path="/auth/action" component={AuthActionPage} />
-        <Route path="/join" component={JoinPage} />
-        <Route path="/founders" component={FoundersPage} />
-        <Route path="/business/onboard" component={BusinessOnboardPage} />
-        <Route path="/business/setup" component={BusinessShowcasePage} />
-        <Route path="/business/helpdesk">
-          <Redirect to="/helpdesk" />
-        </Route>
-        <Route path="/host/helpdesk">
-          <Redirect to="/helpdesk" />
-        </Route>
-        <Route path="/helpdesk" component={HelpDeskPage} />
-        <Route path="/business" component={BusinessPage} />
-        <Route path="/bio/setup" component={BioSetupPage} />
-        <Route path="/bio/edit" component={BioEditPage} />
-        <Route path="/bio/recover" component={BioRecoverPage} />
-        <Route path="/auth">
-          <Redirect to="/start?tab=signin" />
-        </Route>
-        <Route path="/signin">
-          <Redirect to="/start?tab=signin" />
-        </Route>
-        <Route path="/partners" component={PartnersPage} />
-        <Route path="/partner" component={PartnerPage} />
-        <Route path="/listings">
-          <Redirect to="/partners" />
-        </Route>
-        <Route path="/admin" component={AdminPage} />
-        <Route path="/admin/promotions" component={PromotionsAdminPage} />
-        <Route path="/admin/promotions/:id" component={PromotionAdminDetailPage} />
-        <Route path="/business/promotions/new" component={BusinessPromotionNewPage} />
-        <Route path="/business/promotions/:id" component={BusinessPromotionDetailPage} />
-        <Route path="/business/promotions" component={BusinessPromotionsPage} />
-        <Route path="/admin/notifications" component={NotificationsAdminPage} />
-        {/* One deals surface: legacy deal homes land on /deals. */}
-        <Route path="/deals/:id">
-          <PromotionDetailPage kind="promotion" />
-        </Route>
-        <Route path="/deals" component={PromotionsPage} />
-        <Route path="/offers">
-          <Redirect to="/deals" />
-        </Route>
-        <Route path="/promotions">
-          <Redirect to="/deals" />
-        </Route>
-        <Route path="/promotions/:id">{(p) => <Redirect to={`/deals/${p.id}`} />}</Route>
-        <Route path="/giveaways">
-          <Redirect to="/deals" />
-        </Route>
-        <Route path="/giveaways/:id">{(p) => <Redirect to={`/deals/${p.id}`} />}</Route>
-        <Route path="/birthday-freebies">
-          <Redirect to="/deals" />
-        </Route>
-        <Route path="/birthday-freebies/:region">
-          <Redirect to="/deals" />
-        </Route>
-        <Route path="/getAirPalApp" component={GetAirPalPage} />
-        <Route path="/getAirPal">
-          <Redirect to="/getAirPalApp" />
-        </Route>
-        <Route path="/about" component={AboutPage} />
-        <Route path="/trust" component={TrustPage} />
-        <Route path="/alternatives/:slug" component={AlternativePage} />
-        <Route path="/contact" component={ContactPage} />
-        <Route path="/help" component={HelpPage} />
-        <Route path="/assist" component={AssistPage} />
-        <Route path="/unsubscribe" component={UnsubscribePage} />
-        <Route path="/privacy" component={PrivacyPage} />
-        <Route path="/terms" component={TermsPage} />
-        <Route path="/cookies" component={CookiesPage} />
-        <Route path="/legal">
-          <Redirect to="/privacy" />
-        </Route>
-        <Route path="/os">
-          <Redirect to="/concierge" />
-        </Route>
-        <Route path={BIO_PUBLIC_PATH} component={BioPublicPage} />
-        <Route component={NotFoundPage} />
-      </Switch>
-    </Suspense>
+    // Outside Suspense so rejected chunk imports are caught too; the location
+    // key clears a stale error as soon as navigation succeeds elsewhere.
+    <RouteErrorBoundary resetKeys={[location]}>
+      <Suspense fallback={<RouteFallback />}>
+        <Switch>
+          <Route path="/">{isPassApp() ? <Redirect to="/pass" /> : <HomePage />}</Route>
+          <Route path="/now" component={NowPage} />
+          {/* One composer: every legacy discovery front door lands on /now. */}
+          <Route path="/explore">
+            <Redirect to="/now" />
+          </Route>
+          <Route path="/discover">
+            <Redirect to="/now" />
+          </Route>
+          <Route path="/discovery">
+            <Redirect to="/now" />
+          </Route>
+          <Route path="/search">
+            <Redirect to="/now" />
+          </Route>
+          <Route path="/admin/search-analytics" component={SearchAnalyticsPage} />
+          <Route path="/search/analytics">
+            <Redirect to="/admin/search-analytics" />
+          </Route>
+          <Route path="/guide" component={GuidePage} />
+          <Route path="/tour/:id" component={TourPage} />
+          <Route path="/scan" component={ScanPage} />
+          <Route path="/w/:code" component={WavePage} />
+          <Route path="/concierge" component={ConciergePage} />
+          <Route path="/stay" component={StayListPage} />
+          <Route path="/g/:id" component={StayPage} />
+          <Route path="/stay/@:handle" component={StayProfilePage} />
+          <Route path="/stay/:id" component={StayPage} />
+          <Route path="/q/:city/:handle" component={MarkerPage} />
+          <Route path="/q/:a" component={MarkerPage} />
+          <Route path="/q">
+            <Redirect to="/q/syd-rocks-argyle" />
+          </Route>
+          <Route path="/p/:id" component={PlacePage} />
+          <Route path="/e/:eventId/s/:stallId" component={StallPage} />
+          <Route path="/e/:id/guests" component={GuestlistPage} />
+          <Route path="/e/:id" component={EventPage} />
+          <Route path="/ticket/:id" component={TicketPage} />
+          <Route path="/calendar" component={CalendarPage} />
+          <Route path="/events" component={EventsPage} />
+          <Route path="/pass" component={PassPage} />
+          <Route path="/pass/events">
+            <Redirect to="/events" />
+          </Route>
+          <Route path="/pass/deals">
+            <Redirect to="/deals" />
+          </Route>
+          <Route path="/pass/tickets">
+            <Redirect to="/me/tickets" />
+          </Route>
+          <Route path="/plans">
+            <Redirect to="/plan" />
+          </Route>
+          <Route path="/plan/new" component={PlanCreatePage} />
+          <Route path="/plan/:id/edit" component={PlanEditPage} />
+          <Route path="/plan/:id/guests" component={GuestlistPage} />
+          <Route path="/plan/:id" component={PlanDetailPage} />
+          <Route path="/plan" component={PlanHubPage} />
+          <Route path="/invite/:code" component={PlanDetailPage} />
+          <Route path="/event/new">
+            <Redirect to="/event" />
+          </Route>
+          <Route path="/event" component={OrganiserEventPage} />
+          <Route path="/me/memories" component={MemoryWallPage} />
+          <Route path="/me/inbox" component={InboxPage} />
+          <Route path="/inbox">
+            <Redirect to="/me/inbox" />
+          </Route>
+          <Route path="/chat">
+            <Redirect to="/me/inbox" />
+          </Route>
+          <Route path="/messages">
+            <Redirect to="/me/inbox" />
+          </Route>
+          <Route path="/me/tickets" component={MyTicketsPage} />
+          <Route path="/me" component={MePage} />
+          <Route path="/settings" component={SettingsPage} />
+          <Route path="/host/pulse" component={HostPulsePage} />
+          <Route path="/host" component={HostPage} />
+          <Route path="/pulse" component={PulseHubPage} />
+          <Route path="/pulse/:publicToken" component={PulsePublicPage} />
+          <Route path="/start" component={StartPage} />
+          <Route path="/reset">
+            <Redirect to="/start?tab=reset" />
+          </Route>
+          <Route path="/auth/action" component={AuthActionPage} />
+          <Route path="/join" component={JoinPage} />
+          <Route path="/founders" component={FoundersPage} />
+          <Route path="/business/onboard" component={BusinessOnboardPage} />
+          <Route path="/business/setup" component={BusinessShowcasePage} />
+          <Route path="/business/helpdesk">
+            <Redirect to="/helpdesk" />
+          </Route>
+          <Route path="/host/helpdesk">
+            <Redirect to="/helpdesk" />
+          </Route>
+          <Route path="/helpdesk" component={HelpDeskPage} />
+          <Route path="/business" component={BusinessPage} />
+          <Route path="/bio/setup" component={BioSetupPage} />
+          <Route path="/bio/edit" component={BioEditPage} />
+          <Route path="/bio/recover" component={BioRecoverPage} />
+          <Route path="/auth">
+            <Redirect to="/start?tab=signin" />
+          </Route>
+          <Route path="/signin">
+            <Redirect to="/start?tab=signin" />
+          </Route>
+          <Route path="/partners" component={PartnersPage} />
+          <Route path="/partner" component={PartnerPage} />
+          <Route path="/listings">
+            <Redirect to="/partners" />
+          </Route>
+          <Route path="/admin" component={AdminPage} />
+          <Route path="/admin/promotions" component={PromotionsAdminPage} />
+          <Route path="/admin/promotions/:id" component={PromotionAdminDetailPage} />
+          <Route path="/business/promotions/new" component={BusinessPromotionNewPage} />
+          <Route path="/business/promotions/:id" component={BusinessPromotionDetailPage} />
+          <Route path="/business/promotions" component={BusinessPromotionsPage} />
+          <Route path="/admin/notifications" component={NotificationsAdminPage} />
+          {/* One deals surface: legacy deal homes land on /deals. */}
+          <Route path="/deals/:id">
+            <PromotionDetailPage kind="promotion" />
+          </Route>
+          <Route path="/deals" component={PromotionsPage} />
+          <Route path="/offers">
+            <Redirect to="/deals" />
+          </Route>
+          <Route path="/promotions">
+            <Redirect to="/deals" />
+          </Route>
+          <Route path="/promotions/:id">{(p) => <Redirect to={`/deals/${p.id}`} />}</Route>
+          <Route path="/giveaways">
+            <Redirect to="/deals" />
+          </Route>
+          <Route path="/giveaways/:id">{(p) => <Redirect to={`/deals/${p.id}`} />}</Route>
+          <Route path="/birthday-freebies">
+            <Redirect to="/deals" />
+          </Route>
+          <Route path="/birthday-freebies/:region">
+            <Redirect to="/deals" />
+          </Route>
+          <Route path="/getAirPalApp" component={GetAirPalPage} />
+          <Route path="/getAirPal">
+            <Redirect to="/getAirPalApp" />
+          </Route>
+          <Route path="/about" component={AboutPage} />
+          <Route path="/trust" component={TrustPage} />
+          <Route path="/alternatives/:slug" component={AlternativePage} />
+          <Route path="/contact" component={ContactPage} />
+          <Route path="/help" component={HelpPage} />
+          <Route path="/assist" component={AssistPage} />
+          <Route path="/unsubscribe" component={UnsubscribePage} />
+          <Route path="/privacy" component={PrivacyPage} />
+          <Route path="/terms" component={TermsPage} />
+          <Route path="/cookies" component={CookiesPage} />
+          <Route path="/legal">
+            <Redirect to="/privacy" />
+          </Route>
+          <Route path="/os">
+            <Redirect to="/concierge" />
+          </Route>
+          <Route path={BIO_PUBLIC_PATH} component={BioPublicPage} />
+          <Route component={NotFoundPage} />
+        </Switch>
+      </Suspense>
+    </RouteErrorBoundary>
   );
 }

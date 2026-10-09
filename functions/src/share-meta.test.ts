@@ -270,6 +270,33 @@ describe("shareMeta", () => {
     expect(res.body).not.toContain("s3cret");
   });
 
+  it("serves promotion cards for live deals", async () => {
+    fakes.docs["promotions/deal-1"] = {
+      kind: "promotion",
+      title: "2-for-1 Signature Cocktails",
+      sponsorName: "Harbour View Lounge",
+      discountText: "2-for-1",
+      heroImage: "/deals/cocktails.jpg",
+      status: "live",
+    };
+    const res = await run("/deals/deal-1", BOT_UA);
+    expect(res.status).toBe(200);
+    expect(res.body).toContain('<meta property="og:title" content="2-for-1 Signature Cocktails">');
+    expect(res.body).toContain("Harbour View Lounge");
+    expect(res.body).toContain('<meta property="og:image" content="https://airpal.me/deals/cocktails.jpg">');
+    expect(res.body).toContain('<link rel="canonical" href="https://airpal.me/deals/deal-1">');
+  });
+
+  it("serves generic cards for non-live or non-promotion deals (no oracle)", async () => {
+    fakes.docs["promotions/deal-9"] = { kind: "promotion", title: "Secret Draft", status: "draft" };
+    const draft = await run("/deals/deal-9", BOT_UA);
+    expect(draft.body).not.toContain("Secret Draft");
+    fakes.docs["promotions/giv-1"] = { kind: "giveaway", title: "Secret Giveaway", status: "live" };
+    const otherKind = await run("/deals/giv-1", BOT_UA);
+    expect(otherKind.body).not.toContain("Secret Giveaway");
+    expect(otherKind.body).toContain("AirPal.me · Life Made Easy.");
+  });
+
   it("rejects non-GET methods", async () => {
     let status = 0;
     await (shareMeta as unknown as Handler)(

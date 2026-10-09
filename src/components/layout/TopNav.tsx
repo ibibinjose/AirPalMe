@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { partnerAccountPath } from "@/lib/partner-account";
 import { BrowseMenu } from "@/components/layout/BrowseMenu";
+import { isPassApp } from "@/lib/app-flavor";
 import { NAMES } from "@shared/names";
 
 const LINKS = [
@@ -72,7 +73,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
           <button
             onClick={() => {
               void triggerHaptic("light");
-              nav("/");
+              nav(isPassApp() || path.startsWith("/pass") ? "/pass" : "/");
             }}
             className="shrink-0 text-left transition hover:opacity-90 cursor-pointer"
             aria-label="AirPal Home"

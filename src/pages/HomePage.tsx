@@ -215,15 +215,22 @@ export function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/30" />
         </div>
         <div className="relative px-4 pb-8 pt-8 md:px-8 md:pt-12">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md ring-1 ring-white/30">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              {city || "Sydney"} · Live
-              {completedCount > 0 && <> · {completedCount.toLocaleString("en-AU")} completed</>}
-            </span>
-            <span className="text-xs font-medium text-white/80">
-              {greeting}, {firstName}
-            </span>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md ring-1 ring-white/30">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                {city || "Sydney"} · Live
+                {completedCount > 0 && <> · {completedCount.toLocaleString("en-AU")} completed</>}
+              </span>
+              <span className="text-xs font-medium text-white/80">
+                {greeting}, {firstName}
+              </span>
+            </div>
+            <img
+              src="/brand/airpal-me-logo-white.png"
+              alt="AirPal Me"
+              className="h-6 sm:h-7 w-auto object-contain drop-shadow-md opacity-90 hidden sm:block"
+            />
           </div>
 
           <h1 className="font-display mt-3 text-[30px] sm:text-[40px] font-bold leading-[1.05] tracking-tight text-white max-w-2xl">

@@ -3,6 +3,9 @@
  *   npm run build && npx playwright install chromium && npm run screenshots
  * Serves dist/, captures phone screenshots into docs/store/images/screenshots/.
  *
+ * Pass flavor: bake the override first, then capture to screenshots-pass/:
+ *   VITE_APP_FLAVOR=pass npm run build && node scripts/screenshots.mjs --flavor=pass
+ *
  * Viewports use CSS pixels × deviceScaleFactor so 1080×1920 is a phone
  * layout, not a desktop page in a tall frame. Wait for the native splash
  * overlay to unmount before shooting.
@@ -10,16 +13,28 @@
 import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
 
+const FLAVOR = process.argv.includes("--flavor=pass") ? "pass" : "airpal";
+
 const SHOTS = [
-  { route: "/", name: "01-home", door: null },
-  { route: "/", name: "02-discover", door: "explore" },
-  { route: "/plan", name: "03-plan", door: "plan" },
-  { route: "/experiences", name: "04-experiences", door: "explore" },
-  { route: "/concierge", name: "05-stay", door: "stay" },
-  { route: "/calendar", name: "06-calendar", door: "explore" },
-  { route: "/scan", name: "07-scan", door: "stay" },
-  { route: "/getAirPalApp", name: "08-getairpal", door: "explore" },
+  { route: "/", name: "01-home" },
+  { route: "/now", name: "02-now" },
+  { route: "/plan", name: "03-plan" },
+  { route: "/pass", name: "04-pass" },
+  { route: "/calendar", name: "05-calendar" },
+  { route: "/scan", name: "06-scan" },
+  { route: "/getAirPalApp", name: "07-getairpal" },
 ];
+
+const SHOTS_PASS = [
+  { route: "/pass", name: "01-pass" },
+  { route: "/events", name: "02-events" },
+  { route: "/me/tickets", name: "03-tickets" },
+  { route: "/deals", name: "04-deals" },
+  { route: "/scan", name: "05-scan" },
+];
+
+const PLAN = FLAVOR === "pass" ? SHOTS_PASS : SHOTS;
+const OUT_DIR = FLAVOR === "pass" ? "docs/store/images/screenshots-pass" : "docs/store/images/screenshots";
 
 /** CSS size × scale = store pixel size. */
 const SIZES = [
@@ -51,7 +66,7 @@ try {
   await waitForServer(4173);
   const { chromium } = await import("playwright");
   const browser = await chromium.launch();
-  mkdirSync("docs/store/images/screenshots", { recursive: true });
+  mkdirSync(OUT_DIR, { recursive: true });
   for (const size of SIZES) {
     const page = await browser.newPage({
       viewport: { width: size.cssW, height: size.cssH },
@@ -59,44 +74,37 @@ try {
       isMobile: size.mobile,
       hasTouch: true,
     });
-    for (const shot of SHOTS) {
-      await page.addInitScript((door) => {
+    for (const shot of PLAN) {
+      await page.addInitScript(() => {
         try {
-          const storage = globalThis.localStorage;
-          if (door) storage.setItem("airpal.door.v1", door);
-          else storage.removeItem("airpal.door.v1");
-          storage.setItem(
+          globalThis.localStorage.setItem(
             "airpal.location.v1",
             JSON.stringify({ mode: "city", city: "Sydney", lat: -33.8688, lng: 151.2093 }),
           );
         } catch {
           /* ignore */
         }
-      }, shot.door);
+      });
       await page.goto(`http://127.0.0.1:4173${shot.route}`, { waitUntil: "domcontentloaded" });
       await page.addStyleTag({
         content: 'footer[role="contentinfo"]{display:none!important}',
       });
-      await page.locator("#native-splash-transition").waitFor({ state: "detached", timeout: 8000 }).catch(() => {});
-      await page.getByRole("button", { name: "What's on" }).waitFor({ state: "attached", timeout: 15000 });
+      await page
+        .locator("#native-splash-transition")
+        .waitFor({ state: "detached", timeout: 8000 })
+        .catch(() => {});
+      await page.locator("#main-content").waitFor({ state: "attached", timeout: 15000 });
       await page.waitForTimeout(1200);
       await page.screenshot({
-        path: `docs/store/images/screenshots/${shot.name}-${size.suffix}.png`,
+        path: `${OUT_DIR}/${shot.name}-${size.suffix}.png`,
         fullPage: false,
       });
       console.log("captured", shot.name, size.suffix);
     }
     await page.close();
   }
-  // Marketing poster: exact 1080x1350 social/store creative, chrome-free.
-  const poster = await browser.newPage({ viewport: { width: 1080, height: 1350 } });
-  await poster.goto("http://127.0.0.1:4173/marketing?bare=1", { waitUntil: "networkidle" });
-  await poster.waitForTimeout(1500);
-  await poster.locator(".marketing-poster").screenshot({ path: "docs/store/images/marketing-poster-1080x1350.png" });
-  console.log("captured marketing poster 1080x1350");
-  await poster.close();
   await browser.close();
-  console.log("done: docs/store/images/screenshots/");
+  console.log(`done: ${OUT_DIR}/`);
 } finally {
   preview.kill();
 }

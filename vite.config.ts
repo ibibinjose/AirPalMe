@@ -80,8 +80,10 @@ export default defineConfig({
     build: {
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
-    // Don't fail the build when a dep ships without source maps.
-    sourcemap: true,
+    // No production sourcemaps: error tracking reports classes/messages only
+    // (no stacks, no Sentry), so maps would only bloat hosting deploys and
+    // native bundles (~16MB). Dev stack traces are unaffected.
+    sourcemap: false,
     chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {

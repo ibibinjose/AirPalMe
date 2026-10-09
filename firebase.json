@@ -107,6 +107,13 @@
         }
       },
       {
+        "source": "/deals/**",
+        "function": {
+          "functionId": "shareMeta",
+          "region": "us-central1"
+        }
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

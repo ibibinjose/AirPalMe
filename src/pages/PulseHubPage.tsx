@@ -24,6 +24,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
 import { makeQrDataUrl } from "@/lib/qr";
 import { publicSiteOrigin } from "@/lib/public-origin";
+import { toZonedDateStr } from "@/lib/local-time";
 import {
   acknowledgePulseIssue,
   averagePrimaryScore,
@@ -262,7 +263,7 @@ export function PulseHubPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `airpal-pulse-${workspaceId}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `airpal-pulse-${workspaceId}-${toZonedDateStr(new Date())}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success("CSV export downloaded");

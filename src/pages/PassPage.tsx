@@ -195,9 +195,16 @@ export function PassPage() {
         <div className="absolute -left-20 -bottom-20 h-80 w-80 rounded-full bg-rose-500/15 blur-3xl" />
 
         <div className="relative px-6 py-10 md:px-10 md:py-14">
-          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/20 px-3.5 py-1 text-xs font-bold text-amber-300 ring-1 ring-amber-400/30 backdrop-blur-md">
-            <Ticket size={13} />
-            <span>AirPal Pass · {effectiveCity}</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <img
+              src="/brand/airpal-pass-logo-white.png"
+              alt="AirPal Pass"
+              className="h-8 sm:h-10 w-auto object-contain drop-shadow-md"
+            />
+            <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/20 px-3.5 py-1 text-xs font-bold text-amber-300 ring-1 ring-amber-400/30 backdrop-blur-md">
+              <Ticket size={13} />
+              <span>{effectiveCity} · Experiences</span>
+            </div>
           </div>
 
           <h1 className="font-display mt-4 text-3xl sm:text-5xl font-extrabold tracking-tight text-white max-w-2xl leading-[1.1]">

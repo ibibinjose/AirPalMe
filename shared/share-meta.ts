@@ -83,7 +83,7 @@ function str(value: unknown): string {
  * already passed them.
  */
 export function shareCardFor(
-  kind: "event" | "place" | "pulse" | "plan" | "bio" | "property" | "demoHotel" | "demo",
+  kind: "event" | "place" | "pulse" | "plan" | "bio" | "property" | "promotion" | "demoHotel" | "demo",
   doc: Record<string, unknown>,
   origin: string,
 ): ShareCard {
@@ -188,6 +188,16 @@ export function shareCardFor(
           escapeShareText(str(doc.tagline) || str(doc.city), 200) || SHARE_DEFAULTS.description,
         image: imageOf(doc.heroImage),
       };
+    case "promotion": {
+      const sponsor = str(doc.sponsorName || doc.businessName);
+      const offer = str(doc.discountText || doc.prizeValue);
+      const description = [offer, sponsor].filter(Boolean).join(" · ") || str(doc.description);
+      return {
+        title: escapeShareText(doc.title, 90) || SHARE_DEFAULTS.title,
+        description: escapeShareText(description || sponsor, 200) || SHARE_DEFAULTS.description,
+        image: imageOf(doc.heroImage, doc.imageUrl, doc.image),
+      };
+    }
     case "demoHotel":
       return {
         title: escapeShareText(str(doc.name) || "Demo Harbour Hotel", 90),

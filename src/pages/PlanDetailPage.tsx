@@ -639,7 +639,7 @@ export function PlanDetailPage() {
                       toast.success("You're in! RSVP set to Going 🎉");
                     }}
                     className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
+                      "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
                       userAttendee?.status === "going"
                         ? "bg-emerald-700 text-white shadow-xs"
                         : "bg-paper text-ink/80 hover:bg-emerald-500/10 hover:text-emerald-600 ring-1 ring-line",
@@ -658,7 +658,7 @@ export function PlanDetailPage() {
                       toast.success("RSVP updated to Maybe");
                     }}
                     className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
+                      "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer",
                       userAttendee?.status === "maybe"
                         ? "bg-amber-700 text-white shadow-xs"
                         : "bg-paper text-ink/80 hover:bg-amber-500/10 hover:text-amber-600 ring-1 ring-line",
@@ -935,7 +935,7 @@ export function PlanDetailPage() {
               <button
                 type="button"
                 onClick={() => exportIcs(plan)}
-                className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
+                className="flex min-h-[44px] cursor-pointer items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
               >
                 <CalendarPlus size={16} className="text-accent" />
                 <span>Apple / Outlook (.ics)</span>
@@ -944,7 +944,7 @@ export function PlanDetailPage() {
               <button
                 type="button"
                 onClick={() => openGoogleCalendar(plan)}
-                className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
+                className="flex min-h-[44px] cursor-pointer items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95"
               >
                 <Calendar size={16} className="text-accent" />
                 <span>Google Calendar</span>
@@ -953,7 +953,7 @@ export function PlanDetailPage() {
               <button
                 type="button"
                 onClick={() => void handlePrintGuide()}
-                className="flex items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95 col-span-full"
+                className="flex min-h-[44px] cursor-pointer items-center justify-center gap-2 rounded-2xl bg-paper p-3 text-xs sm:text-sm font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition active:scale-95 col-span-full"
               >
                 <Printer size={16} className="text-amber-500" />
                 <span>Print / Save Itinerary PDF Guide</span>

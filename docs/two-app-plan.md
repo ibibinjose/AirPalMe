@@ -77,10 +77,12 @@ Non-goals: second Firebase project, separate web deploys or domains, new auth sy
 - **Dual universal-link claiming**: must be path-scoped or routing is undefined when both apps are installed.
 - **Double store cost**: two listings = two reviews, two screenshot sets, two release trains to maintain.
 - **ID finality**: confirm `me.airpal.pass` before any Firebase/store registration.
-- Open: Pass tab set detail; joint vs independent versioning; per-flavor screenshot strategy.
+- Open: Pass tab set detail; per-flavor screenshot capture runs.
+- Decided: joint versioning — both flavors share `versionCode`/`versionName` from `defaultConfig` (one codebase, one train); split only if store review forces divergence.
 
 ## As-built notes (Phase A/B in-repo, October 2026)
 
 - Flavor resolves at runtime from the native app id (`src/lib/app-flavor.ts`), with `VITE_APP_FLAVOR` as override — one `dist/` serves both shells, so `capacitor.config.ts` stays untouched.
 - Android: `airpal`/`pass` product flavors + per-flavor manifests/strings; iOS: single target + `ios/App/Pass.xcconfig` (`-xcconfig` at archive time), no pbxproj fork.
+- Follow-ups closed in-repo: `/deals/:id` link previews (`promotion` share card, live/approved gate), screenshots script refreshed to live routes with `--flavor=pass` support (`screenshots-pass/`), scaffold Pass icons (Android amber launcher tint, iOS `AppIcon-Pass` placeholder — final art still needed before store submission).
 - Native compiles and e2e could not run in the sandboxed agent (no network/sockets/simulator). User-side: `cd android && ./gradlew :app:assembleAirpalDebug :app:assemblePassDebug`, Xcode archive with `Pass.xcconfig`, `npm run test:e2e:pass`.

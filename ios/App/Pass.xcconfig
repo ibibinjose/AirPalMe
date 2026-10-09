@@ -3,5 +3,8 @@
 // No pbxproj fork: the web bundle is flavor-agnostic and resolves the shell at runtime.
 PRODUCT_BUNDLE_IDENTIFIER = me.airpal.pass
 INFOPLIST_KEY_CFBundleDisplayName = AirPal Pass
-// Follow-ups (Phase B/C): per-flavor GoogleService-Info.plist handling, push
-// entitlements, and final AppIcon-Pass art (Pass currently reuses the AirPal AppIcon).
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon-Pass
+// AppIcon-Pass is a scaffold placeholder (amber-tinted AirPal mark) so the two
+// shells are visually distinct. Replace with final Pass icon art before store
+// submission. Follow-ups (Phase B/C): per-flavor GoogleService-Info.plist
+// handling and push entitlements.
