@@ -175,9 +175,9 @@ export function MePage() {
     return (
       <AuthGate
         next="/me"
-        kicker="Account"
-        title="One login"
-        lede="Sign in or create an account first. Same universal identity for your @handle, tickets, and plans."
+        kicker="AirPal Me"
+        title="Universal AirPal Identity"
+        lede="Sign in or create an account to access your personal cockpit, tickets, appointments, and plans."
       />
     );
   }

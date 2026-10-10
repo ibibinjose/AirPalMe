@@ -126,7 +126,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
                 )}
                 <span className="relative z-10 flex flex-col items-center justify-center gap-0.5 transition-transform duration-150">
                   {tab.id === "bio" ? (
-                    <span className="text-[17px] font-bold leading-none">@</span>
+                    <span className="flex h-[21px] w-[21px] items-center justify-center text-[18px] font-bold leading-none">@</span>
                   ) : (
                     <span className="relative">
                       <Icon size={21} strokeWidth={on ? 2.3 : 1.75} fill="none" />

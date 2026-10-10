@@ -7,38 +7,35 @@ import { getBuildInfo } from "@/lib/build-info";
 import { openDebugOverlay } from "@/components/debug/DebugInfoOverlay";
 import { cn } from "@/lib/cn";
 
-const NAV_EXPLORE = [
-  { href: "/", label: "Discover" },
-  { href: "/now", label: "What now?" },
-  { href: "/plan", label: "Plans" },
-  { href: "/pulse", label: "AirPal Pulse" },
-  { href: "/deals", label: "Deals" },
-  { href: "/calendar", label: "Events" },
-  { href: "/guide", label: "Tours" },
-  { href: "/concierge", label: "Stay" },
-  { href: "/getAirPalApp", label: "Get the app" },
+const NAV_ME = [
+  { href: "/now", label: "What now? (Day Planner)" },
+  { href: "/plan", label: "Plans & Invites" },
+  { href: "/me", label: "Me Cockpit" },
+  { href: "/calendar", label: "Personal Calendar" },
+  { href: "/bio/setup", label: "Claim @handle" },
+  { href: "/me/memories", label: "Memory Wall" },
+  { href: "/getAirPalApp", label: "Get the App" },
 ];
 
-const NAV_HOSPITALITY = [
-  { href: "/business/promotions/new", label: "Create offer" },
-  { href: "/pulse", label: "Create a Pulse" },
-  { href: "/join", label: "Partner account" },
-  { href: "/business", label: "Your place" },
-  { href: "/plan/new", label: "Create plan" },
-  { href: "/event", label: "Create event" },
-  { href: "/host", label: "Stay host" },
-  { href: "/partners", label: "Partners" },
+const NAV_PASS = [
+  { href: "/pass", label: "AirPal Pass Hub" },
+  { href: "/events", label: "Concerts & Festivals" },
+  { href: "/me/tickets", label: "Passbook & Tickets" },
+  { href: "/deals", label: "Member Dining Deals" },
+  { href: "/event", label: "Host an Event" },
+  { href: "/concierge", label: "Stay Concierge" },
+  { href: "/host", label: "Stay Host Workspace" },
+  { href: "/pulse", label: "AirPal Pulse" },
+  { href: "/join", label: "Partner Account" },
 ];
 
 const NAV_LEGAL = [
-  { href: "/about", label: "About" },
-  { href: "/trust", label: "Trust & facts" },
-  { href: "/contact", label: "Contact" },
-  { href: "/assist", label: "Support" },
-  { href: "/help", label: "Help center" },
-  { href: "/privacy", label: "Privacy" },
-  { href: "/terms", label: "Terms" },
-  { href: "/cookies", label: "Cookies" },
+  { href: "/about", label: "About AirPal" },
+  { href: "/trust", label: "Trust & Facts" },
+  { href: "/assist", label: "Support & Help" },
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/terms", label: "Terms of Service" },
+  { href: "/cookies", label: "Cookie Settings" },
 ];
 
 interface SiteFooterProps {
@@ -96,9 +93,9 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
         {/* Links */}
         <nav aria-label="Footer" className="mt-10 grid grid-cols-2 gap-8 border-t border-white/10 pt-8 sm:grid-cols-3">
           <div>
-            <p className="text-[13px] font-semibold text-white/90">Explore</p>
+            <p className="text-[13px] font-semibold text-white/90">AirPal Me</p>
             <ul className="mt-4 space-y-2.5 text-sm">
-              {NAV_EXPLORE.filter((item) => !isNative || item.href !== "/getAirPalApp").map((item) => (
+              {NAV_ME.filter((item) => !isNative || item.href !== "/getAirPalApp").map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className="text-white/70 transition hover:text-white">
                     {item.label}
@@ -109,9 +106,9 @@ export function SiteFooter({ hasTabBar = true, className }: SiteFooterProps) {
           </div>
 
           <div>
-            <p className="text-[13px] font-semibold text-white/90">Stays & Business</p>
+            <p className="text-[13px] font-semibold text-white/90">AirPal Pass</p>
             <ul className="mt-4 space-y-2.5 text-sm">
-              {NAV_HOSPITALITY.map((item) => (
+              {NAV_PASS.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className="text-white/70 transition hover:text-white">
                     {item.label}
