@@ -17,6 +17,8 @@
                 <data android:pathPrefix="/me/tickets" />
                 <data android:pathPrefix="/scan" />
                 <data android:pathPrefix="/deals" />
+                <data android:pathPrefix="/stay" />
+                <data android:pathPrefix="/host" />
             </intent-filter>
         </activity>
     </application>

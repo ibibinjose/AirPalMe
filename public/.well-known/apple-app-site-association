@@ -11,7 +11,9 @@
           "/ticket/*",
           "/me/tickets*",
           "/deals*",
-          "/scan*"
+          "/scan*",
+          "/stay*",
+          "/host*"
         ]
       },
       {
@@ -25,6 +27,8 @@
           "NOT /me/tickets*",
           "NOT /deals*",
           "NOT /scan*",
+          "NOT /stay*",
+          "NOT /host*",
           "/b/*",
           "/plan/*",
           "/invite/*",

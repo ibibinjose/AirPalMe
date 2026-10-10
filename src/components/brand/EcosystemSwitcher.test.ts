@@ -22,5 +22,11 @@ describe("getEcosystemMode", () => {
     expect(getEcosystemMode("/ticket/xyz123")).toBe("pass");
     expect(getEcosystemMode("/event")).toBe("pass");
     expect(getEcosystemMode("/scan")).toBe("pass");
+    expect(getEcosystemMode("/stay")).toBe("pass");
+    expect(getEcosystemMode("/host")).toBe("pass");
+    expect(getEcosystemMode("/business")).toBe("pass");
+    expect(getEcosystemMode("/partners")).toBe("pass");
+    expect(getEcosystemMode("/partner")).toBe("pass");
+    expect(getEcosystemMode("/concierge")).toBe("pass");
   });
 });

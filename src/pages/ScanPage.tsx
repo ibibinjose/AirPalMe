@@ -16,6 +16,7 @@ import { noteQrContext } from "@/lib/analytics";
 import { triggerHaptic } from "@/lib/native";
 import { qrContextIdFromPath, qrContextIdFromStay } from "@shared/analytics";
 import { WaveListenCard } from "@/components/wave/WaveListenCard";
+import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 
 /**
  * Universal Scanner for AirPal — Scans live QR camera feed, user photo library images,
@@ -192,7 +193,11 @@ export function ScanPage() {
 
   return (
     <div className="mx-auto flex h-full max-w-lg flex-col px-4 pb-[max(5rem,calc(env(safe-area-inset-bottom,0px)+5rem))]">
-      <div className="relative mt-2 overflow-hidden rounded-[28px] bg-neutral-900 shadow-lg ring-1 ring-line">
+      <div className="pt-3 pb-2 flex items-center justify-between">
+        <EcosystemSwitcher currentPath="/scan" variant="header" />
+      </div>
+
+      <div className="relative mt-1 overflow-hidden rounded-[28px] bg-neutral-900 shadow-lg ring-1 ring-line">
         <video ref={videoRef} className="h-64 w-full object-cover md:h-80" playsInline muted />
         <canvas ref={canvasRef} className="hidden" />
         <input

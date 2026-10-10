@@ -6,6 +6,7 @@ import {
   CalendarDays,
   Flame,
   Gift,
+  Hotel,
   MapPin,
   Plus,
   QrCode,
@@ -28,12 +29,13 @@ import { mediaSrcSet } from "@/lib/media-srcset";
 import { type Promotion } from "@shared/promotions";
 import { promoArtFor } from "@/lib/promotions";
 
-type PassCategory = "all" | "cultural" | "music" | "deals" | "nightlife" | "community";
+type PassCategory = "all" | "cultural" | "music" | "hotels" | "deals" | "nightlife" | "community";
 
 const PASS_CATEGORIES: { id: PassCategory; label: string; icon: string }[] = [
   { id: "all", label: "All Access", icon: "🎟️" },
-  { id: "cultural", label: "Indian & Cultural", icon: "🪔" },
+  { id: "cultural", label: "Cultural", icon: "🪔" },
   { id: "music", label: "Concerts & Gigs", icon: "🎵" },
+  { id: "hotels", label: "Hotels & Stays", icon: "🏨" },
   { id: "deals", label: "Dining Deals", icon: "🎁" },
   { id: "nightlife", label: "Nightlife & Clubs", icon: "🍸" },
   { id: "community", label: "Community & Expos", icon: "✨" },
@@ -142,6 +144,16 @@ export function PassPage() {
           titleLower.includes("desi")
         );
       }
+      if (activeCategory === "hotels") {
+        return (
+          catLower.includes("hotel") ||
+          catLower.includes("stay") ||
+          titleLower.includes("hotel") ||
+          titleLower.includes("stay") ||
+          titleLower.includes("resort") ||
+          titleLower.includes("inn")
+        );
+      }
       if (activeCategory === "music") {
         return catLower.includes("music") || catLower.includes("concert") || titleLower.includes("live") || titleLower.includes("band");
       }
@@ -183,7 +195,7 @@ export function PassPage() {
             />
             <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/20 px-3.5 py-1 text-xs font-bold text-amber-300 ring-1 ring-amber-400/30 backdrop-blur-md">
               <Ticket size={13} />
-              <span>{effectiveCity} · Experiences</span>
+              <span>{effectiveCity} · Experiences &amp; Stays</span>
             </div>
           </div>
 
@@ -191,7 +203,7 @@ export function PassPage() {
             Your pass to experiences.
           </h1>
           <p className="mt-2 text-base sm:text-lg font-medium text-white/80 max-w-xl">
-            Discover what's happening. Get access. Save money.
+            Ticket sales, festival access, hotel check-in &amp; partner dining perks.
           </p>
 
           {/* Quick Search Input */}
@@ -202,7 +214,7 @@ export function PassPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search concerts, Bollywood nights, food deals, festivals…"
+                placeholder="Search concerts, Bollywood nights, hotels, food deals, festivals…"
                 className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-medium text-white placeholder-white/50 focus:outline-none"
               />
             </div>
@@ -216,6 +228,20 @@ export function PassPage() {
             >
               <Flame size={16} />
               Browse What's On
+            </Link>
+            <Link
+              href="/stay"
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-white/15 px-5 py-2.5 text-sm font-bold text-white ring-1 ring-white/30 backdrop-blur-md transition hover:bg-white/25 active:scale-95"
+            >
+              <Hotel size={16} />
+              Hotel Check-In
+            </Link>
+            <Link
+              href="/event"
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-white/15 px-5 py-2.5 text-sm font-bold text-white ring-1 ring-white/30 backdrop-blur-md transition hover:bg-white/25 active:scale-95"
+            >
+              <Plus size={16} />
+              Host &amp; Sell Tickets
             </Link>
             <Link
               href="/deals"
@@ -330,7 +356,7 @@ export function PassPage() {
           <div>
             <h2 className="font-display text-xl font-bold text-ink">
               {activeCategory === "cultural"
-                ? "Indian & Cultural Festivals"
+                ? "Cultural Festivals"
                 : activeCategory === "music"
                   ? "Live Concerts & Gigs"
                   : "Featured Events & Experiences"}
@@ -494,35 +520,111 @@ export function PassPage() {
         </div>
       </section>
 
-      {/* For Organisers & Hosts */}
-      <section aria-label="Event Organisers" className="mt-10">
-        <div className="rounded-3xl bg-gradient-to-br from-neutral-900 to-neutral-950 p-6 md:p-8 text-white shadow-md">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="max-w-xl">
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider">
-                <ShieldCheck size={14} /> For Organisers &amp; Venues
+      {/* Venue, Event & Stay Services */}
+      <section aria-label="Venue, Event and Stay Services" className="mt-12">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                <ShieldCheck size={14} /> Host &amp; Venue Services
               </span>
-              <h3 className="font-display text-xl sm:text-2xl font-bold mt-1 text-white">
-                Host an Event or Publish a Pass
+            </div>
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-ink mt-1">
+              Run your venue, event, or stay on AirPal Pass
+            </h2>
+            <p className="text-sm text-mute mt-1 max-w-2xl">
+              Turnkey operational tools for ticket sellers, event hosts, hotel operators, and hospitality partners with zero extra hardware.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* Pillar 1: Ticket Sales & Event Hosting */}
+          <div className="group flex flex-col justify-between rounded-3xl bg-card p-6 ring-1 ring-line/80 shadow-xs hover:shadow-md hover:ring-amber-500/30 transition">
+            <div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-1 ring-amber-500/20">
+                <Ticket size={24} />
+              </div>
+              <h3 className="font-display text-lg font-bold text-ink mt-4">
+                Ticket Sales &amp; Hosting
               </h3>
-              <p className="text-xs sm:text-sm text-white/75 mt-1.5">
-                List cultural festivals, music gigs, or community expos. Use our instant QR door scanner for check-in with zero extra hardware.
+              <p className="text-xs sm:text-sm text-mute mt-2 leading-relaxed">
+                List cultural festivals, music gigs, club nights, and community expos. Integrated Stripe checkout, guest tiers, and instant RSVP passes.
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <div className="mt-6 flex flex-wrap items-center gap-2.5 pt-4 border-t border-line/50">
               <Link
                 href="/event"
-                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-xs font-bold text-neutral-950 shadow-xs hover:bg-neutral-100 transition active:scale-95"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
               >
                 <Plus size={14} />
                 Host Event
               </Link>
               <Link
+                href="/events"
+                className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-card px-3.5 py-2 text-xs font-semibold text-mute ring-1 ring-line hover:text-ink hover:bg-paper transition"
+              >
+                Browse Events
+              </Link>
+            </div>
+          </div>
+
+          {/* Pillar 2: Hotel & Stay Check-In */}
+          <div className="group flex flex-col justify-between rounded-3xl bg-card p-6 ring-1 ring-line/80 shadow-xs hover:shadow-md hover:ring-emerald-500/30 transition">
+            <div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/20">
+                <Hotel size={24} />
+              </div>
+              <h3 className="font-display text-lg font-bold text-ink mt-4">
+                Hotel Check-In &amp; Stays
+              </h3>
+              <p className="text-xs sm:text-sm text-mute mt-2 leading-relaxed">
+                Digital guest compendium, room Wi-Fi credentials, staff maintenance tickets, in-room dining menus, and host property operations.
+              </p>
+            </div>
+            <div className="mt-6 flex flex-wrap items-center gap-2.5 pt-4 border-t border-line/50">
+              <Link
+                href="/stay"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition active:scale-95"
+              >
+                <Hotel size={14} />
+                Guest Stays
+              </Link>
+              <Link
+                href="/host"
+                className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-card px-3.5 py-2 text-xs font-semibold text-mute ring-1 ring-line hover:text-ink hover:bg-paper transition"
+              >
+                Host Dashboard
+              </Link>
+            </div>
+          </div>
+
+          {/* Pillar 3: Door Scanner & Operations */}
+          <div className="group flex flex-col justify-between rounded-3xl bg-card p-6 ring-1 ring-line/80 shadow-xs hover:shadow-md hover:ring-rose-500/30 transition">
+            <div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 ring-1 ring-rose-500/20">
+                <QrCode size={24} />
+              </div>
+              <h3 className="font-display text-lg font-bold text-ink mt-4">
+                Door Scanner &amp; Partner Hub
+              </h3>
+              <p className="text-xs sm:text-sm text-mute mt-2 leading-relaxed">
+                High-speed camera scanner for gate staff with instant QR verification and offline cache. Onboard partner deals and member dining discounts.
+              </p>
+            </div>
+            <div className="mt-6 flex flex-wrap items-center gap-2.5 pt-4 border-t border-line/50">
+              <Link
                 href="/scan"
-                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-white/15 px-4 py-2.5 text-xs font-bold text-white ring-1 ring-white/30 hover:bg-white/25 transition active:scale-95"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-neutral-900 dark:bg-white px-4 py-2 text-xs font-bold text-white dark:text-neutral-950 shadow-xs hover:opacity-90 transition active:scale-95"
               >
                 <QrCode size={14} />
-                Door Scanner
+                Open Scanner
+              </Link>
+              <Link
+                href="/partners"
+                className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-card px-3.5 py-2 text-xs font-semibold text-mute ring-1 ring-line hover:text-ink hover:bg-paper transition"
+              >
+                Partner Onboarding
               </Link>
             </div>
           </div>

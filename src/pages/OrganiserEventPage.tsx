@@ -61,6 +61,7 @@ import { PlaceAddressField, type PickedPlace } from "@/components/forms/PlaceAdd
 import { ImageField } from "@/components/media/ImageField";
 import { Photo } from "@/components/ui/Photo";
 import { mapsPlaceUrl } from "@/lib/maps";
+import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 
 const FLAVOUR_META: Record<EventFlavour, { icon: typeof Store; blurb: string }> = {
   market: { icon: Store, blurb: "Makers, produce, and weekend stalls." },
@@ -448,12 +449,16 @@ export function OrganiserEventPage() {
           animate="show"
           variants={reduce ? undefined : landing}
         >
+          <div className="pb-4">
+            <EcosystemSwitcher currentPath="/event" variant="header" />
+          </div>
+
           <motion.header variants={landingItem}>
             <div className="flex items-center gap-2">
               <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-accent">
-                AirPal Organiser
+                AirPal Pass · Event Hosting
               </span>
-              <span className="text-xs text-mute font-medium">Life Made Easy</span>
+              <span className="text-xs text-mute font-medium">Tickets &amp; Passes</span>
             </div>
             <h1 className="font-display mt-2 text-3xl font-bold tracking-tight text-ink md:text-4xl">
               Create a Market, Expo or Event
@@ -934,6 +939,10 @@ export function OrganiserEventPage() {
       />
 
       <div className="relative mx-auto max-w-4xl px-4 pb-24 pt-4">
+        <div className="pb-4">
+          <EcosystemSwitcher currentPath="/event" variant="header" />
+        </div>
+
         {/* Top Header Card */}
         <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay overflow-hidden relative">
           {myEvent.coverImage && (

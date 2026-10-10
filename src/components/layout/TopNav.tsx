@@ -15,6 +15,7 @@ import { useBio } from "@/contexts/BioContext";
 import { partnerAccountPath } from "@/lib/partner-account";
 import { BrowseMenu } from "@/components/layout/BrowseMenu";
 import { isPassApp } from "@/lib/app-flavor";
+import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 import { NAMES } from "@shared/names";
 
 const LINKS = [
@@ -80,6 +81,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
           >
             <BrandMark />
           </button>
+          <EcosystemSwitcher currentPath={path} variant="compact" />
         </div>
         <nav className="flex items-center justify-center gap-1 rounded-full bg-card/60 p-1 ring-1 ring-line/70 backdrop-blur-md">
           {LINKS.slice(0, 2).map(renderLink)}

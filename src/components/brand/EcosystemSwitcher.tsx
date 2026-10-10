@@ -22,7 +22,13 @@ export function getEcosystemMode(path: string): EcosystemMode {
     path.startsWith("/ticket/") ||
     path === "/event" ||
     path.startsWith("/event/") ||
-    path.startsWith("/scan")
+    path.startsWith("/scan") ||
+    path.startsWith("/stay") ||
+    path.startsWith("/host") ||
+    path.startsWith("/business") ||
+    path.startsWith("/partners") ||
+    path === "/partner" ||
+    path.startsWith("/concierge")
   ) {
     return "pass";
   }
@@ -31,7 +37,7 @@ export function getEcosystemMode(path: string): EcosystemMode {
 
 interface EcosystemSwitcherProps {
   currentPath?: string;
-  variant?: "header" | "pill" | "banner";
+  variant?: "header" | "pill" | "banner" | "compact";
   className?: string;
 }
 
@@ -68,12 +74,12 @@ export function EcosystemSwitcher({
           <div className="min-w-0">
             <span className="text-[11px] font-bold uppercase tracking-wider text-accent">AirPal Ecosystem</span>
             <p className="font-display text-base font-bold text-ink mt-0.5">
-              {activeMode === "me" ? "Explore live events & dining perks" : "Organise your day & digital bio"}
+              {activeMode === "me" ? "Explore live events, stays & dining perks" : "Organise your day & digital bio"}
             </p>
             <p className="text-xs text-mute mt-0.5">
               {activeMode === "me"
-                ? "AirPal Pass gives you access to concerts, festivals, and exclusive member discounts."
-                : "AirPal.Me manages your schedule, weather outfit tips, and public @handle bio."}
+                ? "AirPal Pass gives you access to concerts, festivals, hotel check-in, and member perks."
+                : "AirPal Me manages your schedule, weather outfit tips, and public @handle bio."}
             </p>
           </div>
           <button
@@ -89,7 +95,7 @@ export function EcosystemSwitcher({
             ) : (
               <>
                 <Sparkles size={14} />
-                Switch to AirPal.Me
+                Switch to AirPal Me
               </>
             )}
           </button>
@@ -98,37 +104,34 @@ export function EcosystemSwitcher({
     );
   }
 
+  const isCompact = variant === "compact";
+
   return (
     <div
       role="tablist"
       aria-label="AirPal Ecosystem Selector"
       className={cn(
-        "relative inline-flex items-center rounded-full bg-card/85 p-1 ring-1 ring-line/80 shadow-xs backdrop-blur-md",
-        variant === "header" ? "min-h-[44px] h-11" : "min-h-[44px] h-11",
+        "relative inline-flex items-center rounded-full bg-card/85 ring-1 ring-line/80 shadow-xs backdrop-blur-md",
+        isCompact ? "h-9 p-0.5" : "min-h-[44px] h-11 p-1",
         className,
       )}
     >
-      {/* Option 1: AirPal.Me */}
+      {/* Option 1: AirPal Me */}
       <button
         type="button"
         role="tab"
         aria-selected={activeMode === "me"}
         onClick={() => handleSelect("me")}
         className={cn(
-          "relative z-10 flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-bold transition-colors cursor-pointer select-none touch-manipulation min-h-[38px] sm:min-h-[36px]",
+          "relative z-10 flex items-center rounded-full font-bold transition-colors cursor-pointer select-none touch-manipulation",
+          isCompact
+            ? "gap-1.5 px-3 py-1 text-xs min-h-[30px]"
+            : "gap-2 px-4 py-1.5 text-xs min-h-[38px] sm:min-h-[36px]",
           activeMode === "me" ? "text-white" : "text-mute hover:text-ink",
         )}
       >
-        <Sparkles size={13} className={activeMode === "me" ? "text-white" : "text-accent"} />
-        <span>AirPal.Me</span>
-        <span
-          className={cn(
-            "hidden sm:inline-block text-[10px] font-semibold px-1.5 py-0.2 rounded-full",
-            activeMode === "me" ? "bg-white/20 text-white" : "bg-paper text-mute",
-          )}
-        >
-          Life
-        </span>
+        <Sparkles size={isCompact ? 12 : 13} className={activeMode === "me" ? "text-white" : "text-accent"} />
+        <span>AirPal Me</span>
         {activeMode === "me" && (
           <motion.div
             layoutId="ecosystem-pill-active"
@@ -145,20 +148,15 @@ export function EcosystemSwitcher({
         aria-selected={activeMode === "pass"}
         onClick={() => handleSelect("pass")}
         className={cn(
-          "relative z-10 flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-bold transition-colors cursor-pointer select-none touch-manipulation min-h-[38px] sm:min-h-[36px]",
+          "relative z-10 flex items-center rounded-full font-bold transition-colors cursor-pointer select-none touch-manipulation",
+          isCompact
+            ? "gap-1.5 px-3 py-1 text-xs min-h-[30px]"
+            : "gap-2 px-4 py-1.5 text-xs min-h-[38px] sm:min-h-[36px]",
           activeMode === "pass" ? "text-white" : "text-mute hover:text-ink",
         )}
       >
-        <Ticket size={13} className={activeMode === "pass" ? "text-white" : "text-amber-500"} />
+        <Ticket size={isCompact ? 12 : 13} className={activeMode === "pass" ? "text-white" : "text-amber-500"} />
         <span>AirPal Pass</span>
-        <span
-          className={cn(
-            "hidden sm:inline-block text-[10px] font-semibold px-1.5 py-0.2 rounded-full",
-            activeMode === "pass" ? "bg-white/20 text-white" : "bg-amber-500/15 text-amber-700 dark:text-amber-400",
-          )}
-        >
-          Access
-        </span>
         {activeMode === "pass" && (
           <motion.div
             layoutId="ecosystem-pill-active"

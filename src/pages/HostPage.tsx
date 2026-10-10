@@ -31,6 +31,7 @@ import { subscribePropertyTickets } from "@/lib/tickets-store";
 import { subscribePropertyDiningOrders } from "@/lib/dining-store";
 import { hostWorkspacePropertyId, roomTokenEntries } from "@/lib/host-workspace";
 import { getPropertyWifiRemote, liveBackendEnabled } from "@/lib/functions";
+import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 
 type Tab = "today" | "facilities" | "dining" | "rooms" | "place" | "print";
 
@@ -224,7 +225,11 @@ export function HostPage() {
       <div className="relative mx-auto max-w-3xl px-4 pb-28">
         {user.emailVerified === false && <VerifyEmailBanner email={user.email} onSend={sendVerificationEmail} />}
 
-        <header className="flex flex-col gap-3 pt-5 sm:flex-row sm:items-end sm:justify-between">
+        <div className="pt-4 pb-2">
+          <EcosystemSwitcher currentPath="/host" variant="header" />
+        </div>
+
+        <header className="flex flex-col gap-3 pt-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">

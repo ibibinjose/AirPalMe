@@ -10,6 +10,7 @@ import { CalendarEventCard } from "@/components/calendar/CalendarEventCard";
 import { CalendarDragProvider } from "@/components/calendar/CalendarDragContext";
 import { triggerHapticSelection } from "@/lib/native";
 import { cn } from "@/lib/cn";
+import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 
 type BucketedEvent = { event: CalendarEvent; bucket: EventBucket };
 
@@ -101,11 +102,22 @@ export function EventsPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-16 md:px-6">
+      <div className="pt-4 flex flex-wrap items-center justify-between gap-3">
+        <EcosystemSwitcher currentPath="/events" variant="header" />
+        <Link
+          href="/event"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
+        >
+          <Plus size={14} />
+          Host Event
+        </Link>
+      </div>
+
       <header className="pt-6">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Events</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">AirPal Pass · Events &amp; Tickets</p>
         <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-ink">Events in {effectiveCity}</h1>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-mute">
-          Every upcoming event in one feed — at places, in the community, or from friends.
+          Every upcoming event, festival, and concert — book tickets direct or host your own.
         </p>
       </header>
 

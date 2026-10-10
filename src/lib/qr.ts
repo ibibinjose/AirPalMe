@@ -80,13 +80,15 @@ export function parseQrPayload(raw: string): QrIntent {
       return { kind: "url", href: `/@${at[1].toLowerCase()}` };
     }
 
-    // Experience / Event / Plan / Companion / Invite paths
+    // Experience / Event / Ticket / Stay / Deals / Plan / Invite paths
     if (
       url.pathname.startsWith("/e/") ||
       url.pathname.startsWith("/event/") ||
+      url.pathname.startsWith("/ticket/") ||
+      url.pathname.startsWith("/stay/") ||
+      url.pathname.startsWith("/deals/") ||
       url.pathname.startsWith("/plan/") ||
       url.pathname.startsWith("/p/") ||
-      url.pathname.startsWith("/mate/") ||
       url.pathname.startsWith("/companion") ||
       url.pathname.startsWith("/invite/")
     ) {

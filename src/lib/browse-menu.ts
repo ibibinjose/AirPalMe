@@ -175,13 +175,13 @@ export const HELP_LINKS: BrowseLink[] = [
 
 /** Full Browse dropdown sitemap, in display order. */
 export const BROWSE_SECTIONS: BrowseSection[] = [
-  { title: "Browse AirPal", links: BROWSE_LINKS },
-  { title: "Plan & Go", links: PLAN_LINKS },
-  { title: "Stay & Guide", links: GUIDE_LINKS },
-  { title: "Business", links: BUSINESS_LINKS },
-  { title: "Account", links: ACCOUNT_LINKS },
+  { title: "AirPal Pass", links: BROWSE_LINKS },
+  { title: "AirPal Me", links: PLAN_LINKS },
+  { title: "Hotels & Stays", links: GUIDE_LINKS },
+  { title: "Organisers & Partners", links: BUSINESS_LINKS },
+  { title: "Account & Universal Profile", links: ACCOUNT_LINKS },
   { title: "Help & Trust", links: HELP_LINKS },
-  { title: "Host", links: HOST_LINKS, hostsOnly: true },
+  { title: "Host Operations", links: HOST_LINKS, hostsOnly: true },
 ];
 
 const STRIP_PREFIXES = [
