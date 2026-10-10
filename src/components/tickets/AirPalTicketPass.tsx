@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Download, Share2, Ticket } from "lucide-react";
+import { Link } from "wouter";
+import { CalendarDays, CheckCircle2, Download, Share2, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { AppleWalletButton } from "@/components/ui/AppleWalletButton";
 import { GoogleWalletButton } from "@/components/ui/GoogleWalletButton";
@@ -103,11 +104,37 @@ export function AirPalTicketPass({ booking, guestName, hostName, showActions = t
       </div>
 
       <p className="flex items-center justify-center gap-1.5 px-5 pb-4 pt-1 text-[12px] font-semibold opacity-90">
-        <Ticket size={13} /> {paid ? "Paid on AirPal — scan at the gate" : "Unpaid hold — pay to activate"}
+        {booking.admittedAt ? (
+          <>
+            <CheckCircle2 size={13} className="text-emerald-300" />
+            <span>Admitted at gate · Enjoy the experience</span>
+          </>
+        ) : (
+          <>
+            <Ticket size={13} />
+            <span>{paid ? "Paid on AirPal — scan at the gate" : "Unpaid hold — pay to activate"}</span>
+          </>
+        )}
       </p>
 
       {showActions && (
-        <div className="no-print flex flex-col gap-2 bg-white px-4 py-3">
+        <div className="no-print flex flex-col gap-2 bg-white px-4 py-3 text-ink">
+          {booking.planId ? (
+            <Link
+              href={`/plan/${booking.planId}`}
+              className="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-2xl bg-brand/10 px-4 py-2 text-xs font-semibold text-accent transition hover:bg-brand/20 active:scale-[0.98]"
+            >
+              <CalendarDays size={14} /> Open Hangout Day Plan
+            </Link>
+          ) : (
+            <Link
+              href={`/plan/new?title=${encodeURIComponent(booking.title)}&date=${encodeURIComponent(booking.date || "")}&time=${encodeURIComponent(booking.time || "")}&dest=${encodeURIComponent(booking.suburb || "")}&type=nightout&bookingId=${encodeURIComponent(booking.id)}`}
+              className="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-2xl bg-brand/10 px-4 py-2 text-xs font-semibold text-accent transition hover:bg-brand/20 active:scale-[0.98]"
+            >
+              <CalendarDays size={14} /> Plan Day Around This Event
+            </Link>
+          )}
+
           <AppleWalletButton
             className="w-full justify-center"
             onClick={() => {
@@ -122,10 +149,10 @@ export function AirPalTicketPass({ booking, guestName, hostName, showActions = t
             }}
           />
           <div className="flex gap-2">
-            <Button size="sm" variant="ghost" className="flex-1 gap-1.5" onClick={print}>
+            <Button size="sm" variant="ghost" className="flex-1 gap-1.5 ring-1 ring-line" onClick={print}>
               <Download size={15} /> Save PDF
             </Button>
-            <Button size="sm" variant="ghost" className="flex-1 gap-1.5" onClick={() => void share()}>
+            <Button size="sm" variant="ghost" className="flex-1 gap-1.5 ring-1 ring-line" onClick={() => void share()}>
               <Share2 size={15} /> Share
             </Button>
           </div>
