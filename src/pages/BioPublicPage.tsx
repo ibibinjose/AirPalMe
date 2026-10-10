@@ -865,6 +865,15 @@ export function BioPublicPage() {
                   <span aria-hidden>★</span> {bio.starTier}
                 </span>
               )}
+              {bio.kind === "person" && (
+                <Link
+                  href="/pass"
+                  className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 dark:text-amber-400 ring-1 ring-amber-400/25 hover:bg-amber-500/20 transition"
+                  title="AirPal Passholder — access to events, cultural festivals & perks"
+                >
+                  <Ticket size={11} className="text-amber-500" /> Passholder
+                </Link>
+              )}
             </div>
 
             {/* Handle & Subtitle */}

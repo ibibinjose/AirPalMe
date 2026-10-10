@@ -26,4 +26,12 @@ describe("TabBar", () => {
     expect(markup).toContain(">Plan<");
     expect(markup).not.toContain(">Trips<");
   });
+
+  it("renders pass tabs when navigating within AirPal Pass mode", () => {
+    const markup = renderToStaticMarkup(createElement(TabBar, { path: "/pass" }));
+    expect(markup).toContain(">Pass<");
+    expect(markup).toContain(">Events<");
+    expect(markup).toContain(">Tickets<");
+    expect(markup).toContain(">Scan<");
+  });
 });

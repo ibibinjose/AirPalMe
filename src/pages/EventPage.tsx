@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useRoute, useLocation, useSearch } from "wouter";
-import { Check, ChevronDown, Heart, MapPin, Plus, Share2, Sparkles, Star, ArrowLeft } from "lucide-react";
+import { useRoute, useLocation, useSearch, Link } from "wouter";
+import { Check, ChevronDown, Heart, MapPin, Plus, Share2, Sparkles, Star, ArrowLeft, Ticket } from "lucide-react";
 import { toast } from "sonner";
 import { StickyAction } from "@/components/design-system/companions";
 import { Button } from "@/components/ui/Button";
@@ -200,17 +200,29 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
       <div className="flex items-center justify-between px-4 py-3 border-b border-line/60">
         <button
           type="button"
-          onClick={() => nav("/calendar")}
-          className="inline-flex min-h-[44px] items-center gap-1.5 text-xs font-medium text-mute hover:text-ink transition"
+          onClick={() => {
+            if (window.history.length > 1) {
+              window.history.back();
+            } else {
+              nav("/pass");
+            }
+          }}
+          className="inline-flex min-h-[44px] items-center gap-1.5 text-xs font-semibold text-mute hover:text-ink transition cursor-pointer"
         >
           <ArrowLeft size={14} />
-          <span>Calendar</span>
+          <span>Back</span>
         </button>
+
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-800 dark:text-amber-300 ring-1 ring-amber-400/30">
+          <Ticket size={13} />
+          <span>AirPal Pass</span>
+        </div>
+
         <button
           type="button"
           onClick={handleShare}
           aria-label="Share event"
-          className="grid h-11 w-11 place-items-center rounded-full bg-card ring-1 ring-line text-mute hover:text-ink transition"
+          className="grid h-11 w-11 place-items-center rounded-full bg-card ring-1 ring-line text-mute hover:text-ink transition cursor-pointer"
           title="Share"
         >
           <Share2 size={16} />
@@ -246,6 +258,12 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
               <Sparkles size={11} /> Local Event
             </span>
           )}
+          <Link
+            href={`/plan/new?title=${encodeURIComponent(event.title)}&date=${event.date}`}
+            className="inline-flex items-center gap-1 rounded-full bg-paper px-2.5 py-0.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card transition"
+          >
+            <Sparkles size={11} className="text-accent" /> Add to Day Plan
+          </Link>
         </div>
 
         <h1 className="font-display mt-3 text-3xl font-bold tracking-tight text-ink md:text-4xl">{event.title}</h1>

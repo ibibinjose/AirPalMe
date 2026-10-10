@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import {
   Compass,
   Plus,
@@ -16,8 +16,10 @@ import {
   Car,
   PartyPopper,
   Heart,
+  Ticket,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 import { usePlans } from "@/contexts/PlanContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { PlanGridCard } from "@/components/airpal/PlanGridCard";
@@ -218,6 +220,18 @@ export function PlanHubPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:py-10 pb-28">
+      {/* Ecosystem Lens Switcher */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <EcosystemSwitcher currentPath="/plan" variant="header" />
+        <Link
+          href="/pass"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 py-2 text-xs font-bold text-ink ring-1 ring-line shadow-xs hover:bg-paper transition"
+        >
+          <Ticket size={14} className="text-amber-500" />
+          <span>Events &amp; Deals on Pass →</span>
+        </Link>
+      </div>
+
       {/* Header — Plans: Liquid Glass Title & Action */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>

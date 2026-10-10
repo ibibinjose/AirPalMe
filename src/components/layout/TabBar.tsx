@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { triggerHapticSelection } from "@/lib/native";
 import { isPassApp } from "@/lib/app-flavor";
+import { getEcosystemMode } from "@/components/brand/EcosystemSwitcher";
 import { useVirtualKeyboard } from "@/lib/keyboard";
 import { passTabFromPath, tabFromPath, type GuestTab, type PassTab } from "@/lib/tabs";
 
@@ -75,8 +76,9 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
   const { user } = useAuth();
   const { mine } = useBio();
   const passShell = isPassApp();
-  const tabs = passShell ? PASS_TABS : TABS;
-  const active = passShell ? passTabFromPath(path) : tabFromPath(path);
+  const isPass = passShell || getEcosystemMode(path) === "pass";
+  const tabs = isPass ? PASS_TABS : TABS;
+  const active = isPass ? passTabFromPath(path) : tabFromPath(path);
   const { isKeyboardOpen } = useVirtualKeyboard();
   const meHref = !user ? "/start" : mine?.handle ? `/@${mine.handle}` : "/bio/setup";
   const inboxUnread = useInboxUnread(user?.uid);
