@@ -3,6 +3,7 @@ import { useLocation, useRoute, Link } from "wouter";
 import { toast } from "sonner";
 import {
   ArrowLeft,
+  ArrowRight,
   Building2,
   Calendar,
   Check,
@@ -30,6 +31,7 @@ import {
   Sparkles,
   Ticket,
   UserPlus,
+  UserRound,
   Users,
   Utensils,
   Video,
@@ -58,6 +60,15 @@ import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { AirPalChatModal } from "@/components/messaging/AirPalChatModal";
 import { createConversationRecord } from "@/lib/chat-store";
 import { inviteLinkFor } from "@/lib/app-invites";
+import { AppleWalletButton } from "@/components/ui/AppleWalletButton";
+import { GoogleWalletButton } from "@/components/ui/GoogleWalletButton";
+import {
+  businessCardWalletPassUrl,
+  googleWalletCardUrl,
+  openAppleWalletPass,
+  openGoogleWalletPass,
+} from "@/lib/wallet";
+import { makeQrDataUrl } from "@/lib/qr";
 import type { UniversalConversation } from "@shared/messaging";
 import {
   listCatchUpsForHandle,
@@ -287,6 +298,19 @@ export function BioPublicPage() {
   }, [claim]);
 
   const profile = remote || local;
+  const [bioQrUrl, setBioQrUrl] = useState<string>("");
+
+  useEffect(() => {
+    if (!profile?.handle) return;
+    let live = true;
+    void makeQrDataUrl(toPublicUrl(bioPath(profile.handle)), 320).then((data) => {
+      if (live) setBioQrUrl(data);
+    });
+    return () => {
+      live = false;
+    };
+  }, [profile?.handle]);
+
   const loadFailed = useRef("");
 
   useEffect(() => {
@@ -644,6 +668,25 @@ export function BioPublicPage() {
 
   return (
     <div className="mx-auto max-w-2xl pb-20 pb-safe sm:py-6">
+      {isOwner && (
+        <div className="mb-3 mx-3 sm:mx-0 flex items-center justify-between gap-3 rounded-2xl bg-brand/10 p-3 ring-1 ring-brand/25 shadow-2xs">
+          <div className="flex items-center gap-2 min-w-0">
+            <UserRound size={16} className="text-accent shrink-0" />
+            <p className="text-xs font-semibold text-ink truncate">
+              Public Bio view · Your appointments, tickets &amp; schedule live in Me
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => nav("/me")}
+            className="shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-brand px-3.5 py-1 text-xs font-bold text-white transition hover:bg-brand-ink active:scale-95 shadow-2xs cursor-pointer"
+          >
+            <span>Open Me</span>
+            <ArrowRight size={12} />
+          </button>
+        </div>
+      )}
+
       {/* Main Glass Card Wrapper */}
       <div className="overflow-hidden bg-card/95 sm:rounded-[36px] sm:ring-1 sm:ring-line/80 sm:shadow-clay backdrop-blur-xl">
         {/* Cover Hero Header */}
@@ -760,13 +803,21 @@ export function BioPublicPage() {
               {isOwner ? (
                 <div className="flex items-center gap-1.5">
                   <Button
+                    size="sm"
+                    className="gap-1.5 rounded-full bg-brand px-3.5 text-xs font-bold text-white shadow-xs hover:bg-brand-ink active:scale-95 cursor-pointer"
+                    onClick={() => nav("/me")}
+                  >
+                    <UserRound size={13} />
+                    Me Dashboard
+                  </Button>
+                  <Button
                     variant="ghost"
                     size="sm"
-                    className="gap-1.5 rounded-full border border-line bg-paper/80 px-3.5 text-xs font-semibold text-ink shadow-2xs hover:bg-paper active:scale-95"
+                    className="gap-1.5 rounded-full border border-line bg-paper/80 px-3 text-xs font-semibold text-ink shadow-2xs hover:bg-paper active:scale-95"
                     onClick={() => nav("/bio/edit")}
                   >
                     <Edit3 size={13} />
-                    Edit Profile
+                    Edit
                   </Button>
                 </div>
               ) : unclaimed ? (
@@ -1025,6 +1076,77 @@ export function BioPublicPage() {
                 <span className="truncate">Call</span>
               </div>
             )}
+          </div>
+
+          {/* 🪪 Digital ID · AirPal Bio Pass (QR + Apple & Google Wallet) */}
+          <div className="mt-5 rounded-3xl bg-gradient-to-br from-card via-card to-paper p-4 sm:p-5 ring-1 ring-line/80 shadow-xs">
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-accent">
+                <QrCode size={14} className="text-accent" />
+                <span>AirPal Bio Pass · Digital ID</span>
+              </div>
+              <span className="text-[11px] font-mono font-semibold text-mute">
+                @{bio.handle}
+              </span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div
+                onClick={() => setShareModalOpen(true)}
+                className="relative group cursor-pointer shrink-0 grid place-items-center h-32 w-32 rounded-2xl bg-white p-2 shadow-inner ring-1 ring-black/5 hover:ring-brand/50 transition-all duration-200"
+                title="Click to enlarge or download QR Code"
+              >
+                {bioQrUrl ? (
+                  <img src={bioQrUrl} alt={`QR Code for @${bio.handle}`} className="h-full w-full object-contain" />
+                ) : (
+                  <div className="text-[10px] text-mute animate-pulse">Loading QR…</div>
+                )}
+                <span className="absolute inset-0 bg-brand/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity grid place-items-center">
+                  <span className="text-[10px] font-bold bg-ink/80 text-white rounded-full px-2 py-0.5">Enlarge</span>
+                </span>
+              </div>
+
+              <div className="flex-1 min-w-0 w-full space-y-2">
+                <p className="text-xs text-mute leading-relaxed text-center sm:text-left">
+                  Scan to view this profile instantly on any phone, or add to Apple Wallet &amp; Google Wallet as a digital contact pass.
+                </p>
+
+                <div className="flex flex-col sm:flex-row items-center gap-2 pt-1">
+                  <AppleWalletButton
+                    className="w-full sm:w-auto flex-1 justify-center min-h-[40px]"
+                    onClick={() => {
+                      const passUrl = businessCardWalletPassUrl(bio.handle);
+                      void openAppleWalletPass(passUrl, "@" + bio.handle + "-AirPal-Pass");
+                    }}
+                  />
+                  <GoogleWalletButton
+                    className="w-full sm:w-auto flex-1 justify-center min-h-[40px]"
+                    onClick={() => {
+                      void openGoogleWalletPass(googleWalletCardUrl(bio.handle));
+                    }}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between sm:justify-start gap-3 pt-0.5 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setShareModalOpen(true)}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent hover:underline cursor-pointer"
+                  >
+                    <Share2 size={12} />
+                    <span>Share or Print QR</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleQuickCopy}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-mute hover:text-ink cursor-pointer"
+                  >
+                    {copiedLink ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                    <span>{copiedLink ? "Link Copied" : "Copy Link"}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Business & Stay profile specific overview, facilities & actions */}

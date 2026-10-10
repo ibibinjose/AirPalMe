@@ -12,17 +12,17 @@ describe("tabFromPath", () => {
     expect(tabFromPath("/invite/abc")).toBe("trips");
     expect(tabFromPath("/scan")).toBe("scan");
     expect(tabFromPath("/w/abcd")).toBe("scan");
-    expect(tabFromPath("/me/inbox")).toBe("inbox");
     expect(tabFromPath("/concierge")).toBe("explore");
     expect(tabFromPath("/g/harbour-hotel")).toBe("explore");
     expect(tabFromPath("/q/sydney/harbour")).toBe("explore");
   });
 
-  it("maps personal bio and settings to the Me tab", () => {
+  it("maps personal bio to the Bio tab and dashboard/settings to the Me tab", () => {
     expect(tabFromPath("/me")).toBe("me");
-    expect(tabFromPath("/bio/setup")).toBe("me");
-    expect(tabFromPath("/@maya")).toBe("me");
+    expect(tabFromPath("/me/inbox")).toBe("me");
     expect(tabFromPath("/settings")).toBe("me");
+    expect(tabFromPath("/bio/setup")).toBe("bio");
+    expect(tabFromPath("/@maya")).toBe("bio");
   });
 
   it("maps home route to home (accessible via top App icon)", () => {

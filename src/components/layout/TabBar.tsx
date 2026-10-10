@@ -1,4 +1,4 @@
-import { AtSign, CalendarDays, Compass, Home, Inbox, QrCode, ScanLine, Ticket } from "@/components/icons";
+import { AtSign, CalendarDays, Compass, Home, QrCode, ScanLine, Ticket, UserRound } from "@/components/icons";
 import { useLocation } from "wouter";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -16,22 +16,22 @@ import { passTabFromPath, tabFromPath, type GuestTab, type PassTab } from "@/lib
 
 export { tabFromPath };
 
-/** Shipped companion dock: Home / Now / Plan / Inbox / Me. Scan & create live on CreateFab. */
+/** Shipped companion dock: Home / Now / Plan / Me / Bio. */
 const TABS: { href: string; id: GuestTab; label: string; icon: typeof Compass }[] = [
   { href: "/", id: "home", label: "Home", icon: Home },
   { href: "/now", id: "explore", label: "Now", icon: Compass },
   { href: "/plan", id: "trips", label: "Plan", icon: CalendarDays },
-  { href: "/me/inbox", id: "inbox", label: "Inbox", icon: Inbox },
-  { href: "/me", id: "me", label: "Me", icon: AtSign },
+  { href: "/me", id: "me", label: "Me", icon: UserRound },
+  { href: "/bio", id: "bio", label: "Bio", icon: AtSign },
 ];
 
-/** Pass shell dock: Pass / Events / Tickets / Scan / Me. AirPal shell keeps TABS. */
+/** Pass shell dock: Pass / Events / Tickets / Scan / Me. */
 const PASS_TABS: { href: string; id: PassTab; label: string; icon: typeof Compass }[] = [
   { href: "/pass", id: "pass", label: "Pass", icon: Ticket },
   { href: "/events", id: "events", label: "Events", icon: CalendarDays },
   { href: "/me/tickets", id: "tickets", label: "Tickets", icon: QrCode },
   { href: "/scan", id: "scan", label: "Scan", icon: ScanLine },
-  { href: "/me", id: "me", label: "Me", icon: AtSign },
+  { href: "/me", id: "me", label: "Me", icon: UserRound },
 ];
 
 /** Live unread count for the Inbox tab: unanswered pings + unread activity. */
@@ -80,7 +80,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
   const tabs = isPass ? PASS_TABS : TABS;
   const active = isPass ? passTabFromPath(path) : tabFromPath(path);
   const { isKeyboardOpen } = useVirtualKeyboard();
-  const meHref = !user ? "/start" : mine?.handle ? `/@${mine.handle}` : "/bio/setup";
+  const bioHref = !user ? "/start" : mine?.handle ? `/@${mine.handle}` : "/bio/setup";
   const inboxUnread = useInboxUnread(user?.uid);
 
   return (
@@ -99,14 +99,14 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
         <div className="apple-liquid-glass-dock relative mb-[max(0.75rem,env(safe-area-inset-bottom,0px))] flex items-center justify-between rounded-full p-1.5 text-ink">
           {tabs.map((tab) => {
             const on = active === tab.id;
-            const href = tab.id === "me" ? meHref : tab.href;
+            const href = tab.id === "bio" ? bioHref : tab.href;
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 type="button"
                 aria-current={on ? "page" : undefined}
-                aria-label={tab.id === "me" ? "My bio" : tab.label}
+                aria-label={tab.id === "bio" ? "My bio" : tab.id === "me" ? "Me dashboard" : tab.label}
                 onClick={() => {
                   void triggerHapticSelection();
                   nav(href);
@@ -125,12 +125,12 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
                   />
                 )}
                 <span className="relative z-10 flex flex-col items-center justify-center gap-0.5 transition-transform duration-150">
-                  {tab.id === "me" ? (
+                  {tab.id === "bio" ? (
                     <span className="text-[17px] font-bold leading-none">@</span>
                   ) : (
                     <span className="relative">
                       <Icon size={21} strokeWidth={on ? 2.3 : 1.75} fill="none" />
-                      {tab.id === "inbox" && inboxUnread > 0 && (
+                      {tab.id === "me" && inboxUnread > 0 && (
                         <span
                           className="absolute -right-2 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white"
                           aria-label={`${inboxUnread} unread`}
