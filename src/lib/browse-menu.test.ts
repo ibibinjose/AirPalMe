@@ -81,17 +81,17 @@ describe("browse menu", () => {
   it("lists every sitemap href once across sections, hosts-only last", () => {
     const titles = BROWSE_SECTIONS.map((s) => s.title);
     expect(titles).toEqual([
-      "AirPal Pass",
-      "AirPal Me",
-      "Hotels & Stays",
-      "Organisers & Partners",
-      "Account & Universal Profile",
+      "Browse AirPal",
+      "Plan & Go",
+      "Stay & Guide",
+      "Business",
+      "Account",
       "Help & Trust",
-      "Host Operations",
+      "Host",
     ]);
     const hrefs = BROWSE_SECTIONS.flatMap((s) => s.links.map((l) => l.href));
     expect(new Set(hrefs).size).toBe(hrefs.length);
     for (const href of hrefs) expect(href.startsWith("/")).toBe(true);
-    expect(BROWSE_SECTIONS.filter((s) => s.hostsOnly).map((s) => s.title)).toEqual(["Host Operations"]);
+    expect(BROWSE_SECTIONS.filter((s) => s.hostsOnly).map((s) => s.title)).toEqual(["Host"]);
   });
 });

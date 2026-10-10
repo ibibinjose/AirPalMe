@@ -33,7 +33,7 @@ AIRPAL (Master Brand — "Life Made Easy")
 ├── 2. AIRPAL PASS — EVENTS, DEALS & EXPERIENCES
 │   │   Core Job: "Discover what's happening. Get access. Save money."
 │   │
-│   ├── /pass — Experience discovery hub (All Access, Indian & Cultural, Concerts, Gigs)
+│   ├── /pass — Experience discovery hub (All Access, Cultural, Concerts, Gigs)
 │   ├── /events — Public events catalog and festival listings
 │   ├── /deals — Exclusive member dining perks and local discounts
 │   ├── /me/tickets — Digital Passbook Wallet (QR tickets, Apple Wallet, Google Wallet)
