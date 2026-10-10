@@ -70,6 +70,8 @@ export interface CreatePlanInput {
     address?: string;
   }>;
   invited?: Array<{ id: string; name: string; handle?: string }>;
+  bookingId?: string;
+  eventId?: string;
 
   // Experience Marketplace Fields
   isExperience?: boolean;
@@ -288,6 +290,8 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         isPublic: input.isPublic ?? true,
         interests: (input.interests || []).map((t) => t.toLowerCase()),
         geo: input.geo,
+        bookingId: input.bookingId,
+        eventId: input.eventId,
 
         // Experience properties
         isExperience: input.isExperience,

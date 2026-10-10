@@ -156,7 +156,8 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
         window.location.href = res.checkoutUrl;
         return;
       }
-      toast.success("Ticket reserved — see your bookings");
+      toast.success("Ticket reserved — added to your AirPal Pass wallet");
+      nav("/me/tickets");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't start checkout.");
     } finally {

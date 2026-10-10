@@ -282,3 +282,18 @@ describe("cancelPlan", () => {
     expect(cancelPlan("no-such-plan")).toBeUndefined();
   });
 });
+
+describe("linked AirPal Pass ticket and event", () => {
+  it("preserves bookingId and eventId linkage on save and load", () => {
+    const plan = fixture();
+    savePlan({
+      ...plan,
+      bookingId: "b-12345",
+      eventId: "ev-67890",
+    });
+    const loaded = getPlan(plan.id);
+    expect(loaded?.bookingId).toBe("b-12345");
+    expect(loaded?.eventId).toBe("ev-67890");
+  });
+});
+

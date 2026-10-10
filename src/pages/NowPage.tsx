@@ -29,6 +29,7 @@ import { Photo } from "@/components/ui/Photo";
 import { LocationSheet } from "@/components/layout/LocationSheet";
 import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 import { getDailyOutfitRecommendation } from "@/lib/outfit";
+import { useMyBookings } from "@/hooks/useMyBookings";
 import { triggerHapticSelection } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
@@ -72,6 +73,17 @@ export function NowPage() {
     if (!weather) return null;
     return getDailyOutfitRecommendation(weather.temp, weather.code, weather.isDay);
   }, [weather]);
+
+  const { upcomingBookings } = useMyBookings();
+
+  const todayPass = useMemo(() => {
+    return upcomingBookings.find((b) => b.date === today);
+  }, [upcomingBookings, today]);
+
+  const nextPass = useMemo(() => {
+    if (todayPass) return null;
+    return upcomingBookings[0] || null;
+  }, [upcomingBookings, todayPass]);
 
   const effectiveCity = city && city !== "Choose a city" && city !== "Current location" ? city : "Sydney";
 
@@ -182,6 +194,64 @@ export function NowPage() {
               </div>
               <p className="text-mute mt-0.5 truncate">{outfitAdvice.outfit}</p>
             </div>
+          </div>
+        )}
+
+        {/* AirPal Pass Integration: Active Event Passes */}
+        {todayPass && (
+          <div className="mt-3 overflow-hidden rounded-3xl bg-brand p-4 text-white shadow-md ring-1 ring-white/10">
+            <div className="flex items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-amber-300 ring-1 ring-amber-400/30">
+                <Ticket size={12} /> On Your Schedule Today
+              </span>
+              <span className="text-xs font-semibold text-white/90">
+                {todayPass.time || "Today"}
+              </span>
+            </div>
+            <h3 className="font-display mt-2 text-lg font-bold text-white leading-snug">
+              {todayPass.title}
+            </h3>
+            <p className="mt-0.5 text-xs text-white/80">
+              {[todayPass.suburb, todayPass.providerName].filter(Boolean).join(" · ") || "Sydney"} · Ready to scan at gate
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <Link
+                href="/me/tickets"
+                className="inline-flex min-h-[38px] items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-xs font-bold text-neutral-950 shadow-xs transition hover:bg-neutral-100 active:scale-95"
+              >
+                <Ticket size={13} className="text-amber-600" />
+                <span>View Ticket Pass (QR)</span>
+              </Link>
+              <Link
+                href={`/plan/new?title=${encodeURIComponent(todayPass.title)}&date=${encodeURIComponent(todayPass.date || "")}&time=${encodeURIComponent(todayPass.time || "")}&dest=${encodeURIComponent(todayPass.suburb || "")}&type=nightout&bookingId=${encodeURIComponent(todayPass.id)}`}
+                className="inline-flex min-h-[38px] items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20 hover:bg-white/25 transition active:scale-95"
+              >
+                <Sparkles size={13} />
+                <span>Plan Hangout Around Event</span>
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {!todayPass && nextPass && (
+          <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-card p-3 text-xs ring-1 ring-line/80 shadow-xs">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                <Ticket size={14} />
+              </span>
+              <div className="min-w-0">
+                <span className="font-bold text-ink truncate block">Upcoming: {nextPass.title}</span>
+                <span className="text-mute truncate block">
+                  {nextPass.date}{nextPass.time ? ` at ${nextPass.time}` : ""} · {nextPass.suburb || "Sydney"}
+                </span>
+              </div>
+            </div>
+            <Link
+              href="/me/tickets"
+              className="shrink-0 inline-flex min-h-[36px] items-center rounded-full bg-paper px-3 py-1 font-bold text-accent ring-1 ring-line hover:bg-card transition"
+            >
+              View Pass →
+            </Link>
           </div>
         )}
       </div>

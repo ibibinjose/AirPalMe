@@ -278,6 +278,10 @@ export interface HangoutPlan {
   dateOptions?: PlanDateOption[];
   /** True once the host locks a date option in. */
   datePollLocked?: boolean;
+  /** Linked AirPal Pass ticket or booking ID */
+  bookingId?: string;
+  /** Linked AirPal Pass event ID */
+  eventId?: string;
 
   // Experience Marketplace & Monetization Fields (Optional for full backward compatibility)
   isExperience?: boolean;

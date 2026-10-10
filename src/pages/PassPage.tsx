@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import {
   ArrowRight,
   CalendarDays,
@@ -17,16 +17,16 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { useLocalNow } from "@/contexts/LocalNowContext";
-import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
+import { getFirebaseDb } from "@/lib/firebase";
 import { recordToCalendarBase, cityMatches } from "@/lib/remote-events";
 import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
+import { useMyBookings } from "@/hooks/useMyBookings";
 import { triggerHapticSelection } from "@/lib/native";
 import { cn } from "@/lib/cn";
 import { Photo } from "@/components/ui/Photo";
 import { mediaSrcSet } from "@/lib/media-srcset";
 import { type Promotion } from "@shared/promotions";
 import { promoArtFor } from "@/lib/promotions";
-import type { Booking } from "@shared/booking";
 
 type PassCategory = "all" | "cultural" | "music" | "deals" | "nightlife" | "community";
 
@@ -48,27 +48,7 @@ export function PassPage() {
   const [activeCategory, setActiveCategory] = useState<PassCategory>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [promotions, setPromotions] = useState<Promotion[]>([]);
-  const [myTickets, setMyTickets] = useState<Booking[]>([]);
-
-  // Load user's active tickets/passes
-  useEffect(() => {
-    const db = getFirebaseDb();
-    if (!db || !isFirebaseConfigured || !user?.uid) {
-      setMyTickets([]);
-      return;
-    }
-    let cancelled = false;
-    void getDocs(
-      query(collection(db, "bookings"), where("customerUid", "==", user.uid), orderBy("createdAt", "desc")),
-    )
-      .then((snap) => {
-        if (!cancelled) setMyTickets(snap.docs.map((d) => d.data() as Booking));
-      })
-      .catch(() => undefined);
-    return () => {
-      cancelled = true;
-    };
-  }, [user?.uid]);
+  const { bookings: myBookings, upcomingBookings: myUpcomingBookings } = useMyBookings();
 
   // Load live promotions/deals
   useEffect(() => {
@@ -185,7 +165,7 @@ export function PassPage() {
           className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-card px-4 py-2 text-xs font-bold text-ink ring-1 ring-line shadow-xs hover:bg-paper transition"
         >
           <QrCode size={14} className="text-accent" />
-          <span>My Passes ({myTickets.length})</span>
+          <span>My Passes ({myUpcomingBookings.length || myBookings.length})</span>
         </Link>
       </div>
 
@@ -295,7 +275,7 @@ export function PassPage() {
                 </p>
                 <p className="text-xs text-mute mt-0.5">
                   {user
-                    ? `You currently hold ${myTickets.length} active event pass${myTickets.length === 1 ? "" : "es"}.`
+                    ? `You currently hold ${myUpcomingBookings.length} upcoming event pass${myUpcomingBookings.length === 1 ? "" : "es"}.`
                     : "Sign in with your AirPal account to store scannable tickets and unlock member perks."}
                 </p>
               </div>
@@ -310,6 +290,37 @@ export function PassPage() {
               </Link>
             </div>
           </div>
+
+          {/* Quick Passes Preview */}
+          {user && myUpcomingBookings.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-line/60">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-accent">
+                Upcoming Scannable Passes
+              </span>
+              <div className="mt-2.5 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                {myUpcomingBookings.slice(0, 2).map((b) => (
+                  <div
+                    key={b.id}
+                    className="flex items-center justify-between gap-3 rounded-2xl bg-card p-3 ring-1 ring-line/70"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-display text-xs font-bold text-ink truncate">{b.title}</p>
+                      <p className="text-[11px] text-mute truncate mt-0.5">
+                        {[b.date, b.time].filter(Boolean).join(" · ")} · {b.suburb || "Sydney"}
+                      </p>
+                    </div>
+                    <Link
+                      href="/me/tickets"
+                      className="inline-flex min-h-[34px] shrink-0 items-center gap-1 rounded-full bg-paper px-3 text-[11px] font-bold text-accent ring-1 ring-line hover:bg-card transition"
+                    >
+                      <Ticket size={12} />
+                      <span>Pass</span>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

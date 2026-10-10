@@ -213,6 +213,8 @@ export function PlanCreatePage() {
   const targetHandle = (params.get("with") || "").replace(/^@/, "") || undefined;
   const targetName = params.get("name") || undefined;
   const paramType = params.get("type") as PlanType | null;
+  const bookingIdParam = params.get("bookingId") || undefined;
+  const eventIdParam = params.get("eventId") || undefined;
 
   const initialType: PlanType =
     paramType && TEMPLATES.some((k) => k.id === paramType)
@@ -254,7 +256,9 @@ export function PlanCreatePage() {
   const [showDetails, setShowDetails] = useState(false);
 
   // Stepped flow: 0 (Plan Type) → 1 (Details: When & where) → 2 (Who: Invites).
-  const [step, setStep] = useState<0 | 1 | 2>(targetHandle || solvedIntent ? 1 : 0);
+  const [step, setStep] = useState<0 | 1 | 2>(
+    targetHandle || solvedIntent || bookingIdParam || eventIdParam ? 1 : 0,
+  );
   const guardRef = useRef(createSubmitGuard());
 
   const circle = useMemo(() => {
@@ -348,6 +352,8 @@ export function PlanCreatePage() {
         geo: placeGeo,
         heroImage: hero,
         isPublic,
+        bookingId: bookingIdParam,
+        eventId: eventIdParam,
         invited: circle
           .filter((p) => invite.has(p.handle))
           .map((p) => ({ id: `h-${p.handle}`, name: p.name, handle: p.handle })),
@@ -496,6 +502,25 @@ export function PlanCreatePage() {
           </div>
           <span className="rounded-full bg-brand/15 px-2.5 py-0.5 text-[10px] font-bold text-accent uppercase tracking-wider">
             Connected
+          </span>
+        </div>
+      )}
+
+      {bookingIdParam && step > 0 && (
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 p-3.5 shadow-2xs">
+          <div className="flex items-center gap-2.5">
+            <span className="grid h-8 w-8 place-items-center rounded-xl bg-amber-500 text-neutral-950 text-xs font-bold">
+              <Ticket size={16} />
+            </span>
+            <div>
+              <p className="text-xs font-bold text-ink">
+                Planning around your AirPal Pass event
+              </p>
+              <p className="text-[11px] text-mute">Gate pass will be linked to this hangout thread</p>
+            </div>
+          </div>
+          <span className="rounded-full bg-amber-500/20 px-2.5 py-0.5 text-[10px] font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">
+            AirPal Pass
           </span>
         </div>
       )}

@@ -118,7 +118,7 @@ export function useMyBookings() {
         setBookings(docs);
         setIsOfflineCached(false);
         setLoading(false);
-      } catch (err) {
+      } catch (_err) {
         if (cancelled) return;
         const cached = readCachedBookings(uid);
         if (cached.length > 0) {

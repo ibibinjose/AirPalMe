@@ -111,11 +111,13 @@ export function PlanDetailPage() {
     deletePlan,
   } = usePlans();
   const { user } = useAuth();
-  // Gate-scan QR landings (?ticket=). Guests never fire it; the panel hides on denial.
-  const ticketId = user ? ticketIdFromSearch(search) : null;
+  // Gate-scan QR landings (?ticket=) or linked AirPal Pass ticket on plan.
+  const ticketFromSearch = user ? ticketIdFromSearch(search) : null;
 
   const [localPlan, setLocalPlan] = useState<HangoutPlan | undefined>(() => getPlan(targetId));
   const [loading, setLoading] = useState(!localPlan);
+
+  const ticketId = ticketFromSearch || (user && localPlan?.bookingId ? localPlan.bookingId : null);
 
   useEffect(() => {
     const p = getPlan(targetId);
