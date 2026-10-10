@@ -283,7 +283,7 @@ export function PhoneLogin({
             </ValidField>
 
             <ValidField
-              label={`Personal @${normalizeHandle(handle) || "handle"}`}
+              label={`AirPal Me @${normalizeHandle(handle) || "handle"}`}
               ok={handleOk}
               error={handle && !handleStatus.checking ? handleStatus.reason || null : null}
               hint={handleStatus.checking ? "Checking availability…" : "Word handle or hexadecimal ID"}

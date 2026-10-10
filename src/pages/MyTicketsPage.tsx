@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Calendar, RefreshCw, Ticket, WifiOff } from "lucide-react";
+import { Calendar, RefreshCw, Ticket, UserRound, WifiOff } from "lucide-react";
 import { PageLoading } from "@/components/ui/PageLoading";
 import { AirPalTicketPass } from "@/components/tickets/AirPalTicketPass";
 import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
@@ -30,13 +30,22 @@ export function MyTicketsPage() {
       {/* Ecosystem Lens Switcher */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <EcosystemSwitcher currentPath="/me/tickets" variant="header" />
-        <Link
-          href="/calendar"
-          className="no-print inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-mute ring-1 ring-line hover:bg-paper hover:text-ink"
-        >
-          <Calendar size={14} className="text-accent" />
-          <span>View in Calendar</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/me"
+            className="no-print inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-mute ring-1 ring-line hover:bg-paper hover:text-ink transition"
+          >
+            <UserRound size={14} className="text-accent" />
+            <span>Me Cockpit</span>
+          </Link>
+          <Link
+            href="/calendar"
+            className="no-print inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-mute ring-1 ring-line hover:bg-paper hover:text-ink transition"
+          >
+            <Calendar size={14} className="text-accent" />
+            <span>Calendar</span>
+          </Link>
+        </div>
       </div>
 
       <div className="flex items-center justify-between gap-2">

@@ -223,10 +223,10 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
         {step === "handle" && (
           <>
             <ValidField
-              label="Choose your Personal @handle"
+              label="Choose your AirPal Me @handle"
               ok={handleOk}
               error={handle && !handleStatus.checking ? handleStatus.reason || null : null}
-              hint={handleStatus.checking ? "Checking…" : "This is you — not your café or hotel"}
+              hint={handleStatus.checking ? "Checking…" : "This is your personal identity on AirPal"}
             >
               <input
                 value={handle}

@@ -1126,7 +1126,7 @@ export function StartPage() {
                 </ValidField>
 
                 <ValidField
-                  label="Personal @handle"
+                  label="AirPal Me @handle"
                   ok={handleOk}
                   error={
                     signupHandle && !handleStatus.checking && !handleOk

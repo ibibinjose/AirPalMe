@@ -2190,7 +2190,7 @@ export function BioPublicPage() {
               </span>
             </Link>
             <p className="text-xs text-mute">
-              AirPal.Me · Personal life &amp; digital identity ·{" "}
+              AirPal.Me · Plan your day, organise your life &amp; share who you are ·{" "}
               <Link href="/bio/setup" className="font-semibold text-ink underline hover:text-accent">
                 Claim your free @handle
               </Link>

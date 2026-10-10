@@ -319,12 +319,12 @@ export function BioEditPage() {
           </div>
           <p className="font-display text-2xl font-bold text-ink">No @ handle yet</p>
           <p className="mt-2 text-sm text-mute leading-relaxed">
-            Set up your personal AirPal profile or business place handle to get started.
+            Set up your AirPal Me profile or AirPal Pass place handle to get started.
           </p>
           <div className="mt-6 space-y-2">
             <Button className="w-full h-11 text-sm font-semibold shadow-md gap-2" onClick={() => nav("/bio/setup")}>
               <User size={16} />
-              Set Up Personal Bio
+              Set Up AirPal Me Bio
             </Button>
             <Button
               variant="ghost"
@@ -422,7 +422,7 @@ export function BioEditPage() {
       >
         <span className="flex items-center gap-1.5">
           {isBusiness ? <Store size={14} /> : <UserCheck size={14} />}
-          {isBusiness ? "Business Profile" : "Personal AirPal Bio"}
+          {isBusiness ? "AirPal Pass Place Profile" : "AirPal Me Bio"}
         </span>
         <span className="inline-flex items-center gap-1 font-mono text-[10px] lowercase text-ink/70">
           @{activeProfile.handle}
@@ -641,7 +641,7 @@ export function BioEditPage() {
               <BioKindBadge kind={activeProfile.kind} />
             </div>
             <h1 className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
-              {isBusiness ? "Edit Business Place Profile" : "Edit Personal AirPal Bio"}
+              {isBusiness ? "Edit AirPal Pass Place Profile" : "Edit AirPal Me Bio"}
             </h1>
           </div>
         </div>
@@ -687,7 +687,7 @@ export function BioEditPage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-ink">
-                  {isBusiness ? "Business / Place Profile" : "Personal AirPal Bio"}
+                  {isBusiness ? "AirPal Pass Place Profile" : "AirPal Me Bio"}
                 </span>
                 <span
                   className={cn(
@@ -701,7 +701,7 @@ export function BioEditPage() {
               <p className="text-xs text-mute mt-0.5 leading-relaxed">
                 {isBusiness
                   ? "Your place profile displays trading hours, Google Place sync, menus, and customer orders."
-                  : "Your personal @handle is your human identity for Mate catch-ups, travel companions, and social links."}
+                  : "Your @handle is your digital identity for catch-ups, friend hangouts, and verified wallet passes."}
               </p>
             </div>
           </div>
@@ -758,7 +758,7 @@ export function BioEditPage() {
                 onClick={() => nav("/bio/setup")}
               >
                 <Plus size={13} className="text-accent" />
-                <span>Claim Personal @handle</span>
+                <span>Claim AirPal Me @handle</span>
               </Button>
             )}
           </div>
@@ -1417,12 +1417,12 @@ export function BioEditPage() {
             <div className="mt-6 rounded-3xl border border-line bg-card p-5 shadow-xs">
               <div className="mb-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-accent">
-                  {isBusiness ? "Business Menu, Deals & Products" : "Personal Shop & Recommendations"}
+                  {isBusiness ? "Business Menu, Deals & Products" : "Bio Recommendations & Deals"}
                 </p>
                 <p className="text-xs text-mute mt-0.5">
                   {isBusiness
                     ? "Add your specials, signature dishes, or bookable services."
-                    : "Add deals, recommended items, or personal services you provide."}
+                    : "Add deals, recommended items, or services you provide."}
                 </p>
               </div>
               <BioCatalogEditor products={products} services={services} deals={deals} onChange={saveCatalog} />
@@ -1434,7 +1434,7 @@ export function BioEditPage() {
             <div className="mt-6 space-y-6">
               <div className="rounded-3xl border border-line bg-card p-6 text-center shadow-xs space-y-4">
                 <p className="text-xs font-bold uppercase tracking-wider text-accent">
-                  {isBusiness ? "Place QR Code & Share Link" : "Personal Profile QR & Share Link"}
+                  {isBusiness ? "Place QR Code & Share Link" : "AirPal Bio QR Code & Share Link"}
                 </p>
 
                 {qr && (

@@ -453,14 +453,21 @@ export function ProfileMenu() {
         </div>
       </div>
 
-      {/* Social & Discovery Hubs */}
+      {/* AirPal Me */}
       <div className="mt-2 space-y-0.5">
+        <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent">AirPal Me</p>
+        <Row
+          icon={UserRound}
+          label="Me Cockpit"
+          hint="Agenda, appointments & wallet"
+          badge="Me"
+          highlight
+          onClick={() => go("/me")}
+        />
         <Row
           icon={Compass}
           label="What now?"
           hint="One suggestion, then a plan"
-          badge="Now"
-          highlight
           onClick={() => go("/now")}
         />
         <Row icon={CalendarDays} label="Plans & Invites" hint="Group plans, RSVPs & meetups" onClick={() => go("/plan")} />
@@ -485,32 +492,33 @@ export function ProfileMenu() {
         {mine && (
           <Row icon={PencilLine} label="Edit Bio" hint="Profile, links, shop & share" onClick={() => go("/bio/edit")} />
         )}
+        <Row icon={Images} label="Memory Wall" hint="Keepsakes & moments" onClick={() => go("/me/memories")} />
       </div>
 
-      {/* Workspaces & Pulse Hub */}
+      {/* AirPal Pass */}
       <div className="my-1.5 h-px bg-line/80" />
-      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent">Workspaces & Business</p>
+      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent">AirPal Pass</p>
       <div className="mt-1 space-y-0.5">
         <Row
-          icon={Activity}
-          label="AirPal Pulse"
-          hint="Instant venue feedback & QR codes"
-          badge="NEW"
-          badgeColor="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-          onClick={() => go("/pulse")}
+          icon={Ticket}
+          label="AirPal Pass Hub"
+          hint="Concerts, cultural festivals & gigs"
+          badge="Pass"
+          badgeColor="bg-amber-500/15 text-amber-600 dark:text-amber-400"
+          onClick={() => go("/pass")}
         />
+        <Row icon={Ticket} label="My Tickets" hint="Passes & reservations" onClick={() => go("/me/tickets")} />
+        <Row icon={QrCode} label="Door Scanner" hint="Scan tickets & guest entry" onClick={() => go("/scan")} />
 
         <Row
-          icon={Headphones}
-          label="Help Desk Operations"
-          hint="Front desk, kitchen & event support"
-          badge="LIVE"
-          badgeColor="bg-brand/15 text-accent"
-          onClick={() => go("/helpdesk")}
+          icon={CalendarDays}
+          label={myEvent ? "Event Manager" : "Run an Event"}
+          hint={myEvent ? myEvent.name : "Market, festival, expo"}
+          onClick={() => go("/event")}
         />
 
         {isHost ? (
-          <Row icon={Building2} label="Host Workspace" hint="Hotel, venue, campus" onClick={() => go("/host")} />
+          <Row icon={Building2} label="Host Workspace" hint="Hotel, venue, campus concierge" onClick={() => go("/host")} />
         ) : (
           <Row icon={Building2} label="Stay Host" hint="Hotel, hostel, or room concierge" onClick={() => go("/join")} />
         )}
@@ -532,27 +540,22 @@ export function ProfileMenu() {
         )}
 
         <Row
-          icon={CalendarDays}
-          label={myEvent ? "Event Manager" : "Run an Event"}
-          hint={myEvent ? myEvent.name : "Market, festival, expo"}
-          onClick={() => go("/event")}
+          icon={Activity}
+          label="AirPal Pulse"
+          hint="Instant venue feedback & QR codes"
+          badge="NEW"
+          badgeColor="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+          onClick={() => go("/pulse")}
         />
 
-      </div>
-
-      {/* Personal & Tools */}
-      <div className="my-1.5 h-px bg-line/80" />
-      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent">Personal & Tools</p>
-      <div className="mt-1 space-y-0.5">
         <Row
-          icon={UserRound}
-          label="Me Dashboard"
-          hint={mine ? `@${mine.handle}` : "Profile, zoo, stats"}
-          onClick={() => go("/me")}
+          icon={Headphones}
+          label="Help Desk Operations"
+          hint="Front desk, kitchen & event support"
+          badge="LIVE"
+          badgeColor="bg-brand/15 text-accent"
+          onClick={() => go("/helpdesk")}
         />
-        <Row icon={Ticket} label="My Tickets" hint="Passes & reservations" onClick={() => go("/me/tickets")} />
-        <Row icon={Images} label="Memory Wall" hint="Keepsakes & moments" onClick={() => go("/me/memories")} />
-        <Row icon={QrCode} label="Scan QR & Wave" hint="Scan marks & interact" onClick={() => go("/scan")} />
       </div>
 
       {/* Settings & Admin */}
@@ -578,7 +581,7 @@ export function ProfileMenu() {
       <div className="rounded-2xl bg-paper/70 p-3.5 ring-1 ring-line/80 shadow-2xs">
         <p className="font-display text-sm font-bold text-ink">Welcome to AirPal</p>
         <p className="mt-0.5 text-xs text-mute leading-relaxed">
-          Sign in to start a Circle, find a Mate, make plans, and discover places.
+          Sign in to plan your day, get event passes, connect with friends, and discover experiences.
         </p>
 
         {/* Language selector under welcome header */}
@@ -604,8 +607,9 @@ export function ProfileMenu() {
         />
       </div>
 
+      {/* Guest: AirPal Me */}
       <div className="my-1.5 h-px bg-line/80" />
-      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent">Get started</p>
+      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent">AirPal Me</p>
       <div className="mt-1 space-y-0.5">
         <Row
           icon={Compass}
@@ -615,13 +619,24 @@ export function ProfileMenu() {
           onClick={() => go("/now")}
         />
         <Row
-          icon={Activity}
-          label="AirPal Pulse"
-          hint="Fast real-time guest/customer feedback"
-          badge="NEW"
-          badgeColor="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-          onClick={() => go("/pulse")}
+          icon={Sparkles}
+          label="Claim @handle"
+          hint="Reserve your unique AirPal handle"
+          onClick={() => go("/bio/setup")}
         />
+      </div>
+
+      {/* Guest: AirPal Pass */}
+      <div className="my-1.5 h-px bg-line/80" />
+      <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent">AirPal Pass</p>
+      <div className="mt-1 space-y-0.5">
+        <Row
+          icon={Ticket}
+          label="AirPal Pass Hub"
+          hint="Concerts, cultural festivals & dining perks"
+          onClick={() => go("/pass")}
+        />
+        <Row icon={QrCode} label="Scan QR Pass" hint="Scan marks & tickets" onClick={() => go("/scan")} />
         <Row
           icon={Store}
           label={NAMES.partnerAccount}
@@ -630,7 +645,14 @@ export function ProfileMenu() {
         />
         <Row icon={Building2} label="Become a Host" hint="Hotel, venue, hostel, campus" onClick={() => go("/join")} />
         <Row icon={CalendarDays} label="Organise an Event" hint="Market, expo, festival" onClick={() => go("/join")} />
-        <Row icon={QrCode} label="Scan QR & Wave" hint="Scan marks & interact" onClick={() => go("/scan")} />
+        <Row
+          icon={Activity}
+          label="AirPal Pulse"
+          hint="Fast real-time guest/customer feedback"
+          badge="NEW"
+          badgeColor="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+          onClick={() => go("/pulse")}
+        />
       </div>
 
       <div className="my-1.5 h-px bg-line/80" />
