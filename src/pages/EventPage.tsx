@@ -20,6 +20,7 @@ import { AddToTripSheet } from "@/components/plan/AddToTripSheet";
 import type { CalendarEvent } from "@shared/event";
 import type { NearbyEvent } from "@shared/nearby";
 import { ExpoDirectoryPage } from "./ExpoDirectoryPage";
+import { SpeakerRow } from "@/components/event/SpeakerRow";
 import { PageLoading } from "@/components/ui/PageLoading";
 import { NotFoundPage } from "./NotFoundPage";
 import { useLocalNow } from "@/hooks/useLocalNow";
@@ -301,6 +302,12 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
               {[event.venue, event.room].filter(Boolean).join(" · ")}, {event.city}
             </span>
           </button>
+          {event.speakers && event.speakers.length > 0 && (
+            <div className="border-t border-line/60 pt-2">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-accent mb-1">Speakers &amp; Artists</p>
+              <SpeakerRow speakers={event.speakers} />
+            </div>
+          )}
           {/* Ticket Options & Tier Selection */}
           <div className="border-t border-line/60 pt-3">
             <p className="text-[11px] font-bold uppercase tracking-wider text-accent mb-2">

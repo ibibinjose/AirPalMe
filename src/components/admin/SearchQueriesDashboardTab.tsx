@@ -346,7 +346,7 @@ export function SearchQueriesDashboardTab() {
             </Button>
             <Button
               size="sm"
-              onClick={() => nav("/search")}
+              onClick={() => nav("/now")}
               className="rounded-full text-xs font-bold gap-1 shadow-xs"
             >
               <Search size={13} />
@@ -791,8 +791,14 @@ export function SearchQueriesDashboardTab() {
                     <td className="py-3 pr-2 text-right">
                       <button
                         type="button"
-                        onClick={() => nav(`/search?q=${encodeURIComponent(item.query)}`)}
-                        className="inline-flex items-center gap-1 text-[11px] font-bold text-accent hover:underline cursor-pointer"
+                        onClick={() => {
+                          if (item.category === "events") {
+                            nav(`/events?q=${encodeURIComponent(item.query)}`);
+                          } else {
+                            nav(`/now?q=${encodeURIComponent(item.query)}`);
+                          }
+                        }}
+                        className="inline-flex min-h-[36px] items-center gap-1 text-[11px] font-bold text-accent hover:underline cursor-pointer"
                       >
                         <span>Search</span>
                         <ArrowUpRight size={12} />

@@ -161,11 +161,11 @@ export function HostActivationChecklist({
                 onClick={() => {
                   setTestScan(true);
                   saveFlag(TEST_SCAN_PREFIX + propertyId, true);
-                  nav(`/g/${propertyId}`);
+                  nav(`/join/${propertyId}`);
                 }}
-                className="h-9 shrink-0 rounded-full bg-brand px-3.5 text-xs font-semibold text-white"
+                className="inline-flex min-h-[44px] shrink-0 items-center rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs transition hover:bg-brand-ink active:scale-95"
               >
-                Open guest view
+                Open arrival view
               </button>
             )}
           </li>

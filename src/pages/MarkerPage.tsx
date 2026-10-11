@@ -171,8 +171,8 @@ export function MarkerPage() {
         {[
           { label: "Ask", run: () => setAskOpen(true) },
           {
-            label: "Stay",
-            run: () => marker?.propertyId && nav(`/g/${marker.propertyId}?room=101`),
+            label: "Arrival",
+            run: () => marker?.propertyId && nav(`/join/${marker.propertyId}`),
             hide: !isStayMarker || !marker?.propertyId,
           },
           { label: "Walk", run: () => nav("/guide") },

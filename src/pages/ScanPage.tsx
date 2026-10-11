@@ -327,7 +327,7 @@ export function ScanPage() {
           <EmptyState
             title="Nothing nearby to try yet"
             body="Enter a room number, invite code, or @handle — or open Explore."
-            action={() => nav("/")}
+            action={() => nav("/now")}
             actionLabel={t("explore")}
           />
         </div>

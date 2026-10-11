@@ -158,7 +158,7 @@ export function JoinPage() {
                   key={inst.id}
                   type="button"
                   onClick={() => handleJoin(inst.code)}
-                  className="flex items-center gap-3 rounded-2xl border border-line bg-paper/60 p-3 text-left transition hover:border-brand/40 hover:bg-card active:scale-[0.98] cursor-pointer"
+                  className="flex min-h-[56px] items-center gap-3 rounded-2xl border border-line bg-paper/60 p-3 text-left transition hover:border-brand/40 hover:bg-card active:scale-[0.98] cursor-pointer"
                 >
                   <span className="text-2xl shrink-0">{inst.badgeEmoji}</span>
                   <div className="min-w-0 flex-1">
@@ -175,12 +175,12 @@ export function JoinPage() {
 
       {/* General Public Link */}
       <div className="mt-8 text-center">
-        <p className="text-xs text-mute">
-          Not staying in a partner college or hotel?{" "}
+        <p className="text-xs text-mute flex items-center justify-center flex-wrap gap-1">
+          <span>Not staying in a partner college or hotel?</span>
           <button
             type="button"
             onClick={() => nav("/now")}
-            className="font-semibold text-accent underline cursor-pointer"
+            className="inline-flex min-h-[44px] items-center font-semibold text-accent underline cursor-pointer"
           >
             Explore Sydney as a general guest
           </button>

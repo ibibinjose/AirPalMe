@@ -1338,20 +1338,20 @@ export function BioPublicPage() {
 
                     <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <Link
-                        href={`/stay/${stayTargetId}`}
+                        href={`/join/${stayTargetId}`}
                         onClick={() => void triggerHaptic("light")}
                         className="flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-brand px-5 text-xs font-bold text-white shadow-xs transition hover:bg-brand-ink active:scale-95"
                       >
                         <DoorOpen size={15} />
-                        <span>Open Stay & Guide</span>
+                        <span>Open Arrival & Guide</span>
                       </Link>
                       <Link
-                        href={`/stay/${stayTargetId}?open=answers`}
+                        href="/helpdesk"
                         onClick={() => void triggerHaptic("light")}
                         className="flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-paper px-5 text-xs font-bold text-ink ring-1 ring-line/80 shadow-2xs transition hover:bg-paper/80 active:scale-95"
                       >
                         <Sparkles size={14} className="text-accent" />
-                        <span>Ask AirPal AI 24/7</span>
+                        <span>Ask AirPal Help Desk</span>
                       </Link>
                     </div>
                   </div>

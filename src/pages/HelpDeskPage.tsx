@@ -641,8 +641,8 @@ export function HelpDeskPage() {
                     <p className="text-xs text-mute">{evt.venue || evt.city || "Sydney"}</p>
                   </div>
                   <Link
-                    href={`/events/${evt.id}/manage`}
-                    className="rounded-full bg-paper px-3 py-1 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card transition"
+                    href={`/e/${evt.id}/guests`}
+                    className="inline-flex min-h-[44px] items-center rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card transition"
                   >
                     Event Desk
                   </Link>

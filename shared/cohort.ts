@@ -175,7 +175,12 @@ export const SEED_COHORT_EXPERIENCES: Record<string, CohortHostedExperience[]> =
 export function findInstitutionByCode(code: string): Institution | undefined {
   if (!code) return undefined;
   const clean = code.trim().toUpperCase();
-  return SEED_INSTITUTIONS.find((inst) => inst.code.toUpperCase() === clean);
+  return SEED_INSTITUTIONS.find(
+    (inst) =>
+      inst.code.toUpperCase() === clean ||
+      inst.id.toUpperCase() === clean ||
+      inst.id.replace(/-/g, "").toUpperCase() === clean,
+  );
 }
 
 export function findInstitutionById(id: string): Institution | undefined {

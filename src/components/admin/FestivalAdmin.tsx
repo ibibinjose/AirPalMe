@@ -73,13 +73,13 @@ export function FestivalAdmin() {
       {loading ? (
         <p className="mt-3 text-sm text-mute">Loading festivals…</p>
       ) : visible.length === 0 ? (
-        <p className="mt-3 text-sm text-mute">No festivals here. Organizers create them at /f/new.</p>
+        <p className="mt-3 text-sm text-mute">No festivals here. Organizers create them at /event.</p>
       ) : (
         <ul className="mt-3 space-y-2">
           {visible.map((row) => (
             <li key={row.slug} className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-paper px-3 py-2 ring-1 ring-line/60">
               <span className="min-w-0 text-[13px]">
-                <Link href={`/f/${row.slug}`} className="font-semibold text-ink">
+                <Link href={`/events?q=${encodeURIComponent(row.name || row.slug)}`} className="font-semibold text-ink hover:underline">
                   {row.name}
                 </Link>
                 <span className="text-mute">

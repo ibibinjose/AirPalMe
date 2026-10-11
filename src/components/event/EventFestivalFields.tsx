@@ -35,7 +35,7 @@ export function EventFestivalFields({ values, onChange }: Props) {
       <div className="flex items-center justify-between">
         <p className="text-xs font-bold uppercase tracking-wider text-accent">Festival program (optional)</p>
         {slug && slugState === "ok" && (
-          <Link href={`/f/${slug}`} className="text-[11px] font-semibold text-accent hover:underline">
+          <Link href={`/events?q=${encodeURIComponent(slug)}`} className="text-[11px] font-semibold text-accent hover:underline">
             View program
           </Link>
         )}

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useSearch } from "wouter";
 import {
   ArrowRight,
   Clock,
@@ -8,10 +8,12 @@ import {
   MapPin,
   Navigation,
   RefreshCw,
+  Search,
   Share2,
   Sparkles,
   Tag,
   Ticket,
+  X,
 } from "lucide-react";
 import { useListings } from "@/contexts/ListingsContext";
 import { useLocalNow } from "@/contexts/LocalNowContext";
@@ -86,6 +88,15 @@ export function NowPage() {
     return upcomingBookings[0] || null;
   }, [upcomingBookings, todayPass]);
 
+  const searchString = useSearch();
+  const searchParam = useMemo(() => {
+    try {
+      return new URLSearchParams(searchString).get("q")?.trim() || "";
+    } catch {
+      return "";
+    }
+  }, [searchString]);
+
   const effectiveCity = city && city !== "Choose a city" && city !== "Current location" ? city : "Sydney";
 
   const pool = useMemo(
@@ -93,10 +104,32 @@ export function NowPage() {
     [here, effectiveCity, usingGps, version],
   );
 
+  const filteredPool = useMemo(() => {
+    if (!searchParam) return pool;
+    const qLower = searchParam.toLowerCase();
+    const matched = pool.filter((p) => {
+      const name = (p.name || "").toLowerCase();
+      const why = (p.shortWhy || "").toLowerCase();
+      const cat = (p.category || "").toLowerCase();
+      const addr = (p.address || "").toLowerCase();
+      const desc = (p.description || "").toLowerCase();
+      const tip = (p.insiderTip || "").toLowerCase();
+      return (
+        name.includes(qLower) ||
+        why.includes(qLower) ||
+        cat.includes(qLower) ||
+        addr.includes(qLower) ||
+        desc.includes(qLower) ||
+        tip.includes(qLower)
+      );
+    });
+    return matched.length > 0 ? matched : pool;
+  }, [pool, searchParam]);
+
   const weekday = zonedWeekdayIndex(now, timeZone);
   const suggestion = useMemo(
-    () => pickSuggestion(pool, { mood, when, now, timeZone, weekday, excludeIds: excluded }),
-    [pool, mood, when, now, timeZone, weekday, excluded],
+    () => pickSuggestion(filteredPool, { mood, when, now, timeZone, weekday, excludeIds: excluded }),
+    [filteredPool, mood, when, now, timeZone, weekday, excluded],
   );
 
   const selectMood = (id: NowMood) => {
@@ -177,6 +210,24 @@ export function NowPage() {
         <p className="mt-1.5 text-[15px] leading-relaxed text-mute">
           Plan your day with AirPal.Me — pick a vibe, get one real nearby spot, and go.
         </p>
+
+        {/* Active Search Query Handoff */}
+        {searchParam && (
+          <div className="mt-3 flex items-center justify-between gap-2 rounded-2xl bg-brand/10 p-3 text-xs font-semibold text-accent ring-1 ring-brand/20">
+            <div className="flex items-center gap-2">
+              <Search size={14} className="shrink-0" />
+              <span>Showing places matching &ldquo;{searchParam}&rdquo;</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate("/now")}
+              className="inline-flex min-h-[36px] items-center gap-1 rounded-full bg-paper px-3 py-1 text-ink ring-1 ring-line hover:bg-card transition cursor-pointer"
+            >
+              <X size={13} />
+              <span>Clear</span>
+            </button>
+          </div>
+        )}
 
         {/* Live Weather & Outfit Context */}
         {weather && outfitAdvice && (

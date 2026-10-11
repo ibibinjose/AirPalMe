@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Link, useLocation } from "wouter";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation, useSearch } from "wouter";
 import { ArrowLeft, CalendarDays, ChevronDown, MapPin, Plus, Search, Ticket, X } from "lucide-react";
 import { useEvents } from "@/contexts/EventsContext";
 import { useLocalNow } from "@/contexts/LocalNowContext";
@@ -136,10 +136,25 @@ export function EventsPage() {
   const { city, today, chooseLocation } = useLocalNow();
   const effectiveCity = city && city !== "Choose a city" && city !== "Current location" ? city : "Sydney";
 
+  const searchString = useSearch();
+  const searchParam = useMemo(() => {
+    try {
+      return new URLSearchParams(searchString).get("q")?.trim() || "";
+    } catch {
+      return "";
+    }
+  }, [searchString]);
+
   const [category, setCategory] = useState<EventCategory>("all");
   const [dateRange, setDateRange] = useState<DateRange>("all");
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(() => searchParam);
   const [cityMenuOpen, setCityMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParam) {
+      setQuery(searchParam);
+    }
+  }, [searchParam]);
 
   // All upcoming events for the selected city
   const cityEvents = useMemo(() => {

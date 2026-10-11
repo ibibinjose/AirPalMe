@@ -134,7 +134,7 @@ export function AppRoutes() {
             <Redirect to="/now" />
           </Route>
           <Route path="/search">
-            <Redirect to="/now" />
+            {() => <Redirect to={`/now${typeof window !== "undefined" && window.location.search ? window.location.search : ""}`} />}
           </Route>
           <Route path="/admin/search-analytics" component={SearchAnalyticsPage} />
           <Route path="/search/analytics">
@@ -151,8 +151,13 @@ export function AppRoutes() {
           <Route path="/stay">
             <Redirect to="/business" />
           </Route>
-          <Route path="/g/:id">
-            <Redirect to="/now" />
+          <Route path="/g/:id">{(p) => <Redirect to={`/join/${p.id}`} />}</Route>
+          <Route path="/g">
+            <Redirect to="/join" />
+          </Route>
+          <Route path="/c/:id">{(p) => <Redirect to={`/join/${p.id}`} />}</Route>
+          <Route path="/c">
+            <Redirect to="/join" />
           </Route>
           <Route path="/stay/@:handle">{(p) => <Redirect to={`/@${p.handle}`} />}</Route>
           <Route path="/stay/:id">
@@ -166,9 +171,18 @@ export function AppRoutes() {
           <Route path="/p/:id" component={PlacePage} />
           <Route path="/e/:eventId/s/:stallId" component={StallPage} />
           <Route path="/e/:id/guests" component={GuestlistPage} />
+          <Route path="/e/:id/manage">{(p) => <Redirect to={`/e/${p.id}/guests`} />}</Route>
+          <Route path="/events/:id/manage">{(p) => <Redirect to={`/e/${p.id}/guests`} />}</Route>
           <Route path="/e/:id" component={EventPage} />
           <Route path="/ticket/:id" component={TicketPage} />
           <Route path="/calendar" component={CalendarPage} />
+          <Route path="/f/:slug">{(p) => <Redirect to={`/events?q=${encodeURIComponent(p.slug)}`} />}</Route>
+          <Route path="/f/new">
+            <Redirect to="/event" />
+          </Route>
+          <Route path="/f">
+            <Redirect to="/events" />
+          </Route>
           <Route path="/events" component={EventsPage} />
           <Route path="/pass" component={PassPage} />
           <Route path="/pass/events">
