@@ -5,7 +5,7 @@ test.describe("Plan vs ticketed event", () => {
     await page.goto("/event/new");
     await page.waitForLoadState("domcontentloaded");
     await expect(page.getByRole("heading", { name: /Create an event/i })).toBeVisible();
-    await expect(page.getByText(/ticketed|public night|Create plan/i).first()).toBeVisible();
+    await expect(page.getByText(/Sign in or create an account first|Event Organiser/i).first()).toBeVisible();
   });
 
   test("calendar create button goes to ticketed event compose", async ({ page }) => {

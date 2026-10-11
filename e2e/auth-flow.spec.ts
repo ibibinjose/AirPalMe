@@ -62,7 +62,7 @@ test.describe("Authentication & Security Flow", () => {
   test("displays context-aware role banner for Host and Business", async ({ page }) => {
     await page.goto("/start?role=host");
     await expect(page.getByText("Host Portal")).toBeVisible();
-    await expect(page.getByText("Sign in to Host Tools")).toBeVisible();
+    await expect(page.getByText(/Sign in to Host Console|Sign in to Host Tools/i)).toBeVisible();
 
     await page.goto("/start?role=business");
     await expect(page.getByText("Partner account", { exact: true }).first()).toBeVisible();

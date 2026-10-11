@@ -15,7 +15,6 @@ import {
   HeartHandshake,
   TrendingUp,
   Ticket,
-  Tag,
 } from "lucide-react";
 import { useSearchQueryLogger, usePopularSearches } from "@/hooks/useSearchQueryLogger";
 import { activePlaces, placeByHandle, placesForLocation, toursForPrecinct } from "@/lib/catalog";
@@ -242,7 +241,21 @@ export function GlobalSearchModal() {
         }
         return items;
       }
-      if (activeCategory === "circle" || activeCategory === "stay") {
+      if (activeCategory === "deals") {
+        for (const promo of promotions.slice(0, 10)) {
+          items.push({
+            id: `promo-${promo.id}`,
+            category: "deal",
+            title: promo.title,
+            subtitle: `${promo.sponsorName} · ${promo.prize?.title || promo.category}`,
+            badge: promo.prizeValue || "Perk",
+            href: `/deals/${promo.id}`,
+            icon: Sparkles,
+          });
+        }
+        return items;
+      }
+      if (activeCategory === "circle") {
         items.push({
           id: "circle-hub",
           category: "person",
@@ -275,7 +288,7 @@ export function GlobalSearchModal() {
         }
         return items;
       }
-      if (activeCategory === "plan") {
+      if (activeCategory === "plan" || activeCategory === "plans") {
         items.push({
           id: "plan-create",
           category: "plan",
@@ -304,6 +317,29 @@ export function GlobalSearchModal() {
         }
         return items;
       }
+      if (activeCategory === "people") {
+        items.push({
+          id: "bio-claim",
+          category: "person",
+          title: "Claim Personal Bio",
+          subtitle: "Your @handle link & vibes",
+          badge: "Bio",
+          href: "/bio/setup",
+          icon: Sparkles,
+        });
+        for (const p of listPeople().slice(0, 8)) {
+          items.push({
+            id: `met-${p.id}`,
+            category: "person",
+            title: p.name,
+            subtitle: p.handle ? `@${p.handle}` : p.whereMet || "People you met",
+            badge: "Met",
+            href: p.handle ? bioPath(p.handle) : "/me",
+            icon: HeartHandshake,
+          });
+        }
+        return items;
+      }
     }
 
     function pushPerson(item: SearchResultItem) {
@@ -312,8 +348,17 @@ export function GlobalSearchModal() {
       items.push(item);
     }
 
-    // 0. People / bios by @handle (local cache + remote exact hit + saved contacts)
+    // 0. Bios by @handle (local cache + remote exact hit)
     if (handleBio && profileMatchesSearch(handleBio, needle)) {
+      const bioScore = scoreSearchItem(
+        {
+          title: handleBio.name || `@${handleBio.handle}`,
+          subtitle: handleBio.shortWhy,
+          handle: handleBio.handle,
+          category: handleBio.kind,
+        },
+        query,
+      );
       pushPerson({
         id: `bio-${handleBio.id || handleBio.handle}`,
         category: "person",
@@ -322,19 +367,31 @@ export function GlobalSearchModal() {
         badge: bioKindLabel(handleBio.kind),
         href: bioPath(handleBio.handle),
         icon: HeartHandshake,
+        score: bioScore || 120,
       });
     }
     for (const bio of loadBios()) {
-      if (!profileMatchesSearch(bio, needle)) continue;
-      pushPerson({
-        id: `bio-${bio.id || bio.handle}`,
-        category: "person",
-        title: bio.name || `@${bio.handle}`,
-        subtitle: `@${bio.handle}${bio.shortWhy ? ` · ${bio.shortWhy}` : ""}`,
-        badge: bioKindLabel(bio.kind),
-        href: bioPath(bio.handle),
-        icon: HeartHandshake,
-      });
+      const bioScore = scoreSearchItem(
+        {
+          title: bio.name || `@${bio.handle}`,
+          subtitle: bio.shortWhy,
+          handle: bio.handle,
+          category: bio.kind,
+        },
+        query,
+      );
+      if (bioScore > 0 || profileMatchesSearch(bio, needle)) {
+        pushPerson({
+          id: `bio-${bio.id || bio.handle}`,
+          category: "person",
+          title: bio.name || `@${bio.handle}`,
+          subtitle: `@${bio.handle}${bio.shortWhy ? ` · ${bio.shortWhy}` : ""}`,
+          badge: bioKindLabel(bio.kind),
+          href: bioPath(bio.handle),
+          icon: HeartHandshake,
+          score: bioScore || 80,
+        });
+      }
     }
     if (needle.looksLikeHandle) {
       const resolved = resolvePublicBio(needle.handle, (h) => loadBios().find((b) => b.handle === h));
@@ -347,6 +404,7 @@ export function GlobalSearchModal() {
           badge: bioKindLabel(resolved.kind),
           href: bioPath(resolved.handle),
           icon: HeartHandshake,
+          score: 130,
         });
       } else {
         const place = placeByHandle(needle.handle);
@@ -359,37 +417,49 @@ export function GlobalSearchModal() {
             badge: place.category,
             href: hrefForPlace(place),
             icon: MapPin,
+            score: 140,
           });
         }
       }
     }
     for (const person of listPeople()) {
-      const handle = (person.handle || "").toLowerCase();
-      if (!q) continue;
-      if (!(handle && (handle === needle.handle || handle.includes(q))) && !person.name.toLowerCase().includes(q)) {
-        continue;
+      const pScore = scoreSearchItem(
+        {
+          title: person.name,
+          subtitle: person.whereMet,
+          handle: person.handle,
+        },
+        query,
+      );
+      if (pScore > 0) {
+        pushPerson({
+          id: `met-${person.id}`,
+          category: "person",
+          title: person.name,
+          subtitle: person.handle ? `@${person.handle}` : person.whereMet || "People you met",
+          badge: "Met",
+          href: person.handle ? bioPath(person.handle) : "/me",
+          icon: HeartHandshake,
+          score: pScore,
+        });
       }
-      pushPerson({
-        id: `met-${person.id}`,
-        category: "person",
-        title: person.name,
-        subtitle: person.handle ? `@${person.handle}` : person.whereMet || "People you met",
-        badge: "Met",
-        href: person.handle ? bioPath(person.handle) : "/me",
-        icon: HeartHandshake,
-      });
     }
 
-    // 1. Match Places (live listings only — empty DB means no place results)
+    // 1. Match Places (live listings scored via multi-token search)
     for (const p of placesForLocation(activePlaces(), here, city, usingGps)) {
       const placeHandle = handleOfPlace(p) || "";
-      if (
-        p.name.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        p.shortWhy.toLowerCase().includes(q) ||
-        (p.address && p.address.toLowerCase().includes(q)) ||
-        (placeHandle && (placeHandle === needle.handle || placeHandle.includes(q)))
-      ) {
+      const pScore = scoreSearchItem(
+        {
+          title: p.name,
+          subtitle: p.shortWhy || p.address,
+          description: p.description,
+          category: p.category,
+          handle: placeHandle,
+          tags: p.deal ? [p.deal.badge, p.deal.detail] : undefined,
+        },
+        query,
+      );
+      if (pScore > 0) {
         items.push({
           id: `place-${p.id}`,
           category: "place",
@@ -398,6 +468,7 @@ export function GlobalSearchModal() {
           badge: p.category,
           href: hrefForPlace(p),
           icon: MapPin,
+          score: pScore,
         });
       }
     }
@@ -405,11 +476,17 @@ export function GlobalSearchModal() {
     // 2. Match Events
     for (const e of calendarEvents) {
       if (!cityMatches(e.city, city)) continue;
-      if (
-        e.title.toLowerCase().includes(q) ||
-        e.category.toLowerCase().includes(q) ||
-        e.venue.toLowerCase().includes(q)
-      ) {
+      const eScore = scoreSearchItem(
+        {
+          title: e.title,
+          subtitle: `${e.timeLabel} · ${e.venue}`,
+          description: e.description,
+          category: e.categoryLabel || e.category,
+          keywords: [e.venue, e.city],
+        },
+        query,
+      );
+      if (eScore > 0) {
         items.push({
           id: `event-${e.id}`,
           category: "event",
@@ -418,11 +495,74 @@ export function GlobalSearchModal() {
           badge: e.categoryLabel,
           href: `/calendar?event=${e.id}`,
           icon: CalendarDays,
+          score: eScore,
         });
       }
     }
 
-    // 3. Match Circle / Networking actions
+    // 3. Match Deals & Perks (Pillar 4)
+    for (const promo of promotions) {
+      const promoScore = scoreSearchItem(
+        {
+          title: promo.title,
+          subtitle: `${promo.sponsorName} · ${promo.category}`,
+          description: promo.description,
+          category: promo.category,
+          tags: [promo.kind, promo.status],
+          keywords: [promo.sponsorName, promo.prize?.title || "", promo.prizeValue || "", "deal", "perk", "discount", "offer"],
+        },
+        query,
+      );
+      if (promoScore > 0) {
+        items.push({
+          id: `promo-${promo.id}`,
+          category: "deal",
+          title: promo.title,
+          subtitle: `${promo.sponsorName} · ${promo.prize?.title || promo.category}`,
+          badge: promo.prizeValue || "Perk",
+          href: `/deals/${promo.id}`,
+          icon: Sparkles,
+          score: promoScore,
+        });
+      }
+    }
+
+    // 4. Match AirPal Pass & Ticketing Shortcuts
+    const passKeywords = ["pass", "ticket", "tickets", "admission", "scanner", "scan", "wallet", "gig", "mela", "festival", "concert"];
+    if (passKeywords.some((k) => q.includes(k))) {
+      items.push({
+        id: "airpal-pass",
+        category: "event",
+        title: "AirPal Pass",
+        subtitle: "Live concerts, Indian festivals & digital passbook tickets",
+        badge: "Pass",
+        href: "/pass",
+        icon: Ticket,
+        score: 95,
+      });
+      items.push({
+        id: "my-tickets",
+        category: "event",
+        title: "My Ticket Wallet",
+        subtitle: "View your saved passes, dynamic QR codes & receipts",
+        badge: "Wallet",
+        href: "/me/tickets",
+        icon: Sparkles,
+        score: 90,
+      });
+      items.push({
+        id: "door-scan",
+        category: "event",
+        title: "Gate Admission Scanner",
+        subtitle: "Scan dynamic pass QR codes at entry gates",
+        badge: "Scanner",
+        href: "/scan",
+        icon: Compass,
+        score: 85,
+      });
+    }
+
+    // 5. Match Circle / Networking actions
     const circleKeywords = ["circle", "network", "meet", "hangout", "catchup", "cohort", "campus", "presence", "here", "bio", "handle"];
     if (circleKeywords.some((k) => q.includes(k))) {
       items.push({
@@ -433,21 +573,12 @@ export function GlobalSearchModal() {
         badge: "Circle",
         href: "/circle",
         icon: Users,
+        score: 88,
       });
     }
 
-    // 4. Match planning keywords
-    const planKeywords = [
-      "plan",
-      "friends",
-      "night",
-      "dinner",
-      "lunch",
-      "movie",
-      "cinema",
-      "roadtrip",
-      "hangout",
-    ];
+    // 6. Match Planning keywords & Open Plans
+    const planKeywords = ["plan", "friends", "night", "dinner", "lunch", "movie", "cinema", "roadtrip", "hangout"];
     if (planKeywords.some((k) => q.includes(k))) {
       items.push({
         id: "plan-create",
@@ -457,31 +588,9 @@ export function GlobalSearchModal() {
         badge: "Plan",
         href: "/plan/new",
         icon: Users,
+        score: 82,
       });
     }
-
-    if (q.includes("ticket") || q.includes("experience") || q.includes("event")) {
-      items.push({
-        id: "event-create",
-        category: "event",
-        title: "Sell tickets",
-        subtitle: "Create a public event",
-        badge: "Tickets",
-        href: "/event",
-        icon: CalendarDays,
-      });
-      items.push({
-        id: "join-tickets",
-        category: "event",
-        title: "Buy tickets",
-        subtitle: "Public events nearby",
-        badge: "Join",
-        href: "/events",
-        icon: Sparkles,
-      });
-    }
-
-    // 5. Match open Plans (one global search replaces per-page plan search)
     const openPlans = plans.filter(
       (p) =>
         p.isPublic &&
@@ -489,8 +598,16 @@ export function GlobalSearchModal() {
         locatedNear({ geo: p.geo, city: p.city || p.destination }, here, city, usingGps, EVENT_NEAR_M),
     );
     for (const p of openPlans) {
-      const hay = `${p.title} ${p.destination} ${p.city}`.toLowerCase();
-      if (q.length >= 2 && hay.includes(q)) {
+      const planScore = scoreSearchItem(
+        {
+          title: p.title,
+          subtitle: `${p.destination || p.city} · ${p.date}`,
+          description: p.notes,
+          keywords: [p.destination, p.city],
+        },
+        query,
+      );
+      if (planScore > 0) {
         items.push({
           id: `plan-${p.id}`,
           category: "plan",
@@ -499,13 +616,22 @@ export function GlobalSearchModal() {
           badge: isTicketed(p) ? `$${p.pricePerPerson}` : p.isExperience ? "Free" : "Plan",
           href: `/plan/${p.id}`,
           icon: Users,
+          score: planScore,
         });
       }
     }
 
-    // 6. Match Walks / Tours (live tours only)
+    // 7. Match Walks / Tours
     for (const t of toursForPrecinct(usingGps ? city : city || "", loadTours())) {
-      if (t.title.toLowerCase().includes(q) || t.city.toLowerCase().includes(q)) {
+      const tourScore = scoreSearchItem(
+        {
+          title: t.title,
+          subtitle: `${t.city} · guided walk`,
+          keywords: [t.city],
+        },
+        query,
+      );
+      if (tourScore > 0) {
         items.push({
           id: `tour-${t.id}`,
           category: "place",
@@ -514,38 +640,55 @@ export function GlobalSearchModal() {
           badge: "Walk",
           href: `/tour/${t.id}`,
           icon: Footprints,
+          score: tourScore,
         });
       }
     }
 
-    // 7. Street / lobby markers are QR-scanned codes, not searchable directory
-    // entries (marker docs are not publicly listable). They resolve on /q pages.
+    // 8. Match Arrival Engine / Campus Cohort keywords
+    const arrivalKeywords = ["arrival", "campus", "unsw", "uts", "usyd", "college", "dorm", "student", "scape", "iglu", "just got here", "building"];
+    if (arrivalKeywords.some((k) => q.includes(k))) {
+      items.push({
+        id: "arrival-engine",
+        category: "person",
+        title: "I Just Got Here — Arrival Engine",
+        subtitle: "Connect with verified campus & PBSA building cohorts",
+        badge: "Arrival",
+        href: "/join",
+        icon: Building2,
+        score: 92,
+      });
+    }
 
-    // 8. Match Partner / Roles keywords
-    const partnerKeywords = ["host", "business", "list", "partner", "organise", "join", "creator"];
+    // 9. Match Partner / Roles keywords
+    const partnerKeywords = ["host", "business", "list", "partner", "organise", "creator", "merchant"];
     if (partnerKeywords.some((k) => q.includes(k))) {
       items.push({
         id: "partner-join",
         category: "partner",
-        title: "Partner account",
-        subtitle: "Same AirPal login. Guests find your place on What's on",
-        badge: "Partner",
-        href: "/join",
+        title: "AirPal for Business",
+        subtitle: "List dining perks, host cohort arrivals, and reach Sydney locals",
+        badge: "Business",
+        href: "/business",
         icon: Building2,
+        score: 80,
       });
     }
 
     // Apply category filter
-    if (activeCategory === "people") return items.filter((i) => i.category === "person");
-    if (activeCategory === "places") return items.filter((i) => i.category === "place");
-    if (activeCategory === "events") return items.filter((i) => i.category === "event");
-    if (activeCategory === "circle" || activeCategory === "stay") {
-      return items.filter((i) => i.category === "person");
-    }
-    if (activeCategory === "plan") return items.filter((i) => i.category === "plan");
+    let filtered = items;
+    if (activeCategory === "people") filtered = items.filter((i) => i.category === "person");
+    else if (activeCategory === "places") filtered = items.filter((i) => i.category === "place");
+    else if (activeCategory === "events") filtered = items.filter((i) => i.category === "event");
+    else if (activeCategory === "deals") filtered = items.filter((i) => i.category === "deal");
+    else if (activeCategory === "circle") filtered = items.filter((i) => i.category === "person");
+    else if (activeCategory === "plan" || activeCategory === "plans") filtered = items.filter((i) => i.category === "plan");
 
-    return items;
-  }, [query, calendarEvents, catalogVersion, plans, activeCategory, handleBio, here, city, usingGps]);
+    // Sort by relevance score descending
+    filtered.sort((a, b) => (b.score || 0) - (a.score || 0));
+
+    return filtered;
+  }, [query, calendarEvents, catalogVersion, plans, promotions, activeCategory, handleBio, here, city, usingGps]);
 
   // Keyboard navigation within list
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -622,8 +765,8 @@ export function GlobalSearchModal() {
               setSelectedIndex(0);
             }}
             onKeyDown={handleKeyDown}
-            placeholder="Search people, places, events, stays, plans…"
-            aria-label="Search people, places, events, stays, plans"
+            placeholder="Search people, places, events, deals, circles, plans…"
+            aria-label="Search people, places, events, deals, circles, plans"
             className="min-h-[44px] w-full bg-transparent text-[16px] sm:text-[15px] font-medium text-ink placeholder:text-mute focus:outline-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden [&::-webkit-search-results-button]:hidden"
           />
           {query && (
@@ -659,11 +802,12 @@ export function GlobalSearchModal() {
           {(
             [
               { id: "all", label: "All" },
-              { id: "people", label: "People" },
               { id: "places", label: "Places" },
               { id: "events", label: "Events" },
+              { id: "deals", label: "Deals" },
               { id: "circle", label: "Circle" },
               { id: "plan", label: "Plans" },
+              { id: "people", label: "People" },
             ] as const
           ).map((c) => (
             <button
@@ -688,7 +832,15 @@ export function GlobalSearchModal() {
         {/* Results List: Mobile-first flex scroll container */}
         <div className="flex-1 overflow-y-auto overscroll-contain p-2.5 sm:p-3 space-y-1 sm:max-h-[min(60vh,calc(var(--visual-viewport-height,100dvh)-12rem))]">
           {query.trim() && (
-            <div className="mb-2 rounded-2xl bg-brand/5 p-3 ring-1 ring-brand/15">
+            <button
+              type="button"
+              onClick={() => {
+                void triggerHaptic("light");
+                setOpen(false);
+                nav(`/search?q=${encodeURIComponent(query)}&category=${activeCategory}`);
+              }}
+              className="mb-2 w-full rounded-2xl bg-brand/5 p-3 ring-1 ring-brand/15 hover:bg-brand/10 transition text-left cursor-pointer active:scale-[0.99]"
+            >
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-brand text-white shadow-xs">
@@ -701,8 +853,12 @@ export function GlobalSearchModal() {
                     </p>
                   </div>
                 </div>
+                <span className="text-xs font-semibold text-accent inline-flex items-center gap-1 shrink-0">
+                  <span>View page</span>
+                  <ArrowRight size={13} />
+                </span>
               </div>
-            </div>
+            </button>
           )}
 
           {!query.trim() ? (
@@ -802,14 +958,34 @@ export function GlobalSearchModal() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="truncate text-sm font-semibold text-ink">{item.title}</span>
+                      <span className="truncate text-sm font-semibold text-ink">
+                        {highlightSearchMatch(item.title, query).map((seg, i) =>
+                          seg.match ? (
+                            <span key={i} className="text-accent font-bold">
+                              {seg.text}
+                            </span>
+                          ) : (
+                            <span key={i}>{seg.text}</span>
+                          ),
+                        )}
+                      </span>
                       {item.badge && (
                         <span className="rounded-full bg-paper px-2 py-0.5 text-[10px] font-medium text-accent ring-1 ring-line shrink-0">
                           {item.badge}
                         </span>
                       )}
                     </div>
-                    <p className="truncate text-xs text-mute mt-0.5">{item.subtitle}</p>
+                    <p className="truncate text-xs text-mute mt-0.5">
+                      {highlightSearchMatch(item.subtitle, query).map((seg, i) =>
+                        seg.match ? (
+                          <span key={i} className="text-ink font-semibold">
+                            {seg.text}
+                          </span>
+                        ) : (
+                          <span key={i}>{seg.text}</span>
+                        ),
+                      )}
+                    </p>
                   </div>
                   <ArrowRight
                     size={15}

@@ -113,7 +113,7 @@ test.describe("Global Navigation & Profile Flow", () => {
     const searchBtn = page.getByRole("button", { name: "Search" }).first();
     await searchBtn.click();
 
-    const searchInput = page.getByPlaceholder(/Search people, places, events, stays, plans/i);
+    const searchInput = page.getByPlaceholder(/Search people, places, events/i);
     await expect(searchInput).toBeVisible();
 
     // Search for Glenmore

@@ -28,10 +28,12 @@ test.describe("AirPal loop proof (P0)", () => {
     await expect(page.getByText(/payment canceled/i)).toBeVisible();
   });
 
-  test("canceled stay checkout shows a no-charge notice on concierge", async ({ page }) => {
-    await page.goto("/concierge?canceled=true");
+  test("canceled plan checkout notice can be dismissed", async ({ page }) => {
+    await page.goto("/plan/plan-rocks-night-out?canceled=1");
     await page.waitForLoadState("domcontentloaded");
     await expect(page.getByText(/payment canceled/i)).toBeVisible();
+    await page.getByRole("button", { name: "Dismiss" }).click();
+    await expect(page.getByText(/payment canceled/i)).toHaveCount(0);
   });
 
   test("plan creation surface renders its form entry", async ({ page }) => {

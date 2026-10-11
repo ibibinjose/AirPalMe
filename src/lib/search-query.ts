@@ -35,7 +35,7 @@ export function profileMatchesSearch(
 export function tokenizeSearchQuery(raw: string): string[] {
   return raw
     .toLowerCase()
-    .replace(/[^\p{L}\p{N}\s@_-]/gu, " ")
+    .replace(/[^a-zA-Z0-9\s@_-]/g, " ")
     .split(/\s+/)
     .map((t) => t.trim())
     .filter((t) => t.length > 0);
