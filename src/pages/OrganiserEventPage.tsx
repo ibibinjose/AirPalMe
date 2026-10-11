@@ -39,6 +39,7 @@ import {
 import { bioPath } from "@shared/bio";
 import { DEMO_BUSINESS, DEMO_EVENT_ID, isDemoModeSearch } from "@shared/demo-business";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { publicSiteOrigin } from "@/lib/public-origin";
 import { useAuth } from "@/contexts/AuthContext";
@@ -425,7 +426,7 @@ export function OrganiserEventPage() {
   }
 
   if (!authReady) {
-    return <div className="mx-auto max-w-md px-4 py-16 text-center text-sm text-mute">Loading…</div>;
+    return <PageLoading message="Loading event workspace…" />;
   }
 
   if (!user) {

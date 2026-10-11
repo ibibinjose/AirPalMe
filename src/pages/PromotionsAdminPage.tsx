@@ -4,6 +4,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { ArrowLeft, Pause, Play, Plus, Star, StarOff } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
 import { liveBackendEnabled } from "@/lib/functions";
@@ -66,7 +67,9 @@ export function PromotionsAdminPage() {
     void reload();
   }, [locked]);
 
-  if (!authReady) return <p className="mx-auto max-w-2xl px-4 py-16 text-center text-sm text-mute">Loading…</p>;
+  if (!authReady) {
+    return <PageLoading message="Loading promotion review board…" />;
+  }
   if (locked) {
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center">

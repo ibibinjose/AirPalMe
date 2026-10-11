@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Hand } from "lucide-react";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchWaveByCode, waveAtRemote } from "@/lib/wave";
 import { waveCodeFrom, type WaveSession } from "@shared/wave";
@@ -22,7 +23,7 @@ export function WavePage() {
   }, [code]);
 
   if (!authReady) {
-    return <div className="mx-auto max-w-md px-4 py-16 text-center text-sm text-mute">Loading…</div>;
+    return <PageLoading message="Connecting to wave…" />;
   }
   if (!user) {
     return (

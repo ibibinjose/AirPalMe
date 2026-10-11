@@ -4,6 +4,7 @@ import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { ArrowLeft, Megaphone } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
 import { liveBackendEnabled } from "@/lib/functions";
@@ -42,8 +43,9 @@ export function NotificationsAdminPage() {
     void reload();
   }, [locked]);
 
-  if (!authReady || loading)
-    return <p className="mx-auto max-w-2xl px-4 py-16 text-center text-sm text-mute">Loading…</p>;
+  if (!authReady || loading) {
+    return <PageLoading message="Loading platform announcements…" />;
+  }
   if (locked) {
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center">

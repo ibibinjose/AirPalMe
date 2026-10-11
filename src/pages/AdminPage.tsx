@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { TabPills } from "@/components/ui/TabPills";
 import { Link, useLocation } from "wouter";
 import { activePlaces } from "@/lib/catalog";
@@ -104,12 +105,7 @@ export function AdminPage() {
   }, [rows, handleSearch, handleSort]);
 
   if (!authReady) {
-    return (
-      <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-        <p className="mt-3 text-sm text-mute font-medium">Authenticating platform admin…</p>
-      </div>
-    );
+    return <PageLoading message="Authenticating platform admin…" />;
   }
 
   if (locked) {

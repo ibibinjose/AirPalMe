@@ -4,6 +4,7 @@ import { collection, doc, getDoc, getDocs, query, where } from "firebase/firesto
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
 import { liveBackendEnabled } from "@/lib/functions";
@@ -66,8 +67,9 @@ export function PromotionAdminDetailPage() {
     void reload();
   }, [locked, id]);
 
-  if (!authReady || loading)
-    return <p className="mx-auto max-w-2xl px-4 py-16 text-center text-sm text-mute">Loading…</p>;
+  if (!authReady || loading) {
+    return <PageLoading message="Loading promotion audit record…" />;
+  }
   if (locked || !promo) {
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center">

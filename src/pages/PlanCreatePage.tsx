@@ -27,6 +27,7 @@ import {
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Photo } from "@/components/ui/Photo";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { createSubmitGuard } from "@/lib/submit-guard";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { fieldInput } from "@/components/forms/ValidField";
@@ -283,7 +284,7 @@ export function PlanCreatePage() {
   }, [circle, peopleSearch]);
 
   if (!authReady) {
-    return <div className="mx-auto max-w-md px-4 py-16 text-center text-sm text-mute">Loading…</div>;
+    return <PageLoading message="Preparing plan composer…" />;
   }
   if (!user) {
     const qs = params.toString();
