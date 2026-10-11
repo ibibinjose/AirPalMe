@@ -16,7 +16,7 @@ test.describe("Global Navigation & Profile Flow", () => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
     await expect(page.getByRole("heading", { level: 1, name: /Plan your day\. Organise your life\./i })).toBeVisible();
-    await expect(page.getByRole("button", { name: /search places, events, plans, or stays/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /search places, events, plans, or circles/i })).toBeVisible();
   });
 
   test("desktop top navigation links between major application hubs", async ({ page }) => {
@@ -34,8 +34,8 @@ test.describe("Global Navigation & Profile Flow", () => {
     await header.getByRole("button", { name: "Plan" }).click();
     await expect(page).toHaveURL(/\/plan/);
 
-    await header.getByRole("button", { name: "Pulse" }).click();
-    await expect(page).toHaveURL(/\/pulse/);
+    await header.getByRole("button", { name: "Pass" }).click();
+    await expect(page).toHaveURL(/\/pass/);
 
     await header.getByRole("button", { name: "Home", exact: true }).click();
     await expect(page).toHaveURL("/");
@@ -88,7 +88,7 @@ test.describe("Global Navigation & Profile Flow", () => {
     const tabNav = page.locator("nav.lg\\:hidden");
     await expect(tabNav).toBeVisible();
 
-    // Shipped companion dock: Home / Now / Plan / Inbox / Me.
+    // Shipped companion dock: Home / Now / Plan / Me / Bio.
     await tabNav.getByRole("button", { name: "Now" }).click();
     await expect(page).toHaveURL(/\/now/);
 
@@ -98,11 +98,11 @@ test.describe("Global Navigation & Profile Flow", () => {
     await tabNav.getByRole("button", { name: "Home" }).click();
     await expect(page).toHaveURL("/");
 
-    await tabNav.getByRole("button", { name: "Inbox" }).click();
-    await expect(page).toHaveURL(/\/me\/inbox/);
+    await tabNav.getByRole("button", { name: "Me dashboard" }).click();
+    await expect(page).toHaveURL(/\/me|\/start/);
 
     await tabNav.getByRole("button", { name: "My bio" }).click();
-    await expect(page).toHaveURL(/\/start|\/bio\/setup|\/@|\/me/);
+    await expect(page).toHaveURL(/\/start|\/bio\/setup|\/@|\/bio/);
   });
 
   test("universal quick search command palette opens and navigates to places and tools", async ({ page }) => {

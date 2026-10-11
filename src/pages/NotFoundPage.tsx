@@ -14,7 +14,9 @@ export function NotFoundPage() {
       <div className="flex justify-center">
         <BrandMark />
       </div>
-      <p className="mt-8 text-[11px] font-bold uppercase tracking-[0.2em] text-accent">404 · Page Not Found</p>
+      <p className="mt-8 text-[11px] font-bold uppercase tracking-[0.2em] text-accent">
+        <span>404</span> · Page Not Found
+      </p>
       <h1 className="font-display mt-2 text-3xl font-bold tracking-tight text-ink sm:text-4xl">{t("lost")}</h1>
       <p className="mt-2 text-[15px] leading-relaxed text-mute">{t("lostLead")}</p>
       <p className="mt-1 text-sm text-mute">{t("lostBody")}</p>

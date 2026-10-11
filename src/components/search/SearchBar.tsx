@@ -102,11 +102,13 @@ function getCategoryIcon(cat?: string) {
     case "events":
       return <Calendar size={13} className="text-rose-500" />;
     case "people":
+    case "circle":
       return <Users size={13} className="text-emerald-600" />;
-    case "stay":
-      return <Hotel size={13} className="text-amber-600" />;
-    case "experiences":
-      return <Sparkles size={13} className="text-purple-600" />;
+    case "deals":
+      return <Sparkles size={13} className="text-emerald-600" />;
+    case "plans":
+    case "plan":
+      return <Users size={13} className="text-indigo-600" />;
     case "places":
     default:
       return <MapPin size={13} className="text-accent" />;

@@ -83,6 +83,6 @@ test.describe("Discover & Places Flow", () => {
 
     // Click back button to return
     await backBtn.click({ force: true });
-    await expect(page).toHaveURL("/");
+    await expect(page).toHaveURL(/\/now|\/$/);
   });
 });

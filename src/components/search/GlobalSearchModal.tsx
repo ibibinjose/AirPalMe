@@ -14,6 +14,8 @@ import {
   Footprints,
   HeartHandshake,
   TrendingUp,
+  Ticket,
+  Tag,
 } from "lucide-react";
 import { useSearchQueryLogger, usePopularSearches } from "@/hooks/useSearchQueryLogger";
 import { activePlaces, placeByHandle, placesForLocation, toursForPrecinct } from "@/lib/catalog";
@@ -26,7 +28,15 @@ import { loadTours } from "@/lib/tours-store";
 import { bioPath, bioKindLabel, type BioProfile } from "@shared/bio";
 import { fetchPublicBio, loadBios } from "@/lib/bio-store";
 import { listPeople } from "@/lib/people";
-import { profileMatchesSearch, searchNeedle } from "@/lib/search-query";
+import {
+  highlightSearchMatch,
+  profileMatchesSearch,
+  scoreSearchItem,
+  searchNeedle,
+} from "@/lib/search-query";
+import { type Promotion } from "@shared/promotions";
+import { getFirebaseDb } from "@/lib/firebase";
+import { collection, getDocs, query as firestoreQuery, where } from "firebase/firestore";
 import { useEvents } from "@/contexts/EventsContext";
 import { useListings } from "@/contexts/ListingsContext";
 import { usePlans } from "@/contexts/PlanContext";
@@ -64,19 +74,21 @@ function saveRecent(item: RecentItem) {
 
 const EXPLORE_GROUPS = [
   { label: "What now?", href: "/now", icon: Compass },
-  { label: "Events", href: "/calendar", icon: CalendarDays },
-  { label: "Plans", href: "/plan", icon: Users },
-  { label: "Deals", href: "/deals", icon: Sparkles },
+  { label: "AirPal Pass", href: "/pass", icon: Ticket },
+  { label: "Deals & Perks", href: "/deals", icon: Sparkles },
+  { label: "Circle & Presence", href: "/circle", icon: Users },
+  { label: "Plans & Hangouts", href: "/plan", icon: CalendarDays },
 ];
 
 interface SearchResultItem {
   id: string;
-  category: "place" | "event" | "stay" | "plan" | "partner" | "person";
+  category: "place" | "event" | "deal" | "plan" | "partner" | "person";
   title: string;
   subtitle: string;
   badge?: string;
   href: string;
   icon: typeof Compass;
+  score?: number;
 }
 
 export function GlobalSearchModal() {
@@ -91,11 +103,38 @@ export function GlobalSearchModal() {
   const { plans } = usePlans();
   const { here, city, usingGps } = useLocalNow();
   const [handleBio, setHandleBio] = useState<BioProfile | null>(null);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [recent, setRecent] = useState<RecentItem[]>([]);
   const { trackQuery, logResultClick } = useSearchQueryLogger({ source: "global_modal" });
   const { popularTerms } = usePopularSearches({ limit: 6 });
 
   useScrollLock(open);
+
+  // Load active promotions/deals from Firestore when modal is opened
+  useEffect(() => {
+    if (!open) return;
+    const db = getFirebaseDb();
+    if (!db) return;
+    let cancelled = false;
+    getDocs(
+      firestoreQuery(
+        collection(db, "promotions"),
+        where("status", "in", ["live", "approved"]),
+      ),
+    )
+      .then((snap) => {
+        if (cancelled) return;
+        const list = snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as Omit<Promotion, "id">),
+        }));
+        setPromotions(list);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
 
   // Exact @handle → public profile (handles/{handle} get). Without this, People search never finds bios.
   useEffect(() => {
