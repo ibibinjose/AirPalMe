@@ -25,7 +25,6 @@ import { toast } from "sonner";
 import { cn } from "@/lib/cn";
 import { PROMOTION_CATEGORIES, type Promotion } from "@shared/promotions";
 import { SearchBar } from "@/components/search/SearchBar";
-import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 
 export function PromotionsPage() {
   const { user, isAdmin } = useAuth();
@@ -105,27 +104,24 @@ export function PromotionsPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 md:py-10 pb-32">
-      {/* Ecosystem Lens Switcher */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <EcosystemSwitcher currentPath="/deals" variant="header" />
-        <Link
-          href="/me/tickets"
-          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 py-2 text-xs font-bold text-ink ring-1 ring-line shadow-xs hover:bg-paper transition"
-        >
-          <Ticket size={14} className="text-amber-500" />
-          <span>My Passbook Wallet →</span>
-        </Link>
-      </div>
-
       {/* Top Breadcrumb & Quick Actions Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <Link
-          href="/pass"
-          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
-        >
-          <ArrowLeft size={14} />
-          <span>AirPal Pass</span>
-        </Link>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link
+            href="/pass"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
+          >
+            <ArrowLeft size={14} />
+            <span>AirPal Pass</span>
+          </Link>
+          <Link
+            href="/me/tickets"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition"
+          >
+            <Ticket size={14} className="text-amber-500" />
+            <span>My Passbook Wallet</span>
+          </Link>
+        </div>
 
         {/* CRUD Quick Navigation Bar */}
         <div className="flex items-center gap-2 flex-wrap">

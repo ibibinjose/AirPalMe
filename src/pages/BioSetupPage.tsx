@@ -188,10 +188,10 @@ export function BioSetupPage() {
       <AuthGate
         next={asBusiness ? "/bio/setup?kind=business" : "/bio/setup"}
         kicker={asBusiness ? "Your place" : "Account"}
-        title={asBusiness ? "Add your place" : "Your personal profile"}
+        title={asBusiness ? "Add your place" : "Your AirPal Me profile"}
         lede={
           asBusiness
-            ? "Sign in with your personal account first. Your @handle is you — the place is a separate business profile."
+            ? "Sign in with your AirPal Me account first. Your @handle is you — the place is a separate profile."
             : "Create an account first: @handle and mobile, then name, email, and password."
         }
       />

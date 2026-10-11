@@ -169,34 +169,32 @@ export function PassPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-28 md:px-6">
-      {/* Top Switcher Bar */}
-      <div className="pt-4 flex items-center justify-between gap-3">
-        <EcosystemSwitcher currentPath="/pass" variant="header" />
-        <Link
-          href="/me/tickets"
-          className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-card px-4 py-2 text-xs font-bold text-ink ring-1 ring-line shadow-xs hover:bg-paper transition"
-        >
-          <QrCode size={14} className="text-accent" />
-          <span>My Passes ({myUpcomingBookings.length || myBookings.length})</span>
-        </Link>
-      </div>
-
       {/* Hero Pass Section */}
-      <header className="relative mt-4 overflow-hidden rounded-[32px] bg-gradient-to-br from-neutral-950 via-neutral-900 to-amber-950 text-white shadow-lg">
+      <header className="relative mt-2 sm:mt-4 overflow-hidden rounded-[32px] bg-gradient-to-br from-neutral-950 via-neutral-900 to-amber-950 text-white shadow-lg">
         <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-amber-500/20 blur-3xl" />
         <div className="absolute -left-20 -bottom-20 h-80 w-80 rounded-full bg-rose-500/15 blur-3xl" />
 
         <div className="relative px-6 py-10 md:px-10 md:py-14">
-          <div className="flex flex-wrap items-center gap-3">
-            <img
-              src="/brand/airpal-pass-logo-white.png"
-              alt="AirPal Pass"
-              className="h-8 sm:h-10 w-auto object-contain drop-shadow-md"
-            />
-            <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/20 px-3.5 py-1 text-xs font-bold text-amber-300 ring-1 ring-amber-400/30 backdrop-blur-md">
-              <Ticket size={13} />
-              <span>{effectiveCity} · Experiences &amp; Stays</span>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <img
+                src="/brand/airpal-pass-logo-white.png"
+                alt="AirPal Pass"
+                className="h-8 sm:h-10 w-auto object-contain drop-shadow-md"
+              />
+              <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/20 px-3.5 py-1 text-xs font-bold text-amber-300 ring-1 ring-amber-400/30 backdrop-blur-md">
+                <Ticket size={13} />
+                <span>{effectiveCity} · Experiences &amp; Stays</span>
+              </div>
             </div>
+
+            <Link
+              href="/me/tickets"
+              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1 text-xs font-bold text-white ring-1 ring-white/25 backdrop-blur-md hover:bg-white/25 transition active:scale-95 shadow-2xs"
+            >
+              <QrCode size={13} className="text-amber-400" />
+              <span>My Passes ({myUpcomingBookings.length || myBookings.length})</span>
+            </Link>
           </div>
 
           <h1 className="font-display mt-4 text-3xl sm:text-5xl font-extrabold tracking-tight text-white max-w-2xl leading-[1.1]">

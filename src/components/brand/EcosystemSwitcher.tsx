@@ -49,6 +49,8 @@ export function EcosystemSwitcher({
   const [location, nav] = useLocation();
   // Native Pass shell is pass-only: no cross-surface switcher (web unaffected).
   if (isPassApp()) return null;
+  // User instruction: remove AirPal Me / AirPal Pass switcher from top menu bar to prevent duplication
+  if (variant === "header") return null;
   const path = currentPath ?? location;
   const activeMode = getEcosystemMode(path);
 

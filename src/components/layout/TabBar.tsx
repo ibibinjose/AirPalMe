@@ -25,13 +25,13 @@ const TABS: { href: string; id: GuestTab; label: string; icon: typeof Compass }[
   { href: "/bio", id: "bio", label: "Bio", icon: AtSign },
 ];
 
-/** Pass shell dock: Pass / Events / Tickets / Scan / Me. */
+/** Pass shell dock: Pass / Events / Tickets / Scan / Bio. */
 const PASS_TABS: { href: string; id: PassTab; label: string; icon: typeof Compass }[] = [
   { href: "/pass", id: "pass", label: "Pass", icon: Ticket },
   { href: "/events", id: "events", label: "Events", icon: CalendarDays },
   { href: "/me/tickets", id: "tickets", label: "Tickets", icon: QrCode },
   { href: "/scan", id: "scan", label: "Scan", icon: ScanLine },
-  { href: "/me", id: "me", label: "Me", icon: UserRound },
+  { href: "/bio", id: "bio", label: "Bio", icon: AtSign },
 ];
 
 /** Live unread count for the Inbox tab: unanswered pings + unread activity. */
@@ -99,7 +99,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
         <div className="apple-liquid-glass-dock relative mb-[max(0.75rem,env(safe-area-inset-bottom,0px))] flex items-center justify-between rounded-full p-1.5 text-ink">
           {tabs.map((tab) => {
             const on = active === tab.id;
-            const href = tab.id === "bio" ? bioHref : tab.href;
+            const href = isPass && tab.id === "bio" ? (user ? "/bio" : "/start") : tab.id === "bio" ? bioHref : tab.href;
             const Icon = tab.icon;
             return (
               <button

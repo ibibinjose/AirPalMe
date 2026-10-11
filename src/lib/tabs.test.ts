@@ -55,7 +55,8 @@ describe("passTabFromPath (Pass dock)", () => {
     expect(passTabFromPath("/me/tickets")).toBe("tickets");
     expect(passTabFromPath("/ticket/abc")).toBe("tickets");
     expect(passTabFromPath("/scan")).toBe("scan");
-    expect(passTabFromPath("/me")).toBe("me");
-    expect(passTabFromPath("/@handle")).toBe("me");
+    expect(passTabFromPath("/me")).toBe("bio");
+    expect(passTabFromPath("/@handle")).toBe("bio");
+    expect(passTabFromPath("/bio")).toBe("bio");
   });
 });

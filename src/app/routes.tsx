@@ -200,6 +200,7 @@ export function AppRoutes() {
           </Route>
           <Route path="/me/tickets" component={MyTicketsPage} />
           <Route path="/me" component={MePage} />
+          <Route path="/bio" component={MePage} />
           <Route path="/settings" component={SettingsPage} />
           <Route path="/host/pulse" component={HostPulsePage} />
           <Route path="/host" component={HostPage} />

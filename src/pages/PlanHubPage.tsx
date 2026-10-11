@@ -19,7 +19,6 @@ import {
   Ticket,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 import { usePlans } from "@/contexts/PlanContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { PlanGridCard } from "@/components/airpal/PlanGridCard";
@@ -220,22 +219,10 @@ export function PlanHubPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:py-10 pb-28">
-      {/* Ecosystem Lens Switcher */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <EcosystemSwitcher currentPath="/plan" variant="header" />
-        <Link
-          href="/pass"
-          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 py-2 text-xs font-bold text-ink ring-1 ring-line shadow-xs hover:bg-paper transition"
-        >
-          <Ticket size={14} className="text-amber-500" />
-          <span>Events &amp; Deals on Pass →</span>
-        </Link>
-      </div>
-
       {/* Header — Plans: Liquid Glass Title & Action */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-accent">
               <MapPin size={12} className="shrink-0" />
               <span>{effectiveCity}</span>
@@ -246,6 +233,13 @@ export function PlanHubPage() {
                 {activeMyPlans.length} upcoming
               </span>
             )}
+            <Link
+              href="/pass"
+              className="inline-flex min-h-[28px] items-center gap-1 rounded-full bg-card px-3 py-1 text-xs font-bold text-ink ring-1 ring-line hover:bg-paper transition shadow-xs"
+            >
+              <Ticket size={12} className="text-amber-500" />
+              <span>Events &amp; Deals on Pass →</span>
+            </Link>
           </div>
           <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-ink md:text-4xl">
             Plans &amp; Invites

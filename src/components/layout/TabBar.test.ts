@@ -33,7 +33,7 @@ describe("TabBar", () => {
     expect(markup).toContain(">Events<");
     expect(markup).toContain(">Tickets<");
     expect(markup).toContain(">Scan<");
-    expect(markup).toContain(">Me<");
+    expect(markup).toContain(">Bio<");
   });
 
   it("renders Me cockpit and Bio profile tabs in companion mode", () => {

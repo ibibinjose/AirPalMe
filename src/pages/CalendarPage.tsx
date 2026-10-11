@@ -17,7 +17,6 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { toast } from "sonner";
-import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 import { useEvents } from "@/contexts/EventsContext";
 import type { CalendarEvent, CalendarEventCategory } from "@shared/event";
 import {
@@ -369,18 +368,6 @@ function CalendarPageContent() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-24 pt-4 md:px-6 md:pt-6">
-      {/* Ecosystem Lens Switcher */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <EcosystemSwitcher currentPath="/calendar" variant="header" />
-        <Link
-          href="/pass"
-          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 py-2 text-xs font-bold text-ink ring-1 ring-line shadow-xs hover:bg-paper transition"
-        >
-          <Ticket size={14} className="text-amber-500" />
-          <span>Tickets &amp; Passes on AirPal Pass →</span>
-        </Link>
-      </div>
-
       {/* Image header — laneway backdrop, controls float below the title */}
       <div className="relative mb-6 overflow-hidden rounded-[28px]">
         <div className="absolute inset-0" aria-hidden="true">
@@ -397,11 +384,20 @@ function CalendarPageContent() {
           <div className="hero-scrim absolute inset-0" />
         </div>
         <div className="relative p-5 md:p-7">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/85">
-            <Sparkles size={13} />
-            <span>{city} · What’s On</span>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/85">
+              <Sparkles size={13} />
+              <span>{city} · What’s On</span>
+            </div>
+            <Link
+              href="/pass"
+              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1 text-xs font-bold text-white ring-1 ring-white/25 backdrop-blur-md hover:bg-white/25 transition active:scale-95"
+            >
+              <Ticket size={13} className="text-amber-400" />
+              <span>AirPal Pass →</span>
+            </Link>
           </div>
-          <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-white md:text-4xl">
+          <h1 className="font-display mt-2 text-3xl font-bold tracking-tight text-white md:text-4xl">
             Event Calendar
           </h1>
           <p className="mt-1 text-[14px] font-medium text-white/80">

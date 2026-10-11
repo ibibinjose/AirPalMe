@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { hideNativeSplash } from "@/lib/native";
 import { BRAND_TAGLINE } from "@/lib/brand";
+import { isPassApp } from "@/lib/app-flavor";
 
 interface NativeSplashTransitionProps {
   /**
@@ -24,6 +25,7 @@ interface NativeSplashTransitionProps {
 export function NativeSplashTransition({ holdDuration = 250, fadeDuration = 350 }: NativeSplashTransitionProps) {
   const [mounted, setMounted] = useState(true);
   const [fading, setFading] = useState(false);
+  const isPass = isPassApp();
 
   useEffect(() => {
     // When AppProviders finish mounting, tell native layer to smoothly fade out the OS splash
@@ -63,10 +65,11 @@ export function NativeSplashTransition({ holdDuration = 250, fadeDuration = 350 
           />
         </div>
         <div className="font-display text-2xl font-bold tracking-tight text-ink">
-          AirPal<span className="text-accent">.me</span>
+          AirPal{isPass ? <span className="text-accent"> Pass</span> : <span className="text-accent">.me</span>}
         </div>
         <div className="text-[11px] font-semibold tracking-widest uppercase text-accent mt-1.5">{BRAND_TAGLINE}</div>
       </div>
     </div>
   );
 }
+

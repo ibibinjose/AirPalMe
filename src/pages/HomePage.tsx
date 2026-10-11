@@ -28,7 +28,6 @@ import { Button } from "@/components/ui/Button";
 import { openGlobalSearch } from "@/components/search/openSearch";
 import { triggerHaptic } from "@/lib/native";
 import { getExperienceProofRemote } from "@/lib/functions";
-import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 import { getDailyOutfitRecommendation } from "@/lib/outfit";
 import {
   ArrowCta,
@@ -188,19 +187,6 @@ export function HomePage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-20 md:px-6">
-      {/* Top Switcher Bar */}
-      <div className="pt-3 pb-2 flex items-center justify-between gap-3">
-        <EcosystemSwitcher currentPath="/" variant="header" />
-        <Link
-          href="/pass"
-          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-4 py-2 text-xs font-bold text-ink ring-1 ring-line shadow-xs hover:bg-paper transition"
-        >
-          <Ticket size={14} className="text-amber-500" />
-          <span className="hidden sm:inline">Explore</span>
-          <span>AirPal Pass →</span>
-        </Link>
-      </div>
-
       {/* Hero Header Section */}
       <header className="relative -mx-4 overflow-hidden rounded-b-[32px] md:-mx-6 shadow-sm">
         <div className="absolute inset-0" aria-hidden="true">
@@ -226,11 +212,20 @@ export function HomePage() {
                 {greeting}, {firstName}
               </span>
             </div>
-            <img
-              src="/brand/airpal-me-logo-white.png"
-              alt="AirPal Me"
-              className="h-6 sm:h-7 w-auto object-contain drop-shadow-md opacity-90 hidden sm:block"
-            />
+            <div className="flex items-center gap-2.5">
+              <Link
+                href="/pass"
+                className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1 text-xs font-bold text-white ring-1 ring-white/25 backdrop-blur-md hover:bg-white/25 transition active:scale-95"
+              >
+                <Ticket size={13} className="text-amber-400" />
+                <span>AirPal Pass →</span>
+              </Link>
+              <img
+                src="/brand/airpal-me-logo-white.png"
+                alt="AirPal Me"
+                className="h-6 sm:h-7 w-auto object-contain drop-shadow-md opacity-90 hidden sm:block"
+              />
+            </div>
           </div>
 
           <h1 className="font-display mt-3 text-[30px] sm:text-[40px] font-bold leading-[1.05] tracking-tight text-white max-w-2xl">

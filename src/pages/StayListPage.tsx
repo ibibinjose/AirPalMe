@@ -9,7 +9,6 @@ import { getFirebaseDb } from "@/lib/firebase";
 import { filterStayFinder, normalizeProperty, stayKindLabel, stayPriceLabel, stayProfilePath } from "@/lib/properties";
 import type { PropertyInfo } from "@shared/airpal-data";
 import { cn } from "@/lib/cn";
-import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 
 /**
  * Stay listings — an Airbnb-style discovery surface over live host
@@ -62,8 +61,14 @@ export function StayListPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-10">
-      <div className="pt-4 flex flex-wrap items-center justify-between gap-3">
-        <EcosystemSwitcher currentPath="/stay" variant="header" />
+      <header className="py-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">AirPal Pass · Stays &amp; Hospitality</p>
+          <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-ink">Stays &amp; Hotel Check-In in {effectiveCity}</h1>
+          <p className="mt-1 max-w-xl text-sm leading-relaxed text-mute">
+            Live listings and digital compendiums from hosts — hotels, motels, hostels and boutique stays with instant QR check-in.
+          </p>
+        </div>
         <div className="flex items-center gap-2">
           <Button
             size="sm"
@@ -81,14 +86,6 @@ export function StayListPage() {
             Host Dashboard
           </Button>
         </div>
-      </div>
-
-      <header className="py-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">AirPal Pass · Stays &amp; Hospitality</p>
-        <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-ink">Stays &amp; Hotel Check-In in {effectiveCity}</h1>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-mute">
-          Live listings and digital compendiums from hosts — hotels, motels, hostels and boutique stays with instant QR check-in.
-        </p>
       </header>
 
       {kindsPresent.length > 0 && (

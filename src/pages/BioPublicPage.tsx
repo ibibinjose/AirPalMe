@@ -830,7 +830,7 @@ export function BioPublicPage() {
                   title={
                     bio.kind === "business" || isStay
                       ? "Claim this place as its owner — business verification applies"
-                      : `Claim @${bio.handle} as your personal handle`
+                      : `Claim @${bio.handle} as your AirPal Me handle`
                   }
                 >
                   Claim @{bio.handle}

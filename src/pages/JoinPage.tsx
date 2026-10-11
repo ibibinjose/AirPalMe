@@ -23,7 +23,7 @@ export function JoinPage() {
       <header>
         <h1 className="font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">Join AirPal</h1>
         <p className="mt-3 text-base leading-relaxed text-mute">
-          Everyone on AirPal has a personal account. A partner account is the same login, plus a place guests can find.
+          Everyone on AirPal starts with an AirPal Me account. A partner account is the same login, plus a place guests can find.
         </p>
       </header>
 

@@ -278,7 +278,7 @@ export function StartPage() {
         kicker: "Partner account",
         title: "Sign in — same AirPal login",
         signupTitle: "Open a partner account",
-        desc: "Same login as your personal AirPal. Add the place, then guests find it on What's on and in search.",
+        desc: "Same login as your AirPal Me account. Add the place, then guests find it on What's on and in search.",
         color: "text-emerald-600 dark:text-emerald-400",
         bg: "bg-emerald-500/10",
       };

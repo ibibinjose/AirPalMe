@@ -79,7 +79,7 @@ Non-goals: second Firebase project, separate web deploys or domains, new auth sy
 - **Dual universal-link claiming**: must be path-scoped or routing is undefined when both apps are installed.
 - **Double store cost**: two listings = two reviews, two screenshot sets, two release trains to maintain.
 - **ID finality**: confirm `me.airpal.pass` before any Firebase/store registration.
-- Decided: Pass tab set = Pass / Events / Tickets / Scan / Me (`PASS_TABS` in `TabBar.tsx`). Open: per-flavor screenshot capture runs (user-side).
+- Decided: Pass tab set = Pass / Events / Tickets / Scan / Bio (`PASS_TABS` in `TabBar.tsx`). Open: per-flavor screenshot capture runs (user-side).
 - Decided: joint versioning — both flavors share `versionCode`/`versionName` from `defaultConfig` (one codebase, one train); split only if store review forces divergence.
 
 ## As-built notes (Phase A/B in-repo, October 2026)

@@ -377,7 +377,7 @@ export function BioEditPage() {
         services,
         deals,
       });
-      toast.success(isBusiness ? "Saved business place profile" : "Saved personal AirPal profile");
+      toast.success(isBusiness ? "Saved business place profile" : "Saved AirPal Me profile");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save profile changes. Try again.");
     }

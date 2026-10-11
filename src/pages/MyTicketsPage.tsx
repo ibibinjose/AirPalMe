@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Calendar, RefreshCw, Ticket, UserRound, WifiOff } from "lucide-react";
+import { Calendar, RefreshCw, Ticket, WifiOff } from "lucide-react";
 import { PageLoading } from "@/components/ui/PageLoading";
 import { AirPalTicketPass } from "@/components/tickets/AirPalTicketPass";
-import { EcosystemSwitcher } from "@/components/brand/EcosystemSwitcher";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMyBookings } from "@/hooks/useMyBookings";
 import { triggerHapticSelection } from "@/lib/native";
@@ -27,46 +26,34 @@ export function MyTicketsPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 pb-28 pt-4 md:px-6 md:pt-6">
-      {/* Ecosystem Lens Switcher */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <EcosystemSwitcher currentPath="/me/tickets" variant="header" />
-        <div className="flex items-center gap-2">
-          <Link
-            href="/me"
-            className="no-print inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-mute ring-1 ring-line hover:bg-paper hover:text-ink transition"
-          >
-            <UserRound size={14} className="text-accent" />
-            <span>Me Cockpit</span>
-          </Link>
-          <Link
-            href="/calendar"
-            className="no-print inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-[13px] font-semibold text-mute ring-1 ring-line hover:bg-paper hover:text-ink transition"
-          >
-            <Calendar size={14} className="text-accent" />
-            <span>Calendar</span>
-          </Link>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">AirPal Pass · Wallet</p>
           <h1 className="mt-0.5 font-display text-3xl font-bold text-ink">My event passes &amp; tickets</h1>
         </div>
-        {user && (
-          <button
-            type="button"
-            onClick={() => {
-              void triggerHapticSelection();
-              refresh();
-            }}
-            aria-label="Refresh tickets"
-            title="Refresh tickets"
-            className="no-print grid h-10 w-10 shrink-0 place-items-center rounded-full bg-card ring-1 ring-line text-mute hover:text-ink hover:bg-paper transition active:scale-95"
+        <div className="flex items-center gap-2">
+          {user && (
+            <button
+              type="button"
+              onClick={() => {
+                void triggerHapticSelection();
+                refresh();
+              }}
+              aria-label="Refresh tickets"
+              title="Refresh tickets"
+              className="no-print grid h-10 w-10 shrink-0 place-items-center rounded-full bg-card ring-1 ring-line text-mute hover:text-ink hover:bg-paper transition active:scale-95"
+            >
+              <RefreshCw size={15} />
+            </button>
+          )}
+          <Link
+            href="/calendar"
+            className="no-print inline-flex min-h-[40px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-mute ring-1 ring-line hover:bg-paper hover:text-ink transition"
           >
-            <RefreshCw size={15} />
-          </button>
-        )}
+            <Calendar size={13} className="text-accent" />
+            <span>Calendar</span>
+          </Link>
+        </div>
       </div>
 
       {isOfflineCached && (

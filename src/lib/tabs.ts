@@ -27,8 +27,8 @@ export function tabFromPath(path: string): GuestTab {
   return "explore";
 }
 
-/** Pass shell dock: Pass / Events / Tickets / Scan / Me. */
-export type PassTab = "pass" | "events" | "tickets" | "scan" | "me";
+/** Pass shell dock: Pass / Events / Tickets / Scan / Bio. */
+export type PassTab = "pass" | "events" | "tickets" | "scan" | "bio";
 
 /** Map a route path to the Pass-dock tab it belongs to. Pure: safe to unit test. */
 export function passTabFromPath(path: string): PassTab {
@@ -36,7 +36,7 @@ export function passTabFromPath(path: string): PassTab {
   if (path.startsWith("/events") || path.startsWith("/e/")) return "events";
   if (path.startsWith("/scan") || path.startsWith("/w/")) return "scan";
   if (path.startsWith("/me") || path.startsWith("/bio") || path.startsWith("/@") || path.startsWith("/settings")) {
-    return "me";
+    return "bio";
   }
   return "pass";
 }
