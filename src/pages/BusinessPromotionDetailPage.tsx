@@ -4,6 +4,7 @@ import { collection, doc, getDoc, getDocs, query, where } from "firebase/firesto
 import { ArrowLeft, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
 import { friendlyPromotionError, submitPromotionRemote, updatePromotionRemote } from "@/lib/promotions";
@@ -64,7 +65,7 @@ export function BusinessPromotionDetailPage() {
       .catch(() => undefined);
   }, [id, promo]);
 
-  if (loading) return <p className="mx-auto max-w-2xl px-4 py-12 text-center text-sm text-mute">Loading…</p>;
+  if (loading) return <PageLoading />;
   if (!promo) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-12 text-center">
@@ -97,7 +98,7 @@ export function BusinessPromotionDetailPage() {
     setBusy(true);
     try {
       await submitPromotionRemote({ promotionId: id });
-      toast.success("Submitted for AirPal.Me review.");
+      toast.success("Submitted for AirPal review.");
       setPromo((p) => (p ? { ...p, status: "submitted" } : p));
     } catch (err) {
       toast.error(friendlyPromotionError(err));

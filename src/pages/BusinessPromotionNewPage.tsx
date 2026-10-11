@@ -25,7 +25,7 @@ export function BusinessPromotionNewPage() {
     category: "Local",
     prizeTitle: "",
     prizeValue: "",
-    eligibility: "Open to AirPal.Me members where permitted.",
+    eligibility: "Open to AirPal members where permitted.",
     entryLimit: 1,
     startAt: "",
     endAt: "",
@@ -57,7 +57,7 @@ export function BusinessPromotionNewPage() {
       });
       if (submit) {
         await submitPromotionRemote({ promotionId: res.promotionId });
-        toast.success("Submitted for AirPal.Me review.");
+        toast.success("Submitted for AirPal review.");
       } else {
         toast.success("Draft saved.");
       }

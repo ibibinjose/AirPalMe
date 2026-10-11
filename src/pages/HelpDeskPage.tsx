@@ -44,6 +44,7 @@ import {
   ticketSoundEnabled,
 } from "@/lib/ticket-alert-sound";
 import { track } from "@/lib/analytics";
+import { cn } from "@/lib/cn";
 
 type DomainFilter = "all" | "stay" | "dining" | "events" | "venue";
 type StatusFilter = "active" | "urgent" | "resolved";
@@ -297,7 +298,7 @@ export function HelpDeskPage() {
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 active:scale-95 transition"
+            className="flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-brand/90 active:scale-95 transition cursor-pointer"
           >
             <Plus size={15} /> Log Service Request
           </button>
@@ -365,11 +366,12 @@ export function HelpDeskPage() {
                 key={tab.id}
                 type="button"
                 onClick={() => setDomainFilter(tab.id as DomainFilter)}
-                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
+                className={cn(
+                  "flex min-h-[44px] items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition cursor-pointer active:scale-95",
                   active
                     ? "bg-brand text-white shadow-xs"
-                    : "text-mute hover:text-ink hover:bg-paper"
-                }`}
+                    : "text-mute hover:text-ink hover:bg-paper",
+                )}
               >
                 <Icon size={14} />
                 <span>{tab.label}</span>

@@ -59,11 +59,11 @@ export function BelongingReportPanel() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={handleCopyLink} className="gap-1.5">
+          <Button variant="ghost" onClick={handleCopyLink} className="min-h-[44px] gap-1.5 px-4 text-xs font-semibold">
             <Copy size={14} />
             <span>{copied ? "Copied" : "Copy Join Link"}</span>
           </Button>
-          <Button variant="primary" size="sm" onClick={handleExport} className="gap-1.5">
+          <Button variant="primary" onClick={handleExport} className="min-h-[44px] gap-1.5 px-4 text-xs font-semibold shadow-xs">
             <Download size={14} />
             <span>Print Report</span>
           </Button>
@@ -81,10 +81,10 @@ export function BelongingReportPanel() {
               setSelectedInstId(inst.id);
             }}
             className={cn(
-              "flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-bold transition whitespace-nowrap cursor-pointer touch-manipulation",
+              "flex min-h-[44px] items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition whitespace-nowrap cursor-pointer touch-manipulation active:scale-95",
               inst.id === selectedInstId
                 ? "bg-brand text-white shadow-xs"
-                : "bg-card text-mute ring-1 ring-line hover:text-ink",
+                : "bg-card text-mute ring-1 ring-line hover:text-ink hover:bg-paper",
             )}
           >
             <span>{inst.badgeEmoji}</span>

@@ -6,6 +6,7 @@ import { ArrowRight, Store } from "lucide-react";
 import { handleFromName, randomHexHandle, type BioCatalogItem, type BioCatalogKind } from "@shared/bio";
 import { isBusinessCategory } from "@shared/business";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { fieldInput } from "@/components/forms/ValidField";
 import { useAuth } from "@/contexts/AuthContext";
@@ -48,7 +49,7 @@ export function BusinessShowcasePage() {
   const placeName = stashed?.name || business?.name || "your place";
 
   if (!authReady) {
-    return <div className="mx-auto max-w-md px-4 py-16 text-center text-sm text-mute">Loading…</div>;
+    return <PageLoading />;
   }
   if (!user) {
     return (

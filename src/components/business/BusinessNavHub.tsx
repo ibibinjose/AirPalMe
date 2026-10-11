@@ -36,9 +36,10 @@ export function BusinessNavHub({
           </div>
           <Link
             href="/business/onboard"
-            className="inline-flex items-center gap-1 rounded-full border border-line/20 bg-paper px-3 py-1 text-xs font-semibold text-ink hover:bg-card transition"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-line/20 bg-paper px-3.5 py-2 text-xs font-semibold text-ink hover:bg-card transition shadow-2xs active:scale-95"
           >
-            <PlusCircle size={13} /> Claim Venue
+            <PlusCircle size={14} className="text-accent" />
+            <span>Claim Venue</span>
           </Link>
         </div>
 

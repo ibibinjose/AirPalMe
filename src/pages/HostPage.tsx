@@ -3,6 +3,7 @@ import { useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { TabPills } from "@/components/ui/TabPills";
 import { ValidField, fieldInput } from "@/components/forms/ValidField";
 import { AuthGate } from "@/components/auth/AuthGate";
@@ -150,7 +151,7 @@ export function HostPage() {
   }
 
   if (!authReady) {
-    return <div className="mx-auto max-w-md px-4 py-16 text-center text-sm text-mute">Loading…</div>;
+    return <PageLoading />;
   }
 
   if (!user) {

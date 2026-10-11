@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { ArrowLeft, Megaphone, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
 import { cn } from "@/lib/cn";
@@ -68,12 +69,14 @@ export function BusinessPromotionsPage() {
       </div>
 
       {loading ? (
-        <p className="mt-8 text-center text-sm text-mute">Loading campaigns…</p>
+        <div className="py-12">
+          <PageLoading />
+        </div>
       ) : rows.length === 0 ? (
         <div className="mt-8 rounded-3xl border-2 border-dashed border-ink/20 p-8 text-center">
           <Megaphone size={32} className="mx-auto text-mute" />
-          <p className="font-display mt-2 text-lg font-bold">Be the first business to create an AirPal.Me promotion.</p>
-          <p className="mt-1 text-sm text-mute">Drafts are free. Every campaign goes live after AirPal.Me review.</p>
+          <p className="font-display mt-2 text-lg font-bold">Be the first business to create an AirPal promotion.</p>
+          <p className="mt-1 text-sm text-mute">Drafts are free. Every campaign goes live after AirPal review.</p>
           <Link href="/business/promotions/new">
             <Button className="mt-4">Create promotion</Button>
           </Link>

@@ -81,7 +81,7 @@ const PRIZES: PrizeItem[] = [
     name: "Ten × $100 AirPal Credits",
     badge: "Ten Happy Winners",
     highlight: "10 Founders · $100 Cash Credit Each",
-    line: "Ten lucky founding members get $100 in AirPal credits directly in their wallet. Spend it on verified Mates, weekend stays, local events, or food & dining!",
+    line: "Ten lucky founding members get $100 in AirPal credits directly in their wallet. Spend it on concerts, local events, dining perks, or weekend experiences!",
     bullets: ["10 winners drawn at random", "$100 AirPal credit each", "Usable across all AirPal services", "Instant credit to your wallet"],
     icon: Gift,
     color: "from-emerald-500/10 to-teal-500/5 border-emerald-200 text-emerald-900",

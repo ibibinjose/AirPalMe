@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "wouter";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { SwipeChoice } from "@/components/pulse/SwipeChoice";
 import { ensureAnonymousSession } from "@/lib/firebase";
 import { fetchPulseByToken, submitPulse } from "@/lib/pulse-store";
@@ -143,11 +144,7 @@ export function PulsePublicPage() {
   }
 
   if (loading) {
-    return (
-      <div className="mx-auto flex min-h-[70vh] max-w-md items-center justify-center px-4 text-sm text-mute">
-        Loading Pulse…
-      </div>
-    );
+    return <PageLoading />;
   }
 
   if (error || !pulse) {

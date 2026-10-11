@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { ArrowLeft, Check, Copy, Download, ExternalLink, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { useAuth } from "@/contexts/AuthContext";
 import { track } from "@/lib/analytics";
@@ -292,12 +293,7 @@ export function HostPulsePage() {
   }
 
   if (!authReady) {
-    return (
-      <div className="mx-auto flex max-w-md flex-col items-center gap-3 px-4 py-16 text-center">
-        <Loader2 size={28} className="text-accent motion-safe:animate-spin" />
-        <p className="text-sm font-medium text-mute">Loading Pulse…</p>
-      </div>
-    );
+    return <PageLoading />;
   }
 
   if (!user) {

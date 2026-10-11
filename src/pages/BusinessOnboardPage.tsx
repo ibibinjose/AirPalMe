@@ -12,6 +12,7 @@ import {
   Store,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { useAuth } from "@/contexts/AuthContext";
 import { useListings } from "@/contexts/ListingsContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
@@ -312,12 +313,7 @@ export function BusinessOnboardPage() {
   }
 
   if (!authReady) {
-    return (
-      <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-        <p className="mt-3 text-sm text-mute font-medium">Checking authorization…</p>
-      </div>
-    );
+    return <PageLoading />;
   }
 
   const domainOk = googleOwnerVerified(draft, user?.email);
@@ -325,8 +321,8 @@ export function BusinessOnboardPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 py-6 sm:py-8">
-      <Link href="/business" className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:underline">
-        <ArrowLeft className="h-3.5 w-3.5" /> Back to Business Studio
+      <Link href="/business" className="inline-flex min-h-[44px] items-center gap-1.5 text-xs font-semibold text-accent hover:underline">
+        <ArrowLeft className="h-4 w-4" /> Back to Business Studio
       </Link>
 
       <div className="mt-3 rounded-[32px] bg-card p-6 sm:p-8 ring-1 ring-line shadow-xs">

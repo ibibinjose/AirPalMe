@@ -3,6 +3,7 @@ import { useLocation, Link } from "wouter";
 import { toast } from "sonner";
 import { BUSINESS_CATEGORIES, listingToPlace, type BusinessCategoryId } from "@shared/business";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { PlaceCard } from "@/components/discovery/PlaceCard";
 import { BioHandleButton } from "@/components/bio/BioHandleButton";
 import { Photo } from "@/components/ui/Photo";
@@ -138,12 +139,7 @@ export function BusinessPage() {
   }, [user]);
 
   if (!authReady) {
-    return (
-      <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-        <p className="mt-3 text-sm text-mute font-medium">Loading partner dashboard…</p>
-      </div>
-    );
+    return <PageLoading />;
   }
 
   if (!user) {
@@ -319,28 +315,28 @@ export function BusinessPage() {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link
             href="/business/onboard"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl bg-paper px-3.5 py-2 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs active:scale-[0.98]"
           >
-            <Plus className="h-3.5 w-3.5 text-accent" />
+            <Plus className="h-4 w-4 text-accent" />
             <span>Add Venue</span>
           </Link>
           <Link
             href="/business/promotions/new"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl bg-paper px-3.5 py-2 text-xs font-semibold text-ink ring-1 ring-line transition hover:bg-card hover:ring-brand/40 shadow-2xs active:scale-[0.98]"
           >
-            <Plus className="h-3.5 w-3.5 text-accent" />
+            <Plus className="h-4 w-4 text-accent" />
             <span>Create offer</span>
           </Link>
           <button
             type="button"
             onClick={() => setShowDeleteModal(true)}
             title="Remove / Unlink this venue"
-            className="inline-flex items-center gap-1.5 rounded-xl bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-500/20 transition"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-xl bg-red-500/10 px-3.5 py-2 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-500/20 transition active:scale-[0.98] cursor-pointer"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Trash2 className="h-4 w-4" />
             <span className="hidden sm:inline">Remove Venue</span>
           </button>
         </div>
@@ -374,7 +370,7 @@ export function BusinessPage() {
               <button
                 type="button"
                 onClick={() => nav(hrefForPlace(listingToPlace(mine)))}
-                className="inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-bold text-ink backdrop-blur-md hover:bg-white transition shadow-sm"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-white/90 px-4 py-2 text-xs font-bold text-ink backdrop-blur-md hover:bg-white transition shadow-sm active:scale-95 cursor-pointer"
               >
                 <Eye className="h-3.5 w-3.5 text-accent" />
                 Guest View
