@@ -15,14 +15,28 @@ export function WavePage() {
   const { user, authReady } = useAuth();
   const code = waveCodeFrom(params?.code || "");
   const [session, setSession] = useState<WaveSession | null>(null);
+  const [loadingSession, setLoadingSession] = useState(false);
   const [busy, setBusy] = useState(false);
+  const uid = user?.uid;
 
   useEffect(() => {
-    if (!code) return;
-    void fetchWaveByCode(code).then(setSession);
-  }, [code]);
+    // Wave docs are only readable when signed in; skip the read for guests.
+    if (!code || !uid) return;
+    let alive = true;
+    setLoadingSession(true);
+    void fetchWaveByCode(code)
+      .then((s) => {
+        if (alive) setSession(s);
+      })
+      .finally(() => {
+        if (alive) setLoadingSession(false);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [code, uid]);
 
-  if (!authReady) {
+  if (!authReady || loadingSession) {
     return <PageLoading message="Connecting to wave…" />;
   }
   if (!user) {
