@@ -5,7 +5,7 @@ import { LEGAL } from "@/lib/legal";
 import { ASSIST_FAQ, buildAssistJsonLd } from "@/lib/assist-meta";
 
 const GUIDES = [
-  { href: "/help?a=stay-guest", title: "Staying guest guide", note: "Scans, Wi-Fi, dining, the front desk" },
+  { href: "/help?a=resident-arrival", title: "Resident arrival guide", note: "Check-in, cohorts, building hub" },
   { href: "/help?a=meet-safely", title: "Meet safely", note: "Public places, check-ins, instincts" },
   { href: "/help?a=report-block", title: "Report or block someone", note: "Human review on every case" },
   { href: "/help?a=tickets-payments", title: "Tickets and payments", note: "Bookings, cancellations, refunds" },

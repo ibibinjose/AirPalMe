@@ -2,9 +2,9 @@ import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import {
   ArrowRight,
+  Building2,
   CalendarDays,
   ChevronDown,
-  Hotel,
   LifeBuoy,
   ShieldCheck,
   Sparkles,
@@ -31,7 +31,7 @@ const CATEGORY_ICONS: Record<CategoryFilter, typeof Sparkles> = {
   tickets: Ticket,
   safety: ShieldCheck,
   account: User,
-  stay: Hotel,
+  arrival: Building2,
 };
 
 export function HelpPage() {

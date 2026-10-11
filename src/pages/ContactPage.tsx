@@ -3,16 +3,18 @@ import { Link } from "wouter";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { LEGAL } from "@/lib/legal";
+import { triggerHaptic } from "@/lib/native";
 import { fieldInput, fieldTextarea } from "@/components/forms/ValidField";
 
 const TOPICS = [
   { id: "general", label: "General" },
-  { id: "access", label: "Copy of my data" },
-  { id: "delete", label: "Delete my data" },
-  { id: "host", label: "Host / property" },
-  { id: "business", label: "Local business" },
-  { id: "handle", label: "Handle / trade mark" },
-  { id: "legal", label: "Legal" },
+  { id: "ticketing", label: "Tickets & Passes" },
+  { id: "host", label: "PBSA / Residence Host" },
+  { id: "business", label: "Local Business / Merchant" },
+  { id: "handle", label: "Handle / Trade Mark" },
+  { id: "access", label: "Copy of My Data" },
+  { id: "delete", label: "Delete My Data" },
+  { id: "legal", label: "Legal & Compliance" },
 ] as const;
 
 export function ContactPage() {
@@ -23,6 +25,7 @@ export function ContactPage() {
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
+    void triggerHaptic("medium");
     const subject = `[AirPal.me] ${TOPICS.find((t) => t.id === topic)?.label} — ${name || "Message"}`;
     const body = [`Name: ${name}`, `Email: ${email}`, `Topic: ${topic}`, "", message].join("\n");
     const href = `mailto:${LEGAL.contacts}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -80,8 +83,13 @@ export function ContactPage() {
               <button
                 key={t.id}
                 type="button"
-                onClick={() => setTopic(t.id)}
-                className={`h-9 rounded-full px-3 text-sm ${topic === t.id ? "bg-brand text-white" : "bg-card ring-1 ring-line"}`}
+                onClick={() => {
+                  void triggerHaptic("light");
+                  setTopic(t.id);
+                }}
+                className={`inline-flex min-h-[44px] items-center rounded-full px-3.5 text-xs font-semibold transition active:scale-95 ${
+                  topic === t.id ? "bg-brand text-white shadow-xs" : "bg-card text-ink ring-1 ring-line hover:bg-paper"
+                }`}
               >
                 {t.label}
               </button>
@@ -94,7 +102,7 @@ export function ContactPage() {
             required
             className={`h-36 ${fieldTextarea}`}
           />
-          <Button type="submit" className="w-full">
+          <Button type="submit" size="lg" className="min-h-[44px] w-full rounded-full">
             Open email
           </Button>
         </form>

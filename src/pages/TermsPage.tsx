@@ -18,9 +18,10 @@ export function TermsPage() {
 
       <h2>1. The service</h2>
       <p>
-        AirPal is a guest concierge and local guide. Hosts print QR codes for rooms, lobbies, campuses, and streets.
-        Visitors scan to see What’s around, stay answers, tours, events, and public bios. Local businesses may claim an
-        @handle. Organisers may run a market or expo directory.
+        AirPal is an all-in-one platform for live events, ambient discovery, group plans, PBSA resident arrival cohorts,
+        and personal digital bio profiles. Organizers and operators print QR codes for event check-in, precinct markers,
+        campuses, and reception desks. Visitors scan to discover What's on, plan stops, join cohorts, and view public bios.
+        Local businesses may claim an @handle and publish member perks.
       </p>
       <p>
         We may change, suspend, or discontinue features. Information about places, hours, deals, weather, and walking

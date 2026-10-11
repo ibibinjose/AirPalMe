@@ -27,8 +27,8 @@ export const ASSIST_FAQ: AssistFaq[] = [
     a: "No. On the airpal.me website you can read the help guides and contact us without signing in. The native iOS and Android apps require an account.",
   },
   {
-    q: "I scanned a stay QR code — where is my help?",
-    a: "Open the Staying guest guide in the help center for scans, Wi-Fi, dining and the front desk. For anything about your room or your booking, ask the property's reception directly.",
+    q: "I scanned an arrival or precinct QR code — where is my help?",
+    a: "Open the Resident arrival guide or help center for scans, check-in, cohorts, and ticketing. For anything about your room or building booking, ask the residence reception directly.",
   },
   {
     q: "How do I report someone or stay safe?",

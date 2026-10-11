@@ -96,7 +96,7 @@ export function AlternativePage() {
         <p className="text-[11px] font-bold uppercase tracking-wider text-accent">Early access · Sydney · October 2026</p>
         <p className="mt-2 text-sm leading-relaxed text-ink/80">
           Everything above is live in the product today. We publish no customer counts, ratings or customer stories yet
-          — this page grows only with real, permissioned evidence. Running a stay, venue or event?{" "}
+          — this page grows only with real, permissioned evidence. Running a student residence, venue or event?{" "}
           <Link href="/business" className="font-semibold text-accent hover:underline">
             List your place
           </Link>{" "}

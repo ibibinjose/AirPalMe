@@ -49,15 +49,15 @@ export function CookiesPage() {
             <td>Until you change it or clear storage</td>
           </tr>
           <tr>
-            <td>airpal.stay</td>
+            <td>airpal.cohort / airpal.marker</td>
             <td>Strictly necessary</td>
-            <td>Remember the scanned room, marker, or campus for this tab.</td>
+            <td>Remember the scanned building cohort, room token, marker, or campus for this tab.</td>
             <td>Session</td>
           </tr>
           <tr>
             <td>airpal.local-now.v2</td>
             <td>Functional</td>
-            <td>Cache weather for the current stay or GPS origin so we do not re-query Open-Meteo every load.</td>
+            <td>Cache weather for the current precinct anchor or GPS origin so we do not re-query Open-Meteo every load.</td>
             <td>Session (about 15 minutes of usefulness)</td>
           </tr>
           <tr>

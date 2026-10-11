@@ -3,21 +3,20 @@ import { Link } from "wouter";
 import {
   ArrowLeft,
   BadgePercent,
+  Building2,
+  CalendarDays,
   CheckCircle2,
   Compass,
   Copy,
   ExternalLink,
   Globe,
   MoreVertical,
-  Plane,
   PlusSquare,
   Share2,
   ShieldCheck,
-  Shirt,
   Smartphone,
   Sparkles,
-  Users,
-  Bed,
+  Ticket,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
@@ -35,7 +34,7 @@ function StoreBadge({ store, href }: { store: "apple" | "play"; href: string }) 
       href={href}
       onClick={comingSoon ? (e) => e.preventDefault() : undefined}
       aria-label={store === "apple" ? "Download on the App Store" : "Get it on Google Play"}
-      className="group relative flex items-center gap-3 rounded-2xl ring-1 ring-line bg-neutral-900 px-5 py-3 text-white transition hover:bg-neutral-800 active:scale-[0.98]"
+      className="group relative flex min-h-[44px] items-center gap-3 rounded-2xl ring-1 ring-line bg-neutral-900 px-5 py-3 text-white transition hover:bg-neutral-800 active:scale-[0.98]"
     >
       {store === "apple" ? (
         <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden className="shrink-0">
@@ -66,46 +65,39 @@ function StoreBadge({ store, href }: { store: "apple" | "play"; href: string }) 
 
 const VERTICALS = [
   {
-    title: "AirPal Mate",
-    badge: "Find Someone To Go With",
-    description: "Never go alone. Connect with verified local mates for gigs, dining, events, and activities.",
-    icon: Users,
-    color: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-  },
-  {
-    title: "AirPal Stay",
-    badge: "Boutique Accommodations",
-    description: "Discover verified hotels, boutique stays, hostels, and serviced apartments worldwide.",
-    icon: Bed,
-    color: "bg-amber-500/10 text-amber-600 border-amber-500/20",
-  },
-  {
-    title: "AirPal Experiences",
-    badge: "Curated Local Activities",
-    description: "Book unique food tours, harbour adventures, fitness classes, and creative workshops.",
-    icon: Compass,
+    title: "AirPal Pass",
+    badge: "Events & Tickets",
+    description: "Live concerts, Indian festivals, native Stripe ticketing, and 1-tap Apple & Google Wallet passbooks.",
+    icon: Ticket,
     color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
   },
   {
-    title: "AirPal Fashion",
-    badge: "Brand campaigns first",
-    description: "Brand campaigns and exclusive drops. Rentals open with partner brands — no peer-to-peer store until trust proves out.",
-    icon: Shirt,
+    title: "What now?",
+    badge: "Real-Time Discovery",
+    description: "60-second plan composer with live weather, deterministic outfit recommendations, and precinct highlights.",
+    icon: Compass,
+    color: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+  },
+  {
+    title: "Hangouts & Plans",
+    badge: "Social Coordination",
+    description: "Effortless group planning: multi-stop itineraries, voting, 1-tap web RSVPs, and calendar sync.",
+    icon: CalendarDays,
     color: "bg-brand/10 text-accent border-brand/20",
   },
   {
-    title: "AirPal Daily",
-    badge: "Local Discovery",
-    description: "What's happening near you today: live events, pop-up offers, and local giveaways.",
-    icon: Sparkles,
-    color: "bg-rose-500/10 text-rose-600 border-rose-500/20",
+    title: "Arrival & Business",
+    badge: "PBSA & Community",
+    description: "60-second resident check-in, building cohorts, operator Belonging Reports, and merchant perks.",
+    icon: Building2,
+    color: "bg-amber-500/10 text-amber-600 border-amber-500/20",
   },
   {
-    title: "AirPal Travel",
-    badge: "Smart Itineraries",
-    description: "Seamless trip planning connecting your stays, activities, fashion, and local companions.",
-    icon: Plane,
-    color: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20",
+    title: "Circle & Bio",
+    badge: "Networking & Identity",
+    description: "Dedicated networking circle with live presence check-in, connector quests, and personal @handle bio.",
+    icon: Sparkles,
+    color: "bg-purple-500/10 text-purple-600 border-purple-500/20",
   },
 ];
 
@@ -172,9 +164,8 @@ export function GetAirPalPage() {
         <p className="mt-6 text-xs font-bold uppercase tracking-[0.24em] text-accent">iPhone · Android · Web</p>
         <h1 className="font-display mt-2 text-5xl font-bold tracking-tight text-ink md:text-6xl">Get AirPal</h1>
         <p className="mx-auto mt-4 max-w-lg text-balance text-base leading-relaxed text-mute md:text-lg">
-          Your global networking app, link-in-bio, and guide to life around you — connecting{" "}
-          <strong className="font-semibold text-ink">friends, family, colleagues, and mates</strong> with places,
-          stays, experiences and things in any city worldwide.
+          Your master companion for live events, social plans, resident arrival, and personal bio — connecting{" "}
+          <strong className="font-semibold text-ink">friends, family, colleagues, and mates</strong> across Sydney and beyond.
         </p>
 
         {/* Store badges up front */}
@@ -196,13 +187,13 @@ export function GetAirPalPage() {
             </div>
             <h2 className="mt-3 text-2xl font-bold tracking-tight text-ink">Use AirPal instantly</h2>
             <p className="mt-1.5 text-sm leading-relaxed text-mute">
-              Opens in your browser on iPhone, Android, or desktop — then install it to your home screen for the full
+              Opens directly in your browser on iPhone, Android, or desktop — or install it to your home screen for the full
               app experience.
             </p>
           </div>
 
           <Link href="/" className="mt-6 block">
-            <Button size="lg" className="h-12 w-full gap-1.5 rounded-full text-base font-bold shadow-sm">
+            <Button size="lg" className="h-12 min-h-[44px] w-full gap-1.5 rounded-full text-base font-bold shadow-sm">
               Launch the app <ExternalLink size={16} />
             </Button>
           </Link>
@@ -229,14 +220,14 @@ export function GetAirPalPage() {
             <Button
               onClick={share}
               variant="light"
-              className="flex-1 ring-1 ring-line text-ink font-semibold hover:bg-paper"
+              className="flex-1 min-h-[44px] ring-1 ring-line text-ink font-semibold hover:bg-paper"
             >
               <Share2 size={14} /> Share
             </Button>
             <Button
               onClick={copyLink}
               variant="light"
-              className="ring-1 ring-line text-ink font-semibold hover:bg-paper"
+              className="min-h-[44px] ring-1 ring-line text-ink font-semibold hover:bg-paper"
             >
               <Copy size={14} /> Copy Link
             </Button>
@@ -364,14 +355,14 @@ export function GetAirPalPage() {
         </div>
       </div>
 
-      {/* One Platform — 6 Verticals Section */}
+      {/* One Platform — 5 Pillars Section */}
       <div className="mt-16 text-center">
-        <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent">One platform engine</p>
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-accent">Master Brand Ecosystem</p>
         <h2 className="font-display mx-auto mt-2 max-w-xl text-balance text-3xl font-bold tracking-tight text-ink md:text-4xl">
-          Everything AirPal offers
+          Five pillars. One account.
         </h2>
         <p className="mx-auto mt-3 max-w-md text-[15px] text-mute">
-          Mates, stays, experiences, fashion, daily discovery and trips — one login across it all.
+          Events & access, 60-second discovery, group plans, resident arrival, and personal digital bio — seamlessly unified.
         </p>
 
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
@@ -385,7 +376,7 @@ export function GetAirPalPage() {
                   <v.icon size={20} />
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-mute border border-line px-2 py-0.5 rounded-full">
-                  {v.title.replace("AirPal ", "")}
+                  {v.badge}
                 </span>
               </div>
               <h3 className="mt-3 text-lg font-bold text-ink">{v.title}</h3>
@@ -402,9 +393,9 @@ export function GetAirPalPage() {
             <div className="rounded-2xl bg-brand/10 p-3 text-accent border border-brand/20">
               <ShieldCheck size={24} />
             </div>
-            <h4 className="mt-3 font-bold text-ink text-base">Verified AirPal Mates</h4>
+            <h4 className="mt-3 font-bold text-ink text-base">Verified Identity & Attendance</h4>
             <p className="mt-1 text-xs text-mute leading-relaxed">
-              Every active Mate completes identity verification and admin profile review before connecting.
+              SMS phone OTP, email verification, and authenticated ticket passes guarantee trusted, authentic real-world connections.
             </p>
           </div>
 
@@ -412,9 +403,9 @@ export function GetAirPalPage() {
             <div className="rounded-2xl bg-gold/10 p-3 text-accent border border-gold/20">
               <CheckCircle2 size={24} />
             </div>
-            <h4 className="mt-3 font-bold text-ink text-base">Protected Marketplace</h4>
+            <h4 className="mt-3 font-bold text-ink text-base">Protected Stripe Payments</h4>
             <p className="mt-1 text-xs text-mute leading-relaxed">
-              Secure booking, escrow payments via Stripe, transparent reviews, and 24/7 safety reporting.
+              Encrypted ticket checkout via Stripe, instant wallet passes, zero stored card numbers, and 24/7 moderation reporting.
             </p>
           </div>
 
@@ -424,7 +415,7 @@ export function GetAirPalPage() {
             </div>
             <h4 className="mt-3 font-bold text-ink text-base">Free for Local Discovery</h4>
             <p className="mt-1 text-xs text-mute leading-relaxed">
-              100% free to browse Sydney activities, events, and stays. No hidden registration fees.
+              100% free to browse precinct guides, join friend hangouts, and check in. Zero hidden registration fees.
             </p>
           </div>
         </div>

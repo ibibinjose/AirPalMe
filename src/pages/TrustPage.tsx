@@ -79,9 +79,9 @@ export function TrustPage() {
           <ShieldCheck size={14} /> The short answer
         </p>
         <p className="mt-3 text-base leading-relaxed text-white/90 sm:text-lg">
-          AirPal.Me is a guest-companion and local-discovery platform built in Sydney by SarvamDaily Pty Ltd (ABN 83 702
+          AirPal.Me is an all-in-one event, discovery, and arrival platform built in Sydney by SarvamDaily Pty Ltd (ABN 83 702
           462 977). It is not Arjo&apos;s AirPal patient-transfer mattress and not the airpal.app flight-search tool.
-          One account connects mates, stays, experiences and plans, with human-reviewed trust and safety.
+          One account connects events, plans, arrival cohorts, and personal bio, with human-reviewed trust and safety.
         </p>
       </div>
 
@@ -113,15 +113,15 @@ export function TrustPage() {
           <span id="trust-is">What AirPal.Me is</span>
         </SectionTitle>
         <p className="mt-3 text-[15px] leading-relaxed text-ink/85">
-          AirPal.Me is the guest companion for stays and the local-discovery platform for going out — and the operating
-          system for the people who run those places. Guests get one place for everything about their stay or plan;
-          hosts and businesses get one place to run it.{" "}
+          AirPal.Me is the master ecosystem uniting live events & ticketing (AirPal Pass), ambient 60-second discovery,
+          group hangouts, PBSA resident arrival cohorts, and personal digital bio profiles. Guests and attendees
+          get one place for everything in real life; organizers, venues, and accommodation hosts get one console to run it.{" "}
           <Link href="/about" className="font-semibold text-accent hover:underline">
             About
           </Link>
           {" · "}
-          <Link href="/concierge" className="font-semibold text-accent hover:underline">
-            Stay & Guide
+          <Link href="/pass" className="font-semibold text-accent hover:underline">
+            AirPal Pass
           </Link>
           {" · "}
           <Link href="/business" className="font-semibold text-accent hover:underline">
@@ -210,19 +210,23 @@ export function TrustPage() {
           We&apos;re early — here is exactly what is live, and nothing we cannot stand behind.
         </p>
         <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-ink/80">
-          <li>The public website is live: guests can browse places, stays, plans and events without an account.</li>
+          <li>The public website is live: guests can browse events, places, plans, and guides without an account.</li>
           <li>
-            A live Stay & Guide demo (
-            <Link href="/concierge" className="font-semibold text-accent hover:underline">
-              concierge
+            Live precinct guides (
+            <Link href="/guide" className="font-semibold text-accent hover:underline">
+              guides
             </Link>
-            ) shows the guest loop — labelled as a demonstration, not a customer.
+            ) and the PBSA Arrival Engine (
+            <Link href="/join" className="font-semibold text-accent hover:underline">
+              arrival
+            </Link>
+            ) show the instant community onboarding loop.
           </li>
-          <li>Reporting, blocking and human admin review are part of the product from day one.</li>
+          <li>Reporting, blocking, encrypted Stripe payments, and human admin review are part of the product from day one.</li>
         </ul>
         <p className="mt-4 text-sm leading-relaxed text-ink/80">
           No customer counts, ratings or testimonials are published yet. This section grows only with real, permissioned
-          evidence. Running a stay, venue or college in Sydney and want to pilot with us?{" "}
+          evidence. Running a student residence, venue, or event in Sydney and want to pilot with us?{" "}
           <Link href="/business" className="font-semibold text-accent hover:underline">
             List your place
           </Link>{" "}
@@ -273,7 +277,7 @@ export function TrustPage() {
             href="/business"
             className="inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-bold text-ink ring-1 ring-line transition hover:bg-paper active:scale-[0.98]"
           >
-            For hosts
+            For operators
           </Link>
         </div>
       </section>

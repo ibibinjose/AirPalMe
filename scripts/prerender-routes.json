@@ -220,10 +220,10 @@
           },
           {
             "@type": "Question",
-            "name": "I scanned a stay QR code — where is my help?",
+            "name": "I scanned an arrival or precinct QR code — where is my help?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Open the Staying guest guide in the help center for scans, Wi-Fi, dining and the front desk. For anything about your room or your booking, ask the property's reception directly."
+              "text": "Open the Resident arrival guide or help center for scans, check-in, cohorts, and ticketing. For anything about your room or building booking, ask the residence reception directly."
             }
           },
           {

@@ -54,7 +54,10 @@ export function UnsubscribePage() {
             You&apos;re off the AirPal Guestlist — no more event invites to {email.trim()}. Changed your mind? Rejoin
             from any bio anytime.
           </p>
-          <Link href="/" className="mt-4 inline-block text-sm font-semibold text-accent hover:underline">
+          <Link
+            href="/"
+            className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full bg-brand px-6 text-sm font-bold text-white transition hover:bg-brand-ink active:scale-95"
+          >
             Back to AirPal.Me
           </Link>
         </>
@@ -77,9 +80,9 @@ export function UnsubscribePage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="h-11 w-full rounded-xl bg-card px-3 text-[16px] text-ink ring-1 ring-line"
+              className="h-11 min-h-[44px] w-full rounded-xl bg-card px-3 text-[16px] text-ink ring-1 ring-line"
             />
-            <Button type="submit" disabled={busy} className="h-11 w-full">
+            <Button type="submit" size="lg" disabled={busy} className="min-h-[44px] w-full rounded-full">
               {busy ? "Working…" : "Unsubscribe me"}
             </Button>
           </form>

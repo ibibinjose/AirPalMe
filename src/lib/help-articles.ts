@@ -2,7 +2,7 @@
  * Every href must be a registered internal route (see help-articles.test.ts).
  * Keep steps short, factual, and matched to shipped behavior. */
 
-export type HelpCategoryId = "plans" | "tickets" | "safety" | "account" | "stay";
+export type HelpCategoryId = "plans" | "tickets" | "safety" | "account" | "arrival";
 
 export interface HelpCategory {
   id: HelpCategoryId;
@@ -29,7 +29,7 @@ export const HELP_CATEGORIES: HelpCategory[] = [
   { id: "tickets", label: "Tickets & payments", blurb: "Pay, balances, cancellations, refunds." },
   { id: "safety", label: "Trust & safety", blurb: "Meet safely, verify, report, block." },
   { id: "account", label: "Account", blurb: "Sign in, profile, bio, settings." },
-  { id: "stay", label: "Stay guest", blurb: "Scans, Wi-Fi, dining, the desk." },
+  { id: "arrival", label: "Resident arrival", blurb: "PBSA check-in, cohorts, building hub." },
 ];
 
 export const HELP_ARTICLES: HelpArticle[] = [
@@ -151,21 +151,21 @@ export const HELP_ARTICLES: HelpArticle[] = [
     ],
   },
   {
-    id: "stay-guest",
-    title: "Staying guest guide",
-    category: "stay",
-    summary: "Everything for your stay in one scan — no front-desk queue.",
+    id: "resident-arrival",
+    title: "Resident & PBSA arrival guide",
+    category: "arrival",
+    summary: "60-second resident check-in, building cohort assignment, and local perks.",
     steps: [
-      "Scan the QR in your room or at the lobby to open your stay.",
-      "Copy the Wi-Fi in one tap — never ask the desk for the password.",
-      "Order in-room dining and request housekeeping from the companion.",
-      "Raise a ticket for reception, maintenance, or late checkout.",
-      "Your stay session lives on your device only.",
+      "Open /join or scan your building's QR plaque at reception.",
+      "Enter your 6-letter building code to join tonight's resident cohort.",
+      "See tonight's resident events, meet neighbours, and discover local merchant perks.",
+      "Your building circle is instantly unlocked in your networking circle.",
+      "Need room assistance or maintenance? Dispatch support through your building desk.",
     ],
     links: [
-      { label: "Scan", href: "/scan" },
-      { label: "Stay & Guide", href: "/concierge" },
-      { label: "Browse stays", href: "/stay" },
+      { label: "Arrival check-in", href: "/join" },
+      { label: "Inner circle", href: "/circle" },
+      { label: "Business hub", href: "/business" },
     ],
   },
 ];
