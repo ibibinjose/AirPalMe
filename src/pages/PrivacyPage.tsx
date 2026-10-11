@@ -62,7 +62,8 @@ export function PrivacyPage() {
           <tr>
             <td>Arrival, plan and scan context</td>
             <td>
-              Building cohort, precinct guide or marker scanned, room token, campus, saved stops, messages you send a host.
+              Building cohort, precinct guide or marker scanned, room token, campus, saved stops, messages you send a
+              host.
             </td>
           </tr>
           <tr>
@@ -151,8 +152,8 @@ export function PrivacyPage() {
         <li>Operate, debug, and protect the service (security, abuse, uptime).</li>
         <li>
           Measure product use: QR scans, page/context views, first useful action, map open, Wi-Fi reveal, questions,
-          offer claims, event saves, operator activation, offer redemption, and support resolution. We track
-          weekly qualified guest actions per active QR context as a product diagnostic.
+          offer claims, event saves, operator activation, offer redemption, and support resolution. We track weekly
+          qualified guest actions per active QR context as a product diagnostic.
         </li>
         <li>Remember language, stay context, and drafts on your device.</li>
         <li>Comply with law and respond to lawful requests.</li>

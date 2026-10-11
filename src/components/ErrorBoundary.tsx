@@ -29,7 +29,9 @@ export class ErrorBoundary extends React.Component<
             </p>
             {import.meta.env.DEV && this.state.err && (
               <div className="mt-4 max-h-60 overflow-auto rounded-2xl bg-red-500/10 p-3.5 text-left text-xs font-mono text-red-600 ring-1 ring-red-500/20">
-                <p className="font-bold">{this.state.err.name}: {this.state.err.message}</p>
+                <p className="font-bold">
+                  {this.state.err.name}: {this.state.err.message}
+                </p>
                 <pre className="mt-2 whitespace-pre-wrap text-[10px] opacity-80 leading-relaxed">
                   {this.state.err.stack}
                 </pre>
@@ -57,4 +59,3 @@ export class ErrorBoundary extends React.Component<
     return this.props.children;
   }
 }
-

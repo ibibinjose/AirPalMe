@@ -213,12 +213,12 @@ export function NotificationBell() {
               className="block border-t border-line/60 px-4 py-2.5"
             >
               <span className="flex items-baseline justify-between gap-2">
-                <p className={cn("min-w-0 flex-1 truncate text-[14px] leading-5", n.read ? "text-ink" : "font-semibold")}>
+                <p
+                  className={cn("min-w-0 flex-1 truncate text-[14px] leading-5", n.read ? "text-ink" : "font-semibold")}
+                >
                   {n.title}
                 </p>
-                {relativeAgo(n.at) ? (
-                  <span className="shrink-0 text-[11px] text-mute">{relativeAgo(n.at)}</span>
-                ) : null}
+                {relativeAgo(n.at) ? <span className="shrink-0 text-[11px] text-mute">{relativeAgo(n.at)}</span> : null}
               </span>
               <p className="mt-0.5 line-clamp-2 text-[12px] text-mute">{n.body}</p>
             </Link>

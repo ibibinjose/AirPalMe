@@ -2,7 +2,14 @@ import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
 import { ArrowLeft, Calendar, Check, Clock, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { PLAN_THEMES, PLAN_TYPES, canCancelPlanStatus, isPlanManager, type PlanTheme, type PlanType } from "@shared/plan";
+import {
+  PLAN_THEMES,
+  PLAN_TYPES,
+  canCancelPlanStatus,
+  isPlanManager,
+  type PlanTheme,
+  type PlanType,
+} from "@shared/plan";
 import { usePlans } from "@/contexts/PlanContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { PLAN_TYPE_ICONS } from "@/components/plan/planTypeIcons";
@@ -409,7 +416,9 @@ export function PlanEditPage() {
         <div className="mt-6 rounded-3xl bg-card p-6 ring-1 ring-red-500/20 shadow-xs">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-red-500">Danger zone</p>
           <h2 className="font-display text-base font-bold text-ink">Cancel this plan</h2>
-          <p className="mt-0.5 text-[13px] text-mute">Everyone going gets notified. The plan stays visible as cancelled.</p>
+          <p className="mt-0.5 text-[13px] text-mute">
+            Everyone going gets notified. The plan stays visible as cancelled.
+          </p>
           <input
             type="text"
             value={cancelReason}

@@ -116,7 +116,9 @@ export function PingsPanel() {
                     {p.fromHandle && <span className="font-normal text-mute"> @{p.fromHandle}</span>}
                   </p>
                   <p className="text-[13px] text-mute">
-                    {p.status === "pinged_back" ? "Pinged you back — wants to hang out." : "Wants to know if you're around."}
+                    {p.status === "pinged_back"
+                      ? "Pinged you back — wants to hang out."
+                      : "Wants to know if you're around."}
                   </p>
                   <div className="mt-2 flex gap-2">
                     {p.status === "sent" && (
@@ -159,7 +161,10 @@ export function PingsPanel() {
             {sent
               .filter((p) => isOpenPing(p.status))
               .map((p, i) => (
-                <li key={p.id} className={cn("flex items-center gap-3 px-4 py-3.5", i > 0 && "border-t border-line/70")}>
+                <li
+                  key={p.id}
+                  className={cn("flex items-center gap-3 px-4 py-3.5", i > 0 && "border-t border-line/70")}
+                >
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand/10 text-accent">
                     <Zap size={16} />
                   </span>

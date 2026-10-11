@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
-import {
-  Check,
-  MapPin,
-  Monitor,
-  Moon,
-  Sun,
-} from "lucide-react";
+import { Check, MapPin, Monitor, Moon, Sun } from "lucide-react";
 import { authErrorMessage } from "@shared/auth-email";
 import { BIRTHDAY_REGIONS, isBirthdayRegionCode, type BirthdayRegionCode } from "@shared/birthday-freebies";
 import { Button } from "@/components/ui/Button";
@@ -188,9 +182,7 @@ export function SettingsPage() {
                 onClick={() => handleThemeChange(opt.id)}
                 className={cn(
                   "flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-2xl p-2.5 text-xs font-semibold ring-1 transition active:scale-95 cursor-pointer",
-                  active
-                    ? "bg-brand text-white ring-brand shadow-xs"
-                    : "bg-card text-ink ring-line hover:bg-paper",
+                  active ? "bg-brand text-white ring-brand shadow-xs" : "bg-card text-ink ring-line hover:bg-paper",
                 )}
               >
                 <Icon size={16} />
@@ -302,7 +294,10 @@ export function SettingsPage() {
               </span>
             </div>
             <div className="mt-3">
-              <label htmlFor="city-select" className="block text-[11px] font-bold text-mute uppercase tracking-wider mb-1">
+              <label
+                htmlFor="city-select"
+                className="block text-[11px] font-bold text-mute uppercase tracking-wider mb-1"
+              >
                 Default City
               </label>
               <select
@@ -463,7 +458,9 @@ export function SettingsPage() {
         >
           <span>
             <span className="block text-[12px] text-mute">{NAMES.partnerAccount}</span>
-            <span className="font-medium text-ink">{business ? `@${business.handle}` : "Local venue, dining perks & counter QR"}</span>
+            <span className="font-medium text-ink">
+              {business ? `@${business.handle}` : "Local venue, dining perks & counter QR"}
+            </span>
           </span>
           <span className="text-sm font-semibold text-accent">Open</span>
         </button>

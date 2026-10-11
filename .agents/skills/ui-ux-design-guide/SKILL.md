@@ -68,6 +68,7 @@ Rules are priority-ordered. Address higher-priority categories first.
 ## 6. Color (MEDIUM)
 
 Use these Tailwind values:
+
 - Body text: `text-slate-900`
 - Muted/secondary text: `text-slate-600` minimum
 - Borders: `border-gray-200`
@@ -95,6 +96,7 @@ Use these Tailwind values:
 ## Pattern Selection
 
 ### Feedback & Notifications
+
 - Action result (save, delete): Toast notification
 - Form field error: Inline message next to field; focus first error on submit
 - Page-level error or empty result: Inline alert banner or empty state illustration
@@ -102,6 +104,7 @@ Use these Tailwind values:
 - Long-running operation: Progress bar or skeleton with status text
 
 ### Content Display
+
 - Quick edit of single field: Inline edit / click-to-edit
 - Create or edit full record: Full page or slide-over panel
 - Confirm destructive action: Confirmation dialog with explicit action name (e.g., "Delete project")
@@ -109,15 +112,17 @@ Use these Tailwind values:
 - Auxiliary content (filters, details): Side panel or sheet
 
 ### Data & Lists
+
 - <10 items, simple display: Simple list or card grid
 - 10–50 items with sorting/filtering: Table with column headers
-- >50 items: Virtualized list or paginated table
+- > 50 items: Virtualized list or paginated table
 - No data yet: Empty state with illustration and primary CTA
 - Entity has no records: "No [items] yet. Create your first [item]." with action button
 
 ### Navigation
+
 - 2–5 top-level sections: Tab bar or horizontal tabs
-- >5 sections or nested hierarchy: Sidebar navigation
+- > 5 sections or nested hierarchy: Sidebar navigation
 - Settings or configuration groups: Vertical tabs or segmented sections
 - Step-by-step process: Stepper/wizard with progress indicator
 

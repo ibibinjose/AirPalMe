@@ -120,10 +120,8 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
       )}
 
       <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-ink">{event.name}</h1>
-      
-      {event.shortWhy && (
-        <p className="mt-1 text-xs text-ink/80 font-medium">{event.shortWhy}</p>
-      )}
+
+      {event.shortWhy && <p className="mt-1 text-xs text-ink/80 font-medium">{event.shortWhy}</p>}
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-mute border-y border-line/60 py-2.5">
         <span className="inline-flex items-center gap-1">
@@ -307,7 +305,9 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
                 {s.offer && <span className="mt-0.5 block text-xs font-semibold text-accent">🏷️ {s.offer}</span>}
               </span>
               <span className="shrink-0 text-right text-xs font-medium text-mute group-hover:text-ink">
-                {isSaved(s.id) && <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-accent">Saved</span>}
+                {isSaved(s.id) && (
+                  <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-accent">Saved</span>
+                )}
                 {s.handle ? `@${s.handle}` : "View"}
               </span>
             </button>
@@ -334,4 +334,3 @@ export function ExpoDirectoryPage({ event }: { event: EventRecord }) {
     </div>
   );
 }
-

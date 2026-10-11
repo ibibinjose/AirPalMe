@@ -22,9 +22,7 @@ describe("pingPushTarget", () => {
   });
 
   it("stays silent on unrelated updates and repeats", () => {
-    expect(
-      pingPushTarget({ status: "sent", fromUid: "a" }, { status: "seen", fromUid: "a", toUid: "b" }),
-    ).toBeNull();
+    expect(pingPushTarget({ status: "sent", fromUid: "a" }, { status: "seen", fromUid: "a", toUid: "b" })).toBeNull();
     expect(
       pingPushTarget(
         { status: "pinged_back", fromUid: "a", toUid: "b" },

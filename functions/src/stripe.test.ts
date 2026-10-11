@@ -98,9 +98,7 @@ describe("assertChargeableAmount", () => {
 
   it("rejects zero, negative, and non-finite totals", () => {
     for (const bad of [0, -10, Number.NaN, Number.POSITIVE_INFINITY]) {
-      expect(() => assertChargeableAmount(bad)).toThrowError(
-        expect.objectContaining({ code: "failed-precondition" }),
-      );
+      expect(() => assertChargeableAmount(bad)).toThrowError(expect.objectContaining({ code: "failed-precondition" }));
     }
   });
 });
@@ -116,12 +114,12 @@ describe("money idempotency keys", () => {
 
 describe("needsTransferReversal", () => {
   it("reverses once, then stands down on webhook retries", () => {
-    expect(
-      needsTransferReversal({ status: "confirmed", payoutStatus: "transferred", stripeTransferId: "tr-1" }),
-    ).toBe(true);
-    expect(
-      needsTransferReversal({ status: "disputed", payoutStatus: "reversed", stripeTransferId: "tr-1" }),
-    ).toBe(false);
+    expect(needsTransferReversal({ status: "confirmed", payoutStatus: "transferred", stripeTransferId: "tr-1" })).toBe(
+      true,
+    );
+    expect(needsTransferReversal({ status: "disputed", payoutStatus: "reversed", stripeTransferId: "tr-1" })).toBe(
+      false,
+    );
     expect(needsTransferReversal({ status: "confirmed", payoutStatus: "held" })).toBe(false);
   });
 });

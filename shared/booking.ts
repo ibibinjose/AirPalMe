@@ -175,9 +175,7 @@ export type TicketAdmitCheck = { valid: true } | { valid: false; reason: TicketA
  * and still open. Cancelled/refunded/disputed/completed bookings never
  * admit — the gate shows the reason instead of a button.
  */
-export function ticketAdmitCheck(
-  b: Pick<Booking, "paymentStatus" | "priceCents" | "status">,
-): TicketAdmitCheck {
+export function ticketAdmitCheck(b: Pick<Booking, "paymentStatus" | "priceCents" | "status">): TicketAdmitCheck {
   if (b.status === "cancelled") return { valid: false, reason: "cancelled" };
   if (b.status === "refunded") return { valid: false, reason: "refunded" };
   if (b.status === "disputed") return { valid: false, reason: "disputed" };

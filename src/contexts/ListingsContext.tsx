@@ -197,9 +197,7 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
       version,
       remoteLoaded,
       async savePlace(input, targetListingId) {
-        const existing = targetListingId
-          ? listings.find((r) => r.id === targetListingId) || mine
-          : mine;
+        const existing = targetListingId ? listings.find((r) => r.id === targetListingId) || mine : mine;
         const id = existing?.id || `list-${nanoid(8)}`;
         const listing = listingDefaults({
           ...existing,
@@ -341,7 +339,11 @@ export function ListingsProvider({ children }: { children: ReactNode }) {
           try {
             await deleteDoc(doc(db, "listings", listingId));
             const placeId = listingId.replace(/^list-/, "pl-");
-            await setDoc(doc(db, "places", placeId), { status: "inactive", updatedAt: new Date().toISOString() }, { merge: true });
+            await setDoc(
+              doc(db, "places", placeId),
+              { status: "inactive", updatedAt: new Date().toISOString() },
+              { merge: true },
+            );
           } catch {
             /* ignore */
           }

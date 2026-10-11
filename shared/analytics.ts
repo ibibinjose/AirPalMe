@@ -97,7 +97,18 @@ export type AnalyticsSource = (typeof ANALYTICS_SOURCES)[number];
 export const BACKEND_STATES = ["live", "offline_queued", "local_demo", "failed"] as const;
 export type BackendState = (typeof BACKEND_STATES)[number];
 
-export const VALUE_TYPES = ["wifi", "answer", "map", "profile", "faq", "offer", "save", "support", "booking", "place"] as const;
+export const VALUE_TYPES = [
+  "wifi",
+  "answer",
+  "map",
+  "profile",
+  "faq",
+  "offer",
+  "save",
+  "support",
+  "booking",
+  "place",
+] as const;
 export type ValueType = (typeof VALUE_TYPES)[number];
 
 export const CONTENT_ACTION_TYPES = [
@@ -214,7 +225,10 @@ export const EVENT_PROPERTY_ALLOWLIST: Record<
   companion_application_submitted: { required: [], optional: ["roles"] },
   companion_application_reviewed: { required: ["status"], optional: [] },
   pulse_viewed: { required: ["contextId", "pulseId"], optional: ["deploymentId", "template"] },
-  pulse_response_completed: { required: ["contextId", "pulseId", "responseId"], optional: ["scoreBucket", "issueCreated"] },
+  pulse_response_completed: {
+    required: ["contextId", "pulseId", "responseId"],
+    optional: ["scoreBucket", "issueCreated"],
+  },
   pulse_issue_created: { required: ["contextId", "pulseId", "issueId", "responseId"], optional: ["category"] },
   pulse_issue_acknowledged: { required: ["contextId", "issueId"], optional: ["pulseId"] },
   pulse_issue_resolved: { required: ["contextId", "issueId"], optional: ["pulseId", "resolutionTimeMs"] },
@@ -472,11 +486,7 @@ export type WqgaResult = {
   byContext: Array<{ contextId: string; scans: number; qualifiedActions: number }>;
 };
 
-export function wqgaFromEvents(
-  events: AnalyticsEvent[],
-  now = Date.now(),
-  windowMs = WQGA_WINDOW_MS,
-): WqgaResult {
+export function wqgaFromEvents(events: AnalyticsEvent[], now = Date.now(), windowMs = WQGA_WINDOW_MS): WqgaResult {
   const from = now - windowMs;
   const seenDedupe = new Set<string>();
   let localDemoExcluded = 0;

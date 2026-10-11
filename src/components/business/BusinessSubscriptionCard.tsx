@@ -70,9 +70,7 @@ export function BusinessSubscriptionCard() {
   return (
     <section className="rounded-[28px] bg-card p-4 ring-1 ring-line" aria-label="Partner subscription">
       <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">AirPal Partner</p>
-      <h2 className="font-display mt-1 text-lg font-semibold">
-        {active ? "Partner active" : "Grow this place"}
-      </h2>
+      <h2 className="font-display mt-1 text-lg font-semibold">{active ? "Partner active" : "Grow this place"}</h2>
       <p className="mt-1 text-sm text-mute">
         {active
           ? "Campaigns are unlocked on this place. Manage seats, invoices, and cancellation in billing."

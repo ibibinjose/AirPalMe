@@ -68,19 +68,17 @@ export function isUseCase(id: string): id is MateUseCaseId {
 }
 
 export function mateRequestValid(input: MateRequestInput, today?: string): boolean {
-  if (
-    !(
-      isUseCase(input.useCase) &&
-      input.what.trim().length >= 4 &&
-      /^\d{4}-\d{2}-\d{2}$/.test(input.date) &&
-      input.suburb.trim().length >= 2 &&
-      Number.isFinite(input.partySize) &&
-      input.partySize >= 1 &&
-      input.partySize <= 20 &&
-      Number.isFinite(input.budget) &&
-      input.budget >= 0
-    )
-  ) {
+  if (!(
+    isUseCase(input.useCase) &&
+    input.what.trim().length >= 4 &&
+    /^\d{4}-\d{2}-\d{2}$/.test(input.date) &&
+    input.suburb.trim().length >= 2 &&
+    Number.isFinite(input.partySize) &&
+    input.partySize >= 1 &&
+    input.partySize <= 20 &&
+    Number.isFinite(input.budget) &&
+    input.budget >= 0
+  )) {
     return false;
   }
   // Past-date guard: callers pass the zoned today (LocalNow). YYYY-MM-DD

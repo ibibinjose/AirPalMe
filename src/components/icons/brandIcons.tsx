@@ -25,12 +25,7 @@ interface BrandIconProps {
 }
 
 /** AirPal Verified Badge for approved mates, partner stays, and trusted businesses */
-export function VerifiedBadgeIcon({
-  size = "sm",
-  variant = "brand",
-  className,
-  strokeWidth = 2,
-}: BrandIconProps) {
+export function VerifiedBadgeIcon({ size = "sm", variant = "brand", className, strokeWidth = 2 }: BrandIconProps) {
   return (
     <Icon
       icon={BadgeCheck}
@@ -44,12 +39,7 @@ export function VerifiedBadgeIcon({
 }
 
 /** AirPal Trust & Safety shield */
-export function SecurityShieldIcon({
-  size = "md",
-  variant = "brand",
-  className,
-  strokeWidth = 2,
-}: BrandIconProps) {
+export function SecurityShieldIcon({ size = "md", variant = "brand", className, strokeWidth = 2 }: BrandIconProps) {
   return (
     <Icon
       icon={ShieldCheck}
@@ -63,12 +53,7 @@ export function SecurityShieldIcon({
 }
 
 /** AirPal Mate: find someone to go with you */
-export function MateVerticalIcon({
-  size = "md",
-  variant = "brand",
-  className,
-  strokeWidth = 2,
-}: BrandIconProps) {
+export function MateVerticalIcon({ size = "md", variant = "brand", className, strokeWidth = 2 }: BrandIconProps) {
   return (
     <Icon
       icon={HeartHandshake}
@@ -82,12 +67,7 @@ export function MateVerticalIcon({
 }
 
 /** AirPal Stay: boutique hotels, motels & serviced apartments */
-export function StayVerticalIcon({
-  size = "md",
-  variant = "brand",
-  className,
-  strokeWidth = 2,
-}: BrandIconProps) {
+export function StayVerticalIcon({ size = "md", variant = "brand", className, strokeWidth = 2 }: BrandIconProps) {
   return (
     <Icon
       icon={BedDouble}
@@ -101,12 +81,7 @@ export function StayVerticalIcon({
 }
 
 /** AirPal Experiences: food, culture, art & wellness activities */
-export function ExperienceVerticalIcon({
-  size = "md",
-  variant = "brand",
-  className,
-  strokeWidth = 2,
-}: BrandIconProps) {
+export function ExperienceVerticalIcon({ size = "md", variant = "brand", className, strokeWidth = 2 }: BrandIconProps) {
   return (
     <Icon
       icon={Compass}
@@ -120,12 +95,7 @@ export function ExperienceVerticalIcon({
 }
 
 /** AirPal Fashion: share, rent, swap & style */
-export function FashionVerticalIcon({
-  size = "md",
-  variant = "brand",
-  className,
-  strokeWidth = 2,
-}: BrandIconProps) {
+export function FashionVerticalIcon({ size = "md", variant = "brand", className, strokeWidth = 2 }: BrandIconProps) {
   return (
     <Icon
       icon={Shirt}
@@ -139,12 +109,7 @@ export function FashionVerticalIcon({
 }
 
 /** AirPal Travel: itinerary & trip orchestration */
-export function TravelVerticalIcon({
-  size = "md",
-  variant = "brand",
-  className,
-  strokeWidth = 2,
-}: BrandIconProps) {
+export function TravelVerticalIcon({ size = "md", variant = "brand", className, strokeWidth = 2 }: BrandIconProps) {
   return (
     <Icon
       icon={Plane}
@@ -158,12 +123,7 @@ export function TravelVerticalIcon({
 }
 
 /** AirPal Daily: what's happening near me */
-export function DailyVerticalIcon({
-  size = "md",
-  variant = "brand",
-  className,
-  strokeWidth = 2,
-}: BrandIconProps) {
+export function DailyVerticalIcon({ size = "md", variant = "brand", className, strokeWidth = 2 }: BrandIconProps) {
   return (
     <Icon
       icon={Sparkles}
@@ -177,31 +137,14 @@ export function DailyVerticalIcon({
 }
 
 /** Universal Search Icon with brand blue accent */
-export function BrandSearchIcon({
-  size = "sm",
-  variant = "brand",
-  className,
-  strokeWidth = 2,
-}: BrandIconProps) {
+export function BrandSearchIcon({ size = "sm", variant = "brand", className, strokeWidth = 2 }: BrandIconProps) {
   return (
-    <Icon
-      icon={Search}
-      size={size}
-      variant={variant}
-      strokeWidth={strokeWidth}
-      className={className}
-      title="Search"
-    />
+    <Icon icon={Search} size={size} variant={variant} strokeWidth={strokeWidth} className={className} title="Search" />
   );
 }
 
 /** Location pin with brand styling */
-export function BrandLocationIcon({
-  size = "sm",
-  variant = "brand",
-  className,
-  strokeWidth = 2,
-}: BrandIconProps) {
+export function BrandLocationIcon({ size = "sm", variant = "brand", className, strokeWidth = 2 }: BrandIconProps) {
   return (
     <Icon
       icon={MapPin}
@@ -215,12 +158,7 @@ export function BrandLocationIcon({
 }
 
 /** Messaging & chat icon with brand styling */
-export function BrandChatIcon({
-  size = "sm",
-  variant = "brand",
-  className,
-  strokeWidth = 2,
-}: BrandIconProps) {
+export function BrandChatIcon({ size = "sm", variant = "brand", className, strokeWidth = 2 }: BrandIconProps) {
   return (
     <Icon
       icon={MessageSquare}
@@ -234,12 +172,7 @@ export function BrandChatIcon({
 }
 
 /** Social circles & mates icon */
-export function BrandUsersIcon({
-  size = "sm",
-  variant = "brand",
-  className,
-  strokeWidth = 2,
-}: BrandIconProps) {
+export function BrandUsersIcon({ size = "sm", variant = "brand", className, strokeWidth = 2 }: BrandIconProps) {
   return (
     <Icon
       icon={Users}

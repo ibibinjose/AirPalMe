@@ -11,17 +11,7 @@ import {
   reorderStops,
   stopChangeRecipients,
 } from "@shared/plan";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-  onSnapshot,
-  setDoc,
-  deleteDoc,
-} from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, where, onSnapshot, setDoc, deleteDoc } from "firebase/firestore";
 import { getFirebaseDb, isFirebaseConfigured } from "./firebase";
 import { omitUndefinedDeep } from "./firestore-data";
 import { publicSiteOrigin } from "./public-origin";
@@ -186,7 +176,6 @@ export function savePlan(plan: HangoutPlan, syncRemote = true): HangoutPlan {
   return finalPlan;
 }
 
-
 /** Close the AirPal loop: plan → show up → completed experience. */
 export function completePlan(planId: string): HangoutPlan | undefined {
   const current = getPlan(planId);
@@ -205,7 +194,9 @@ export function cancelPlan(planId: string, reason?: string): HangoutPlan | undef
   const current = getPlan(planId);
   if (!current) return undefined;
   if (!canCancelPlanStatus(current.status)) return current;
-  const cleanReason = String(reason || "").trim().slice(0, 280);
+  const cleanReason = String(reason || "")
+    .trim()
+    .slice(0, 280);
   return savePlan({
     ...current,
     status: "cancelled",

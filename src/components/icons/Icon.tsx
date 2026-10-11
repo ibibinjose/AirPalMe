@@ -4,15 +4,7 @@ import type { AirPalIconProps } from "./types";
 import { resolveIconSize, resolveIconVariantClass } from "./utils";
 
 export const Icon = React.forwardRef<SVGSVGElement, AirPalIconProps>(function Icon(
-  {
-    icon: LucideComponent,
-    size = "md",
-    variant = "current",
-    strokeWidth = 2,
-    className,
-    title,
-    ...rest
-  },
+  { icon: LucideComponent, size = "md", variant = "current", strokeWidth = 2, className, title, ...rest },
   ref,
 ) {
   const numericSize = resolveIconSize(size);

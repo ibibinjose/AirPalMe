@@ -237,120 +237,125 @@ export function MemoryWallPage() {
         </div>
       )}
 
-      {composerOpen && draftUrl && typeof document !== "undefined" && createPortal(
-        <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
-          onClick={closeComposer}
-        >
+      {composerOpen &&
+        draftUrl &&
+        typeof document !== "undefined" &&
+        createPortal(
           <div
-            className="w-full max-w-sm max-h-[min(90dvh,calc(var(--visual-viewport-height,100dvh)-1.5rem))] overflow-y-auto rounded-[28px] bg-paper p-5 shadow-2xl ring-1 ring-line motion-safe:animate-[sheet-up_0.22s_ease-out] transition-all duration-200"
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-label="New memory"
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 backdrop-blur-sm sm:items-center [padding-bottom:var(--keyboard-height,0px)] transition-[padding] duration-200"
+            onClick={closeComposer}
           >
-            <img src={draftUrl} alt="New memory" className="aspect-square w-full rounded-2xl object-cover" />
-            <input
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Caption — sunset swim at Bondi"
-              maxLength={120}
-              className={`mt-3 ${fieldInput}`}
-            />
-            <input
-              value={withPeople}
-              onChange={(e) => setWithPeople(e.target.value)}
-              placeholder="With — Maya, @leo (comma separated)"
-              maxLength={120}
-              list="memory-people"
-              className={`mt-2 ${fieldInput}`}
-            />
-            {knownPeople.length > 0 && (
-              <datalist id="memory-people">
-                {knownPeople.map((p) => (
-                  <option key={p.id} value={p.handle ? `@${p.handle}` : p.name} />
-                ))}
-              </datalist>
-            )}
-            <input
-              value={place}
-              onChange={(e) => setPlace(e.target.value)}
-              placeholder="Place — Bondi Beach"
-              maxLength={80}
-              className={`mt-2 ${fieldInput}`}
-            />
-            <div className="mt-4 flex gap-2">
-              <Button variant="ghost" className="flex-1 rounded-full" onClick={closeComposer}>
-                Cancel
-              </Button>
-              <Button className="flex-1 rounded-full" disabled={saving} onClick={onSave}>
-                {saving ? "Saving…" : "Save memory"}
-              </Button>
-            </div>
-          </div>
-        </div>,
-        document.body,
-      )}
-
-      {lightbox && typeof document !== "undefined" && createPortal(
-        <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 p-4 backdrop-blur-sm sm:items-center"
-          onClick={() => setLightbox(null)}
-          role="dialog"
-          aria-modal="true"
-          aria-label={lightbox.caption || "Memory"}
-        >
-          <div
-            className="w-full max-w-md overflow-hidden rounded-[28px] bg-paper shadow-2xl ring-1 ring-line"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Photo src={lightbox.src} className="aspect-square w-full object-cover" />
-            <div className="p-5">
-              {lightbox.caption && <p className="font-display text-lg font-bold leading-snug">{lightbox.caption}</p>}
-              <p className="mt-1 flex items-center gap-1.5 text-xs text-mute">
-                <MapPin size={12} />
-                {[lightbox.place, formatDay(lightbox.takenAt)].filter(Boolean).join(" · ")}
-              </p>
-              {lightbox.people.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {lightbox.people.map((p) => {
-                    const handle = p.replace(/^@/, "");
-                    const isHandle = p.startsWith("@") && handle.length > 0;
-                    return isHandle ? (
-                      <button
-                        key={p}
-                        type="button"
-                        onClick={() => nav(bioPath(handle))}
-                        className="inline-flex min-h-[40px] items-center rounded-full bg-brand/10 px-3.5 text-xs font-semibold text-accent hover:bg-brand/15"
-                      >
-                        @{handle}
-                      </button>
-                    ) : (
-                      <span key={p} className="rounded-full bg-card px-3 py-1 text-xs font-medium ring-1 ring-line">
-                        {p}
-                      </span>
-                    );
-                  })}
-                </div>
+            <div
+              className="w-full max-w-sm max-h-[min(90dvh,calc(var(--visual-viewport-height,100dvh)-1.5rem))] overflow-y-auto rounded-[28px] bg-paper p-5 shadow-2xl ring-1 ring-line motion-safe:animate-[sheet-up_0.22s_ease-out] transition-all duration-200"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-label="New memory"
+            >
+              <img src={draftUrl} alt="New memory" className="aspect-square w-full rounded-2xl object-cover" />
+              <input
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                placeholder="Caption — sunset swim at Bondi"
+                maxLength={120}
+                className={`mt-3 ${fieldInput}`}
+              />
+              <input
+                value={withPeople}
+                onChange={(e) => setWithPeople(e.target.value)}
+                placeholder="With — Maya, @leo (comma separated)"
+                maxLength={120}
+                list="memory-people"
+                className={`mt-2 ${fieldInput}`}
+              />
+              {knownPeople.length > 0 && (
+                <datalist id="memory-people">
+                  {knownPeople.map((p) => (
+                    <option key={p.id} value={p.handle ? `@${p.handle}` : p.name} />
+                  ))}
+                </datalist>
               )}
+              <input
+                value={place}
+                onChange={(e) => setPlace(e.target.value)}
+                placeholder="Place — Bondi Beach"
+                maxLength={80}
+                className={`mt-2 ${fieldInput}`}
+              />
               <div className="mt-4 flex gap-2">
-                <Button variant="ghost" className={cn("flex-1 rounded-full")} onClick={() => setLightbox(null)}>
-                  Close
+                <Button variant="ghost" className="flex-1 rounded-full" onClick={closeComposer}>
+                  Cancel
                 </Button>
-                <Button
-                  variant="ghost"
-                  className="gap-1.5 rounded-full text-red-600"
-                  onClick={() => onDelete(lightbox.id)}
-                >
-                  <Trash2 size={14} />
-                  Delete
+                <Button className="flex-1 rounded-full" disabled={saving} onClick={onSave}>
+                  {saving ? "Saving…" : "Save memory"}
                 </Button>
               </div>
             </div>
-          </div>
-        </div>,
-        document.body,
-      )}
+          </div>,
+          document.body,
+        )}
+
+      {lightbox &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 p-4 backdrop-blur-sm sm:items-center"
+            onClick={() => setLightbox(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={lightbox.caption || "Memory"}
+          >
+            <div
+              className="w-full max-w-md overflow-hidden rounded-[28px] bg-paper shadow-2xl ring-1 ring-line"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Photo src={lightbox.src} className="aspect-square w-full object-cover" />
+              <div className="p-5">
+                {lightbox.caption && <p className="font-display text-lg font-bold leading-snug">{lightbox.caption}</p>}
+                <p className="mt-1 flex items-center gap-1.5 text-xs text-mute">
+                  <MapPin size={12} />
+                  {[lightbox.place, formatDay(lightbox.takenAt)].filter(Boolean).join(" · ")}
+                </p>
+                {lightbox.people.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {lightbox.people.map((p) => {
+                      const handle = p.replace(/^@/, "");
+                      const isHandle = p.startsWith("@") && handle.length > 0;
+                      return isHandle ? (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => nav(bioPath(handle))}
+                          className="inline-flex min-h-[40px] items-center rounded-full bg-brand/10 px-3.5 text-xs font-semibold text-accent hover:bg-brand/15"
+                        >
+                          @{handle}
+                        </button>
+                      ) : (
+                        <span key={p} className="rounded-full bg-card px-3 py-1 text-xs font-medium ring-1 ring-line">
+                          {p}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+                <div className="mt-4 flex gap-2">
+                  <Button variant="ghost" className={cn("flex-1 rounded-full")} onClick={() => setLightbox(null)}>
+                    Close
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="gap-1.5 rounded-full text-red-600"
+                    onClick={() => onDelete(lightbox.id)}
+                  >
+                    <Trash2 size={14} />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

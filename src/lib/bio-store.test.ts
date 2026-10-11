@@ -79,9 +79,7 @@ describe("profileFromDoc", () => {
   });
 
   it("keeps a known Stars tier badge and drops forged ones", () => {
-    expect(profileFromDoc("p1", { handle: "maya", starTier: "Rising Mate" }).starTier).toBe(
-      "Rising Mate",
-    );
+    expect(profileFromDoc("p1", { handle: "maya", starTier: "Rising Mate" }).starTier).toBe("Rising Mate");
     expect(profileFromDoc("p2", { handle: "leo", starTier: "City Emperor" }).starTier).toBeUndefined();
     expect(profileFromDoc("p3", { handle: "zoe" }).starTier).toBeUndefined();
   });

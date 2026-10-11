@@ -39,8 +39,7 @@ export function canTransitionPing(current: PingStatus, next: PingStatus, actor: 
   if (actor === "sender") {
     if (current === "sent") return next === "cancelled";
     // Either party closes a live thread (matches the Firestore rules).
-    return (current === "pinged_back" || current === "hanging_out") &&
-      (next === "hanging_out" || next === "dismissed");
+    return (current === "pinged_back" || current === "hanging_out") && (next === "hanging_out" || next === "dismissed");
   }
   // recipient
   if (current === "sent") return next === "pinged_back" || next === "hanging_out" || next === "dismissed";

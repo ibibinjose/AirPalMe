@@ -172,10 +172,7 @@ export function CreateFab() {
               open ? "bg-neutral-900 hover:bg-black" : "bg-brand hover:bg-brand-ink",
             )}
           >
-            <motion.div
-              animate={{ rotate: open ? 45 : 0 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
-            >
+            <motion.div animate={{ rotate: open ? 45 : 0 }} transition={{ duration: 0.2, ease: "easeInOut" }}>
               <Plus size={24} strokeWidth={2.5} />
             </motion.div>
           </button>
@@ -246,9 +243,7 @@ export function CreateFab() {
                   <div className="mt-4 grid gap-2.5">
                     {CREATE_GROUPS.map((group) => (
                       <div key={group.id}>
-                        <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-mute">
-                          {group.label}
-                        </p>
+                        <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-mute">{group.label}</p>
                         <div className="grid gap-2.5">
                           {CREATE_OPTIONS.filter((opt) => opt.group === group.id).map((opt) => {
                             const Icon = opt.icon;
@@ -273,9 +268,7 @@ export function CreateFab() {
                                       {opt.title}
                                     </span>
                                     {opt.badge && (
-                                      <span className="text-[11px] font-bold text-accent">
-                                        · {opt.badge}
-                                      </span>
+                                      <span className="text-[11px] font-bold text-accent">· {opt.badge}</span>
                                     )}
                                   </div>
                                   <p className="text-xs text-mute truncate mt-0.5">{opt.subtitle}</p>

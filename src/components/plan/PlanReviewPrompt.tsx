@@ -27,10 +27,7 @@ export function PlanReviewPrompt({ onSubmit }: { onSubmit: (input: { rating: num
             }}
             className="grid h-12 w-12 place-items-center rounded-full transition active:scale-90"
           >
-            <Star
-              size={26}
-              className={cn(s <= rating ? "fill-gold text-accent" : "fill-line text-line")}
-            />
+            <Star size={26} className={cn(s <= rating ? "fill-gold text-accent" : "fill-line text-line")} />
           </button>
         ))}
       </div>

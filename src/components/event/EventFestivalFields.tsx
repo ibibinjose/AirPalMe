@@ -35,21 +35,22 @@ export function EventFestivalFields({ values, onChange }: Props) {
       <div className="flex items-center justify-between">
         <p className="text-xs font-bold uppercase tracking-wider text-accent">Festival program (optional)</p>
         {slug && slugState === "ok" && (
-          <Link href={`/events?q=${encodeURIComponent(slug)}`} className="text-[11px] font-semibold text-accent hover:underline">
+          <Link
+            href={`/events?q=${encodeURIComponent(slug)}`}
+            className="text-[11px] font-semibold text-accent hover:underline"
+          >
             View program
           </Link>
         )}
       </div>
       <p className="text-xs text-mute leading-relaxed">
-        Attach this event as a session on a festival week. Only the festival organiser can approve the listing —
-        anyone else sees an error on save.
+        Attach this event as a session on a festival week. Only the festival organiser can approve the listing — anyone
+        else sees an error on save.
       </p>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-            Festival slug
-          </label>
+          <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">Festival slug</label>
           <input
             value={values.festivalSlug}
             onChange={(e) => set({ festivalSlug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "") })}
@@ -59,9 +60,7 @@ export function EventFestivalFields({ values, onChange }: Props) {
           {slugState === "bad" && <p className="mt-1 text-[12px] text-red-600">Lowercase letters, digits, hyphens.</p>}
         </div>
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-            Program track
-          </label>
+          <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">Program track</label>
           <input
             value={values.track}
             onChange={(e) => set({ track: e.target.value })}

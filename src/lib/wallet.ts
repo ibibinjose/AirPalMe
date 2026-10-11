@@ -52,7 +52,10 @@ export function googleWalletCardUrl(handle: string): string {
  * so requests route via the Vite dev server proxy without CORS complications.
  */
 function normalizeWalletUrl(url: string): string {
-  if (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
+  if (
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+  ) {
     return url.replace(/^https?:\/\/airpal\.me/, "");
   }
   return url;

@@ -209,8 +209,8 @@ describe("csv export & security", () => {
     expect(lines).toHaveLength(2);
     // Formula characters must be prepended with a single quote
     expect(csv).toContain("\"'=cmd|' /C calc'!A0\"");
-    expect(csv).toContain("\"'+61 400 000 000, ext 123\"");
-    expect(csv).toContain("\"'@SUM(1+1)\"");
+    expect(csv).toContain('"\'+61 400 000 000, ext 123"');
+    expect(csv).toContain('"\'@SUM(1+1)"');
     // Double quotes must be escaped as ""
     expect(csv).toContain('"101 ""Penthouse"""');
   });

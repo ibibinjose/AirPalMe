@@ -412,9 +412,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
                   <span className="block text-xs font-bold text-ink">
                     Enable {biometricLabel} for instant 1-tap sign in
                   </span>
-                  <span className="block text-[11px] text-mute">
-                    Never need passwords or SMS codes on this device
-                  </span>
+                  <span className="block text-[11px] text-mute">Never need passwords or SMS codes on this device</span>
                 </div>
                 <ScanFace size={18} className="text-accent shrink-0" />
               </label>

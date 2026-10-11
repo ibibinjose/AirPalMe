@@ -244,9 +244,7 @@ export function EventsPage() {
           </div>
 
           <div className="mt-2 flex items-center gap-2.5 flex-wrap">
-            <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink md:text-4xl">
-              Events in
-            </h1>
+            <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink md:text-4xl">Events in</h1>
 
             {/* City Picker Trigger */}
             <div className="relative">
@@ -289,9 +287,7 @@ export function EventsPage() {
                           }}
                           className={cn(
                             "flex w-full min-h-[40px] items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold transition active:scale-[0.98]",
-                            selected
-                              ? "bg-brand text-white"
-                              : "text-ink hover:bg-paper",
+                            selected ? "bg-brand text-white" : "text-ink hover:bg-paper",
                           )}
                         >
                           <span className="flex items-center gap-2">
@@ -430,7 +426,8 @@ export function EventsPage() {
           <Ticket size={36} className="mx-auto text-mute" />
           <p className="font-display text-lg font-bold text-ink mt-3">No events match this filter</p>
           <p className="mx-auto mt-1 max-w-sm text-xs text-mute">
-            No live events found for {effectiveCity} with selected category and dates. Try resetting filters or host your own gig.
+            No live events found for {effectiveCity} with selected category and dates. Try resetting filters or host
+            your own gig.
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5">
             <button

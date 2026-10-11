@@ -50,11 +50,7 @@ export function AirPalChatModal({
           <X size={18} />
         </button>
 
-        <AirPalChatView
-          conversation={conversation}
-          propertyContext={propertyContext}
-          onActionClick={onActionClick}
-        />
+        <AirPalChatView conversation={conversation} propertyContext={propertyContext} onActionClick={onActionClick} />
       </div>
     </div>,
     document.body,

@@ -74,11 +74,8 @@ export function StallPage() {
         setRemoteEvent({
           id: ev.id,
           name: ev.title,
-          flavour: (ev.category === "market"
-            ? "market"
-            : ev.category === "expo"
-              ? "expo"
-              : "event_space") as "expo" | "market" | "event_space",
+          flavour: (ev.category === "market" ? "market" : ev.category === "expo" ? "expo" : "event_space") as
+            "expo" | "market" | "event_space",
           gatePath: `/e/${ev.id}`,
         });
       }

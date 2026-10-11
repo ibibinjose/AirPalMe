@@ -43,10 +43,7 @@ export function PromotionsPage() {
     }
     try {
       const snap = await getDocs(
-        query(
-          collection(db, "promotions"),
-          where("status", "in", ["live", "closed", "approved"]),
-        ),
+        query(collection(db, "promotions"), where("status", "in", ["live", "closed", "approved"])),
       );
       const list = snap.docs
         .map((d) => ({ id: d.id, ...(d.data() as Omit<Promotion, "id">) }))
@@ -153,7 +150,6 @@ export function PromotionsPage() {
               <span>Admin Queue</span>
             </Link>
           )}
-
         </div>
       </div>
 
@@ -171,7 +167,8 @@ export function PromotionsPage() {
           Exclusive Deals & Member Offers
         </h1>
         <p className="mt-1.5 text-xs sm:text-sm text-mute max-w-xl">
-          Discounts, dining perks, secret barista codes, and member vouchers verified from local businesses across your city.
+          Discounts, dining perks, secret barista codes, and member vouchers verified from local businesses across your
+          city.
         </p>
 
         {/* Search Bar */}
@@ -203,9 +200,7 @@ export function PromotionsPage() {
                 aria-pressed={active}
                 className={cn(
                   "inline-flex min-h-[44px] shrink-0 items-center rounded-full px-4 text-xs font-semibold transition active:scale-95 cursor-pointer ring-1",
-                  active
-                    ? "bg-brand text-white ring-brand shadow-xs"
-                    : "bg-card text-ink ring-line hover:bg-paper",
+                  active ? "bg-brand text-white ring-brand shadow-xs" : "bg-card text-ink ring-line hover:bg-paper",
                 )}
               >
                 {c}
@@ -283,7 +278,11 @@ export function PromotionsPage() {
                 disabled={seeding}
                 className="gap-1.5 rounded-full px-4"
               >
-                {seeding ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="text-accent" />}
+                {seeding ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <Sparkles size={14} className="text-accent" />
+                )}
                 <span>Seed Sample Deals</span>
               </Button>
             )}
@@ -303,11 +302,7 @@ export function PromotionsPage() {
               >
                 {/* Top Image Banner */}
                 <div className="relative aspect-[16/9] w-full overflow-hidden bg-paper">
-                  <img
-                    src={coverImage}
-                    alt={p.title}
-                    className="h-full w-full object-cover"
-                  />
+                  <img src={coverImage} alt={p.title} className="h-full w-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-black/20 to-transparent" />
 
                   {/* Badges Over Image */}
@@ -329,9 +324,7 @@ export function PromotionsPage() {
                     <p className="text-[11px] font-bold uppercase tracking-wider text-amber-300">
                       {p.sponsorName || "Local Partner"}
                     </p>
-                    <h3 className="font-display text-lg font-bold text-white leading-tight line-clamp-1">
-                      {p.title}
-                    </h3>
+                    <h3 className="font-display text-lg font-bold text-white leading-tight line-clamp-1">{p.title}</h3>
                   </div>
                 </div>
 
@@ -369,7 +362,7 @@ export function PromotionsPage() {
 
                   {/* Actions Row */}
                   <div className="pt-2 flex items-center justify-between gap-2">
-                    {(isOwner || isAdmin) ? (
+                    {isOwner || isAdmin ? (
                       <Link
                         href={isAdmin ? `/admin/promotions/${p.id}` : `/business/promotions/${p.id}`}
                         className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line hover:bg-line/50 transition"

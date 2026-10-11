@@ -16,12 +16,7 @@ import { TabPills } from "@/components/ui/TabPills";
 import { SearchBar } from "@/components/search/SearchBar";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
-import {
-  HELP_ARTICLES,
-  HELP_CATEGORIES,
-  helpArticleIdFromSearch,
-  type HelpCategoryId,
-} from "@/lib/help-articles";
+import { HELP_ARTICLES, HELP_CATEGORIES, helpArticleIdFromSearch, type HelpCategoryId } from "@/lib/help-articles";
 
 type CategoryFilter = "all" | HelpCategoryId;
 
@@ -134,9 +129,7 @@ export function HelpPage() {
                     <span className="font-display mt-0.5 block text-[17px] font-bold leading-snug text-ink">
                       {article.title}
                     </span>
-                    {!open && (
-                      <span className="mt-0.5 block truncate text-[13px] text-mute">{article.summary}</span>
-                    )}
+                    {!open && <span className="mt-0.5 block truncate text-[13px] text-mute">{article.summary}</span>}
                   </span>
                   <ChevronDown
                     size={18}

@@ -1,6 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { useRoute, useLocation, useSearch, Link } from "wouter";
-import { Check, ChevronDown, Heart, MapPin, Plus, Share2, Sparkles, Star, ArrowLeft, ArrowRight, Ticket, Users } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  Heart,
+  MapPin,
+  Plus,
+  Share2,
+  Sparkles,
+  Star,
+  ArrowLeft,
+  ArrowRight,
+  Ticket,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 import { StickyAction } from "@/components/design-system/companions";
 import { Button } from "@/components/ui/Button";
@@ -77,8 +90,7 @@ export function EventPage() {
   // with context_load_failed when nothing resolves, or the miss reads as a hit.
   const loadFailed = useRef("");
   useEffect(() => {
-    if (!remoteLoaded || !directDone || expo || calEv || near || directEv || !id || loadFailed.current === id)
-      return;
+    if (!remoteLoaded || !directDone || expo || calEv || near || directEv || !id || loadFailed.current === id) return;
     loadFailed.current = id;
     void track("context_load_failed", { contextType: "event", contextId: id, errorClass: "not_found" });
   }, [remoteLoaded, directDone, expo, calEv, near, directEv, id]);
@@ -123,11 +135,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
 
   const effectiveSpots = tier === "group" ? 4 : spots;
   const unitPriceCents =
-    tier === "vip"
-      ? Math.round(paidCents * 1.5)
-      : tier === "group"
-        ? Math.round(paidCents * 0.9)
-        : paidCents;
+    tier === "vip" ? Math.round(paidCents * 1.5) : tier === "group" ? Math.round(paidCents * 0.9) : paidCents;
   const effectivePriceCents = isPaid
     ? tier === "group"
       ? Math.round(paidCents * 4 * 0.9)
@@ -314,22 +322,26 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
               Ticket Options &amp; Passes
             </p>
             <div className="grid grid-cols-3 gap-2">
-              {[
-                { id: "standard", label: "General", desc: isPaid ? `$${(paidCents / 100).toFixed(0)}` : "Free" },
-                { id: "vip", label: "VIP Pass", desc: isPaid ? `$${(Math.round(paidCents * 1.5) / 100).toFixed(0)}` : "VIP" },
-                { id: "group", label: "Group (4)", desc: isPaid ? "10% Off" : "4 Passes" },
-              ].map((t) => {
+              {(
+                [
+                  { id: "standard", label: "General", desc: isPaid ? `$${(paidCents / 100).toFixed(0)}` : "Free" },
+                  {
+                    id: "vip",
+                    label: "VIP Pass",
+                    desc: isPaid ? `$${(Math.round(paidCents * 1.5) / 100).toFixed(0)}` : "VIP",
+                  },
+                  { id: "group", label: "Group (4)", desc: isPaid ? "10% Off" : "4 Passes" },
+                ] as const
+              ).map((t) => {
                 const active = tier === t.id;
                 return (
                   <button
                     key={t.id}
                     type="button"
-                    onClick={() => setTier(t.id as any)}
+                    onClick={() => setTier(t.id)}
                     className={cn(
                       "flex flex-col items-center justify-center rounded-xl p-2 text-center transition active:scale-95 cursor-pointer ring-1",
-                      active
-                        ? "bg-brand text-white ring-brand shadow-xs"
-                        : "bg-paper text-ink ring-line hover:bg-card",
+                      active ? "bg-brand text-white ring-brand shadow-xs" : "bg-paper text-ink ring-line hover:bg-card",
                     )}
                   >
                     <span className="text-xs font-bold">{t.label}</span>
@@ -352,9 +364,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
                       onClick={() => setSpots(qty)}
                       className={cn(
                         "h-7 w-7 rounded-lg text-xs font-bold transition active:scale-95 ring-1",
-                        spots === qty
-                          ? "bg-brand text-white ring-brand"
-                          : "bg-paper text-ink ring-line hover:bg-card",
+                        spots === qty ? "bg-brand text-white ring-brand" : "bg-paper text-ink ring-line hover:bg-card",
                       )}
                     >
                       {qty}
@@ -366,10 +376,10 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
 
             {isPaid && (
               <div className="mt-2 flex items-center justify-between text-xs font-semibold text-ink pt-2 border-t border-line/40">
-                <span className="text-mute">Total for {effectiveSpots} {effectiveSpots === 1 ? "pass" : "passes"}:</span>
-                <span className="text-sm font-bold text-accent">
-                  ${(effectivePriceCents / 100).toFixed(2)} AUD
+                <span className="text-mute">
+                  Total for {effectiveSpots} {effectiveSpots === 1 ? "pass" : "passes"}:
                 </span>
+                <span className="text-sm font-bold text-accent">${(effectivePriceCents / 100).toFixed(2)} AUD</span>
               </div>
             )}
           </div>
@@ -434,9 +444,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
             }}
             className={cn(
               "inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full text-[13px] font-semibold transition active:scale-[0.98]",
-              event.isInterested
-                ? "bg-ink text-paper"
-                : "bg-card text-mute ring-1 ring-line hover:text-ink",
+              event.isInterested ? "bg-ink text-paper" : "bg-card text-mute ring-1 ring-line hover:text-ink",
             )}
           >
             <Star
@@ -456,9 +464,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
             }}
             className={cn(
               "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition active:scale-95",
-              event.isLiked
-                ? "bg-ink text-paper"
-                : "bg-card text-mute ring-1 ring-line hover:text-ink",
+              event.isLiked ? "bg-ink text-paper" : "bg-card text-mute ring-1 ring-line hover:text-ink",
             )}
           >
             <Heart size={16} className={event.isLiked ? "fill-white" : ""} strokeWidth={event.isLiked ? 2.5 : 2} />
@@ -492,10 +498,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
             className="flex w-full cursor-pointer touch-manipulation items-center justify-between px-4 py-3.5 text-left"
           >
             <span className="text-[15px] font-semibold">More details</span>
-            <ChevronDown
-              size={17}
-              className={cn("text-mute transition-transform", detailsOpen && "rotate-180")}
-            />
+            <ChevronDown size={17} className={cn("text-mute transition-transform", detailsOpen && "rotate-180")} />
           </button>
           {detailsOpen && (
             <div className="border-t border-line/70 px-4 py-4">
@@ -531,7 +534,11 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
               disabled={buying}
               className="flex h-12 w-full cursor-pointer touch-manipulation items-center justify-center gap-2 rounded-full bg-brand text-[15px] font-semibold text-white transition active:scale-[0.99] disabled:opacity-60"
             >
-              <span>{buying ? "Starting checkout…" : `Get ${effectiveSpots > 1 ? `${effectiveSpots} tickets` : "ticket"} · $${(effectivePriceCents / 100).toFixed(2)}`}</span>
+              <span>
+                {buying
+                  ? "Starting checkout…"
+                  : `Get ${effectiveSpots > 1 ? `${effectiveSpots} tickets` : "ticket"} · $${(effectivePriceCents / 100).toFixed(2)}`}
+              </span>
             </button>
           ) : (
             <button

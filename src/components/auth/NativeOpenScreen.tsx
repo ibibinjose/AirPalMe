@@ -1,16 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
-import {
-  Calendar,
-  Compass,
-  Mail,
-  QrCode,
-  ShieldCheck,
-  Sparkles,
-  Ticket,
-  UserCheck,
-} from "lucide-react";
+import { Calendar, Compass, Mail, QrCode, ShieldCheck, Sparkles, Ticket, UserCheck } from "lucide-react";
 import { BRAND_TAGLINE, ECOSYSTEM } from "@/lib/brand";
 import { isPassApp } from "@/lib/app-flavor";
 import { useAuth } from "@/contexts/AuthContext";
@@ -89,13 +80,9 @@ export function NativeOpenScreen() {
           AirPal{isPass ? <span className="text-accent"> Pass</span> : <span className="text-accent">.me</span>}
         </h1>
 
-        <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.2em] text-accent">
-          {BRAND_TAGLINE}
-        </p>
+        <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.2em] text-accent">{BRAND_TAGLINE}</p>
 
-        <p className="mt-2 max-w-xs text-[14px] font-medium leading-relaxed text-ink/80">
-          {currentProduct.coreJob}
-        </p>
+        <p className="mt-2 max-w-xs text-[14px] font-medium leading-relaxed text-ink/80">{currentProduct.coreJob}</p>
 
         {/* Product feature cards */}
         <div className="mt-6 w-full max-w-sm space-y-2.5 text-left">
@@ -186,19 +173,11 @@ export function NativeOpenScreen() {
         {/* Legal Footer */}
         <p className="pt-2 text-center text-[11px] leading-relaxed text-mute">
           By continuing you agree to AirPal{" "}
-          <button
-            type="button"
-            className="font-semibold text-ink underline"
-            onClick={() => nav("/terms")}
-          >
+          <button type="button" className="font-semibold text-ink underline" onClick={() => nav("/terms")}>
             Terms
           </button>{" "}
           and{" "}
-          <button
-            type="button"
-            className="font-semibold text-ink underline"
-            onClick={() => nav("/privacy")}
-          >
+          <button type="button" className="font-semibold text-ink underline" onClick={() => nav("/privacy")}>
             Privacy
           </button>
           . Accounts are for people 18+.

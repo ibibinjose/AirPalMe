@@ -90,16 +90,29 @@ export function InvitePanel({ handle, loading }: { handle?: string; loading?: bo
 
       <ol className="mt-4 space-y-2 border-t border-line pt-3 text-[13px]">
         <li className="flex gap-2.5">
-          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-accent">1</span>
-          <span><strong>Share</strong> your link — your @handle is the code.</span>
+          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-accent">
+            1
+          </span>
+          <span>
+            <strong>Share</strong> your link — your @handle is the code.
+          </span>
         </li>
         <li className="flex gap-2.5">
-          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-accent">2</span>
-          <span><strong>Mate completes</strong> their first real experience.</span>
+          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-accent">
+            2
+          </span>
+          <span>
+            <strong>Mate completes</strong> their first real experience.
+          </span>
         </li>
         <li className="flex gap-2.5">
-          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-accent">3</span>
-          <span><strong>You both earn</strong> — {REFERRAL_INVITER_STARS} Stars for you, {REFERRAL_INVITEE_STARS} for them. Signups alone earn nothing.</span>
+          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand/10 text-[11px] font-bold text-accent">
+            3
+          </span>
+          <span>
+            <strong>You both earn</strong> — {REFERRAL_INVITER_STARS} Stars for you, {REFERRAL_INVITEE_STARS} for them.
+            Signups alone earn nothing.
+          </span>
         </li>
       </ol>
 

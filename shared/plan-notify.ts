@@ -39,10 +39,7 @@ export function validatePlanBroadcast(input: PlanBroadcastInput): string[] {
  * Skips the sender, empties, duplicates, and device-local guest ids
  * (`anon-…`) that no account can read — over the cap, oldest RSVPs win.
  */
-export function planBroadcastRecipients(
-  plan: Pick<HangoutPlan, "attendees">,
-  senderUid?: string,
-): string[] {
+export function planBroadcastRecipients(plan: Pick<HangoutPlan, "attendees">, senderUid?: string): string[] {
   const out: string[] = [];
   const seen = new Set<string>();
   for (const a of plan.attendees || []) {
@@ -134,7 +131,15 @@ export function visibleAttendees(
     if (viewer?.uid && a.id === viewer.uid) return a;
     if (plan.creator?.uid && a.id === plan.creator.uid) return a;
     if (plan.creator?.name && a.name === plan.creator.name) return a;
-    return { ...a, name: "Guest", handle: undefined, avatar: undefined, notes: undefined, answers: undefined, review: undefined };
+    return {
+      ...a,
+      name: "Guest",
+      handle: undefined,
+      avatar: undefined,
+      notes: undefined,
+      answers: undefined,
+      review: undefined,
+    };
   });
 }
 
@@ -147,7 +152,8 @@ export function goingFits(
   const cap = Math.floor(Number(plan.capacity));
   if (!Number.isFinite(cap) || cap <= 0) return true;
   const existing = (plan.attendees || []).find((a) => a?.id === attendeeId);
-  const takenExcludingSelf = headcountTaken(plan) - (existing?.status === "going" ? 1 + normalizePlusOnes(existing.plusOnes) : 0);
+  const takenExcludingSelf =
+    headcountTaken(plan) - (existing?.status === "going" ? 1 + normalizePlusOnes(existing.plusOnes) : 0);
   return takenExcludingSelf + 1 + normalizePlusOnes(plusOnes) <= cap;
 }
 

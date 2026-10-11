@@ -156,7 +156,9 @@ export function AirPalTicketPass({ booking, guestName, hostName, showActions = t
               venue: booking.suburb || "Sydney",
               city: booking.suburb || "Sydney",
               description: `AirPal Pass Ticket: ${booking.title}. Booking ID: ${booking.id}`,
-              startsAt: booking.date ? `${booking.date}T${booking.time ? booking.time : "19:00"}:00` : new Date().toISOString(),
+              startsAt: booking.date
+                ? `${booking.date}T${booking.time ? booking.time : "19:00"}:00`
+                : new Date().toISOString(),
             }}
             label="1-Tap Add to Calendar"
             buttonClassName="w-full justify-center rounded-2xl bg-paper px-4 py-2 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card transition"

@@ -1,13 +1,4 @@
-import {
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  query,
-  setDoc,
-  updateDoc,
-  where,
-} from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot, query, setDoc, updateDoc, where } from "firebase/firestore";
 import type { CatchUpSlot } from "@shared/catchup-agent";
 import type { PlanType } from "@shared/plan";
 import { getFirebaseDb, isFirebaseConfigured } from "./firebase";
@@ -129,8 +120,7 @@ function migrateLegacyForUid(uid: string): void {
   }
 
   for (const row of legacy) {
-    const belongs =
-      row.requesterUid === uid || (!row.requesterUid && Boolean(row.isReminderOnly));
+    const belongs = row.requesterUid === uid || (!row.requesterUid && Boolean(row.isReminderOnly));
     if (!belongs) continue;
     const item: CatchUpItem = {
       ...row,
@@ -167,7 +157,8 @@ export function listMyCatchUpReminders(): CatchUpItem[] {
 export function hasCatchUpReminder(targetHandle: string): boolean {
   const norm = normalizeHandle(targetHandle);
   return listCatchUps().some(
-    (item) => normalizeHandle(item.targetHandle) === norm && Boolean(item.isReminderOnly) && item.status !== "dismissed",
+    (item) =>
+      normalizeHandle(item.targetHandle) === norm && Boolean(item.isReminderOnly) && item.status !== "dismissed",
   );
 }
 

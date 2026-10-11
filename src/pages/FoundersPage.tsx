@@ -34,7 +34,8 @@ import { cn } from "@/lib/cn";
 
 const DOC_ID = "founders-100k";
 const CAP = 100000;
-const TICKER = "JULY CARRY-ON /// SYDNEY WEEKEND FOR TWO /// 10 × $100 AIRPAL CREDIT /// LIFETIME FOUNDER STATUS /// 100% FREE ENTRY ///";
+const TICKER =
+  "JULY CARRY-ON /// SYDNEY WEEKEND FOR TWO /// 10 × $100 AIRPAL CREDIT /// LIFETIME FOUNDER STATUS /// 100% FREE ENTRY ///";
 
 interface PrizeItem {
   id: string;
@@ -58,7 +59,12 @@ const PRIZES: PrizeItem[] = [
     badge: "Grand Prize · Winner's Choice",
     highlight: "Rated 4.9 ★ · 500+ reviews · Lifetime warranty",
     line: "July's ultra-popular expandable cabin case engineered from aerospace polycarbonate. The lucky winner gets to pick their favorite colour (Forest Green, Sand, Navy, Black, Moss)!",
-    bullets: ["Super lightweight & durable", "Expandable zip capacity (+7L)", "Silent 360° spinner wheels", "Lifetime July manufacturer warranty"],
+    bullets: [
+      "Super lightweight & durable",
+      "Expandable zip capacity (+7L)",
+      "Silent 360° spinner wheels",
+      "Lifetime July manufacturer warranty",
+    ],
     link: "https://july.com/au/luggage/carry-on-light-expandable/",
     linkText: "Check it out on July.com",
     icon: Luggage,
@@ -71,7 +77,12 @@ const PRIZES: PrizeItem[] = [
     badge: "Weekend Getaway For Two",
     highlight: "5-Star Stay + Chef's Dinner + Sunset Harbour Cruise",
     line: "An unforgettable Sydney weekend package for you and a bestie. Includes a boutique luxury hotel stay, a multi-course chef's dinner with wine pairings, and harbour experiences.",
-    bullets: ["2 nights boutique luxury stay", "Chef's curated tasting menu", "Private sunset harbour cruise", "Zero stress, all fun"],
+    bullets: [
+      "2 nights boutique luxury stay",
+      "Chef's curated tasting menu",
+      "Private sunset harbour cruise",
+      "Zero stress, all fun",
+    ],
     icon: BedDouble,
     color: "from-blue-500/10 to-indigo-500/5 border-blue-200 text-blue-900",
   },
@@ -82,7 +93,12 @@ const PRIZES: PrizeItem[] = [
     badge: "Ten Happy Winners",
     highlight: "10 Founders · $100 Cash Credit Each",
     line: "Ten lucky founding members get $100 in AirPal credits directly in their wallet. Spend it on concerts, local events, dining perks, or weekend experiences!",
-    bullets: ["10 winners drawn at random", "$100 AirPal credit each", "Usable across all AirPal services", "Instant credit to your wallet"],
+    bullets: [
+      "10 winners drawn at random",
+      "$100 AirPal credit each",
+      "Usable across all AirPal services",
+      "Instant credit to your wallet",
+    ],
     icon: Gift,
     color: "from-emerald-500/10 to-teal-500/5 border-emerald-200 text-emerald-900",
   },
@@ -93,7 +109,12 @@ const PRIZES: PrizeItem[] = [
     badge: "For Every Single Founder",
     highlight: "Permanent Gold Seal on Profile",
     line: "Every member in the 100K pool keeps their permanent Gold Founder badge and member number forever — proof that you were here from day one when AirPal was born.",
-    bullets: ["Permanent Gold Founder profile badge", "Your personal founder number forever", "2× bonus referral points stacking", "VIP early access to new feature drops"],
+    bullets: [
+      "Permanent Gold Founder profile badge",
+      "Your personal founder number forever",
+      "2× bonus referral points stacking",
+      "VIP early access to new feature drops",
+    ],
     icon: BadgeCheck,
     color: "from-brand/10 to-brand/5 border-brand/20 text-accent",
   },
@@ -170,7 +191,12 @@ export function FoundersPage() {
         }
       });
       void getDocs(
-        query(collection(db, "promotion_entries"), where("promotionId", "==", DOC_ID), where("uid", "==", user.uid), limit(1)),
+        query(
+          collection(db, "promotion_entries"),
+          where("promotionId", "==", DOC_ID),
+          where("uid", "==", user.uid),
+          limit(1),
+        ),
       )
         .then((snap) => {
           if (!alive || snap.empty) return;
@@ -229,7 +255,7 @@ export function FoundersPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-brand selection:text-white">
       <ConfettiBurst fireKey={celebrate} />
-      
+
       {/* Gentle ambient background glows */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[700px] rounded-full bg-blue-100/60 blur-[130px]" />
@@ -256,7 +282,6 @@ export function FoundersPage() {
       <section className="relative z-10 overflow-hidden pb-16 pt-8 md:pt-14">
         <div className="mx-auto max-w-6xl px-5">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            
             {/* Left Column */}
             <div className="lg:col-span-7 space-y-6 text-left">
               <div className="inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-50 px-4 py-1.5 text-xs font-bold text-amber-900 shadow-xs">
@@ -270,7 +295,10 @@ export function FoundersPage() {
               </h1>
 
               <p className="max-w-xl text-base sm:text-lg leading-relaxed text-slate-600 font-normal">
-                Win a sleek <strong className="text-slate-900 font-bold">July Expandable Carry-On</strong>, a fun <strong className="text-slate-900 font-bold">Sydney 5-Star Weekend for Two</strong>, and <strong className="text-slate-900 font-bold">$100 credits</strong> for ten founders. Lock in your free Founder Pass today!
+                Win a sleek <strong className="text-slate-900 font-bold">July Expandable Carry-On</strong>, a fun{" "}
+                <strong className="text-slate-900 font-bold">Sydney 5-Star Weekend for Two</strong>, and{" "}
+                <strong className="text-slate-900 font-bold">$100 credits</strong> for ten founders. Lock in your free
+                Founder Pass today!
               </p>
 
               {/* Action CTA Buttons */}
@@ -311,9 +339,7 @@ export function FoundersPage() {
               <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm max-w-xl">
                 <div className="flex items-center justify-between text-sm mb-2.5">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-900 text-lg">
-                      {poolKnown ? fmt(pool.used) : "100,000"}
-                    </span>
+                    <span className="font-bold text-slate-900 text-lg">{poolKnown ? fmt(pool.used) : "100,000"}</span>
                     <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">
                       {poolKnown ? "/ 100,000 claimed" : "spots · doors open soon"}
                     </span>
@@ -352,11 +378,13 @@ export function FoundersPage() {
             <div className="lg:col-span-5 flex justify-center">
               <div className="relative w-full max-w-[360px] sm:max-w-[390px]">
                 {/* Soft ambient shadow */}
-                <div className="absolute -inset-2 rounded-3xl bg-gradient-to-tr from-amber-200/50 via-blue-200/40 to-indigo-200/50 blur-xl" aria-hidden />
+                <div
+                  className="absolute -inset-2 rounded-3xl bg-gradient-to-tr from-amber-200/50 via-blue-200/40 to-indigo-200/50 blur-xl"
+                  aria-hidden
+                />
 
                 {/* Card Container */}
                 <div className="relative rounded-3xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-amber-50/40 p-6 sm:p-7 shadow-xl text-left">
-                  
                   {/* Card Header */}
                   <div className="flex items-center justify-between border-b border-slate-200/80 pb-4">
                     <div className="flex items-center gap-2.5">
@@ -429,7 +457,6 @@ export function FoundersPage() {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </section>
@@ -459,9 +486,7 @@ export function FoundersPage() {
                 className="relative rounded-2xl border border-slate-200 bg-slate-50/70 p-5 shadow-xs transition hover:bg-white hover:shadow-sm"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="font-display text-lg font-black text-accent">
-                    {m.top}
-                  </span>
+                  <span className="font-display text-lg font-black text-accent">{m.top}</span>
                   <span className="text-xs font-bold text-slate-400">0{idx + 1}</span>
                 </div>
                 <h3 className="font-display text-base font-bold text-slate-900">{m.label}</h3>
@@ -502,9 +527,7 @@ export function FoundersPage() {
                 >
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="font-display text-3xl font-black text-accent">
-                        {p.n}
-                      </span>
+                      <span className="font-display text-3xl font-black text-accent">{p.n}</span>
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-xs font-bold text-slate-800">
                         <IconComp size={14} className="text-accent" />
                         {p.badge}
@@ -512,17 +535,11 @@ export function FoundersPage() {
                     </div>
 
                     <div>
-                      <h3 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">
-                        {p.name}
-                      </h3>
-                      <p className="text-xs sm:text-sm font-bold text-accent mt-1">
-                        {p.highlight}
-                      </p>
+                      <h3 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">{p.name}</h3>
+                      <p className="text-xs sm:text-sm font-bold text-accent mt-1">{p.highlight}</p>
                     </div>
 
-                    <p className="text-sm text-slate-600 leading-relaxed font-normal">
-                      {p.line}
-                    </p>
+                    <p className="text-sm text-slate-600 leading-relaxed font-normal">{p.line}</p>
 
                     <div className="border-t border-slate-100 pt-4 space-y-2">
                       {p.bullets.map((b) => (
@@ -633,8 +650,8 @@ export function FoundersPage() {
                 Join to make a change.
               </h2>
               <p className="mt-3 max-w-xl text-base leading-relaxed text-ink/75">
-                AirPal is built by the people who use it. The first 100,000 founders shape the
-                marketplace — what launches, what stays, what goes.
+                AirPal is built by the people who use it. The first 100,000 founders shape the marketplace — what
+                launches, what stays, what goes.
               </p>
             </div>
             <Button
@@ -653,7 +670,6 @@ export function FoundersPage() {
       <section id="crew-station" className="relative z-10 py-16 md:py-24 bg-brand text-white">
         <div className="mx-auto max-w-5xl px-5 text-center sm:text-left">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
             <div className="lg:col-span-7 space-y-4">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-1 text-xs font-bold text-white">
                 <Users size={14} />
@@ -664,7 +680,8 @@ export function FoundersPage() {
                 Your points.
               </h2>
               <p className="text-white/85 text-sm sm:text-base leading-relaxed">
-                Every friend who signs up with your personal invite link is recorded as your crew referral — earning you +{REFERRAL_POINTS} points each.
+                Every friend who signs up with your personal invite link is recorded as your crew referral — earning you
+                +{REFERRAL_POINTS} points each.
               </p>
 
               {user && (
@@ -690,7 +707,9 @@ export function FoundersPage() {
                     <div>
                       <p className="text-xs font-semibold text-white/80 uppercase">YOUR PERSONAL INVITE LINK</p>
                       <div className="mt-1.5 flex items-center gap-2 rounded-2xl bg-white p-2 border border-white/30 text-slate-900 shadow-sm">
-                        <span className="font-mono text-xs text-slate-800 truncate flex-1 pl-1.5 font-medium">{myLink}</span>
+                        <span className="font-mono text-xs text-slate-800 truncate flex-1 pl-1.5 font-medium">
+                          {myLink}
+                        </span>
                         <Button
                           size="sm"
                           onClick={copyLink}
@@ -753,7 +772,6 @@ export function FoundersPage() {
                 )}
               </div>
             </div>
-
           </div>
         </div>
       </section>
@@ -785,7 +803,10 @@ export function FoundersPage() {
                     <span>{faq.q}</span>
                     <ChevronDown
                       size={18}
-                      className={cn("text-slate-400 transition-transform duration-200", isOpen && "rotate-180 text-accent")}
+                      className={cn(
+                        "text-slate-400 transition-transform duration-200",
+                        isOpen && "rotate-180 text-accent",
+                      )}
                     />
                   </button>
                   {isOpen && (
@@ -805,7 +826,9 @@ export function FoundersPage() {
         <div className="mx-auto max-w-6xl px-5 text-center sm:text-left">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
             <p className="max-w-3xl leading-relaxed">
-              <strong>Official Notice:</strong> 100% Free Entry · Open to Australian residents aged 18+ · Capped at 100,000 eligible entries · Winners drawn at random from the founding pool and announced in-app · Entry does not guarantee winning · The July suitcase prize is purchased at retail and is not sponsored by July.
+              <strong>Official Notice:</strong> 100% Free Entry · Open to Australian residents aged 18+ · Capped at
+              100,000 eligible entries · Winners drawn at random from the founding pool and announced in-app · Entry
+              does not guarantee winning · The July suitcase prize is purchased at retail and is not sponsored by July.
             </p>
             <div className="flex items-center gap-4 shrink-0 font-medium">
               <Link href="/terms" className="text-slate-600 hover:text-accent hover:underline">

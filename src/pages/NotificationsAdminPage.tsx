@@ -111,9 +111,7 @@ export function NotificationsAdminPage() {
         Creator messages send only after approval. Transactional mail (entries, wins, reviews) never waits.
       </p>
 
-      <h2 className="mb-2 mt-6 text-xs font-bold uppercase tracking-wider text-mute">
-        Send platform update
-      </h2>
+      <h2 className="mb-2 mt-6 text-xs font-bold uppercase tracking-wider text-mute">Send platform update</h2>
       <div className="rounded-2xl ring-1 ring-line bg-card p-3">
         <p className="text-[11px] leading-5 text-mute">
           Lands in every inbox under Updates after approval. Noisy by design — keep it rare.
@@ -148,7 +146,11 @@ export function NotificationsAdminPage() {
             className="mt-1 min-h-[48px] w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none placeholder:text-mute focus:border-brand"
           />
         </label>
-        <Button className="mt-3 w-full" disabled={!title.trim() || !body.trim() || busy !== null} onClick={() => void compose()}>
+        <Button
+          className="mt-3 w-full"
+          disabled={!title.trim() || !body.trim() || busy !== null}
+          onClick={() => void compose()}
+        >
           {busy === "compose" ? "Queueing…" : "Queue for review"}
         </Button>
       </div>

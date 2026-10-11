@@ -1,5 +1,17 @@
 import { useMemo, useState, useRef } from "react";
-import { Car, MapPin, MessageSquare, Send, Sparkles, Ticket, Camera, Image as ImageIcon, Link2, Loader2, X } from "lucide-react";
+import {
+  Car,
+  MapPin,
+  MessageSquare,
+  Send,
+  Sparkles,
+  Ticket,
+  Camera,
+  Image as ImageIcon,
+  Link2,
+  Loader2,
+  X,
+} from "lucide-react";
 import type { HangoutPlan } from "@shared/plan";
 import { Button } from "@/components/ui/Button";
 import { Photo } from "@/components/ui/Photo";
@@ -74,11 +86,7 @@ export function PlanDiscussionWall({
       if (!ctx) throw new Error("Could not process image");
       ctx.drawImage(image, 0, 0, width, height);
       const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob(
-          (b) => (b ? resolve(b) : reject(new Error("Could not encode image"))),
-          "image/jpeg",
-          0.88,
-        );
+        canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Could not encode image"))), "image/jpeg", 0.88);
       });
       const src = await storeMedia(blob, { folder: "memories", kind: "comment" });
       setPhotoUrl(src);
@@ -206,11 +214,7 @@ export function PlanDiscussionWall({
                   </p>
                   {comment.photoUrl && (
                     <div className="mt-2.5 aspect-video w-full max-w-[280px] overflow-hidden rounded-2xl ring-1 ring-line shadow-xs">
-                      <Photo
-                        src={comment.photoUrl}
-                        alt="Drop from crew"
-                        className="h-full w-full object-cover"
-                      />
+                      <Photo src={comment.photoUrl} alt="Drop from crew" className="h-full w-full object-cover" />
                     </div>
                   )}
                 </div>
@@ -307,7 +311,9 @@ export function PlanDiscussionWall({
             aria-label="Upload photo from device or take picture"
             className={cn(
               "grid h-11 w-11 shrink-0 place-items-center rounded-2xl transition ring-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
-              photoUrl ? "bg-emerald-500/15 text-emerald-600 ring-emerald-500/30" : "bg-paper text-mute ring-line hover:text-ink",
+              photoUrl
+                ? "bg-emerald-500/15 text-emerald-600 ring-emerald-500/30"
+                : "bg-paper text-mute ring-line hover:text-ink",
             )}
           >
             {uploadingPhoto ? <Loader2 size={17} className="animate-spin text-accent" /> : <Camera size={17} />}

@@ -25,15 +25,8 @@ import { useBio } from "@/contexts/BioContext";
 import { useListings } from "@/contexts/ListingsContext";
 import { useEvents } from "@/contexts/EventsContext";
 import { hostWatchPropertyIds } from "@/lib/host-workspace";
-import {
-  resolveStaffTicket,
-  submitStaffTicket,
-  subscribePropertyTickets,
-  type StaffTicket,
-} from "@/lib/tickets-store";
-import {
-  subscribePropertyDiningOrders,
-} from "@/lib/dining-store";
+import { resolveStaffTicket, submitStaffTicket, subscribePropertyTickets, type StaffTicket } from "@/lib/tickets-store";
+import { subscribePropertyDiningOrders } from "@/lib/dining-store";
 import type { DiningOrder, DiningOrderStatus } from "@shared/airpal-data";
 import { updateDiningOrderStatusRemote } from "@/lib/functions";
 import {
@@ -50,9 +43,21 @@ type DomainFilter = "all" | "stay" | "dining" | "events" | "venue";
 type StatusFilter = "active" | "urgent" | "resolved";
 
 const TICKET_CATEGORIES: Record<StaffTicket["category"], { label: string; icon: string; badgeClass: string }> = {
-  reception: { label: "Reception / Front Desk", icon: "🛎️", badgeClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
-  housekeeping: { label: "Housekeeping", icon: "✨", badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-  maintenance: { label: "Maintenance & Tech", icon: "🔧", badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+  reception: {
+    label: "Reception / Front Desk",
+    icon: "🛎️",
+    badgeClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+  },
+  housekeeping: {
+    label: "Housekeeping",
+    icon: "✨",
+    badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  },
+  maintenance: {
+    label: "Maintenance & Tech",
+    icon: "🔧",
+    badgeClass: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  },
   dining: { label: "In-Room Dining", icon: "🍽️", badgeClass: "bg-purple-500/10 text-purple-600 dark:text-purple-400" },
   late_checkout: { label: "Late Checkout", icon: "⏰", badgeClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400" },
 };
@@ -128,10 +133,7 @@ export function HelpDeskPage() {
     return list.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [ordersByProperty]);
 
-  const activeTicketCount = useMemo(
-    () => allTickets.filter((t) => t.status !== "resolved").length,
-    [allTickets],
-  );
+  const activeTicketCount = useMemo(() => allTickets.filter((t) => t.status !== "resolved").length, [allTickets]);
   const urgentTicketCount = useMemo(
     () => allTickets.filter((t) => t.status !== "resolved" && t.urgency === "urgent").length,
     [allTickets],
@@ -207,9 +209,7 @@ export function HelpDeskPage() {
     try {
       stopTicketAlarm();
       playResolutionChime();
-      await Promise.all(
-        pending.map((t) => resolveStaffTicket(t.propertyId || propertyIds[0] || "unknown", t.id)),
-      );
+      await Promise.all(pending.map((t) => resolveStaffTicket(t.propertyId || propertyIds[0] || "unknown", t.id)));
       toast.success(`Resolved ${pending.length} tickets`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't resolve tickets");
@@ -265,7 +265,9 @@ export function HelpDeskPage() {
               <Headphones size={20} />
             </div>
             <div>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">AirPal Operations</span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">
+                AirPal Operations
+              </span>
               <h1 className="font-display text-2xl font-bold tracking-tight text-ink md:text-3xl">
                 Universal Help Desk
               </h1>
@@ -321,7 +323,9 @@ export function HelpDeskPage() {
             <span className="text-xs font-semibold text-mute">Urgent Priority</span>
             <ShieldAlert size={16} className="text-red-500" />
           </div>
-          <p className={`font-display mt-2 text-2xl font-bold ${urgentTicketCount > 0 ? "text-red-600 animate-pulse" : "text-ink"}`}>
+          <p
+            className={`font-display mt-2 text-2xl font-bold ${urgentTicketCount > 0 ? "text-red-600 animate-pulse" : "text-ink"}`}
+          >
             {urgentTicketCount}
           </p>
           <p className="mt-0.5 text-[11px] text-mute">High-urgency guest alerts</p>
@@ -368,9 +372,7 @@ export function HelpDeskPage() {
                 onClick={() => setDomainFilter(tab.id as DomainFilter)}
                 className={cn(
                   "flex min-h-[44px] items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold transition cursor-pointer active:scale-95",
-                  active
-                    ? "bg-brand text-white shadow-xs"
-                    : "text-mute hover:text-ink hover:bg-paper",
+                  active ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink hover:bg-paper",
                 )}
               >
                 <Icon size={14} />
@@ -431,7 +433,8 @@ export function HelpDeskPage() {
             onClick={handleResolveAll}
             className="flex items-center gap-1 rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-accent hover:bg-brand/15 transition"
           >
-            <CheckCheck size={14} /> Resolve All Visible ({filteredTickets.filter((t) => t.status !== "resolved").length})
+            <CheckCheck size={14} /> Resolve All Visible (
+            {filteredTickets.filter((t) => t.status !== "resolved").length})
           </button>
         )}
       </div>
@@ -472,12 +475,12 @@ export function HelpDeskPage() {
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ${cat.badgeClass}`}>
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ${cat.badgeClass}`}
+                          >
                             <span>{cat.icon}</span> {cat.label}
                           </span>
-                          <span className="text-xs font-bold text-ink">
-                            Room {ticket.roomNumber}
-                          </span>
+                          <span className="text-xs font-bold text-ink">Room {ticket.roomNumber}</span>
                           {ticket.urgency === "urgent" && !isResolved && (
                             <span className="inline-flex items-center gap-1 rounded-md bg-red-500/15 px-2 py-0.5 text-[11px] font-bold text-red-600 dark:text-red-400 animate-pulse">
                               🚨 Urgent Priority
@@ -488,7 +491,9 @@ export function HelpDeskPage() {
                           </span>
                         </div>
 
-                        <p className={`mt-2 text-sm font-medium text-ink leading-relaxed break-words ${isResolved ? "line-through text-mute" : ""}`}>
+                        <p
+                          className={`mt-2 text-sm font-medium text-ink leading-relaxed break-words ${isResolved ? "line-through text-mute" : ""}`}
+                        >
                           {ticket.details}
                         </p>
                       </div>
@@ -535,11 +540,7 @@ export function HelpDeskPage() {
                 {filteredOrders.map((order) => {
                   const propId = order.propertyId || propertyIds[0] || "unknown";
                   const nextStatus =
-                    order.status === "ready"
-                      ? "delivered"
-                      : order.status === "preparing"
-                        ? "ready"
-                        : "preparing";
+                    order.status === "ready" ? "delivered" : order.status === "preparing" ? "ready" : "preparing";
                   const nextLabel =
                     nextStatus === "delivered"
                       ? "Complete Delivery"
@@ -580,9 +581,7 @@ export function HelpDeskPage() {
                             <span>
                               <strong className="text-accent">{it.qty}×</strong> {it.name}
                             </span>
-                            <span className="text-mute">
-                              A${((it.unitCents * it.qty) / 100).toFixed(2)}
-                            </span>
+                            <span className="text-mute">A${((it.unitCents * it.qty) / 100).toFixed(2)}</span>
                           </div>
                         ))}
                       </div>
@@ -594,7 +593,11 @@ export function HelpDeskPage() {
                             type="button"
                             className="rounded-full px-3 py-1.5 text-xs text-mute hover:text-red-600 transition"
                             onClick={() => {
-                              void updateDiningOrderStatusRemote({ propertyId: propId, orderId: order.id, status: "cancelled" })
+                              void updateDiningOrderStatusRemote({
+                                propertyId: propId,
+                                orderId: order.id,
+                                status: "cancelled",
+                              })
                                 .then(() => toast.success("Order cancelled"))
                                 .catch((err) => toast.error(err instanceof Error ? err.message : "Couldn't cancel"));
                             }}
@@ -668,7 +671,9 @@ export function HelpDeskPage() {
             </div>
             <div className="mt-3 flex items-center justify-between">
               <div>
-                <p className="text-xs text-mute">Category: {businessListing.category} · Phone: {businessListing.phone || "Not set"}</p>
+                <p className="text-xs text-mute">
+                  Category: {businessListing.category} · Phone: {businessListing.phone || "Not set"}
+                </p>
                 <p className="text-xs font-medium text-ink mt-0.5">{businessListing.address || "Address verified"}</p>
               </div>
               <Link

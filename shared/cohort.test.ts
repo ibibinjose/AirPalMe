@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  findInstitutionByCode,
-  findInstitutionById,
-  getBelongingReportData,
-} from "./cohort";
+import { findInstitutionByCode, findInstitutionById, getBelongingReportData } from "./cohort";
 
 describe("cohort domain model", () => {
   it("locates institution by uppercase and lowercase code", () => {

@@ -1,16 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { collection, endAt, getDocs, limit, orderBy, query, startAt } from "firebase/firestore";
-import {
-  ArrowLeft,
-  ArrowRight,
-  BadgeCheck,
-  Building2,
-  Globe2,
-  ShieldCheck,
-  Sparkles,
-  Store,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, BadgeCheck, Building2, Globe2, ShieldCheck, Sparkles, Store } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PageLoading } from "@/components/ui/PageLoading";
 import { useAuth } from "@/contexts/AuthContext";
@@ -55,7 +46,10 @@ const inputCls =
 
 function Stepper({ step }: { step: number }) {
   return (
-    <ol className="flex flex-row md:flex-col justify-between md:justify-start gap-2 md:gap-1" aria-label="Onboarding progress">
+    <ol
+      className="flex flex-row md:flex-col justify-between md:justify-start gap-2 md:gap-1"
+      aria-label="Onboarding progress"
+    >
       {ONBOARD_STEPS.map((s, i) => {
         const done = i < step;
         const current = i === step;
@@ -77,7 +71,12 @@ function Stepper({ step }: { step: number }) {
               {i < ONBOARD_STEPS.length - 1 && <span className="hidden md:block my-1 h-5 w-px bg-line/80" />}
             </span>
             <div className="text-center md:text-left pb-1 pt-1">
-              <span className={cn("block text-xs md:text-sm transition", current ? "font-bold text-ink" : done ? "font-semibold text-ink/70" : "text-mute")}>
+              <span
+                className={cn(
+                  "block text-xs md:text-sm transition",
+                  current ? "font-bold text-ink" : done ? "font-semibold text-ink/70" : "text-mute",
+                )}
+              >
                 {s.label}
               </span>
             </div>
@@ -321,14 +320,19 @@ export function BusinessOnboardPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 py-6 sm:py-8">
-      <Link href="/business" className="inline-flex min-h-[44px] items-center gap-1.5 text-xs font-semibold text-accent hover:underline">
+      <Link
+        href="/business"
+        className="inline-flex min-h-[44px] items-center gap-1.5 text-xs font-semibold text-accent hover:underline"
+      >
         <ArrowLeft className="h-4 w-4" /> Back to Business Studio
       </Link>
 
       <div className="mt-3 rounded-[32px] bg-card p-6 sm:p-8 ring-1 ring-line shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-line/60 pb-5">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">{NAMES.partnerAccount}</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">
+              {NAMES.partnerAccount}
+            </span>
             <h1 className="font-display mt-1 text-2xl sm:text-3xl font-bold tracking-tight text-ink">
               Register a Business Venue
             </h1>
@@ -350,7 +354,8 @@ export function BusinessOnboardPage() {
                 <div>
                   <h2 className="font-display text-lg font-bold text-ink">What is the venue or business called?</h2>
                   <p className="text-xs text-mute mt-0.5">
-                    Search Google Places. Pick your location to auto-populate photos, street address, trading hours, and phone.
+                    Search Google Places. Pick your location to auto-populate photos, street address, trading hours, and
+                    phone.
                   </p>
                 </div>
                 <div className="mt-3">
@@ -405,7 +410,9 @@ export function BusinessOnboardPage() {
               <section className="space-y-4">
                 <div>
                   <h2 className="font-display text-lg font-bold text-ink">Owner & Contact Details</h2>
-                  <p className="text-xs text-mute mt-0.5">Primary liaison for reservations, payouts, and partner communications.</p>
+                  <p className="text-xs text-mute mt-0.5">
+                    Primary liaison for reservations, payouts, and partner communications.
+                  </p>
                 </div>
                 <div className="space-y-3">
                   <label className="block">
@@ -430,9 +437,7 @@ export function BusinessOnboardPage() {
                         required
                       />
                       <span className="mt-1 block text-[11px] text-mute">
-                        {user?.email
-                          ? `Signed in as ${user.email}.`
-                          : "Used for reservation confirmations and alerts."}
+                        {user?.email ? `Signed in as ${user.email}.` : "Used for reservation confirmations and alerts."}
                       </span>
                     </label>
                     <label className="block">
@@ -455,13 +460,17 @@ export function BusinessOnboardPage() {
                         onChange={(e) => set("owner", { ...draft.owner, role: e.target.value })}
                         className={inputCls}
                       >
-                        {["Owner", "General Manager", "Head Chef / Host", "Marketing Director", "Staff Lead"].map((r) => (
-                          <option key={r}>{r}</option>
-                        ))}
+                        {["Owner", "General Manager", "Head Chef / Host", "Marketing Director", "Staff Lead"].map(
+                          (r) => (
+                            <option key={r}>{r}</option>
+                          ),
+                        )}
                       </select>
                     </label>
                     <label className="block">
-                      <span className="text-xs font-bold uppercase tracking-wider text-mute">ABN / Business Tax ID (Optional)</span>
+                      <span className="text-xs font-bold uppercase tracking-wider text-mute">
+                        ABN / Business Tax ID (Optional)
+                      </span>
                       <input
                         value={draft.owner.abnOrTaxId}
                         onChange={(e) => set("owner", { ...draft.owner, abnOrTaxId: e.target.value })}
@@ -471,7 +480,9 @@ export function BusinessOnboardPage() {
                     </label>
                   </div>
                   <label className="block">
-                    <span className="text-xs font-bold uppercase tracking-wider text-mute">AirPal Welcome Perk (Optional)</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-mute">
+                      AirPal Welcome Perk (Optional)
+                    </span>
                     <input
                       value={draft.owner.customPerk}
                       onChange={(e) => set("owner", { ...draft.owner, customPerk: e.target.value })}
@@ -488,7 +499,8 @@ export function BusinessOnboardPage() {
                 <div>
                   <h2 className="font-display text-lg font-bold text-ink">Verify Location Details</h2>
                   <p className="text-xs text-mute mt-0.5">
-                    Confirm street address, website, and operating presence for {draft.venue.venueName || "your business"}.
+                    Confirm street address, website, and operating presence for{" "}
+                    {draft.venue.venueName || "your business"}.
                   </p>
                 </div>
                 <div>
@@ -544,7 +556,9 @@ export function BusinessOnboardPage() {
                 </label>
 
                 <label className="block">
-                  <span className="text-xs font-bold uppercase tracking-wider text-mute">Short Description (Optional)</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-mute">
+                    Short Description (Optional)
+                  </span>
                   <textarea
                     value={draft.shortWhy}
                     onChange={(e) => set("shortWhy", e.target.value)}
@@ -668,7 +682,9 @@ export function BusinessOnboardPage() {
                           onClick={() => set("plan", p.id)}
                           className={cn(
                             "rounded-2xl border p-3.5 text-left transition shadow-2xs",
-                            selected ? "border-brand bg-brand/5 ring-1 ring-brand/30" : "border-line bg-card hover:bg-paper",
+                            selected
+                              ? "border-brand bg-brand/5 ring-1 ring-brand/30"
+                              : "border-line bg-card hover:bg-paper",
                             locked && "cursor-not-allowed opacity-60",
                           )}
                         >
@@ -707,7 +723,12 @@ export function BusinessOnboardPage() {
 
             {/* Stepper Controls */}
             <div className="mt-6 flex items-center justify-between gap-3 border-t border-line/60 pt-4">
-              <Button variant="ghost" size="sm" disabled={step === 0 || submitting} onClick={() => setStep((s) => s - 1)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={step === 0 || submitting}
+                onClick={() => setStep((s) => s - 1)}
+              >
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
               </Button>
               {step < ONBOARD_STEPS.length - 1 ? (
@@ -715,7 +736,13 @@ export function BusinessOnboardPage() {
                   Continue <ArrowRight className="h-3.5 w-3.5" />
                 </Button>
               ) : (
-                <Button size="sm" disabled={!canNext || submitting} loading={submitting} onClick={() => void submit()} className="gap-1.5">
+                <Button
+                  size="sm"
+                  disabled={!canNext || submitting}
+                  loading={submitting}
+                  onClick={() => void submit()}
+                  className="gap-1.5"
+                >
                   <Building2 className="h-3.5 w-3.5" /> Go Live on AirPal
                 </Button>
               )}

@@ -57,7 +57,9 @@ export function CookiesPage() {
           <tr>
             <td>airpal.local-now.v2</td>
             <td>Functional</td>
-            <td>Cache weather for the current precinct anchor or GPS origin so we do not re-query Open-Meteo every load.</td>
+            <td>
+              Cache weather for the current precinct anchor or GPS origin so we do not re-query Open-Meteo every load.
+            </td>
             <td>Session (about 15 minutes of usefulness)</td>
           </tr>
           <tr>

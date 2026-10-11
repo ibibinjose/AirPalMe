@@ -68,19 +68,24 @@ describe("checkTimeConflict", () => {
   });
 
   it("ignores reminder-only catch-ups when checking conflicts", () => {
-    const result = checkTimeConflict("2026-09-25", "14:00", [], [
-      {
-        id: "r1",
-        targetHandle: "xyz",
-        requesterName: "Sam",
-        type: "catchup",
-        date: "2026-09-25",
-        time: "14:00",
-        createdAt: new Date().toISOString(),
-        isReminderOnly: true,
-        status: "pending",
-      },
-    ]);
+    const result = checkTimeConflict(
+      "2026-09-25",
+      "14:00",
+      [],
+      [
+        {
+          id: "r1",
+          targetHandle: "xyz",
+          requesterName: "Sam",
+          type: "catchup",
+          date: "2026-09-25",
+          time: "14:00",
+          createdAt: new Date().toISOString(),
+          isReminderOnly: true,
+          status: "pending",
+        },
+      ],
+    );
     expect(result.hasConflict).toBe(false);
   });
 });

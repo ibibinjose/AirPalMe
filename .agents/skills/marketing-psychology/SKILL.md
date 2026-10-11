@@ -96,26 +96,26 @@ This skill applies psychological principles, cognitive heuristics, and behaviora
 
 ## Page Models
 
-| Page | Models |
-|------|--------|
-| Pricing | Anchoring, Decoy, Good-Better-Best, Charm/Round Pricing, Paradox of Choice, Framing |
-| Landing | AIDA, Social Proof, Loss Aversion, Contrast, Authority, Activation Energy |
-| Onboarding | Goal-Gradient, IKEA Effect, Commitment & Consistency, Zeigarnik, Default Effect |
-| Checkout | Activation Energy, Regret Aversion, Endowment, Status-Quo Bias, Hick's Law |
-| Feature | Jobs to Be Done, Framing, Social Proof, Availability Heuristic |
-| Trial expiry | Loss Aversion, Endowment, Scarcity, Present Bias |
+| Page         | Models                                                                              |
+| ------------ | ----------------------------------------------------------------------------------- |
+| Pricing      | Anchoring, Decoy, Good-Better-Best, Charm/Round Pricing, Paradox of Choice, Framing |
+| Landing      | AIDA, Social Proof, Loss Aversion, Contrast, Authority, Activation Energy           |
+| Onboarding   | Goal-Gradient, IKEA Effect, Commitment & Consistency, Zeigarnik, Default Effect     |
+| Checkout     | Activation Energy, Regret Aversion, Endowment, Status-Quo Bias, Hick's Law          |
+| Feature      | Jobs to Be Done, Framing, Social Proof, Availability Heuristic                      |
+| Trial expiry | Loss Aversion, Endowment, Scarcity, Present Bias                                    |
 
 ---
 
 ## Quick Reference
 
-| Challenge | Models |
-|-----------|--------|
-| Low conversions | Hick's Law, Activation Energy, BJ Fogg, Fundamental Attribution |
-| Price objections | Anchoring, Framing, Mental Accounting, Loss Aversion, Rule of 100 |
-| Building trust | Authority, Social Proof, Reciprocity, Pratfall Effect |
-| Urgency | Scarcity, Loss Aversion, Zeigarnik |
-| Retention | Endowment, Switching Costs, Status-Quo Bias, Network Effects |
-| Decision paralysis | Paradox of Choice, Default Effect, Nudge Theory |
+| Challenge           | Models                                                                  |
+| ------------------- | ----------------------------------------------------------------------- |
+| Low conversions     | Hick's Law, Activation Energy, BJ Fogg, Fundamental Attribution         |
+| Price objections    | Anchoring, Framing, Mental Accounting, Loss Aversion, Rule of 100       |
+| Building trust      | Authority, Social Proof, Reciprocity, Pratfall Effect                   |
+| Urgency             | Scarcity, Loss Aversion, Zeigarnik                                      |
+| Retention           | Endowment, Switching Costs, Status-Quo Bias, Network Effects            |
+| Decision paralysis  | Paradox of Choice, Default Effect, Nudge Theory                         |
 | Onboarding drop-off | Goal-Gradient, IKEA Effect, Commitment & Consistency, Activation Energy |
-| Copy underperforms | Curse of Knowledge, Jobs to Be Done, Confirmation Bias, Framing |
+| Copy underperforms  | Curse of Knowledge, Jobs to Be Done, Confirmation Bias, Framing         |

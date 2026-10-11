@@ -74,7 +74,9 @@ export function SegmentedControl<T extends string>({
           }}
           className={cn(
             "min-h-[44px] flex-1 cursor-pointer touch-manipulation rounded-full px-4 text-[14px] font-semibold whitespace-nowrap transition active:scale-[0.98]",
-            value === o.id ? "bg-brand text-white shadow-[0_6px_14px_-8px_rgba(18,22,20,0.3)]" : "text-mute hover:text-ink",
+            value === o.id
+              ? "bg-brand text-white shadow-[0_6px_14px_-8px_rgba(18,22,20,0.3)]"
+              : "text-mute hover:text-ink",
           )}
         >
           {o.label}
@@ -113,11 +115,7 @@ export function PillRow<T extends string>({
               "min-h-[44px] shrink-0 cursor-pointer touch-manipulation rounded-full px-4 text-[14px] font-semibold shadow-sm transition active:scale-[0.96]",
               !on && "ring-1 ring-line",
             )}
-            style={
-              on
-                ? { backgroundColor: solid, color: "#fff" }
-                : { backgroundColor: `${solid}14`, color: solid }
-            }
+            style={on ? { backgroundColor: solid, color: "#fff" } : { backgroundColor: `${solid}14`, color: solid }}
           >
             {o.label}
           </button>
@@ -142,14 +140,7 @@ export function AirPalSearchField({ placeholder = "Search AirPal" }: { placehold
 
 export function GlassPanel({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div
-      className={cn(
-        "apple-liquid-glass-card rounded-3xl p-5 ring-1 ring-white/80",
-        className,
-      )}
-    >
-      {children}
-    </div>
+    <div className={cn("apple-liquid-glass-card rounded-3xl p-5 ring-1 ring-white/80", className)}>{children}</div>
   );
 }
 
@@ -215,9 +206,16 @@ export function CategoryTile({
         className="grid h-[68px] w-[68px] place-items-center rounded-[22px] shadow-[0_4px_14px_rgba(18,22,20,0.08)] ring-1 ring-black/5 transition-all duration-280 group-hover:-translate-y-1 group-hover:shadow-[0_8px_20px_rgba(18,22,20,0.12)]"
         style={{ backgroundColor: tint }}
       >
-        <Icon size={28} style={{ color: fg }} strokeWidth={2.2} className="transition-transform duration-200 group-hover:scale-105" />
+        <Icon
+          size={28}
+          style={{ color: fg }}
+          strokeWidth={2.2}
+          className="transition-transform duration-200 group-hover:scale-105"
+        />
       </span>
-      <span className="px-1 text-center text-[12px] font-semibold leading-tight text-ink group-hover:text-accent transition-colors">{label}</span>
+      <span className="px-1 text-center text-[12px] font-semibold leading-tight text-ink group-hover:text-accent transition-colors">
+        {label}
+      </span>
     </Link>
   );
 }
@@ -226,7 +224,10 @@ export function CategoryTile({
 export function RatingBadge({ value }: { value: number }) {
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-1 text-[12px] font-bold text-ink shadow-sm">
-      <span aria-hidden className="text-amber-500">★</span> {value.toFixed(1)}
+      <span aria-hidden className="text-amber-500">
+        ★
+      </span>{" "}
+      {value.toFixed(1)}
     </span>
   );
 }
@@ -301,13 +302,7 @@ export function CardSkeletonRow({ count = 3 }: { count?: number }) {
  * the tab dock. One primary action; everything else stays secondary inline.
  * Detail pages using this must hide the global + Create (see AppShell).
  */
-export function StickyAction({
-  primary,
-  secondary,
-}: {
-  primary: ReactNode;
-  secondary?: ReactNode;
-}) {
+export function StickyAction({ primary, secondary }: { primary: ReactNode; secondary?: ReactNode }) {
   // Portaled to body: page wrappers use transform (pull-to-refresh), which
   // would trap `fixed` mid-page. Same pattern as Sheet.
   if (typeof document === "undefined") return null;

@@ -69,11 +69,7 @@ export function SpeakerPicker({ speakers, onChange }: Props) {
       {speakers.length > 0 && (
         <ul className="mb-2 space-y-1.5">
           {speakers.map((s, i) => (
-            <SpeakerPickerRow
-              key={`${s.handle || s.name}-${i}`}
-              speaker={s}
-              onRemove={() => removeMember(i)}
-            />
+            <SpeakerPickerRow key={`${s.handle || s.name}-${i}`} speaker={s} onRemove={() => removeMember(i)} />
           ))}
         </ul>
       )}
@@ -136,9 +132,16 @@ export function SpeakerPicker({ speakers, onChange }: Props) {
             className="flex w-full items-center gap-2 rounded-2xl bg-card px-3 py-2 text-left ring-1 ring-brand/30"
           >
             {lookedUp.photoUrl ? (
-              <Photo src={lookedUp.photoUrl} alt={lookedUp.name} className="h-8 w-8 rounded-full object-cover ring-1 ring-line" />
+              <Photo
+                src={lookedUp.photoUrl}
+                alt={lookedUp.name}
+                className="h-8 w-8 rounded-full object-cover ring-1 ring-line"
+              />
             ) : (
-              <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-accent">
+              <span
+                aria-hidden
+                className="grid h-8 w-8 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-accent"
+              >
                 {lookedUp.name.trim().charAt(0).toUpperCase()}
               </span>
             )}
@@ -227,9 +230,16 @@ export function SpeakerPickerRow({ speaker, onRemove }: { speaker: Speaker; onRe
   return (
     <li className="flex items-center gap-2 rounded-2xl bg-paper px-3 py-2 text-[13px] ring-1 ring-line/60">
       {photo ? (
-        <Photo src={photo} alt={name || speaker.name} className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-line" />
+        <Photo
+          src={photo}
+          alt={name || speaker.name}
+          className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-line"
+        />
       ) : (
-        <span aria-hidden className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-accent">
+        <span
+          aria-hidden
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-accent"
+        >
           {(name || speaker.name).trim().charAt(0).toUpperCase() || "?"}
         </span>
       )}
@@ -245,7 +255,12 @@ export function SpeakerPickerRow({ speaker, onRemove }: { speaker: Speaker; onRe
         )}
       </span>
       {onRemove && (
-        <button type="button" aria-label={`Remove ${speaker.name}`} onClick={onRemove} className="relative rounded-full p-1.5 text-mute hover:text-rose-700 after:absolute after:-inset-3 after:content-[''] cursor-pointer">
+        <button
+          type="button"
+          aria-label={`Remove ${speaker.name}`}
+          onClick={onRemove}
+          className="relative rounded-full p-1.5 text-mute hover:text-rose-700 after:absolute after:-inset-3 after:content-[''] cursor-pointer"
+        >
           <X size={14} />
         </button>
       )}

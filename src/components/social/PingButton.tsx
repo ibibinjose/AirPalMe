@@ -28,12 +28,7 @@ export function PingButton({ toUid, toHandle, toName }: { toUid: string; toHandl
     if (!db || !isFirebaseConfigured) return;
     let live = true;
     void getDocs(
-      query(
-        collection(db, "pings"),
-        where("fromUid", "==", user.uid),
-        where("toUid", "==", toUid),
-        limit(10),
-      ),
+      query(collection(db, "pings"), where("fromUid", "==", user.uid), where("toUid", "==", toUid), limit(10)),
     )
       .then((snap) => {
         if (!live) return;

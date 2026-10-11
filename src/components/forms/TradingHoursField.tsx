@@ -102,12 +102,7 @@ export function TradingHoursField({
 
       {/* 7-Day Modal */}
       {modalOpen && (
-        <TradingHoursModal
-          open={modalOpen}
-          onClose={() => setModalOpen(false)}
-          value={value}
-          onApply={onChange}
-        />
+        <TradingHoursModal open={modalOpen} onClose={() => setModalOpen(false)} value={value} onApply={onChange} />
       )}
     </div>
   );

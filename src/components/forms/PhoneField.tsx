@@ -120,9 +120,7 @@ export function PhoneField({
           hint={!value && required ? "Enter local mobile number" : undefined}
         >
           <div className="relative flex items-center">
-            <span className="absolute left-3.5 text-xs font-semibold text-mute select-none">
-              {activeCountry.dial}
-            </span>
+            <span className="absolute left-3.5 text-xs font-semibold text-mute select-none">{activeCountry.dial}</span>
             <input
               value={national}
               onChange={(e) => handleNumberChange(e.target.value)}

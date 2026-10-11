@@ -13,12 +13,7 @@ import {
 } from "firebase/firestore";
 import { getFirebaseDb, isFirebaseConfigured } from "./firebase";
 import { askAirPalRemote } from "./functions";
-import type {
-  ChatParticipant,
-  ConversationType,
-  UniversalChatMessage,
-  UniversalConversation,
-} from "@shared/messaging";
+import type { ChatParticipant, ConversationType, UniversalChatMessage, UniversalConversation } from "@shared/messaging";
 import { MESSAGE_MAX, messageValid } from "@shared/messaging";
 import { getCachedProperty } from "./properties";
 import { CURRENT_PROPERTY } from "@shared/airpal-data";
@@ -233,9 +228,7 @@ function getInitialGreeting(type: ConversationType, title: string, targetId?: st
 
 /** Get all locally stored conversations synchronously */
 export function getLocalConversations(): UniversalConversation[] {
-  return Object.values(readConvs()).sort((a, b) =>
-    (b.lastMessageAt || "").localeCompare(a.lastMessageAt || ""),
-  );
+  return Object.values(readConvs()).sort((a, b) => (b.lastMessageAt || "").localeCompare(a.lastMessageAt || ""));
 }
 
 /** Synchronously create or retrieve conversation record */
@@ -629,10 +622,7 @@ export function markConversationRead(conversationId: string, uid: string): void 
  * legacy local echoes that match a server copy by content collapse into it,
  * local-only and failed rows always survive. Sorted oldest-first.
  */
-export function mergeMessages(
-  local: UniversalChatMessage[],
-  remote: UniversalChatMessage[],
-): UniversalChatMessage[] {
+export function mergeMessages(local: UniversalChatMessage[], remote: UniversalChatMessage[]): UniversalChatMessage[] {
   const byId: Record<string, UniversalChatMessage> = {};
   for (const m of local) {
     if (m && m.id) byId[m.id] = m;

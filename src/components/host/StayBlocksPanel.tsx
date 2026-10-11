@@ -95,7 +95,12 @@ export function StayBlocksPanel({ propertyId }: { propertyId: string }) {
             className="mt-1 w-full rounded-xl border border-line bg-paper px-3 py-2.5 text-sm outline-none focus:border-brand"
           />
         </label>
-        <Button className="h-11 px-4 text-xs" disabled={busy || !isStayDay(day)} loading={busy} onClick={() => void block()}>
+        <Button
+          className="h-11 px-4 text-xs"
+          disabled={busy || !isStayDay(day)}
+          loading={busy}
+          onClick={() => void block()}
+        >
           Block
         </Button>
       </div>

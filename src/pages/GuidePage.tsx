@@ -103,8 +103,7 @@ export function GuidePage() {
           <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-accent">{t("guide")}</p>
           <h1 className="font-display mt-1 text-3xl font-semibold">{t("walks")}</h1>
           <p className="mt-1 text-xs text-mute">
-            Curated walks &amp; sights in{" "}
-            <span className="font-medium text-ink">{effectiveCity}</span>
+            Curated walks &amp; sights in <span className="font-medium text-ink">{effectiveCity}</span>
           </p>
         </div>
         <ShareGuideButton city={effectiveCity} label={shareLabel} variant="ghost" onShare={handleShareGuide} />

@@ -230,16 +230,16 @@ export function HomePage() {
           <h1 className="font-display mt-3 text-[30px] sm:text-[40px] font-bold leading-[1.05] tracking-tight text-white max-w-2xl">
             Plan your day. Organise your life.
           </h1>
-          <p className="mt-1 text-sm sm:text-base font-medium text-white/90 max-w-lg">
-            My life, organised by AirPal.
-          </p>
+          <p className="mt-1 text-sm sm:text-base font-medium text-white/90 max-w-lg">My life, organised by AirPal.</p>
 
           {/* Daily Weather & Outfit Recommendation Capsule */}
           {weather && outfitAdvice && (
             <div className="mt-4 flex flex-wrap items-center gap-2 rounded-2xl bg-white/15 p-3 text-xs text-white ring-1 ring-white/25 backdrop-blur-md max-w-xl">
               <span className="font-bold inline-flex items-center gap-1.5">
                 <span>{outfitAdvice.icon}</span>
-                <span>{weather.temp}°C {outfitAdvice.vibe}</span>
+                <span>
+                  {weather.temp}°C {outfitAdvice.vibe}
+                </span>
               </span>
               <span className="text-white/60">·</span>
               <span className="text-white/90 font-medium">{outfitAdvice.outfit}</span>
@@ -460,8 +460,8 @@ export function HomePage() {
                 Discover what's happening. Get access. Save money.
               </h3>
               <p className="text-xs sm:text-sm text-white/80 mt-1">
-                Concerts, Indian cultural festivals, live gigs, and dining perks across {city || "Sydney"}.
-                Share the same AirPal account — zero extra signups.
+                Concerts, Indian cultural festivals, live gigs, and dining perks across {city || "Sydney"}. Share the
+                same AirPal account — zero extra signups.
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">

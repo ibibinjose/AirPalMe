@@ -16,17 +16,7 @@ export interface IconBadgeProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const IconBadge = React.forwardRef<HTMLDivElement, IconBadgeProps>(function IconBadge(
-  {
-    icon,
-    variant = "brand",
-    size = "md",
-    iconSize,
-    iconVariant,
-    strokeWidth = 2,
-    className,
-    children,
-    ...rest
-  },
+  { icon, variant = "brand", size = "md", iconSize, iconVariant, strokeWidth = 2, className, children, ...rest },
   ref,
 ) {
   const sizeConfig = BADGE_SIZE_MAP[size] || BADGE_SIZE_MAP.md;

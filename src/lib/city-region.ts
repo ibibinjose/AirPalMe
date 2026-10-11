@@ -45,7 +45,8 @@ export function formatCitySuburbRegion(
   // If address components are provided, extract locality/sublocality and administrative area
   if (addressComponents && addressComponents.length > 0) {
     const locality =
-      addressComponents.find((c) => c.types?.includes("sublocality") || c.types?.includes("sublocality_level_1"))?.longText ||
+      addressComponents.find((c) => c.types?.includes("sublocality") || c.types?.includes("sublocality_level_1"))
+        ?.longText ||
       addressComponents.find((c) => c.types?.includes("locality"))?.longText ||
       addressComponents.find((c) => c.types?.includes("postal_town"))?.longText ||
       t;
@@ -55,8 +56,7 @@ export function formatCitySuburbRegion(
       addressComponents.find((c) => c.types?.includes("administrative_area_level_2"))?.longText ||
       "";
 
-    const country =
-      addressComponents.find((c) => c.types?.includes("country"))?.longText || "";
+    const country = addressComponents.find((c) => c.types?.includes("country"))?.longText || "";
 
     const cleanLocality = locality.trim();
     const cleanState = cleanStateName(state.trim());

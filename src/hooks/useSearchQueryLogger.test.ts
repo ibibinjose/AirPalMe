@@ -37,4 +37,3 @@ describe("useSearchQueryLogger", () => {
     expect(html).toContain("trending:");
   });
 });
-

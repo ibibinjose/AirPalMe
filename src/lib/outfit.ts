@@ -21,9 +21,7 @@ export function getDailyOutfitRecommendation(
   isDay: boolean = true,
 ): DailyOutfitAdvice {
   const isRain =
-    weatherCode <= 67 && weatherCode >= 51 ||
-    (weatherCode >= 80 && weatherCode <= 82) ||
-    weatherCode >= 95;
+    (weatherCode <= 67 && weatherCode >= 51) || (weatherCode >= 80 && weatherCode <= 82) || weatherCode >= 95;
   const isSnow = (weatherCode >= 71 && weatherCode <= 77) || (weatherCode >= 85 && weatherCode <= 86);
 
   if (isRain) {

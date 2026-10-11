@@ -58,12 +58,7 @@ export function PassPage() {
     const db = getFirebaseDb();
     if (!db) return;
     let cancelled = false;
-    void getDocs(
-      query(
-        collection(db, "promotions"),
-        where("status", "in", ["live", "approved"]),
-      ),
-    )
+    void getDocs(query(collection(db, "promotions"), where("status", "in", ["live", "approved"])))
       .then((snap) => {
         if (!cancelled) {
           const list = snap.docs
@@ -117,7 +112,8 @@ export function PassPage() {
         venue: base.venue || base.city || "Sydney",
         category: base.category || "community",
         image: base.heroImage || "/media/live-music.jpg",
-        priceLabel: base.ticketPrice || (base.ticketPriceCents ? `$${Math.round(base.ticketPriceCents / 100)}` : "Free Pass"),
+        priceLabel:
+          base.ticketPrice || (base.ticketPriceCents ? `$${Math.round(base.ticketPriceCents / 100)}` : "Free Pass"),
         isFree: !base.ticketPriceCents || (base.ticketPrice ? base.ticketPrice.toLowerCase().includes("free") : false),
       });
     }
@@ -157,7 +153,12 @@ export function PassPage() {
         );
       }
       if (activeCategory === "music") {
-        return catLower.includes("music") || catLower.includes("concert") || titleLower.includes("live") || titleLower.includes("band");
+        return (
+          catLower.includes("music") ||
+          catLower.includes("concert") ||
+          titleLower.includes("live") ||
+          titleLower.includes("band")
+        );
       }
       if (activeCategory === "deals") {
         return (
@@ -176,7 +177,12 @@ export function PassPage() {
         );
       }
       if (activeCategory === "nightlife") {
-        return catLower.includes("club") || catLower.includes("bar") || titleLower.includes("night") || titleLower.includes("party");
+        return (
+          catLower.includes("club") ||
+          catLower.includes("bar") ||
+          titleLower.includes("night") ||
+          titleLower.includes("party")
+        );
       }
       if (activeCategory === "community") {
         return catLower.includes("community") || catLower.includes("market") || catLower.includes("expo");
@@ -278,7 +284,10 @@ export function PassPage() {
       </header>
 
       {/* Category Pills Strip */}
-      <nav aria-label="Experience Categories" className="mt-6 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+      <nav
+        aria-label="Experience Categories"
+        className="mt-6 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"
+      >
         {PASS_CATEGORIES.map((cat) => {
           const active = activeCategory === cat.id;
           return (
@@ -481,66 +490,74 @@ export function PassPage() {
             <span className="text-[11px] font-bold uppercase tracking-wider text-accent">Passholder Perks</span>
             <h2 className="font-display text-xl font-bold text-ink mt-0.5">Dining Deals &amp; Freebies</h2>
           </div>
-          <Link href="/deals" className="inline-flex min-h-[44px] items-center text-xs font-bold text-accent hover:underline">
+          <Link
+            href="/deals"
+            className="inline-flex min-h-[44px] items-center text-xs font-bold text-accent hover:underline"
+          >
             All Deals →
           </Link>
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {(promotions.length > 0 ? promotions : [
-            {
-              id: "demo-coffee",
-              title: "Free Morning Coffee with Breakfast",
-              businessName: "The Rocks Cafe",
-              discountText: "100% Off",
-              badge: "Perk",
-              image: "/media/dining.jpg",
-            },
-            {
-              id: "demo-2for1",
-              title: "2-for-1 Signature Cocktails",
-              businessName: "Harbour View Lounge",
-              discountText: "2-for-1",
-              badge: "Evening",
-              image: "/media/drinks.jpg",
-            },
-            {
-              id: "demo-dessert",
-              title: "Complimentary Dessert with Mains",
-              businessName: "Bennelong Bistro",
-              discountText: "Free Sweet",
-              badge: "Dining",
-              image: "/media/food.jpg",
-            },
-          ]).slice(0, 3).map((deal, idx) => (
-            <Link
-              key={deal.id || idx}
-              href={deal.id.startsWith("demo") ? "/deals" : `/deals/${deal.id}`}
-              className="group flex items-center justify-between gap-3 rounded-3xl bg-card p-4 ring-1 ring-line/80 shadow-xs hover:shadow-md hover:ring-brand/30 transition active:scale-[0.98]"
-            >
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-paper">
-                  <Photo
-                    src={"image" in deal && deal.image ? deal.image : promoArtFor(deal.id)}
-                    className="h-full w-full object-cover"
-                    alt={deal.title}
-                  />
+          {(promotions.length > 0
+            ? promotions
+            : [
+                {
+                  id: "demo-coffee",
+                  title: "Free Morning Coffee with Breakfast",
+                  businessName: "The Rocks Cafe",
+                  discountText: "100% Off",
+                  badge: "Perk",
+                  image: "/media/dining.jpg",
+                },
+                {
+                  id: "demo-2for1",
+                  title: "2-for-1 Signature Cocktails",
+                  businessName: "Harbour View Lounge",
+                  discountText: "2-for-1",
+                  badge: "Evening",
+                  image: "/media/drinks.jpg",
+                },
+                {
+                  id: "demo-dessert",
+                  title: "Complimentary Dessert with Mains",
+                  businessName: "Bennelong Bistro",
+                  discountText: "Free Sweet",
+                  badge: "Dining",
+                  image: "/media/food.jpg",
+                },
+              ]
+          )
+            .slice(0, 3)
+            .map((deal, idx) => (
+              <Link
+                key={deal.id || idx}
+                href={deal.id.startsWith("demo") ? "/deals" : `/deals/${deal.id}`}
+                className="group flex items-center justify-between gap-3 rounded-3xl bg-card p-4 ring-1 ring-line/80 shadow-xs hover:shadow-md hover:ring-brand/30 transition active:scale-[0.98]"
+              >
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-paper">
+                    <Photo
+                      src={"image" in deal && deal.image ? deal.image : promoArtFor(deal.id)}
+                      className="h-full w-full object-cover"
+                      alt={deal.title}
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="inline-block rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                      {"discountText" in deal && deal.discountText ? deal.discountText : "Exclusive Perk"}
+                    </span>
+                    <p className="font-display text-sm font-bold text-ink mt-0.5 truncate group-hover:text-accent transition-colors">
+                      {deal.title}
+                    </p>
+                    <p className="text-[11px] text-mute truncate mt-0.5">
+                      {"businessName" in deal ? deal.businessName : "Sydney Local Partner"}
+                    </p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <span className="inline-block rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
-                    {"discountText" in deal && deal.discountText ? deal.discountText : "Exclusive Perk"}
-                  </span>
-                  <p className="font-display text-sm font-bold text-ink mt-0.5 truncate group-hover:text-accent transition-colors">
-                    {deal.title}
-                  </p>
-                  <p className="text-[11px] text-mute truncate mt-0.5">
-                    {"businessName" in deal ? deal.businessName : "Sydney Local Partner"}
-                  </p>
-                </div>
-              </div>
-              <ArrowRight size={16} className="text-mute group-hover:text-ink shrink-0 mr-1" />
-            </Link>
-          ))}
+                <ArrowRight size={16} className="text-mute group-hover:text-ink shrink-0 mr-1" />
+              </Link>
+            ))}
         </div>
       </section>
 
@@ -557,7 +574,8 @@ export function PassPage() {
               Run your venue, event, or stay on AirPal Pass
             </h2>
             <p className="text-sm text-mute mt-1 max-w-2xl">
-              Turnkey operational tools for ticket sellers, event hosts, hotel operators, and hospitality partners with zero extra hardware.
+              Turnkey operational tools for ticket sellers, event hosts, hotel operators, and hospitality partners with
+              zero extra hardware.
             </p>
           </div>
         </div>
@@ -569,11 +587,10 @@ export function PassPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-1 ring-amber-500/20">
                 <Ticket size={24} />
               </div>
-              <h3 className="font-display text-lg font-bold text-ink mt-4">
-                Ticket Sales &amp; Hosting
-              </h3>
+              <h3 className="font-display text-lg font-bold text-ink mt-4">Ticket Sales &amp; Hosting</h3>
               <p className="text-xs sm:text-sm text-mute mt-2 leading-relaxed">
-                List cultural festivals, music gigs, club nights, and community expos. Integrated Stripe checkout, guest tiers, and instant RSVP passes.
+                List cultural festivals, music gigs, club nights, and community expos. Integrated Stripe checkout, guest
+                tiers, and instant RSVP passes.
               </p>
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-2.5 pt-4 border-t border-line/50">
@@ -599,11 +616,10 @@ export function PassPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/20">
                 <Building2 size={24} />
               </div>
-              <h3 className="font-display text-lg font-bold text-ink mt-4">
-                Arrival Engine &amp; Cohort Host
-              </h3>
+              <h3 className="font-display text-lg font-bold text-ink mt-4">Arrival Engine &amp; Cohort Host</h3>
               <p className="text-xs sm:text-sm text-mute mt-2 leading-relaxed">
-                B2B2C Arrival Engine for PBSA student accommodation, colleges, and innovation hubs. Pre-verified resident onboarding, tonight's hosted events, and executive Belonging Reports.
+                B2B2C Arrival Engine for PBSA student accommodation, colleges, and innovation hubs. Pre-verified
+                resident onboarding, tonight's hosted events, and executive Belonging Reports.
               </p>
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-2.5 pt-4 border-t border-line/50">
@@ -630,11 +646,10 @@ export function PassPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 ring-1 ring-rose-500/20">
                 <QrCode size={24} />
               </div>
-              <h3 className="font-display text-lg font-bold text-ink mt-4">
-                Door Scanner &amp; Partner Hub
-              </h3>
+              <h3 className="font-display text-lg font-bold text-ink mt-4">Door Scanner &amp; Partner Hub</h3>
               <p className="text-xs sm:text-sm text-mute mt-2 leading-relaxed">
-                High-speed camera scanner for gate staff with instant QR verification and offline cache. Onboard partner deals and member dining discounts.
+                High-speed camera scanner for gate staff with instant QR verification and offline cache. Onboard partner
+                deals and member dining discounts.
               </p>
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-2.5 pt-4 border-t border-line/50">

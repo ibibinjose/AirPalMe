@@ -18,13 +18,7 @@ export function isPlanCover(src: string | undefined): boolean {
   return Boolean(src) && PLAN_COVERS.some((c) => c.src === src);
 }
 
-export function PlanCoverPicker({
-  value,
-  onChange,
-}: {
-  value?: string;
-  onChange: (src: string | undefined) => void;
-}) {
+export function PlanCoverPicker({ value, onChange }: { value?: string; onChange: (src: string | undefined) => void }) {
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">

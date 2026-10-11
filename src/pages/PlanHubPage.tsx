@@ -244,9 +244,7 @@ export function PlanHubPage() {
           <h1 className="mt-1 font-display text-3xl font-extrabold tracking-tight text-ink md:text-4xl">
             Plans &amp; Invites
           </h1>
-          <p className="mt-0.5 text-xs text-mute font-medium">
-            Shared itineraries with mates &amp; friends.
-          </p>
+          <p className="mt-0.5 text-xs text-mute font-medium">Shared itineraries with mates &amp; friends.</p>
         </div>
 
         <Button
@@ -269,9 +267,7 @@ export function PlanHubPage() {
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand/15 text-accent">
                 <Sparkles size={13} />
               </span>
-              <span className="text-xs font-bold uppercase tracking-wider text-accent">
-                Spotlight · Your Next Plan
-              </span>
+              <span className="text-xs font-bold uppercase tracking-wider text-accent">Spotlight · Your Next Plan</span>
             </div>
             {getCountdownBadge(nextUpcomingPlan.date, nextUpcomingPlan.time) && (
               <span className="inline-flex items-center gap-1 rounded-full bg-brand px-3 py-1 text-xs font-bold text-white shadow-xs">
@@ -293,11 +289,14 @@ export function PlanHubPage() {
               </div>
             )}
 
-            <div className={cn("flex flex-col justify-between", nextUpcomingPlan.heroImage ? "md:col-span-8" : "md:col-span-12")}>
+            <div
+              className={cn(
+                "flex flex-col justify-between",
+                nextUpcomingPlan.heroImage ? "md:col-span-8" : "md:col-span-12",
+              )}
+            >
               <div>
-                <h2 className="font-display text-xl font-bold text-ink md:text-2xl">
-                  {nextUpcomingPlan.title}
-                </h2>
+                <h2 className="font-display text-xl font-bold text-ink md:text-2xl">{nextUpcomingPlan.title}</h2>
 
                 <div className="mt-2.5 flex flex-wrap items-center gap-y-2 gap-x-4 text-xs font-medium text-mute md:text-sm">
                   <span className="inline-flex items-center gap-1.5">
@@ -319,9 +318,7 @@ export function PlanHubPage() {
                 </div>
 
                 {nextUpcomingPlan.notes && (
-                  <p className="mt-2 line-clamp-2 text-xs text-mute/90 md:text-sm">
-                    {nextUpcomingPlan.notes}
-                  </p>
+                  <p className="mt-2 line-clamp-2 text-xs text-mute/90 md:text-sm">{nextUpcomingPlan.notes}</p>
                 )}
 
                 {nextUpcomingPlan.attendees && nextUpcomingPlan.attendees.length > 0 && (
@@ -373,9 +370,7 @@ export function PlanHubPage() {
       {/* Quick Starter Templates */}
       <div className="mt-8">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-mute">
-            Quick Starters
-          </h2>
+          <h2 className="text-xs font-bold uppercase tracking-wider text-mute">Quick Starters</h2>
           <span className="text-xs text-mute">1-tap to start</span>
         </div>
 
@@ -388,23 +383,14 @@ export function PlanHubPage() {
               className="group flex w-44 shrink-0 flex-col justify-between rounded-2xl bg-card p-3.5 text-left ring-1 ring-line transition-shadow duration-200 hover:ring-brand/30 hover:shadow-sm active:scale-95 sm:w-auto"
             >
               <div className="flex items-center justify-between">
-                <span
-                  className={cn(
-                    "flex h-10 w-10 items-center justify-center rounded-xl",
-                    starter.color,
-                  )}
-                >
+                <span className={cn("flex h-10 w-10 items-center justify-center rounded-xl", starter.color)}>
                   <starter.icon size={19} />
                 </span>
                 <ArrowRight size={15} className="text-mute opacity-0 transition-opacity group-hover:opacity-100" />
               </div>
               <div className="mt-3">
-                <span className="block truncate text-sm font-bold text-ink">
-                  {starter.label}
-                </span>
-                <span className="block truncate text-[11px] text-mute">
-                  {starter.desc}
-                </span>
+                <span className="block truncate text-sm font-bold text-ink">{starter.label}</span>
+                <span className="block truncate text-[11px] text-mute">{starter.desc}</span>
               </div>
             </button>
           ))}
@@ -421,10 +407,10 @@ export function PlanHubPage() {
                 t.id === "my"
                   ? activeMyPlans.length
                   : t.id === "public"
-                  ? activePublicPlans.length
-                  : t.id === "past"
-                  ? pastPlans.length
-                  : savedDetailed.length;
+                    ? activePublicPlans.length
+                    : t.id === "past"
+                      ? pastPlans.length
+                      : savedDetailed.length;
 
               return (
                 <button
@@ -537,9 +523,7 @@ export function PlanHubPage() {
                       <Calendar size={18} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-bold text-ink">
-                        {event?.title || name}
-                      </span>
+                      <span className="block truncate text-sm font-bold text-ink">{event?.title || name}</span>
                       <span className="mt-0.5 block truncate text-xs text-mute">
                         {event ? `${event.timeLabel}${event.venue ? ` · ${event.venue}` : ""}` : "Saved event"}
                       </span>
@@ -561,19 +545,19 @@ export function PlanHubPage() {
               {searchQuery
                 ? `No plans matched "${searchQuery}"`
                 : tab === "my"
-                ? "No upcoming plans scheduled"
-                : tab === "public"
-                ? "No public plans nearby"
-                : "No past plans recorded"}
+                  ? "No upcoming plans scheduled"
+                  : tab === "public"
+                    ? "No public plans nearby"
+                    : "No past plans recorded"}
             </h2>
             <p className="mt-1.5 text-sm text-mute max-w-sm mx-auto">
               {searchQuery
                 ? "Try searching for a different destination, activity, or keyword."
                 : tab === "my"
-                ? "Create a hangout, invite friends with a shareable link, and experience it together."
-                : tab === "public"
-                ? "Be the first to host a public plan or experience in your city."
-                : "Your completed hangouts and experiences will appear here as memories."}
+                  ? "Create a hangout, invite friends with a shareable link, and experience it together."
+                  : tab === "public"
+                    ? "Be the first to host a public plan or experience in your city."
+                    : "Your completed hangouts and experiences will appear here as memories."}
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               {searchQuery ? (
@@ -609,4 +593,3 @@ export function PlanHubPage() {
     </div>
   );
 }
-

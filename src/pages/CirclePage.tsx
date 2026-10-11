@@ -1,14 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
-import {
-  CheckCircle2,
-  ChevronDown,
-  ChevronUp,
-  MapPin,
-  Plus,
-  UserPlus,
-  Users,
-} from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronUp, MapPin, Plus, UserPlus, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useBio } from "@/contexts/BioContext";
 import { useSocial } from "@/contexts/SocialContext";
@@ -59,9 +51,7 @@ export function CirclePage() {
 
   const handleShareCircleInvite = () => {
     void triggerHaptic("medium");
-    const url = mine?.handle
-      ? `${window.location.origin}/@${mine.handle}`
-      : `${window.location.origin}/start`;
+    const url = mine?.handle ? `${window.location.origin}/@${mine.handle}` : `${window.location.origin}/start`;
     void navigator.clipboard.writeText(url);
     toast.success("Circle invite link copied to clipboard!");
   };
@@ -75,9 +65,7 @@ export function CirclePage() {
             <Users size={13} />
             <span>Networking Circle</span>
           </div>
-          <h1 className="font-display mt-2 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
-            My Circle
-          </h1>
+          <h1 className="font-display mt-2 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">My Circle</h1>
           <p className="mt-1 text-sm text-mute">
             Your trusted real-world network — friends, cohort neighbors, and people you&apos;ve completed plans with.
           </p>
@@ -111,7 +99,9 @@ export function CirclePage() {
           </div>
           <div className="text-right">
             <span className="text-xs font-bold text-accent">{quest.points} pts</span>
-            <p className="text-[11px] text-mute">{quest.completed} of {quest.total} quests done</p>
+            <p className="text-[11px] text-mute">
+              {quest.completed} of {quest.total} quests done
+            </p>
           </div>
         </div>
 
@@ -135,7 +125,9 @@ export function CirclePage() {
             {showQuests ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
           </button>
           <span className="text-[11px] font-medium text-mute">
-            {quest.completed === quest.total ? "All completed! 🎉" : `${quest.total - quest.completed} quests remaining`}
+            {quest.completed === quest.total
+              ? "All completed! 🎉"
+              : `${quest.total - quest.completed} quests remaining`}
           </span>
         </div>
 
@@ -223,9 +215,7 @@ export function CirclePage() {
       {/* Circle Members List */}
       <section className="mt-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display text-lg font-bold text-ink">
-            Circle Network ({circleMembers.length})
-          </h2>
+          <h2 className="font-display text-lg font-bold text-ink">Circle Network ({circleMembers.length})</h2>
           <Link
             href="/plan/new"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:underline"
@@ -240,11 +230,10 @@ export function CirclePage() {
             <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand/10 text-accent">
               <Users size={24} />
             </div>
-            <h3 className="font-display mt-3 text-base font-bold text-ink">
-              Your circle starts here
-            </h3>
+            <h3 className="font-display mt-3 text-base font-bold text-ink">Your circle starts here</h3>
             <p className="mt-1 text-xs text-mute max-w-sm mx-auto">
-              Add mates by sharing your plan links, meeting up at events, or connecting with people from your building cohort.
+              Add mates by sharing your plan links, meeting up at events, or connecting with people from your building
+              cohort.
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2.5">
               <Button
@@ -275,10 +264,7 @@ export function CirclePage() {
                     @{handle.charAt(0).toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <Link
-                      href={`/@${handle}`}
-                      className="font-bold text-sm text-ink hover:underline truncate block"
-                    >
+                    <Link href={`/@${handle}`} className="font-bold text-sm text-ink hover:underline truncate block">
                       @{handle}
                     </Link>
                     <p className="text-[11px] text-mute">In your trusted circle</p>
@@ -303,7 +289,9 @@ export function CirclePage() {
       <div className="mt-8 rounded-3xl bg-card p-6 ring-1 ring-line shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h3 className="font-display text-base font-bold text-ink">Need a quick plan with friends?</h3>
-          <p className="text-xs text-mute mt-0.5">Assemble a plan in 60s and send a one-tap RSVP link to your circle.</p>
+          <p className="text-xs text-mute mt-0.5">
+            Assemble a plan in 60s and send a one-tap RSVP link to your circle.
+          </p>
         </div>
         <Button
           variant="primary"

@@ -22,15 +22,7 @@ export type PickedPlace = {
   placeId?: string;
 };
 
-export function PlaceAddressLink({
-  label,
-  geo,
-  className,
-}: {
-  label: string;
-  geo?: Geo;
-  className?: string;
-}) {
+export function PlaceAddressLink({ label, geo, className }: { label: string; geo?: Geo; className?: string }) {
   if (!label.trim()) return null;
   const href = geo ? mapsPlaceUrl(geo, label) : mapsSearchUrl(label);
   return (
@@ -243,9 +235,7 @@ export function PlaceAddressField({
         )}
       </div>
       {error && <span className="mt-1 block text-[12px] text-mute">{error}</span>}
-      {pickedId && !error && (
-        <span className="mt-1 block text-[12px] text-mute">Address from Google Maps</span>
-      )}
+      {pickedId && !error && <span className="mt-1 block text-[12px] text-mute">Address from Google Maps</span>}
     </label>
   );
 }

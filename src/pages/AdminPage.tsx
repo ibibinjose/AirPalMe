@@ -444,8 +444,8 @@ export function AdminPage() {
               ))}
             </div>
             <p className="mt-3 text-[11px] text-mute">
-              Demo excluded: {wqga.localDemoExcluded} · Duplicates excluded: {wqga.duplicatesExcluded} ·
-              Unique sessions: {wqga.uniqueSessions}
+              Demo excluded: {wqga.localDemoExcluded} · Duplicates excluded: {wqga.duplicatesExcluded} · Unique
+              sessions: {wqga.uniqueSessions}
             </p>
           </section>
 

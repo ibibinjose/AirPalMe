@@ -33,14 +33,7 @@ export const BIRTHDAY_MONTHS: Array<{ value: number; label: string; short: strin
   { value: 12, label: "December", short: "Dec" },
 ];
 
-const BIRTHDAY_OFFER_CATEGORIES = [
-  "food",
-  "beauty",
-  "retail",
-  "stay",
-  "activity",
-  "other",
-] as const;
+const BIRTHDAY_OFFER_CATEGORIES = ["food", "beauty", "retail", "stay", "activity", "other"] as const;
 type BirthdayOfferCategory = (typeof BIRTHDAY_OFFER_CATEGORIES)[number];
 
 const BIRTHDAY_OFFER_STATUSES = ["draft", "live", "archived"] as const;
@@ -108,7 +101,9 @@ export function offerVisibleFor(
 ): boolean {
   if (offer.status !== "live") return false;
   if (!Number.isInteger(month) || month < 1 || month > 12) return false;
-  const regionNorm = String(region || "").trim().toLowerCase();
+  const regionNorm = String(region || "")
+    .trim()
+    .toLowerCase();
   if (!regionNorm || !offer.regions.map((r) => r.toLowerCase()).includes(regionNorm)) return false;
   if (!offer.birthdayMonths.length) return true;
   return offer.birthdayMonths.includes(month);
@@ -132,9 +127,7 @@ export function validateBirthdayOfferDraft(input: Record<string, unknown>): stri
     if (!isBirthdayRegionCode(r)) errors.push(`Unknown region: ${r}.`);
   }
 
-  const months = Array.isArray(input.birthdayMonths)
-    ? input.birthdayMonths.map((m) => Number(m))
-    : [];
+  const months = Array.isArray(input.birthdayMonths) ? input.birthdayMonths.map((m) => Number(m)) : [];
   for (const m of months) {
     if (!Number.isInteger(m) || m < 1 || m > 12) {
       errors.push("Birthday months must be integers from 1 to 12.");
@@ -154,7 +147,6 @@ export function validateBirthdayOfferDraft(input: Record<string, unknown>): stri
 
   return Array.from(new Set(errors));
 }
-
 
 export type CreateBirthdayOfferRequest = {
   brand: string;
@@ -310,7 +302,10 @@ export function birthdayAlertsHref(region?: string | null): string {
   return `/birthday-freebies/${isBirthdayRegionCode(code) ? code : "au"}`;
 }
 
-export function buildBirthdayMonthAlert(kind: BirthdayAlertKind, region?: string | null): {
+export function buildBirthdayMonthAlert(
+  kind: BirthdayAlertKind,
+  region?: string | null,
+): {
   title: string;
   body: string;
   href: string;

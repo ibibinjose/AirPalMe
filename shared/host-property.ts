@@ -2,14 +2,7 @@ import type { PropertyInfo, PropertyMemberRole } from "./airpal-data";
 import { generatePropertyId, slugifyCity, slugifyHandle } from "./airpal-urls";
 
 /** D3 — commercial stay kinds only. No residential/STRA kinds until legal compliance lands. */
-export type HostPropertyKind =
-  | "hotel"
-  | "motel"
-  | "serviced-apartment"
-  | "hostel"
-  | "boutique"
-  | "campus"
-  | "venue";
+export type HostPropertyKind = "hotel" | "motel" | "serviced-apartment" | "hostel" | "boutique" | "campus" | "venue";
 
 export function parseHostPropertyKind(value?: string | null): HostPropertyKind {
   if (

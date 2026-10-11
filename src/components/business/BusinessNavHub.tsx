@@ -68,7 +68,10 @@ export function BusinessNavHub({
           <Link href="/helpdesk" className="inline-flex items-center gap-1 text-accent hover:underline">
             <span>🎧</span> Help Desk & Operations <ChevronRight size={12} />
           </Link>
-          <Link href="/business/promotions" className="inline-flex items-center gap-1 text-ink/75 hover:text-accent hover:underline">
+          <Link
+            href="/business/promotions"
+            className="inline-flex items-center gap-1 text-ink/75 hover:text-accent hover:underline"
+          >
             <Gift size={13} /> Promotions
           </Link>
         </div>

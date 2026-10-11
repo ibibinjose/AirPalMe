@@ -607,7 +607,8 @@ export function StartPage() {
             Find a place. Make&nbsp;a&nbsp;plan. Meet&nbsp;your&nbsp;people.
           </h1>
           <p className="mx-auto mt-2 max-w-sm text-sm text-mute">
-            Find places and experiences, make plans with family and friends, and use AirPal Pass & Guide — in one account.
+            Find places and experiences, make plans with family and friends, and use AirPal Pass & Guide — in one
+            account.
           </p>
           <div className="mt-4 grid grid-cols-3 gap-2 text-left">
             {[
@@ -1373,7 +1374,9 @@ export function StartPage() {
                 <ShieldCheck size={14} className="text-emerald-500 shrink-0" />
                 <span className="font-semibold text-ink">AirPal Trust &amp; Safety Certified</span>
               </div>
-              <span className="text-[10.5px]">256-bit Encrypted · Australian Privacy Act Compliant · Human Moderated</span>
+              <span className="text-[10.5px]">
+                256-bit Encrypted · Australian Privacy Act Compliant · Human Moderated
+              </span>
             </div>
           </div>
         )}

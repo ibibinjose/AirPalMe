@@ -1,17 +1,7 @@
 import { useEffect, useRef } from "react";
 
 /** Solid celebration colours — paper, never washed out. */
-const COLORS = [
-  "#1805db",
-  "#f43f5e",
-  "#ffc2d1",
-  "#e63946",
-  "#e76f51",
-  "#ffb703",
-  "#a3e635",
-  "#22c55e",
-  "#f5f0e6",
-];
+const COLORS = ["#1805db", "#f43f5e", "#ffc2d1", "#e63946", "#e76f51", "#ffb703", "#a3e635", "#22c55e", "#f5f0e6"];
 
 interface Piece {
   x: number;
@@ -121,11 +111,5 @@ export function ConfettiBurst({ fireKey }: { fireKey: number }) {
     return () => cancelAnimationFrame(raf);
   }, [fireKey]);
 
-  return (
-    <canvas
-      ref={ref}
-      aria-hidden
-      className="pointer-events-none fixed inset-0 z-[100] h-full w-full"
-    />
-  );
+  return <canvas ref={ref} aria-hidden className="pointer-events-none fixed inset-0 z-[100] h-full w-full" />;
 }

@@ -55,7 +55,11 @@ export function buildBioUrl(handle: string): string {
 }
 
 export function buildStayUrl(propertyId: string, roomToken?: string): string {
-  return toPublicUrl(roomToken ? `/g/${encodeURIComponent(propertyId)}?r=${encodeURIComponent(roomToken)}` : `/g/${encodeURIComponent(propertyId)}`);
+  return toPublicUrl(
+    roomToken
+      ? `/g/${encodeURIComponent(propertyId)}?r=${encodeURIComponent(roomToken)}`
+      : `/g/${encodeURIComponent(propertyId)}`,
+  );
 }
 
 export function buildWaveUrl(code: string): string {
@@ -67,6 +71,9 @@ export function buildMarkerUrl(markerId: string): string {
 }
 
 export function buildPromoUrl(id: string, refUid?: string): string {
-  return toPublicUrl(refUid ? `/promotions/${encodeURIComponent(id)}?ref=${encodeURIComponent(refUid)}` : `/promotions/${encodeURIComponent(id)}`);
+  return toPublicUrl(
+    refUid
+      ? `/promotions/${encodeURIComponent(id)}?ref=${encodeURIComponent(refUid)}`
+      : `/promotions/${encodeURIComponent(id)}`,
+  );
 }
-

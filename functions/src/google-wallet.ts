@@ -90,9 +90,7 @@ export interface TicketObjectInput {
 }
 
 export function ticketSavePayload(input: TicketObjectInput): Record<string, unknown> {
-  const classSuffix = input.eventId
-    ? sanitizeObjectId(input.eventId)
-    : `event_${sanitizeObjectId(input.bookingId)}`;
+  const classSuffix = input.eventId ? sanitizeObjectId(input.eventId) : `event_${sanitizeObjectId(input.bookingId)}`;
   const classId = `${input.issuerId}.${classSuffix}`;
   const time = parseTime(input.time);
   return {

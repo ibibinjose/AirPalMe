@@ -39,9 +39,7 @@ describe("city-region helper", () => {
         { longText: "New South Wales", types: ["administrative_area_level_1"] },
         { longText: "Australia", types: ["country"] },
       ];
-      expect(formatCitySuburbRegion("Bondi Beach", "NSW, Australia", components)).toBe(
-        "Bondi Beach, NSW",
-      );
+      expect(formatCitySuburbRegion("Bondi Beach", "NSW, Australia", components)).toBe("Bondi Beach, NSW");
     });
   });
 

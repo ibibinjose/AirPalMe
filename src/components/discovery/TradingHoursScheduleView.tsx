@@ -76,11 +76,7 @@ export function TradingHoursScheduleView({
           <span
             className={cn(
               "h-2 w-2 rounded-full",
-              openStatus === true
-                ? "bg-emerald-500 animate-pulse"
-                : openStatus === false
-                  ? "bg-rose-500"
-                  : "bg-gold",
+              openStatus === true ? "bg-emerald-500 animate-pulse" : openStatus === false ? "bg-rose-500" : "bg-gold",
             )}
           />
           <span>{hours}</span>
@@ -136,16 +132,10 @@ export function TradingHoursScheduleView({
                 <div className="flex items-center gap-1.5">
                   <span>{item.dayName}</span>
                   {item.isToday && (
-                    <span className="rounded-md bg-brand text-[10px] font-bold text-white px-1.5 py-0.2">
-                      Today
-                    </span>
+                    <span className="rounded-md bg-brand text-[10px] font-bold text-white px-1.5 py-0.2">Today</span>
                   )}
                 </div>
-                <span
-                  className={cn(
-                    item.status === "closed" ? "text-mute font-normal" : "font-semibold",
-                  )}
-                >
+                <span className={cn(item.status === "closed" ? "text-mute font-normal" : "font-semibold")}>
                   {item.hoursText}
                 </span>
               </div>
@@ -189,26 +179,16 @@ export function TradingHoursScheduleView({
                   key={item.dayKey}
                   className={cn(
                     "flex items-center justify-between p-3 text-xs transition",
-                    item.isToday
-                      ? "bg-brand/10 font-bold text-accent"
-                      : "hover:bg-surface/50 text-ink",
+                    item.isToday ? "bg-brand/10 font-bold text-accent" : "hover:bg-surface/50 text-ink",
                   )}
                 >
                   <div className="flex items-center gap-2">
                     <span className="font-semibold w-24">{item.dayName}</span>
                     {item.isToday && (
-                      <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white">
-                        Today
-                      </span>
+                      <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white">Today</span>
                     )}
                   </div>
-                  <span
-                    className={cn(
-                      item.status === "closed"
-                        ? "text-mute font-normal"
-                        : "font-semibold text-right",
-                    )}
-                  >
+                  <span className={cn(item.status === "closed" ? "text-mute font-normal" : "font-semibold text-right")}>
                     {item.hoursText}
                   </span>
                 </div>

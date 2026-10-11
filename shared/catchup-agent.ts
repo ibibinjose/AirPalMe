@@ -112,7 +112,9 @@ export function proposeCatchUpSlots(input: {
 
   const [lead, ...rest] = chosen;
   if (!lead) return [];
-  const requestedFirst = Boolean(input.requestedDate && input.requestedTime && lead.id === catchUpSlotId(input.requestedDate, input.requestedTime));
+  const requestedFirst = Boolean(
+    input.requestedDate && input.requestedTime && lead.id === catchUpSlotId(input.requestedDate, input.requestedTime),
+  );
   const ordered = requestedFirst
     ? [lead, ...rest.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time))]
     : [...chosen].sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
@@ -154,7 +156,9 @@ export function catchUpNotice(input: {
   return {
     kind: "catchup_proposed",
     title: `${input.who} wants a ${input.typeLabel}`,
-    body: input.slot ? `Suggested ${input.slot.label}. Open the thread to lock it in.` : "Open the thread to pick a time.",
+    body: input.slot
+      ? `Suggested ${input.slot.label}. Open the thread to lock it in.`
+      : "Open the thread to pick a time.",
     href,
   };
 }

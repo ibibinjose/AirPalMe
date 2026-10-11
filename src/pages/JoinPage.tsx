@@ -52,7 +52,8 @@ export function JoinPage() {
           I Just Got Here
         </h1>
         <p className="mt-2 text-base text-mute">
-          Enter your building or college code to connect with your verified cohort, join hosted events, and make plans in under a minute.
+          Enter your building or college code to connect with your verified cohort, join hosted events, and make plans
+          in under a minute.
         </p>
       </header>
 
@@ -125,19 +126,13 @@ export function JoinPage() {
               placeholder="e.g. SCAPE26, STPAULS"
               className="h-12 flex-1 rounded-2xl bg-paper px-4 text-sm font-semibold uppercase tracking-wider text-ink ring-1 ring-line/80 focus:outline-none focus:ring-2 focus:ring-brand"
             />
-            <Button
-              type="submit"
-              className="h-12 min-w-[120px]"
-              variant="primary"
-            >
+            <Button type="submit" className="h-12 min-w-[120px]" variant="primary">
               Join Cohort
             </Button>
           </form>
 
           {errorMessage && (
-            <p className="mt-3 text-xs font-semibold text-rose-600 dark:text-rose-400">
-              {errorMessage}
-            </p>
+            <p className="mt-3 text-xs font-semibold text-rose-600 dark:text-rose-400">{errorMessage}</p>
           )}
 
           {joinedSuccess && (
@@ -163,7 +158,9 @@ export function JoinPage() {
                   <span className="text-2xl shrink-0">{inst.badgeEmoji}</span>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-bold text-ink truncate">{inst.name}</p>
-                    <p className="text-[11px] text-mute">{inst.code} · {inst.city}</p>
+                    <p className="text-[11px] text-mute">
+                      {inst.code} · {inst.city}
+                    </p>
                   </div>
                   <ArrowRight size={14} className="text-mute shrink-0" />
                 </button>

@@ -115,7 +115,9 @@ function nearestScrollParent(el: HTMLElement): HTMLElement | "window" {
   }
   const root = document.getElementById?.("root") as HTMLElement | null;
   if (root && root.contains(el)) {
-    const oy = root.style.overflowY || (typeof window.getComputedStyle === "function" ? window.getComputedStyle(root).overflowY : "");
+    const oy =
+      root.style.overflowY ||
+      (typeof window.getComputedStyle === "function" ? window.getComputedStyle(root).overflowY : "");
     if (oy === "auto" || oy === "scroll") return root;
   }
   return "window";

@@ -62,7 +62,9 @@ export function StallHandleField({ value, onChange, onAutofillName }: Props) {
       </div>
       {busy && <p className="mt-1 text-[12px] text-mute">Looking up profile…</p>}
       {miss && value.trim() && (
-        <p className="mt-1 text-[12px] text-mute">No AirPal profile for @{normalizeSpeakerHandle(value)} — the stall still saves with this handle.</p>
+        <p className="mt-1 text-[12px] text-mute">
+          No AirPal profile for @{normalizeSpeakerHandle(value)} — the stall still saves with this handle.
+        </p>
       )}
       {preview && (
         <button
@@ -74,9 +76,16 @@ export function StallHandleField({ value, onChange, onAutofillName }: Props) {
           title="Fill stall name from this profile"
         >
           {preview.photoUrl ? (
-            <Photo src={preview.photoUrl} alt={preview.name} className="h-8 w-8 rounded-full object-cover ring-1 ring-line" />
+            <Photo
+              src={preview.photoUrl}
+              alt={preview.name}
+              className="h-8 w-8 rounded-full object-cover ring-1 ring-line"
+            />
           ) : (
-            <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-accent">
+            <span
+              aria-hidden
+              className="grid h-8 w-8 place-items-center rounded-full bg-brand/10 text-[13px] font-bold text-accent"
+            >
               {preview.name.trim().charAt(0).toUpperCase()}
             </span>
           )}

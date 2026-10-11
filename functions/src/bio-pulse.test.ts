@@ -82,9 +82,7 @@ vi.mock("./admin", () => ({
               get: async () => {
                 expect(field).toBe("active");
                 expect(op).toBe("==");
-                const docs = fakes.deployments
-                  .filter((d) => d.active === value)
-                  .map((data) => ({ data: () => data }));
+                const docs = fakes.deployments.filter((d) => d.active === value).map((data) => ({ data: () => data }));
                 return { empty: docs.length === 0, docs };
               },
             }),

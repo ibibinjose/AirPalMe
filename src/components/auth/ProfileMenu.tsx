@@ -30,12 +30,7 @@ import { createSubmitGuard } from "@/lib/submit-guard";
 import { useEvents } from "@/contexts/EventsContext";
 import { AvatarFace } from "@/components/auth/MeAvatar";
 import { LanguageSwitch } from "@/components/layout/LanguageSwitch";
-import {
-  AVAILABILITY_STATUSES,
-  bioKindLabel,
-  resolveStatusPicks,
-  type AvailabilityStatus,
-} from "@shared/bio";
+import { AVAILABILITY_STATUSES, bioKindLabel, resolveStatusPicks, type AvailabilityStatus } from "@shared/bio";
 import { toast } from "sonner";
 import { NAMES } from "@shared/names";
 import { partnerAccountPath } from "@/lib/partner-account";
@@ -155,10 +150,7 @@ export function ProfileMenu() {
   useEffect(() => {
     if (!open) return;
     function onDoc(e: MouseEvent | PointerEvent) {
-      if (
-        !box.current?.contains(e.target as Node) &&
-        !drawerRef.current?.contains(e.target as Node)
-      ) {
+      if (!box.current?.contains(e.target as Node) && !drawerRef.current?.contains(e.target as Node)) {
         setOpen(false);
       }
     }
@@ -262,14 +254,15 @@ export function ProfileMenu() {
           aria-label={mine ? `View @${mine.handle} profile` : "View your profile"}
         >
           <div className="relative shrink-0">
-            <AvatarFace
-              className="h-12 w-12 text-base transition-transform group-hover/card:scale-105"
-              showRing
-            />
+            <AvatarFace className="h-12 w-12 text-base transition-transform group-hover/card:scale-105" showRing />
             <span
               className={cn(
                 "absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full ring-2 ring-card shadow-xs",
-                currentStatusKey === "available" ? "bg-emerald-500" : currentStatusKey === "busy" ? "bg-amber-500" : "bg-zinc-400",
+                currentStatusKey === "available"
+                  ? "bg-emerald-500"
+                  : currentStatusKey === "busy"
+                    ? "bg-amber-500"
+                    : "bg-zinc-400",
               )}
               title={statusInfo.label}
             >
@@ -354,7 +347,10 @@ export function ProfileMenu() {
 
         {/* Inline Status Editor */}
         {statusEditing && mine && (
-          <div className="mt-2.5 rounded-2xl bg-card p-3 ring-1 ring-line/80 shadow-xs animate-in fade-in zoom-in-95 duration-150" onKeyDown={(e) => e.stopPropagation()}>
+          <div
+            className="mt-2.5 rounded-2xl bg-card p-3 ring-1 ring-line/80 shadow-xs animate-in fade-in zoom-in-95 duration-150"
+            onKeyDown={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-accent">Set Status</span>
               <button
@@ -379,7 +375,9 @@ export function ProfileMenu() {
                     onClick={() => setEditStatus(key)}
                     className={cn(
                       "flex min-h-[44px] items-center gap-2 rounded-xl px-2 text-left ring-1 transition active:scale-[0.98]",
-                      selected ? "bg-paper font-bold ring-brand text-accent shadow-2xs" : "bg-card ring-line/70 text-ink/80 hover:bg-paper/50",
+                      selected
+                        ? "bg-paper font-bold ring-brand text-accent shadow-2xs"
+                        : "bg-card ring-line/70 text-ink/80 hover:bg-paper/50",
                     )}
                   >
                     <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", info.dotColor)} />
@@ -464,13 +462,13 @@ export function ProfileMenu() {
           highlight
           onClick={() => go("/me")}
         />
+        <Row icon={Compass} label="What now?" hint="One suggestion, then a plan" onClick={() => go("/now")} />
         <Row
-          icon={Compass}
-          label="What now?"
-          hint="One suggestion, then a plan"
-          onClick={() => go("/now")}
+          icon={CalendarDays}
+          label="Plans & Invites"
+          hint="Group plans, RSVPs & meetups"
+          onClick={() => go("/plan")}
         />
-        <Row icon={CalendarDays} label="Plans & Invites" hint="Group plans, RSVPs & meetups" onClick={() => go("/plan")} />
         {mine ? (
           <Row
             icon={Sparkles}
@@ -518,7 +516,12 @@ export function ProfileMenu() {
         />
 
         {isHost ? (
-          <Row icon={Building2} label="Host Workspace" hint="Hotel, venue, campus concierge" onClick={() => go("/host")} />
+          <Row
+            icon={Building2}
+            label="Host Workspace"
+            hint="Hotel, venue, campus concierge"
+            onClick={() => go("/host")}
+          />
         ) : (
           <Row icon={Building2} label="Stay Host" hint="Hotel, hostel, or room concierge" onClick={() => go("/join")} />
         )}
@@ -563,7 +566,9 @@ export function ProfileMenu() {
       <div className="space-y-0.5">
         <Row icon={Settings} label="Settings" hint="Account, notifications & privacy" onClick={() => go("/settings")} />
         <Row icon={Info} label="About AirPal" hint="Life Made Easy" onClick={() => go("/about")} />
-        {isAdmin && <Row icon={ShieldCheck} label="Admin Portal" hint="Platform controls" onClick={() => go("/admin")} />}
+        {isAdmin && (
+          <Row icon={ShieldCheck} label="Admin Portal" hint="Platform controls" onClick={() => go("/admin")} />
+        )}
         <Row
           icon={LogOut}
           label="Sign out"
@@ -611,13 +616,7 @@ export function ProfileMenu() {
       <div className="my-1.5 h-px bg-line/80" />
       <p className="px-3 pt-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-accent">AirPal Me</p>
       <div className="mt-1 space-y-0.5">
-        <Row
-          icon={Compass}
-          label="What now?"
-          hint="One suggestion, then a plan"
-          highlight
-          onClick={() => go("/now")}
-        />
+        <Row icon={Compass} label="What now?" hint="One suggestion, then a plan" highlight onClick={() => go("/now")} />
         <Row
           icon={Sparkles}
           label="Claim @handle"
@@ -688,7 +687,11 @@ export function ProfileMenu() {
           <span
             className={cn(
               "absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full ring-2 ring-card shadow-2xs",
-              currentStatusKey === "available" ? "bg-emerald-500" : currentStatusKey === "busy" ? "bg-amber-500" : "bg-zinc-400",
+              currentStatusKey === "available"
+                ? "bg-emerald-500"
+                : currentStatusKey === "busy"
+                  ? "bg-amber-500"
+                  : "bg-zinc-400",
             )}
           />
         )}

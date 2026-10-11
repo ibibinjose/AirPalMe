@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  catchUpNotice,
-  catchUpThreadText,
-  proposeCatchUpSlots,
-} from "./catchup-agent";
+import { catchUpNotice, catchUpThreadText, proposeCatchUpSlots } from "./catchup-agent";
 
 describe("catch-up scheduler", () => {
   const now = new Date("2026-10-03T00:00:00Z");

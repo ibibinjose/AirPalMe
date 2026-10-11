@@ -8,6 +8,7 @@ description: Evaluates product features, architecture, UI, and code changes agai
 This skill enforces product integrity defined in **`docs/AIRPAL.md`** (the binding source of truth) and **`AGENTS.md`**.
 
 ## Core Operating Principle
+
 > **"Don't optimize for users. Optimize for completed experiences."**
 > **Company Loop: Want → Discover → Connect → Plan → Go → Experience → Remember → Repeat**
 > **North Star Metric:** Completed AirPal Experiences per active user.
@@ -19,20 +20,23 @@ This skill enforces product integrity defined in **`docs/AIRPAL.md`** (the bindi
 **AIRPAL** is the master brand ("Life Made Easy") with two distinct UX lenses powered by a unified account and database engine:
 
 1. **AirPal.Me (Personal Life & Identity):**
-   * *Core Job:* "Plan your day. Organise your life. Share who you are."
-   * *Surfaces:* Profile/bio (`/@handle`), daily planner (`/now`), outfit advice, personal calendar (`/calendar`), friends' hangout threads (`/plan`).
+   - _Core Job:_ "Plan your day. Organise your life. Share who you are."
+   - _Surfaces:_ Profile/bio (`/@handle`), daily planner (`/now`), outfit advice, personal calendar (`/calendar`), friends' hangout threads (`/plan`).
 2. **AirPal Pass (Events, Deals & Experiences):**
-   * *Core Job:* "Discover what's happening. Get access. Save money."
-   * *Surfaces:* What's on (`/pass`, `/events`), scannable digital passbook (`/me/tickets`), member dining perks (`/deals`), door scanner (`/scan`), organiser tools (`/event`).
+   - _Core Job:_ "Discover what's happening. Get access. Save money."
+   - _Surfaces:_ What's on (`/pass`, `/events`), scannable digital passbook (`/me/tickets`), member dining perks (`/deals`), door scanner (`/scan`), organiser tools (`/event`).
 
 **Invariants:**
-* **One Universal Identity:** Under no circumstances create separate user accounts, login databases, or siloed user systems between AirPal.Me and AirPal Pass.
-* **Deterministic Intelligence:** Real weather, pure deterministic outfit advice (`src/lib/outfit.ts`), honest open-now hours, and live Firestore events. No hallucinated data or fake providers.
+
+- **One Universal Identity:** Under no circumstances create separate user accounts, login databases, or siloed user systems between AirPal.Me and AirPal Pass.
+- **Deterministic Intelligence:** Real weather, pure deterministic outfit advice (`src/lib/outfit.ts`), honest open-now hours, and live Firestore events. No hallucinated data or fake providers.
 
 ---
 
 ## Conflict Hierarchy
+
 When documents or requirements conflict, resolve in this strict order:
+
 1. **Safety, Security, Privacy, and Payment Integrity** (`docs/AIRPAL.md` Part C)
 2. **Binding Rebuild Truth** (`docs/AIRPAL.md` Parts A–G)
 3. **Shipped Chrome, Auth, and Design System** (`docs/AIRPAL.md` Part E)
@@ -41,6 +45,7 @@ When documents or requirements conflict, resolve in this strict order:
 ---
 
 ## Feature Evaluation Framework
+
 Before creating any new screen, route, Firestore collection, integration, or feature, evaluate against the 6 gates:
 
 1. **Discovery:** Does it help someone discover what to do in their city?
@@ -50,12 +55,14 @@ Before creating any new screen, route, Firestore collection, integration, or fea
 5. **Trust & Safety:** Does it increase trust, identity verification, or safety?
 6. **Business Value:** Does it create measurable value or facilitate legitimate marketplace transactions?
 
-*Decision Rule:* If the answer is NO to most of these questions, do NOT build it.
+_Decision Rule:_ If the answer is NO to most of these questions, do NOT build it.
 
 ---
 
 ## Anti-Pattern Checklist (What AirPal is NOT)
+
 Reject changes that turn AirPal into:
+
 - A generic social network or dating app
 - An uncurated events directory or news feed
 - A generic hotel/Airbnb clone without the experience connection layer

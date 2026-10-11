@@ -8,7 +8,7 @@ describe("PersonalProfileListingHint", () => {
     const html = renderToStaticMarkup(
       createElement(PersonalProfileListingHint, { hasBusiness: false, onOpenBusiness: vi.fn() }),
     );
-    expect(html).toContain("data-testid=\"personal-listing-hint\"");
+    expect(html).toContain('data-testid="personal-listing-hint"');
     expect(html).toContain("Import the listing on the business profile");
     expect(html).toContain("Register the business");
     expect(html).not.toContain("Import or sync the listing");

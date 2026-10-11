@@ -74,7 +74,8 @@ const VERTICALS = [
   {
     title: "What now?",
     badge: "Real-Time Discovery",
-    description: "60-second plan composer with live weather, deterministic outfit recommendations, and precinct highlights.",
+    description:
+      "60-second plan composer with live weather, deterministic outfit recommendations, and precinct highlights.",
     icon: Compass,
     color: "bg-blue-500/10 text-blue-600 border-blue-500/20",
   },
@@ -165,7 +166,8 @@ export function GetAirPalPage() {
         <h1 className="font-display mt-2 text-5xl font-bold tracking-tight text-ink md:text-6xl">Get AirPal</h1>
         <p className="mx-auto mt-4 max-w-lg text-balance text-base leading-relaxed text-mute md:text-lg">
           Your master companion for live events, social plans, resident arrival, and personal bio — connecting{" "}
-          <strong className="font-semibold text-ink">friends, family, colleagues, and mates</strong> across Sydney and beyond.
+          <strong className="font-semibold text-ink">friends, family, colleagues, and mates</strong> across Sydney and
+          beyond.
         </p>
 
         {/* Store badges up front */}
@@ -187,8 +189,8 @@ export function GetAirPalPage() {
             </div>
             <h2 className="mt-3 text-2xl font-bold tracking-tight text-ink">Use AirPal instantly</h2>
             <p className="mt-1.5 text-sm leading-relaxed text-mute">
-              Opens directly in your browser on iPhone, Android, or desktop — or install it to your home screen for the full
-              app experience.
+              Opens directly in your browser on iPhone, Android, or desktop — or install it to your home screen for the
+              full app experience.
             </p>
           </div>
 
@@ -362,7 +364,8 @@ export function GetAirPalPage() {
           Five pillars. One account.
         </h2>
         <p className="mx-auto mt-3 max-w-md text-[15px] text-mute">
-          Events & access, 60-second discovery, group plans, resident arrival, and personal digital bio — seamlessly unified.
+          Events & access, 60-second discovery, group plans, resident arrival, and personal digital bio — seamlessly
+          unified.
         </p>
 
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
@@ -395,7 +398,8 @@ export function GetAirPalPage() {
             </div>
             <h4 className="mt-3 font-bold text-ink text-base">Verified Identity & Attendance</h4>
             <p className="mt-1 text-xs text-mute leading-relaxed">
-              SMS phone OTP, email verification, and authenticated ticket passes guarantee trusted, authentic real-world connections.
+              SMS phone OTP, email verification, and authenticated ticket passes guarantee trusted, authentic real-world
+              connections.
             </p>
           </div>
 
@@ -405,7 +409,8 @@ export function GetAirPalPage() {
             </div>
             <h4 className="mt-3 font-bold text-ink text-base">Protected Stripe Payments</h4>
             <p className="mt-1 text-xs text-mute leading-relaxed">
-              Encrypted ticket checkout via Stripe, instant wallet passes, zero stored card numbers, and 24/7 moderation reporting.
+              Encrypted ticket checkout via Stripe, instant wallet passes, zero stored card numbers, and 24/7 moderation
+              reporting.
             </p>
           </div>
 

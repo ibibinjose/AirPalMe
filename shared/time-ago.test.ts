@@ -15,9 +15,7 @@ describe("inbox timestamps", () => {
   it("names days after that", () => {
     expect(relativeAgo(iso(NOW - 26 * 60 * 60_000), NOW)).toBe("Yesterday");
     const threeDays = NOW - 3 * 24 * 60 * 60_000;
-    expect(relativeAgo(iso(threeDays), NOW)).toBe(
-      new Date(threeDays).toLocaleDateString([], { weekday: "short" }),
-    );
+    expect(relativeAgo(iso(threeDays), NOW)).toBe(new Date(threeDays).toLocaleDateString([], { weekday: "short" }));
     const fortyDays = NOW - 40 * 24 * 60 * 60_000;
     expect(relativeAgo(iso(fortyDays), NOW)).toBe(
       new Date(fortyDays).toLocaleDateString([], { day: "numeric", month: "short" }),

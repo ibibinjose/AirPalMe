@@ -47,7 +47,8 @@ function stripUndefined(value) {
 function firestoreValue(value) {
   if (value === null) return { nullValue: null };
   if (typeof value === "boolean") return { booleanValue: value };
-  if (typeof value === "number") return Number.isInteger(value) ? { integerValue: String(value) } : { doubleValue: value };
+  if (typeof value === "number")
+    return Number.isInteger(value) ? { integerValue: String(value) } : { doubleValue: value };
   if (typeof value === "string") return { stringValue: value };
   if (Array.isArray(value)) return { arrayValue: { values: value.map(firestoreValue) } };
   if (value && typeof value === "object") {

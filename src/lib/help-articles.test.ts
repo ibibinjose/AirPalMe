@@ -2,17 +2,9 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-  HELP_ARTICLES,
-  HELP_CATEGORIES,
-  getHelpArticle,
-  helpArticleIdFromSearch,
-} from "./help-articles";
+import { HELP_ARTICLES, HELP_CATEGORIES, getHelpArticle, helpArticleIdFromSearch } from "./help-articles";
 
-const routesSource = readFileSync(
-  resolve(dirname(fileURLToPath(import.meta.url)), "../app/routes.tsx"),
-  "utf8",
-);
+const routesSource = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), "../app/routes.tsx"), "utf8");
 const registered = new Set([...routesSource.matchAll(/path="([^"]+)"/g)].map((m) => m[1]));
 
 describe("help articles catalog", () => {

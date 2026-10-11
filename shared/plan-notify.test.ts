@@ -197,16 +197,16 @@ describe("waitlist promotion", () => {
 
   it("drains the queue when there is no limit", () => {
     const plan = {
-      attendees: [
-        att("w1", "waitlisted", "2026-09-02T00:00:00Z"),
-        att("w2", "waitlisted", "2026-09-01T00:00:00Z"),
-      ],
+      attendees: [att("w1", "waitlisted", "2026-09-02T00:00:00Z"), att("w2", "waitlisted", "2026-09-01T00:00:00Z")],
     };
     expect(nextPromotions(plan)).toEqual(["w2", "w1"]);
   });
 
   it("promotes nothing when full", () => {
-    const plan = { capacity: 1, attendees: [att("g1", "going", "2026-09-01T00:00:00Z"), att("w1", "waitlisted", "2026-09-02T00:00:00Z")] };
+    const plan = {
+      capacity: 1,
+      attendees: [att("g1", "going", "2026-09-01T00:00:00Z"), att("w1", "waitlisted", "2026-09-02T00:00:00Z")],
+    };
     expect(nextPromotions(plan)).toEqual([]);
   });
 });

@@ -18,12 +18,7 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { triggerHaptic } from "@/lib/native";
-import {
-  messageValid,
-  type ChatMessage,
-  type MatchChatAction,
-  type MatchChatActionId,
-} from "@shared/messaging";
+import { messageValid, type ChatMessage, type MatchChatAction, type MatchChatActionId } from "@shared/messaging";
 import { SafetyMenu } from "@/components/safety/SafetyMenu";
 
 const PENDING_MESSAGE_KEY = "airpal:pending-message:v1";
@@ -92,11 +87,7 @@ export function ChatBox({
       ).catch(() => undefined);
     }
 
-    const q = query(
-      collection(db, "request_chats", requestId, "messages"),
-      orderBy("createdAt", "asc"),
-      limit(100),
-    );
+    const q = query(collection(db, "request_chats", requestId, "messages"), orderBy("createdAt", "asc"), limit(100));
 
     const unsub = onSnapshot(
       q,

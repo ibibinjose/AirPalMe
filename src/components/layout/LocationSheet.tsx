@@ -1,17 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
-import {
-  Navigation,
-  Building2,
-  Check,
-  Globe2,
-  X,
-  Sparkles,
-  MapPin,
-  Share2,
-  ShieldCheck,
-  Compass,
-} from "lucide-react";
+import { Navigation, Building2, Check, Globe2, X, Sparkles, MapPin, Share2, ShieldCheck, Compass } from "lucide-react";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { useLocalNow } from "@/hooks/useLocalNow";
 import { toast } from "sonner";

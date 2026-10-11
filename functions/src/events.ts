@@ -47,7 +47,9 @@ export const upsertEvent = onCall(CALLABLE, async (request) => {
   }
   // Festival attach: the slug must be real, and only the festival organiser
   // (or an admin) may pull an event into the program.
-  const festivalSlug = String(data.festivalSlug || "").trim().toLowerCase();
+  const festivalSlug = String(data.festivalSlug || "")
+    .trim()
+    .toLowerCase();
   let festivalTrack = "";
   let festivalRegistrationUrl = "";
   let festivalRegistrationNote = "";
@@ -64,9 +66,15 @@ export const upsertEvent = onCall(CALLABLE, async (request) => {
       isPlatformAdmin(request.auth?.token as AccessClaims | undefined),
     );
     if (refusal) throw new HttpsError("permission-denied", refusal);
-    festivalTrack = String(data.track || "").trim().slice(0, 60);
-    festivalRegistrationUrl = String(data.registrationUrl || "").trim().slice(0, 500);
-    festivalRegistrationNote = String(data.registrationNote || "").trim().slice(0, 120);
+    festivalTrack = String(data.track || "")
+      .trim()
+      .slice(0, 60);
+    festivalRegistrationUrl = String(data.registrationUrl || "")
+      .trim()
+      .slice(0, 500);
+    festivalRegistrationNote = String(data.registrationNote || "")
+      .trim()
+      .slice(0, 120);
     if (Array.isArray(data.speakers)) {
       const cleaned = data.speakers
         .filter((s) => s && typeof s.name === "string" && s.name.trim())
@@ -127,7 +135,8 @@ export const upsertEvent = onCall(CALLABLE, async (request) => {
     hostName: typeof data.hostName === "string" && data.hostName.trim() ? data.hostName.trim() : null,
     hostHandle: typeof data.hostHandle === "string" && data.hostHandle.trim() ? data.hostHandle.trim() : null,
     businessName: typeof data.businessName === "string" && data.businessName.trim() ? data.businessName.trim() : null,
-    businessHandle: typeof data.businessHandle === "string" && data.businessHandle.trim() ? data.businessHandle.trim() : null,
+    businessHandle:
+      typeof data.businessHandle === "string" && data.businessHandle.trim() ? data.businessHandle.trim() : null,
     collaboratorHandles: Array.isArray(data.collaboratorHandles) ? data.collaboratorHandles : null,
     ticketPriceCents: cleanTicketCents(data.ticketPriceCents) || null,
     capacity: cleanCapacity(data.capacity) || null,

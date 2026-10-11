@@ -141,7 +141,10 @@ export const createPromotion = onCall(CALLABLE, async (request) => {
   const targetId = String(data.targetId || "").trim();
   if (targetType || targetId) {
     if (!offerTargetValid(targetType, targetId)) {
-      throw new HttpsError("invalid-argument", "Offer target must be a stay, event, place, mate, experience, or fashion surface.");
+      throw new HttpsError(
+        "invalid-argument",
+        "Offer target must be a stay, event, place, mate, experience, or fashion surface.",
+      );
     }
     if ((targetType === "place" || targetType === "stay") && !(await ownsOfferVenue(uid, targetType, targetId))) {
       throw new HttpsError("permission-denied", "Offers for a place or stay must come from its owner.");
@@ -240,7 +243,10 @@ export const updatePromotion = onCall(CALLABLE, async (request) => {
     const nextType = String(patch.targetType ?? promo.targetType ?? "").trim();
     const nextId = String(patch.targetId ?? promo.targetId ?? "").trim();
     if ((nextType || nextId) && !offerTargetValid(nextType, nextId)) {
-      throw new HttpsError("invalid-argument", "Offer target must be a stay, event, place, mate, experience, or fashion surface.");
+      throw new HttpsError(
+        "invalid-argument",
+        "Offer target must be a stay, event, place, mate, experience, or fashion surface.",
+      );
     }
     if ((nextType === "place" || nextType === "stay") && !admin && !(await ownsOfferVenue(uid, nextType, nextId))) {
       throw new HttpsError("permission-denied", "Offers for a place or stay must come from its owner.");

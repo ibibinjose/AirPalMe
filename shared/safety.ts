@@ -64,9 +64,7 @@ export function isEmergencyReason(reason: string): boolean {
   return reason === "emergency";
 }
 
-export function sortSafetyCasesEmergenciesFirst<
-  T extends { reason: string; createdAt: string },
->(rows: T[]): T[] {
+export function sortSafetyCasesEmergenciesFirst<T extends { reason: string; createdAt: string }>(rows: T[]): T[] {
   return [...rows].sort((a, b) => {
     const aEmergency = isEmergencyReason(a.reason) ? 0 : 1;
     const bEmergency = isEmergencyReason(b.reason) ? 0 : 1;
@@ -84,10 +82,7 @@ export function slaDeadlineHours(reason: string): number {
 
 export type SlaState = "ok" | "due" | "overdue";
 
-export function slaState(
-  report: { reason: string; status: string; createdAt: string },
-  nowMs = Date.now(),
-): SlaState {
+export function slaState(report: { reason: string; status: string; createdAt: string }, nowMs = Date.now()): SlaState {
   if (report.status !== "new") return "ok";
   const created = new Date(report.createdAt).getTime();
   if (!Number.isFinite(created)) return "due";

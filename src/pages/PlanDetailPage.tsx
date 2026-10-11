@@ -153,11 +153,12 @@ export function PlanDetailPage() {
 
     const isInviteRoute = Boolean(paramsInvite?.code);
     const title = isInviteRoute ? `You're invited: ${plan.title}` : `${plan.title} · AirPal.Me`;
-    const canonicalPath = isInviteRoute && paramsInvite?.code
-      ? `/invite/${paramsInvite.code}`
-      : plan.inviteCode
-        ? `/invite/${plan.inviteCode}`
-        : `/plan/${plan.id}`;
+    const canonicalPath =
+      isInviteRoute && paramsInvite?.code
+        ? `/invite/${paramsInvite.code}`
+        : plan.inviteCode
+          ? `/invite/${plan.inviteCode}`
+          : `/plan/${plan.id}`;
 
     setShareMeta({
       title,
@@ -728,9 +729,7 @@ export function PlanDetailPage() {
               <span className="block text-sm font-bold text-ink">Need company? Invite friends</span>
               <span className="block truncate text-xs text-mute">Share the invite link with your people</span>
             </span>
-            <span className="shrink-0 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-bold text-accent">
-              Invite
-            </span>
+            <span className="shrink-0 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-bold text-accent">Invite</span>
           </button>
 
           <HereCheckIn placeName={plan.destination} planId={plan.id} />

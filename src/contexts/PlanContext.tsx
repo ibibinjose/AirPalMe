@@ -1,10 +1,25 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { HangoutPlan, PlanStop, PlanType, PlanTheme } from "@shared/plan";
 import { isDemoContent } from "@shared/content-meta";
-import { attendeeSeats, canCancelPlanStatus, formatDateOption, headcountTaken, isPlanManager, isTicketed, normalizeAnswer, normalizePlusOnes, normalizeRating, normalizeReview, setAttendeeCheckedIn, validDateOption, waitlistQueue } from "@shared/plan";
+import {
+  attendeeSeats,
+  canCancelPlanStatus,
+  formatDateOption,
+  headcountTaken,
+  isPlanManager,
+  isTicketed,
+  normalizeAnswer,
+  normalizePlusOnes,
+  normalizeRating,
+  normalizeReview,
+  setAttendeeCheckedIn,
+  validDateOption,
+  waitlistQueue,
+} from "@shared/plan";
 import { goingFits, resolveRsvpStatus, rsvpAllowed } from "@shared/plan-notify";
 import type { Geo } from "@shared/nearby";
-import { completePlan as storeCompletePlan,
+import {
+  completePlan as storeCompletePlan,
   cancelPlan as storeCancelPlan,
   loadPlans,
   subscribePlans,
@@ -109,11 +124,7 @@ interface PlanContextValue {
     plusOnes?: number,
     answers?: Record<string, string>,
   ) => Promise<HangoutPlan | undefined>;
-  reviewRsvp: (
-    planId: string,
-    attendeeId: string,
-    decision: "approve" | "decline",
-  ) => HangoutPlan | undefined;
+  reviewRsvp: (planId: string, attendeeId: string, decision: "approve" | "decline") => HangoutPlan | undefined;
   toggleCheckIn: (planId: string, attendeeId: string) => HangoutPlan | undefined;
   checkInSelf: (planId: string) => HangoutPlan | undefined;
   repeatPlan: (planId: string, today: string) => HangoutPlan | undefined;
@@ -498,10 +509,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         const cap = Math.floor(Number(current.capacity));
         if (Number.isFinite(cap) && cap > 0) {
           const existing = current.attendees.find((a) => a.id === attendeeId);
-          const room = Math.max(
-            0,
-            cap - (headcountTaken(current) - attendeeSeats(existing)) - 1,
-          );
+          const room = Math.max(0, cap - (headcountTaken(current) - attendeeSeats(existing)) - 1);
           if (seats > room) {
             finalSeats = room;
             toast.message(
@@ -588,8 +596,7 @@ export function PlanProvider({ children }: { children: ReactNode }) {
         toast.message("Reviews open once the plan is completed.");
         return undefined;
       }
-      const attendeeId =
-        user?.uid || (typeof window !== "undefined" && localStorage.getItem("airpal.anon.id")) || null;
+      const attendeeId = user?.uid || (typeof window !== "undefined" && localStorage.getItem("airpal.anon.id")) || null;
       const existing = (current.attendees || []).find((a) => a.id === attendeeId);
       if (!attendeeId || !existing || existing.status !== "going") {
         toast.message("Only the crew who went can review.");

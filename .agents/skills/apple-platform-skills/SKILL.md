@@ -15,13 +15,13 @@ Liquid Glass is the translucent material of the **navigation layer** — toolbar
 
 ### Core Invariants
 
-| Rule | Enforcement |
-|------|-------------|
-| **Never glass on glass** | Never stack translucent glass elements. Elements placed *inside* a glass container must use solid fills, vibrancy, or subtle ink contrasts (`bg-brand`, `text-ink`), never a second blur layer. |
-| **Two variants — never mix** | **Regular** (default): High-density blur (`backdrop-blur-2xl` / `backdrop-blur-3xl`), subtle white specular highlight (`border-white/80` or `inset 0 1px 1.5px rgba(255,255,255,0.9)`), adaptive over light and dark backgrounds.<br>**Clear**: High-transparency lens (`rgba(255,255,255,0.14)`), only permitted when resting over rich full-bleed media with an underlying dimming scrim. |
-| **Tint only primary actions** | When every control is tinted, nothing stands out. Use AirPal brand blue (`#1805db`) exclusively for the active tab, primary CTA, or focal state. Supporting icons and text stay neutral (`text-ink`, `text-mute`). |
-| **No steady-state intersections** | Content in resting scroll state must never be clipped or parked half-underneath floating glass bars. Maintain clearance using `pb-[calc(env(safe-area-inset-bottom,0px)+5rem)]` and `pt-[calc(env(safe-area-inset-top,0px)+4rem)]`. |
-| **Concentric squircle radius** | Outer container corners and inner interactive elements follow concentric curvature: $R_{\text{inner}} = R_{\text{outer}} - \text{padding}$. Rounded-full docks contain rounded-full badges; rounded-3xl cards contain rounded-2xl items. |
+| Rule                              | Enforcement                                                                                                                                                                                                                                                                                                                                                                                 |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Never glass on glass**          | Never stack translucent glass elements. Elements placed _inside_ a glass container must use solid fills, vibrancy, or subtle ink contrasts (`bg-brand`, `text-ink`), never a second blur layer.                                                                                                                                                                                             |
+| **Two variants — never mix**      | **Regular** (default): High-density blur (`backdrop-blur-2xl` / `backdrop-blur-3xl`), subtle white specular highlight (`border-white/80` or `inset 0 1px 1.5px rgba(255,255,255,0.9)`), adaptive over light and dark backgrounds.<br>**Clear**: High-transparency lens (`rgba(255,255,255,0.14)`), only permitted when resting over rich full-bleed media with an underlying dimming scrim. |
+| **Tint only primary actions**     | When every control is tinted, nothing stands out. Use AirPal brand blue (`#1805db`) exclusively for the active tab, primary CTA, or focal state. Supporting icons and text stay neutral (`text-ink`, `text-mute`).                                                                                                                                                                          |
+| **No steady-state intersections** | Content in resting scroll state must never be clipped or parked half-underneath floating glass bars. Maintain clearance using `pb-[calc(env(safe-area-inset-bottom,0px)+5rem)]` and `pt-[calc(env(safe-area-inset-top,0px)+4rem)]`.                                                                                                                                                         |
+| **Concentric squircle radius**    | Outer container corners and inner interactive elements follow concentric curvature: $R_{\text{inner}} = R_{\text{outer}} - \text{padding}$. Rounded-full docks contain rounded-full badges; rounded-3xl cards contain rounded-2xl items.                                                                                                                                                    |
 
 ### Liquid Glass CSS Implementation (`src/index.css`)
 
@@ -99,6 +99,7 @@ Exactly **one** layer fires haptics for an event. If `<Button onClick={...} hapt
 ### Native & Web Fallback Support
 
 Via `@capacitor/haptics` in `src/lib/native.ts`:
+
 - **iOS & Android**: Native Taptic Engine and vibrator motors via `Haptics.impact` and `Haptics.selectionChanged`.
 - **Web Mobile**: Degrades to `navigator.vibrate([10])` where supported, or silent no-op.
 
@@ -133,10 +134,13 @@ Via `@capacitor/haptics` in `src/lib/native.ts`:
 ### Spring Motion Curves
 
 Interactive components must use Apple-inspired physics springs rather than linear or mechanical eases:
+
 ```tsx
 transition={{ type: "spring", stiffness: 420, damping: 32 }}
 ```
+
 Micro-press feedback uses subtle scale depression:
+
 ```css
 .apple-spring-press:active {
   transform: scale(0.96);
@@ -156,13 +160,13 @@ Micro-press feedback uses subtle scale depression:
 
 ## 5. Cross-Platform Parity Checklist (iOS, Android, Web)
 
-| Area | iOS Target | Android Target | Web SPA Target |
-|------|------------|----------------|----------------|
-| **Status Bar** | Dark icons, translucent blend, safe-area top inset | Light theme `#ffffff` background, `overlaysWebView: false` | Browser theme-color `#f2f2f7` |
-| **Back Nav** | Edge-swipe gesture, modal dismiss | Hardware back button listener via `App.addListener('backButton')` | Browser history popstate |
-| **Keyboard** | `Keyboard.resize = "none"`, `#root` visual viewport padding | `Keyboard.resize = "none"`, smooth scroll margin on active input | Visual Viewport API |
-| **Haptics** | Core Haptics / Taptic Engine | Android Vibrator service | `navigator.vibrate` |
-| **Share** | Native UIActivityViewController sheet | Native Android ShareCompat intent | Web Share API fallback to clipboard |
+| Area           | iOS Target                                                  | Android Target                                                    | Web SPA Target                      |
+| -------------- | ----------------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------- |
+| **Status Bar** | Dark icons, translucent blend, safe-area top inset          | Light theme `#ffffff` background, `overlaysWebView: false`        | Browser theme-color `#f2f2f7`       |
+| **Back Nav**   | Edge-swipe gesture, modal dismiss                           | Hardware back button listener via `App.addListener('backButton')` | Browser history popstate            |
+| **Keyboard**   | `Keyboard.resize = "none"`, `#root` visual viewport padding | `Keyboard.resize = "none"`, smooth scroll margin on active input  | Visual Viewport API                 |
+| **Haptics**    | Core Haptics / Taptic Engine                                | Android Vibrator service                                          | `navigator.vibrate`                 |
+| **Share**      | Native UIActivityViewController sheet                       | Native Android ShareCompat intent                                 | Web Share API fallback to clipboard |
 
 ---
 

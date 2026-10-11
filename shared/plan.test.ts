@@ -395,9 +395,9 @@ describe("date poll", () => {
 
   it("opens with options until the host locks", () => {
     expect(hasOpenDatePoll({ dateOptions: [{ id: "o1", date: "2026-09-20", votes: 0 }] })).toBe(true);
-    expect(
-      hasOpenDatePoll({ dateOptions: [{ id: "o1", date: "2026-09-20", votes: 0 }], datePollLocked: true }),
-    ).toBe(false);
+    expect(hasOpenDatePoll({ dateOptions: [{ id: "o1", date: "2026-09-20", votes: 0 }], datePollLocked: true })).toBe(
+      false,
+    );
     expect(hasOpenDatePoll({})).toBe(false);
   });
 
@@ -421,7 +421,12 @@ describe("date poll", () => {
 });
 
 describe("guest questions", () => {
-  const diet = { id: "q1", question: "Any dietary needs?", type: "choice" as const, options: ["None", "Vego", "Vegan"] };
+  const diet = {
+    id: "q1",
+    question: "Any dietary needs?",
+    type: "choice" as const,
+    options: ["None", "Vego", "Vegan"],
+  };
   const ride = { id: "q2", question: "How are you getting there?", type: "text" as const };
 
   it("validates host questions", () => {
@@ -430,7 +435,9 @@ describe("guest questions", () => {
     expect(validGuestQuestion({ question: "X", type: "choice", options: ["Only"] })).toContain(
       "Choice needs at least 2 options.",
     );
-    expect(validGuestQuestion({ question: "X", type: "choice", options: ["A", "a"] })).toContain("Options must differ.");
+    expect(validGuestQuestion({ question: "X", type: "choice", options: ["A", "a"] })).toContain(
+      "Options must differ.",
+    );
     expect(validGuestQuestion({ question: "X", type: "weird", options: [] })).toContain("Pick text or choice.");
   });
 
@@ -462,9 +469,12 @@ describe("trip itinerary", () => {
   it("orders days and renumbers without gaps", () => {
     expect(scheduleDays(undefined)).toEqual([]);
     expect(
-      scheduleDays([day(3, "Coast"), day(1, "City"), { dayNumber: 0, title: "Nowhere", description: "", stops: [] }, day(2, "  ")]).map(
-        (d) => [d.dayNumber, d.title],
-      ),
+      scheduleDays([
+        day(3, "Coast"),
+        day(1, "City"),
+        { dayNumber: 0, title: "Nowhere", description: "", stops: [] },
+        day(2, "  "),
+      ]).map((d) => [d.dayNumber, d.title]),
     ).toEqual([
       [1, "City"],
       [2, "Coast"],
@@ -542,7 +552,12 @@ describe("experience pricing sanitizer", () => {
     expect(tiers[1]!.price).toBe(25.5);
     expect(tiers[1]!.capacity).toBe(20);
     const many = sanitizePricingTiers(
-      Array.from({ length: EXPERIENCE_TIERS_MAX + 5 }, (_, i) => ({ id: `t${i}`, name: `T${i}`, price: 1, capacity: 1 })),
+      Array.from({ length: EXPERIENCE_TIERS_MAX + 5 }, (_, i) => ({
+        id: `t${i}`,
+        name: `T${i}`,
+        price: 1,
+        capacity: 1,
+      })),
     )!;
     expect(many).toHaveLength(EXPERIENCE_TIERS_MAX);
   });

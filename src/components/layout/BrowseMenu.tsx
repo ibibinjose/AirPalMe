@@ -1,12 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { ChevronDown, LayoutDashboard } from "lucide-react";
-import {
-  BROWSE_LINKS,
-  BROWSE_SECTIONS,
-  HOST_LINKS,
-  type BrowseLink,
-} from "@/lib/browse-menu";
+import { BROWSE_LINKS, BROWSE_SECTIONS, HOST_LINKS, type BrowseLink } from "@/lib/browse-menu";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/cn";
 import { triggerHaptic } from "@/lib/native";

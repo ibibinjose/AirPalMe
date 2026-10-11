@@ -154,11 +154,7 @@ describe("getTour", () => {
 
 describe("placesWithDeals", () => {
   it("keeps only places carrying a live offer", () => {
-    const rows = [
-      { id: "a", deal: { badge: "10% off", detail: "Show key" } },
-      { id: "b" },
-      { id: "c", deal: null },
-    ];
+    const rows = [{ id: "a", deal: { badge: "10% off", detail: "Show key" } }, { id: "b" }, { id: "c", deal: null }];
     expect(placesWithDeals(rows).map((p) => p.id)).toEqual(["a"]);
     expect(placesWithDeals([])).toEqual([]);
   });

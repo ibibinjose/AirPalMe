@@ -47,9 +47,7 @@ export function pulseIssueFromDoc(id: string, data: Record<string, unknown>): Pu
   const summary = typeof data.summary === "string" ? data.summary.trim() : "";
   if (!summary) return null;
   const status =
-    data.status === "acknowledged" || data.status === "resolved" || data.status === "open"
-      ? data.status
-      : "open";
+    data.status === "acknowledged" || data.status === "resolved" || data.status === "open" ? data.status : "open";
   return {
     id,
     propertyId: String(data.propertyId || ""),
@@ -127,21 +125,12 @@ export async function resolvePulseIssue(propertyId: string, issueId: string, res
   return resolvePulseIssueRemote({ propertyId, issueId, resolutionNote });
 }
 
-export async function setPulseStatus(
-  propertyId: string,
-  pulseId: string,
-  status: "live" | "paused" | "archived",
-) {
+export async function setPulseStatus(propertyId: string, pulseId: string, status: "live" | "paused" | "archived") {
   if (!liveBackendEnabled()) throw new Error("Pulse needs a live connection.");
   return setPulseStatusRemote({ propertyId, pulseId, status });
 }
 
-export async function recordPulseFollowup(
-  propertyId: string,
-  issueId: string,
-  score: number,
-  note?: string,
-) {
+export async function recordPulseFollowup(propertyId: string, issueId: string, score: number, note?: string) {
   return recordPulseFollowupRemote({ propertyId, issueId, score, note });
 }
 
@@ -168,10 +157,7 @@ export function pulseFromDoc(id: string, data: Record<string, unknown>): Propert
   };
 }
 
-export function subscribePropertyPulses(
-  propertyId: string,
-  onChange: (rows: PropertyPulse[]) => void,
-): () => void {
+export function subscribePropertyPulses(propertyId: string, onChange: (rows: PropertyPulse[]) => void): () => void {
   if (!propertyId || propertyId === "unknown" || !liveBackendEnabled()) {
     onChange([]);
     return () => undefined;
@@ -224,10 +210,7 @@ export function subscribePropertyPulseResponses(
   );
 }
 
-export function subscribePropertyPulseIssues(
-  propertyId: string,
-  onChange: (rows: PulseIssue[]) => void,
-): () => void {
+export function subscribePropertyPulseIssues(propertyId: string, onChange: (rows: PulseIssue[]) => void): () => void {
   if (!propertyId || propertyId === "unknown" || !liveBackendEnabled()) {
     onChange([]);
     return () => undefined;

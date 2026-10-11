@@ -24,12 +24,9 @@ export function friendlyBirthdayError(err: unknown): string {
   return message || "Something went wrong. Please try again.";
 }
 
-export function setBirthdayAlertPrefsRemote(data: {
-  birthdayAlertsEnabled?: boolean;
-  birthdayAlertsRegion?: string;
-}) {
-  return callBirthday<
-    { birthdayAlertsEnabled?: boolean; birthdayAlertsRegion?: string },
-    { ok: boolean }
-  >("setBirthdayAlertPrefs", data);
+export function setBirthdayAlertPrefsRemote(data: { birthdayAlertsEnabled?: boolean; birthdayAlertsRegion?: string }) {
+  return callBirthday<{ birthdayAlertsEnabled?: boolean; birthdayAlertsRegion?: string }, { ok: boolean }>(
+    "setBirthdayAlertPrefs",
+    data,
+  );
 }

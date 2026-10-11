@@ -218,9 +218,25 @@ export function BioCatchUpModal({
         invited: [{ id: ownerUid || `h-${handle}`, name, handle }],
         initialStops:
           selectedType === "catchup"
-            ? [{ name: meetingPlatform === "in_person" ? `Coffee at ${place}` : place, time, notes: "Catch up", icon: meetingPlatform === "in_person" ? "coffee" : "drinks", address: place }]
+            ? [
+                {
+                  name: meetingPlatform === "in_person" ? `Coffee at ${place}` : place,
+                  time,
+                  notes: "Catch up",
+                  icon: meetingPlatform === "in_person" ? "coffee" : "drinks",
+                  address: place,
+                },
+              ]
             : selectedType === "meeting"
-              ? [{ name: meetingPlatform === "in_person" ? `Meeting at ${place}` : place, time, notes: notes || "Sync", icon: "pin", address: place }]
+              ? [
+                  {
+                    name: meetingPlatform === "in_person" ? `Meeting at ${place}` : place,
+                    time,
+                    notes: notes || "Sync",
+                    icon: "pin",
+                    address: place,
+                  },
+                ]
               : [{ name: place, time, notes: "Meet here", icon: "drinks", address: place }],
       });
 
@@ -268,7 +284,12 @@ export function BioCatchUpModal({
     title: `${currentOption.label} with ${name}`,
     description: `${notes || `AirPal ${currentOption.label} with @${handle}`}\nhttps://airpal.me/@${handle}`,
     startsAt: `${date}T${time || "14:00"}:00`,
-    venue: meetingPlatform === "in_person" ? (venue || city) : (meetingPlatform === "facetime" ? "FaceTime Call" : "Google Meet"),
+    venue:
+      meetingPlatform === "in_person"
+        ? venue || city
+        : meetingPlatform === "facetime"
+          ? "FaceTime Call"
+          : "Google Meet",
     city: meetingPlatform === "in_person" ? city : undefined,
     meetingLink: effectiveMeetingLink,
     meetingPlatform,
@@ -327,9 +348,9 @@ export function BioCatchUpModal({
                 <span>Double-Booking Warning</span>
               </div>
               <p className="mt-1 text-amber-900/90 dark:text-amber-200/90 leading-relaxed">
-                You already have <strong className="font-semibold">&ldquo;{conflict.conflictingTitle}&rdquo;</strong> scheduled at{" "}
-                <strong className="font-semibold">{conflict.conflictingTime}</strong> on this date. Propose is blocked until you pick
-                another slot.
+                You already have <strong className="font-semibold">&ldquo;{conflict.conflictingTitle}&rdquo;</strong>{" "}
+                scheduled at <strong className="font-semibold">{conflict.conflictingTime}</strong> on this date. Propose
+                is blocked until you pick another slot.
               </p>
               <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
                 <span className="text-[11px] font-medium text-amber-800/80">Available slots:</span>
@@ -437,9 +458,7 @@ export function BioCatchUpModal({
                 Where / Location
               </label>
               {meetingPlatform !== "in_person" && (
-                <span className="text-[10px] font-bold text-accent uppercase tracking-wider">
-                  Virtual Meeting
-                </span>
+                <span className="text-[10px] font-bold text-accent uppercase tracking-wider">Virtual Meeting</span>
               )}
             </div>
 
@@ -557,14 +576,17 @@ export function BioCatchUpModal({
                   />
                 </div>
                 <p className="text-[11px] text-mute leading-relaxed">
-                  Paste a FaceTime Web link (works on iPhone, Mac, Windows &amp; Android) or enter an Apple ID email/phone.
+                  Paste a FaceTime Web link (works on iPhone, Mac, Windows &amp; Android) or enter an Apple ID
+                  email/phone.
                 </p>
               </div>
             )}
           </div>
 
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-mute">Note / Agenda</label>
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-mute">
+              Note / Agenda
+            </label>
             <div className="relative">
               <MessageSquare size={14} className="absolute left-3.5 top-3 text-mute" />
               <textarea

@@ -1,16 +1,7 @@
 /** Tiny opener for the global search modal. Lives apart from the modal so pages
  * can trigger search without eagerly bundling the 800-line modal + catalog. */
 
-export type SearchCategory =
-  | "all"
-  | "people"
-  | "places"
-  | "events"
-  | "deals"
-  | "circle"
-  | "plan"
-  | "plans"
-  | "stay";
+export type SearchCategory = "all" | "people" | "places" | "events" | "deals" | "circle" | "plan" | "plans" | "stay";
 
 export interface OpenGlobalSearchOptions {
   query?: string;

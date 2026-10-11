@@ -3,6 +3,7 @@
 ## The Event × Channel Matrix
 
 Feedback reaches the user across distinct channels:
+
 - **Haptics**: Perceived only by the individual holding the device.
 - **Screen Motion**: Perceived by anyone looking at the screen.
 - **Audio / SFX**: Perceived by the room.
@@ -17,4 +18,5 @@ Feedback reaches the user across distinct channels:
 6. **Alert / Block (`warning` / `error`)**: Destructive operation warning, validation failure.
 
 ### Single-Owner Invariant
+
 Only one component or handler may fire haptics for any single event to prevent jarring double-vibrations.

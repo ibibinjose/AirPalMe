@@ -197,9 +197,7 @@ export function TradingHoursModal({ open, onClose, value, onApply }: TradingHour
                       onClick={() => handleStatusChange(dayKey, "open")}
                       className={cn(
                         "rounded-lg px-2 py-1 text-xs font-semibold transition active:scale-95",
-                        daySched.status === "open"
-                          ? "bg-brand text-white shadow-xs"
-                          : "text-mute hover:text-ink",
+                        daySched.status === "open" ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
                       )}
                     >
                       Open
@@ -209,9 +207,7 @@ export function TradingHoursModal({ open, onClose, value, onApply }: TradingHour
                       onClick={() => handleStatusChange(dayKey, "closed")}
                       className={cn(
                         "rounded-lg px-2 py-1 text-xs font-semibold transition active:scale-95",
-                        daySched.status === "closed"
-                          ? "bg-rose-500 text-white shadow-xs"
-                          : "text-mute hover:text-ink",
+                        daySched.status === "closed" ? "bg-rose-500 text-white shadow-xs" : "text-mute hover:text-ink",
                       )}
                     >
                       Closed
@@ -221,9 +217,7 @@ export function TradingHoursModal({ open, onClose, value, onApply }: TradingHour
                       onClick={() => handleStatusChange(dayKey, "24hours")}
                       className={cn(
                         "rounded-lg px-2 py-1 text-xs font-semibold transition active:scale-95",
-                        daySched.status === "24hours"
-                          ? "bg-teal-600 text-white shadow-xs"
-                          : "text-mute hover:text-ink",
+                        daySched.status === "24hours" ? "bg-teal-600 text-white shadow-xs" : "text-mute hover:text-ink",
                       )}
                     >
                       24h

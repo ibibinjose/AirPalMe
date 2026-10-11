@@ -27,12 +27,7 @@ import { loadTours } from "@/lib/tours-store";
 import { bioPath, bioKindLabel, type BioProfile } from "@shared/bio";
 import { fetchPublicBio, loadBios } from "@/lib/bio-store";
 import { listPeople } from "@/lib/people";
-import {
-  highlightSearchMatch,
-  profileMatchesSearch,
-  scoreSearchItem,
-  searchNeedle,
-} from "@/lib/search-query";
+import { highlightSearchMatch, profileMatchesSearch, scoreSearchItem, searchNeedle } from "@/lib/search-query";
 import { type Promotion } from "@shared/promotions";
 import { getFirebaseDb } from "@/lib/firebase";
 import { collection, getDocs, query as firestoreQuery, where } from "firebase/firestore";
@@ -132,12 +127,7 @@ export function SearchPage() {
     const db = getFirebaseDb();
     if (!db) return;
     let cancelled = false;
-    getDocs(
-      firestoreQuery(
-        collection(db, "promotions"),
-        where("status", "in", ["live", "approved"]),
-      ),
-    )
+    getDocs(firestoreQuery(collection(db, "promotions"), where("status", "in", ["live", "approved"])))
       .then((snap) => {
         if (cancelled) return;
         const list = snap.docs.map((d) => ({
@@ -323,7 +313,15 @@ export function SearchPage() {
           description: promo.description,
           category: promo.category,
           tags: [promo.kind, promo.status],
-          keywords: [promo.sponsorName, promo.prize?.title || "", promo.prizeValue || "", "deal", "perk", "discount", "offer"],
+          keywords: [
+            promo.sponsorName,
+            promo.prize?.title || "",
+            promo.prizeValue || "",
+            "deal",
+            "perk",
+            "discount",
+            "offer",
+          ],
         },
         query,
       );
@@ -344,7 +342,19 @@ export function SearchPage() {
     }
 
     // 4. AirPal Pass & Ticketing Shortcuts
-    const passKeywords = ["pass", "ticket", "tickets", "admission", "scanner", "scan", "wallet", "gig", "mela", "festival", "concert"];
+    const passKeywords = [
+      "pass",
+      "ticket",
+      "tickets",
+      "admission",
+      "scanner",
+      "scan",
+      "wallet",
+      "gig",
+      "mela",
+      "festival",
+      "concert",
+    ];
     if (passKeywords.some((k) => q.includes(k))) {
       items.push({
         id: "airpal-pass",
@@ -371,7 +381,19 @@ export function SearchPage() {
     }
 
     // 5. Circle / Networking shortcuts
-    const circleKeywords = ["circle", "network", "meet", "hangout", "catchup", "cohort", "campus", "presence", "here", "bio", "handle"];
+    const circleKeywords = [
+      "circle",
+      "network",
+      "meet",
+      "hangout",
+      "catchup",
+      "cohort",
+      "campus",
+      "presence",
+      "here",
+      "bio",
+      "handle",
+    ];
     if (circleKeywords.some((k) => q.includes(k))) {
       items.push({
         id: "circle-hub",
@@ -443,7 +465,19 @@ export function SearchPage() {
     }
 
     // 8. Arrival Engine & Campus Cohorts
-    const arrivalKeywords = ["arrival", "campus", "unsw", "uts", "usyd", "college", "dorm", "student", "scape", "iglu", "just got here"];
+    const arrivalKeywords = [
+      "arrival",
+      "campus",
+      "unsw",
+      "uts",
+      "usyd",
+      "college",
+      "dorm",
+      "student",
+      "scape",
+      "iglu",
+      "just got here",
+    ];
     if (arrivalKeywords.some((k) => q.includes(k))) {
       items.push({
         id: "arrival-engine",
@@ -528,9 +562,7 @@ export function SearchPage() {
           <ArrowLeft size={18} />
         </button>
         <div className="min-w-0 flex-1">
-          <h1 className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
-            Search AirPal
-          </h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">Search AirPal</h1>
           <p className="text-xs text-mute mt-0.5 truncate">
             Places, live events, member dining perks, circles & hangouts
           </p>
@@ -632,9 +664,7 @@ export function SearchPage() {
 
           {/* Quick inspiration chips */}
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-mute">
-              Explore Sydney
-            </p>
+            <p className="text-xs font-bold uppercase tracking-wider text-mute">Explore Sydney</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {SUGGESTED_QUERIES.map((sq) => (
                 <button
@@ -714,9 +744,7 @@ export function SearchPage() {
                       )}
                     </p>
                     {item.description && (
-                      <p className="mt-1 text-[11px] text-mute/80 line-clamp-1 hidden sm:block">
-                        {item.description}
-                      </p>
+                      <p className="mt-1 text-[11px] text-mute/80 line-clamp-1 hidden sm:block">{item.description}</p>
                     )}
                   </div>
                 </div>
@@ -732,11 +760,10 @@ export function SearchPage() {
         ) : query.trim() ? (
           <div className="rounded-3xl bg-card p-10 text-center ring-1 ring-line">
             <Compass size={32} className="mx-auto text-mute/60 mb-3" />
-            <h3 className="font-display text-base font-bold text-ink">
-              No results for &ldquo;{query}&rdquo;
-            </h3>
+            <h3 className="font-display text-base font-bold text-ink">No results for &ldquo;{query}&rdquo;</h3>
             <p className="mt-1 text-xs text-mute max-w-sm mx-auto">
-              We couldn&apos;t find matching places, events, or deals for that search. Try one of our suggested categories or popular queries.
+              We couldn&apos;t find matching places, events, or deals for that search. Try one of our suggested
+              categories or popular queries.
             </p>
             <div className="mt-5 flex justify-center gap-2 flex-wrap">
               <Button
@@ -750,11 +777,7 @@ export function SearchPage() {
               >
                 Clear Search
               </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => nav("/now")}
-              >
+              <Button variant="primary" size="sm" onClick={() => nav("/now")}>
                 Discover on What Now
               </Button>
             </div>

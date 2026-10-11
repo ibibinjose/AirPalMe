@@ -62,7 +62,7 @@ export function syncListingToBio(listing: {
       name: listing.name,
       hours: listing.hours,
       shortWhy: listing.shortWhy,
-      aboutText: listing.description !== undefined ? (listing.description || undefined) : bio.aboutText,
+      aboutText: listing.description !== undefined ? listing.description || undefined : bio.aboutText,
       phone: listing.phone || bio.phone,
       listingId: listing.id,
       cover: listing.heroImage || bio.cover,

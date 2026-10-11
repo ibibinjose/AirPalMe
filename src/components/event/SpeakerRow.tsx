@@ -17,7 +17,11 @@ export function SpeakerRow({ speakers, compact }: { speakers: Speaker[] | undefi
         const body = (
           <>
             {s.photoUrl ? (
-              <Photo src={s.photoUrl} alt={s.displayName} className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-line" />
+              <Photo
+                src={s.photoUrl}
+                alt={s.displayName}
+                className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-line"
+              />
             ) : (
               <span
                 aria-hidden

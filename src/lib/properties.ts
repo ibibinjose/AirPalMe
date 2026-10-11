@@ -17,7 +17,6 @@ import { isoFromUnknown } from "@shared/freshness";
 import { getFirebaseDb } from "./firebase";
 import { liveBackendEnabled, updatePropertyProfileRemote, updatePropertyWifiRemote } from "./functions";
 
-
 const CACHE_KEY = "airpal.properties.v1";
 
 function readCache(): Record<string, PropertyInfo> {

@@ -35,10 +35,7 @@ export function PlanShareModal({
   const { user } = useAuth();
   const viewerId = user?.uid || (typeof window !== "undefined" ? localStorage.getItem("airpal.anon.id") : null);
 
-  const currentAttendeeIds = useMemo(
-    () => new Set((plan.attendees || []).map((a) => a.id)),
-    [plan.attendees],
-  );
+  const currentAttendeeIds = useMemo(() => new Set((plan.attendees || []).map((a) => a.id)), [plan.attendees]);
 
   // People you've already been out with, minus this plan's crew.
   const crew = useMemo(
@@ -93,10 +90,7 @@ export function PlanShareModal({
 
   // Combined Circle Mates (past crew + real-life met contacts)
   const circleMates = useMemo(() => {
-    const matesMap = new Map<
-      string,
-      { id?: string; name: string; handle?: string; avatar?: string; info: string }
-    >();
+    const matesMap = new Map<string, { id?: string; name: string; handle?: string; avatar?: string; info: string }>();
 
     for (const c of crew) {
       if (!currentAttendeeIds.has(c.id)) {
@@ -130,9 +124,7 @@ export function PlanShareModal({
     return Array.from(matesMap.values());
   }, [crew, currentAttendeeIds]);
 
-  const [activeTab, setActiveTab] = useState<"groups" | "mates">(() =>
-    circleGroups.length > 0 ? "groups" : "mates",
-  );
+  const [activeTab, setActiveTab] = useState<"groups" | "mates">(() => (circleGroups.length > 0 ? "groups" : "mates"));
 
   useEffect(() => {
     if (open) setInvited(new Set());
@@ -237,7 +229,9 @@ export function PlanShareModal({
       <div className="scroll-container modal-safe relative w-full max-w-md rounded-t-[32px] sm:rounded-[32px] bg-zinc-950 text-white p-6 ring-1 ring-white/10 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <div>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-400">Share Invitation</span>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-400">
+              Share Invitation
+            </span>
             <h2 className="font-display mt-0.5 text-xl font-bold text-white">Invite Your Mates</h2>
           </div>
           <button

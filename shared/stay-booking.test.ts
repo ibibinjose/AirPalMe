@@ -25,21 +25,23 @@ describe("stay nights", () => {
   });
 
   it("quotes from the nightly price in cents", () => {
-    expect(quoteStayNights({ checkIn: "2026-10-03", checkOut: "2026-10-05", nightlyDollars: 320, guests: 2, capacity: 2 })).toEqual({
+    expect(
+      quoteStayNights({ checkIn: "2026-10-03", checkOut: "2026-10-05", nightlyDollars: 320, guests: 2, capacity: 2 }),
+    ).toEqual({
       nights: 2,
       nightlyCents: 32000,
       totalCents: 64000,
       guests: 2,
     });
-    expect(quoteStayNights({ checkIn: "2026-10-05", checkOut: "2026-10-03", nightlyDollars: 320, guests: 1, capacity: 2 })).toBe(
-      "Check-out must be after check-in.",
-    );
-    expect(quoteStayNights({ checkIn: "2026-10-03", checkOut: "2026-10-05", nightlyDollars: 0, guests: 1, capacity: 2 })).toBe(
-      "This room has no nightly price yet.",
-    );
-    expect(quoteStayNights({ checkIn: "2026-10-03", checkOut: "2026-10-05", nightlyDollars: 320, guests: 5, capacity: 2 })).toBe(
-      "Too many guests for this room.",
-    );
+    expect(
+      quoteStayNights({ checkIn: "2026-10-05", checkOut: "2026-10-03", nightlyDollars: 320, guests: 1, capacity: 2 }),
+    ).toBe("Check-out must be after check-in.");
+    expect(
+      quoteStayNights({ checkIn: "2026-10-03", checkOut: "2026-10-05", nightlyDollars: 0, guests: 1, capacity: 2 }),
+    ).toBe("This room has no nightly price yet.");
+    expect(
+      quoteStayNights({ checkIn: "2026-10-03", checkOut: "2026-10-05", nightlyDollars: 320, guests: 5, capacity: 2 }),
+    ).toBe("Too many guests for this room.");
   });
 
   it("detects blocked nights and overlapping stays", () => {

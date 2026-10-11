@@ -189,9 +189,7 @@ export function NowPage() {
       {/* Hero Header */}
       <div>
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
-            What now?
-          </h1>
+          <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">What now?</h1>
           <div className="flex items-center gap-2">
             <Link
               href="/pass"
@@ -232,10 +230,14 @@ export function NowPage() {
         {/* Live Weather & Outfit Context */}
         {weather && outfitAdvice && (
           <div className="mt-3 flex items-center gap-3 rounded-2xl bg-card p-3.5 text-xs ring-1 ring-line/80 shadow-xs">
-            <span className="text-2xl shrink-0" aria-hidden="true">{outfitAdvice.icon}</span>
+            <span className="text-2xl shrink-0" aria-hidden="true">
+              {outfitAdvice.icon}
+            </span>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-bold text-ink">{weather.temp}°C {outfitAdvice.vibe} in {effectiveCity}</span>
+                <span className="font-bold text-ink">
+                  {weather.temp}°C {outfitAdvice.vibe} in {effectiveCity}
+                </span>
                 {outfitAdvice.accessory && (
                   <span className="inline-flex items-center rounded-full bg-paper px-2 py-0.5 text-[10px] font-semibold text-accent ring-1 ring-line">
                     {outfitAdvice.accessory}
@@ -324,15 +326,12 @@ export function NowPage() {
               <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-amber-300 ring-1 ring-amber-400/30">
                 <Ticket size={12} /> On Your Schedule Today
               </span>
-              <span className="text-xs font-semibold text-white/90">
-                {todayPass.time || "Today"}
-              </span>
+              <span className="text-xs font-semibold text-white/90">{todayPass.time || "Today"}</span>
             </div>
-            <h3 className="font-display mt-2 text-lg font-bold text-white leading-snug">
-              {todayPass.title}
-            </h3>
+            <h3 className="font-display mt-2 text-lg font-bold text-white leading-snug">{todayPass.title}</h3>
             <p className="mt-0.5 text-xs text-white/80">
-              {[todayPass.suburb, todayPass.providerName].filter(Boolean).join(" · ") || "Sydney"} · Ready to scan at gate
+              {[todayPass.suburb, todayPass.providerName].filter(Boolean).join(" · ") || "Sydney"} · Ready to scan at
+              gate
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <Link
@@ -362,7 +361,8 @@ export function NowPage() {
               <div className="min-w-0">
                 <span className="font-bold text-ink truncate block">Upcoming: {nextPass.title}</span>
                 <span className="text-mute truncate block">
-                  {nextPass.date}{nextPass.time ? ` at ${nextPass.time}` : ""} · {nextPass.suburb || "Sydney"}
+                  {nextPass.date}
+                  {nextPass.time ? ` at ${nextPass.time}` : ""} · {nextPass.suburb || "Sydney"}
                 </span>
               </div>
             </div>
@@ -680,4 +680,3 @@ export function NowPage() {
     </div>
   );
 }
-

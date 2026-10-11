@@ -160,7 +160,9 @@ export function MarkerPage() {
         >
           <ArrowLeft size={16} />
         </button>
-        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">{marker?.city || PRECINCT.name}</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">
+          {marker?.city || PRECINCT.name}
+        </p>
       </div>
       <h1 className="font-display mt-1 text-3xl font-semibold">{marker?.label || "Nearby"}</h1>
       <div className="mt-4">

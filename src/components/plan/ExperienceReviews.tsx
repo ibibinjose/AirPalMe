@@ -22,7 +22,12 @@ export function ExperienceReviews({ planId }: { planId: string }) {
       return;
     }
     void getDocs(
-      query(collection(db, "experience_reviews"), where("planId", "==", planId), orderBy("createdAt", "desc"), limit(20)),
+      query(
+        collection(db, "experience_reviews"),
+        where("planId", "==", planId),
+        orderBy("createdAt", "desc"),
+        limit(20),
+      ),
     )
       .then((snap) => {
         setRows(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ExperienceReview, "id">) })));

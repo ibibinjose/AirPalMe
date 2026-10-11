@@ -30,9 +30,7 @@ vi.mock("./admin", () => ({
           get: async () => {
             expect(field).toBe("inviteCode");
             expect(op).toBe("==");
-            const docs = fakes.invitePlans
-              .filter((p) => p.inviteCode === value)
-              .map((data) => ({ data: () => data }));
+            const docs = fakes.invitePlans.filter((p) => p.inviteCode === value).map((data) => ({ data: () => data }));
             return { empty: docs.length === 0, docs };
           },
         }),

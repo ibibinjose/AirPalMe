@@ -68,9 +68,7 @@ function NotificationRows({
                 </span>
                 <span className="mt-0.5 line-clamp-2 block text-[13px] leading-5 text-mute">{n.body}</span>
               </span>
-              {when ? (
-                <span className="shrink-0 pt-0.5 text-[11px] font-medium text-mute">{when}</span>
-              ) : null}
+              {when ? <span className="shrink-0 pt-0.5 text-[11px] font-medium text-mute">{when}</span> : null}
             </button>
           </li>
         );
@@ -338,7 +336,12 @@ export function InboxPage() {
                         {/* Text details */}
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-1">
-                            <p className={cn("truncate text-[15px]", hasUnread ? "font-bold text-ink" : "font-semibold text-ink")}>
+                            <p
+                              className={cn(
+                                "truncate text-[15px]",
+                                hasUnread ? "font-bold text-ink" : "font-semibold text-ink",
+                              )}
+                            >
                               {conv.title}
                             </p>
                             {conv.updatedAt && smartChatTime(conv.updatedAt) ? (
@@ -347,7 +350,12 @@ export function InboxPage() {
                               </span>
                             ) : null}
                           </div>
-                          <p className={cn("mt-0.5 line-clamp-1 text-[13px]", hasUnread ? "font-semibold text-accent" : "text-mute")}>
+                          <p
+                            className={cn(
+                              "mt-0.5 line-clamp-1 text-[13px]",
+                              hasUnread ? "font-semibold text-accent" : "text-mute",
+                            )}
+                          >
                             {conv.lastMessage || "Start conversation"}
                           </p>
                         </div>
@@ -413,7 +421,10 @@ export function InboxPage() {
                 >
                   Chat with AirPal AI
                 </button>
-                <Link href="/plan/new" className="inline-flex min-h-[44px] items-center rounded-full bg-paper px-4 py-2 text-xs font-bold text-ink ring-1 ring-line hover:bg-card active:scale-95">
+                <Link
+                  href="/plan/new"
+                  className="inline-flex min-h-[44px] items-center rounded-full bg-paper px-4 py-2 text-xs font-bold text-ink ring-1 ring-line hover:bg-card active:scale-95"
+                >
                   Plan a Trip
                 </Link>
               </div>
@@ -549,4 +560,3 @@ export function InboxPage() {
     </div>
   );
 }
-

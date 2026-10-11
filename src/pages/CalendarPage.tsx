@@ -397,9 +397,7 @@ function CalendarPageContent() {
               <span>AirPal Pass →</span>
             </Link>
           </div>
-          <h1 className="font-display mt-2 text-3xl font-bold tracking-tight text-white md:text-4xl">
-            Event Calendar
-          </h1>
+          <h1 className="font-display mt-2 text-3xl font-bold tracking-tight text-white md:text-4xl">Event Calendar</h1>
           <p className="mt-1 text-[14px] font-medium text-white/80">
             {filteredEvents.length} upcoming · {savedItineraryCount} saved to your itinerary
           </p>
@@ -697,11 +695,10 @@ function CalendarPageContent() {
                       AirPal Pass · You have a ticket
                     </span>
                   </div>
-                  <p className="font-display text-sm font-bold text-ink">
-                    {selectedDateBooking.title}
-                  </p>
+                  <p className="font-display text-sm font-bold text-ink">{selectedDateBooking.title}</p>
                   <p className="text-[11px] text-mute">
-                    {[selectedDateBooking.time, selectedDateBooking.suburb].filter(Boolean).join(" · ")} · Scannable gate ticket
+                    {[selectedDateBooking.time, selectedDateBooking.suburb].filter(Boolean).join(" · ")} · Scannable
+                    gate ticket
                   </p>
                 </div>
               </div>
@@ -912,11 +909,16 @@ function CalendarPageContent() {
           {/* Dual Integration Grid: AirPal Pass Tickets & AirPal.Me Hangout Plans */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* AirPal Pass Event Passes */}
-            <section aria-label="Event Passes & Tickets" className="flex flex-col justify-between rounded-3xl bg-card p-4 ring-1 ring-line/80 shadow-sm md:p-6">
+            <section
+              aria-label="Event Passes & Tickets"
+              className="flex flex-col justify-between rounded-3xl bg-card p-4 ring-1 ring-line/80 shadow-sm md:p-6"
+            >
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-accent">AirPal Pass Wallet</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-accent">
+                      AirPal Pass Wallet
+                    </span>
                     <h3 className="font-display text-xl font-bold text-ink mt-0.5">My passes &amp; tickets</h3>
                     <p className="mt-0.5 text-xs text-mute">
                       Passes booked on AirPal Pass — scan at the door or export to wallet.
@@ -934,7 +936,10 @@ function CalendarPageContent() {
                 {upcomingBookings.length === 0 ? (
                   <div className="mt-4 rounded-2xl bg-paper px-4 py-3 text-[13px] text-mute ring-1 ring-line/60">
                     <p>No booked passes yet. Browse concerts, Diwali festivals, or dining perks on AirPal Pass.</p>
-                    <Link href="/pass" className="mt-2 inline-flex items-center text-xs font-bold text-accent hover:underline">
+                    <Link
+                      href="/pass"
+                      className="mt-2 inline-flex items-center text-xs font-bold text-accent hover:underline"
+                    >
                       Find experiences on Pass →
                     </Link>
                   </div>
@@ -982,11 +987,16 @@ function CalendarPageContent() {
             </section>
 
             {/* My plans — the repeat loop lives here, same chrome as events */}
-            <section aria-label="My plans" className="flex flex-col justify-between rounded-3xl bg-card p-4 ring-1 ring-line/80 shadow-sm md:p-6">
+            <section
+              aria-label="My plans"
+              className="flex flex-col justify-between rounded-3xl bg-card p-4 ring-1 ring-line/80 shadow-sm md:p-6"
+            >
               <div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-accent">AirPal.Me Hangouts</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-accent">
+                      AirPal.Me Hangouts
+                    </span>
                     <h3 className="font-display text-xl font-bold text-ink mt-0.5">My plans</h3>
                     <p className="mt-0.5 text-xs text-mute">
                       Your upcoming plans — open one to coordinate, or save it to your calendar.
@@ -1042,45 +1052,47 @@ function CalendarPageContent() {
       </div>
 
       {/* Mobile Filters Slide-over Drawer */}
-      {isMobileDrawerOpen && typeof document !== "undefined" && createPortal(
-        <div
-          className="fixed inset-0 z-50 lg:hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Calendar search and filters"
-        >
+      {isMobileDrawerOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
-            onClick={() => setIsMobileDrawerOpen(false)}
-            aria-hidden="true"
-          />
-          <div className="fixed inset-y-0 right-0 max-w-xs w-full bg-card p-5 shadow-2xl border-l border-line overflow-y-auto z-10 pb-[max(1.5rem,calc(env(safe-area-inset-bottom,0px)+1.25rem))]">
-            <CalendarSidebar
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              category={category}
-              onCategoryChange={setCategory}
-              filter={filter}
-              onFilterChange={setFilter}
-              allTags={allTags}
-              categoryCounts={categoryCounts}
-              statusCounts={counts}
-              totalCount={calendarEvents.length}
-              filteredCount={filteredEvents.length}
-              onResetFilters={() => {
-                setSearchQuery("");
-                setCategory("all");
-                setFilter("all");
-              }}
-              onCloseMobile={() => setIsMobileDrawerOpen(false)}
-              idPrefix="calendar-drawer"
+            className="fixed inset-0 z-50 lg:hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Calendar search and filters"
+          >
+            <div
+              className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+              onClick={() => setIsMobileDrawerOpen(false)}
+              aria-hidden="true"
             />
-          </div>
-        </div>,
-        document.body,
-      )}
+            <div className="fixed inset-y-0 right-0 max-w-xs w-full bg-card p-5 shadow-2xl border-l border-line overflow-y-auto z-10 pb-[max(1.5rem,calc(env(safe-area-inset-bottom,0px)+1.25rem))]">
+              <CalendarSidebar
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                category={category}
+                onCategoryChange={setCategory}
+                filter={filter}
+                onFilterChange={setFilter}
+                allTags={allTags}
+                categoryCounts={categoryCounts}
+                statusCounts={counts}
+                totalCount={calendarEvents.length}
+                filteredCount={filteredEvents.length}
+                onResetFilters={() => {
+                  setSearchQuery("");
+                  setCategory("all");
+                  setFilter("all");
+                }}
+                onCloseMobile={() => setIsMobileDrawerOpen(false)}
+                idPrefix="calendar-drawer"
+              />
+            </div>
+          </div>,
+          document.body,
+        )}
 
       {/* Event Detail Modal */}
       <CalendarEventModal

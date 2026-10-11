@@ -49,7 +49,9 @@ export function NotFoundPage() {
 
       {/* Pillar Recovery Links */}
       <div className="mt-10 rounded-3xl bg-card p-5 ring-1 ring-line text-left shadow-xs">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-mute px-2 pb-2">Jump to an ecosystem pillar</p>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-mute px-2 pb-2">
+          Jump to an ecosystem pillar
+        </p>
         <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
           <Link
             href="/pass"

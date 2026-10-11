@@ -97,9 +97,7 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(f
         <span
           className={cn(
             "absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold shadow-xs",
-            isBrandSolid
-              ? "bg-white text-brand"
-              : "bg-brand text-white",
+            isBrandSolid ? "bg-white text-brand" : "bg-brand text-white",
           )}
         >
           {badge}

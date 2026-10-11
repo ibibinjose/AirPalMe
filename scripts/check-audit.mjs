@@ -50,7 +50,7 @@ function findUnallowedVulnerabilities(report, scope) {
       if (typeof v === "string") {
         // Points to another vulnerability entry
         const parent = vulns[v];
-        if (!parent || parent.severity !== "high" && parent.severity !== "critical") continue;
+        if (!parent || (parent.severity !== "high" && parent.severity !== "critical")) continue;
         const parentVia = Array.isArray(parent.via) ? parent.via : [];
         const parentAllowed = parentVia.every(
           (pv) => typeof pv === "object" && pv.url && ALLOWED_ADVISORY_URLS.has(pv.url),

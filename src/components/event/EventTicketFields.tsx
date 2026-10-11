@@ -70,9 +70,7 @@ export function EventTicketFields({ values, onChange }: Props) {
       {values.paid && (
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-              Price (AUD)
-            </label>
+            <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">Price (AUD)</label>
             <input
               value={values.price}
               onChange={(e) => set({ price: e.target.value })}

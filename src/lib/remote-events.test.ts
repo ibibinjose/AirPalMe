@@ -134,11 +134,7 @@ describe("cleanSpeakers", () => {
         { name: "X", handle: "  " },
         "not-an-object",
       ]),
-    ).toEqual([
-      { name: "Sarah J", role: "CEO", handle: "sarah_j" },
-      { name: "Roy Green" },
-      { name: "X" },
-    ]);
+    ).toEqual([{ name: "Sarah J", role: "CEO", handle: "sarah_j" }, { name: "Roy Green" }, { name: "X" }]);
   });
 
   it("returns undefined for empty input", () => {

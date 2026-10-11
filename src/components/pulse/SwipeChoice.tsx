@@ -58,15 +58,11 @@ export function SwipeChoice({
         {rightLabel} →
       </motion.span>
       <div className="flex items-center justify-between gap-3 pt-7">
-        <span className="min-w-0 flex-1 truncate text-left text-sm font-bold text-ink">
-          {leftLabel}
-        </span>
+        <span className="min-w-0 flex-1 truncate text-left text-sm font-bold text-ink">{leftLabel}</span>
         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-paper text-mute ring-1 ring-line">
           <MoveHorizontal size={16} />
         </span>
-        <span className="min-w-0 flex-1 truncate text-right text-sm font-bold text-ink">
-          {rightLabel}
-        </span>
+        <span className="min-w-0 flex-1 truncate text-right text-sm font-bold text-ink">{rightLabel}</span>
       </div>
       <p className="mt-2 text-center text-[11px] font-medium text-mute">
         {reduceMotion ? "Tap an option below" : "Swipe to answer — or tap below"}

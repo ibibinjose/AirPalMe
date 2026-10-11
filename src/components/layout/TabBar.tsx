@@ -99,7 +99,8 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
         <div className="apple-liquid-glass-dock relative mb-[max(0.75rem,env(safe-area-inset-bottom,0px))] flex items-center justify-between rounded-full p-1.5 text-ink">
           {tabs.map((tab) => {
             const on = active === tab.id;
-            const href = isPass && tab.id === "bio" ? (user ? "/bio" : "/start") : tab.id === "bio" ? bioHref : tab.href;
+            const href =
+              isPass && tab.id === "bio" ? (user ? "/bio" : "/start") : tab.id === "bio" ? bioHref : tab.href;
             const Icon = tab.icon;
             return (
               <button
@@ -126,7 +127,9 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
                 )}
                 <span className="relative z-10 flex flex-col items-center justify-center gap-0.5 transition-transform duration-150">
                   {tab.id === "bio" ? (
-                    <span className="flex h-[21px] w-[21px] items-center justify-center text-[18px] font-bold leading-none">@</span>
+                    <span className="flex h-[21px] w-[21px] items-center justify-center text-[18px] font-bold leading-none">
+                      @
+                    </span>
                   ) : (
                     <span className="relative">
                       <Icon size={21} strokeWidth={on ? 2.3 : 1.75} fill="none" />

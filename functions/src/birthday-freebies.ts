@@ -74,9 +74,7 @@ export const sendBirthdayMonthAlerts = onSchedule(
         birthdayAlertsEnabled: row.birthdayAlertsEnabled as boolean | undefined,
         birthdayAlertsRegion: row.birthdayAlertsRegion ? String(row.birthdayAlertsRegion) : "au",
         lastBirthdayMonthAlertAt: row.lastBirthdayMonthAlertAt ? String(row.lastBirthdayMonthAlertAt) : "",
-        lastBirthdayMidMonthAlertAt: row.lastBirthdayMidMonthAlertAt
-          ? String(row.lastBirthdayMidMonthAlertAt)
-          : "",
+        lastBirthdayMidMonthAlertAt: row.lastBirthdayMidMonthAlertAt ? String(row.lastBirthdayMidMonthAlertAt) : "",
       };
 
       const sendStart = shouldAlertBirthdayMonth(candidate, now);

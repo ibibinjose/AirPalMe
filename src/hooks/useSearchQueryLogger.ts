@@ -69,8 +69,7 @@ export function useSearchQueryLogger(options: UseSearchQueryLoggerOptions = {}) 
    */
   const logSearch = useCallback(
     async (payloadOrQuery: SearchLogPayload | string) => {
-      const payload: SearchLogPayload =
-        typeof payloadOrQuery === "string" ? { query: payloadOrQuery } : payloadOrQuery;
+      const payload: SearchLogPayload = typeof payloadOrQuery === "string" ? { query: payloadOrQuery } : payloadOrQuery;
 
       const trimmed = (payload.query || "").trim();
       // Ignore queries with less than 2 characters
@@ -169,10 +168,7 @@ export function useSearchQueryLogger(options: UseSearchQueryLoggerOptions = {}) 
    * Log click on a specific search result to measure relevance and conversions.
    */
   const logResultClick = useCallback(
-    (
-      query: string,
-      result: { id: string; title: string; category?: string; href?: string },
-    ) => {
+    (query: string, result: { id: string; title: string; category?: string; href?: string }) => {
       const trimmed = (query || "").trim();
       if (!trimmed) return;
 
@@ -240,11 +236,7 @@ export function usePopularSearches(options: { limit?: number; fallbackDefaults?:
       return;
     }
 
-    const q = fsQuery(
-      collection(db, "popular_searches"),
-      orderBy("count", "desc"),
-      fsLimit(limit),
-    );
+    const q = fsQuery(collection(db, "popular_searches"), orderBy("count", "desc"), fsLimit(limit));
 
     getDocs(q)
       .then((snapshot) => {
@@ -320,10 +312,7 @@ export interface UseSearchAutocompleteOptions {
  * Autocomplete hook that provides real-time search term suggestions as the user types,
  * ranked by prefix matches, substring matches, and historical search volume from Firestore.
  */
-export function useSearchAutocomplete(
-  query: string,
-  options: UseSearchAutocompleteOptions = {},
-) {
+export function useSearchAutocomplete(query: string, options: UseSearchAutocompleteOptions = {}) {
   const {
     limit = 6,
     category,
@@ -401,4 +390,3 @@ export function useSearchAutocomplete(
 
   return { suggestions, loading };
 }
-

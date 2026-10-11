@@ -22,7 +22,12 @@ type NominatimRow = {
 function asAddressHit(row: NominatimRow): OsmSearchHit | null {
   const osmType = String(row.osm_type || "").toLowerCase();
   const osmId = String(row.osm_id || "");
-  const name = String(row.name || "").trim() || String(row.display_name || "").split(",")[0]?.trim() || "";
+  const name =
+    String(row.name || "").trim() ||
+    String(row.display_name || "")
+      .split(",")[0]
+      ?.trim() ||
+    "";
   const lat = Number(row.lat);
   const lng = Number(row.lon);
   if (!osmType || !osmId || !name) return null;

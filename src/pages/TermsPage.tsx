@@ -20,8 +20,8 @@ export function TermsPage() {
       <p>
         AirPal is an all-in-one platform for live events, ambient discovery, group plans, PBSA resident arrival cohorts,
         and personal digital bio profiles. Organizers and operators print QR codes for event check-in, precinct markers,
-        campuses, and reception desks. Visitors scan to discover What's on, plan stops, join cohorts, and view public bios.
-        Local businesses may claim an @handle and publish member perks.
+        campuses, and reception desks. Visitors scan to discover What's on, plan stops, join cohorts, and view public
+        bios. Local businesses may claim an @handle and publish member perks.
       </p>
       <p>
         We may change, suspend, or discontinue features. Information about places, hours, deals, weather, and walking

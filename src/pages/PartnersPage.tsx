@@ -16,10 +16,17 @@ export function PartnersPage() {
           <h1 className="font-display text-3xl font-semibold">Places & Venues</h1>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row sm:items-center">
-          <Button variant="ghost" className="min-h-[44px] w-full px-4 text-xs font-semibold sm:w-auto" onClick={() => nav("/partner")}>
+          <Button
+            variant="ghost"
+            className="min-h-[44px] w-full px-4 text-xs font-semibold sm:w-auto"
+            onClick={() => nav("/partner")}
+          >
             Talk to Partnerships
           </Button>
-          <Button className="min-h-[44px] w-full px-4 text-xs font-semibold sm:w-auto shadow-xs" onClick={() => nav("/business/onboard")}>
+          <Button
+            className="min-h-[44px] w-full px-4 text-xs font-semibold sm:w-auto shadow-xs"
+            onClick={() => nav("/business/onboard")}
+          >
             Onboard Your Business
           </Button>
         </div>
@@ -28,7 +35,10 @@ export function PartnersPage() {
         <div className="rounded-3xl border border-dashed border-line p-10 text-center">
           <p className="font-display text-lg font-medium">No partner venues listed yet</p>
           <p className="mt-1 text-sm text-mute">Be the first local venue or stall to list on AirPal.</p>
-          <Button className="mt-4 min-h-[44px] px-5 text-xs font-semibold shadow-xs" onClick={() => nav("/business/onboard")}>
+          <Button
+            className="mt-4 min-h-[44px] px-5 text-xs font-semibold shadow-xs"
+            onClick={() => nav("/business/onboard")}
+          >
             List Your Business
           </Button>
         </div>

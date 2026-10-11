@@ -133,11 +133,7 @@ export function PulsePublicPage() {
   }
 
   /** Tap-to-answer: select, flash the choice, then glide on. Text stays manual. */
-  function chooseAndAdvance(
-    question: PulseQuestion,
-    value: number | string | boolean,
-    label?: string,
-  ) {
+  function chooseAndAdvance(question: PulseQuestion, value: number | string | boolean, label?: string) {
     setAnswer(question, value, label);
     clearAdvance();
     advanceTimer.current = window.setTimeout(() => goNextRef.current(), 380);
@@ -187,32 +183,18 @@ export function PulsePublicPage() {
       {headerImage ? (
         <div>
           <div className="relative h-40 overflow-hidden rounded-[28px] ring-1 ring-line">
-            <img
-              src={headerImage}
-              alt=""
-              className="h-full w-full object-cover"
-              loading="eager"
-            />
-            <div
-              className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-transparent"
-              aria-hidden
-            />
+            <img src={headerImage} alt="" className="h-full w-full object-cover" loading="eager" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-transparent" aria-hidden />
             <div className="absolute inset-x-0 bottom-0 p-4">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/80">
-                AirPal Pulse
-              </p>
-              <p className="font-display text-lg font-bold leading-snug text-white">
-                {pulse.propertyName}
-              </p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/80">AirPal Pulse</p>
+              <p className="font-display text-lg font-bold leading-snug text-white">{pulse.propertyName}</p>
             </div>
           </div>
           <h1 className="font-display mt-4 text-2xl font-semibold">{pulse.title}</h1>
         </div>
       ) : (
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">
-            AirPal Pulse
-          </p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">AirPal Pulse</p>
           <h1 className="font-display mt-1 text-2xl font-semibold">{pulse.title}</h1>
           <p className="mt-1 text-sm text-mute">{pulse.propertyName}</p>
         </div>
@@ -306,14 +288,14 @@ export function PulsePublicPage() {
                         key={String(v)}
                         type="button"
                         onClick={() => chooseAndAdvance(current, v)}
-                      className={`h-12 rounded-full text-sm font-medium ring-1 ${
-                        selected ? "bg-ink text-paper ring-ink" : "bg-card ring-line"
-                      }`}
-                    >
-                      {v ? "Yes" : "No"}
-                    </button>
-                  );
-                })}
+                        className={`h-12 rounded-full text-sm font-medium ring-1 ${
+                          selected ? "bg-ink text-paper ring-ink" : "bg-card ring-line"
+                        }`}
+                      >
+                        {v ? "Yes" : "No"}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -325,9 +307,7 @@ export function PulsePublicPage() {
                       key={current.id}
                       leftLabel={binaryOptions[1]}
                       rightLabel={binaryOptions[0]}
-                      onChoose={(side) =>
-                        chooseAndAdvance(current, binaryOptions[side === "right" ? 0 : 1])
-                      }
+                      onChoose={(side) => chooseAndAdvance(current, binaryOptions[side === "right" ? 0 : 1])}
                     />
                   </div>
                 )}
@@ -339,14 +319,14 @@ export function PulsePublicPage() {
                         key={opt}
                         type="button"
                         onClick={() => chooseAndAdvance(current, opt)}
-                      className={`flex w-full items-center rounded-2xl px-4 py-3 text-left text-sm font-medium ring-1 ${
-                        selected ? "bg-ink text-paper ring-ink" : "bg-card ring-line"
-                      }`}
-                    >
-                      {opt}
-                    </button>
-                  );
-                })}
+                        className={`flex w-full items-center rounded-2xl px-4 py-3 text-left text-sm font-medium ring-1 ${
+                          selected ? "bg-ink text-paper ring-ink" : "bg-card ring-line"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}

@@ -31,17 +31,12 @@ export function BioPulseRate({ propertyId }: { propertyId: string }) {
   if (!result || !result.found) return null;
   const { publicToken, title } = result;
   return (
-    <section
-      aria-label="Rate your experience"
-      className="mt-8 rounded-[28px] bg-neutral-900 p-6 text-white shadow-xs"
-    >
+    <section aria-label="Rate your experience" className="mt-8 rounded-[28px] bg-neutral-900 p-6 text-white shadow-xs">
       <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-accent">
         <Star size={13} /> AirPal Pulse
       </p>
       <h3 className="font-display mt-2 text-xl font-bold tracking-tight">Rate your experience</h3>
-      <p className="mt-1 text-sm leading-6 text-white/70">
-        {title} · takes under a minute, anonymous by default.
-      </p>
+      <p className="mt-1 text-sm leading-6 text-white/70">{title} · takes under a minute, anonymous by default.</p>
       <button
         type="button"
         onClick={() => nav(`/pulse/${publicToken}`)}

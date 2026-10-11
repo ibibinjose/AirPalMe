@@ -83,4 +83,3 @@ test.describe("Join & business profile", () => {
     await expect(page.getByRole("button", { name: /Register the business/i })).toBeVisible();
   });
 });
-

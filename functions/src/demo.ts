@@ -1,8 +1,5 @@
 import { HttpsError, onCall } from "firebase-functions/v2/https";
-import {
-  DEMO_TEARDOWN_COLLECTIONS,
-  DEMO_TEARDOWN_SUBCOLLECTIONS,
-} from "../../shared/demo-business";
+import { DEMO_TEARDOWN_COLLECTIONS, DEMO_TEARDOWN_SUBCOLLECTIONS } from "../../shared/demo-business";
 import type { AccessClaims } from "../../shared/airpal-security";
 import { CALLABLE, db, isPlatformAdmin, requireAccount } from "./admin";
 import { writeAudit } from "./abuse";

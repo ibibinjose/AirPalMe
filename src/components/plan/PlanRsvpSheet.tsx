@@ -7,7 +7,13 @@ import { useBio } from "@/contexts/BioContext";
 import { useLocation } from "wouter";
 import { triggerHaptic } from "@/lib/native";
 import { useScrollLock } from "@/hooks/useScrollLock";
-import { PLAN_ANSWER_MAX, PLAN_PLUS_ONES_MAX, normalizeAnswer, normalizePlusOnes, type PlanGuestQuestion } from "@shared/plan";
+import {
+  PLAN_ANSWER_MAX,
+  PLAN_PLUS_ONES_MAX,
+  normalizeAnswer,
+  normalizePlusOnes,
+  type PlanGuestQuestion,
+} from "@shared/plan";
 import { cn } from "@/lib/cn";
 
 export function PlanRsvpSheet({

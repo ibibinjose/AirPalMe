@@ -7,9 +7,7 @@ import { CREATE_GROUPS, CREATE_OPTIONS, CreateFab, openGlobalCreate } from "./Cr
 const staticHook = (): [string, (to: string) => void] => ["/", () => undefined];
 
 function fabHtml() {
-  return renderToStaticMarkup(
-    createElement(Router, { hook: staticHook }, createElement(CreateFab)),
-  );
+  return renderToStaticMarkup(createElement(Router, { hook: staticHook }, createElement(CreateFab)));
 }
 
 function fabHtmlAt(path: string) {

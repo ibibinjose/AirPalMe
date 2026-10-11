@@ -64,18 +64,26 @@ test.describe("Global Navigation & Profile Flow", () => {
     await page.waitForLoadState("domcontentloaded");
 
     // Open profile menu
-    const menuTrigger = page.getByRole("button", { name: /menu and sign in/i }).filter({ visible: true }).first();
+    const menuTrigger = page
+      .getByRole("button", { name: /menu and sign in/i })
+      .filter({ visible: true })
+      .first();
     await expect(menuTrigger).toBeVisible();
     await menuTrigger.click({ force: true });
 
     // Dropdown options (filter visible since desktop and mobile markup coexist in DOM)
     await expect(page.getByText("Welcome to AirPal").filter({ visible: true })).toBeVisible();
-    await expect(page.getByRole("menuitem", { name: /Sign in \/ Create account/i }).filter({ visible: true })).toBeVisible();
+    await expect(
+      page.getByRole("menuitem", { name: /Sign in \/ Create account/i }).filter({ visible: true }),
+    ).toBeVisible();
     await expect(page.getByRole("menuitem", { name: /Partner account/i }).filter({ visible: true })).toBeVisible();
     await expect(page.getByRole("menuitem", { name: /Become a Host/i }).filter({ visible: true })).toBeVisible();
 
     // Click Sign in / Create account -> goes to /start
-    await page.getByRole("menuitem", { name: /Sign in \/ Create account/i }).filter({ visible: true }).click();
+    await page
+      .getByRole("menuitem", { name: /Sign in \/ Create account/i })
+      .filter({ visible: true })
+      .click();
     await expect(page).toHaveURL(/\/start/);
   });
 

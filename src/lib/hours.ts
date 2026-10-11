@@ -89,11 +89,7 @@ export function isOpenAt(hours: string | undefined, now: Date, timeZone: string)
   if (!hasTimesOrKeywords) return null;
 
   // Multi-day schedule evaluation
-  if (
-    s.includes(";") ||
-    s.includes(",") ||
-    /mon|tue|wed|thu|fri|sat|sun|daily|everyday/i.test(lower)
-  ) {
+  if (s.includes(";") || s.includes(",") || /mon|tue|wed|thu|fri|sat|sun|daily|everyday/i.test(lower)) {
     const dayIdx = zonedWeekdayIndex(now, timeZone);
     const dayKey = WEEKDAY_INDEX_TO_KEY[dayIdx];
     const sched = parseHoursTo7DaySchedule(s);

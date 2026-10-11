@@ -79,7 +79,9 @@ export function PartnerPage() {
 
   function mailtoFallback() {
     const subject = `[AirPal.me] Partnership — ${company || name || "New inquiry"}`;
-    const body = [`Name: ${name}`, `Company: ${company}`, `Email: ${email}`, `Segment: ${segment}`, "", message].join("\n");
+    const body = [`Name: ${name}`, `Company: ${company}`, `Email: ${email}`, `Segment: ${segment}`, "", message].join(
+      "\n",
+    );
     window.location.href = `mailto:${LEGAL.contacts}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
@@ -110,8 +112,8 @@ export function PartnerPage() {
       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">Partner with AirPal</p>
       <h1 className="mt-1 font-display text-4xl font-bold text-ink">Let&apos;s talk.</h1>
       <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-ink/80">
-        Tell us a little about your property or business and we&apos;ll get back to you fast. It takes under a
-        minute — or just email us, your call. Already curious who&apos;s here?{" "}
+        Tell us a little about your property or business and we&apos;ll get back to you fast. It takes under a minute —
+        or just email us, your call. Already curious who&apos;s here?{" "}
         <Link href="/partners" className="font-semibold text-accent">
           See our partners
         </Link>
@@ -138,12 +140,19 @@ export function PartnerPage() {
                   on ? "bg-brand text-white ring-brand shadow-sm" : "bg-paper text-ink ring-line hover:ring-brand/40",
                 )}
               >
-                <span className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-xl ring-1", on ? "bg-white/15 ring-white/25" : "bg-brand/10 text-accent ring-brand/20")}>
+                <span
+                  className={cn(
+                    "grid h-10 w-10 shrink-0 place-items-center rounded-xl ring-1",
+                    on ? "bg-white/15 ring-white/25" : "bg-brand/10 text-accent ring-brand/20",
+                  )}
+                >
                   <Icon size={18} />
                 </span>
                 <span>
                   <span className="block text-sm font-bold">{s.label}</span>
-                  <span className={cn("block text-[11px] leading-snug", on ? "text-white/80" : "text-mute")}>{s.hint}</span>
+                  <span className={cn("block text-[11px] leading-snug", on ? "text-white/80" : "text-mute")}>
+                    {s.hint}
+                  </span>
                 </span>
               </button>
             );
@@ -191,11 +200,23 @@ export function PartnerPage() {
             <label className="mb-1.5 block text-[13px] font-bold text-ink">
               Work email <span className="text-accent">*</span>
             </label>
-            <input value={email} onChange={(e) => setEmail(e.target.value)} inputMode="email" className={input} maxLength={120} />
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              inputMode="email"
+              className={input}
+              maxLength={120}
+            />
           </div>
           <div>
             <label className="mb-1.5 block text-[13px] font-bold text-ink">Phone</label>
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" className={input} maxLength={40} />
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              inputMode="tel"
+              className={input}
+              maxLength={40}
+            />
           </div>
         </div>
 
@@ -235,11 +256,21 @@ export function PartnerPage() {
       <section className="mt-6 rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs sm:p-6">
         <h2 className="font-display text-xl font-bold text-ink">What happens next</h2>
         <ol className="mt-3 space-y-2 text-[14px] text-ink/80">
-          <li><strong className="text-ink">1. We reply</strong> — usually within two business days.</li>
-          <li><strong className="text-ink">2. You apply & verify</strong> — one application, reviewed by a human.</li>
-          <li><strong className="text-ink">3. You go live & get paid</strong> — list, sell, and receive payouts after each event.</li>
+          <li>
+            <strong className="text-ink">1. We reply</strong> — usually within two business days.
+          </li>
+          <li>
+            <strong className="text-ink">2. You apply & verify</strong> — one application, reviewed by a human.
+          </li>
+          <li>
+            <strong className="text-ink">3. You go live & get paid</strong> — list, sell, and receive payouts after each
+            event.
+          </li>
         </ol>
-        <Link href="/business/onboard" className="mt-4 inline-block rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white">
+        <Link
+          href="/business/onboard"
+          className="mt-4 inline-block rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white"
+        >
           Skip the wait — apply now
         </Link>
       </section>

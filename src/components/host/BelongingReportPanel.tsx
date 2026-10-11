@@ -1,14 +1,5 @@
 import { useState } from "react";
-import {
-  Award,
-  CheckCircle2,
-  Copy,
-  Download,
-  HeartHandshake,
-  ShieldCheck,
-  TrendingUp,
-  Users,
-} from "lucide-react";
+import { Award, CheckCircle2, Copy, Download, HeartHandshake, ShieldCheck, TrendingUp, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useCohort } from "@/contexts/CohortContext";
 import { SEED_INSTITUTIONS, getBelongingReportData } from "@shared/cohort";
@@ -18,9 +9,7 @@ import { cn } from "@/lib/cn";
 
 export function BelongingReportPanel() {
   const { activeCohort } = useCohort();
-  const [selectedInstId, setSelectedInstId] = useState<string>(
-    activeCohort?.id || SEED_INSTITUTIONS[0].id,
-  );
+  const [selectedInstId, setSelectedInstId] = useState<string>(activeCohort?.id || SEED_INSTITUTIONS[0].id);
   const [copied, setCopied] = useState(false);
 
   const currentInst = SEED_INSTITUTIONS.find((i) => i.id === selectedInstId) || SEED_INSTITUTIONS[0];
@@ -50,9 +39,7 @@ export function BelongingReportPanel() {
             <HeartHandshake size={13} />
             <span>Executive Belonging Report</span>
           </div>
-          <h2 className="font-display mt-2 text-2xl font-bold text-ink">
-            Cohort Wellbeing & Retention Analytics
-          </h2>
+          <h2 className="font-display mt-2 text-2xl font-bold text-ink">Cohort Wellbeing & Retention Analytics</h2>
           <p className="text-xs text-mute mt-1">
             Audited real-world engagement metrics for residential colleges, student housing & hotel cohorts.
           </p>
@@ -63,7 +50,11 @@ export function BelongingReportPanel() {
             <Copy size={14} />
             <span>{copied ? "Copied" : "Copy Join Link"}</span>
           </Button>
-          <Button variant="primary" onClick={handleExport} className="min-h-[44px] gap-1.5 px-4 text-xs font-semibold shadow-xs">
+          <Button
+            variant="primary"
+            onClick={handleExport}
+            className="min-h-[44px] gap-1.5 px-4 text-xs font-semibold shadow-xs"
+          >
             <Download size={14} />
             <span>Print Report</span>
           </Button>
@@ -104,9 +95,7 @@ export function BelongingReportPanel() {
             </span>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="font-display text-3xl font-extrabold text-ink">
-              {metrics.activated30DayPercent}%
-            </span>
+            <span className="font-display text-3xl font-extrabold text-ink">{metrics.activated30DayPercent}%</span>
             <span className="text-xs font-bold text-emerald-600">+14% vs benchmark</span>
           </div>
           <p className="mt-1 text-[11px] text-mute">
@@ -123,9 +112,7 @@ export function BelongingReportPanel() {
             </span>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="font-display text-3xl font-extrabold text-ink">
-              {metrics.completedExperiences}
-            </span>
+            <span className="font-display text-3xl font-extrabold text-ink">{metrics.completedExperiences}</span>
             <span className="text-xs text-mute">this month</span>
           </div>
           <p className="mt-1 text-[11px] text-mute">
@@ -142,9 +129,7 @@ export function BelongingReportPanel() {
             </span>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="font-display text-3xl font-extrabold text-ink">
-              {metrics.hostedEventAttendanceRate}%
-            </span>
+            <span className="font-display text-3xl font-extrabold text-ink">{metrics.hostedEventAttendanceRate}%</span>
             <span className="text-xs font-bold text-emerald-600">High Turnout</span>
           </div>
           <p className="mt-1 text-[11px] text-mute">
@@ -161,9 +146,7 @@ export function BelongingReportPanel() {
             </span>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="font-display text-3xl font-extrabold text-ink">
-              {metrics.safetyIncidents} Incidents
-            </span>
+            <span className="font-display text-3xl font-extrabold text-ink">{metrics.safetyIncidents} Incidents</span>
           </div>
           <p className="mt-1 text-[11px] text-mute">
             100% human-moderated safety rail with zero unreviewed incident tickets.
@@ -175,9 +158,7 @@ export function BelongingReportPanel() {
       <div className="rounded-3xl bg-gradient-to-r from-card via-card to-paper p-6 ring-1 ring-line shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 className="font-display text-lg font-bold text-ink">
-              {currentInst.name} — Belonging Health Score
-            </h3>
+            <h3 className="font-display text-lg font-bold text-ink">{currentInst.name} — Belonging Health Score</h3>
             <p className="text-xs text-mute mt-0.5">
               Period: {metrics.period} · Total Residents: {metrics.totalResidents} · Active: {metrics.activeResidents}
             </p>
@@ -189,12 +170,11 @@ export function BelongingReportPanel() {
         </div>
 
         <div className="mt-6 border-t border-line/60 pt-4">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-mute">
-            Duty of Care & Privacy Guarantee
-          </h4>
+          <h4 className="text-xs font-bold uppercase tracking-wider text-mute">Duty of Care & Privacy Guarantee</h4>
           <p className="mt-1 text-xs text-mute leading-relaxed">
             All belonging analytics are aggregated strictly in accordance with Australian Privacy Principles (APPs).
-            Individual private plans, personal messages, and location pins are encrypted and never disclosed to institutions.
+            Individual private plans, personal messages, and location pins are encrypted and never disclosed to
+            institutions.
           </p>
         </div>
       </div>

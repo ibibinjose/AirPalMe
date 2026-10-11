@@ -16,6 +16,7 @@ function tag(el: Element | null): string {
  */
 export function ScrollProbe() {
   useEffect(() => {
+    if (!import.meta.env.DEV) return;
     let params: URLSearchParams | null = null;
     try {
       params = new URLSearchParams(window.location.search);

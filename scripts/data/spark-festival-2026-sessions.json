@@ -1,1676 +1,1676 @@
 [
- {
-  "date": "2026-09-21",
-  "start": "09:00",
-  "end": "17:00",
-  "title": "AI for Social Enterprise Hackathon",
-  "host": "The Moreneta Initiative with City Quokka",
-  "description": "Two days of building AI for social enterprises, with no prior experience or existing team required. Day one is for validating the problem and forming teams; day two is for building a prototype and pitching it to judges. 1:00–3:30pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://events.humanitix.com/ai-for-social-enterprise-hackathon",
-  "registrationNote": "",
-  "track": "Hackathon",
-  "speakers": []
- },
- {
-  "date": "2026-09-21",
-  "start": "13:00",
-  "end": "15:30",
-  "title": "From Bench to Bedside: Funding Health Technology from Idea to Impact",
-  "host": "UNSW Founders",
-  "description": "A working session on the path from a health idea to a funded venture. It maps the health innovation landscape, covers turning a research project into a company, and explains how grants and investment actually work for early-stage healthcare businesses. 1:00–3:00pm",
-  "venue": "UNSW Health Translation Hub, 55 Botany Street, Randwick",
-  "registrationUrl": "https://www.eventbrite.com.au/e/from-bench-to-bedside-funding-health-technology-from-idea-to-impact-tickets-1998699019571",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-21",
-  "start": "13:00",
-  "end": "15:00",
-  "title": "Longevity Unleashed: NSW's Next Big Opportunity",
-  "host": "PrimeLife Partners",
-  "description": "By 2030 Australia will have more people aged over 65 than under 18. This session looks at what that shift opens up: financial security, the policy settings around it, and solutions that improve quality of life while bringing costs down. 5:30–7:30pm",
-  "venue": "UNSW CBD, Level 4, 210 George Street, Sydney",
-  "registrationUrl": "https://events.humanitix.com/longevity-unleashed-nsw-s-next-big-opportunity-spark-festival",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "The Hon Jacqui Munro MLC (Shadow Minister for Science and Technology"
-   },
-   {
-    "name": "Harry Godber (CEO, Spark Foundation"
-   },
-   {
-    "name": "Annabel Zhou (Toastie Health"
-   },
-   {
-    "name": "Colin Jowell (BillWill"
-   },
-   {
-    "name": "Andrew Payne (CarePlan"
-   },
-   {
-    "name": "Dr Abby Bloom (moderator"
-   },
-   {
-    "name": "Anne-Marie Elias (PrimeLife Partners"
-   }
-  ]
- },
- {
-  "date": "2026-09-21",
-  "start": "17:00",
-  "end": "20:30",
-  "title": "Spark Festival 2026 Opening Celebration — Launch of the Spark Foundation",
-  "host": "Spark Foundation",
-  "description": "Spark is the home of startups in NSW. The launch of the Spark Foundation takes a deep dive into the dialogue between startups and government: a look back at this year's interactions between government and founders, what we've done well, and what we need to do better.",
-  "venue": "UTS Great Hall, Building 1, 15 Broadway, Ultimo",
-  "registrationUrl": "https://events.humanitix.com/spark-2026-opening",
-  "registrationNote": "Free, but please book",
-  "track": "Opening night",
-  "speakers": [
-   {
-    "name": "The Hon Arthur Sinodinos AO",
-    "role": "Former Ambassador to the US, Federal Minister for Industry, Innovation and Science"
-   },
-   {
-    "name": "Ranya Alkadamani",
-    "role": "Founder, Impact Group International"
-   },
-   {
-    "name": "The Hon Jacqui Munro MLC",
-    "role": "Shadow Minister for Science and Technology, Parliament of NSW"
-   },
-   {
-    "name": "David Brudenell",
-    "role": "Executive Chair, Decidr"
-   }
-  ]
- },
- {
-  "date": "2026-09-21",
-  "start": "17:30",
-  "end": "19:30",
-  "title": "Investment: The myth vs the reality",
-  "host": "UNSW Founders",
-  "description": "What venture capital and private equity are like from the inside, rather than as they appear on social media. The panel covers the day-to-day work, how due diligence really runs, and how different firms operate in the Australian ecosystem.",
-  "venue": "210 George Street, Sydney",
-  "registrationUrl": "https://www.eventbrite.com.au/e/investment-the-myth-vs-the-reality-tickets-1998400572909",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-22",
-  "start": "09:00",
-  "end": "17:00",
-  "title": "AI for Social Enterprise Hackathon — day two",
-  "host": "The Moreneta Initiative with City Quokka",
-  "description": "Two days of building AI for social enterprises, with no prior experience or existing team required. Day one is for validating the problem and forming teams; day two is for building a prototype and pitching it to judges. 1:00–3:30pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://events.humanitix.com/ai-for-social-enterprise-hackathon",
-  "registrationNote": "",
-  "track": "Hackathon",
-  "speakers": []
- },
- {
-  "date": "2026-09-22",
-  "start": "09:00",
-  "end": "11:00",
-  "title": "The AI Reality Check: From Hype to Institutional Confidence",
-  "host": "Tech Council of Australia with J.P. Morgan",
-  "description": "The AI market has moved from enthusiasm to scrutiny, and investors and boards now want a strategy that stands up financially rather than a story about AI. Speakers from J.P. Morgan, law, venture capital and AI companies themselves look at what it takes to build and fund an AI business serious capital will back. 10:00–11:00am",
-  "venue": "J.P. Morgan, 85 Castlereagh Street, Sydney",
-  "registrationUrl": "https://events.techcouncil.com.au/092226_AIRealityCheck_IandGseries",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Aengus Tran (Co-founder and CEO, Harrison.ai"
-   },
-   {
-    "name": "Danielle Haj-Moussa (Investment Manager, Main Sequence Ventures"
-   },
-   {
-    "name": "Kyra Hannaford (Executive Director, Equity Capital Markets ANZ, J.P. Morgan"
-   },
-   {
-    "name": "Mark Hoh (Head of TMT Investment Banking ANZ, J.P. Morgan"
-   },
-   {
-    "name": "Paul Fletcher (Board Director, Tech Council of Australia"
-   },
-   {
-    "name": "Simon Burns (Partner, Gilbert + Tobin"
-   }
-  ]
- },
- {
-  "date": "2026-09-22",
-  "start": "10:00",
-  "end": "11:00",
-  "title": "Ready to Scale? Running and scaling corporate pilots",
-  "host": "Treble Strategic",
-  "description": "Founders often win the pilot and then watch it stall. The usual verdict is that the technology underdelivered. It rarely did. Proven pilots stall because the organisation was not ready to scale them, and real value and ROI only arrive at scale. In this hands-on workshop, founders run Treble's Strategic Pulse on their own companies in twenty minutes to see exactly where their scaling will break. 10:30am",
-  "venue": "Stone & Chalk Tech Central, Boardroom 5+6, 477 Pitt Street",
-  "registrationUrl": "https://events.humanitix.com/ready-to-scale-running-and-scaling-corporate-pilots",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Matthew Werner (Principal, Innovation & Strategy, Treble Strategic"
-   },
-   {
-    "name": "Alejandro Patterson (Principal, Product & Strategy, Treble Strategic"
-   }
-  ]
- },
- {
-  "date": "2026-09-22",
-  "start": "10:30",
-  "end": "11:30",
-  "title": "Where the Jobs Are: using labour market data to plan, build or grow",
-  "host": "Jobs and Skills Australia",
-  "description": "An interactive online masterclass on the Jobs and Skills Atlas, Australia's most comprehensive public source of labour market, industry, workforce and training data. How founders, investors and innovators can use it to spot fast-growing industries and occupations, read talent availability by region, trace pathways into and out of an occupation, and test expansion, investment and location decisions against real local conditions. Worked examples, then questions. 11:00am–2:00pm",
-  "venue": "Online",
-  "registrationUrl": "https://events.teams.microsoft.com/event/af644942-a09b-45ef-9ab5-e3261ca50672@dd0cfd15-4558-4b12-8bad-ea26984fc417?source=copyLinkOneEventsShareDialog",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Liz Jakubowski (Director, Digital, Jobs and Skills Australia"
-   }
-  ]
- },
- {
-  "date": "2026-09-22",
-  "start": "11:00",
-  "end": "14:00",
-  "title": "Programs, Resources and Funding support for deep tech and innovation",
-  "host": "University of Sydney — Sydney Knowledge Hub",
-  "description": "A run through the funding, programs and resources open to deep tech researchers and founders, with Investment NSW's Office of the Chief Scientist and Engineer, Therapeutic Innovation Australia, CSIRO ON, Cicada Innovations, Uniseed, IP Group and the Advanced Manufacturing Readiness Facility. A catered lunch follows so people can talk to the speakers directly. 12:30–1:30pm",
-  "venue": "Sydney Knowledge Hub, Room 277, Merewether Building, City Rd & Butlin Ave, Darlington",
-  "registrationUrl": "https://events.humanitix.com/spark-festival-reverse-pitch-and-networking-event",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-22",
-  "start": "12:30",
-  "end": "13:30",
-  "title": "Employee claims in the age of AI: what founders need to know",
-  "host": "Spark Foundation with HSF Kramer",
-  "description": "Redundancies and terminations are part and parcel of a high-growth startup as it evolves. But in 2026 founders across Australia have been hit with a barrage of AI-generated Fair Work claims and other employment disputes, often with no reasonable grounds. Two of Australia's leading employment law practitioners on responding to those claims effectively and affordably, and on the employment arrangements that protect a company before one arrives. 12:30–2:00pm",
-  "venue": "Stone & Chalk Tech Central, Level 1, 477 Pitt Street, Haymarket",
-  "registrationUrl": "https://events.humanitix.com/employee-claims-in-the-age-of-ai",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Michael Gonski (Employment Partner, HSF Kramer"
-   },
-   {
-    "name": "Dominic Woolrych (Co-founder and CEO, LawPath"
-   }
-  ]
- },
- {
-  "date": "2026-09-22",
-  "start": "12:30",
-  "end": "14:00",
-  "title": "Speaking Under Pressure: How Founders and Leaders Communicate with Confidence When It Matters Most",
-  "host": "The Executive Centre and Inveniax Group",
-  "description": "The moments that matter most are rarely the rehearsed ones. A practical session for founders and leaders on communicating with confidence under pressure, with lunch provided. 1:00–4:00pm",
-  "venue": "The Executive Centre Angel Place, Level 17, 123 Pitt Street, Sydney",
-  "registrationUrl": "https://events.humanitix.com/speaking-under-pressure-how-founders-and-leaders-communicate-with-confidence-when-it-matters-most",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Richie Widjaja"
-   }
-  ]
- },
- {
-  "date": "2026-09-22",
-  "start": "13:00",
-  "end": "16:00",
-  "title": "Selling the Green Dream",
-  "host": "UNSW Founders",
-  "description": "Can climate-positive technology also make money? Founders and industry leaders discuss where the economic value actually sits, opening with a keynote from Shane Keating of CounterCurrent and closing with questions and networking. 1:00–4:00pm",
-  "venue": "Greenhouse, Level 3, 180 George Street, Sydney",
-  "registrationUrl": "https://www.eventbrite.com.au/e/selling-the-green-dream-tickets-1998699639425",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-22",
-  "start": "13:00",
-  "end": "16:00",
-  "title": "The Startup Engine Workshop",
-  "host": "Macquarie University Incubator",
-  "description": "The Startup Engine Method is a practical framework for designing, testing and validating a business model before committing years to the wrong one. Work through revenue model design, simulate the numbers with the FUEL model and map a path to product-market fit. Aimed at founders in their first or second year, or anyone yet to confirm problem-solution or product-market fit. 1:30–3:30pm",
-  "venue": "The Incubator, 8 Hadenfeld Ave, Macquarie Park",
-  "registrationUrl": "https://events.humanitix.com/the-startup-engine-workshop",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "A/Professor Todd Davey (Macquarie University"
-   }
-  ]
- },
- {
-  "date": "2026-09-22",
-  "start": "13:30",
-  "end": "15:30",
-  "title": "AI and Human Behaviour",
-  "host": "PeerWize with the Behavioural Insights Team",
-  "description": "How can an organisation increase AI adoption safely and effectively? Dr Alex Gyani, who runs the Behavioural Insights Team across the Asia-Pacific, on the behavioural traps that stall adoption - the pilot that never scales, shadow AI, and the cognitive surrender that sets in when people stop questioning the output - and what to do about each. A small curated room, run on a non-attribution basis: arrival from 1:30, session 2:00 to 3:00, networking to 3:30. 1:30–2:30pm",
-  "venue": "321 Kent Street, Sydney",
-  "registrationUrl": "https://luma.com/zb0wfk54",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Dr Alex Gyani (Managing Director, Asia-Pacific, Behavioural Insights Team"
-   }
-  ]
- },
- {
-  "date": "2026-09-22",
-  "start": "13:30",
-  "end": "14:30",
-  "title": "Accounting, Tax and R&D for Startup Founders in Sydney",
-  "host": "Gild Group",
-  "description": "Two Gild Group advisers on the unglamorous decisions that decide whether a startup survives contact with the tax system: five things on accounting and tax, five on R&D, and an open Q&A on whatever you are worried about. 2:00–3:00pm SI",
-  "venue": "Stone & Chalk Tech Central, Level 1, 477 Pitt Street, Haymarket",
-  "registrationUrl": "https://events.humanitix.com/accounting-tax-and-r-and-d-for-startup-founders-in-sydney",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Catherine Turner (Client Manager, Gild Business Management"
-   },
-   {
-    "name": "Alex Canning (Gild Group"
-   }
-  ]
- },
- {
-  "date": "2026-09-22",
-  "start": "14:00",
-  "end": "15:00",
-  "title": "Your Brand in the Age of AI",
-  "host": "Spark Interact",
-  "description": "A free webinar on what AI changes about brand: where it helps, where it flattens everything into the same voice, and what a small company should hold on to while the tools keep moving. 2:30–4:30pm",
-  "venue": "Online",
-  "registrationUrl": "https://events.humanitix.com/your-brand-in-the-age-of-ai",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Mac Nguyen (Marketing Specialist, Spark Interact"
-   }
-  ]
- },
- {
-  "date": "2026-09-22",
-  "start": "14:30",
-  "end": "16:30",
-  "title": "The Great Database Clean-Up: a party for people who hate admin",
-  "host": "Utopia Rising",
-  "description": "A working session on turning a pile of contacts into a relationship system you can actually use: who to prioritise, what good networking practice looks like, and which platform to keep it in as you grow. Exercises rather than a lecture. 2:30–3:00pm",
-  "venue": "Poly Centre, Level 4, 210 George Street, Sydney",
-  "registrationUrl": "https://events.humanitix.com/the-great-database-clean-up-a-party-for-people-who-hate-admin",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Jonathan Lee"
-   }
-  ]
- },
- {
-  "date": "2026-09-22",
-  "start": "14:30",
-  "end": "15:00",
-  "title": "UTS Startups Space Tour — Spark Festival Edition",
-  "host": "UTS Startups",
-  "description": "A half-hour guided tour of one of Australia's largest university-affiliated startup communities. See the space, hear how UTS Startups supports founders at different stages, and meet people from the community. Open to founders, aspiring entrepreneurs, students, investors and ecosystem partners. Meet at UTS Building 3, Bon Marche, Level 4. 4:30–6:00pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo — meet at Building 3, Bon Marche, Level 4, 755 Harris Street",
-  "registrationUrl": "https://luma.com/utss-6wgk",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-22",
-  "start": "16:30",
-  "end": "18:00",
-  "title": "Pledge 1% Meetup — activating for impact: how founders do the do",
-  "host": "Pledge 1%",
-  "description": "For companies that want to build social responsibility in from the start rather than bolt it on later. Meet the new Australian Pledge 1% team, work through the different pledge categories, and meet others doing the same thing. 5:00–7:00pm",
-  "venue": "Canva Space, 110 Kippax Street, Surry Hills",
-  "registrationUrl": "https://pledge1sparkfestival.splashthat.com",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Antonia Ruffell (Managing Director, Australia, Pledge 1%"
-   },
-   {
-    "name": "Joni Fleischer (Co-founder, tekFoundation"
-   },
-   {
-    "name": "Nick Shepherd (Founder and Managing Director, tekFinder"
-   }
-  ]
- },
- {
-  "date": "2026-09-22",
-  "start": "17:00",
-  "end": "19:00",
-  "title": "Spark — AI: After Hours",
-  "host": "UNSW Founders",
-  "description": "An open build hour followed by a focused AI hour and networking, at the Michael Crouch Innovation Centre. Come to work on something, find a mentor, or argue about what AI is doing to the rest of us. 6:00–7:00pm (doors 5:30pm)",
-  "venue": "Michael Crouch Innovation Centre, Gate Two Avenue, Kensington",
-  "registrationUrl": "https://www.eventbrite.com.au/e/spark-ai-after-hours-tickets-1998399589969",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-22",
-  "start": "18:00",
-  "end": "19:00",
-  "title": "Spark Festival Tackles Housing Affordability",
-  "host": "Spark Foundation",
-  "description": "Housing policy has a tech problem. Is the sector that could fix it paying for it? Meanwhile, the search for answers on affordability has reached into capital gains treatment, and much of that has landed on the tech sector — the same sector we keep saying will help solve the problem. Can startups deliver on the promise – and is the new CGT regime cutting off our nose to spite our face? Three people join us who see this from different ends: the policy, the capital, and the construction. We’ll put to them the tough questions – from political attitudes to investor appetite – and whether affordable housing in Australia is a realistic goal. UTS Startups, corner of Harris St and Broadway · Kristy McSweeney (The PR Counsel, political commentator on ABC and Sky), Chen Rosen (Co-Founder and Managing Partner, Reality PropTech Fund), Andy Rampton (Field COO, International, Procore), Harry Godber (CEO, Spark Foundation) moderating",
-  "venue": "Everyone agrees on housing. Build more, build faster — you’d struggle to find a politician or an industry body who’d say otherwise.",
-  "registrationUrl": "https://events.humanitix.com/spark-festival-tackles-housing-affordability",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-23",
-  "start": "08:00",
-  "end": "09:30",
-  "title": "AI Sovereignty — Parliamentary Friends",
-  "host": "Decidr with Spark Festival",
-  "description": "At NSW Parliament, Decidr partners with Spark Festival to bring together political and industry leaders for a breakfast conversation on sovereign AI capability. Hear from David Brudenell (Decidr) in discussion with the Hon. Jacqui Munro MLC, Shadow Minister for Science and Technology and Jason Yat-Sen Li MP, Member for Strathfield, Co-Chairs of the Parliamentary Friends of Innovation, Ventures, Entrepreneurs and Technology (INVENT). Then Spark’s Kristy McSweeney will host an industry panel featuring voices from CareerOne and SCX – unpacking what sovereign AI means in practice. 9:00–9:50am",
-  "venue": "Parliament House, 6 Macquarie Street, Sydney",
-  "registrationUrl": "https://events.humanitix.com/spark-decidr-parliament",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-23",
-  "start": "09:00",
-  "end": "17:00",
-  "title": "Spark Startup Growth Lab — day one",
-  "host": "Geoff Main",
-  "description": "Two days of practical problem-solving for people building and growing startups. Every session starts with a specific problem, then brings in someone who has actually solved it to show how: the systems, the decisions, the numbers, the mistakes and what they would do differently. Sessions run across finding your first customers, scaling GTM, community-led growth, making AI products usable, AI video, cloud costs, raising capital, R&D and grants, SEO and AI search, scaling teams, and building a personal brand that creates real business value. Register here for the whole stream, or take individual sessions - each one is listed separately below with its own registration. 8:00–9:30am",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/sparkstartupgrowthlab",
-  "registrationNote": "",
-  "track": "Growth Lab",
-  "speakers": []
- },
- {
-  "date": "2026-09-23",
-  "start": "09:00",
-  "end": "09:50",
-  "title": "Building an AI Content Engine That Actually Works",
-  "host": "Spark Startup Growth Lab",
-  "description": "Where AI video is really up to. Jerrod Lew works at the cutting edge of AI video with Adobe, Google and some of the world's leading AI creative platforms, and demonstrates what the tools can and cannot do now: the workflows, the current limits, and the applications that are realistic for a startup rather than a studio. 9:00–9:50am",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/f0ltcpjj",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Jerrod Lew (AI video consultant to Adobe and Google"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "09:00",
-  "end": "09:50",
-  "title": "Conversion.Live: Workshop and Fix Your Funnel",
-  "host": "Spark Startup Growth Lab",
-  "description": "Bring the funnel that is not working. Before the session you diagnose where you think the problem is and submit the block you are facing; in the room Brendan Lee works through selected real funnels live, showing where confidence is breaking, what the evidence suggests, and what he would change first. Most founders assume a growth problem means they need more leads. Often the real constraint is further down the funnel. 10:15–11:05am",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/ac93gl5w",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Brendan Lee (Conversions.today"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "10:15",
-  "end": "11:05",
-  "title": "Behind the Scenes of Building a Personal Brand People Actually Care About",
-  "host": "Spark Startup Growth Lab",
-  "description": "We have reached peak founder content, and most of it is forgettable. Jemma McKenzie works directly under Jane Lu growing her personal brand, The Lazy CEO, and unpacks what it actually takes to turn a personal brand into a profitable engine - not content hacks, but the real decisions behind it. 10:15–11:05am",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/zfpc1zmv",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Jemma McKenzie"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "10:15",
-  "end": "11:05",
-  "title": "Build Your Marketing Brain: One System for Positioning, Competitive Intel and Content",
-  "host": "Spark Startup Growth Lab",
-  "description": "Most marketers use AI like a smart intern - prompt it, paste in the context, fix the draft, then start from zero tomorrow. Will Mulholland demonstrates the alternative live: a marketing system that holds your positioning, customer language and competitive context so the work compounds instead of resetting each time. Live demonstration against real examples from the room, and a blueprint you could stand up inside a week. 10:30am–12:00pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/n0xkvm65",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Will Mulholland (Product Marketer, beehiiv, Founder, Intelligent Growth"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "10:30",
-  "end": "12:00",
-  "title": "Dyslexia Networking Coffee",
-  "host": "Always Carbon",
-  "description": "An informal coffee for dyslexic people in the innovation economy and the people who back them, to meet each other and build connections across neurotypes. Pay as you go. 11:30am–12:20pm",
-  "venue": "Little Duck, Lobby, 347 Kent Street, Sydney CBD",
-  "registrationUrl": "https://luma.com/5uq6hyge",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-23",
-  "start": "11:30",
-  "end": "12:20",
-  "title": "Be the Answer in AI: What's Actually Working Now?",
-  "host": "Spark Startup Growth Lab",
-  "description": "Google search, AI answers and tools like ChatGPT are starting to overlap, and the rules for getting found are changing with them. Celia Harding uses fresh evidence, side-by-side examples and new research published during festival week to separate what is genuinely changing from what still matters, and where a small team should put its effort first. 11:30am–12:20pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/0ezjptew",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Celia Harding"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "11:30",
-  "end": "12:20",
-  "title": "How Relevance AI Built Customer Support to Scale",
-  "host": "Spark Startup Growth Lab",
-  "description": "What it actually takes to build customer support for scale. Alex Waite goes behind the scenes on the AI-plus-human support system she built at Relevance AI: the workflows, the agents, the before-and-after changes, the metrics, and where AI helps against where human judgement is still needed. 12:00–1:00pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/ah9x59wi",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Alex Waite (Relevance AI"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "12:00",
-  "end": "13:00",
-  "title": "But why? Having a clear strategy for a clear ask for the right capital",
-  "host": "Tank Stream Labs",
-  "description": "Founders ask for capital before they can say what it is for. Anthony Passe-de Silva works through how a business strategy is actually built, how it feeds into short, medium and long-term planning, and where financial capital sits as one input among several rather than the answer itself - so you know which kind of capital you need and when to ask for it. Hybrid: attend in the room or online. 12:00–1:00pm",
-  "venue": "Tank Stream Labs, Level 17, 300 Barangaroo Avenue, Barangaroo (board room 17.08)",
-  "registrationUrl": "https://events.humanitix.com/but-why",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Anthony Passe-de Silva GAICD (Founder and CEO, One2Solutions Group"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "12:00",
-  "end": "13:00",
-  "title": "MQ Incubator Lunch & Learn: The Psychology of Entrepreneurial Courage",
-  "host": "Macquarie University Incubator",
-  "description": "Fear and self-doubt are a normal part of building something new. Drawing on psychology and neuroscience, this session looks at how avoidance reinforces fear while small, deliberate action builds self-efficacy: confidence usually comes after action, not before it. Bring your own lunch. Attend in person or online. 1:00–2:00pm",
-  "venue": "The Incubator, 8 Hadenfeld Avenue, Macquarie Park (and online)",
-  "registrationUrl": "https://events.humanitix.com/the-psychology-of-entrepreneurial-courage",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "James Linton (Incubator Manager, Macquarie University Incubator"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "13:00",
-  "end": "14:00",
-  "title": "Unpacking the Federal Budget: what it practically means for startups and scaleups",
-  "host": "William Buck",
-  "description": "What the federal budget means in practice for startups and scaleups, from the people who read it line by line. 1:30–2:20pm",
-  "venue": "William Buck, Level 29, 66 Goulburn Street",
-  "registrationUrl": "https://assets1-oce.mkt.dynamics.com/352ee5a9-4afa-ef11-b015-0022489322c4/digitalassets/standaloneforms/3b747b24-82a6-f111-aaab-7c1e522b38eb?readableEventId=William_Buck_Unpacking_the_Federal_Budget2621586055",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Alex Zinzopoulos (Partner"
-   },
-   {
-    "name": "Ramsey Aoude (Manager"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "13:30",
-  "end": "14:20",
-  "title": "Personal Branding: Be the Signal, Not the Noise",
-  "host": "Spark Startup Growth Lab",
-  "description": "AI agents increasingly decide who gets seen before a human ever does, but the rooms, referrals and relationships that move opportunities still run on people remembering people. Vinisha Rathod on working out what you want to be known for, saying it clearly, and showing up consistently without adopting a persona the market invented for you. 2:00–4:00pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/cafrtejh",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Vinisha Rathod (Managing Director and Founder, p3 Studio"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "14:00",
-  "end": "16:00",
-  "title": "R&D Tax Incentive: A Founder's Guide",
-  "host": "Prime Partners Chartered Accountants",
-  "description": "How the R&D Tax Incentive actually works, and how to tell genuine technical uncertainty from routine product development - the distinction the whole claim turns on. Hamish Sinclair runs the R&D Tax Incentive program at Prime Partners and works across the full life of a claim, from the first eligibility conversation through to documentation and lodgement. Expect real startup examples, the financial and technical pitfalls that catch people out, and what you need to be recording as you build. For founders, CFOs, tax managers and innovation teams. 2:45–3:35pm",
-  "venue": "Tank Stream Labs, Level 17 (Room 17.08), International Tower 3, 300 Barangaroo Avenue, Barangaroo",
-  "registrationUrl": "https://events.humanitix.com/r-and-d-tax-incentive-a-founders-guide",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Hamish Sinclair (R&D Tax Manager, Prime Partners"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "14:45",
-  "end": "15:35",
-  "title": "Clean Exit: How to Leave, Sell or Step Back From Your Startup Without the Baggage",
-  "host": "Spark Startup Growth Lab",
-  "description": "Could your startup survive the scrutiny of a buyer, an investor, an incoming partner or a co-founder separation? A commercial lawyer and an accountant work through a fictional startup going into due diligence and the problems that surface there: gaps in the shareholder agreement, IP sitting in the wrong entity, undocumented loans, unsigned agreements and unresolved founder conflict. Attendees leave with a one-page exit-readiness check they can run over their own company. 2:45–3:35pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/npnx0n5j",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Mark Lazarus (Founder and Director, Lazarus Legal"
-   },
-   {
-    "name": "Zander De Klerk (Xeta Accounting"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "14:45",
-  "end": "15:35",
-  "title": "Where Is Your B2B Sales Growth Actually Stuck?",
-  "host": "Spark Startup Growth Lab",
-  "description": "The answer is not always more leads. Sometimes the constraint is the sales process, the conversion step, or the fact that founder-led selling has stopped scaling. Tammie Lee opens with a self-assessment across lead generation, sales process, conversion and moving beyond founder-led sales, then works through what a low score in each area usually means and what to do about it. Everyone leaves with a diagnosis and two or three priority actions rather than a list of everything that could be improved. 3:00–4:00pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/1grhlt55",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Tammie Lee (Principal and Sales Partner, Founder Sales Solution"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "15:00",
-  "end": "16:00",
-  "title": "Raising Capital in 2026: What HNW Investors and Family Offices Are Looking For",
-  "host": "Wholesale Investor",
-  "description": "Why do some raises gain momentum within weeks, while others go quiet for months? This session unpacks what's shifted in how capital is being allocated this year, the factors that build investor confidence, and a framework you can apply directly to your own raise. 3:30–5:00pm TFU",
-  "venue": "Stone & Chalk Tech Central, Level 1, 477 Pitt Street",
-  "registrationUrl": "https://www.eventbrite.com.au/e/raising-capital-in-2026-what-hnw-investors-family-offices-are-looking-fo-tickets-1999003593560?aff=Spark",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Steve Torso (Managing Director, Wholesale Investor"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "15:30",
-  "end": "17:00",
-  "title": "Beyond the Raise",
-  "host": "The Founders Union and Tech Ready Women",
-  "description": "Three lenders and three different kinds of capital, on what each one is actually for. Beyond venture capital: which options suit which businesses, where they sit in a company's growth, how you get access and what you need to qualify — so the capital stack is built deliberately rather than by default. 3:30–5:45pm",
-  "venue": "Tank Stream Suites, 52 Martin Place, Sydney",
-  "registrationUrl": "https://luma.com/b6grtp7h",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Mat Hansen (Kashcade"
-   },
-   {
-    "name": "Kylie Little (Lighter Capital"
-   },
-   {
-    "name": "Westpac Startup Loans team"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "15:30",
-  "end": "17:45",
-  "title": "Just Raised. Now What? — What I Wish I Knew LIVE",
-  "host": "KC Ventures",
-  "description": "What actually happens in the six months after the money lands — the part nobody puts in the announcement post. Daniel Lord-Doyle talks through Mary Technology’s A$7m raise and everything that came after it; Oliver Darwin of OIF Ventures takes the same questions from the investor’s chair. Forty-five minutes each, then both of them on for audience questions. Recorded live, light refreshments from 3:30pm. 4:00–6:00pm",
-  "venue": "Song Kitchen, Song Hotel, 5 Wentworth Avenue, Surry Hills",
-  "registrationUrl": "https://events.humanitix.com/just-raised-now-what",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Luke Rix (Founder, KC Ventures) hosting, with Daniel Lord-Doyle (Co-founder, Mar"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "16:00",
-  "end": "18:00",
-  "title": "Build Sprint One",
-  "host": "ACU Co-Lab",
-  "description": "4:00–4:50pm",
-  "venue": "Online",
-  "registrationUrl": "https://www.acu.edu.au/locations/co-lab/our-programs/building-your-startup-with-ai-tools",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Gavin Heaton"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "16:00",
-  "end": "16:50",
-  "title": "Can I Afford to Grow? Bring Your Biggest Financial Question",
-  "host": "Spark Startup Growth Lab",
-  "description": "What is the financial question you are hoping nobody asks you? Bring a real decision to experienced CFOs Wayne Wanders, Michelle Kvello and Amit Shah, and work through the numbers and assumptions that matter to leave with practical next steps. 4:00–4:50pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/dik90gmm",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Wayne Wanders, Michelle Kvello, Amit Shah"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "16:00",
-  "end": "16:50",
-  "title": "How to Create Realistic AI Video — Practical Session",
-  "host": "Spark Startup Growth Lab",
-  "description": "The practical companion to the morning session. Jerrod Lew takes one finished piece - his GenAI short film Clueless in Love - and unpacks how it was actually made, from idea and storyboard through image generation and video generation to the decisions that keep a finished work coherent. 5:00–7:30pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/b3hz6y2p",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Jerrod Lew (AI video consultant to Adobe and Google"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "17:00",
-  "end": "19:30",
-  "title": "Built Different: Diversity in the Startup Ecosystem",
-  "host": "UNSW Founders",
-  "description": "A panel and networking evening on how identity, culture, lived experience and representation shape what people build. Part of the UNSW Diversity Festival, bringing together founders, investors and student entrepreneurs. 5:00–7:30pm",
-  "venue": "Michael Crouch Innovation Centre, Gate Two Avenue, Kensington",
-  "registrationUrl": "https://www.eventbrite.com.au/e/built-different-diversity-in-the-startup-ecosystem-tickets-1994914461857",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-23",
-  "start": "17:00",
-  "end": "19:30",
-  "title": "Deep Tech Mixer",
-  "host": "CSIRO and Cicada Innovations",
-  "description": "An evening for deep tech researchers, founders and the people who fund them, hosted by CSIRO and Cicada Innovations. Cicada Innovations 5:30–8:30pm",
-  "venue": "Cicada Innovations",
-  "registrationUrl": "https://comms.innovation.csiro.au/pub/pubType/EO/pubID/zzzz6a90ce598b768658/interface.html",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-23",
-  "start": "17:30",
-  "end": "20:30",
-  "title": "Bio & RNA Networking Drinks and Nibbles",
-  "host": "RNA Australia, BioNSW and Macquarie University DeepTech Incubator",
-  "description": "An evening of casual drinks, nibbles and networking with Sydney's bio and RNA community — researchers, founders, investors and anyone interested in bio and RNA innovation. Spaces are limited, so RSVP. 5:30–8:30pm",
-  "venue": "Bar 1880, 10 Bulletin Place, Sydney",
-  "registrationUrl": "https://events.humanitix.com/bio-and-rna-networking-drinks-and-nibbles-or-spark-festival",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-23",
-  "start": "17:30",
-  "end": "20:30",
-  "title": "Brookvale Pitch Club at Dad & Dave's Brewing",
-  "host": "The Pitch Club",
-  "description": "A casual platform for entrepreneurs, startups and business enthusiasts to share ideas, collaborate and support each other - this edition with an ed-tech theme. Founders, mentors, investors and anyone curious about the startup ecosystem are welcome. Anyone can pitch an idea on the night and compete for audience votes and prizes. Some ticket tiers include a welcome drink and a burger. 5:30–8:45pm",
-  "venue": "Dad & Dave's Brewing, 45 Mitchell Road, Brookvale",
-  "registrationUrl": "https://events.humanitix.com/brookvale-pitch-club-at-dad-and-dave-s-brewing",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Margaret Mai (Pitch Judge"
-   },
-   {
-    "name": "David Kenney (Pitch Judge"
-   },
-   {
-    "name": "Shahe Momdjian (Pitch Judge"
-   },
-   {
-    "name": "Chris Clark (Host"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "17:30",
-  "end": "20:45",
-  "title": "Find Your Co-Founder or New Hire",
-  "host": "Western Sydney Startup Hub",
-  "description": "An evening of networking, founder connections and talent matchmaking for founders, startup teams and anyone looking for a co-founder or a role in a high-growth venture. Networking and refreshments from 5:30pm, a founder panel at 6:00pm, sixty-second elevator pitches from 6:45pm, then more networking and canapes. 5:30–7:00pm (doors 5:00pm)",
-  "venue": "Western Sydney Startup Hub, 5 Fleet Street, North Parramatta",
-  "registrationUrl": "https://events.humanitix.com/copy-of-find-your-co-founder-or-new-hire-ai-edition",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Api Yuganathan (Co-Founder, HealthcareLink"
-   },
-   {
-    "name": "Georgina Schepis (Co-Founder and Business & Operations Manager, Handle Branding"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "17:30",
-  "end": "19:00",
-  "title": "Town Hall — Agentic AI Transformation in Government",
-  "host": "Portal Global / BCG / Royal Society NSW / UTS Startups",
-  "description": "Governments everywhere are grappling with how agentic AI will reshape policy, service delivery and the machinery of the public sector itself. This Town Hall brings together global leaders from government, strategy consulting and critical infrastructure to explore what that transformation looks like in practice, and what it takes to deliver it. Evening",
-  "venue": "BCG Sydney",
-  "registrationUrl": "https://events.humanitix.com/agentic-ai-transformation-in-government",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Hon. Victor Dominello (CEO, Future Government Institute"
-   },
-   {
-    "name": "Miguel Carrasco (Managing Director and Senior Partner, BCG and BCG-X"
-   },
-   {
-    "name": "Brad Eliot (former CTO, IMI Media). Opened by Murray Hurps, closed by Christina "
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "18:00",
-  "end": "19:00",
-  "title": "This Is Not a Tech Talk!",
-  "host": "Validate Launch Scale",
-  "description": "A hands-on AI workshop for non-tech founders and small business owners. How to use AI, automation and no-code tools without a tech team or any coding, what AI can genuinely do for a small business, where human judgement still matters, and what to test before investing in a new automation, app or system.",
-  "venue": "Substation no.13, 63 Little Mount Street, Pyrmont",
-  "registrationUrl": "https://luma.com/c4zz8l28",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Valeria Oliveira (Founder, Validate Launch Scale"
-   },
-   {
-    "name": "Simone Oro (Founder, Oro Fashion House"
-   }
-  ]
- },
- {
-  "date": "2026-09-23",
-  "start": "18:30",
-  "end": "21:00",
-  "title": "Spark Festival Founders' Dinner",
-  "host": "Spark Festival",
-  "description": "A private dinner for founders, by invitation. Steve Shelley  6:00pm VL",
-  "venue": "Steve Shelley",
-  "registrationUrl": "",
-  "registrationNote": "By invitation",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-24",
-  "start": "08:00",
-  "end": "10:00",
-  "title": "Kindling Cafe",
-  "host": "Kindling Tech",
-  "description": "Every market of fifty to three hundred people has a handful of names the rest of the room listens to. This is a small session on how to earn a public co-sign from them rather than a polite reply: one topic, one room, and coffee. 9:00–11:30am",
-  "venue": "26 Queen Street, Chippendale",
-  "registrationUrl": "https://luma.com/4z15ftau",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-24",
-  "start": "09:00",
-  "end": "17:00",
-  "title": "Spark Startup Growth Lab — day two",
-  "host": "Geoff Main",
-  "description": "Two days of practical problem-solving for people building and growing startups. Every session starts with a specific problem, then brings in someone who has actually solved it to show how: the systems, the decisions, the numbers, the mistakes and what they would do differently. Sessions run across finding your first customers, scaling GTM, community-led growth, making AI products usable, AI video, cloud costs, raising capital, R&D and grants, SEO and AI search, scaling teams, and building a personal brand that creates real business value. Register here for the whole stream, or take individual sessions - each one is listed separately below with its own registration. 8:00–10:00am KT",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/sparkstartupgrowthlab",
-  "registrationNote": "",
-  "track": "Growth Lab",
-  "speakers": []
- },
- {
-  "date": "2026-09-24",
-  "start": "09:00",
-  "end": "11:30",
-  "title": "Brew & Build Sydney: Your Cap Table, Plugged In",
-  "host": "Carta with Stone & Chalk",
-  "description": "A workshop for early-stage founders on managing equity: setting up a cap table in Carta Launch, querying ownership structures with an AI plugin, and modelling fundraising scenarios. A Carta expert covers the fundamentals of early-stage fundraising live on stage, followed by an investor keynote on what founders actually need before a raise, then brunch and open Q&A. 9:00–9:50am",
-  "venue": "Stone & Chalk, Haymarket",
-  "registrationUrl": "https://luma.com/iwywam16",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-24",
-  "start": "09:00",
-  "end": "09:50",
-  "title": "R&D Tax: How Startups Actually Get More Value From It",
-  "host": "Spark Startup Growth Lab",
-  "description": "Most startups focus on whether their R&D claim is eligible. The bigger opportunity is what separates an average claim from a strong one, and that usually comes down to how the company behaves through the year rather than what it reconstructs at lodgement. Alex Knight on the behaviours, records and decisions behind a stronger, more defensible claim. 10:15–11:05am",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/mgm6rh8u",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Alex Knight (Founder and CEO, Advanced"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "10:15",
-  "end": "11:05",
-  "title": "Scaling Everlab: The Decisions That Mattered",
-  "host": "Spark Startup Growth Lab",
-  "description": "Everlab is a rare Australian startup story you can learn from while the scaling is still happening. Govinda Pathak unpacks the decisions, rebuilds and trade-offs behind taking it from Seed towards Series A at home and overseas: what had to change, what they would do differently, and what founders with traction can take from it. 10:15–11:05am",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/rugpvlfk",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Govinda Pathak (Head of Growth, Everlab"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "10:15",
-  "end": "11:05",
-  "title": "Stop Chasing Every Grant: Find the Ones Worth Winning",
-  "host": "Spark Startup Growth Lab",
-  "description": "There are plenty of grants, government programmes and tenders out there. The hard part is knowing which are worth your time. Brian Lim on how to find the right opportunities, judge whether they genuinely fit, and avoid losing weeks to applications you were never likely to win. 10:30am–12:30pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/ut48qf9q",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Brian Lim"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "10:30",
-  "end": "12:30",
-  "title": "High Tea, High Conversations: Female Founders Mentor Exchange",
-  "host": "UNSW Founders",
-  "description": "An intimate high tea bringing together women founders from across Western Sydney for curated conversations with senior mentors in entrepreneurship, investment, technology, health and leadership. . Parramatta Town Hall  10:30am–3:00pm",
-  "venue": "Parramatta Town Hall",
-  "registrationUrl": "",
-  "registrationNote": "By invitation",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-24",
-  "start": "10:30",
-  "end": "15:00",
-  "title": "Spark Illawarra day",
-  "host": "Scycle AI",
-  "description": "A full day of Illawarra sessions at iAccelerate on the University of Wollongong campus, for founders outside the Sydney CBD orbit. 11:00am–12:00pm",
-  "venue": "iAccelerate, University of Wollongong",
-  "registrationUrl": "https://luma.com/uwsymdk6",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Tania Jones (Green Gravity"
-   },
-   {
-    "name": "Paul Pirie (Elementri"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "11:00",
-  "end": "12:00",
-  "title": "Your Customer is the Strategy",
-  "host": "Exec Edge",
-  "description": "An hour of working on your own business rather than listening to someone else's. Who are you actually building for, why does the problem matter to them, why you over the alternatives, and which moments in the experience decide whether they stay. You leave with a clearer view of your priority customer and one thing to do about it next week. No customer-experience background needed. 11:30am–12:20pm",
-  "venue": "Cubes & Co, Origin Room, Level 12, 347 Kent Street, Sydney",
-  "registrationUrl": "https://events.humanitix.com/execedge-your-customer-is-the-strategy",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-24",
-  "start": "11:30",
-  "end": "12:20",
-  "title": "Cut Your Cloud Bill Without Breaking What Works",
-  "host": "Spark Startup Growth Lab",
-  "description": "Your cloud bill can grow faster than your business. In fifty minutes three operators show three different ways to bring it back under control: optimise the technology, improve the commercial deal, or rethink the infrastructure altogether - with the trade-offs of each and a way to decide between them. 11:30am–12:20pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/hof4dskb",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Mark Zmarzly (Head of Startups and VC Partnerships, Morfless"
-   },
-   {
-    "name": "Sarah Caveley (Founder, PurePlay Cloud"
-   },
-   {
-    "name": "Ben Duncan"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "11:30",
-  "end": "12:20",
-  "title": "What Relevance AI Is Actually Doing to Win Enterprise Growth",
-  "host": "Spark Startup Growth Lab",
-  "description": "How you win enterprise growth inside a fast-moving AI company. Chelsea Wise goes behind the scenes on three things Relevance AI is doing right now - Relevance Academy, analyst relations and market intelligence - why each was chosen, how it was executed, and what changed because of it. 12:30–1:30pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/0whcw20g",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Chelsea Wise (Head of Enterprise Enablement and Education, Relevance AI"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "12:30",
-  "end": "13:30",
-  "title": "Don't Let Your Customers Be Your Test Team",
-  "host": "Exec Edge and TTC Global",
-  "description": "For founders about to put a digital product in front of real people. Which customer journeys cannot fail, how to find the risks before your customers do, and why functionality alone is not the test — usability, performance, accessibility and trust all decide whether a launch holds. Practical and business-focused rather than technical, and you leave with a Launch Ready Checklist. 12:30–1:30pm",
-  "venue": "Cubes & Co, Origin Room, Level 12, 347 Kent Street, Sydney",
-  "registrationUrl": "https://events.humanitix.com/don-t-let-your-customers-be-the-test-team",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-24",
-  "start": "12:30",
-  "end": "13:30",
-  "title": "Life Beyond Work: Misnomers, Paradoxes and the Disconnect",
-  "host": "ACU Co-Lab",
-  "description": "12:30–1:00pm",
-  "venue": "Online",
-  "registrationUrl": "https://www.eventbrite.com.au/e/lunch-and-learn-life-beyond-work-misnomers-paradoxes-and-the-disconnect-tickets-1999446321772",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Sam Wright"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "12:30",
-  "end": "13:00",
-  "title": "R&D Funding: A Founder's Guide to the 2028 Reforms and Optimising R&D Spend",
-  "host": "Fullstack Advisory with Kashcade",
-  "description": "What the 2028 R&D reforms change for founders, and how to get more out of R&D spend in the meantime. Online, and short enough to fit in a lunch break. 12:30–1:00pm",
-  "venue": "Online",
-  "registrationUrl": "https://www.eventbrite.com.au/e/rd-funding-a-founders-guide-to-the-2028-reforms-optimising-rd-spend-tickets-1999195316007",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Jack Dean (R&D Tax Manager, Fullstack"
-   },
-   {
-    "name": "Josh Sanders (Head of Customer, Kashcade"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "12:30",
-  "end": "13:00",
-  "title": "UTS Startups Space Tour — Spark Festival Edition",
-  "host": "UTS Startups",
-  "description": "A half-hour guided tour of one of Australia's largest university-affiliated startup communities. See the space, hear how UTS Startups supports founders at different stages, and meet people from the community. Open to founders, aspiring entrepreneurs, students, investors and ecosystem partners. Meet at UTS Building 3, Bon Marche, Level 4. 1:00–2:00pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo — meet at Building 3, Bon Marche, Level 4, 755 Harris Street",
-  "registrationUrl": "https://luma.com/scoc2sjm",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-24",
-  "start": "13:00",
-  "end": "14:00",
-  "title": "Focus and Cognitive Flexibility: staying sharp in a distracted world",
-  "host": "VRM Performance Coaching",
-  "description": "An interactive workshop on staying focused and adaptable when attention is constantly pulled in different directions. Neuroscientist Dr Cam Higgins unpacks what happens in the brain when we switch between tasks and demands, and high-performance coach Veronica Mason turns that into practical exercises you can use straight away. 1:00–2:00pm",
-  "venue": "Tank Stream Labs, Level 3, 333 Kent Street, Sydney (board room 3.01)",
-  "registrationUrl": "https://events.humanitix.com/focus-and-cognitive-flexibility",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Dr Cam Higgins and Veronica Mason (Co-Founders, Onyx Neuro"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "13:00",
-  "end": "14:00",
-  "title": "Is your startup missing out on impact capital?",
-  "host": "SEFA Partnerships",
-  "description": "Impact capital is a real pool of money that many founders never think to ask for. Sefa Partnerships on who it is for and how to approach it. 1:30–3:30pm",
-  "venue": "Yirranma Place, 262 Liverpool Street, Darlinghurst",
-  "registrationUrl": "https://events.humanitix.com/is-your-startup-missing-out-on-impact-capital",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Alice Brennan"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "13:30",
-  "end": "15:30",
-  "title": "Founder Stories: Lessons from Building and Scaling Startups",
-  "host": "Investment NSW",
-  "description": "A Lunch and Learn on the realities of building and scaling a startup. A moderated panel of founders on the challenges and setbacks, the decisions that mattered, winning customers, and what they would tell someone at the start. Light lunch on arrival. 1:30–2:20pm",
-  "venue": "Tech Central Innovation Hub, Level 1, 477 Pitt Street",
-  "registrationUrl": "https://events.humanitix.com/founder-stories-lessons-from-building-and-scaling-startups",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-24",
-  "start": "13:30",
-  "end": "14:20",
-  "title": "Is Media Relations Startups' Most Underrated Growth and Trust Lever?",
-  "host": "Spark Startup Growth Lab",
-  "description": "Simon Thomsen, editor of Startup Daily, interviews PR tech founder Marie Dowling on the good, the bad and the freaking stupid things founders do with their PR - and what actually helps a startup earn attention and trust. 1:30–2:20pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/yju97iea",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Simon Thomsen (Editor, Startup Daily"
-   },
-   {
-    "name": "Marie Dowling"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "13:30",
-  "end": "14:20",
-  "title": "See How AI Sees Your Brand — and Fix It Live",
-  "host": "Spark Startup Growth Lab",
-  "description": "What do ChatGPT, Gemini and the rest actually think your business is known for, and who do they recommend instead? A hands-on session: founders run BrandViz on their own business to see how they are positioned and who they are really competing with, and leave with their next three to five brand actions identified. 2:00–3:00pm SI",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/fogn4nyr",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Rushana Maksudova (Co-founder and CEO, BrandViz.AI"
-   },
-   {
-    "name": "David Andersen (Co-founder, BrandViz.AI"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "14:00",
-  "end": "15:00",
-  "title": "Brand Systems in the Age of AI: one brand, ten thousand assets",
-  "host": "Spark Interact",
-  "description": "The companion session: how to keep one coherent brand when AI lets anyone generate ten thousand assets a week, and what has to be decided once so it does not have to be decided every time. 2:00–2:45pm",
-  "venue": "Online",
-  "registrationUrl": "https://events.humanitix.com/webinar-event-brand-systems-in-the-age-of-ai",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Mac Nguyen (Marketing Specialist, Spark Interact"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "14:00",
-  "end": "14:45",
-  "title": "R&D Tax Incentive: The New Rules of the Game",
-  "host": "Azure Group",
-  "description": "The R&D Tax Incentive can be a critical source of funding for Australian startups and innovative businesses. This session covers how the incentive works, who is eligible, and what the recent budget announcements change. It goes past filling in a claim to the practices that make one defensible: contemporaneous record-keeping, the documentation that substantiates a claim, and the habits that reduce audit risk. 2:45–3:35pm",
-  "venue": "Clarence Workspaces for Lawyers, Level 21, 133 Castlereagh Street, Sydney",
-  "registrationUrl": "https://events.humanitix.com/r-and-d-tax-incentive-the-new-rules-of-the-game",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-24",
-  "start": "14:45",
-  "end": "15:35",
-  "title": "Build Something Useful With AI — Live",
-  "host": "Spark Startup Growth Lab",
-  "description": "Bring a real problem. Michael Batko picks a couple of challenges from the room and builds the solution live - a website, an AI agent, a workflow - showing the thinking, the tools and the decisions as the work comes together. The value is as much in watching the approach as in the finished build. 3:00–5:00pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/6ll2qt4j",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Michael Batko (CEO, Hourglass AI"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "15:00",
-  "end": "17:00",
-  "title": "Tech Central Walking Tour",
-  "host": "UTS",
-  "description": "A guided walk through Tech Central, Australia's largest innovation precinct, taking in the landmarks and facilities and what is being built there next. Tech Central — meet at UTS Tower concierge 4:00–4:50pm",
-  "venue": "Tech Central — meet at UTS Tower concierge",
-  "registrationUrl": "https://events.humanitix.com/tech-central-walking-tours/tickets",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-24",
-  "start": "16:00",
-  "end": "16:50",
-  "title": "Building With AI: What Changes at Every Stage",
-  "host": "Spark Startup Growth Lab",
-  "description": "Martin Medina built Solotude as the only technical person on the team, using AI-assisted development. He shows how he actually works, where he lets agents run, where he reviews every line, and how much to trust AI changes as a product moves from prototype to something people rely on daily. 4:00–4:50pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/iokv3nol",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Martin Medina (Solotude"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "16:00",
-  "end": "16:50",
-  "title": "Vibe-Coded It. Now Make It Real.",
-  "host": "Spark Startup Growth Lab",
-  "description": "You built something with AI and it works. Now comes the harder part: making it reliable, secure, scalable and ready for real customers. Mike Gardiner works with a small group on the last ten per cent between a promising prototype and something people can depend on - testing, reliability, security, usability. 5:00–9:00pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/fssj2bdb",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Mike Gardiner (Founder, Buzzy"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "17:00",
-  "end": "21:00",
-  "title": "Google Developer community event — AI",
-  "host": "Google Developer Relations",
-  "description": "An evening for the Google developer community on AI at Google's Sydney office: a panel on AI and sovereignty, a walkthrough of building a secure, compliant agent with Antigravity and the Gemini Enterprise Agent Platform, food and drinks, then a hands-on Vibe Coding Agent Skills workshop. 5:30–7:30pm",
-  "venue": "Google Sydney HQ, 48 Pirrama Road, Pyrmont",
-  "registrationUrl": "https://rsvp.withgoogle.com/events/google-for-developers-spark-festival",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "David Brudenell (Co-CEO and Executive Chair, Decidr"
-   },
-   {
-    "name": "Raymond Sun (Senior Associate, HSF Kramer"
-   },
-   {
-    "name": "Ramesh Heidary (Google"
-   },
-   {
-    "name": "Brett Morgan (Google"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "17:30",
-  "end": "19:30",
-  "title": "Parramatta Pitch Night x A-One",
-  "host": "Launch Pad, Western Sydney University",
-  "description": "A low-pressure pitch night in Western Sydney. Five to seven pitchers get three minutes each, then three minutes of questions and feedback from a judging panel, and the winner takes a $200 voucher. You do not need a registered company or a polished deck, just an idea you want to talk about. Come to pitch or come to watch — founders, students, side-hustlers and anyone with a business idea. 5:30–8:00pm",
-  "venue": "Launch Pad Parramatta, Level 1, 6 Hassall Street, Parramatta",
-  "registrationUrl": "https://www.eventbrite.com.au/e/parramatta-pitch-night-x-a-one-tickets-1996427953752?aff=spark",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-24",
-  "start": "17:30",
-  "end": "20:00",
-  "title": "The Inner Game of Success: Master Your Mindset, Energy and Performance",
-  "host": "Coach Anywhere",
-  "description": "An interactive workshop exploring the mental and emotional habits that drive peak performance in business and life. Practical exercises for breaking through mental barriers, building confidence and creating momentum in both business and life. Evening",
-  "venue": "TDQS, Suite 301, 2-4 Cunningham Street, Haymarket",
-  "registrationUrl": "https://events.humanitix.com/the-inner-game-of-success-master-your-mindset-energy-and-performance",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Roy Kwan, Sonya Furlong"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "18:00",
-  "end": "20:00",
-  "title": "I2N Accelerator Investor Showcase",
-  "host": "I2N — University of Newcastle",
-  "description": "6:00–8:00pm",
-  "venue": "",
-  "registrationUrl": "",
-  "registrationNote": "By invitation",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-24",
-  "start": "18:00",
-  "end": "20:00",
-  "title": "Improv for Innovators & Leaders: Break Patterns. Spark New Ideas.",
-  "host": "Improv Life Lessons",
-  "description": "Improvisation as a working tool for founders: breaking a fixed pattern, thinking on your feet and getting comfortable being wrong in public. 6:00–9:00pm SS",
-  "venue": "City of Sydney Creative Studios, 119 Bathurst Street, Sydney",
-  "registrationUrl": "https://www.eventbrite.com.au/e/improv-for-innovators-leaders-break-patterns-spark-new-ideas-tickets-1999204422244",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Susan Zheng"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "18:00",
-  "end": "21:00",
-  "title": "Late Night Cafe",
-  "host": "Students&Starters",
-  "description": "House party meets late-night cafe: founders and students in one room over good food and real conversation. Founders meet peers, potential hires and collaborators; students exploring tech get an honest look at the paths beyond a graduate program - founding, engineering, product and design. A potluck, so bring something if you can; brownies, matcha and coffee are already covered. 6:00–8:00pm",
-  "venue": "Drummoyne (address on registration)",
-  "registrationUrl": "https://luma.com/ec74rkrk",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Akshat (Founder, Arrayah"
-   },
-   {
-    "name": "Isaac (Dev lead, Ripple"
-   },
-   {
-    "name": "Georgia (Founder, Flock"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "18:00",
-  "end": "20:00",
-  "title": "Navigating the Advisory Minefield",
-  "host": "Founder Institute with goto.health",
-  "description": "A panel on choosing and working with advisers, board members and investors: who actually helps, what good governance looks like early, and how to tell the difference before you hand over equity. 6:00–7:30pm",
-  "venue": "Hall Chadwick, Level 40, 2 Park Street, Sydney",
-  "registrationUrl": "https://luma.com/ymq28qb5",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Jakomi Mathews (moderator"
-   },
-   {
-    "name": "Benjamin Chong (Right Click Capital"
-   },
-   {
-    "name": "Josh Ayscough (Utiliti Ventures"
-   },
-   {
-    "name": "Brinley Meagher, Trinity Woolnough (Hall Chadwick"
-   }
-  ]
- },
- {
-  "date": "2026-09-24",
-  "start": "18:00",
-  "end": "19:30",
-  "title": "Pitching on Screen with Genevieve",
-  "host": "Presence Studio",
-  "description": "How your presence reads on camera, and what to do about it, for founders who pitch over video as often as they pitch in a room. Ninety minutes of voice work, movement and play, putting the two together, and then demonstrations on screen. Bring a two-minute pitch or piece to camera if you can - five people drawn on the day get recorded feedback and media training from Genevieve afterwards.",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://events.humanitix.com/pitching-on-screen-with-genevieve",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Genevieve Craig (Chief Storyteller, Presence Studio"
-   }
-  ]
- },
- {
-  "date": "2026-09-25",
-  "start": "10:00",
-  "end": "11:00",
-  "title": "Coffee Hour",
-  "host": "UTS Startups",
-  "description": "A casual drop-in for people building, backing and supporting startups around Tech Central. No panels and no networking theatre - just coffee, conversation and the useful collisions that happen when founders, builders, investors and operators are in the same room. UTS Startups run it fortnightly; this one falls in festival week. Come for a quick cup or stay the hour. 10:00–11:30am",
-  "venue": "UTS Startups, 3 Broadway, Ultimo",
-  "registrationUrl": "https://luma.com/o54m9nad",
-  "registrationNote": "",
-  "track": "",
-  "speakers": []
- },
- {
-  "date": "2026-09-25",
-  "start": "10:00",
-  "end": "11:30",
-  "title": "Interactive Design: Turn Your Value Proposition into an Experience",
-  "host": "Utopia Rising with Western Sydney Startup Hub",
-  "description": "A workshop on turning a value proposition into something people can see, feel, test and remember rather than sit through. Attendees prototype a demonstration of their own, which works as well for a personal brand or a room full of strangers as it does for a startup. 11:00am–12:00pm",
-  "venue": "Western Sydney Startup Hub, North Parramatta",
-  "registrationUrl": "https://events.humanitix.com/interactive-design-turn-your-value-proposition-into-an-experience",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Jonathan Lee"
-   }
-  ]
- },
- {
-  "date": "2026-09-25",
-  "start": "11:00",
-  "end": "12:00",
-  "title": "Humaning is your Moat: B2B Sales in the Age of AI",
-  "host": "Authentic Selling",
-  "description": "As AI becomes part of everyday business, the thing it still cannot do is be human, and that is your moat. A practical session on leaning into that alongside your AI tools so the connection that drives sales does not get lost. 11:00am–12:00pm CA",
-  "venue": "Online",
-  "registrationUrl": "https://authenticselling.com.au/webinars/webinar-20260925-registration",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Nimmity Zappert (Founder, Authentic Selling"
-   }
-  ]
- },
- {
-  "date": "2026-09-25",
-  "start": "11:00",
-  "end": "12:00",
-  "title": "What do you do when your AI tells you no?",
-  "host": "CanTicket",
-  "description": "There is a difference between using AI as a tool and handing it a job it can refuse. The seven levels of AI maturity and which rung your business is actually on, agentic AI doing real work when it is briefed properly, and what it looks like when the AI says no - watched live, plus how to build the guardrails that let it. Cassandra took her own agency from fourteen people to four by building the systems instead of hiring. Capped at 40. 12:00–1:00pm",
-  "venue": "Stone & Chalk Tech Central, Level 1, 477 Pitt Street, Haymarket",
-  "registrationUrl": "https://events.humanitix.com/what-do-you-do-when-your-ai-tells-you-no",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Cassandra Cadorin (Founder, CanTicket and House of Can"
-   }
-  ]
- },
- {
-  "date": "2026-09-25",
-  "start": "12:00",
-  "end": "13:00",
-  "title": "Demystifying Term Sheets",
-  "host": "Sydney Angels",
-  "description": "A practical workshop that takes the mystery out of term sheets and the part they play in early-stage investment. Richard Dale covers what a term sheet actually is, why one is used at all when it is not legally binding, the terms that turn up again and again and the reasons they are there, and how the document changes shape across different kinds of raise. Built for founders preparing to raise and for people new to investing, and followed by open Q&A. 12:30–1:15pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo (Room CB03.02.045)",
-  "registrationUrl": "https://luma.com/0udji8e7",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Richard Dale (Committee member, Sydney Angels"
-   }
-  ]
- },
- {
-  "date": "2026-09-25",
-  "start": "12:30",
-  "end": "13:15",
-  "title": "Don’t Let Compliance Kill Your Sustainability Story",
-  "host": "Envirotivity",
-  "description": "Sustainability communications are being squeezed from three sides at once: what audiences care about has shifted, regulators have tightened up, and AI search has changed how claims get found. A practitioner's session on treating compliance as a creative guardrail rather than a blocker - turning legal requirements into a stronger message, and making specific, evidence-backed claims that hold up and get found. Real cases, and questions at the end. 1:00–2:00pm",
-  "venue": "Online",
-  "registrationUrl": "https://events.humanitix.com/don-t-let-compliance-kill-your-sustainability-story",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Ayelet Mendel-Girin (Co-Founder, Envirotivity"
-   }
-  ]
- },
- {
-  "date": "2026-09-25",
-  "start": "13:00",
-  "end": "14:00",
-  "title": "Angel Investing 101",
-  "host": "Sydney Angels",
-  "description": "For anyone curious about angel investing, and for founders who want to understand what the investor on the other side of the table is actually looking at. Philip Argy introduces the startup funding landscape, Australia's technology success stories and the early-stage ecosystem, then walks through what angel investing involves, the private capital journey, and how the Sydney Angels investment process works in practice. 1:00–4:00pm",
-  "venue": "UTS Startups, 3 Broadway, Ultimo (Room CB03.02.045)",
-  "registrationUrl": "https://luma.com/x4je1rjh",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Philip Argy (Committee member, Sydney Angels"
-   }
-  ]
- },
- {
-  "date": "2026-09-25",
-  "start": "13:00",
-  "end": "16:00",
-  "title": "Bushwalk with SquareBySquare",
-  "host": "SquareBySquare",
-  "description": "A bushwalk from Waverton Park to Balls Head Reserve, ending with a private heritage tour at the Coal Loader Centre for Sustainability. Being out in nature is a good way to close out a festival week: walking and talking beats sitting in rows, and it makes for a low-key networking session before people head off for a drink. Along the way, Henk and Emely share how SquareBySquare is building an economic model to fund nature conservation, using their own startup as a live case study of what it takes to make conservation work as a B2C business. 1:00–2:00pm BR",
-  "venue": "Waverton Park to Balls Head Reserve — meet at the bus stop by Waverton Bowling Club, Woolcott Street",
-  "registrationUrl": "https://events.humanitix.com/bushwalk-with-squarebysquare",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "Henk Kleynhans and Emely Junker (Co-Founders, SquareBySquare"
-   }
-  ]
- },
- {
-  "date": "2026-09-25",
-  "start": "13:00",
-  "end": "14:00",
-  "title": "Hiring your first GTM or commercial lead",
-  "host": "Bluebird Recruitment",
-  "description": "The first commercial hire is the one founders most often get wrong. What the role actually needs to cover at this stage, how to tell a closer from a builder, and what it costs to find out late. 6:30pm",
-  "venue": "Stone & Chalk Tech Central, Level 1, 477 Pitt Street, Haymarket",
-  "registrationUrl": "https://luma.com/lfxeih97",
-  "registrationNote": "",
-  "track": "",
-  "speakers": [
-   {
-    "name": "James Bergl (Bluebird Recruitment"
-   }
-  ]
- },
- {
-  "date": "2026-09-25",
-  "start": "16:00",
-  "end": "18:00",
-  "title": "Spark Festival 2026 Closing Celebration",
-  "host": "",
-  "description": "The festival closes with the community that made it. Spark Foundation CEO Harry Godber and Simon Thomsen, editor of Startup Daily, are joined by the Hon. Paul Fletcher on the state of technology policy in Australia and what founders need to know about dealing with — and selling to — government.",
-  "venue": "UTS Startups @ Central",
-  "registrationUrl": "https://luma.com/elp2rcr5",
-  "registrationNote": "Free, but please book",
-  "track": "Closing celebration",
-  "speakers": [
-   {
-    "name": "The Hon. Paul Fletcher",
-    "role": "Non-Executive Director, Tech Council of Australia"
-   },
-   {
-    "name": "Simon Thomsen",
-    "role": "Editor, Startup Daily"
-   },
-   {
-    "name": "Harry Godber",
-    "role": "CEO, Spark Foundation"
-   }
-  ]
- },
- {
-  "date": "2026-09-25",
-  "start": "18:30",
-  "end": "19:30",
-  "title": "Spark AI Dinner",
-  "host": "Decidr",
-  "description": "A dinner for founders, operators and investors working at the front edge of AI in Australia, closing out festival week over one table and one conversation.  Closing celebration",
-  "venue": "",
-  "registrationUrl": "",
-  "registrationNote": "By invitation",
-  "track": "",
-  "speakers": []
- }
+  {
+    "date": "2026-09-21",
+    "start": "09:00",
+    "end": "17:00",
+    "title": "AI for Social Enterprise Hackathon",
+    "host": "The Moreneta Initiative with City Quokka",
+    "description": "Two days of building AI for social enterprises, with no prior experience or existing team required. Day one is for validating the problem and forming teams; day two is for building a prototype and pitching it to judges. 1:00–3:30pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://events.humanitix.com/ai-for-social-enterprise-hackathon",
+    "registrationNote": "",
+    "track": "Hackathon",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-21",
+    "start": "13:00",
+    "end": "15:30",
+    "title": "From Bench to Bedside: Funding Health Technology from Idea to Impact",
+    "host": "UNSW Founders",
+    "description": "A working session on the path from a health idea to a funded venture. It maps the health innovation landscape, covers turning a research project into a company, and explains how grants and investment actually work for early-stage healthcare businesses. 1:00–3:00pm",
+    "venue": "UNSW Health Translation Hub, 55 Botany Street, Randwick",
+    "registrationUrl": "https://www.eventbrite.com.au/e/from-bench-to-bedside-funding-health-technology-from-idea-to-impact-tickets-1998699019571",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-21",
+    "start": "13:00",
+    "end": "15:00",
+    "title": "Longevity Unleashed: NSW's Next Big Opportunity",
+    "host": "PrimeLife Partners",
+    "description": "By 2030 Australia will have more people aged over 65 than under 18. This session looks at what that shift opens up: financial security, the policy settings around it, and solutions that improve quality of life while bringing costs down. 5:30–7:30pm",
+    "venue": "UNSW CBD, Level 4, 210 George Street, Sydney",
+    "registrationUrl": "https://events.humanitix.com/longevity-unleashed-nsw-s-next-big-opportunity-spark-festival",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "The Hon Jacqui Munro MLC (Shadow Minister for Science and Technology"
+      },
+      {
+        "name": "Harry Godber (CEO, Spark Foundation"
+      },
+      {
+        "name": "Annabel Zhou (Toastie Health"
+      },
+      {
+        "name": "Colin Jowell (BillWill"
+      },
+      {
+        "name": "Andrew Payne (CarePlan"
+      },
+      {
+        "name": "Dr Abby Bloom (moderator"
+      },
+      {
+        "name": "Anne-Marie Elias (PrimeLife Partners"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-21",
+    "start": "17:00",
+    "end": "20:30",
+    "title": "Spark Festival 2026 Opening Celebration — Launch of the Spark Foundation",
+    "host": "Spark Foundation",
+    "description": "Spark is the home of startups in NSW. The launch of the Spark Foundation takes a deep dive into the dialogue between startups and government: a look back at this year's interactions between government and founders, what we've done well, and what we need to do better.",
+    "venue": "UTS Great Hall, Building 1, 15 Broadway, Ultimo",
+    "registrationUrl": "https://events.humanitix.com/spark-2026-opening",
+    "registrationNote": "Free, but please book",
+    "track": "Opening night",
+    "speakers": [
+      {
+        "name": "The Hon Arthur Sinodinos AO",
+        "role": "Former Ambassador to the US, Federal Minister for Industry, Innovation and Science"
+      },
+      {
+        "name": "Ranya Alkadamani",
+        "role": "Founder, Impact Group International"
+      },
+      {
+        "name": "The Hon Jacqui Munro MLC",
+        "role": "Shadow Minister for Science and Technology, Parliament of NSW"
+      },
+      {
+        "name": "David Brudenell",
+        "role": "Executive Chair, Decidr"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-21",
+    "start": "17:30",
+    "end": "19:30",
+    "title": "Investment: The myth vs the reality",
+    "host": "UNSW Founders",
+    "description": "What venture capital and private equity are like from the inside, rather than as they appear on social media. The panel covers the day-to-day work, how due diligence really runs, and how different firms operate in the Australian ecosystem.",
+    "venue": "210 George Street, Sydney",
+    "registrationUrl": "https://www.eventbrite.com.au/e/investment-the-myth-vs-the-reality-tickets-1998400572909",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-22",
+    "start": "09:00",
+    "end": "17:00",
+    "title": "AI for Social Enterprise Hackathon — day two",
+    "host": "The Moreneta Initiative with City Quokka",
+    "description": "Two days of building AI for social enterprises, with no prior experience or existing team required. Day one is for validating the problem and forming teams; day two is for building a prototype and pitching it to judges. 1:00–3:30pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://events.humanitix.com/ai-for-social-enterprise-hackathon",
+    "registrationNote": "",
+    "track": "Hackathon",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-22",
+    "start": "09:00",
+    "end": "11:00",
+    "title": "The AI Reality Check: From Hype to Institutional Confidence",
+    "host": "Tech Council of Australia with J.P. Morgan",
+    "description": "The AI market has moved from enthusiasm to scrutiny, and investors and boards now want a strategy that stands up financially rather than a story about AI. Speakers from J.P. Morgan, law, venture capital and AI companies themselves look at what it takes to build and fund an AI business serious capital will back. 10:00–11:00am",
+    "venue": "J.P. Morgan, 85 Castlereagh Street, Sydney",
+    "registrationUrl": "https://events.techcouncil.com.au/092226_AIRealityCheck_IandGseries",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Aengus Tran (Co-founder and CEO, Harrison.ai"
+      },
+      {
+        "name": "Danielle Haj-Moussa (Investment Manager, Main Sequence Ventures"
+      },
+      {
+        "name": "Kyra Hannaford (Executive Director, Equity Capital Markets ANZ, J.P. Morgan"
+      },
+      {
+        "name": "Mark Hoh (Head of TMT Investment Banking ANZ, J.P. Morgan"
+      },
+      {
+        "name": "Paul Fletcher (Board Director, Tech Council of Australia"
+      },
+      {
+        "name": "Simon Burns (Partner, Gilbert + Tobin"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-22",
+    "start": "10:00",
+    "end": "11:00",
+    "title": "Ready to Scale? Running and scaling corporate pilots",
+    "host": "Treble Strategic",
+    "description": "Founders often win the pilot and then watch it stall. The usual verdict is that the technology underdelivered. It rarely did. Proven pilots stall because the organisation was not ready to scale them, and real value and ROI only arrive at scale. In this hands-on workshop, founders run Treble's Strategic Pulse on their own companies in twenty minutes to see exactly where their scaling will break. 10:30am",
+    "venue": "Stone & Chalk Tech Central, Boardroom 5+6, 477 Pitt Street",
+    "registrationUrl": "https://events.humanitix.com/ready-to-scale-running-and-scaling-corporate-pilots",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Matthew Werner (Principal, Innovation & Strategy, Treble Strategic"
+      },
+      {
+        "name": "Alejandro Patterson (Principal, Product & Strategy, Treble Strategic"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-22",
+    "start": "10:30",
+    "end": "11:30",
+    "title": "Where the Jobs Are: using labour market data to plan, build or grow",
+    "host": "Jobs and Skills Australia",
+    "description": "An interactive online masterclass on the Jobs and Skills Atlas, Australia's most comprehensive public source of labour market, industry, workforce and training data. How founders, investors and innovators can use it to spot fast-growing industries and occupations, read talent availability by region, trace pathways into and out of an occupation, and test expansion, investment and location decisions against real local conditions. Worked examples, then questions. 11:00am–2:00pm",
+    "venue": "Online",
+    "registrationUrl": "https://events.teams.microsoft.com/event/af644942-a09b-45ef-9ab5-e3261ca50672@dd0cfd15-4558-4b12-8bad-ea26984fc417?source=copyLinkOneEventsShareDialog",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Liz Jakubowski (Director, Digital, Jobs and Skills Australia"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-22",
+    "start": "11:00",
+    "end": "14:00",
+    "title": "Programs, Resources and Funding support for deep tech and innovation",
+    "host": "University of Sydney — Sydney Knowledge Hub",
+    "description": "A run through the funding, programs and resources open to deep tech researchers and founders, with Investment NSW's Office of the Chief Scientist and Engineer, Therapeutic Innovation Australia, CSIRO ON, Cicada Innovations, Uniseed, IP Group and the Advanced Manufacturing Readiness Facility. A catered lunch follows so people can talk to the speakers directly. 12:30–1:30pm",
+    "venue": "Sydney Knowledge Hub, Room 277, Merewether Building, City Rd & Butlin Ave, Darlington",
+    "registrationUrl": "https://events.humanitix.com/spark-festival-reverse-pitch-and-networking-event",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-22",
+    "start": "12:30",
+    "end": "13:30",
+    "title": "Employee claims in the age of AI: what founders need to know",
+    "host": "Spark Foundation with HSF Kramer",
+    "description": "Redundancies and terminations are part and parcel of a high-growth startup as it evolves. But in 2026 founders across Australia have been hit with a barrage of AI-generated Fair Work claims and other employment disputes, often with no reasonable grounds. Two of Australia's leading employment law practitioners on responding to those claims effectively and affordably, and on the employment arrangements that protect a company before one arrives. 12:30–2:00pm",
+    "venue": "Stone & Chalk Tech Central, Level 1, 477 Pitt Street, Haymarket",
+    "registrationUrl": "https://events.humanitix.com/employee-claims-in-the-age-of-ai",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Michael Gonski (Employment Partner, HSF Kramer"
+      },
+      {
+        "name": "Dominic Woolrych (Co-founder and CEO, LawPath"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-22",
+    "start": "12:30",
+    "end": "14:00",
+    "title": "Speaking Under Pressure: How Founders and Leaders Communicate with Confidence When It Matters Most",
+    "host": "The Executive Centre and Inveniax Group",
+    "description": "The moments that matter most are rarely the rehearsed ones. A practical session for founders and leaders on communicating with confidence under pressure, with lunch provided. 1:00–4:00pm",
+    "venue": "The Executive Centre Angel Place, Level 17, 123 Pitt Street, Sydney",
+    "registrationUrl": "https://events.humanitix.com/speaking-under-pressure-how-founders-and-leaders-communicate-with-confidence-when-it-matters-most",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Richie Widjaja"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-22",
+    "start": "13:00",
+    "end": "16:00",
+    "title": "Selling the Green Dream",
+    "host": "UNSW Founders",
+    "description": "Can climate-positive technology also make money? Founders and industry leaders discuss where the economic value actually sits, opening with a keynote from Shane Keating of CounterCurrent and closing with questions and networking. 1:00–4:00pm",
+    "venue": "Greenhouse, Level 3, 180 George Street, Sydney",
+    "registrationUrl": "https://www.eventbrite.com.au/e/selling-the-green-dream-tickets-1998699639425",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-22",
+    "start": "13:00",
+    "end": "16:00",
+    "title": "The Startup Engine Workshop",
+    "host": "Macquarie University Incubator",
+    "description": "The Startup Engine Method is a practical framework for designing, testing and validating a business model before committing years to the wrong one. Work through revenue model design, simulate the numbers with the FUEL model and map a path to product-market fit. Aimed at founders in their first or second year, or anyone yet to confirm problem-solution or product-market fit. 1:30–3:30pm",
+    "venue": "The Incubator, 8 Hadenfeld Ave, Macquarie Park",
+    "registrationUrl": "https://events.humanitix.com/the-startup-engine-workshop",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "A/Professor Todd Davey (Macquarie University"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-22",
+    "start": "13:30",
+    "end": "15:30",
+    "title": "AI and Human Behaviour",
+    "host": "PeerWize with the Behavioural Insights Team",
+    "description": "How can an organisation increase AI adoption safely and effectively? Dr Alex Gyani, who runs the Behavioural Insights Team across the Asia-Pacific, on the behavioural traps that stall adoption - the pilot that never scales, shadow AI, and the cognitive surrender that sets in when people stop questioning the output - and what to do about each. A small curated room, run on a non-attribution basis: arrival from 1:30, session 2:00 to 3:00, networking to 3:30. 1:30–2:30pm",
+    "venue": "321 Kent Street, Sydney",
+    "registrationUrl": "https://luma.com/zb0wfk54",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Dr Alex Gyani (Managing Director, Asia-Pacific, Behavioural Insights Team"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-22",
+    "start": "13:30",
+    "end": "14:30",
+    "title": "Accounting, Tax and R&D for Startup Founders in Sydney",
+    "host": "Gild Group",
+    "description": "Two Gild Group advisers on the unglamorous decisions that decide whether a startup survives contact with the tax system: five things on accounting and tax, five on R&D, and an open Q&A on whatever you are worried about. 2:00–3:00pm SI",
+    "venue": "Stone & Chalk Tech Central, Level 1, 477 Pitt Street, Haymarket",
+    "registrationUrl": "https://events.humanitix.com/accounting-tax-and-r-and-d-for-startup-founders-in-sydney",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Catherine Turner (Client Manager, Gild Business Management"
+      },
+      {
+        "name": "Alex Canning (Gild Group"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-22",
+    "start": "14:00",
+    "end": "15:00",
+    "title": "Your Brand in the Age of AI",
+    "host": "Spark Interact",
+    "description": "A free webinar on what AI changes about brand: where it helps, where it flattens everything into the same voice, and what a small company should hold on to while the tools keep moving. 2:30–4:30pm",
+    "venue": "Online",
+    "registrationUrl": "https://events.humanitix.com/your-brand-in-the-age-of-ai",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Mac Nguyen (Marketing Specialist, Spark Interact"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-22",
+    "start": "14:30",
+    "end": "16:30",
+    "title": "The Great Database Clean-Up: a party for people who hate admin",
+    "host": "Utopia Rising",
+    "description": "A working session on turning a pile of contacts into a relationship system you can actually use: who to prioritise, what good networking practice looks like, and which platform to keep it in as you grow. Exercises rather than a lecture. 2:30–3:00pm",
+    "venue": "Poly Centre, Level 4, 210 George Street, Sydney",
+    "registrationUrl": "https://events.humanitix.com/the-great-database-clean-up-a-party-for-people-who-hate-admin",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Jonathan Lee"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-22",
+    "start": "14:30",
+    "end": "15:00",
+    "title": "UTS Startups Space Tour — Spark Festival Edition",
+    "host": "UTS Startups",
+    "description": "A half-hour guided tour of one of Australia's largest university-affiliated startup communities. See the space, hear how UTS Startups supports founders at different stages, and meet people from the community. Open to founders, aspiring entrepreneurs, students, investors and ecosystem partners. Meet at UTS Building 3, Bon Marche, Level 4. 4:30–6:00pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo — meet at Building 3, Bon Marche, Level 4, 755 Harris Street",
+    "registrationUrl": "https://luma.com/utss-6wgk",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-22",
+    "start": "16:30",
+    "end": "18:00",
+    "title": "Pledge 1% Meetup — activating for impact: how founders do the do",
+    "host": "Pledge 1%",
+    "description": "For companies that want to build social responsibility in from the start rather than bolt it on later. Meet the new Australian Pledge 1% team, work through the different pledge categories, and meet others doing the same thing. 5:00–7:00pm",
+    "venue": "Canva Space, 110 Kippax Street, Surry Hills",
+    "registrationUrl": "https://pledge1sparkfestival.splashthat.com",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Antonia Ruffell (Managing Director, Australia, Pledge 1%"
+      },
+      {
+        "name": "Joni Fleischer (Co-founder, tekFoundation"
+      },
+      {
+        "name": "Nick Shepherd (Founder and Managing Director, tekFinder"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-22",
+    "start": "17:00",
+    "end": "19:00",
+    "title": "Spark — AI: After Hours",
+    "host": "UNSW Founders",
+    "description": "An open build hour followed by a focused AI hour and networking, at the Michael Crouch Innovation Centre. Come to work on something, find a mentor, or argue about what AI is doing to the rest of us. 6:00–7:00pm (doors 5:30pm)",
+    "venue": "Michael Crouch Innovation Centre, Gate Two Avenue, Kensington",
+    "registrationUrl": "https://www.eventbrite.com.au/e/spark-ai-after-hours-tickets-1998399589969",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-22",
+    "start": "18:00",
+    "end": "19:00",
+    "title": "Spark Festival Tackles Housing Affordability",
+    "host": "Spark Foundation",
+    "description": "Housing policy has a tech problem. Is the sector that could fix it paying for it? Meanwhile, the search for answers on affordability has reached into capital gains treatment, and much of that has landed on the tech sector — the same sector we keep saying will help solve the problem. Can startups deliver on the promise – and is the new CGT regime cutting off our nose to spite our face? Three people join us who see this from different ends: the policy, the capital, and the construction. We’ll put to them the tough questions – from political attitudes to investor appetite – and whether affordable housing in Australia is a realistic goal. UTS Startups, corner of Harris St and Broadway · Kristy McSweeney (The PR Counsel, political commentator on ABC and Sky), Chen Rosen (Co-Founder and Managing Partner, Reality PropTech Fund), Andy Rampton (Field COO, International, Procore), Harry Godber (CEO, Spark Foundation) moderating",
+    "venue": "Everyone agrees on housing. Build more, build faster — you’d struggle to find a politician or an industry body who’d say otherwise.",
+    "registrationUrl": "https://events.humanitix.com/spark-festival-tackles-housing-affordability",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-23",
+    "start": "08:00",
+    "end": "09:30",
+    "title": "AI Sovereignty — Parliamentary Friends",
+    "host": "Decidr with Spark Festival",
+    "description": "At NSW Parliament, Decidr partners with Spark Festival to bring together political and industry leaders for a breakfast conversation on sovereign AI capability. Hear from David Brudenell (Decidr) in discussion with the Hon. Jacqui Munro MLC, Shadow Minister for Science and Technology and Jason Yat-Sen Li MP, Member for Strathfield, Co-Chairs of the Parliamentary Friends of Innovation, Ventures, Entrepreneurs and Technology (INVENT). Then Spark’s Kristy McSweeney will host an industry panel featuring voices from CareerOne and SCX – unpacking what sovereign AI means in practice. 9:00–9:50am",
+    "venue": "Parliament House, 6 Macquarie Street, Sydney",
+    "registrationUrl": "https://events.humanitix.com/spark-decidr-parliament",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-23",
+    "start": "09:00",
+    "end": "17:00",
+    "title": "Spark Startup Growth Lab — day one",
+    "host": "Geoff Main",
+    "description": "Two days of practical problem-solving for people building and growing startups. Every session starts with a specific problem, then brings in someone who has actually solved it to show how: the systems, the decisions, the numbers, the mistakes and what they would do differently. Sessions run across finding your first customers, scaling GTM, community-led growth, making AI products usable, AI video, cloud costs, raising capital, R&D and grants, SEO and AI search, scaling teams, and building a personal brand that creates real business value. Register here for the whole stream, or take individual sessions - each one is listed separately below with its own registration. 8:00–9:30am",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/sparkstartupgrowthlab",
+    "registrationNote": "",
+    "track": "Growth Lab",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-23",
+    "start": "09:00",
+    "end": "09:50",
+    "title": "Building an AI Content Engine That Actually Works",
+    "host": "Spark Startup Growth Lab",
+    "description": "Where AI video is really up to. Jerrod Lew works at the cutting edge of AI video with Adobe, Google and some of the world's leading AI creative platforms, and demonstrates what the tools can and cannot do now: the workflows, the current limits, and the applications that are realistic for a startup rather than a studio. 9:00–9:50am",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/f0ltcpjj",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Jerrod Lew (AI video consultant to Adobe and Google"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "09:00",
+    "end": "09:50",
+    "title": "Conversion.Live: Workshop and Fix Your Funnel",
+    "host": "Spark Startup Growth Lab",
+    "description": "Bring the funnel that is not working. Before the session you diagnose where you think the problem is and submit the block you are facing; in the room Brendan Lee works through selected real funnels live, showing where confidence is breaking, what the evidence suggests, and what he would change first. Most founders assume a growth problem means they need more leads. Often the real constraint is further down the funnel. 10:15–11:05am",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/ac93gl5w",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Brendan Lee (Conversions.today"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "10:15",
+    "end": "11:05",
+    "title": "Behind the Scenes of Building a Personal Brand People Actually Care About",
+    "host": "Spark Startup Growth Lab",
+    "description": "We have reached peak founder content, and most of it is forgettable. Jemma McKenzie works directly under Jane Lu growing her personal brand, The Lazy CEO, and unpacks what it actually takes to turn a personal brand into a profitable engine - not content hacks, but the real decisions behind it. 10:15–11:05am",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/zfpc1zmv",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Jemma McKenzie"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "10:15",
+    "end": "11:05",
+    "title": "Build Your Marketing Brain: One System for Positioning, Competitive Intel and Content",
+    "host": "Spark Startup Growth Lab",
+    "description": "Most marketers use AI like a smart intern - prompt it, paste in the context, fix the draft, then start from zero tomorrow. Will Mulholland demonstrates the alternative live: a marketing system that holds your positioning, customer language and competitive context so the work compounds instead of resetting each time. Live demonstration against real examples from the room, and a blueprint you could stand up inside a week. 10:30am–12:00pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/n0xkvm65",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Will Mulholland (Product Marketer, beehiiv, Founder, Intelligent Growth"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "10:30",
+    "end": "12:00",
+    "title": "Dyslexia Networking Coffee",
+    "host": "Always Carbon",
+    "description": "An informal coffee for dyslexic people in the innovation economy and the people who back them, to meet each other and build connections across neurotypes. Pay as you go. 11:30am–12:20pm",
+    "venue": "Little Duck, Lobby, 347 Kent Street, Sydney CBD",
+    "registrationUrl": "https://luma.com/5uq6hyge",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-23",
+    "start": "11:30",
+    "end": "12:20",
+    "title": "Be the Answer in AI: What's Actually Working Now?",
+    "host": "Spark Startup Growth Lab",
+    "description": "Google search, AI answers and tools like ChatGPT are starting to overlap, and the rules for getting found are changing with them. Celia Harding uses fresh evidence, side-by-side examples and new research published during festival week to separate what is genuinely changing from what still matters, and where a small team should put its effort first. 11:30am–12:20pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/0ezjptew",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Celia Harding"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "11:30",
+    "end": "12:20",
+    "title": "How Relevance AI Built Customer Support to Scale",
+    "host": "Spark Startup Growth Lab",
+    "description": "What it actually takes to build customer support for scale. Alex Waite goes behind the scenes on the AI-plus-human support system she built at Relevance AI: the workflows, the agents, the before-and-after changes, the metrics, and where AI helps against where human judgement is still needed. 12:00–1:00pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/ah9x59wi",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Alex Waite (Relevance AI"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "12:00",
+    "end": "13:00",
+    "title": "But why? Having a clear strategy for a clear ask for the right capital",
+    "host": "Tank Stream Labs",
+    "description": "Founders ask for capital before they can say what it is for. Anthony Passe-de Silva works through how a business strategy is actually built, how it feeds into short, medium and long-term planning, and where financial capital sits as one input among several rather than the answer itself - so you know which kind of capital you need and when to ask for it. Hybrid: attend in the room or online. 12:00–1:00pm",
+    "venue": "Tank Stream Labs, Level 17, 300 Barangaroo Avenue, Barangaroo (board room 17.08)",
+    "registrationUrl": "https://events.humanitix.com/but-why",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Anthony Passe-de Silva GAICD (Founder and CEO, One2Solutions Group"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "12:00",
+    "end": "13:00",
+    "title": "MQ Incubator Lunch & Learn: The Psychology of Entrepreneurial Courage",
+    "host": "Macquarie University Incubator",
+    "description": "Fear and self-doubt are a normal part of building something new. Drawing on psychology and neuroscience, this session looks at how avoidance reinforces fear while small, deliberate action builds self-efficacy: confidence usually comes after action, not before it. Bring your own lunch. Attend in person or online. 1:00–2:00pm",
+    "venue": "The Incubator, 8 Hadenfeld Avenue, Macquarie Park (and online)",
+    "registrationUrl": "https://events.humanitix.com/the-psychology-of-entrepreneurial-courage",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "James Linton (Incubator Manager, Macquarie University Incubator"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "13:00",
+    "end": "14:00",
+    "title": "Unpacking the Federal Budget: what it practically means for startups and scaleups",
+    "host": "William Buck",
+    "description": "What the federal budget means in practice for startups and scaleups, from the people who read it line by line. 1:30–2:20pm",
+    "venue": "William Buck, Level 29, 66 Goulburn Street",
+    "registrationUrl": "https://assets1-oce.mkt.dynamics.com/352ee5a9-4afa-ef11-b015-0022489322c4/digitalassets/standaloneforms/3b747b24-82a6-f111-aaab-7c1e522b38eb?readableEventId=William_Buck_Unpacking_the_Federal_Budget2621586055",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Alex Zinzopoulos (Partner"
+      },
+      {
+        "name": "Ramsey Aoude (Manager"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "13:30",
+    "end": "14:20",
+    "title": "Personal Branding: Be the Signal, Not the Noise",
+    "host": "Spark Startup Growth Lab",
+    "description": "AI agents increasingly decide who gets seen before a human ever does, but the rooms, referrals and relationships that move opportunities still run on people remembering people. Vinisha Rathod on working out what you want to be known for, saying it clearly, and showing up consistently without adopting a persona the market invented for you. 2:00–4:00pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/cafrtejh",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Vinisha Rathod (Managing Director and Founder, p3 Studio"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "14:00",
+    "end": "16:00",
+    "title": "R&D Tax Incentive: A Founder's Guide",
+    "host": "Prime Partners Chartered Accountants",
+    "description": "How the R&D Tax Incentive actually works, and how to tell genuine technical uncertainty from routine product development - the distinction the whole claim turns on. Hamish Sinclair runs the R&D Tax Incentive program at Prime Partners and works across the full life of a claim, from the first eligibility conversation through to documentation and lodgement. Expect real startup examples, the financial and technical pitfalls that catch people out, and what you need to be recording as you build. For founders, CFOs, tax managers and innovation teams. 2:45–3:35pm",
+    "venue": "Tank Stream Labs, Level 17 (Room 17.08), International Tower 3, 300 Barangaroo Avenue, Barangaroo",
+    "registrationUrl": "https://events.humanitix.com/r-and-d-tax-incentive-a-founders-guide",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Hamish Sinclair (R&D Tax Manager, Prime Partners"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "14:45",
+    "end": "15:35",
+    "title": "Clean Exit: How to Leave, Sell or Step Back From Your Startup Without the Baggage",
+    "host": "Spark Startup Growth Lab",
+    "description": "Could your startup survive the scrutiny of a buyer, an investor, an incoming partner or a co-founder separation? A commercial lawyer and an accountant work through a fictional startup going into due diligence and the problems that surface there: gaps in the shareholder agreement, IP sitting in the wrong entity, undocumented loans, unsigned agreements and unresolved founder conflict. Attendees leave with a one-page exit-readiness check they can run over their own company. 2:45–3:35pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/npnx0n5j",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Mark Lazarus (Founder and Director, Lazarus Legal"
+      },
+      {
+        "name": "Zander De Klerk (Xeta Accounting"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "14:45",
+    "end": "15:35",
+    "title": "Where Is Your B2B Sales Growth Actually Stuck?",
+    "host": "Spark Startup Growth Lab",
+    "description": "The answer is not always more leads. Sometimes the constraint is the sales process, the conversion step, or the fact that founder-led selling has stopped scaling. Tammie Lee opens with a self-assessment across lead generation, sales process, conversion and moving beyond founder-led sales, then works through what a low score in each area usually means and what to do about it. Everyone leaves with a diagnosis and two or three priority actions rather than a list of everything that could be improved. 3:00–4:00pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/1grhlt55",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Tammie Lee (Principal and Sales Partner, Founder Sales Solution"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "15:00",
+    "end": "16:00",
+    "title": "Raising Capital in 2026: What HNW Investors and Family Offices Are Looking For",
+    "host": "Wholesale Investor",
+    "description": "Why do some raises gain momentum within weeks, while others go quiet for months? This session unpacks what's shifted in how capital is being allocated this year, the factors that build investor confidence, and a framework you can apply directly to your own raise. 3:30–5:00pm TFU",
+    "venue": "Stone & Chalk Tech Central, Level 1, 477 Pitt Street",
+    "registrationUrl": "https://www.eventbrite.com.au/e/raising-capital-in-2026-what-hnw-investors-family-offices-are-looking-fo-tickets-1999003593560?aff=Spark",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Steve Torso (Managing Director, Wholesale Investor"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "15:30",
+    "end": "17:00",
+    "title": "Beyond the Raise",
+    "host": "The Founders Union and Tech Ready Women",
+    "description": "Three lenders and three different kinds of capital, on what each one is actually for. Beyond venture capital: which options suit which businesses, where they sit in a company's growth, how you get access and what you need to qualify — so the capital stack is built deliberately rather than by default. 3:30–5:45pm",
+    "venue": "Tank Stream Suites, 52 Martin Place, Sydney",
+    "registrationUrl": "https://luma.com/b6grtp7h",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Mat Hansen (Kashcade"
+      },
+      {
+        "name": "Kylie Little (Lighter Capital"
+      },
+      {
+        "name": "Westpac Startup Loans team"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "15:30",
+    "end": "17:45",
+    "title": "Just Raised. Now What? — What I Wish I Knew LIVE",
+    "host": "KC Ventures",
+    "description": "What actually happens in the six months after the money lands — the part nobody puts in the announcement post. Daniel Lord-Doyle talks through Mary Technology’s A$7m raise and everything that came after it; Oliver Darwin of OIF Ventures takes the same questions from the investor’s chair. Forty-five minutes each, then both of them on for audience questions. Recorded live, light refreshments from 3:30pm. 4:00–6:00pm",
+    "venue": "Song Kitchen, Song Hotel, 5 Wentworth Avenue, Surry Hills",
+    "registrationUrl": "https://events.humanitix.com/just-raised-now-what",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Luke Rix (Founder, KC Ventures) hosting, with Daniel Lord-Doyle (Co-founder, Mar"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "16:00",
+    "end": "18:00",
+    "title": "Build Sprint One",
+    "host": "ACU Co-Lab",
+    "description": "4:00–4:50pm",
+    "venue": "Online",
+    "registrationUrl": "https://www.acu.edu.au/locations/co-lab/our-programs/building-your-startup-with-ai-tools",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Gavin Heaton"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "16:00",
+    "end": "16:50",
+    "title": "Can I Afford to Grow? Bring Your Biggest Financial Question",
+    "host": "Spark Startup Growth Lab",
+    "description": "What is the financial question you are hoping nobody asks you? Bring a real decision to experienced CFOs Wayne Wanders, Michelle Kvello and Amit Shah, and work through the numbers and assumptions that matter to leave with practical next steps. 4:00–4:50pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/dik90gmm",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Wayne Wanders, Michelle Kvello, Amit Shah"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "16:00",
+    "end": "16:50",
+    "title": "How to Create Realistic AI Video — Practical Session",
+    "host": "Spark Startup Growth Lab",
+    "description": "The practical companion to the morning session. Jerrod Lew takes one finished piece - his GenAI short film Clueless in Love - and unpacks how it was actually made, from idea and storyboard through image generation and video generation to the decisions that keep a finished work coherent. 5:00–7:30pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/b3hz6y2p",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Jerrod Lew (AI video consultant to Adobe and Google"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "17:00",
+    "end": "19:30",
+    "title": "Built Different: Diversity in the Startup Ecosystem",
+    "host": "UNSW Founders",
+    "description": "A panel and networking evening on how identity, culture, lived experience and representation shape what people build. Part of the UNSW Diversity Festival, bringing together founders, investors and student entrepreneurs. 5:00–7:30pm",
+    "venue": "Michael Crouch Innovation Centre, Gate Two Avenue, Kensington",
+    "registrationUrl": "https://www.eventbrite.com.au/e/built-different-diversity-in-the-startup-ecosystem-tickets-1994914461857",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-23",
+    "start": "17:00",
+    "end": "19:30",
+    "title": "Deep Tech Mixer",
+    "host": "CSIRO and Cicada Innovations",
+    "description": "An evening for deep tech researchers, founders and the people who fund them, hosted by CSIRO and Cicada Innovations. Cicada Innovations 5:30–8:30pm",
+    "venue": "Cicada Innovations",
+    "registrationUrl": "https://comms.innovation.csiro.au/pub/pubType/EO/pubID/zzzz6a90ce598b768658/interface.html",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-23",
+    "start": "17:30",
+    "end": "20:30",
+    "title": "Bio & RNA Networking Drinks and Nibbles",
+    "host": "RNA Australia, BioNSW and Macquarie University DeepTech Incubator",
+    "description": "An evening of casual drinks, nibbles and networking with Sydney's bio and RNA community — researchers, founders, investors and anyone interested in bio and RNA innovation. Spaces are limited, so RSVP. 5:30–8:30pm",
+    "venue": "Bar 1880, 10 Bulletin Place, Sydney",
+    "registrationUrl": "https://events.humanitix.com/bio-and-rna-networking-drinks-and-nibbles-or-spark-festival",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-23",
+    "start": "17:30",
+    "end": "20:30",
+    "title": "Brookvale Pitch Club at Dad & Dave's Brewing",
+    "host": "The Pitch Club",
+    "description": "A casual platform for entrepreneurs, startups and business enthusiasts to share ideas, collaborate and support each other - this edition with an ed-tech theme. Founders, mentors, investors and anyone curious about the startup ecosystem are welcome. Anyone can pitch an idea on the night and compete for audience votes and prizes. Some ticket tiers include a welcome drink and a burger. 5:30–8:45pm",
+    "venue": "Dad & Dave's Brewing, 45 Mitchell Road, Brookvale",
+    "registrationUrl": "https://events.humanitix.com/brookvale-pitch-club-at-dad-and-dave-s-brewing",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Margaret Mai (Pitch Judge"
+      },
+      {
+        "name": "David Kenney (Pitch Judge"
+      },
+      {
+        "name": "Shahe Momdjian (Pitch Judge"
+      },
+      {
+        "name": "Chris Clark (Host"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "17:30",
+    "end": "20:45",
+    "title": "Find Your Co-Founder or New Hire",
+    "host": "Western Sydney Startup Hub",
+    "description": "An evening of networking, founder connections and talent matchmaking for founders, startup teams and anyone looking for a co-founder or a role in a high-growth venture. Networking and refreshments from 5:30pm, a founder panel at 6:00pm, sixty-second elevator pitches from 6:45pm, then more networking and canapes. 5:30–7:00pm (doors 5:00pm)",
+    "venue": "Western Sydney Startup Hub, 5 Fleet Street, North Parramatta",
+    "registrationUrl": "https://events.humanitix.com/copy-of-find-your-co-founder-or-new-hire-ai-edition",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Api Yuganathan (Co-Founder, HealthcareLink"
+      },
+      {
+        "name": "Georgina Schepis (Co-Founder and Business & Operations Manager, Handle Branding"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "17:30",
+    "end": "19:00",
+    "title": "Town Hall — Agentic AI Transformation in Government",
+    "host": "Portal Global / BCG / Royal Society NSW / UTS Startups",
+    "description": "Governments everywhere are grappling with how agentic AI will reshape policy, service delivery and the machinery of the public sector itself. This Town Hall brings together global leaders from government, strategy consulting and critical infrastructure to explore what that transformation looks like in practice, and what it takes to deliver it. Evening",
+    "venue": "BCG Sydney",
+    "registrationUrl": "https://events.humanitix.com/agentic-ai-transformation-in-government",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Hon. Victor Dominello (CEO, Future Government Institute"
+      },
+      {
+        "name": "Miguel Carrasco (Managing Director and Senior Partner, BCG and BCG-X"
+      },
+      {
+        "name": "Brad Eliot (former CTO, IMI Media). Opened by Murray Hurps, closed by Christina "
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "18:00",
+    "end": "19:00",
+    "title": "This Is Not a Tech Talk!",
+    "host": "Validate Launch Scale",
+    "description": "A hands-on AI workshop for non-tech founders and small business owners. How to use AI, automation and no-code tools without a tech team or any coding, what AI can genuinely do for a small business, where human judgement still matters, and what to test before investing in a new automation, app or system.",
+    "venue": "Substation no.13, 63 Little Mount Street, Pyrmont",
+    "registrationUrl": "https://luma.com/c4zz8l28",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Valeria Oliveira (Founder, Validate Launch Scale"
+      },
+      {
+        "name": "Simone Oro (Founder, Oro Fashion House"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-23",
+    "start": "18:30",
+    "end": "21:00",
+    "title": "Spark Festival Founders' Dinner",
+    "host": "Spark Festival",
+    "description": "A private dinner for founders, by invitation. Steve Shelley  6:00pm VL",
+    "venue": "Steve Shelley",
+    "registrationUrl": "",
+    "registrationNote": "By invitation",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-24",
+    "start": "08:00",
+    "end": "10:00",
+    "title": "Kindling Cafe",
+    "host": "Kindling Tech",
+    "description": "Every market of fifty to three hundred people has a handful of names the rest of the room listens to. This is a small session on how to earn a public co-sign from them rather than a polite reply: one topic, one room, and coffee. 9:00–11:30am",
+    "venue": "26 Queen Street, Chippendale",
+    "registrationUrl": "https://luma.com/4z15ftau",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-24",
+    "start": "09:00",
+    "end": "17:00",
+    "title": "Spark Startup Growth Lab — day two",
+    "host": "Geoff Main",
+    "description": "Two days of practical problem-solving for people building and growing startups. Every session starts with a specific problem, then brings in someone who has actually solved it to show how: the systems, the decisions, the numbers, the mistakes and what they would do differently. Sessions run across finding your first customers, scaling GTM, community-led growth, making AI products usable, AI video, cloud costs, raising capital, R&D and grants, SEO and AI search, scaling teams, and building a personal brand that creates real business value. Register here for the whole stream, or take individual sessions - each one is listed separately below with its own registration. 8:00–10:00am KT",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/sparkstartupgrowthlab",
+    "registrationNote": "",
+    "track": "Growth Lab",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-24",
+    "start": "09:00",
+    "end": "11:30",
+    "title": "Brew & Build Sydney: Your Cap Table, Plugged In",
+    "host": "Carta with Stone & Chalk",
+    "description": "A workshop for early-stage founders on managing equity: setting up a cap table in Carta Launch, querying ownership structures with an AI plugin, and modelling fundraising scenarios. A Carta expert covers the fundamentals of early-stage fundraising live on stage, followed by an investor keynote on what founders actually need before a raise, then brunch and open Q&A. 9:00–9:50am",
+    "venue": "Stone & Chalk, Haymarket",
+    "registrationUrl": "https://luma.com/iwywam16",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-24",
+    "start": "09:00",
+    "end": "09:50",
+    "title": "R&D Tax: How Startups Actually Get More Value From It",
+    "host": "Spark Startup Growth Lab",
+    "description": "Most startups focus on whether their R&D claim is eligible. The bigger opportunity is what separates an average claim from a strong one, and that usually comes down to how the company behaves through the year rather than what it reconstructs at lodgement. Alex Knight on the behaviours, records and decisions behind a stronger, more defensible claim. 10:15–11:05am",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/mgm6rh8u",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Alex Knight (Founder and CEO, Advanced"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "10:15",
+    "end": "11:05",
+    "title": "Scaling Everlab: The Decisions That Mattered",
+    "host": "Spark Startup Growth Lab",
+    "description": "Everlab is a rare Australian startup story you can learn from while the scaling is still happening. Govinda Pathak unpacks the decisions, rebuilds and trade-offs behind taking it from Seed towards Series A at home and overseas: what had to change, what they would do differently, and what founders with traction can take from it. 10:15–11:05am",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/rugpvlfk",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Govinda Pathak (Head of Growth, Everlab"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "10:15",
+    "end": "11:05",
+    "title": "Stop Chasing Every Grant: Find the Ones Worth Winning",
+    "host": "Spark Startup Growth Lab",
+    "description": "There are plenty of grants, government programmes and tenders out there. The hard part is knowing which are worth your time. Brian Lim on how to find the right opportunities, judge whether they genuinely fit, and avoid losing weeks to applications you were never likely to win. 10:30am–12:30pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/ut48qf9q",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Brian Lim"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "10:30",
+    "end": "12:30",
+    "title": "High Tea, High Conversations: Female Founders Mentor Exchange",
+    "host": "UNSW Founders",
+    "description": "An intimate high tea bringing together women founders from across Western Sydney for curated conversations with senior mentors in entrepreneurship, investment, technology, health and leadership. . Parramatta Town Hall  10:30am–3:00pm",
+    "venue": "Parramatta Town Hall",
+    "registrationUrl": "",
+    "registrationNote": "By invitation",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-24",
+    "start": "10:30",
+    "end": "15:00",
+    "title": "Spark Illawarra day",
+    "host": "Scycle AI",
+    "description": "A full day of Illawarra sessions at iAccelerate on the University of Wollongong campus, for founders outside the Sydney CBD orbit. 11:00am–12:00pm",
+    "venue": "iAccelerate, University of Wollongong",
+    "registrationUrl": "https://luma.com/uwsymdk6",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Tania Jones (Green Gravity"
+      },
+      {
+        "name": "Paul Pirie (Elementri"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "11:00",
+    "end": "12:00",
+    "title": "Your Customer is the Strategy",
+    "host": "Exec Edge",
+    "description": "An hour of working on your own business rather than listening to someone else's. Who are you actually building for, why does the problem matter to them, why you over the alternatives, and which moments in the experience decide whether they stay. You leave with a clearer view of your priority customer and one thing to do about it next week. No customer-experience background needed. 11:30am–12:20pm",
+    "venue": "Cubes & Co, Origin Room, Level 12, 347 Kent Street, Sydney",
+    "registrationUrl": "https://events.humanitix.com/execedge-your-customer-is-the-strategy",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-24",
+    "start": "11:30",
+    "end": "12:20",
+    "title": "Cut Your Cloud Bill Without Breaking What Works",
+    "host": "Spark Startup Growth Lab",
+    "description": "Your cloud bill can grow faster than your business. In fifty minutes three operators show three different ways to bring it back under control: optimise the technology, improve the commercial deal, or rethink the infrastructure altogether - with the trade-offs of each and a way to decide between them. 11:30am–12:20pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/hof4dskb",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Mark Zmarzly (Head of Startups and VC Partnerships, Morfless"
+      },
+      {
+        "name": "Sarah Caveley (Founder, PurePlay Cloud"
+      },
+      {
+        "name": "Ben Duncan"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "11:30",
+    "end": "12:20",
+    "title": "What Relevance AI Is Actually Doing to Win Enterprise Growth",
+    "host": "Spark Startup Growth Lab",
+    "description": "How you win enterprise growth inside a fast-moving AI company. Chelsea Wise goes behind the scenes on three things Relevance AI is doing right now - Relevance Academy, analyst relations and market intelligence - why each was chosen, how it was executed, and what changed because of it. 12:30–1:30pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/0whcw20g",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Chelsea Wise (Head of Enterprise Enablement and Education, Relevance AI"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "12:30",
+    "end": "13:30",
+    "title": "Don't Let Your Customers Be Your Test Team",
+    "host": "Exec Edge and TTC Global",
+    "description": "For founders about to put a digital product in front of real people. Which customer journeys cannot fail, how to find the risks before your customers do, and why functionality alone is not the test — usability, performance, accessibility and trust all decide whether a launch holds. Practical and business-focused rather than technical, and you leave with a Launch Ready Checklist. 12:30–1:30pm",
+    "venue": "Cubes & Co, Origin Room, Level 12, 347 Kent Street, Sydney",
+    "registrationUrl": "https://events.humanitix.com/don-t-let-your-customers-be-the-test-team",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-24",
+    "start": "12:30",
+    "end": "13:30",
+    "title": "Life Beyond Work: Misnomers, Paradoxes and the Disconnect",
+    "host": "ACU Co-Lab",
+    "description": "12:30–1:00pm",
+    "venue": "Online",
+    "registrationUrl": "https://www.eventbrite.com.au/e/lunch-and-learn-life-beyond-work-misnomers-paradoxes-and-the-disconnect-tickets-1999446321772",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Sam Wright"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "12:30",
+    "end": "13:00",
+    "title": "R&D Funding: A Founder's Guide to the 2028 Reforms and Optimising R&D Spend",
+    "host": "Fullstack Advisory with Kashcade",
+    "description": "What the 2028 R&D reforms change for founders, and how to get more out of R&D spend in the meantime. Online, and short enough to fit in a lunch break. 12:30–1:00pm",
+    "venue": "Online",
+    "registrationUrl": "https://www.eventbrite.com.au/e/rd-funding-a-founders-guide-to-the-2028-reforms-optimising-rd-spend-tickets-1999195316007",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Jack Dean (R&D Tax Manager, Fullstack"
+      },
+      {
+        "name": "Josh Sanders (Head of Customer, Kashcade"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "12:30",
+    "end": "13:00",
+    "title": "UTS Startups Space Tour — Spark Festival Edition",
+    "host": "UTS Startups",
+    "description": "A half-hour guided tour of one of Australia's largest university-affiliated startup communities. See the space, hear how UTS Startups supports founders at different stages, and meet people from the community. Open to founders, aspiring entrepreneurs, students, investors and ecosystem partners. Meet at UTS Building 3, Bon Marche, Level 4. 1:00–2:00pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo — meet at Building 3, Bon Marche, Level 4, 755 Harris Street",
+    "registrationUrl": "https://luma.com/scoc2sjm",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-24",
+    "start": "13:00",
+    "end": "14:00",
+    "title": "Focus and Cognitive Flexibility: staying sharp in a distracted world",
+    "host": "VRM Performance Coaching",
+    "description": "An interactive workshop on staying focused and adaptable when attention is constantly pulled in different directions. Neuroscientist Dr Cam Higgins unpacks what happens in the brain when we switch between tasks and demands, and high-performance coach Veronica Mason turns that into practical exercises you can use straight away. 1:00–2:00pm",
+    "venue": "Tank Stream Labs, Level 3, 333 Kent Street, Sydney (board room 3.01)",
+    "registrationUrl": "https://events.humanitix.com/focus-and-cognitive-flexibility",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Dr Cam Higgins and Veronica Mason (Co-Founders, Onyx Neuro"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "13:00",
+    "end": "14:00",
+    "title": "Is your startup missing out on impact capital?",
+    "host": "SEFA Partnerships",
+    "description": "Impact capital is a real pool of money that many founders never think to ask for. Sefa Partnerships on who it is for and how to approach it. 1:30–3:30pm",
+    "venue": "Yirranma Place, 262 Liverpool Street, Darlinghurst",
+    "registrationUrl": "https://events.humanitix.com/is-your-startup-missing-out-on-impact-capital",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Alice Brennan"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "13:30",
+    "end": "15:30",
+    "title": "Founder Stories: Lessons from Building and Scaling Startups",
+    "host": "Investment NSW",
+    "description": "A Lunch and Learn on the realities of building and scaling a startup. A moderated panel of founders on the challenges and setbacks, the decisions that mattered, winning customers, and what they would tell someone at the start. Light lunch on arrival. 1:30–2:20pm",
+    "venue": "Tech Central Innovation Hub, Level 1, 477 Pitt Street",
+    "registrationUrl": "https://events.humanitix.com/founder-stories-lessons-from-building-and-scaling-startups",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-24",
+    "start": "13:30",
+    "end": "14:20",
+    "title": "Is Media Relations Startups' Most Underrated Growth and Trust Lever?",
+    "host": "Spark Startup Growth Lab",
+    "description": "Simon Thomsen, editor of Startup Daily, interviews PR tech founder Marie Dowling on the good, the bad and the freaking stupid things founders do with their PR - and what actually helps a startup earn attention and trust. 1:30–2:20pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/yju97iea",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Simon Thomsen (Editor, Startup Daily"
+      },
+      {
+        "name": "Marie Dowling"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "13:30",
+    "end": "14:20",
+    "title": "See How AI Sees Your Brand — and Fix It Live",
+    "host": "Spark Startup Growth Lab",
+    "description": "What do ChatGPT, Gemini and the rest actually think your business is known for, and who do they recommend instead? A hands-on session: founders run BrandViz on their own business to see how they are positioned and who they are really competing with, and leave with their next three to five brand actions identified. 2:00–3:00pm SI",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/fogn4nyr",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Rushana Maksudova (Co-founder and CEO, BrandViz.AI"
+      },
+      {
+        "name": "David Andersen (Co-founder, BrandViz.AI"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "14:00",
+    "end": "15:00",
+    "title": "Brand Systems in the Age of AI: one brand, ten thousand assets",
+    "host": "Spark Interact",
+    "description": "The companion session: how to keep one coherent brand when AI lets anyone generate ten thousand assets a week, and what has to be decided once so it does not have to be decided every time. 2:00–2:45pm",
+    "venue": "Online",
+    "registrationUrl": "https://events.humanitix.com/webinar-event-brand-systems-in-the-age-of-ai",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Mac Nguyen (Marketing Specialist, Spark Interact"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "14:00",
+    "end": "14:45",
+    "title": "R&D Tax Incentive: The New Rules of the Game",
+    "host": "Azure Group",
+    "description": "The R&D Tax Incentive can be a critical source of funding for Australian startups and innovative businesses. This session covers how the incentive works, who is eligible, and what the recent budget announcements change. It goes past filling in a claim to the practices that make one defensible: contemporaneous record-keeping, the documentation that substantiates a claim, and the habits that reduce audit risk. 2:45–3:35pm",
+    "venue": "Clarence Workspaces for Lawyers, Level 21, 133 Castlereagh Street, Sydney",
+    "registrationUrl": "https://events.humanitix.com/r-and-d-tax-incentive-the-new-rules-of-the-game",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-24",
+    "start": "14:45",
+    "end": "15:35",
+    "title": "Build Something Useful With AI — Live",
+    "host": "Spark Startup Growth Lab",
+    "description": "Bring a real problem. Michael Batko picks a couple of challenges from the room and builds the solution live - a website, an AI agent, a workflow - showing the thinking, the tools and the decisions as the work comes together. The value is as much in watching the approach as in the finished build. 3:00–5:00pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/6ll2qt4j",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Michael Batko (CEO, Hourglass AI"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "15:00",
+    "end": "17:00",
+    "title": "Tech Central Walking Tour",
+    "host": "UTS",
+    "description": "A guided walk through Tech Central, Australia's largest innovation precinct, taking in the landmarks and facilities and what is being built there next. Tech Central — meet at UTS Tower concierge 4:00–4:50pm",
+    "venue": "Tech Central — meet at UTS Tower concierge",
+    "registrationUrl": "https://events.humanitix.com/tech-central-walking-tours/tickets",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-24",
+    "start": "16:00",
+    "end": "16:50",
+    "title": "Building With AI: What Changes at Every Stage",
+    "host": "Spark Startup Growth Lab",
+    "description": "Martin Medina built Solotude as the only technical person on the team, using AI-assisted development. He shows how he actually works, where he lets agents run, where he reviews every line, and how much to trust AI changes as a product moves from prototype to something people rely on daily. 4:00–4:50pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/iokv3nol",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Martin Medina (Solotude"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "16:00",
+    "end": "16:50",
+    "title": "Vibe-Coded It. Now Make It Real.",
+    "host": "Spark Startup Growth Lab",
+    "description": "You built something with AI and it works. Now comes the harder part: making it reliable, secure, scalable and ready for real customers. Mike Gardiner works with a small group on the last ten per cent between a promising prototype and something people can depend on - testing, reliability, security, usability. 5:00–9:00pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/fssj2bdb",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Mike Gardiner (Founder, Buzzy"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "17:00",
+    "end": "21:00",
+    "title": "Google Developer community event — AI",
+    "host": "Google Developer Relations",
+    "description": "An evening for the Google developer community on AI at Google's Sydney office: a panel on AI and sovereignty, a walkthrough of building a secure, compliant agent with Antigravity and the Gemini Enterprise Agent Platform, food and drinks, then a hands-on Vibe Coding Agent Skills workshop. 5:30–7:30pm",
+    "venue": "Google Sydney HQ, 48 Pirrama Road, Pyrmont",
+    "registrationUrl": "https://rsvp.withgoogle.com/events/google-for-developers-spark-festival",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "David Brudenell (Co-CEO and Executive Chair, Decidr"
+      },
+      {
+        "name": "Raymond Sun (Senior Associate, HSF Kramer"
+      },
+      {
+        "name": "Ramesh Heidary (Google"
+      },
+      {
+        "name": "Brett Morgan (Google"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "17:30",
+    "end": "19:30",
+    "title": "Parramatta Pitch Night x A-One",
+    "host": "Launch Pad, Western Sydney University",
+    "description": "A low-pressure pitch night in Western Sydney. Five to seven pitchers get three minutes each, then three minutes of questions and feedback from a judging panel, and the winner takes a $200 voucher. You do not need a registered company or a polished deck, just an idea you want to talk about. Come to pitch or come to watch — founders, students, side-hustlers and anyone with a business idea. 5:30–8:00pm",
+    "venue": "Launch Pad Parramatta, Level 1, 6 Hassall Street, Parramatta",
+    "registrationUrl": "https://www.eventbrite.com.au/e/parramatta-pitch-night-x-a-one-tickets-1996427953752?aff=spark",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-24",
+    "start": "17:30",
+    "end": "20:00",
+    "title": "The Inner Game of Success: Master Your Mindset, Energy and Performance",
+    "host": "Coach Anywhere",
+    "description": "An interactive workshop exploring the mental and emotional habits that drive peak performance in business and life. Practical exercises for breaking through mental barriers, building confidence and creating momentum in both business and life. Evening",
+    "venue": "TDQS, Suite 301, 2-4 Cunningham Street, Haymarket",
+    "registrationUrl": "https://events.humanitix.com/the-inner-game-of-success-master-your-mindset-energy-and-performance",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Roy Kwan, Sonya Furlong"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "18:00",
+    "end": "20:00",
+    "title": "I2N Accelerator Investor Showcase",
+    "host": "I2N — University of Newcastle",
+    "description": "6:00–8:00pm",
+    "venue": "",
+    "registrationUrl": "",
+    "registrationNote": "By invitation",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-24",
+    "start": "18:00",
+    "end": "20:00",
+    "title": "Improv for Innovators & Leaders: Break Patterns. Spark New Ideas.",
+    "host": "Improv Life Lessons",
+    "description": "Improvisation as a working tool for founders: breaking a fixed pattern, thinking on your feet and getting comfortable being wrong in public. 6:00–9:00pm SS",
+    "venue": "City of Sydney Creative Studios, 119 Bathurst Street, Sydney",
+    "registrationUrl": "https://www.eventbrite.com.au/e/improv-for-innovators-leaders-break-patterns-spark-new-ideas-tickets-1999204422244",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Susan Zheng"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "18:00",
+    "end": "21:00",
+    "title": "Late Night Cafe",
+    "host": "Students&Starters",
+    "description": "House party meets late-night cafe: founders and students in one room over good food and real conversation. Founders meet peers, potential hires and collaborators; students exploring tech get an honest look at the paths beyond a graduate program - founding, engineering, product and design. A potluck, so bring something if you can; brownies, matcha and coffee are already covered. 6:00–8:00pm",
+    "venue": "Drummoyne (address on registration)",
+    "registrationUrl": "https://luma.com/ec74rkrk",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Akshat (Founder, Arrayah"
+      },
+      {
+        "name": "Isaac (Dev lead, Ripple"
+      },
+      {
+        "name": "Georgia (Founder, Flock"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "18:00",
+    "end": "20:00",
+    "title": "Navigating the Advisory Minefield",
+    "host": "Founder Institute with goto.health",
+    "description": "A panel on choosing and working with advisers, board members and investors: who actually helps, what good governance looks like early, and how to tell the difference before you hand over equity. 6:00–7:30pm",
+    "venue": "Hall Chadwick, Level 40, 2 Park Street, Sydney",
+    "registrationUrl": "https://luma.com/ymq28qb5",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Jakomi Mathews (moderator"
+      },
+      {
+        "name": "Benjamin Chong (Right Click Capital"
+      },
+      {
+        "name": "Josh Ayscough (Utiliti Ventures"
+      },
+      {
+        "name": "Brinley Meagher, Trinity Woolnough (Hall Chadwick"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-24",
+    "start": "18:00",
+    "end": "19:30",
+    "title": "Pitching on Screen with Genevieve",
+    "host": "Presence Studio",
+    "description": "How your presence reads on camera, and what to do about it, for founders who pitch over video as often as they pitch in a room. Ninety minutes of voice work, movement and play, putting the two together, and then demonstrations on screen. Bring a two-minute pitch or piece to camera if you can - five people drawn on the day get recorded feedback and media training from Genevieve afterwards.",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://events.humanitix.com/pitching-on-screen-with-genevieve",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Genevieve Craig (Chief Storyteller, Presence Studio"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-25",
+    "start": "10:00",
+    "end": "11:00",
+    "title": "Coffee Hour",
+    "host": "UTS Startups",
+    "description": "A casual drop-in for people building, backing and supporting startups around Tech Central. No panels and no networking theatre - just coffee, conversation and the useful collisions that happen when founders, builders, investors and operators are in the same room. UTS Startups run it fortnightly; this one falls in festival week. Come for a quick cup or stay the hour. 10:00–11:30am",
+    "venue": "UTS Startups, 3 Broadway, Ultimo",
+    "registrationUrl": "https://luma.com/o54m9nad",
+    "registrationNote": "",
+    "track": "",
+    "speakers": []
+  },
+  {
+    "date": "2026-09-25",
+    "start": "10:00",
+    "end": "11:30",
+    "title": "Interactive Design: Turn Your Value Proposition into an Experience",
+    "host": "Utopia Rising with Western Sydney Startup Hub",
+    "description": "A workshop on turning a value proposition into something people can see, feel, test and remember rather than sit through. Attendees prototype a demonstration of their own, which works as well for a personal brand or a room full of strangers as it does for a startup. 11:00am–12:00pm",
+    "venue": "Western Sydney Startup Hub, North Parramatta",
+    "registrationUrl": "https://events.humanitix.com/interactive-design-turn-your-value-proposition-into-an-experience",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Jonathan Lee"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-25",
+    "start": "11:00",
+    "end": "12:00",
+    "title": "Humaning is your Moat: B2B Sales in the Age of AI",
+    "host": "Authentic Selling",
+    "description": "As AI becomes part of everyday business, the thing it still cannot do is be human, and that is your moat. A practical session on leaning into that alongside your AI tools so the connection that drives sales does not get lost. 11:00am–12:00pm CA",
+    "venue": "Online",
+    "registrationUrl": "https://authenticselling.com.au/webinars/webinar-20260925-registration",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Nimmity Zappert (Founder, Authentic Selling"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-25",
+    "start": "11:00",
+    "end": "12:00",
+    "title": "What do you do when your AI tells you no?",
+    "host": "CanTicket",
+    "description": "There is a difference between using AI as a tool and handing it a job it can refuse. The seven levels of AI maturity and which rung your business is actually on, agentic AI doing real work when it is briefed properly, and what it looks like when the AI says no - watched live, plus how to build the guardrails that let it. Cassandra took her own agency from fourteen people to four by building the systems instead of hiring. Capped at 40. 12:00–1:00pm",
+    "venue": "Stone & Chalk Tech Central, Level 1, 477 Pitt Street, Haymarket",
+    "registrationUrl": "https://events.humanitix.com/what-do-you-do-when-your-ai-tells-you-no",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Cassandra Cadorin (Founder, CanTicket and House of Can"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-25",
+    "start": "12:00",
+    "end": "13:00",
+    "title": "Demystifying Term Sheets",
+    "host": "Sydney Angels",
+    "description": "A practical workshop that takes the mystery out of term sheets and the part they play in early-stage investment. Richard Dale covers what a term sheet actually is, why one is used at all when it is not legally binding, the terms that turn up again and again and the reasons they are there, and how the document changes shape across different kinds of raise. Built for founders preparing to raise and for people new to investing, and followed by open Q&A. 12:30–1:15pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo (Room CB03.02.045)",
+    "registrationUrl": "https://luma.com/0udji8e7",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Richard Dale (Committee member, Sydney Angels"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-25",
+    "start": "12:30",
+    "end": "13:15",
+    "title": "Don’t Let Compliance Kill Your Sustainability Story",
+    "host": "Envirotivity",
+    "description": "Sustainability communications are being squeezed from three sides at once: what audiences care about has shifted, regulators have tightened up, and AI search has changed how claims get found. A practitioner's session on treating compliance as a creative guardrail rather than a blocker - turning legal requirements into a stronger message, and making specific, evidence-backed claims that hold up and get found. Real cases, and questions at the end. 1:00–2:00pm",
+    "venue": "Online",
+    "registrationUrl": "https://events.humanitix.com/don-t-let-compliance-kill-your-sustainability-story",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Ayelet Mendel-Girin (Co-Founder, Envirotivity"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-25",
+    "start": "13:00",
+    "end": "14:00",
+    "title": "Angel Investing 101",
+    "host": "Sydney Angels",
+    "description": "For anyone curious about angel investing, and for founders who want to understand what the investor on the other side of the table is actually looking at. Philip Argy introduces the startup funding landscape, Australia's technology success stories and the early-stage ecosystem, then walks through what angel investing involves, the private capital journey, and how the Sydney Angels investment process works in practice. 1:00–4:00pm",
+    "venue": "UTS Startups, 3 Broadway, Ultimo (Room CB03.02.045)",
+    "registrationUrl": "https://luma.com/x4je1rjh",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Philip Argy (Committee member, Sydney Angels"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-25",
+    "start": "13:00",
+    "end": "16:00",
+    "title": "Bushwalk with SquareBySquare",
+    "host": "SquareBySquare",
+    "description": "A bushwalk from Waverton Park to Balls Head Reserve, ending with a private heritage tour at the Coal Loader Centre for Sustainability. Being out in nature is a good way to close out a festival week: walking and talking beats sitting in rows, and it makes for a low-key networking session before people head off for a drink. Along the way, Henk and Emely share how SquareBySquare is building an economic model to fund nature conservation, using their own startup as a live case study of what it takes to make conservation work as a B2C business. 1:00–2:00pm BR",
+    "venue": "Waverton Park to Balls Head Reserve — meet at the bus stop by Waverton Bowling Club, Woolcott Street",
+    "registrationUrl": "https://events.humanitix.com/bushwalk-with-squarebysquare",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "Henk Kleynhans and Emely Junker (Co-Founders, SquareBySquare"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-25",
+    "start": "13:00",
+    "end": "14:00",
+    "title": "Hiring your first GTM or commercial lead",
+    "host": "Bluebird Recruitment",
+    "description": "The first commercial hire is the one founders most often get wrong. What the role actually needs to cover at this stage, how to tell a closer from a builder, and what it costs to find out late. 6:30pm",
+    "venue": "Stone & Chalk Tech Central, Level 1, 477 Pitt Street, Haymarket",
+    "registrationUrl": "https://luma.com/lfxeih97",
+    "registrationNote": "",
+    "track": "",
+    "speakers": [
+      {
+        "name": "James Bergl (Bluebird Recruitment"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-25",
+    "start": "16:00",
+    "end": "18:00",
+    "title": "Spark Festival 2026 Closing Celebration",
+    "host": "",
+    "description": "The festival closes with the community that made it. Spark Foundation CEO Harry Godber and Simon Thomsen, editor of Startup Daily, are joined by the Hon. Paul Fletcher on the state of technology policy in Australia and what founders need to know about dealing with — and selling to — government.",
+    "venue": "UTS Startups @ Central",
+    "registrationUrl": "https://luma.com/elp2rcr5",
+    "registrationNote": "Free, but please book",
+    "track": "Closing celebration",
+    "speakers": [
+      {
+        "name": "The Hon. Paul Fletcher",
+        "role": "Non-Executive Director, Tech Council of Australia"
+      },
+      {
+        "name": "Simon Thomsen",
+        "role": "Editor, Startup Daily"
+      },
+      {
+        "name": "Harry Godber",
+        "role": "CEO, Spark Foundation"
+      }
+    ]
+  },
+  {
+    "date": "2026-09-25",
+    "start": "18:30",
+    "end": "19:30",
+    "title": "Spark AI Dinner",
+    "host": "Decidr",
+    "description": "A dinner for founders, operators and investors working at the front edge of AI in Australia, closing out festival week over one table and one conversation.  Closing celebration",
+    "venue": "",
+    "registrationUrl": "",
+    "registrationNote": "By invitation",
+    "track": "",
+    "speakers": []
+  }
 ]

@@ -1,24 +1,10 @@
 import React, { forwardRef, useRef, useState, useEffect, useCallback } from "react";
-import {
-  Search,
-  X,
-  ArrowRight,
-  CornerDownLeft,
-  TrendingUp,
-  MapPin,
-  Calendar,
-  Sparkles,
-  Users,
-} from "lucide-react";
+import { Search, X, ArrowRight, CornerDownLeft, TrendingUp, MapPin, Calendar, Sparkles, Users } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { triggerHaptic } from "@/lib/native";
-import {
-  useSearchAutocomplete,
-  type AutocompleteSuggestion,
-} from "@/hooks/useSearchQueryLogger";
+import { useSearchAutocomplete, type AutocompleteSuggestion } from "@/hooks/useSearchQueryLogger";
 
-export interface SearchBarProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "onChange"> {
+export interface SearchBarProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "onChange"> {
   value: string;
   onChange: (value: string) => void;
   onClear?: () => void;
@@ -74,9 +60,12 @@ const SIZE_STYLES = {
 
 const VARIANT_STYLES = {
   card: "bg-card text-ink ring-1 ring-line/90 shadow-xs focus-within:ring-2 focus-within:ring-brand/40 focus-within:shadow-[0_4px_16px_-4px_rgba(18,22,20,0.08)]",
-  paper: "bg-paper text-ink ring-1 ring-line focus-within:ring-2 focus-within:ring-brand/40 focus-within:bg-card shadow-2xs",
-  glass: "bg-card/85 backdrop-blur-md text-ink ring-1 ring-line/80 shadow-xs focus-within:ring-2 focus-within:ring-brand/40 focus-within:bg-card",
-  ghost: "bg-transparent text-ink ring-1 ring-transparent focus-within:ring-1 focus-within:ring-line focus-within:bg-paper/50",
+  paper:
+    "bg-paper text-ink ring-1 ring-line focus-within:ring-2 focus-within:ring-brand/40 focus-within:bg-card shadow-2xs",
+  glass:
+    "bg-card/85 backdrop-blur-md text-ink ring-1 ring-line/80 shadow-xs focus-within:ring-2 focus-within:ring-brand/40 focus-within:bg-card",
+  ghost:
+    "bg-transparent text-ink ring-1 ring-transparent focus-within:ring-1 focus-within:ring-line focus-within:bg-paper/50",
 };
 
 function highlightMatch(text: string, query: string) {
@@ -247,10 +236,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
   const isDropdownVisible = enableAutocomplete && isOpen && suggestions.length > 0;
 
   return (
-    <div
-      ref={containerRef}
-      className={cn("relative w-full max-w-full box-border group", containerClassName)}
-    >
+    <div ref={containerRef} className={cn("relative w-full max-w-full box-border group", containerClassName)}>
       <div
         className={cn(
           "relative flex w-full items-center rounded-2xl transition-all duration-200",
@@ -268,11 +254,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
           )}
           aria-hidden="true"
         >
-          {icon !== undefined ? (
-            icon
-          ) : (
-            <Search size={currentSize.iconSize} strokeWidth={2.2} />
-          )}
+          {icon !== undefined ? icon : <Search size={currentSize.iconSize} strokeWidth={2.2} />}
         </div>
 
         {/* Input Field: iOS zoom-safe text-[16px] on mobile, WebKit decoration suppression */}
@@ -347,9 +329,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
           ) : null}
 
           {/* Right Slot (e.g. filter icon or shortcut badge) */}
-          {rightSlot && !value ? (
-            <div className="mr-2.5 flex items-center">{rightSlot}</div>
-          ) : null}
+          {rightSlot && !value ? <div className="mr-2.5 flex items-center">{rightSlot}</div> : null}
         </div>
       </div>
 
@@ -362,9 +342,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
         >
           {/* Header indicator */}
           <div className="flex items-center justify-between px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-mute">
-            <span>
-              {value.trim() ? "Suggested Searches" : "Trending Searches"}
-            </span>
+            <span>{value.trim() ? "Suggested Searches" : "Trending Searches"}</span>
             <span className="flex items-center gap-1 text-[10px] text-accent lowercase font-medium">
               <TrendingUp size={11} />
               <span>from search logs</span>
@@ -388,30 +366,20 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
                   onMouseEnter={() => setHighlightedIndex(idx)}
                   className={cn(
                     "flex w-full min-h-[44px] items-center justify-between rounded-xl px-3 py-2 text-left text-xs transition cursor-pointer touch-manipulation active:scale-[0.99]",
-                    isSelected
-                      ? "bg-brand/10 text-accent font-semibold"
-                      : "text-ink hover:bg-paper",
+                    isSelected ? "bg-brand/10 text-accent font-semibold" : "text-ink hover:bg-paper",
                   )}
                 >
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     <span
                       className={cn(
                         "grid h-7 w-7 shrink-0 place-items-center rounded-lg transition-colors",
-                        isSelected
-                          ? "bg-brand text-white"
-                          : "bg-paper text-mute",
+                        isSelected ? "bg-brand text-white" : "bg-paper text-mute",
                       )}
                     >
-                      {item.matchType === "trending" ? (
-                        <TrendingUp size={13} />
-                      ) : (
-                        <Search size={13} />
-                      )}
+                      {item.matchType === "trending" ? <TrendingUp size={13} /> : <Search size={13} />}
                     </span>
                     <div className="min-w-0 flex-1 truncate">
-                      <span className="truncate">
-                        {highlightMatch(item.term, value)}
-                      </span>
+                      <span className="truncate">{highlightMatch(item.term, value)}</span>
                     </div>
                   </div>
 
@@ -444,9 +412,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
               >
                 <span className="flex items-center gap-2 truncate">
                   <Search size={13} className="text-accent shrink-0" />
-                  <span className="truncate">
-                    Search all AirPal for &ldquo;{value.trim()}&rdquo;
-                  </span>
+                  <span className="truncate">Search all AirPal for &ldquo;{value.trim()}&rdquo;</span>
                 </span>
                 <span className="flex items-center gap-1 text-[11px] font-bold shrink-0">
                   <CornerDownLeft size={12} strokeWidth={2.5} />

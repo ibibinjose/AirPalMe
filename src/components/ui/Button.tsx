@@ -34,15 +34,15 @@ export function Button({
         size === "sm" && "min-h-[44px] px-3.5 text-sm lg:h-9 lg:min-h-0",
         size === "md" && "h-11 px-5 text-[15px]",
         size === "lg" && "h-12 px-6 text-base",
-        variant === "primary" &&
-          "bg-brand text-white shadow-[0_10px_24px_-10px_rgba(18,22,20,0.28)]",
+        variant === "primary" && "bg-brand text-white shadow-[0_10px_24px_-10px_rgba(18,22,20,0.28)]",
         variant === "ghost" && "bg-card text-ink ring-1 ring-line hover:bg-paper",
         variant === "dark" && "bg-brand text-white",
         variant === "gold" && "bg-gold text-white",
         variant === "light" && "bg-white text-zinc-950 hover:bg-white/90",
         variant === "onDark" && "bg-neutral-900/80 text-white ring-1 ring-white/55 hover:bg-neutral-900",
         variant === "tonal" && "bg-brand/10 text-accent font-semibold hover:bg-brand/15 active:bg-brand/20",
-        variant === "elevated" && "bg-card text-ink shadow-[var(--shadow-m3-1)] ring-1 ring-line hover:shadow-[var(--shadow-m3-2)]",
+        variant === "elevated" &&
+          "bg-card text-ink shadow-[var(--shadow-m3-1)] ring-1 ring-line hover:shadow-[var(--shadow-m3-2)]",
         variant === "outlined" && "bg-transparent text-ink border border-line hover:bg-black/[0.04]",
         variant === "glass" && "apple-liquid-glass-light text-ink ring-1 ring-white/60 hover:ring-brand/40 shadow-xs",
         className,

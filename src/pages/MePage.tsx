@@ -37,12 +37,7 @@ import { useCohort } from "@/contexts/CohortContext";
 import { usePlans } from "@/contexts/PlanContext";
 import { useLocalNow } from "@/contexts/LocalNowContext";
 import { useMyBookings } from "@/hooks/useMyBookings";
-import {
-  listCatchUps,
-  subscribeCatchUpsForOwner,
-  updateCatchUpStatus,
-  type CatchUpItem,
-} from "@/lib/catchup";
+import { listCatchUps, subscribeCatchUpsForOwner, updateCatchUpStatus, type CatchUpItem } from "@/lib/catchup";
 import { getDailyOutfitRecommendation } from "@/lib/outfit";
 import { BioCatchUpModal } from "@/components/bio/BioCatchUpModal";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
@@ -189,13 +184,17 @@ export function MePage() {
       const ctx = canvas.getContext("2d");
       if (ctx) {
         ctx.drawImage(img.image, 0, 0, 400, 400);
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            const src = await storeMedia(blob, { folder: "bios", kind: "avatar" });
-            await updateProfile({ handle: mine.handle, avatar: src });
-            toast.success("Profile photo updated");
-          }
-        }, "image/webp", 0.9);
+        canvas.toBlob(
+          async (blob) => {
+            if (blob) {
+              const src = await storeMedia(blob, { folder: "bios", kind: "avatar" });
+              await updateProfile({ handle: mine.handle, avatar: src });
+              toast.success("Profile photo updated");
+            }
+          },
+          "image/webp",
+          0.9,
+        );
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to upload photo");
@@ -227,7 +226,10 @@ export function MePage() {
         {/* Ambient Top Glow & Pattern */}
         <div className="relative h-32 sm:h-44 bg-gradient-to-r from-brand-ink via-[#0d173f] to-[#1a0a52] overflow-hidden">
           <div className="absolute inset-0 opacity-25 bg-[radial-gradient(#ffffff_1.2px,transparent_1.2px)] [background-size:18px_18px]" />
-          <Photo src="/media/harbour.jpg" className="absolute inset-0 h-full w-full object-cover opacity-40 mix-blend-overlay" />
+          <Photo
+            src="/media/harbour.jpg"
+            className="absolute inset-0 h-full w-full object-cover opacity-40 mix-blend-overlay"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
 
           {/* Top Quick Status Pill */}
@@ -396,7 +398,9 @@ export function MePage() {
                 <Sun size={17} />
               </span>
               <div className="min-w-0">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-mute block leading-tight">Today</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-mute block leading-tight">
+                  Today
+                </span>
                 <span className="font-display text-base font-black text-ink tabular-nums leading-tight">
                   {todayTotalCount > 0 ? `${todayTotalCount} items` : "Open"}
                 </span>
@@ -417,7 +421,9 @@ export function MePage() {
                 <Coffee size={17} />
               </span>
               <div className="min-w-0">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-mute block leading-tight">Catch-ups</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-mute block leading-tight">
+                  Catch-ups
+                </span>
                 <span className="font-display text-base font-black text-ink tabular-nums leading-tight">
                   {upcomingScheduledAppointments.length + pendingAppointments.length}
                 </span>
@@ -438,7 +444,9 @@ export function MePage() {
                 <Ticket size={17} />
               </span>
               <div className="min-w-0">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-mute block leading-tight">Tickets</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-mute block leading-tight">
+                  Tickets
+                </span>
                 <span className="font-display text-base font-black text-ink tabular-nums leading-tight">
                   {upcomingTickets.length}
                 </span>
@@ -459,7 +467,9 @@ export function MePage() {
                 <Users size={17} />
               </span>
               <div className="min-w-0">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-mute block leading-tight">Plans</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-mute block leading-tight">
+                  Plans
+                </span>
                 <span className="font-display text-base font-black text-ink tabular-nums leading-tight">
                   {myPlans.length}
                 </span>
@@ -475,7 +485,11 @@ export function MePage() {
           {[
             { id: "all" as const, label: "All Cockpit", icon: Sparkles },
             { id: "today" as const, label: `Today (${todayTotalCount})`, icon: Sun },
-            { id: "appointments" as const, label: `Catch-ups (${upcomingScheduledAppointments.length + pendingAppointments.length})`, icon: Coffee },
+            {
+              id: "appointments" as const,
+              label: `Catch-ups (${upcomingScheduledAppointments.length + pendingAppointments.length})`,
+              icon: Coffee,
+            },
             { id: "tickets" as const, label: `Tickets (${upcomingTickets.length})`, icon: Ticket },
             { id: "plans" as const, label: `Plans (${upcomingPlansList.length})`, icon: Users },
             { id: "pass" as const, label: "Bio & QR Pass", icon: QrCode },
@@ -489,9 +503,7 @@ export function MePage() {
                 onClick={() => handleTabChange(tab.id)}
                 className={cn(
                   "flex min-h-[42px] items-center gap-1.5 whitespace-nowrap rounded-full px-4 text-xs font-bold transition-all cursor-pointer select-none active:scale-95",
-                  isCurrent
-                    ? "bg-brand text-white shadow-xs"
-                    : "text-mute hover:bg-paper hover:text-ink",
+                  isCurrent ? "bg-brand text-white shadow-xs" : "text-mute hover:bg-paper hover:text-ink",
                 )}
               >
                 <Icon size={14} className={isCurrent ? "text-white" : "text-mute"} />
@@ -513,10 +525,10 @@ export function MePage() {
                   <Sun size={18} />
                 </span>
                 <div>
-                  <h2 className="font-display text-lg sm:text-xl font-black text-ink">
-                    Today&apos;s Agenda
-                  </h2>
-                  <p className="text-xs text-mute font-medium">{day}, {today} · {city || "Sydney"}</p>
+                  <h2 className="font-display text-lg sm:text-xl font-black text-ink">Today&apos;s Agenda</h2>
+                  <p className="text-xs text-mute font-medium">
+                    {day}, {today} · {city || "Sydney"}
+                  </p>
                 </div>
               </div>
 
@@ -550,7 +562,9 @@ export function MePage() {
                 </div>
                 <div className="text-left sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-line/40">
                   <span className="font-display text-base font-black text-ink tabular-nums">{weather.temp}°C</span>
-                  <span className="block text-[10px] text-mute">{weather.isDay ? "Daytime" : "Evening"} local forecast</span>
+                  <span className="block text-[10px] text-mute">
+                    {weather.isDay ? "Daytime" : "Evening"} local forecast
+                  </span>
                 </div>
               </div>
             )}
@@ -631,7 +645,9 @@ export function MePage() {
                         <span className="font-bold text-sm text-ink truncate block">{ticket.title}</span>
                         <p className="text-xs text-mute mt-1 flex items-center gap-1.5 truncate">
                           <Flame size={12} className="text-amber-600 shrink-0" />
-                          <span>🎟 Pass ({ticket.spots || 1}x) {ticket.time ? `· Doors ${ticket.time}` : ""}</span>
+                          <span>
+                            🎟 Pass ({ticket.spots || 1}x) {ticket.time ? `· Doors ${ticket.time}` : ""}
+                          </span>
                           <span>· {ticket.suburb || "Venue"}</span>
                         </p>
                       </div>
@@ -661,7 +677,9 @@ export function MePage() {
                       <p className="text-xs text-mute mt-1 flex items-center gap-1.5 truncate">
                         <Users size={12} className="text-accent shrink-0" />
                         <span>Today {plan.time ? `@ ${plan.time}` : ""}</span>
-                        <span>· {plan.destination || plan.city || "Sydney"} ({plan.attendees?.length || 1} going)</span>
+                        <span>
+                          · {plan.destination || plan.city || "Sydney"} ({plan.attendees?.length || 1} going)
+                        </span>
                       </p>
                     </div>
                     <Button
@@ -725,9 +743,7 @@ export function MePage() {
                   <Coffee size={18} />
                 </span>
                 <div>
-                  <h2 className="font-display text-lg sm:text-xl font-black text-ink">
-                    Appointments &amp; Catch-ups
-                  </h2>
+                  <h2 className="font-display text-lg sm:text-xl font-black text-ink">Appointments &amp; Catch-ups</h2>
                   <p className="text-xs text-mute font-medium">
                     1-on-1 Catch-ups &amp; Syncs ({upcomingScheduledAppointments.length + pendingAppointments.length})
                   </p>
@@ -751,9 +767,27 @@ export function MePage() {
             <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5 mb-5">
               {(
                 [
-                  { type: "catchup" as const, label: "Catch Up", sub: "1-on-1 coffee", Icon: Coffee, tint: "bg-amber-500/15 text-amber-700 dark:text-amber-400" },
-                  { type: "meeting" as const, label: "Meeting", sub: "1-on-1 sync", Icon: Calendar, tint: "bg-sky-500/15 text-sky-700 dark:text-sky-400" },
-                  { type: "nightout" as const, label: "Hangout", sub: "Group plan", Icon: Users, tint: "bg-violet-500/15 text-violet-700 dark:text-violet-400" },
+                  {
+                    type: "catchup" as const,
+                    label: "Catch Up",
+                    sub: "1-on-1 coffee",
+                    Icon: Coffee,
+                    tint: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
+                  },
+                  {
+                    type: "meeting" as const,
+                    label: "Meeting",
+                    sub: "1-on-1 sync",
+                    Icon: Calendar,
+                    tint: "bg-sky-500/15 text-sky-700 dark:text-sky-400",
+                  },
+                  {
+                    type: "nightout" as const,
+                    label: "Hangout",
+                    sub: "Group plan",
+                    Icon: Users,
+                    tint: "bg-violet-500/15 text-violet-700 dark:text-violet-400",
+                  },
                 ] as const
               ).map((opt) => (
                 <button
@@ -807,7 +841,11 @@ export function MePage() {
                         <div className="min-w-0">
                           <p className="font-bold text-sm text-ink truncate">{item.requesterName}</p>
                           <p className="text-xs text-mute truncate mt-0.5">
-                            {item.type === "meeting" ? "📅 Meeting" : item.type === "nightout" ? "👥 Hangout" : "☕ Coffee"}
+                            {item.type === "meeting"
+                              ? "📅 Meeting"
+                              : item.type === "nightout"
+                                ? "👥 Hangout"
+                                : "☕ Coffee"}
                             {item.date && ` · ${item.date}`}
                             {item.time && ` @ ${item.time}`}
                             {item.venue && ` · ${item.venue}`}
@@ -868,13 +906,17 @@ export function MePage() {
                         <div className="flex items-center gap-2">
                           <p className="font-bold text-sm text-ink truncate">{item.requesterName}</p>
                           {item.requesterHandle && (
-                            <Link href={`/@${item.requesterHandle}`} className="text-xs text-mute hover:text-accent truncate">
+                            <Link
+                              href={`/@${item.requesterHandle}`}
+                              className="text-xs text-mute hover:text-accent truncate"
+                            >
                               @{item.requesterHandle}
                             </Link>
                           )}
                         </div>
                         <p className="text-xs text-mute truncate mt-0.5">
-                          {item.date || "Upcoming"} {item.time ? `@ ${item.time}` : ""} {item.venue ? `· ${item.venue}` : ""}
+                          {item.date || "Upcoming"} {item.time ? `@ ${item.time}` : ""}{" "}
+                          {item.venue ? `· ${item.venue}` : ""}
                         </p>
                       </div>
                     </div>
@@ -935,9 +977,7 @@ export function MePage() {
                   <Ticket size={18} />
                 </span>
                 <div>
-                  <h2 className="font-display text-lg sm:text-xl font-black text-ink">
-                    AirPal Pass · Digital Wallet
-                  </h2>
+                  <h2 className="font-display text-lg sm:text-xl font-black text-ink">AirPal Pass · Digital Wallet</h2>
                   <p className="text-xs text-mute font-medium">
                     My Tickets &amp; Event Passes ({upcomingTickets.length})
                   </p>
@@ -972,7 +1012,9 @@ export function MePage() {
                       <h3 className="font-display font-bold text-base text-ink leading-snug">{ticket.title}</h3>
                       <p className="text-xs text-mute mt-1 flex items-center gap-1.5">
                         <Clock size={12} className="text-mute shrink-0" />
-                        <span>{ticket.date || "Anytime"} {ticket.time ? `@ ${ticket.time}` : ""}</span>
+                        <span>
+                          {ticket.date || "Anytime"} {ticket.time ? `@ ${ticket.time}` : ""}
+                        </span>
                       </p>
                       {ticket.suburb && (
                         <p className="text-xs text-mute mt-0.5 flex items-center gap-1.5">
@@ -1039,10 +1081,10 @@ export function MePage() {
                   <Users size={18} />
                 </span>
                 <div>
-                  <h2 className="font-display text-lg sm:text-xl font-black text-ink">
-                    Upcoming Plans
-                  </h2>
-                  <p className="text-xs text-mute font-medium">Hangouts &amp; Itineraries ({upcomingPlansList.length})</p>
+                  <h2 className="font-display text-lg sm:text-xl font-black text-ink">Upcoming Plans</h2>
+                  <p className="text-xs text-mute font-medium">
+                    Hangouts &amp; Itineraries ({upcomingPlansList.length})
+                  </p>
                 </div>
               </div>
 
@@ -1087,7 +1129,9 @@ export function MePage() {
             ) : (
               <div className="rounded-3xl border border-dashed border-line/80 p-6 text-center bg-paper/40">
                 <Users size={28} className="mx-auto text-mute/80" />
-                <p className="font-display text-sm font-bold text-ink mt-2">You don&apos;t have any upcoming plans yet.</p>
+                <p className="font-display text-sm font-bold text-ink mt-2">
+                  You don&apos;t have any upcoming plans yet.
+                </p>
                 <p className="text-xs text-mute mt-1 max-w-md mx-auto leading-relaxed">
                   Coordinate an outing, coffee walk, or weekend dinner with friends.
                 </p>
@@ -1112,9 +1156,7 @@ export function MePage() {
                   <QrCode size={18} />
                 </span>
                 <div>
-                  <h2 className="font-display text-lg sm:text-xl font-black text-ink">
-                    My Digital Bio Pass
-                  </h2>
+                  <h2 className="font-display text-lg sm:text-xl font-black text-ink">My Digital Bio Pass</h2>
                   <p className="text-xs text-mute font-medium">Universal Contact Pass &amp; Apple/Google Wallet</p>
                 </div>
               </div>
@@ -1134,7 +1176,8 @@ export function MePage() {
 
               <div className="min-w-0 flex-1 space-y-3 text-center sm:text-left">
                 <p className="text-xs text-mute leading-relaxed max-w-lg">
-                  Present your digital bio pass at meetups or add directly to Apple &amp; Google Wallet for instant contact exchange.
+                  Present your digital bio pass at meetups or add directly to Apple &amp; Google Wallet for instant
+                  contact exchange.
                 </p>
 
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 pt-1">

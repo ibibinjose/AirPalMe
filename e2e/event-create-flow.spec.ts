@@ -30,7 +30,10 @@ test.describe("Plan vs ticketed event", () => {
   test("plan hub create plan goes to plan compose, not events", async ({ page }) => {
     await page.goto("/plan");
     await page.waitForLoadState("domcontentloaded");
-    await page.getByRole("button", { name: /new plan|create a plan/i }).first().click();
+    await page
+      .getByRole("button", { name: /new plan|create a plan/i })
+      .first()
+      .click();
     await expect(page).toHaveURL(/\/plan\/new/);
   });
 });

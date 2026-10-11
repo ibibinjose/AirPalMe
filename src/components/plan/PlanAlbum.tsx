@@ -32,8 +32,7 @@ export function PlanAlbum({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setLightbox(null);
       if (e.key === "ArrowRight") setLightbox((i) => (i === null ? i : (i + 1) % photos.length));
-      if (e.key === "ArrowLeft")
-        setLightbox((i) => (i === null ? i : (i - 1 + photos.length) % photos.length));
+      if (e.key === "ArrowLeft") setLightbox((i) => (i === null ? i : (i - 1 + photos.length) % photos.length));
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);

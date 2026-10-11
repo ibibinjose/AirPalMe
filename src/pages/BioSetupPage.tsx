@@ -294,7 +294,9 @@ export function BioSetupPage() {
             .join(", ");
           const hit =
             (await geocodePlaceName(query)) ||
-            (await geocodePlaceName([address.city, countryByCode(address.countryCode)?.name].filter(Boolean).join(", ")));
+            (await geocodePlaceName(
+              [address.city, countryByCode(address.countryCode)?.name].filter(Boolean).join(", "),
+            ));
           if (hit) {
             currentGeo = { lat: hit.lat, lng: hit.lng };
             setGeo(currentGeo);

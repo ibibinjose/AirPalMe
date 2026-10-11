@@ -72,12 +72,16 @@ export function TicketPage() {
 
   // Screen brightness boost & wake-lock effect for dark gate/entrance scanning
   useEffect(() => {
-    let wakeLock: any = null;
-    if (brightnessBoost && typeof navigator !== "undefined" && "wakeLock" in navigator) {
+    let wakeLock: WakeLockSentinel | null = null;
+    const navWithWakeLock =
+      typeof navigator !== "undefined"
+        ? (navigator as Navigator & { wakeLock?: { request: (type: "screen") => Promise<WakeLockSentinel> } })
+        : null;
+    if (brightnessBoost && navWithWakeLock?.wakeLock) {
       try {
-        (navigator as any).wakeLock
+        navWithWakeLock.wakeLock
           .request("screen")
-          .then((lock: any) => {
+          .then((lock) => {
             wakeLock = lock;
           })
           .catch(() => undefined);
@@ -230,7 +234,10 @@ export function TicketPage() {
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-accent mb-1">
               <ShieldCheck size={14} /> Gate Staff Door Validation
             </div>
-            <TicketGatePanel ticketId={id} deniedMessage="Only this event's organiser or ticket holder can access this pass." />
+            <TicketGatePanel
+              ticketId={id}
+              deniedMessage="Only this event's organiser or ticket holder can access this pass."
+            />
           </div>
         ) : booking ? (
           <div className="space-y-4">

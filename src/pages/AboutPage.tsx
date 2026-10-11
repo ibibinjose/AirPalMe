@@ -151,9 +151,9 @@ export function AboutPage() {
 
         <div className="p-6 sm:p-8 md:p-10 bg-card">
           <p className="text-base sm:text-lg leading-relaxed text-ink/85 max-w-3xl">
-            <strong className="font-bold text-ink">AirPal.me</strong> is a trusted, people-powered master ecosystem
-            and discovery platform. In Sydney and worldwide, we connect friends, family, colleagues, and mates with
-            live events, social plans, resident arrival cohorts, and real-time community discovery.
+            <strong className="font-bold text-ink">AirPal.me</strong> is a trusted, people-powered master ecosystem and
+            discovery platform. In Sydney and worldwide, we connect friends, family, colleagues, and mates with live
+            events, social plans, resident arrival cohorts, and real-time community discovery.
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-semibold text-mute">
             <span className="rounded-full bg-brand/10 px-3 py-1 text-accent">ME = Made Easy</span>
@@ -226,8 +226,9 @@ export function AboutPage() {
           The student onboarding companion — and Belonging Reports behind it.
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-mute sm:text-base">
-          AirPal is the B2B2C Arrival Engine for PBSA student accommodation, residential colleges, and campus communities.
-          Residents get 60-second check-in and instant cohort connection. Operators get quantifiable Belonging Reports.
+          AirPal is the B2B2C Arrival Engine for PBSA student accommodation, residential colleges, and campus
+          communities. Residents get 60-second check-in and instant cohort connection. Operators get quantifiable
+          Belonging Reports.
         </p>
 
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -251,8 +252,8 @@ export function AboutPage() {
             Empower belonging from night one.
           </h3>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/70">
-            Track resident cohort connectivity, loneliness mitigation indexes, and retention metrics. Dispatch
-            resident support and connect residents with verified local merchants.
+            Track resident cohort connectivity, loneliness mitigation indexes, and retention metrics. Dispatch resident
+            support and connect residents with verified local merchants.
           </p>
           <div className="mt-5 flex flex-wrap gap-2.5">
             <Link

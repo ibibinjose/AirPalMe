@@ -7,7 +7,12 @@ import { createSubmitGuard } from "@/lib/submit-guard";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { logAdminAction } from "@/lib/admin-audit";
 import { getDoc } from "firebase/firestore";
-import { completePaidBookingRemote, createBookingCheckoutSessionRemote, payBookingBalanceRemote, refundPaidBookingRemote } from "@/lib/functions";
+import {
+  completePaidBookingRemote,
+  createBookingCheckoutSessionRemote,
+  payBookingBalanceRemote,
+  refundPaidBookingRemote,
+} from "@/lib/functions";
 import {
   balanceDueCents,
   bookingValid,
@@ -231,7 +236,9 @@ export function BookingsSection() {
     return (
       <section className="mt-6 rounded-2xl border border-line bg-card p-4">
         <h2 className="font-display text-base font-bold">Tickets & bookings</h2>
-        <p className="mt-0.5 text-[13px] text-mute">Couldn&apos;t load your bookings. Check your connection and retry.</p>
+        <p className="mt-0.5 text-[13px] text-mute">
+          Couldn&apos;t load your bookings. Check your connection and retry.
+        </p>
         <Button size="sm" variant="ghost" className="mt-2" onClick={() => void reload(user.uid)}>
           Retry
         </Button>
@@ -371,7 +378,12 @@ export function BookingsSection() {
                     className="mt-2 w-full rounded-xl border border-line bg-card px-3 py-2 text-sm outline-none placeholder:text-mute focus:border-brand"
                   />
                   <span className="mt-2 flex gap-1.5">
-                    <Button size="sm" disabled={savingReview} loading={savingReview} onClick={() => void submitReview(b)}>
+                    <Button
+                      size="sm"
+                      disabled={savingReview}
+                      loading={savingReview}
+                      onClick={() => void submitReview(b)}
+                    >
                       Submit review
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => setReviewFor(null)}>

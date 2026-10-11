@@ -182,9 +182,7 @@ describe("plan store", () => {
 
   it("rejects empty or oversized crew comments", () => {
     const plan = fixture();
-    expect(
-      addCommentToPlan(plan.id, { authorId: "user-1", authorName: "Alex", text: "   " }),
-    ).toBeUndefined();
+    expect(addCommentToPlan(plan.id, { authorId: "user-1", authorName: "Alex", text: "   " })).toBeUndefined();
     expect(
       addCommentToPlan(plan.id, { authorId: "user-1", authorName: "Alex", text: "x".repeat(501) }),
     ).toBeUndefined();
@@ -239,7 +237,6 @@ describe("stop change notifications", () => {
   });
 });
 
-
 describe("completePlan", () => {
   it("marks an open plan completed and is idempotent", () => {
     const plan = fixture();
@@ -253,7 +250,15 @@ describe("completePlan", () => {
 describe("rsvp history preservation", () => {
   it("keeps ratings, reviews, and check-ins across RSVP edits", () => {
     const plan = fixture();
-    respondToPlan(plan.id, { id: "u9", name: "Sam", status: "going", rating: 5, review: "Loved it", checkedIn: true, checkedInAt: "2026-09-20T10:00:00Z" });
+    respondToPlan(plan.id, {
+      id: "u9",
+      name: "Sam",
+      status: "going",
+      rating: 5,
+      review: "Loved it",
+      checkedIn: true,
+      checkedInAt: "2026-09-20T10:00:00Z",
+    });
     const edited = respondToPlan(plan.id, { id: "u9", name: "Sam", status: "maybe" });
     expect(edited?.attendees.find((a) => a.id === "u9")).toMatchObject({
       status: "maybe",
@@ -296,4 +301,3 @@ describe("linked AirPal Pass ticket and event", () => {
     expect(loaded?.eventId).toBe("ev-67890");
   });
 });
-

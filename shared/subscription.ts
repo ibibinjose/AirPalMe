@@ -36,7 +36,10 @@ export function isSubscriptionStatus(s: string): s is SubscriptionStatus {
  * A row with no period end (just created) counts as active — Stripe is the
  * closer via subscription.updated/deleted events.
  */
-export function isSubscriptionActive(sub: Pick<BusinessSubscription, "status" | "currentPeriodEnd"> | null | undefined, nowMs: number = Date.now()): boolean {
+export function isSubscriptionActive(
+  sub: Pick<BusinessSubscription, "status" | "currentPeriodEnd"> | null | undefined,
+  nowMs: number = Date.now(),
+): boolean {
   if (!sub) return false;
   if (sub.status !== "active" && sub.status !== "trialing") return false;
   if (sub.currentPeriodEnd == null) return true;

@@ -17,13 +17,7 @@ import {
   type FeeConfig,
   type PayoutStatus,
 } from "../../shared/booking";
-import {
-  isStayDay,
-  nightsBetween,
-  quoteStayNights,
-  stayDateList,
-  stayRangesOverlap,
-} from "../../shared/stay-booking";
+import { isStayDay, nightsBetween, quoteStayNights, stayDateList, stayRangesOverlap } from "../../shared/stay-booking";
 import { CALLABLE, db, isPlatformAdmin, requireAuth } from "./admin";
 import { enforceRateLimit, isAnonymousAuth, noteAppCheck } from "./abuse";
 import type { AccessClaims } from "../../shared/airpal-security";
@@ -687,9 +681,7 @@ export const payBookingBalance = onCall(STRIPE_CALLABLE, async (request) => {
   await noteAppCheck(request, "payBookingBalance");
   const uid = requireAuth(request.auth?.uid);
   await enforceRateLimit(uid, "pay", isAnonymousAuth(request));
-  const planBookingId = String(
-    (request.data as { planBookingId?: string } | undefined)?.planBookingId || "",
-  ).trim();
+  const planBookingId = String((request.data as { planBookingId?: string } | undefined)?.planBookingId || "").trim();
   if (!planBookingId) throw new HttpsError("invalid-argument", "planBookingId is required.");
 
   const ledgerRef = db.collection("plan_bookings").doc(planBookingId);
@@ -1061,11 +1053,14 @@ export async function recordSubscriptionEvent(sub: {
 }): Promise<boolean> {
   const subscriptionId = String(sub.id || "").trim();
   if (!subscriptionId) return false;
-  const customerId =
-    typeof sub.customer === "string" ? sub.customer : String(sub.customer?.id || "").trim();
+  const customerId = typeof sub.customer === "string" ? sub.customer : String(sub.customer?.id || "").trim();
   let uid = String(sub.metadata?.subscriptionUid || "").trim();
   if (!uid && customerId) {
-    const prior = await db.collection("business_subscriptions").where("stripeCustomerId", "==", customerId).limit(1).get();
+    const prior = await db
+      .collection("business_subscriptions")
+      .where("stripeCustomerId", "==", customerId)
+      .limit(1)
+      .get();
     if (!prior.empty) uid = prior.docs[0]!.id;
   }
   if (!uid) return false;

@@ -51,8 +51,8 @@ export function ChangeHandleForm({
         <>
           <p className="text-xs font-bold uppercase tracking-wider text-accent">@handle</p>
           <p className="text-sm text-mute">
-            Current <span className="font-semibold text-ink">@{current}</span>. Changing it updates your public page
-            and account. Old links to the previous handle stop working.
+            Current <span className="font-semibold text-ink">@{current}</span>. Changing it updates your public page and
+            account. Old links to the previous handle stop working.
           </p>
         </>
       )}
@@ -75,7 +75,12 @@ export function ChangeHandleForm({
         />
       </div>
       {hint && <p className={`text-xs ${hint === "Available" ? "text-emerald-700" : "text-rose-700"}`}>{hint}</p>}
-      <Button type="submit" variant={compact ? "ghost" : "primary"} className="w-full border border-line" disabled={busy || !next}>
+      <Button
+        type="submit"
+        variant={compact ? "ghost" : "primary"}
+        className="w-full border border-line"
+        disabled={busy || !next}
+      >
         {busy ? "Saving…" : "Change @handle"}
       </Button>
     </form>

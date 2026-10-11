@@ -12,15 +12,7 @@ import {
 import { PLAN_CAPACITY_MAX, headcountTaken, normalizeCapacity, type HangoutPlan } from "@shared/plan";
 import { cn } from "@/lib/cn";
 
-function Switch({
-  checked,
-  onToggle,
-  label,
-}: {
-  checked: boolean;
-  onToggle: () => void;
-  label: string;
-}) {
+function Switch({ checked, onToggle, label }: { checked: boolean; onToggle: () => void; label: string }) {
   return (
     <button
       type="button"
@@ -91,9 +83,7 @@ export function PlanManageSheet({
         <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-line/80 sm:hidden" />
         <div className="flex items-center justify-between border-b border-line/60 pb-3">
           <div>
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">
-              Host controls
-            </span>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-accent">Host controls</span>
             <h2 className="font-display mt-0.5 text-xl font-bold text-ink">Manage plan</h2>
           </div>
           <button
@@ -142,7 +132,9 @@ export function PlanManageSheet({
             ) : (
               <Lock size={14} className="shrink-0 text-mute" />
             )}
-            <span className="truncate">{plan.isPublic ? "Public · live on discover map" : "Private · invite-only"}</span>
+            <span className="truncate">
+              {plan.isPublic ? "Public · live on discover map" : "Private · invite-only"}
+            </span>
           </span>
           <Switch
             checked={Boolean(plan.isPublic)}
@@ -168,9 +160,7 @@ export function PlanManageSheet({
                 </span>
                 <Switch
                   checked={!hidden}
-                  onToggle={() =>
-                    onUpdate({ guestList: { ...(plan.guestList || {}), [row.key]: !hidden } })
-                  }
+                  onToggle={() => onUpdate({ guestList: { ...(plan.guestList || {}), [row.key]: !hidden } })}
                   label={row.label}
                 />
               </div>
@@ -227,9 +217,7 @@ export function PlanManageSheet({
                 guestQuestions: [...(plan.guestQuestions || []), { id: `q-${Date.now().toString(36)}`, ...q }],
               })
             }
-            onRemove={(id) =>
-              onUpdate({ guestQuestions: (plan.guestQuestions || []).filter((q) => q.id !== id) })
-            }
+            onRemove={(id) => onUpdate({ guestQuestions: (plan.guestQuestions || []).filter((q) => q.id !== id) })}
           />
         </div>
 

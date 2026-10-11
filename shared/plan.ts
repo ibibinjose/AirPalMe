@@ -376,7 +376,9 @@ export function clampExperienceCapacity(n: unknown, fallback = 20): number {
 }
 
 export function sanitizeCurrencyCode(n: unknown): string {
-  const code = String(n || "AUD").trim().toUpperCase();
+  const code = String(n || "AUD")
+    .trim()
+    .toUpperCase();
   return /^[A-Z]{3}$/.test(code) ? code : "AUD";
 }
 
@@ -405,8 +407,10 @@ export function sanitizeDepositConfig(config: unknown): PlanDepositConfig | unde
     depositAmount: clampExperienceMoney(c.depositAmount),
     depositPercentage: Number.isFinite(pct) ? Math.min(100, Math.max(0, pct)) : undefined,
     balanceDueDate: c.balanceDueDate ? String(c.balanceDueDate).slice(0, 20) : undefined,
-    balanceDueDaysBefore: c.balanceDueDaysBefore === undefined ? undefined : Math.max(0, Math.floor(Number(c.balanceDueDaysBefore)) || 0),
-    dueDateDaysBefore: c.dueDateDaysBefore === undefined ? undefined : Math.max(0, Math.floor(Number(c.dueDateDaysBefore)) || 0),
+    balanceDueDaysBefore:
+      c.balanceDueDaysBefore === undefined ? undefined : Math.max(0, Math.floor(Number(c.balanceDueDaysBefore)) || 0),
+    dueDateDaysBefore:
+      c.dueDateDaysBefore === undefined ? undefined : Math.max(0, Math.floor(Number(c.dueDateDaysBefore)) || 0),
     balanceDueDescription: c.balanceDueDescription ? String(c.balanceDueDescription).slice(0, 280) : undefined,
   };
 }
@@ -486,7 +490,9 @@ export function validGuestQuestion(input: { question: unknown; type: unknown; op
 
 /** Clean a guest answer: trim, clamp, and (for choice) only a listed option survives. */
 export function normalizeAnswer(question: Pick<PlanGuestQuestion, "type" | "options">, raw: unknown): string {
-  const text = String(raw || "").trim().slice(0, PLAN_ANSWER_MAX);
+  const text = String(raw || "")
+    .trim()
+    .slice(0, PLAN_ANSWER_MAX);
   if (!text) return "";
   if (question.type === "choice") {
     const hit = (question.options || []).find((o) => o.toLowerCase() === text.toLowerCase());
@@ -527,9 +533,7 @@ export function textAnswers(
 }
 
 /** Front-runner: most votes, earliest date breaks ties. */
-export function topDateOption(
-  plan: Pick<HangoutPlan, "dateOptions">,
-): PlanDateOption | undefined {
+export function topDateOption(plan: Pick<HangoutPlan, "dateOptions">): PlanDateOption | undefined {
   const opts = [...(plan.dateOptions || [])];
   if (!opts.length) return undefined;
   opts.sort((a, b) => b.votes - a.votes || String(a.date).localeCompare(String(b.date)));
@@ -583,7 +587,9 @@ export function planPhotos(plan: Pick<HangoutPlan, "comments">): PlanPhoto[] {
     .map((c) => ({
       commentId: c.id,
       url: String(c.photoUrl),
-      caption: String(c.text || "").replace(/^\[(Meetup|Carpool|Tables|Photos)\]\s?/, "").trim(),
+      caption: String(c.text || "")
+        .replace(/^\[(Meetup|Carpool|Tables|Photos)\]\s?/, "")
+        .trim(),
       authorId: String(c.authorId || ""),
       authorName: String(c.authorName || "Mate"),
       createdAt: String(c.createdAt || ""),
@@ -592,10 +598,7 @@ export function planPhotos(plan: Pick<HangoutPlan, "comments">): PlanPhoto[] {
 }
 
 /** 1-based position in line, or null when not waitlisted. */
-export function waitlistPosition(
-  plan: Pick<HangoutPlan, "attendees">,
-  attendeeId: string,
-): number | null {
+export function waitlistPosition(plan: Pick<HangoutPlan, "attendees">, attendeeId: string): number | null {
   const idx = waitlistQueue(plan).findIndex((a) => a.id === attendeeId);
   return idx < 0 ? null : idx + 1;
 }
@@ -687,7 +690,9 @@ export function normalizeRating(n: unknown): number | undefined {
 
 /** Review words, trimmed and clamped — blank becomes undefined. */
 export function normalizeReview(text: unknown): string | undefined {
-  const v = String(text || "").trim().slice(0, PLAN_REVIEW_MAX);
+  const v = String(text || "")
+    .trim()
+    .slice(0, PLAN_REVIEW_MAX);
   return v || undefined;
 }
 

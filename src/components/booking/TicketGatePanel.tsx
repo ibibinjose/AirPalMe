@@ -48,13 +48,7 @@ function shortId(id: string): string {
  * (the page behind is the content); pass `deniedMessage` when the card IS the
  * page so a denial reads as an answer, not a blank screen.
  */
-export function TicketGatePanel({
-  ticketId,
-  deniedMessage,
-}: {
-  ticketId: string;
-  deniedMessage?: string;
-}) {
+export function TicketGatePanel({ ticketId, deniedMessage }: { ticketId: string; deniedMessage?: string }) {
   const [ticket, setTicket] = useState<GateTicket | null>(null);
   const [denied, setDenied] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -113,10 +107,7 @@ export function TicketGatePanel({
   if (denied && !deniedMessage) return null;
 
   return (
-    <section
-      aria-label="Gate ticket check"
-      className="rounded-3xl bg-card p-4 ring-1 ring-line shadow-xs"
-    >
+    <section aria-label="Gate ticket check" className="rounded-3xl bg-card p-4 ring-1 ring-line shadow-xs">
       {denied && deniedMessage && (
         <p className="flex items-center gap-2 text-sm font-semibold leading-5 text-mute">
           <ShieldAlert size={16} className="shrink-0" /> {deniedMessage}
@@ -184,17 +175,9 @@ export function TicketGatePanel({
             </p>
           )}
           {ticket.valid && !ticket.admittedAt && (
-            <Button
-              className="mt-3 w-full gap-1.5"
-              disabled={admitting}
-              onClick={() => void admit()}
-            >
+            <Button className="mt-3 w-full gap-1.5" disabled={admitting} onClick={() => void admit()}>
               <BadgeCheck size={16} />
-              {admitting
-                ? "Admitting…"
-                : ticket.spots > 1
-                  ? `Admit ${ticket.spots} guests`
-                  : "Admit guest"}
+              {admitting ? "Admitting…" : ticket.spots > 1 ? `Admit ${ticket.spots} guests` : "Admit guest"}
             </Button>
           )}
         </div>

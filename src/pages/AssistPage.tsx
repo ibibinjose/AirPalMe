@@ -22,7 +22,11 @@ export function AssistPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:py-12">
       {buildAssistJsonLd().map((block, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }} />
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(block).replace(/</g, "\\u003c") }}
+        />
       ))}
 
       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-mute">Support</p>

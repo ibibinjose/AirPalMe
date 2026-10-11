@@ -74,8 +74,7 @@ const DEAL_PRESETS = [
 export function BusinessPage() {
   const [, nav] = useLocation();
   const { user, authReady } = useAuth();
-  const { mine, myListings, setSelectedListingId, savePlace, saveDeal, confirmHours, deleteListing } =
-    useListings();
+  const { mine, myListings, setSelectedListingId, savePlace, saveDeal, confirmHours, deleteListing } = useListings();
   const { mine: bio, business, updateProfile } = useBio();
   const [tab, setTab] = useState<"place" | "offer" | "bookings" | "list">("place");
   const [name, setName] = useState("");
@@ -165,33 +164,49 @@ export function BusinessPage() {
           </span>
           <h1 className="font-display mt-2 text-2xl sm:text-3xl font-bold text-ink">Launch Your Business on AirPal</h1>
           <p className="mt-2 text-sm text-mute max-w-md mx-auto leading-relaxed">
-            One account for your entire hospitality or lifestyle brand. Import directly from Google Places, publish local deals, host exclusive experiences, and manage guest reservations.
+            One account for your entire hospitality or lifestyle brand. Import directly from Google Places, publish
+            local deals, host exclusive experiences, and manage guest reservations.
           </p>
 
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
             <div className="rounded-2xl bg-paper p-4 ring-1 ring-line/60">
-              <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-brand/10 text-xs font-bold text-accent">1</span>
+              <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-brand/10 text-xs font-bold text-accent">
+                1
+              </span>
               <h3 className="font-semibold text-xs text-ink mt-2.5">Import Place</h3>
               <p className="text-[11px] text-mute mt-1">Pull hours, photos, and address in one click.</p>
             </div>
             <div className="rounded-2xl bg-paper p-4 ring-1 ring-line/60">
-              <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-500/10 text-xs font-bold text-emerald-600">2</span>
+              <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-500/10 text-xs font-bold text-emerald-600">
+                2
+              </span>
               <h3 className="font-semibold text-xs text-ink mt-2.5">Publish Offers</h3>
               <p className="text-[11px] text-mute mt-1">Drive instant foot traffic with neighbourhood perks.</p>
             </div>
             <div className="rounded-2xl bg-paper p-4 ring-1 ring-line/60">
-              <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-purple-500/10 text-xs font-bold text-purple-600">3</span>
+              <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-purple-500/10 text-xs font-bold text-purple-600">
+                3
+              </span>
               <h3 className="font-semibold text-xs text-ink mt-2.5">Direct Payouts</h3>
               <p className="text-[11px] text-mute mt-1">Automatic Stripe transfers directly to your bank.</p>
             </div>
           </div>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Button size="lg" className="w-full sm:w-auto gap-2" onClick={() => nav(partnerAccountPath({ signedIn: true, hasPlace: false }))}>
+            <Button
+              size="lg"
+              className="w-full sm:w-auto gap-2"
+              onClick={() => nav(partnerAccountPath({ signedIn: true, hasPlace: false }))}
+            >
               <Sparkles className="h-4 w-4" />
               Open a Partner Account
             </Button>
-            <Button variant="outlined" size="lg" className="w-full sm:w-auto" onClick={() => nav("/bio/setup?kind=business")}>
+            <Button
+              variant="outlined"
+              size="lg"
+              className="w-full sm:w-auto"
+              onClick={() => nav("/bio/setup?kind=business")}
+            >
               Claim Business @handle
             </Button>
           </div>
@@ -345,7 +360,10 @@ export function BusinessPage() {
       {/* Top Header Card with Cover & Fast Action Hub */}
       <header className="overflow-hidden rounded-[32px] bg-card ring-1 ring-line shadow-xs">
         <div className="relative h-44 sm:h-56 w-full overflow-hidden bg-zinc-900">
-          <Photo src={hero || mine.heroImage || "/media/harbour.jpg"} className="h-full w-full object-cover opacity-85" />
+          <Photo
+            src={hero || mine.heroImage || "/media/harbour.jpg"}
+            className="h-full w-full object-cover opacity-85"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/20" />
 
           <div className="absolute left-5 top-5 flex items-center gap-2">
@@ -362,7 +380,8 @@ export function BusinessPage() {
               <h1 className="font-display text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">{mine.name}</h1>
               <p className="text-xs text-white/80 flex items-center gap-1.5 mt-0.5">
                 <MapPin className="h-3.5 w-3.5 text-accent" />
-                {address.city || "Sydney"}, Australia · Category: <span className="capitalize font-semibold">{category}</span>
+                {address.city || "Sydney"}, Australia · Category:{" "}
+                <span className="capitalize font-semibold">{category}</span>
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -382,15 +401,24 @@ export function BusinessPage() {
         {/* Global Business Quick Action Bar */}
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line/60 bg-paper/50 px-5 py-3 text-xs">
           <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-            <Link href="/helpdesk" className="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline">
+            <Link
+              href="/helpdesk"
+              className="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline"
+            >
               <Headphones className="h-3.5 w-3.5" />
               <span>Universal Help Desk</span>
             </Link>
-            <Link href="/pulse" className="inline-flex items-center gap-1.5 font-semibold text-ink/80 hover:text-accent hover:underline">
+            <Link
+              href="/pulse"
+              className="inline-flex items-center gap-1.5 font-semibold text-ink/80 hover:text-accent hover:underline"
+            >
               <Activity className="h-3.5 w-3.5 text-indigo-500" />
               <span>Guest Pulse & Standees</span>
             </Link>
-            <Link href="/business/promotions" className="inline-flex items-center gap-1.5 font-semibold text-ink/80 hover:text-accent hover:underline">
+            <Link
+              href="/business/promotions"
+              className="inline-flex items-center gap-1.5 font-semibold text-ink/80 hover:text-accent hover:underline"
+            >
               <Gift className="h-3.5 w-3.5 text-amber-500" />
               <span>Promotions & Giveaways</span>
             </Link>
@@ -484,7 +512,10 @@ export function BusinessPage() {
               </section>
 
               {/* Venue Form */}
-              <form className="rounded-[28px] bg-card p-5 sm:p-6 ring-1 ring-line shadow-xs space-y-5" onSubmit={onPlace}>
+              <form
+                className="rounded-[28px] bg-card p-5 sm:p-6 ring-1 ring-line shadow-xs space-y-5"
+                onSubmit={onPlace}
+              >
                 <div>
                   <h2 className="font-display text-base font-bold text-ink">Venue Details & Media</h2>
                   <p className="text-xs text-mute">Showcase your property to neighbourhood visitors and locals</p>
@@ -879,7 +910,9 @@ export function BusinessPage() {
             </div>
             <h3 className="font-display mt-4 text-xl font-bold text-ink">Remove &ldquo;{mine.name}&rdquo;?</h3>
             <p className="mt-2 text-xs text-mute leading-relaxed">
-              This will unbind and remove this venue profile from your active partner account. If you imported or tested Shangri-La Sydney or another location by mistake, removing it lets you start fresh or register your own venue.
+              This will unbind and remove this venue profile from your active partner account. If you imported or tested
+              Shangri-La Sydney or another location by mistake, removing it lets you start fresh or register your own
+              venue.
             </p>
 
             <div className="mt-6 flex items-center justify-end gap-3">

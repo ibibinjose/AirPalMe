@@ -132,12 +132,27 @@ const TEMPLATES: TemplateItem[] = [
 
 const TITLE_SUGGESTIONS: Record<string, string[]> = {
   catchup: ["☕ Morning Flat Whites", "🥑 Sunday Brunch & Coffee", "💬 Quick Catchup & Chat", "🥐 Bakery Run & Walk"],
-  lunch: ["🍕 Casual Lunch & Chats", "🍣 Sushi Feast with Friends", "🍔 Midday Foodie Break", "🌮 Market Stalls & Eats"],
+  lunch: [
+    "🍕 Casual Lunch & Chats",
+    "🍣 Sushi Feast with Friends",
+    "🍔 Midday Foodie Break",
+    "🌮 Market Stalls & Eats",
+  ],
   nightout: ["🍸 Friday Sunset Drinks", "🍻 Weekend Hangout & Beats", "🍹 Cocktails & Chats", "🍕 Dinner & Night Out"],
   walk: ["🌊 Bondi to Bronte Walk", "🌿 Park Stroll & Flat Whites", "🏃 Sunset Walk & Stretch", "🐕 Weekend Dog Walk"],
   meeting: ["💻 Strategy & Brainstorm", "☕ Coffee & Work Sync", "🚀 Side Hustle Sprint", "📊 Project Catchup"],
-  escape: ["🚗 South Coast Road Trip", "🏖️ Beach Afternoon & Sunset", "⛰️ Blue Mountains Day Trip", "🌴 Weekend Escape"],
-  birthday: ["🎂 Birthday Celebration Drinks", "🎉 Milestone Birthday Dinner", "🥂 Sunset Birthday Toast", "🥳 Birthday Bash"],
+  escape: [
+    "🚗 South Coast Road Trip",
+    "🏖️ Beach Afternoon & Sunset",
+    "⛰️ Blue Mountains Day Trip",
+    "🌴 Weekend Escape",
+  ],
+  birthday: [
+    "🎂 Birthday Celebration Drinks",
+    "🎉 Milestone Birthday Dinner",
+    "🥂 Sunset Birthday Toast",
+    "🥳 Birthday Bash",
+  ],
 };
 
 const SYDNEY_PRESETS = [
@@ -257,9 +272,7 @@ export function PlanCreatePage() {
   const [showDetails, setShowDetails] = useState(false);
 
   // Stepped flow: 0 (Plan Type) → 1 (Details: When & where) → 2 (Who: Invites).
-  const [step, setStep] = useState<0 | 1 | 2>(
-    targetHandle || solvedIntent || bookingIdParam || eventIdParam ? 1 : 0,
-  );
+  const [step, setStep] = useState<0 | 1 | 2>(targetHandle || solvedIntent || bookingIdParam || eventIdParam ? 1 : 0);
   const guardRef = useRef(createSubmitGuard());
 
   const circle = useMemo(() => {
@@ -402,14 +415,10 @@ export function PlanCreatePage() {
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-accent">
-                Family & Friends
-              </span>
+              <span className="text-xs font-bold uppercase tracking-wider text-accent">Family & Friends</span>
               <span className="text-[10px] font-semibold text-mute">· Step {step + 1} of 3</span>
             </div>
-            <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-              {stepMeta.title}
-            </h1>
+            <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">{stepMeta.title}</h1>
           </div>
         </div>
 
@@ -428,9 +437,7 @@ export function PlanCreatePage() {
         )}
       </div>
 
-      <p className="mt-1 text-xs sm:text-sm text-mute leading-relaxed pl-13">
-        {stepMeta.sub}
-      </p>
+      <p className="mt-1 text-xs sm:text-sm text-mute leading-relaxed pl-13">{stepMeta.sub}</p>
 
       {/* Modern Interactive Liquid Glass Stepper */}
       <div className="mt-6 rounded-2xl bg-paper/60 p-2 border border-line/80 shadow-2xs">
@@ -491,13 +498,9 @@ export function PlanCreatePage() {
       {targetHandle && step > 0 && (
         <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-brand/10 border border-brand/20 p-3.5 shadow-2xs">
           <div className="flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-xl bg-brand text-white text-xs font-bold">
-              @
-            </span>
+            <span className="grid h-8 w-8 place-items-center rounded-xl bg-brand text-white text-xs font-bold">@</span>
             <div>
-              <p className="text-xs font-bold text-ink">
-                Planning with {targetName || `@${targetHandle}`}
-              </p>
+              <p className="text-xs font-bold text-ink">Planning with {targetName || `@${targetHandle}`}</p>
               <p className="text-[11px] text-mute">Automatic invite will be attached</p>
             </div>
           </div>
@@ -514,9 +517,7 @@ export function PlanCreatePage() {
               <Ticket size={16} />
             </span>
             <div>
-              <p className="text-xs font-bold text-ink">
-                Planning around your AirPal Pass event
-              </p>
+              <p className="text-xs font-bold text-ink">Planning around your AirPal Pass event</p>
               <p className="text-[11px] text-mute">Gate pass will be linked to this hangout thread</p>
             </div>
           </div>
@@ -643,9 +644,7 @@ export function PlanCreatePage() {
           <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
             <label className="block">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold uppercase tracking-wider text-accent">
-                  1 · Plan Title
-                </span>
+                <span className="text-xs font-bold uppercase tracking-wider text-accent">1 · Plan Title</span>
                 <span className="text-[11px] font-medium text-mute">Required</span>
               </div>
               <input
@@ -658,9 +657,7 @@ export function PlanCreatePage() {
 
             {/* Quick Title Suggestions */}
             <div className="mt-3">
-              <span className="text-[11px] font-semibold text-mute block mb-1.5">
-                Quick Suggestions:
-              </span>
+              <span className="text-[11px] font-semibold text-mute block mb-1.5">Quick Suggestions:</span>
               <div className="flex flex-wrap gap-1.5">
                 {(TITLE_SUGGESTIONS[type] || TITLE_SUGGESTIONS.catchup)!.map((sug) => (
                   <button
@@ -688,8 +685,7 @@ export function PlanCreatePage() {
           <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold uppercase tracking-wider text-accent flex items-center gap-1.5">
-                <Calendar size={14} />
-                2 · Date & Time
+                <Calendar size={14} />2 · Date & Time
               </span>
               <span className="text-[11px] font-semibold text-accent">
                 {date ? formatPlanDate(date, time) : "Set Schedule"}
@@ -749,12 +745,7 @@ export function PlanCreatePage() {
               </div>
               <div>
                 <label className="block text-[11px] font-semibold text-mute mb-1">Meetup Time</label>
-                <input
-                  type="time"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  className={fieldInput}
-                />
+                <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className={fieldInput} />
               </div>
             </div>
 
@@ -790,8 +781,7 @@ export function PlanCreatePage() {
           <section className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold uppercase tracking-wider text-accent flex items-center gap-1.5">
-                <MapPin size={14} />
-                3 · Location & Venue
+                <MapPin size={14} />3 · Location & Venue
               </span>
               <span className="text-[11px] font-medium text-mute">Search or Pick</span>
             </div>
@@ -808,9 +798,7 @@ export function PlanCreatePage() {
 
             {/* Sydney Area Presets */}
             <div className="mt-3">
-              <span className="text-[11px] font-semibold text-mute block mb-1.5">
-                Popular Sydney Neighborhoods:
-              </span>
+              <span className="text-[11px] font-semibold text-mute block mb-1.5">Popular Sydney Neighborhoods:</span>
               <div className="flex flex-wrap gap-1.5">
                 {SYDNEY_PRESETS.map((preset) => (
                   <button
@@ -851,9 +839,7 @@ export function PlanCreatePage() {
               className="flex min-h-[56px] w-full cursor-pointer items-center justify-between gap-3 p-5 text-left active:scale-[0.99]"
             >
               <span className="min-w-0">
-                <span className="block text-xs font-bold uppercase tracking-wider text-accent">
-                  Details · Optional
-                </span>
+                <span className="block text-xs font-bold uppercase tracking-wider text-accent">Details · Optional</span>
                 <span className="mt-0.5 block truncate text-xs text-mute">
                   {isPublic ? "Public discovery" : "Private · invite-only"}
                 </span>
@@ -869,51 +855,51 @@ export function PlanCreatePage() {
                   Privacy & Visibility
                 </span>
 
-            <div className="grid grid-cols-2 gap-2.5">
-              <button
-                type="button"
-                onClick={() => {
-                  void triggerHaptic("light");
-                  setIsPublic(false);
-                }}
-                className={cn(
-                  "flex flex-col items-start gap-1 rounded-2xl p-3.5 border text-left transition active:scale-98 cursor-pointer",
-                  !isPublic
-                    ? "bg-brand/10 border-brand font-semibold shadow-xs ring-1 ring-brand/20"
-                    : "bg-paper border-line/80 hover:bg-card text-mute",
-                )}
-              >
-                <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
-                  <Lock size={14} className={!isPublic ? "text-accent" : "text-mute"} />
-                  <span>Private / Invite-Only</span>
-                </div>
-                <p className="text-[11px] text-mute leading-tight">
-                  Only people with the link or invited friends can see this plan.
-                </p>
-              </button>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      setIsPublic(false);
+                    }}
+                    className={cn(
+                      "flex flex-col items-start gap-1 rounded-2xl p-3.5 border text-left transition active:scale-98 cursor-pointer",
+                      !isPublic
+                        ? "bg-brand/10 border-brand font-semibold shadow-xs ring-1 ring-brand/20"
+                        : "bg-paper border-line/80 hover:bg-card text-mute",
+                    )}
+                  >
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
+                      <Lock size={14} className={!isPublic ? "text-accent" : "text-mute"} />
+                      <span>Private / Invite-Only</span>
+                    </div>
+                    <p className="text-[11px] text-mute leading-tight">
+                      Only people with the link or invited friends can see this plan.
+                    </p>
+                  </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  void triggerHaptic("light");
-                  setIsPublic(true);
-                }}
-                className={cn(
-                  "flex flex-col items-start gap-1 rounded-2xl p-3.5 border text-left transition active:scale-98 cursor-pointer",
-                  isPublic
-                    ? "bg-brand/10 border-brand font-semibold shadow-xs ring-1 ring-brand/20"
-                    : "bg-paper border-line/80 hover:bg-card text-mute",
-                )}
-              >
-                <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
-                  <Globe size={14} className={isPublic ? "text-accent" : "text-mute"} />
-                  <span>Public Discovery</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      setIsPublic(true);
+                    }}
+                    className={cn(
+                      "flex flex-col items-start gap-1 rounded-2xl p-3.5 border text-left transition active:scale-98 cursor-pointer",
+                      isPublic
+                        ? "bg-brand/10 border-brand font-semibold shadow-xs ring-1 ring-brand/20"
+                        : "bg-paper border-line/80 hover:bg-card text-mute",
+                    )}
+                  >
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-ink">
+                      <Globe size={14} className={isPublic ? "text-accent" : "text-mute"} />
+                      <span>Public Discovery</span>
+                    </div>
+                    <p className="text-[11px] text-mute leading-tight">
+                      Discoverable on Sydney Explore and nearby hangouts.
+                    </p>
+                  </button>
                 </div>
-                <p className="text-[11px] text-mute leading-tight">
-                  Discoverable on Sydney Explore and nearby hangouts.
-                </p>
-              </button>
-            </div>
               </div>
             )}
           </section>
@@ -949,35 +935,35 @@ export function PlanCreatePage() {
               </div>
             )}
             <div className="p-5">
-            <div className="flex items-center justify-between gap-2 pb-3 border-b border-line/60">
-              <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-accent">
-                <activeTemplate.Icon size={14} className={activeTemplate.textColor} />
-                {activeTemplate.label}
-              </span>
-              <span
-                className={cn(
-                  "rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider",
-                  isPublic ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-brand/10 text-accent",
-                )}
-              >
-                {isPublic ? "Public Plan" : "Private Plan"}
-              </span>
-            </div>
+              <div className="flex items-center justify-between gap-2 pb-3 border-b border-line/60">
+                <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-accent">
+                  <activeTemplate.Icon size={14} className={activeTemplate.textColor} />
+                  {activeTemplate.label}
+                </span>
+                <span
+                  className={cn(
+                    "rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+                    isPublic ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "bg-brand/10 text-accent",
+                  )}
+                >
+                  {isPublic ? "Public Plan" : "Private Plan"}
+                </span>
+              </div>
 
-            <h3 className="mt-3 font-display text-xl font-bold text-ink">
-              {title.trim() || PLAN_TYPES[type]?.defaultTitle || "Hangout"}
-            </h3>
+              <h3 className="mt-3 font-display text-xl font-bold text-ink">
+                {title.trim() || PLAN_TYPES[type]?.defaultTitle || "Hangout"}
+              </h3>
 
-            <div className="mt-2.5 flex flex-wrap items-center gap-y-1.5 gap-x-4 text-xs font-medium text-mute">
-              <span className="inline-flex items-center gap-1.5">
-                <Calendar size={13} className="text-accent shrink-0" />
-                {formatPlanDate(date, time)}
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <MapPin size={13} className="text-emerald-500 shrink-0" />
-                {place || city || "Sydney"}
-              </span>
-            </div>
+              <div className="mt-2.5 flex flex-wrap items-center gap-y-1.5 gap-x-4 text-xs font-medium text-mute">
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar size={13} className="text-accent shrink-0" />
+                  {formatPlanDate(date, time)}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <MapPin size={13} className="text-emerald-500 shrink-0" />
+                  {place || city || "Sydney"}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -989,9 +975,7 @@ export function PlanCreatePage() {
                   <Users size={14} />
                   Invite from Circle
                 </p>
-                <p className="text-[11px] text-mute">
-                  Select friends to receive an instant push notification
-                </p>
+                <p className="text-[11px] text-mute">Select friends to receive an instant push notification</p>
               </div>
               <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-bold text-accent">
                 {invite.size} selected
@@ -1031,11 +1015,7 @@ export function PlanCreatePage() {
                     Select All ({circle.length})
                   </button>
                   {invite.size > 0 && (
-                    <button
-                      type="button"
-                      onClick={clearAllInvites}
-                      className="text-mute hover:text-ink cursor-pointer"
-                    >
+                    <button type="button" onClick={clearAllInvites} className="text-mute hover:text-ink cursor-pointer">
                       Clear selection
                     </button>
                   )}
@@ -1101,10 +1081,9 @@ export function PlanCreatePage() {
               <Share2 size={18} />
             </span>
             <div className="text-xs leading-relaxed text-ink/80">
-              <span className="font-bold text-ink block mb-0.5">
-                Instant RSVP Link & QR Code
-              </span>
-              Creating this plan generates a private link ready to copy and share directly to WhatsApp, Messages, or Instagram groups.
+              <span className="font-bold text-ink block mb-0.5">Instant RSVP Link & QR Code</span>
+              Creating this plan generates a private link ready to copy and share directly to WhatsApp, Messages, or
+              Instagram groups.
             </div>
           </div>
 

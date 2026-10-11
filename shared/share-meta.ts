@@ -46,7 +46,9 @@ export function isCrawlerUserAgent(userAgent: string | undefined | null): boolea
 
 /** Escape user content for OG tags/HTML. Caps length so cards stay tight. */
 export function escapeShareText(value: unknown, maxLength: number): string {
-  const text = String(value || "").replace(/\s+/g, " ").trim();
+  const text = String(value || "")
+    .replace(/\s+/g, " ")
+    .trim();
   if (!text) return "";
   const sliced = text.length > maxLength ? `${text.slice(0, maxLength - 1).trimEnd()}…` : text;
   return sliced
@@ -113,8 +115,7 @@ export function shareCardFor(
     case "place":
       return {
         title: escapeShareText(doc.name, 90) || SHARE_DEFAULTS.title,
-        description:
-          escapeShareText(str(doc.shortWhy) || str(doc.address), 200) || SHARE_DEFAULTS.description,
+        description: escapeShareText(str(doc.shortWhy) || str(doc.address), 200) || SHARE_DEFAULTS.description,
         image: imageOf(doc.heroImage, doc.coverImage),
       };
     case "pulse": {
@@ -123,9 +124,7 @@ export function shareCardFor(
       return {
         title: escapeShareText(str(doc.title) || str(doc.name) || "How is your stay?", 90),
         description: escapeShareText(
-          [property, questions ? `${questions} quick questions` : "Quick check-in"]
-            .filter(Boolean)
-            .join(" · "),
+          [property, questions ? `${questions} quick questions` : "Quick check-in"].filter(Boolean).join(" · "),
           200,
         ),
         image: imageOf(doc.imageUrl, doc.propertyHeroImage),
@@ -155,15 +154,16 @@ export function shareCardFor(
       const inviteLine = parts.join(" ");
 
       const notes = str(doc.notes);
-      const descLine = inviteLine || notes
-        ? [inviteLine, notes, isInvite ? "RSVP on AirPal.me · Life Made Easy." : undefined]
-            .filter(Boolean)
-            .join(" — ")
-        : isInvite
-          ? "RSVP on AirPal.me · Life Made Easy."
-          : "";
+      const descLine =
+        inviteLine || notes
+          ? [inviteLine, notes, isInvite ? "RSVP on AirPal.me · Life Made Easy." : undefined]
+              .filter(Boolean)
+              .join(" — ")
+          : isInvite
+            ? "RSVP on AirPal.me · Life Made Easy."
+            : "";
 
-      const firstStopPhoto = stops.length > 0 ? (stops[0]?.photo || stops[0]?.image) : undefined;
+      const firstStopPhoto = stops.length > 0 ? stops[0]?.photo || stops[0]?.image : undefined;
       return {
         title: escapeShareText(title, 90) || SHARE_DEFAULTS.title,
         description: escapeShareText(descLine || where || when, 200) || SHARE_DEFAULTS.description,
@@ -173,10 +173,7 @@ export function shareCardFor(
     case "bio": {
       const handle = str(doc.handle);
       return {
-        title: escapeShareText(
-          str(doc.name) ? `${str(doc.name)} (@${handle || "airpal"})` : SHARE_DEFAULTS.title,
-          90,
-        ),
+        title: escapeShareText(str(doc.name) ? `${str(doc.name)} (@${handle || "airpal"})` : SHARE_DEFAULTS.title, 90),
         description: escapeShareText(str(doc.shortWhy), 200) || SHARE_DEFAULTS.description,
         image: imageOf(doc.avatar),
       };
@@ -184,8 +181,7 @@ export function shareCardFor(
     case "property":
       return {
         title: escapeShareText(doc.name, 90) || SHARE_DEFAULTS.title,
-        description:
-          escapeShareText(str(doc.tagline) || str(doc.city), 200) || SHARE_DEFAULTS.description,
+        description: escapeShareText(str(doc.tagline) || str(doc.city), 200) || SHARE_DEFAULTS.description,
         image: imageOf(doc.heroImage),
       };
     case "promotion": {
@@ -201,25 +197,27 @@ export function shareCardFor(
     case "demoHotel":
       return {
         title: escapeShareText(str(doc.name) || "Demo Harbour Hotel", 90),
-        description:
-          escapeShareText(
-            str(doc.tagline) || "Scan the lobby: Wi-Fi, dining, housekeeping — the live concierge.",
-            200,
-          ),
+        description: escapeShareText(
+          str(doc.tagline) || "Scan the lobby: Wi-Fi, dining, housekeeping — the live concierge.",
+          200,
+        ),
         image: imageOf(doc.heroImage),
       };
     case "demo":
       return {
         title: "AirPal.me in five minutes · Showcase tour",
-        description:
-          "Walk the full AirPal loop — mates, plans, stays, events, business — every stop live.",
+        description: "Walk the full AirPal loop — mates, plans, stays, events, business — every stop live.",
         image: fallbackImage,
       };
   }
 }
 
 /** Minimal crawler HTML: tags only, plus a plain link for odd clients. */
-export function buildShareMetaHtml(card: ShareCard, url: string, ogType: "website" | "event" | "profile" = "website"): string {
+export function buildShareMetaHtml(
+  card: ShareCard,
+  url: string,
+  ogType: "website" | "event" | "profile" = "website",
+): string {
   const large = Boolean(card.image);
   const secureImage = card.image && card.image.startsWith("https://") ? card.image : "";
   return `<!doctype html>

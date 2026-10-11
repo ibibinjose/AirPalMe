@@ -10,14 +10,7 @@ const TOKEN_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrst
 export const PULSE_TOKEN_PREFIX = "pls_";
 export const PULSE_TOKEN_BODY_LEN = 20;
 
-export const PULSE_QUESTION_TYPES = [
-  "rating_5",
-  "emoji",
-  "yes_no",
-  "single_choice",
-  "text_short",
-  "nps",
-] as const;
+export const PULSE_QUESTION_TYPES = ["rating_5", "emoji", "yes_no", "single_choice", "text_short", "nps"] as const;
 export type PulseQuestionType = (typeof PULSE_QUESTION_TYPES)[number];
 
 export const PULSE_STATUSES = ["draft", "live", "paused", "archived"] as const;
@@ -188,8 +181,7 @@ export function swipeChoiceForOffset(offsetX: number): "left" | "right" | null {
 
 /** Bio-page rate card: the property's currently live Pulse, if any. */
 export type BioPulseResult =
-  | { found: false }
-  | { found: true; publicToken: string; title: string; propertyName: string };
+  { found: false } | { found: true; publicToken: string; title: string; propertyName: string };
 
 export type PulseSubmitPayload = {
   publicToken: string;
@@ -339,15 +331,10 @@ export function evaluateLogic(logic: PulseLogicRule[], answers: PulseAnswer[]): 
   return { showQuestionIds: Array.from(show), createIssue, askContact };
 }
 
-export function visibleQuestions(
-  pulse: Pick<Pulse, "questions" | "logic">,
-  answers: PulseAnswer[],
-): PulseQuestion[] {
+export function visibleQuestions(pulse: Pick<Pulse, "questions" | "logic">, answers: PulseAnswer[]): PulseQuestion[] {
   const evaled = evaluateLogic(pulse.logic, answers);
   const show = new Set(evaled.showQuestionIds);
-  return [...pulse.questions]
-    .sort((a, b) => a.sortOrder - b.sortOrder)
-    .filter((q) => !q.gated || show.has(q.id));
+  return [...pulse.questions].sort((a, b) => a.sortOrder - b.sortOrder).filter((q) => !q.gated || show.has(q.id));
 }
 
 export function primaryScoreFromAnswers(answers: PulseAnswer[]): number | undefined {
@@ -585,9 +572,30 @@ export function diningCafeTemplate(
   };
 
   const logic: PulseLogicRule[] = [
-    { id: "r_show_wrong", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "show_question", targetQuestionId: qWrong.id },
-    { id: "r_show_help", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "show_question", targetQuestionId: qHelp.id },
-    { id: "r_show_contact", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "show_question", targetQuestionId: qContact.id },
+    {
+      id: "r_show_wrong",
+      sourceQuestionId: qRate.id,
+      operator: "lte",
+      value: 2,
+      action: "show_question",
+      targetQuestionId: qWrong.id,
+    },
+    {
+      id: "r_show_help",
+      sourceQuestionId: qRate.id,
+      operator: "lte",
+      value: 2,
+      action: "show_question",
+      targetQuestionId: qHelp.id,
+    },
+    {
+      id: "r_show_contact",
+      sourceQuestionId: qRate.id,
+      operator: "lte",
+      value: 2,
+      action: "show_question",
+      targetQuestionId: qContact.id,
+    },
     { id: "r_create_issue", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "create_issue" },
     { id: "r_ask_contact", sourceQuestionId: qContact.id, operator: "eq", value: true, action: "ask_contact" },
   ];
@@ -645,9 +653,30 @@ export function eventExperienceTemplate(
   };
 
   const logic: PulseLogicRule[] = [
-    { id: "r_show_wrong", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "show_question", targetQuestionId: qWrong.id },
-    { id: "r_show_help", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "show_question", targetQuestionId: qHelp.id },
-    { id: "r_show_contact", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "show_question", targetQuestionId: qContact.id },
+    {
+      id: "r_show_wrong",
+      sourceQuestionId: qRate.id,
+      operator: "lte",
+      value: 2,
+      action: "show_question",
+      targetQuestionId: qWrong.id,
+    },
+    {
+      id: "r_show_help",
+      sourceQuestionId: qRate.id,
+      operator: "lte",
+      value: 2,
+      action: "show_question",
+      targetQuestionId: qHelp.id,
+    },
+    {
+      id: "r_show_contact",
+      sourceQuestionId: qRate.id,
+      operator: "lte",
+      value: 2,
+      action: "show_question",
+      targetQuestionId: qContact.id,
+    },
     { id: "r_create_issue", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "create_issue" },
     { id: "r_ask_contact", sourceQuestionId: qContact.id, operator: "eq", value: true, action: "ask_contact" },
   ];
@@ -705,9 +734,30 @@ export function serviceRetailTemplate(
   };
 
   const logic: PulseLogicRule[] = [
-    { id: "r_show_wrong", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "show_question", targetQuestionId: qWrong.id },
-    { id: "r_show_help", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "show_question", targetQuestionId: qHelp.id },
-    { id: "r_show_contact", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "show_question", targetQuestionId: qContact.id },
+    {
+      id: "r_show_wrong",
+      sourceQuestionId: qRate.id,
+      operator: "lte",
+      value: 2,
+      action: "show_question",
+      targetQuestionId: qWrong.id,
+    },
+    {
+      id: "r_show_help",
+      sourceQuestionId: qRate.id,
+      operator: "lte",
+      value: 2,
+      action: "show_question",
+      targetQuestionId: qHelp.id,
+    },
+    {
+      id: "r_show_contact",
+      sourceQuestionId: qRate.id,
+      operator: "lte",
+      value: 2,
+      action: "show_question",
+      targetQuestionId: qContact.id,
+    },
     { id: "r_create_issue", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "create_issue" },
     { id: "r_ask_contact", sourceQuestionId: qContact.id, operator: "eq", value: true, action: "ask_contact" },
   ];
@@ -765,9 +815,30 @@ export function generalCsatTemplate(
   };
 
   const logic: PulseLogicRule[] = [
-    { id: "r_show_wrong", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "show_question", targetQuestionId: qWrong.id },
-    { id: "r_show_help", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "show_question", targetQuestionId: qHelp.id },
-    { id: "r_show_contact", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "show_question", targetQuestionId: qContact.id },
+    {
+      id: "r_show_wrong",
+      sourceQuestionId: qRate.id,
+      operator: "lte",
+      value: 2,
+      action: "show_question",
+      targetQuestionId: qWrong.id,
+    },
+    {
+      id: "r_show_help",
+      sourceQuestionId: qRate.id,
+      operator: "lte",
+      value: 2,
+      action: "show_question",
+      targetQuestionId: qHelp.id,
+    },
+    {
+      id: "r_show_contact",
+      sourceQuestionId: qRate.id,
+      operator: "lte",
+      value: 2,
+      action: "show_question",
+      targetQuestionId: qContact.id,
+    },
     { id: "r_create_issue", sourceQuestionId: qRate.id, operator: "lte", value: 2, action: "create_issue" },
     { id: "r_ask_contact", sourceQuestionId: qContact.id, operator: "eq", value: true, action: "ask_contact" },
   ];

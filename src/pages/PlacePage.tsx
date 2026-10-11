@@ -128,7 +128,9 @@ export function PlacePage() {
             {place.deal.detail && <p className="mt-1 text-[14px] text-mute">{place.deal.detail}</p>}
             {(place.deal.claimHint || place.deal.expiry) && (
               <p className="mt-1 text-[12px] text-mute">
-                {[place.deal.claimHint, place.deal.expiry ? `Ends ${place.deal.expiry}` : ""].filter(Boolean).join(" · ")}
+                {[place.deal.claimHint, place.deal.expiry ? `Ends ${place.deal.expiry}` : ""]
+                  .filter(Boolean)
+                  .join(" · ")}
               </p>
             )}
             <div className="mt-3 flex flex-wrap gap-2">
@@ -148,12 +150,7 @@ export function PlacePage() {
           </div>
         )}
         {place.hours && (
-          <TradingHoursScheduleView
-            hours={place.hours}
-            placeName={place.name}
-            variant="inline"
-            className="mt-4"
-          />
+          <TradingHoursScheduleView hours={place.hours} placeName={place.name} variant="inline" className="mt-4" />
         )}
         {handle && (
           <Button variant="ghost" className="mt-4 w-full" onClick={() => nav(bioPath(handle))}>

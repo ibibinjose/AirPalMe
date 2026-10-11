@@ -55,7 +55,10 @@ export function SafetyInboxAdmin() {
     const filtered = filter === "all" ? rows : rows.filter((r) => r.status === filter);
     return sortSafetyCasesEmergenciesFirst(filtered);
   }, [rows, filter]);
-  const emergencyCount = useMemo(() => rows.filter((r) => r.reason === "emergency" && r.status === "new").length, [rows]);
+  const emergencyCount = useMemo(
+    () => rows.filter((r) => r.reason === "emergency" && r.status === "new").length,
+    [rows],
+  );
   const overdueCount = useMemo(
     () => rows.filter((r) => r.status === "new" && slaState(r, Date.now()) === "overdue").length,
     [rows],
@@ -94,17 +97,15 @@ export function SafetyInboxAdmin() {
       <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-accent">Trust & safety</p>
       <h2 className="font-display mt-1 text-lg font-semibold">Safety cases</h2>
       <p className="mt-1 text-sm text-mute">
-        Every report opens a case. Emergencies first, always — new emergency cases target review within 4 hours.
-        In danger now? Call local emergency services first; AirPal never guarantees personal safety.
+        Every report opens a case. Emergencies first, always — new emergency cases target review within 4 hours. In
+        danger now? Call local emergency services first; AirPal never guarantees personal safety.
         {emergencyCount > 0 && (
           <span className="mt-1 block font-semibold text-red-600">
             {emergencyCount} new {emergencyCount === 1 ? "emergency" : "emergencies"} waiting.
           </span>
         )}
         {overdueCount > 0 && (
-          <span className="mt-1 block font-semibold text-red-600">
-            {overdueCount} past SLA — review now.
-          </span>
+          <span className="mt-1 block font-semibold text-red-600">{overdueCount} past SLA — review now.</span>
         )}
       </p>
       <div className="mt-3 flex flex-wrap gap-1.5">

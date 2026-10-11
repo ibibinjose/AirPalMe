@@ -122,7 +122,9 @@ async function main() {
     const profiles = await personProfilesFor(token, uid);
     for (const p of profiles) {
       if (p.starTier === tierName) continue;
-      console.log(`${APPLY ? "STAMP" : "WOULD STAMP"} ${p.name.split("/").pop()} uid=${uid} balance=${balance} -> "${tierName}"`);
+      console.log(
+        `${APPLY ? "STAMP" : "WOULD STAMP"} ${p.name.split("/").pop()} uid=${uid} balance=${balance} -> "${tierName}"`,
+      );
       writes.push({
         update: {
           name: p.name,

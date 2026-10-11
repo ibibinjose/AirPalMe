@@ -109,7 +109,13 @@ describe("festival validation", () => {
       validateFestival({ name: "Spark", slug: "new", city: "Sydney", startDate: "2026-09-21", endDate: "2026-09-27" }),
     ).toContain("Slug must be 3–60 lowercase letters, digits, or single hyphens.");
     expect(
-      validateFestival({ name: "Spark", slug: "spark-2026", city: "Sydney", startDate: "2026-09-27", endDate: "2026-09-21" }),
+      validateFestival({
+        name: "Spark",
+        slug: "spark-2026",
+        city: "Sydney",
+        startDate: "2026-09-27",
+        endDate: "2026-09-21",
+      }),
     ).toContain("End date cannot be before start date.");
     expect(
       validateFestival({

@@ -22,7 +22,7 @@ vi.mock("@/lib/native", () => ({
 describe("NativeOpenScreen", () => {
   it("renders brand opening copy and sign-in actions", () => {
     const html = renderToStaticMarkup(createElement(NativeOpenScreen));
-    expect(html).toContain("data-testid=\"native-open-screen\"");
+    expect(html).toContain('data-testid="native-open-screen"');
     expect(html).toContain("AirPal");
     expect(html).toContain("Life Made Easy.");
     expect(html).not.toContain("Continue with Google");

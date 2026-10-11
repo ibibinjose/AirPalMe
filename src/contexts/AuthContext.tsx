@@ -87,7 +87,13 @@ type AuthValue = {
   confirmPhoneCode: (code: string) => Promise<void>;
   completePhoneProfile: (input: { name: string; email: string }) => Promise<void>;
   linkEmailPassword: (email: string, password: string) => Promise<void>;
-  completeAccount: (input: { handle: string; name: string; email: string; birthDate: string; adultConsent: boolean }) => Promise<void>;
+  completeAccount: (input: {
+    handle: string;
+    name: string;
+    email: string;
+    birthDate: string;
+    adultConsent: boolean;
+  }) => Promise<void>;
   updateEmailAddress: (email: string) => Promise<void>;
   removeEmailAddress: () => Promise<void>;
   sendAccountPhoneCode: (phone: string) => Promise<void>;
@@ -412,7 +418,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const auth = getFirebaseAuth();
         if (!auth) throw new Error("Sign-up needs Firebase.");
         const cleanEmail = normalizeEmail(email);
-        const cred = await withAuthUpgrade(() => createUserWithEmailAndPassword(auth, cleanEmail, opts?.password || ""));
+        const cred = await withAuthUpgrade(() =>
+          createUserWithEmailAndPassword(auth, cleanEmail, opts?.password || ""),
+        );
         await setAuthDisplayName(cred.user, name);
         try {
           await sendAccountVerificationEmail(cred.user);

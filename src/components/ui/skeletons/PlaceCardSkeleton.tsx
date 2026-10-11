@@ -4,10 +4,7 @@ export function PlaceCardSkeleton({ className }: { className?: string }) {
   return (
     <div
       aria-hidden="true"
-      className={cn(
-        "relative aspect-square overflow-hidden rounded-3xl bg-card ring-1 ring-line/70",
-        className,
-      )}
+      className={cn("relative aspect-square overflow-hidden rounded-3xl bg-card ring-1 ring-line/70", className)}
     >
       {/* Shimmer background image placeholder */}
       <div className="absolute inset-0 bg-gradient-to-r from-line/30 via-line/65 to-line/30 bg-[length:200%_100%] animate-shimmer" />

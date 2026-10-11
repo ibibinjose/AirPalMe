@@ -21,8 +21,7 @@ export function MyTicketsPage() {
 
   if (loading) return <PageLoading />;
 
-  const displayList =
-    tab === "upcoming" ? upcomingBookings : tab === "past" ? pastBookings : bookings;
+  const displayList = tab === "upcoming" ? upcomingBookings : tab === "past" ? pastBookings : bookings;
 
   return (
     <div className="mx-auto max-w-2xl px-4 pb-28 pt-4 md:px-6 md:pt-6">
@@ -81,10 +80,16 @@ export function MyTicketsPage() {
             Tickets and passes live under your AirPal account — one account, tickets everywhere.
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-            <Link href="/start?tab=signin" className="no-print inline-flex min-h-[44px] items-center rounded-full bg-brand px-5 text-sm font-semibold text-white">
+            <Link
+              href="/start?tab=signin"
+              className="no-print inline-flex min-h-[44px] items-center rounded-full bg-brand px-5 text-sm font-semibold text-white"
+            >
               Sign in
             </Link>
-            <Link href="/pass" className="no-print inline-flex min-h-[44px] items-center rounded-full bg-paper px-5 text-sm font-semibold text-ink ring-1 ring-line hover:bg-card">
+            <Link
+              href="/pass"
+              className="no-print inline-flex min-h-[44px] items-center rounded-full bg-paper px-5 text-sm font-semibold text-ink ring-1 ring-line hover:bg-card"
+            >
               Browse events
             </Link>
           </div>
@@ -104,7 +109,10 @@ export function MyTicketsPage() {
             >
               Try again
             </button>
-            <Link href="/pass" className="no-print inline-flex min-h-[44px] items-center rounded-full bg-paper px-5 text-sm font-semibold text-ink ring-1 ring-line hover:bg-card">
+            <Link
+              href="/pass"
+              className="no-print inline-flex min-h-[44px] items-center rounded-full bg-paper px-5 text-sm font-semibold text-ink ring-1 ring-line hover:bg-card"
+            >
               Browse events
             </Link>
           </div>
@@ -114,9 +122,13 @@ export function MyTicketsPage() {
           <Ticket size={28} className="mx-auto text-mute" />
           <p className="mt-2 font-display text-lg font-bold text-ink">No tickets or passes yet</p>
           <p className="mx-auto mt-1 max-w-sm text-[14px] text-mute">
-            Passes and tickets you get on AirPal Pass live here — ready to scan at the door, save to Apple Wallet / Google Wallet, and coordinate in day plans.
+            Passes and tickets you get on AirPal Pass live here — ready to scan at the door, save to Apple Wallet /
+            Google Wallet, and coordinate in day plans.
           </p>
-          <Link href="/pass" className="no-print mt-4 inline-flex min-h-[44px] items-center rounded-full bg-brand px-5 text-sm font-semibold text-white">
+          <Link
+            href="/pass"
+            className="no-print mt-4 inline-flex min-h-[44px] items-center rounded-full bg-brand px-5 text-sm font-semibold text-white"
+          >
             Explore AirPal Pass
           </Link>
         </div>

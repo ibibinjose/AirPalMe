@@ -59,7 +59,8 @@ export const SEED_INSTITUTIONS: Institution[] = [
     city: "Sydney",
     code: "SCAPE26",
     welcomeHeading: "Welcome to Scape Darling Square",
-    welcomeMessage: "Connect with your fellow residents, discover weekly rooftop dinners, and explore Haymarket with your building.",
+    welcomeMessage:
+      "Connect with your fellow residents, discover weekly rooftop dinners, and explore Haymarket with your building.",
     badgeEmoji: "🏢",
     address: "41 Darling Dr, Haymarket NSW 2000",
     residentCountEstimate: 540,
@@ -72,7 +73,8 @@ export const SEED_INSTITUTIONS: Institution[] = [
     city: "Sydney",
     code: "STPAULS",
     welcomeHeading: "Welcome to St Paul's College",
-    welcomeMessage: "Your college community hub. Join floor catchups, morning run clubs, and hall dinners in 60 seconds.",
+    welcomeMessage:
+      "Your college community hub. Join floor catchups, morning run clubs, and hall dinners in 60 seconds.",
     badgeEmoji: "🏛️",
     address: "9 City Rd, Camperdown NSW 2050",
     residentCountEstimate: 380,

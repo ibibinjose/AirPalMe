@@ -27,13 +27,9 @@ describe("share meta", () => {
       expect(isCrawlerUserAgent(ua)).toBe(true);
     }
     expect(isCrawlerUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)")).toBe(false);
-    expect(isCrawlerUserAgent("Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120")).toBe(
-      false,
-    );
+    expect(isCrawlerUserAgent("Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120")).toBe(false);
     // JS search crawlers render the app — never serve them alternate HTML.
-    expect(isCrawlerUserAgent("Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")).toBe(
-      false,
-    );
+    expect(isCrawlerUserAgent("Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")).toBe(false);
     expect(isCrawlerUserAgent("")).toBe(false);
     expect(isCrawlerUserAgent(undefined)).toBe(false);
   });
@@ -48,9 +44,7 @@ describe("share meta", () => {
   });
 
   it("absolutizes images and rejects unsafe schemes", () => {
-    expect(absoluteShareImageUrl("/media/harbour.jpg", ORIGIN)).toBe(
-      "https://airpal.me/media/harbour.jpg",
-    );
+    expect(absoluteShareImageUrl("/media/harbour.jpg", ORIGIN)).toBe("https://airpal.me/media/harbour.jpg");
     expect(absoluteShareImageUrl("https://cdn.example/x.jpg?a=1&b=2", ORIGIN)).toBe(
       "https://cdn.example/x.jpg?a=1&amp;b=2",
     );

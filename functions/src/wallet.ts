@@ -158,9 +158,7 @@ export function ticketPassJson(input: TicketPassInput): Record<string, unknown> 
       backFields: [
         { key: "booking", label: "Booking", value: input.bookingId },
         { key: "status", label: "Status", value: input.status || "booked" },
-        ...(input.spots && input.spots > 1
-          ? [{ key: "spots", label: "Tickets", value: String(input.spots) }]
-          : []),
+        ...(input.spots && input.spots > 1 ? [{ key: "spots", label: "Tickets", value: String(input.spots) }] : []),
       ],
     },
   };

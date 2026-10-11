@@ -99,9 +99,7 @@ export function BusinessBookingsSection() {
     return (
       <div className="mt-5 rounded-2xl border border-dashed border-line bg-card p-6 text-center">
         <p className="font-display text-lg font-bold">Couldn&apos;t load bookings</p>
-        <p className="mx-auto mt-1 max-w-sm text-[13px] leading-6 text-mute">
-          Check your connection and retry.
-        </p>
+        <p className="mx-auto mt-1 max-w-sm text-[13px] leading-6 text-mute">Check your connection and retry.</p>
         <Button size="sm" variant="ghost" className="mt-3" onClick={() => void reload(user.uid)}>
           Retry
         </Button>

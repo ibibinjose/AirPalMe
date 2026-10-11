@@ -13,11 +13,7 @@ import { SyncStatusBar } from "./SyncStatusBar";
 import { NetworkStatusToast } from "./NetworkStatusToast";
 import { applyRouteMeta } from "@/lib/share-meta";
 import { isPassApp } from "@/lib/app-flavor";
-import {
-  OPEN_SEARCH_EVENT,
-  SEARCH_READY_EVENT,
-  openGlobalSearch,
-} from "@/components/search/openSearch";
+import { OPEN_SEARCH_EVENT, SEARCH_READY_EVENT, openGlobalSearch } from "@/components/search/openSearch";
 import { onIdle } from "@/lib/on-idle";
 
 // Search modal (catalog + stores) stays out of the boot bundle: mount on first

@@ -28,17 +28,11 @@ describe("trading-hours helper", () => {
 
   describe("formatDayHours", () => {
     it("formats open, closed, 24h, and late schedules", () => {
-      expect(
-        formatDayHours({ status: "open", openTime: "08:00", closeTime: "16:00" }),
-      ).toBe("8:00 AM – 4:00 PM");
+      expect(formatDayHours({ status: "open", openTime: "08:00", closeTime: "16:00" })).toBe("8:00 AM – 4:00 PM");
 
-      expect(
-        formatDayHours({ status: "closed", openTime: "09:00", closeTime: "17:00" }),
-      ).toBe("Closed");
+      expect(formatDayHours({ status: "closed", openTime: "09:00", closeTime: "17:00" })).toBe("Closed");
 
-      expect(
-        formatDayHours({ status: "24hours", openTime: "00:00", closeTime: "23:59" }),
-      ).toBe("Open 24 Hours");
+      expect(formatDayHours({ status: "24hours", openTime: "00:00", closeTime: "23:59" })).toBe("Open 24 Hours");
 
       expect(
         formatDayHours({
@@ -69,19 +63,13 @@ describe("trading-hours helper", () => {
     });
 
     it("formats multi-tier schedules like weekdays vs weekends", () => {
-      const cafeShift = TRADING_HOURS_PRESETS.find(
-        (p) => p.id === "cafe_weekend_shift",
-      )!.build();
-      expect(format7DaySchedule(cafeShift)).toBe(
-        "Mon–Fri 7:00 AM – 3:00 PM, Sat–Sun 8:00 AM – 2:00 PM",
-      );
+      const cafeShift = TRADING_HOURS_PRESETS.find((p) => p.id === "cafe_weekend_shift")!.build();
+      expect(format7DaySchedule(cafeShift)).toBe("Mon–Fri 7:00 AM – 3:00 PM, Sat–Sun 8:00 AM – 2:00 PM");
     });
 
     it("formats restaurants closed on Mondays", () => {
       const rest = TRADING_HOURS_PRESETS.find((p) => p.id === "restaurant_dinner")!.build();
-      expect(format7DaySchedule(rest)).toBe(
-        "Mon Closed, Tue–Sat 12:00 PM – 10:00 PM, Sun 12:00 PM – 9:30 PM",
-      );
+      expect(format7DaySchedule(rest)).toBe("Mon Closed, Tue–Sat 12:00 PM – 10:00 PM, Sun 12:00 PM – 9:30 PM");
     });
   });
 

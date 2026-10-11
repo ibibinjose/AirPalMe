@@ -5,9 +5,7 @@ import { PLAN_COVERS, PlanCoverPicker } from "./PlanCoverPicker";
 
 describe("PlanCoverPicker", () => {
   it("offers curated self-hosted artwork plus an upload field", () => {
-    const markup = renderToStaticMarkup(
-      createElement(PlanCoverPicker, { value: undefined, onChange: vi.fn() }),
-    );
+    const markup = renderToStaticMarkup(createElement(PlanCoverPicker, { value: undefined, onChange: vi.fn() }));
     expect(markup).toContain('role="radiogroup"');
     for (const cover of PLAN_COVERS) {
       expect(markup).toContain(cover.src);

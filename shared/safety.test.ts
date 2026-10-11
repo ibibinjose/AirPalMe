@@ -41,10 +41,7 @@ describe("safety reports", () => {
     ];
     const sorted = sortSafetyCasesEmergenciesFirst(rows);
     expect(sorted[0].reason).toBe("emergency");
-    expect(sorted.slice(1).map((r) => r.createdAt)).toEqual([
-      "2026-09-21T11:00:00.000Z",
-      "2026-09-21T10:00:00.000Z",
-    ]);
+    expect(sorted.slice(1).map((r) => r.createdAt)).toEqual(["2026-09-21T11:00:00.000Z", "2026-09-21T10:00:00.000Z"]);
     expect(isEmergencyReason("emergency")).toBe(true);
     expect(isEmergencyReason("harassment")).toBe(false);
   });

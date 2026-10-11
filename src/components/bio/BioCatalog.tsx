@@ -38,7 +38,12 @@ function ItemCard({
         </div>
 
         <div className="mt-2.5 flex items-start justify-between gap-2">
-          <h4 className={cn("font-display font-bold text-ink tracking-tight leading-snug", featured ? "text-lg sm:text-xl" : "text-base")}>
+          <h4
+            className={cn(
+              "font-display font-bold text-ink tracking-tight leading-snug",
+              featured ? "text-lg sm:text-xl" : "text-base",
+            )}
+          >
             {item.title}
           </h4>
           {item.href && isSafeBioHref(item.href) && (
@@ -127,9 +132,7 @@ export function BioCatalogSection({
   return (
     <section id={id} className="mt-7 scroll-mt-24">
       <div className="flex items-center justify-between mb-2.5">
-        <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">
-          {label}
-        </h3>
+        <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent">{label}</h3>
         <span className="text-[11px] font-medium text-mute">
           {items.length} {items.length === 1 ? "item" : "items"}
         </span>
@@ -142,4 +145,3 @@ export function BioCatalogSection({
     </section>
   );
 }
-

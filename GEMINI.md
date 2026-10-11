@@ -5,6 +5,7 @@ Read **`AGENTS.md`**, then **`docs/AIRPAL.md`** (the single source of truth) bef
 This is a Vite SPA (not Next.js) on Firebase project `airpalme-app`, with two Capacitor shells from one codebase: `me.airpal.app` (AirPal) + `me.airpal.pass` (AirPal Pass, tickets/events only). Web stays one all-in-one app.
 
 ### Product Architecture:
+
 - **AIRPAL:** Master brand ("Life Made Easy") with unified Firebase Auth and Firestore.
 - **AirPal.Me:** Personal Life & Identity companion (`/@handle`, `/now`, weather & outfit recommendations, `/calendar`, `/plan`).
 - **AirPal Pass:** Events, Deals & Experiences hub (`/pass`, `/me/tickets`, `/deals`, `/scan`, `/event`).

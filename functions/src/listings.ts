@@ -80,7 +80,8 @@ export const upsertBusinessListing = onCall(CALLABLE, async (request) => {
     geo,
     hours: String(data.hours || "See venue").trim(),
     shortWhy,
-    description: data.description !== undefined ? String(data.description || "").trim() || null : previous?.description || null,
+    description:
+      data.description !== undefined ? String(data.description || "").trim() || null : previous?.description || null,
     heroImage: String(data.heroImage || "").trim() || null,
     phone: String(data.phone || "").trim(),
     status: "active" as const,

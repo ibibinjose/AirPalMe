@@ -67,7 +67,9 @@ export function PlanBroadcastSheet({
           placeholder="Running 10 min late — start without me."
           className={`${fieldTextarea} mt-1 min-h-28`}
         />
-        <span className="mt-1 block text-right text-[11px] text-mute">{body.length}/{PLAN_BROADCAST_BODY_MAX}</span>
+        <span className="mt-1 block text-right text-[11px] text-mute">
+          {body.length}/{PLAN_BROADCAST_BODY_MAX}
+        </span>
       </label>
       <Button
         className="mt-4 w-full"

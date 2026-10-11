@@ -114,9 +114,9 @@ describe("shouldAlertBirthdayMonth", () => {
     expect(shouldAlertBirthdayMonth({ ...base, birthdayMonth: 9 }, now)).toBe(false);
     expect(shouldAlertBirthdayMonth({ ...base, birthdayAlertsEnabled: false }, now)).toBe(false);
     expect(shouldAlertBirthdayMonth({ ...base, adultConsent: false, adultConfirmed: false }, now)).toBe(false);
-    expect(
-      shouldAlertBirthdayMonth({ ...base, lastBirthdayMonthAlertAt: "2026-10-02T01:00:00.000Z" }, now),
-    ).toBe(false);
+    expect(shouldAlertBirthdayMonth({ ...base, lastBirthdayMonthAlertAt: "2026-10-02T01:00:00.000Z" }, now)).toBe(
+      false,
+    );
   });
 
   it("defaults enabled when birthdayAlertsEnabled is unset", () => {
@@ -137,9 +137,9 @@ describe("shouldAlertBirthdayMidMonth", () => {
     };
     expect(shouldAlertBirthdayMidMonth(user, early)).toBe(false);
     expect(shouldAlertBirthdayMidMonth(user, mid)).toBe(true);
-    expect(
-      shouldAlertBirthdayMidMonth({ ...user, lastBirthdayMidMonthAlertAt: "2026-10-15T01:00:00.000Z" }, mid),
-    ).toBe(false);
+    expect(shouldAlertBirthdayMidMonth({ ...user, lastBirthdayMidMonthAlertAt: "2026-10-15T01:00:00.000Z" }, mid)).toBe(
+      false,
+    );
   });
 });
 

@@ -102,10 +102,7 @@ export function CitySuburbRegionField({
     setSearching(true);
     try {
       const place = await fetchPlace(hit.placeId, session);
-      const formatted = formatCitySuburbRegion(
-        place.name || hit.title,
-        place.address || hit.subtitle,
-      );
+      const formatted = formatCitySuburbRegion(place.name || hit.title, place.address || hit.subtitle);
       selectedRef.current = true;
       onChange(formatted);
       setVerifiedSource("google");
@@ -206,10 +203,7 @@ export function CitySuburbRegionField({
 
       {/* Input with Map Pin Icon and Autocomplete Dropdown */}
       <div className="relative">
-        <MapPin
-          size={16}
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-accent z-[1]"
-        />
+        <MapPin size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-accent z-[1]" />
         <input
           value={value}
           autoComplete="off"
@@ -273,9 +267,7 @@ export function CitySuburbRegionField({
                   <div className="min-w-0 flex-1">
                     <span className="text-sm font-semibold block leading-tight">{hit.title}</span>
                     {hit.subtitle && (
-                      <span className="text-[12px] text-mute block leading-tight mt-0.5">
-                        {hit.subtitle}
-                      </span>
+                      <span className="text-[12px] text-mute block leading-tight mt-0.5">{hit.subtitle}</span>
                     )}
                   </div>
                 </button>

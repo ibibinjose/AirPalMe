@@ -93,7 +93,9 @@ export function AlternativePage() {
       </section>
 
       <section aria-label="Availability status" className="mt-10 rounded-[28px] bg-paper p-6 ring-1 ring-line sm:p-8">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-accent">Early access · Sydney · October 2026</p>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-accent">
+          Early access · Sydney · October 2026
+        </p>
         <p className="mt-2 text-sm leading-relaxed text-ink/80">
           Everything above is live in the product today. We publish no customer counts, ratings or customer stories yet
           — this page grows only with real, permissioned evidence. Running a student residence, venue or event?{" "}

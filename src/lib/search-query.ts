@@ -167,4 +167,3 @@ export function highlightSearchMatch(text: string, query: string): Array<{ text:
     match: tokens.some((t) => t.toLowerCase() === part.toLowerCase()),
   }));
 }
-

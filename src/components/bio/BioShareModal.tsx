@@ -135,11 +135,22 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
         <p className="mt-3 font-mono text-[13px] text-mute">{url.replace(/^https?:\/\//, "")}</p>
 
         <div className="mt-5 grid grid-cols-2 gap-2">
-          <Button variant="ghost" size="sm" onClick={handleCopy} className="min-h-[44px] gap-1.5 rounded-full font-semibold">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleCopy}
+            className="min-h-[44px] gap-1.5 rounded-full font-semibold"
+          >
             {copied ? <Check size={15} className="text-emerald-500" /> : <Copy size={15} />}
             {copied ? "Copied" : "Copy Link"}
           </Button>
-          <Button variant="ghost" size="sm" onClick={handleDownload} className="min-h-[44px] gap-1.5 rounded-full font-semibold" disabled={!qrData}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleDownload}
+            className="min-h-[44px] gap-1.5 rounded-full font-semibold"
+            disabled={!qrData}
+          >
             <Download size={15} />
             Download
           </Button>
@@ -162,7 +173,11 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
         />
 
         {typeof navigator !== "undefined" && "share" in navigator && (
-          <Button size="sm" onClick={handleNativeShare} className="mt-2.5 w-full min-h-[44px] gap-1.5 rounded-full bg-brand text-white font-bold">
+          <Button
+            size="sm"
+            onClick={handleNativeShare}
+            className="mt-2.5 w-full min-h-[44px] gap-1.5 rounded-full bg-brand text-white font-bold"
+          >
             <Share2 size={15} />
             Share via…
           </Button>

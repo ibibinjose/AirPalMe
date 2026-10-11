@@ -13,10 +13,7 @@ export type WeekSchedule = Record<DayKey, DaySchedule>;
 
 export const DAYS_ORDER: DayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
-export const DAY_METADATA: Record<
-  DayKey,
-  { name: string; short: string; abbrev: string; weekdayIndex: number }
-> = {
+export const DAY_METADATA: Record<DayKey, { name: string; short: string; abbrev: string; weekdayIndex: number }> = {
   mon: { name: "Monday", short: "Mon", abbrev: "M", weekdayIndex: 1 },
   tue: { name: "Tuesday", short: "Tue", abbrev: "T", weekdayIndex: 2 },
   wed: { name: "Wednesday", short: "Wed", abbrev: "W", weekdayIndex: 3 },
@@ -363,7 +360,10 @@ export function parseHoursTo7DaySchedule(raw: string): WeekSchedule {
   for (const seg of segments) {
     if (seg.includes(",")) {
       // Check if comma separates distinct day entries (e.g. "Mon–Fri 9am–5pm, Sat–Sun Closed")
-      const subParts = seg.split(",").map((p) => p.trim()).filter(Boolean);
+      const subParts = seg
+        .split(",")
+        .map((p) => p.trim())
+        .filter(Boolean);
       for (const sp of subParts) {
         parsedSegments.push({ text: sp });
       }
@@ -434,9 +434,7 @@ export function parseHoursTo7DaySchedule(raw: string): WeekSchedule {
         }
       } else {
         // Extract time strings
-        const timeMatches = Array.from(
-          text.matchAll(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/gi),
-        ).map((m) => m[1]);
+        const timeMatches = Array.from(text.matchAll(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/gi)).map((m) => m[1]);
 
         let openTime = "09:00";
         let closeTime = "17:00";
@@ -466,9 +464,7 @@ export function parseHoursTo7DaySchedule(raw: string): WeekSchedule {
 
   // If no day matched, check if it was a single generic time window like "8am–5pm"
   if (!matchedAnyDay) {
-    const timeMatches = Array.from(
-      s.matchAll(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/gi),
-    ).map((m) => m[1]);
+    const timeMatches = Array.from(s.matchAll(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/gi)).map((m) => m[1]);
 
     if (timeMatches.length >= 1) {
       const parsedStart = parseTimeString(timeMatches[0]) || "09:00";
@@ -501,10 +497,7 @@ export interface DayBreakdownItem {
 /**
  * Returns a clean 7-day breakdown for display, highlighting the current day.
  */
-export function get7DayBreakdown(
-  rawHours: string | undefined,
-  currentWeekdayIndex = 1,
-): DayBreakdownItem[] {
+export function get7DayBreakdown(rawHours: string | undefined, currentWeekdayIndex = 1): DayBreakdownItem[] {
   const schedule = parseHoursTo7DaySchedule(rawHours || "");
   const todayKey = WEEKDAY_INDEX_TO_KEY[currentWeekdayIndex] || "mon";
 

@@ -6,13 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
-export function BiometricEnrollCard({
-  compact = false,
-  onEnrolled,
-}: {
-  compact?: boolean;
-  onEnrolled?: () => void;
-}) {
+export function BiometricEnrollCard({ compact = false, onEnrolled }: { compact?: boolean; onEnrolled?: () => void }) {
   const {
     user,
     hasEnrolledBiometrics,
@@ -71,7 +65,12 @@ export function BiometricEnrollCard({
     toast.success(`${biometricLabel} removed from this device.`);
   }
 
-  const Icon = biometricType === "face_id" ? ScanFace : biometricType === "touch_id" || biometricType === "fingerprint" ? Fingerprint : KeyRound;
+  const Icon =
+    biometricType === "face_id"
+      ? ScanFace
+      : biometricType === "touch_id" || biometricType === "fingerprint"
+        ? Fingerprint
+        : KeyRound;
 
   return (
     <div className={cn("rounded-2xl bg-card p-4 ring-1 ring-line shadow-2xs", compact ? "mt-3" : "mt-4")}>

@@ -27,12 +27,7 @@ import { loadTours } from "@/lib/tours-store";
 import { bioPath, bioKindLabel, type BioProfile } from "@shared/bio";
 import { fetchPublicBio, loadBios } from "@/lib/bio-store";
 import { listPeople } from "@/lib/people";
-import {
-  highlightSearchMatch,
-  profileMatchesSearch,
-  scoreSearchItem,
-  searchNeedle,
-} from "@/lib/search-query";
+import { highlightSearchMatch, profileMatchesSearch, scoreSearchItem, searchNeedle } from "@/lib/search-query";
 import { type Promotion } from "@shared/promotions";
 import { getFirebaseDb } from "@/lib/firebase";
 import { collection, getDocs, query as firestoreQuery, where } from "firebase/firestore";
@@ -42,12 +37,7 @@ import { usePlans } from "@/contexts/PlanContext";
 import { triggerHaptic, triggerHapticSelection } from "@/lib/native";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { cn } from "@/lib/cn";
-import {
-  OPEN_SEARCH_EVENT,
-  SEARCH_READY_EVENT,
-  type OpenGlobalSearchOptions,
-  type SearchCategory,
-} from "./openSearch";
+import { OPEN_SEARCH_EVENT, SEARCH_READY_EVENT, type OpenGlobalSearchOptions, type SearchCategory } from "./openSearch";
 
 const RECENT_KEY = "airpal.recentSearches.v1";
 type RecentItem = { title: string; href: string };
@@ -115,12 +105,7 @@ export function GlobalSearchModal() {
     const db = getFirebaseDb();
     if (!db) return;
     let cancelled = false;
-    getDocs(
-      firestoreQuery(
-        collection(db, "promotions"),
-        where("status", "in", ["live", "approved"]),
-      ),
-    )
+    getDocs(firestoreQuery(collection(db, "promotions"), where("status", "in", ["live", "approved"])))
       .then((snap) => {
         if (cancelled) return;
         const list = snap.docs.map((d) => ({
@@ -509,7 +494,15 @@ export function GlobalSearchModal() {
           description: promo.description,
           category: promo.category,
           tags: [promo.kind, promo.status],
-          keywords: [promo.sponsorName, promo.prize?.title || "", promo.prizeValue || "", "deal", "perk", "discount", "offer"],
+          keywords: [
+            promo.sponsorName,
+            promo.prize?.title || "",
+            promo.prizeValue || "",
+            "deal",
+            "perk",
+            "discount",
+            "offer",
+          ],
         },
         query,
       );
@@ -528,7 +521,19 @@ export function GlobalSearchModal() {
     }
 
     // 4. Match AirPal Pass & Ticketing Shortcuts
-    const passKeywords = ["pass", "ticket", "tickets", "admission", "scanner", "scan", "wallet", "gig", "mela", "festival", "concert"];
+    const passKeywords = [
+      "pass",
+      "ticket",
+      "tickets",
+      "admission",
+      "scanner",
+      "scan",
+      "wallet",
+      "gig",
+      "mela",
+      "festival",
+      "concert",
+    ];
     if (passKeywords.some((k) => q.includes(k))) {
       items.push({
         id: "airpal-pass",
@@ -563,7 +568,19 @@ export function GlobalSearchModal() {
     }
 
     // 5. Match Circle / Networking actions
-    const circleKeywords = ["circle", "network", "meet", "hangout", "catchup", "cohort", "campus", "presence", "here", "bio", "handle"];
+    const circleKeywords = [
+      "circle",
+      "network",
+      "meet",
+      "hangout",
+      "catchup",
+      "cohort",
+      "campus",
+      "presence",
+      "here",
+      "bio",
+      "handle",
+    ];
     if (circleKeywords.some((k) => q.includes(k))) {
       items.push({
         id: "circle-hub",
@@ -646,7 +663,20 @@ export function GlobalSearchModal() {
     }
 
     // 8. Match Arrival Engine / Campus Cohort keywords
-    const arrivalKeywords = ["arrival", "campus", "unsw", "uts", "usyd", "college", "dorm", "student", "scape", "iglu", "just got here", "building"];
+    const arrivalKeywords = [
+      "arrival",
+      "campus",
+      "unsw",
+      "uts",
+      "usyd",
+      "college",
+      "dorm",
+      "student",
+      "scape",
+      "iglu",
+      "just got here",
+      "building",
+    ];
     if (arrivalKeywords.some((k) => q.includes(k))) {
       items.push({
         id: "arrival-engine",
@@ -682,7 +712,8 @@ export function GlobalSearchModal() {
     else if (activeCategory === "events") filtered = items.filter((i) => i.category === "event");
     else if (activeCategory === "deals") filtered = items.filter((i) => i.category === "deal");
     else if (activeCategory === "circle") filtered = items.filter((i) => i.category === "person");
-    else if (activeCategory === "plan" || activeCategory === "plans") filtered = items.filter((i) => i.category === "plan");
+    else if (activeCategory === "plan" || activeCategory === "plans")
+      filtered = items.filter((i) => i.category === "plan");
 
     // Sort by relevance score descending
     filtered.sort((a, b) => (b.score || 0) - (a.score || 0));

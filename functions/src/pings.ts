@@ -62,8 +62,7 @@ async function handlePingWrite(
   const target = pingPushTarget(before, after);
   if (!target || !after) return;
   const otherUid = target.event === "pinged" ? String(after.fromUid || "") : String(after.toUid || "");
-  const storedName =
-    target.event === "pinged" ? String(after.fromName || "") : String(after.toName || "");
+  const storedName = target.event === "pinged" ? String(after.fromName || "") : String(after.toName || "");
   const name = storedName || (await displayName(otherUid));
   if (target.event === "pinged") {
     await pushPing(target.toUid, `${name} pinged you`, "See who's around and ping back.", pingId);

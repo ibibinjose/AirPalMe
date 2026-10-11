@@ -17,15 +17,7 @@ import type { MateRequest } from "@shared/mate-request";
 import { haversineMeters } from "./geo";
 
 export type BrainCategory =
-  | "coffee"
-  | "food"
-  | "culture"
-  | "fitness"
-  | "nature"
-  | "nightlife"
-  | "activity"
-  | "exploration"
-  | "shopping";
+  "coffee" | "food" | "culture" | "fitness" | "nature" | "nightlife" | "activity" | "exploration" | "shopping";
 
 export type BrainTimeSlot = "morning" | "midday" | "afternoon" | "evening" | "night";
 
@@ -216,7 +208,12 @@ export function solveAirPalIntent(
   let budget: SolvedIntent["budget"] = "flexible";
   if (lower.includes("free") || lower.includes("$0") || lower.includes("zero cost")) {
     budget = "free";
-  } else if (lower.includes("<$25") || lower.includes("under $25") || lower.includes("cheap") || lower.includes("budget")) {
+  } else if (
+    lower.includes("<$25") ||
+    lower.includes("under $25") ||
+    lower.includes("cheap") ||
+    lower.includes("budget")
+  ) {
     budget = "under-25";
   } else if (lower.includes("<$50") || lower.includes("under $50") || lower.includes("mid range")) {
     budget = "under-50";
@@ -237,7 +234,9 @@ export function solveAirPalIntent(
   });
 
   // 7. Generate Plan Title
-  const cleanNoun = matchedKeywords[0] ? matchedKeywords[0].charAt(0).toUpperCase() + matchedKeywords[0].slice(1) : "Outing";
+  const cleanNoun = matchedKeywords[0]
+    ? matchedKeywords[0].charAt(0).toUpperCase() + matchedKeywords[0].slice(1)
+    : "Outing";
   const title = `${cleanNoun} in ${suburb}`;
 
   // 8. Confidence estimation
@@ -489,7 +488,11 @@ export function evaluateMateMatch(
     } else if (availList.length > 0) {
       isAvailable = false;
       score -= 15;
-      reasons.push({ type: "availability", label: `Usually available: ${mate.availability.join(", ")}`, positive: false });
+      reasons.push({
+        type: "availability",
+        label: `Usually available: ${mate.availability.join(", ")}`,
+        positive: false,
+      });
     }
   }
 
@@ -511,9 +514,7 @@ export function rankMatesForIntent(
   request: Partial<MateRequest>,
   userLocation?: { lat: number; lng: number },
 ): MateMatchResult[] {
-  return mates
-    .map((m) => evaluateMateMatch(m, request, userLocation))
-    .sort((a, b) => b.score - a.score);
+  return mates.map((m) => evaluateMateMatch(m, request, userLocation)).sort((a, b) => b.score - a.score);
 }
 
 /**

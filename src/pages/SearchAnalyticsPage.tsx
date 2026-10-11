@@ -1,12 +1,6 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useLocation } from "wouter";
-import {
-  collection,
-  getDocs,
-  limit as fsLimit,
-  orderBy,
-  query as fsQuery,
-} from "firebase/firestore";
+import { collection, getDocs, limit as fsLimit, orderBy, query as fsQuery } from "firebase/firestore";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -226,7 +220,14 @@ export function SearchAnalyticsPage() {
     }
 
     return Object.entries(counts).map(([name, value]) => ({
-      name: name === "circle" ? "Circle" : name === "plans" ? "Hangouts" : name === "deals" ? "Deals" : name.charAt(0).toUpperCase() + name.slice(1),
+      name:
+        name === "circle"
+          ? "Circle"
+          : name === "plans"
+            ? "Hangouts"
+            : name === "deals"
+              ? "Deals"
+              : name.charAt(0).toUpperCase() + name.slice(1),
       key: name,
       value: Math.max(value, 5),
       color: CATEGORY_COLORS[name] || "#1805db",
@@ -257,8 +258,8 @@ export function SearchAnalyticsPage() {
         date: label,
         total: Math.max(12, baseSearches),
         places: Math.round(baseSearches * 0.35),
-        events: Math.round(baseSearches * 0.30),
-        plans: Math.round(baseSearches * 0.20),
+        events: Math.round(baseSearches * 0.3),
+        plans: Math.round(baseSearches * 0.2),
         deals: Math.round(baseSearches * 0.15),
       });
     }
@@ -311,7 +312,11 @@ export function SearchAnalyticsPage() {
             </div>
             <p className="mt-1 text-xs sm:text-sm text-mute">
               Real-time Firestore query analytics to track trending terms, user intent, and search relevance.
-              {loading && <span className="ml-2 inline-block text-xs font-semibold text-accent motion-safe:animate-pulse">Syncing...</span>}
+              {loading && (
+                <span className="ml-2 inline-block text-xs font-semibold text-accent motion-safe:animate-pulse">
+                  Syncing...
+                </span>
+              )}
               {!loading && queryLogs.length > 0 && (
                 <span className="ml-2 text-xs font-semibold text-emerald-600">
                   · {queryLogs.length} recent sessions logged
@@ -345,9 +350,7 @@ export function SearchAnalyticsPage() {
         {/* Top Metric KPI Cards */}
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-2xl bg-card p-4 ring-1 ring-line/80 shadow-xs">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-mute">
-              Total Logged Searches
-            </span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-mute">Total Logged Searches</span>
             <p className="font-display mt-1 text-2xl sm:text-3xl font-extrabold text-ink">
               {totalVolume.toLocaleString()}
             </p>
@@ -358,19 +361,13 @@ export function SearchAnalyticsPage() {
           </div>
 
           <div className="rounded-2xl bg-card p-4 ring-1 ring-line/80 shadow-xs">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-mute">
-              Unique Search Terms
-            </span>
-            <p className="font-display mt-1 text-2xl sm:text-3xl font-extrabold text-ink">
-              {popularTerms.length}
-            </p>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-mute">Unique Search Terms</span>
+            <p className="font-display mt-1 text-2xl sm:text-3xl font-extrabold text-ink">{popularTerms.length}</p>
             <p className="mt-1 text-[11px] text-mute font-medium">Aggregated in Firestore</p>
           </div>
 
           <div className="rounded-2xl bg-card p-4 ring-1 ring-line/80 shadow-xs">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-mute">
-              Top Trending Query
-            </span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-mute">Top Trending Query</span>
             <p className="font-display mt-1 text-lg sm:text-xl font-bold text-accent truncate" title={topTerm}>
               &ldquo;{topTerm}&rdquo;
             </p>
@@ -378,12 +375,8 @@ export function SearchAnalyticsPage() {
           </div>
 
           <div className="rounded-2xl bg-card p-4 ring-1 ring-line/80 shadow-xs">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-mute">
-              Conversion / CTR
-            </span>
-            <p className="font-display mt-1 text-2xl sm:text-3xl font-extrabold text-ink">
-              74.2%
-            </p>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-mute">Conversion / CTR</span>
+            <p className="font-display mt-1 text-2xl sm:text-3xl font-extrabold text-ink">74.2%</p>
             <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-accent">
               <Sparkles size={12} />
               <span>High intent matches</span>
@@ -440,9 +433,7 @@ export function SearchAnalyticsPage() {
                 }}
                 className={cn(
                   "inline-flex min-h-[40px] items-center rounded-lg px-3 text-xs font-medium transition cursor-pointer",
-                  timeRange === t.id
-                    ? "bg-card text-ink font-bold shadow-xs"
-                    : "text-mute hover:text-ink",
+                  timeRange === t.id ? "bg-card text-ink font-bold shadow-xs" : "text-mute hover:text-ink",
                 )}
               >
                 {t.label}
@@ -485,12 +476,7 @@ export function SearchAnalyticsPage() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4e7ee" />
-                    <XAxis
-                      dataKey="date"
-                      tick={{ fontSize: 11, fill: "#6a726c" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
+                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#6a726c" }} axisLine={false} tickLine={false} />
                     <YAxis
                       tick={{ fontSize: 11, fill: "#6a726c" }}
                       axisLine={false}
@@ -550,9 +536,7 @@ export function SearchAnalyticsPage() {
             <div>
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="font-display text-base sm:text-lg font-bold text-ink">
-                    Top Search Queries
-                  </h2>
+                  <h2 className="font-display text-base sm:text-lg font-bold text-ink">Top Search Queries</h2>
                   <p className="text-xs text-mute mt-0.5">Most searched keywords and terms</p>
                 </div>
                 <span className="text-xs font-bold text-mute">Count</span>
@@ -560,11 +544,7 @@ export function SearchAnalyticsPage() {
 
               <div className="mt-4 h-[260px] sm:h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    layout="vertical"
-                    data={topBarData}
-                    margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
-                  >
+                  <BarChart layout="vertical" data={topBarData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e4e7ee" />
                     <XAxis type="number" tick={{ fontSize: 11, fill: "#6a726c" }} axisLine={false} />
                     <YAxis
@@ -591,9 +571,7 @@ export function SearchAnalyticsPage() {
             </div>
 
             <div className="mt-2 text-right">
-              <span className="text-[11px] text-mute font-medium">
-                Showing top {topBarData.length} queries
-              </span>
+              <span className="text-[11px] text-mute font-medium">Showing top {topBarData.length} queries</span>
             </div>
           </div>
         </div>
@@ -602,9 +580,7 @@ export function SearchAnalyticsPage() {
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Category Distribution Pie Chart (5 cols) */}
           <div className="lg:col-span-5 rounded-3xl bg-card p-5 sm:p-6 ring-1 ring-line shadow-xs">
-            <h2 className="font-display text-base sm:text-lg font-bold text-ink">
-              Search Share by Category
-            </h2>
+            <h2 className="font-display text-base sm:text-lg font-bold text-ink">Search Share by Category</h2>
             <p className="text-xs text-mute mt-0.5">Distribution of user interests across verticals</p>
 
             <div className="mt-4 h-[220px] w-full">
@@ -653,7 +629,8 @@ export function SearchAnalyticsPage() {
                 Simulate Live Search Logging
               </h2>
               <p className="text-xs text-mute mt-0.5">
-                Tap any query below to immediately trigger the `useSearchQueryLogger` hook and observe Firestore updating:
+                Tap any query below to immediately trigger the `useSearchQueryLogger` hook and observe Firestore
+                updating:
               </p>
 
               <div className="mt-4 flex flex-wrap gap-2">
@@ -704,9 +681,7 @@ export function SearchAnalyticsPage() {
         <div className="mt-8 rounded-3xl bg-card p-5 sm:p-6 ring-1 ring-line shadow-xs">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-line pb-4">
             <div>
-              <h2 className="font-display text-lg font-bold text-ink">
-                Popular Search Terms Table
-              </h2>
+              <h2 className="font-display text-lg font-bold text-ink">Popular Search Terms Table</h2>
               <p className="text-xs text-mute mt-0.5">
                 Full list of keywords tracked in the `popular_searches` Firestore collection
               </p>
@@ -770,9 +745,7 @@ export function SearchAnalyticsPage() {
                           <span>{item.city || "Sydney"}</span>
                         </span>
                       </td>
-                      <td className="py-3 text-right font-extrabold text-ink text-sm">
-                        {item.count}
-                      </td>
+                      <td className="py-3 text-right font-extrabold text-ink text-sm">{item.count}</td>
                       <td className="py-3 pr-2 text-right">
                         <button
                           type="button"

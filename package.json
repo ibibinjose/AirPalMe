@@ -28,7 +28,7 @@
     "screenshots": "node scripts/screenshots.mjs",
     "screenshots:pass": "node scripts/screenshots.mjs --flavor=pass",
     "audit": "node scripts/check-audit.mjs",
-    "verify": "npm run typecheck && npm run functions:typecheck && npm run lint && npm test && npm run functions:test && npm run build && npm run functions:build && npm run rules:check && npm run secrets:check && npm run seo:check",
+    "verify": "npm run format:check && npm run typecheck && npm run functions:typecheck && npm run lint && npm test && npm run functions:test && npm run build && npm run functions:build && npm run rules:check && npm run secrets:check && npm run seo:check",
     "ci": "npm run ci:install && npm run verify && npm run audit",
     "deploy": "npm run verify && npx -y firebase-tools@latest deploy --project airpalme-app",
     "deploy:hosting": "npm run build && npx -y firebase-tools@latest deploy --only hosting --project airpalme-app",

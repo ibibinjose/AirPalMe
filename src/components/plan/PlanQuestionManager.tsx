@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { ListChecks, Plus, Type, X } from "lucide-react";
-import {
-  PLAN_QUESTIONS_MAX,
-  validGuestQuestion,
-  type PlanGuestQuestion,
-  type PlanQuestionType,
-} from "@shared/plan";
+import { PLAN_QUESTIONS_MAX, validGuestQuestion, type PlanGuestQuestion, type PlanQuestionType } from "@shared/plan";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
 
@@ -93,7 +88,11 @@ export function PlanQuestionManager({
             className="h-11 w-full rounded-2xl bg-paper px-4 text-sm border border-line outline-none focus:ring-2 focus:ring-brand focus:border-brand"
           />
           <div className="flex flex-col gap-2 sm:flex-row">
-            <div className="grid shrink-0 grid-cols-2 gap-1 rounded-2xl bg-paper p-1 ring-1 ring-line" role="group" aria-label="Question type">
+            <div
+              className="grid shrink-0 grid-cols-2 gap-1 rounded-2xl bg-paper p-1 ring-1 ring-line"
+              role="group"
+              aria-label="Question type"
+            >
               {(["text", "choice"] as const).map((t) => (
                 <button
                   key={t}

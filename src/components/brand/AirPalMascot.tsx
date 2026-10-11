@@ -5,19 +5,20 @@
  */
 export function AirPalMascot({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 240 264"
-      className={className}
-      role="img"
-      aria-label="AirPal Pal mascot celebrating with music"
-    >
+    <svg viewBox="0 0 240 264" className={className} role="img" aria-label="AirPal Pal mascot celebrating with music">
       {/* music notes */}
       <g fill="#1b4332">
-        <text x="18" y="52" fontSize="26" fontWeight="bold" transform="rotate(-12 30 44)">♪</text>
-        <text x="196" y="46" fontSize="22" fontWeight="bold" transform="rotate(10 206 38)">♫</text>
+        <text x="18" y="52" fontSize="26" fontWeight="bold" transform="rotate(-12 30 44)">
+          ♪
+        </text>
+        <text x="196" y="46" fontSize="22" fontWeight="bold" transform="rotate(10 206 38)">
+          ♫
+        </text>
       </g>
       <g fill="#f43f5e">
-        <text x="204" y="84" fontSize="20" fontWeight="bold" transform="rotate(14 212 78)">♪</text>
+        <text x="204" y="84" fontSize="20" fontWeight="bold" transform="rotate(14 212 78)">
+          ♪
+        </text>
       </g>
 
       {/* feet */}

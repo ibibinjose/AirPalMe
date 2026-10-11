@@ -42,16 +42,13 @@ export const createBusinessProfile = onCall(CALLABLE, async (request) => {
   }
   const owned = await db.collection("profiles").where("ownerUid", "==", uid).get();
   const sameKind = owned.docs.find((row) => String(row.data()?.kind || "") === kind);
-  const legacySolo =
-    kind === "person" && owned.size === 1 && !owned.docs[0]?.data()?.kind ? owned.docs[0] : undefined;
+  const legacySolo = kind === "person" && owned.size === 1 && !owned.docs[0]?.data()?.kind ? owned.docs[0] : undefined;
   const profileId =
     existingHandle.exists && String(existingHandle.data()?.ownerUid) === uid
       ? String(existingHandle.data()?.profileId)
       : sameKind?.id || legacySolo?.id || `bio-${randomBytes(4).toString("hex")}`;
   const previous = await db.collection("handles").where("ownerUid", "==", uid).get();
-  const stale = previous.docs.filter(
-    (row) => row.id !== handle && String(row.data()?.profileId || "") === profileId,
-  );
+  const stale = previous.docs.filter((row) => row.id !== handle && String(row.data()?.profileId || "") === profileId);
   await db.collection("handles").doc(handle).set({ handle, profileId, ownerUid: uid });
   await Promise.all(stale.map((row) => row.ref.delete()));
   const previousProfile = await db.collection("profiles").doc(profileId).get();
@@ -276,8 +273,16 @@ export const transferHandle = onCall(CALLABLE, async (request) => {
   }
   const profileSnap = await db.collection("profiles").doc(profileId).get();
   const kind = String(profileSnap.data()?.kind || "person");
-  await db.collection("handles").doc(to).set({ handle: to, profileId, ownerUid: owner || uid });
-  if (from) await db.collection("handles").doc(from).delete().catch(() => undefined);
+  await db
+    .collection("handles")
+    .doc(to)
+    .set({ handle: to, profileId, ownerUid: owner || uid });
+  if (from)
+    await db
+      .collection("handles")
+      .doc(from)
+      .delete()
+      .catch(() => undefined);
   await db
     .collection("profiles")
     .doc(profileId)

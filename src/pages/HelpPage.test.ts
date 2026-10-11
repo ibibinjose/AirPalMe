@@ -10,11 +10,7 @@ const staticHook = (): [string, (to: string) => void] => ["/help", () => undefin
 describe("HelpPage", () => {
   it("renders the knowledge hub with guides and categories", () => {
     const html = renderToStaticMarkup(
-      createElement(
-        Router,
-        { hook: staticHook },
-        createElement(AppProviders, null, createElement(HelpPage)),
-      ),
+      createElement(Router, { hook: staticHook }, createElement(AppProviders, null, createElement(HelpPage))),
     );
 
     expect(html).toContain("How can we help?");

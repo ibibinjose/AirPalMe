@@ -93,16 +93,15 @@ export function BioCatalogEditor({
       </div>
 
       {/* Item creation form */}
-      <form
-        className="space-y-3 rounded-2xl border border-line bg-card p-4 shadow-sm"
-        onSubmit={add}
-      >
+      <form className="space-y-3 rounded-2xl border border-line bg-card p-4 shadow-sm" onSubmit={add}>
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold uppercase tracking-wider text-mute flex items-center gap-1.5">
             {kindIcon(kind)}
             <span>Add New {kind === "deal" ? "Deal / Offer" : kind === "product" ? "Product" : "Service"}</span>
           </span>
-          <span className="text-[11px] text-mute">{rows.length} of {BIO_CATALOG_MAX} items</span>
+          <span className="text-[11px] text-mute">
+            {rows.length} of {BIO_CATALOG_MAX} items
+          </span>
         </div>
 
         <div className="space-y-2">
@@ -110,7 +109,13 @@ export function BioCatalogEditor({
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder={kind === "deal" ? "e.g. 10% Off First Coffee or Welcome Drink" : kind === "product" ? "e.g. Artisanal Single Origin Roast 250g" : "e.g. Private Catering or 1-on-1 Consultation"}
+              placeholder={
+                kind === "deal"
+                  ? "e.g. 10% Off First Coffee or Welcome Drink"
+                  : kind === "product"
+                    ? "e.g. Artisanal Single Origin Roast 250g"
+                    : "e.g. Private Catering or 1-on-1 Consultation"
+              }
               required
               className={fieldInput}
             />
@@ -196,9 +201,7 @@ export function BioCatalogEditor({
                     )}
                     <span className="font-semibold text-sm text-ink">{row.title}</span>
                     {row.price && (
-                      <span className="rounded-md bg-paper px-2 py-0.5 text-xs font-bold text-accent">
-                        {row.price}
-                      </span>
+                      <span className="rounded-md bg-paper px-2 py-0.5 text-xs font-bold text-accent">{row.price}</span>
                     )}
                   </div>
                   {row.detail && <p className="text-xs text-mute leading-relaxed">{row.detail}</p>}
@@ -236,4 +239,3 @@ export function BioCatalogEditor({
     </div>
   );
 }
-

@@ -29,9 +29,7 @@ const FIREBASE_CLI_OAUTH = {
 };
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const sessions = JSON.parse(
-  fs.readFileSync(path.join(here, "data", "spark-festival-2026-sessions.json"), "utf8"),
-);
+const sessions = JSON.parse(fs.readFileSync(path.join(here, "data", "spark-festival-2026-sessions.json"), "utf8"));
 
 function stripUndefined(value) {
   if (Array.isArray(value)) return value.map(stripUndefined);
@@ -48,7 +46,8 @@ function stripUndefined(value) {
 function firestoreValue(value) {
   if (value === null) return { nullValue: null };
   if (typeof value === "boolean") return { booleanValue: value };
-  if (typeof value === "number") return Number.isInteger(value) ? { integerValue: String(value) } : { doubleValue: value };
+  if (typeof value === "number")
+    return Number.isInteger(value) ? { integerValue: String(value) } : { doubleValue: value };
   if (typeof value === "string") return { stringValue: value };
   if (Array.isArray(value)) return { arrayValue: { values: value.map(firestoreValue) } };
   if (value && typeof value === "object") {

@@ -388,11 +388,7 @@ export function inviteToPlanRemote(data: InviteToPlanRequest) {
   return callFunction<InviteToPlanRequest, InviteToPlanResponse>(CALLABLES.inviteToPlan, data);
 }
 
-export function scheduleCatchUpRemote(data: {
-  catchupId: string;
-  action: "open" | "accept";
-  slotId?: string;
-}) {
+export function scheduleCatchUpRemote(data: { catchupId: string; action: "open" | "accept"; slotId?: string }) {
   return callFunction<
     typeof data,
     {

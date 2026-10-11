@@ -37,9 +37,7 @@ export type HapticStyle = "light" | "medium" | "heavy" | "success" | "warning" |
  * Trigger subtle, tactile haptic feedback on native devices.
  * Gracefully degrades to a silent no-op or web vibration.
  */
-export async function triggerHaptic(
-  style: HapticStyle = "light",
-): Promise<void> {
+export async function triggerHaptic(style: HapticStyle = "light"): Promise<void> {
   if (!isNativeApp()) {
     if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
       try {

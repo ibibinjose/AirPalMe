@@ -1,7 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearch } from "wouter";
 import { collection, doc, getDoc, getDocs, limit, query, where } from "firebase/firestore";
-import { ArrowLeft, BadgeCheck, CalendarDays, CheckCircle2, Copy, Gift, MapPin, QrCode, Share2, Trophy, User } from "lucide-react";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  CalendarDays,
+  CheckCircle2,
+  Copy,
+  Gift,
+  MapPin,
+  QrCode,
+  Share2,
+  Trophy,
+  User,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { AirPalMascot } from "@/components/brand/AirPalMascot";
@@ -144,7 +156,10 @@ export function PromotionDetailPage({ kind }: { kind?: "giveaway" | "promotion" 
 
   async function enter() {
     if (
-      !requireUser("Sign in to enter this giveaway — your spot is saved when you return.", id ? { kind: "enter-promotion", id } : undefined)
+      !requireUser(
+        "Sign in to enter this giveaway — your spot is saved when you return.",
+        id ? { kind: "enter-promotion", id } : undefined,
+      )
     )
       return;
     await doEnter();
@@ -166,7 +181,10 @@ export function PromotionDetailPage({ kind }: { kind?: "giveaway" | "promotion" 
 
   async function redeem() {
     if (
-      !requireUser("Sign in to redeem this offer — it's saved for you when you return.", id ? { kind: "redeem-promotion", id } : undefined)
+      !requireUser(
+        "Sign in to redeem this offer — it's saved for you when you return.",
+        id ? { kind: "redeem-promotion", id } : undefined,
+      )
     )
       return;
     await doRedeem();
@@ -322,9 +340,7 @@ export function PromotionDetailPage({ kind }: { kind?: "giveaway" | "promotion" 
             <CheckCircle2 size={28} className="mx-auto mt-2 text-emerald-600" />
             <p className="font-display mt-1 text-lg font-bold">Entry confirmed</p>
             {founderNumber !== null && (
-              <p className="font-display mt-1 text-3xl font-black text-ink">
-                #{founderNumber.toLocaleString("en-AU")}
-              </p>
+              <p className="font-display mt-1 text-3xl font-black text-ink">#{founderNumber.toLocaleString("en-AU")}</p>
             )}
             <p className="mt-0.5 text-sm text-mute">
               Reference <span className="font-mono font-bold text-ink">{reference}</span>
@@ -361,9 +377,7 @@ export function PromotionDetailPage({ kind }: { kind?: "giveaway" | "promotion" 
       {activeVoucherCode && (
         <div className="mt-4 rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
           <div className="flex items-center justify-between pb-3 border-b border-line/60">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-accent">
-              Voucher Breakdown
-            </span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-accent">Voucher Breakdown</span>
             <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
               Ready to Redeem
             </span>

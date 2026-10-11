@@ -58,7 +58,10 @@ async function loadProperty(propertyId: string, callerUid?: string): Promise<Rec
   const snap = await db.collection("properties").doc(propertyId).get();
   if (!snap.exists) {
     // If this is a personal/business workspace for a signed-in user, auto-initialize
-    if (callerUid && (propertyId === callerUid || propertyId === `usr_${callerUid}` || propertyId === `prop_${callerUid}`)) {
+    if (
+      callerUid &&
+      (propertyId === callerUid || propertyId === `usr_${callerUid}` || propertyId === `prop_${callerUid}`)
+    ) {
       const initial: Record<string, unknown> = {
         id: propertyId,
         ownerId: callerUid,
@@ -179,9 +182,10 @@ export const getBioPulse = onCall(CALLABLE, async (request) => {
   return {
     found: true as const,
     publicToken,
-    title: String(
-      (pulse.branding as { title?: string } | undefined)?.title || pulse.name || "How is your stay?",
-    ).slice(0, 80),
+    title: String((pulse.branding as { title?: string } | undefined)?.title || pulse.name || "How is your stay?").slice(
+      0,
+      80,
+    ),
     propertyName: String(propSnap.data()?.name || "AirPal stay"),
   };
 });
@@ -502,11 +506,9 @@ export const acknowledgePulseIssue = onCall(CALLABLE, async (request) => {
   const row = snap.data() || {};
   if (row.status === "resolved") throw new HttpsError("failed-precondition", "Issue already resolved.");
 
-  const assignee =
-    typeof data.assigneeUid === "string" && data.assigneeUid ? data.assigneeUid : uid;
+  const assignee = typeof data.assigneeUid === "string" && data.assigneeUid ? data.assigneeUid : uid;
   if (assignee !== uid) {
-    const members =
-      prop.members && typeof prop.members === "object" ? (prop.members as Record<string, unknown>) : {};
+    const members = prop.members && typeof prop.members === "object" ? (prop.members as Record<string, unknown>) : {};
     if (assignee !== prop.ownerId && !members[assignee]) {
       throw new HttpsError("invalid-argument", "Assignee is not on this property team.");
     }
@@ -548,7 +550,9 @@ export const resolvePulseIssue = onCall(CALLABLE, async (request) => {
   const data = (request.data || {}) as Record<string, unknown>;
   const propertyId = String(data.propertyId || "").trim();
   const issueId = String(data.issueId || "").trim();
-  const resolutionNote = String(data.resolutionNote || "").trim().slice(0, 500);
+  const resolutionNote = String(data.resolutionNote || "")
+    .trim()
+    .slice(0, 500);
   if (!propertyId || !issueId) throw new HttpsError("invalid-argument", "propertyId and issueId are required.");
 
   const prop = await loadProperty(propertyId, uid);
@@ -624,11 +628,7 @@ export const setPulseStatus = onCall(CALLABLE, async (request) => {
   const publicToken = String(row.activePublicToken || "");
   const nowIso = new Date().toISOString();
   const batch = db.batch();
-  batch.set(
-    pulseRef,
-    { status, updatedAt: FieldValue.serverTimestamp(), updatedAtIso: nowIso },
-    { merge: true },
-  );
+  batch.set(pulseRef, { status, updatedAt: FieldValue.serverTimestamp(), updatedAtIso: nowIso }, { merge: true });
   const active = status === "live";
   if (deploymentId) {
     batch.set(
@@ -743,16 +743,21 @@ export const onPulseIssueCreated = onDocumentCreated(
     const tokens: string[] = [];
 
     for (const hostUid of uids) {
-      await db.collection("users").doc(hostUid).collection("hostAlerts").doc(issueId).set({
-        type: "pulse_issue",
-        propertyId,
-        issueId,
-        pulseId: String(data.pulseId || ""),
-        title,
-        body,
-        createdAt: FieldValue.serverTimestamp(),
-        read: false,
-      });
+      await db
+        .collection("users")
+        .doc(hostUid)
+        .collection("hostAlerts")
+        .doc(issueId)
+        .set({
+          type: "pulse_issue",
+          propertyId,
+          issueId,
+          pulseId: String(data.pulseId || ""),
+          title,
+          body,
+          createdAt: FieldValue.serverTimestamp(),
+          read: false,
+        });
       const tokSnap = await db.collection("users").doc(hostUid).collection("fcmTokens").get();
       for (const row of tokSnap.docs) {
         const token = String(row.data().token || "");

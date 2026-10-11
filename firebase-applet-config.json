@@ -1,11 +1,11 @@
 {
-  "projectId": "gen-lang-client-0756762752",
-  "appId": "1:54479546588:web:1ddf176311a825e7ec6c19",
-  "apiKey": "AIzaSyC7dY1qjtWQ3ca2Curkosg93si04fe-kiM",
-  "authDomain": "gen-lang-client-0756762752.firebaseapp.com",
-  "storageBucket": "gen-lang-client-0756762752.firebasestorage.app",
-  "messagingSenderId": "54479546588",
-  "measurementId": "",
-  "oAuthClientId": "54479546588-7viugvs45mi14fikvbopmk46adk1pub9.apps.googleusercontent.com",
+  "projectId": "airpalme-app",
+  "appId": "1:265455282950:web:f9f883965b782d87cacc87",
+  "apiKey": "AIzaSyAaSH4p-2BEeEB2Xh08qRKESY02TsPJObo",
+  "authDomain": "airpalme-app.firebaseapp.com",
+  "storageBucket": "airpalme-app.firebasestorage.app",
+  "messagingSenderId": "265455282950",
+  "measurementId": "G-0SQKWXLDLV",
+  "oAuthClientId": "265455282950-b4qn7ecibbumqo052lkf6j587so1tg5i.apps.googleusercontent.com",
   "recaptchaSiteKey": ""
 }

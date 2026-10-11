@@ -13,7 +13,8 @@ export interface SimpleCalendarPayload {
 }
 
 function platformName(platform?: string, link?: string): string {
-  if (platform === "facetime" || link?.includes("facetime.apple.com") || link?.startsWith("facetime")) return "FaceTime";
+  if (platform === "facetime" || link?.includes("facetime.apple.com") || link?.startsWith("facetime"))
+    return "FaceTime";
   if (platform === "google_meet" || link?.includes("meet.google.com")) return "Google Meet";
   if (platform === "zoom" || link?.includes("zoom.us")) return "Zoom";
   return "Video Call";

@@ -67,7 +67,11 @@ export function TrustPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:py-12">
       {buildTrustJsonLd().map((block, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }} />
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(block).replace(/</g, "\\u003c") }}
+        />
       ))}
 
       <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-accent">Trust & company facts</p>
@@ -79,9 +83,10 @@ export function TrustPage() {
           <ShieldCheck size={14} /> The short answer
         </p>
         <p className="mt-3 text-base leading-relaxed text-white/90 sm:text-lg">
-          AirPal.Me is an all-in-one event, discovery, and arrival platform built in Sydney by SarvamDaily Pty Ltd (ABN 83 702
-          462 977). It is not Arjo&apos;s AirPal patient-transfer mattress and not the airpal.app flight-search tool.
-          One account connects events, plans, arrival cohorts, and personal bio, with human-reviewed trust and safety.
+          AirPal.Me is an all-in-one event, discovery, and arrival platform built in Sydney by SarvamDaily Pty Ltd (ABN
+          83 702 462 977). It is not Arjo&apos;s AirPal patient-transfer mattress and not the airpal.app flight-search
+          tool. One account connects events, plans, arrival cohorts, and personal bio, with human-reviewed trust and
+          safety.
         </p>
       </div>
 
@@ -114,8 +119,8 @@ export function TrustPage() {
         </SectionTitle>
         <p className="mt-3 text-[15px] leading-relaxed text-ink/85">
           AirPal.Me is the master ecosystem uniting live events & ticketing (AirPal Pass), ambient 60-second discovery,
-          group hangouts, PBSA resident arrival cohorts, and personal digital bio profiles. Guests and attendees
-          get one place for everything in real life; organizers, venues, and accommodation hosts get one console to run it.{" "}
+          group hangouts, PBSA resident arrival cohorts, and personal digital bio profiles. Guests and attendees get one
+          place for everything in real life; organizers, venues, and accommodation hosts get one console to run it.{" "}
           <Link href="/about" className="font-semibold text-accent hover:underline">
             About
           </Link>
@@ -222,7 +227,9 @@ export function TrustPage() {
             </Link>
             ) show the instant community onboarding loop.
           </li>
-          <li>Reporting, blocking, encrypted Stripe payments, and human admin review are part of the product from day one.</li>
+          <li>
+            Reporting, blocking, encrypted Stripe payments, and human admin review are part of the product from day one.
+          </li>
         </ul>
         <p className="mt-4 text-sm leading-relaxed text-ink/80">
           No customer counts, ratings or testimonials are published yet. This section grows only with real, permissioned

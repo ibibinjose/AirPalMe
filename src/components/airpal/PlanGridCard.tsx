@@ -37,10 +37,7 @@ export function PlanGridCard({ plan, dimmed = false }: { plan: HangoutPlan; dimm
       onClick={() => {
         void triggerHaptic("light");
       }}
-      className={cn(
-        "group block text-left transition active:scale-[0.98]",
-        dimmed && "opacity-80",
-      )}
+      className={cn("group block text-left transition active:scale-[0.98]", dimmed && "opacity-80")}
     >
       <div className="relative aspect-square overflow-hidden rounded-[20px] bg-paper shadow-[0_4px_16px_rgba(18,22,20,0.10)] ring-1 ring-line">
         {plan.heroImage ? (

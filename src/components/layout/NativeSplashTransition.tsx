@@ -72,4 +72,3 @@ export function NativeSplashTransition({ holdDuration = 250, fadeDuration = 350 
     </div>
   );
 }
-

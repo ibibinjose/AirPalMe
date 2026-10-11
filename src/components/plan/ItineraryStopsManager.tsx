@@ -23,12 +23,7 @@ import { cn } from "@/lib/cn";
 import { getPlace } from "@/lib/catalog";
 import { useListings } from "@/contexts/ListingsContext";
 import type { BioClaim } from "@/lib/bio-claims";
-import {
-  claimThreadDeal,
-  loadThreadDealClaim,
-  threadDealForStop,
-  type ThreadDeal,
-} from "@/lib/thread-deals";
+import { claimThreadDeal, loadThreadDealClaim, threadDealForStop, type ThreadDeal } from "@/lib/thread-deals";
 
 export interface ItineraryStopData {
   id?: string;

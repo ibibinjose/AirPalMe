@@ -1,13 +1,15 @@
 # AirPal Bio — Public Bio & Networking Profile (`/@handle`)
+
 > **Specification, Architecture & Implementation Blueprint** for the shipped bio surface at `airpal.me/@handle` (`src/pages/BioPublicPage.tsx`). There is no separate `airpal.bio` domain or standalone app — bios live inside AirPal.Me (web + native shells).
 
 ---
 
 ## 1. Product Overview
 
-**AirPal.Bio** is a personal and professional identity surface designed for seamless in-person networking, contact exchange, meeting coordination, and digital presence. 
+**AirPal.Bio** is a personal and professional identity surface designed for seamless in-person networking, contact exchange, meeting coordination, and digital presence.
 
 Every user or verified venue/business claims a unique `@handle` (e.g. `airpal.me/@alex`) that serves as:
+
 1. **Digital Business Card**: Instant contact saving (.vcf / vCard 3.0) directly into native iOS and Android Contacts apps without requiring the recipient to install an app.
 2. **Real-Time Availability Hub**: Live status rings (🟢 Available, 🔴 Busy, ⛔ DND, 🟡 BRB, 🟠 Away, ⚪ Offline) with custom activity text (e.g. `"☕ Grabbing coffee in Surry Hills"`).
 3. **Meet & Catch-Up Engine**: Frictionless inbound proposal system for 1-on-1 coffees (`Catch Up`), business chats (`Meeting`), or group plans (`Hangout`) with instant calendar export (Apple, Google, Outlook, iCal).
@@ -20,6 +22,7 @@ Every user or verified venue/business claims a unique `@handle` (e.g. `airpal.me
 ## 2. Design System & Aesthetics
 
 AirPal.Bio follows the **Liquid Glass** aesthetic:
+
 - **Primary Color**: AirPal Blue (`#1805db` / `rgb(24, 5, 219)`)
 - **Accent Color**: AirPal Blue accent (`text-accent`); the legacy `--color-gold` token resolves to brand blue in the shipped theme, so `text-gold` samples below render blue, not gold.
 - **Backgrounds**: Multi-layered glassmorphic cards (`bg-card/95 backdrop-blur-xl ring-1 ring-line/80 shadow-clay`) over subtle gradient meshes.
@@ -176,7 +179,7 @@ export interface BioProfile {
   starTier?: string; // e.g. "★ Rising Mate"
   phone?: string;
   domain?: string;
-  
+
   // Real-time status
   availabilityStatus?: AvailabilityStatus;
   customStatus?: string;
@@ -212,8 +215,8 @@ export interface CatchUpItem {
   requesterPhone?: string;
   requesterEmail?: string;
   type: CatchUpType;
-  date: string;       // YYYY-MM-DD
-  time: string;       // HH:mm
+  date: string; // YYYY-MM-DD
+  time: string; // HH:mm
   venue?: string;
   notes?: string;
   status: "pending" | "accepted" | "declined" | "dismissed";
@@ -226,6 +229,7 @@ export interface CatchUpItem {
 ## 4. Key Functional Features & Implementation Code
 
 ### Feature A: Universal vCard 3.0 Generator & Contact Exporter
+
 This code allows one-click saving of contacts directly into the phone's native address book. On iOS Safari, navigating directly to the vCard data URI opens the native "Create New Contact" sheet without downloading a raw file. On desktop, it downloads `.vcf`.
 
 ```typescript
@@ -268,7 +272,11 @@ export function buildVCard(input: VCardInput): string {
 
 export function downloadVCard(input: VCardInput): void {
   const vcardText = buildVCard(input);
-  const cleanName = input.name.trim().replace(/[^\w\- ]+/g, "").replace(/\s+/g, "-") || "Contact";
+  const cleanName =
+    input.name
+      .trim()
+      .replace(/[^\w\- ]+/g, "")
+      .replace(/\s+/g, "-") || "Contact";
   const fileName = `${cleanName}.vcf`;
   const blob = new Blob([vcardText], { type: "text/vcard;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -299,6 +307,7 @@ export async function openVCardContact(input: VCardInput): Promise<"contact" | "
 ---
 
 ### Feature B: Fast QR Code Generation & Share Suite
+
 Generates on-the-fly vector/canvas QR codes using standard libraries like `qrcode` or native SVG renderers.
 
 ```typescript
@@ -318,6 +327,7 @@ export async function makeQrDataUrl(text: string, size = 360): Promise<string> {
 ```
 
 **Share Modal Workflow:**
+
 1. Renders high-contrast QR code for instant camera scanning.
 2. 1-tap "Copy Link" with instant visual confirmation (`Copied ✓`).
 3. 1-tap "Share" triggering `navigator.share({ title, text, url })` with fallback to clipboard.
@@ -326,18 +336,20 @@ export async function makeQrDataUrl(text: string, size = 360): Promise<string> {
 ---
 
 ### Feature C: Interactive Action Bar
+
 Four primary round or square touch targets placed right under the avatar and bio summary:
 
-| Button | Target Action | Logic / URL Scheme |
-|---|---|---|
-| **Chat** | In-app Direct Messaging | Opens universal chat thread for `@handle` |
-| **Website** | Primary Canonical URL | `target="_blank"` link to personal portfolio or company |
-| **WhatsApp** | 1-Tap WhatsApp Chat | `https://wa.me/<cleaned_phone>` |
-| **Call** | Direct Telephone Dial | `tel:<cleaned_phone>` |
+| Button       | Target Action           | Logic / URL Scheme                                      |
+| ------------ | ----------------------- | ------------------------------------------------------- |
+| **Chat**     | In-app Direct Messaging | Opens universal chat thread for `@handle`               |
+| **Website**  | Primary Canonical URL   | `target="_blank"` link to personal portfolio or company |
+| **WhatsApp** | 1-Tap WhatsApp Chat     | `https://wa.me/<cleaned_phone>`                         |
+| **Call**     | Direct Telephone Dial   | `tel:<cleaned_phone>`                                   |
 
 ---
 
 ### Feature D: Meet & Catch-Up Proposal System
+
 Allows any visitor to request an in-person catch-up or virtual meeting:
 
 1. **Catch Up (☕)**: Casual 1-on-1 coffee or drink.
@@ -345,6 +357,7 @@ Allows any visitor to request an in-person catch-up or virtual meeting:
 3. **Hangout (👥)**: Social group outing or event.
 
 When a proposal is submitted, the profile owner can inspect it in their **Inbox** and sync it with one tap to their personal calendar using standard calendar links:
+
 - **Google Calendar URL**: `https://calendar.google.com/calendar/render?action=TEMPLATE&text=...`
 - **Apple / Outlook (.ics)**: Standard iCalendar blob download.
 
@@ -376,7 +389,9 @@ export function buildGoogleCalendarUrl(event: {
 ---
 
 ### Feature E: "Remind Me to Catch Up" Button
+
 For visitors browsing contacts:
+
 - Tapping **"Remind me"** sets a local or server reminder (`toggleCatchUpReminder`).
 - Stores the target `@handle` in the visitor's local "People I Met" registry.
 - Visual badge switches to `"Reminder on ✓"` with a pulsing amber light.
@@ -384,14 +399,14 @@ For visitors browsing contacts:
 ---
 
 ### Feature F: Viral Invite Code Banner
+
 Positioned right below the contact deck:
+
 ```html
 <div class="rounded-2xl bg-gold/10 p-3.5 ring-1 ring-gold/30">
   <p class="text-[11px] font-bold uppercase tracking-wider text-gold">Join with Alex's code</p>
   <div class="mt-2 flex items-center gap-2">
-    <code class="rounded-xl bg-card px-3 py-2 text-sm font-bold text-ink ring-1 ring-line/70">
-      @alex
-    </code>
+    <code class="rounded-xl bg-card px-3 py-2 text-sm font-bold text-ink ring-1 ring-line/70"> @alex </code>
     <button class="rounded-xl bg-card px-3.5 text-xs font-semibold">Copy</button>
     <button class="rounded-xl bg-ink px-3.5 text-xs font-semibold text-white">Invite</button>
   </div>
@@ -508,6 +523,7 @@ export function getBioMetaTags(bio: BioProfile, publicUrl: string) {
 ## 7. Handle Claiming & 404 State
 
 When a visitor lands on an unreserved or uncreated handle (e.g. `airpal.me/@newmate`):
+
 - Show a friendly **"Available Handle"** card:
   - Header: `@{handle} is available!`
   - Subtitle: `"This AirPal handle hasn't been set up yet. Be the first to claim @{handle} and launch your public bio page."`

@@ -41,4 +41,3 @@ export const ECOSYSTEM = {
     path: "/pass",
   },
 } as const;
-

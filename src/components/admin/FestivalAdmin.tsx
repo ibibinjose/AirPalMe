@@ -77,9 +77,15 @@ export function FestivalAdmin() {
       ) : (
         <ul className="mt-3 space-y-2">
           {visible.map((row) => (
-            <li key={row.slug} className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-paper px-3 py-2 ring-1 ring-line/60">
+            <li
+              key={row.slug}
+              className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-paper px-3 py-2 ring-1 ring-line/60"
+            >
               <span className="min-w-0 text-[13px]">
-                <Link href={`/events?q=${encodeURIComponent(row.name || row.slug)}`} className="font-semibold text-ink hover:underline">
+                <Link
+                  href={`/events?q=${encodeURIComponent(row.name || row.slug)}`}
+                  className="font-semibold text-ink hover:underline"
+                >
                   {row.name}
                 </Link>
                 <span className="text-mute">

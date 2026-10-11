@@ -196,25 +196,28 @@ describe("booking engine", () => {
   });
 
   it("guards paid refunds before any money moves", () => {
-    const held = { paymentStatus: "paid" as const, payoutStatus: "held" as const, providerUid: "host-1", status: "confirmed" as const };
+    const held = {
+      paymentStatus: "paid" as const,
+      payoutStatus: "held" as const,
+      providerUid: "host-1",
+      status: "confirmed" as const,
+    };
     expect(canRefundPaid(held, "host-1", false)).toBe(null);
     expect(canRefundPaid(held, "admin-1", true)).toBe(null);
     expect(canRefundPaid(held, "stranger", false)).toBe("Only the provider can refund this booking.");
-    expect(
-      canRefundPaid({ ...held, paymentStatus: "unpaid" }, "host-1", false),
-    ).toBe("There is no completed payment to refund.");
-    expect(
-      canRefundPaid({ ...held, payoutStatus: "transferred" }, "host-1", false),
-    ).toBe("Already paid out — contact support.");
+    expect(canRefundPaid({ ...held, paymentStatus: "unpaid" }, "host-1", false)).toBe(
+      "There is no completed payment to refund.",
+    );
+    expect(canRefundPaid({ ...held, payoutStatus: "transferred" }, "host-1", false)).toBe(
+      "Already paid out — contact support.",
+    );
     expect(canRefundPaid({ ...held, status: "refunded" }, "host-1", false)).toBe("Already refunded.");
   });
 
   it("pays the provider from the server-stamped fee", () => {
     expect(providerShareCents({ priceCents: 8000, feeCents: 1200 })).toBe(6800);
     // Legacy rows without a stamped fee fall back to the config quote.
-    expect(providerShareCents({ priceCents: 8000, feeCents: NaN })).toBe(
-      quoteFees(8000).providerCents,
-    );
+    expect(providerShareCents({ priceCents: 8000, feeCents: NaN })).toBe(quoteFees(8000).providerCents);
   });
 
   it("detects Stripe cancel returns in both param spellings", () => {
@@ -266,18 +269,18 @@ describe("booking engine", () => {
   });
 
   it("admits paid-and-open bookings, refuses everything else with a reason", () => {
-    expect(
-      ticketAdmitCheck({ paymentStatus: "paid", priceCents: 8000, status: "confirmed" }),
-    ).toEqual({ valid: true });
+    expect(ticketAdmitCheck({ paymentStatus: "paid", priceCents: 8000, status: "confirmed" })).toEqual({ valid: true });
     expect(ticketAdmitCheck({ paymentStatus: "unpaid", priceCents: 0, status: "pending" })).toEqual({
       valid: true,
     });
-    expect(
-      ticketAdmitCheck({ paymentStatus: "unpaid", priceCents: 8000, status: "confirmed" }),
-    ).toEqual({ valid: false, reason: "unpaid" });
-    expect(ticketAdmitCheck({ paymentStatus: "paid", priceCents: 8000, status: "cancelled" })).toEqual(
-      { valid: false, reason: "cancelled" },
-    );
+    expect(ticketAdmitCheck({ paymentStatus: "unpaid", priceCents: 8000, status: "confirmed" })).toEqual({
+      valid: false,
+      reason: "unpaid",
+    });
+    expect(ticketAdmitCheck({ paymentStatus: "paid", priceCents: 8000, status: "cancelled" })).toEqual({
+      valid: false,
+      reason: "cancelled",
+    });
     expect(ticketAdmitCheck({ paymentStatus: "paid", priceCents: 8000, status: "refunded" })).toEqual({
       valid: false,
       reason: "refunded",
@@ -286,9 +289,10 @@ describe("booking engine", () => {
       valid: false,
       reason: "disputed",
     });
-    expect(ticketAdmitCheck({ paymentStatus: "paid", priceCents: 8000, status: "completed" })).toEqual(
-      { valid: false, reason: "completed" },
-    );
+    expect(ticketAdmitCheck({ paymentStatus: "paid", priceCents: 8000, status: "completed" })).toEqual({
+      valid: false,
+      reason: "completed",
+    });
   });
 
   it("words every refusal for gate staff", () => {

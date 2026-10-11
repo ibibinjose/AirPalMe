@@ -37,14 +37,7 @@ export const PLACE_CATEGORY_LABELS: Record<PlaceCategory, string> = {
 export type Geo = { lat: number; lng: number };
 
 /** D3 commercial stay kinds; residential stays stay out until legal compliance lands. */
-export type PropertyTradeKind =
-  | "hotel"
-  | "motel"
-  | "serviced-apartment"
-  | "hostel"
-  | "boutique"
-  | "campus"
-  | "venue";
+export type PropertyTradeKind = "hotel" | "motel" | "serviced-apartment" | "hostel" | "boutique" | "campus" | "venue";
 
 export type MarkerDoc = {
   id: string;

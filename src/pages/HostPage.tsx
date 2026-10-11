@@ -241,11 +241,7 @@ export function HostPage() {
             <h1 className="font-display mt-1 text-3xl font-semibold tracking-tight md:text-4xl">{liveName}</h1>
             {property.tagline ? <p className="mt-1 text-sm text-mute">{property.tagline}</p> : null}
           </div>
-          <Button
-            variant="ghost"
-            className="h-11"
-            onClick={() => nav("/join")}
-          >
+          <Button variant="ghost" className="h-11" onClick={() => nav("/join")}>
             Arrival Portal <ExternalLink size={14} className="opacity-70" />
           </Button>
         </header>
@@ -274,7 +270,10 @@ export function HostPage() {
           layout="contained"
           ariaLabel="Host sections"
           className="mt-5"
-          items={["today", "belonging", "facilities", "dining", "rooms", "place", "print"].map((t) => ({ id: t as Tab, label: t === "belonging" ? "Belonging Report" : t }))}
+          items={["today", "belonging", "facilities", "dining", "rooms", "place", "print"].map((t) => ({
+            id: t as Tab,
+            label: t === "belonging" ? "Belonging Report" : t,
+          }))}
           active={tab}
           onChange={setTab}
         />

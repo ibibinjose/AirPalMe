@@ -1,31 +1,7 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
-import {
-  collection,
-  getDocs,
-  limit as fsLimit,
-  orderBy,
-  query as fsQuery,
-} from "firebase/firestore";
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  Cell,
-} from "recharts";
-import {
-  BarChart3,
-  Calendar,
-  Search,
-  RefreshCw,
-  TrendingUp,
-  Sparkles,
-  ArrowUpRight,
-  Filter,
-} from "lucide-react";
+import { collection, getDocs, limit as fsLimit, orderBy, query as fsQuery } from "firebase/firestore";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from "recharts";
+import { BarChart3, Calendar, Search, RefreshCw, TrendingUp, Sparkles, ArrowUpRight, Filter } from "lucide-react";
 import { getFirebaseDb, isFirebaseConfigured } from "@/lib/firebase";
 import { toZonedDateStr } from "@/lib/local-time";
 import { Button } from "@/components/ui/Button";
@@ -55,18 +31,102 @@ interface RawSearchLog {
 
 // Curated baseline data reflecting high-volume Sydney queries over a 30-day window
 const SEED_QUERIES_30D: SearchQueryItem[] = [
-  { id: "bondi-beach", query: "Bondi Beach", normalized: "bondi-beach", count: 184, category: "places", city: "Sydney" },
-  { id: "surry-hills-cafe", query: "Surry Hills Cafe", normalized: "surry-hills-cafe", count: 162, category: "places", city: "Sydney" },
-  { id: "live-music-tonight", query: "Live Music Tonight", normalized: "live-music-tonight", count: 139, category: "events", city: "Sydney" },
-  { id: "harbour-view-hotel", query: "Harbour View Hotel", normalized: "harbour-view-hotel", count: 118, category: "stay", city: "Sydney" },
-  { id: "morning-running-mate", query: "Morning Running Mate", normalized: "morning-running-mate", count: 104, category: "people", city: "Sydney" },
-  { id: "coffee-walk", query: "Coffee & Walk", normalized: "coffee-walk", count: 91, category: "places", city: "Sydney" },
-  { id: "botanic-gardens-picnic", query: "Botanic Gardens Picnic", normalized: "botanic-gardens-picnic", count: 78, category: "places", city: "Sydney" },
-  { id: "contemporary-art-gallery", query: "Contemporary Art Gallery", normalized: "contemporary-art-gallery", count: 65, category: "events", city: "Sydney" },
-  { id: "manly-ferry-sunset", query: "Manly Ferry Sunset", normalized: "manly-ferry-sunset", count: 54, category: "experiences", city: "Sydney" },
-  { id: "dinner-companion", query: "Dinner Companion", normalized: "dinner-companion", count: 47, category: "people", city: "Sydney" },
-  { id: "rooftop-cocktails", query: "Rooftop Cocktails", normalized: "rooftop-cocktails", count: 41, category: "places", city: "Sydney" },
-  { id: "weekend-bushwalk", query: "Weekend Bushwalk", normalized: "weekend-bushwalk", count: 36, category: "experiences", city: "Sydney" },
+  {
+    id: "bondi-beach",
+    query: "Bondi Beach",
+    normalized: "bondi-beach",
+    count: 184,
+    category: "places",
+    city: "Sydney",
+  },
+  {
+    id: "surry-hills-cafe",
+    query: "Surry Hills Cafe",
+    normalized: "surry-hills-cafe",
+    count: 162,
+    category: "places",
+    city: "Sydney",
+  },
+  {
+    id: "live-music-tonight",
+    query: "Live Music Tonight",
+    normalized: "live-music-tonight",
+    count: 139,
+    category: "events",
+    city: "Sydney",
+  },
+  {
+    id: "harbour-view-hotel",
+    query: "Harbour View Hotel",
+    normalized: "harbour-view-hotel",
+    count: 118,
+    category: "stay",
+    city: "Sydney",
+  },
+  {
+    id: "morning-running-mate",
+    query: "Morning Running Mate",
+    normalized: "morning-running-mate",
+    count: 104,
+    category: "people",
+    city: "Sydney",
+  },
+  {
+    id: "coffee-walk",
+    query: "Coffee & Walk",
+    normalized: "coffee-walk",
+    count: 91,
+    category: "places",
+    city: "Sydney",
+  },
+  {
+    id: "botanic-gardens-picnic",
+    query: "Botanic Gardens Picnic",
+    normalized: "botanic-gardens-picnic",
+    count: 78,
+    category: "places",
+    city: "Sydney",
+  },
+  {
+    id: "contemporary-art-gallery",
+    query: "Contemporary Art Gallery",
+    normalized: "contemporary-art-gallery",
+    count: 65,
+    category: "events",
+    city: "Sydney",
+  },
+  {
+    id: "manly-ferry-sunset",
+    query: "Manly Ferry Sunset",
+    normalized: "manly-ferry-sunset",
+    count: 54,
+    category: "experiences",
+    city: "Sydney",
+  },
+  {
+    id: "dinner-companion",
+    query: "Dinner Companion",
+    normalized: "dinner-companion",
+    count: 47,
+    category: "people",
+    city: "Sydney",
+  },
+  {
+    id: "rooftop-cocktails",
+    query: "Rooftop Cocktails",
+    normalized: "rooftop-cocktails",
+    count: 41,
+    category: "places",
+    city: "Sydney",
+  },
+  {
+    id: "weekend-bushwalk",
+    query: "Weekend Bushwalk",
+    normalized: "weekend-bushwalk",
+    count: 36,
+    category: "experiences",
+    city: "Sydney",
+  },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -215,10 +275,7 @@ export function SearchQueriesDashboardTab() {
     customStart.setHours(0, 0, 0, 0);
     const customEnd = new Date(customEndDate);
     customEnd.setHours(23, 59, 59, 999);
-    const diffDays = Math.max(
-      1,
-      Math.round((customEnd.getTime() - customStart.getTime()) / (1000 * 60 * 60 * 24)),
-    );
+    const diffDays = Math.max(1, Math.round((customEnd.getTime() - customStart.getTime()) / (1000 * 60 * 60 * 24)));
     return { startDate: customStart, endDate: customEnd, daysSpan: diffDays };
   }, [datePreset, customStartDate, customEndDate]);
 
@@ -228,9 +285,7 @@ export function SearchQueriesDashboardTab() {
     const matchingLogs = rawLogs.filter((log) => {
       const t = log.timestamp.getTime();
       const inDateRange = t >= startDate.getTime() && t <= endDate.getTime();
-      const inCategory =
-        selectedCategory === "all" ||
-        log.category?.toLowerCase() === selectedCategory.toLowerCase();
+      const inCategory = selectedCategory === "all" || log.category?.toLowerCase() === selectedCategory.toLowerCase();
       return inDateRange && inCategory;
     });
 
@@ -344,11 +399,7 @@ export function SearchQueriesDashboardTab() {
               <RefreshCw size={13} className={cn(refreshing && "animate-spin text-accent")} />
               <span>Refresh</span>
             </Button>
-            <Button
-              size="sm"
-              onClick={() => nav("/now")}
-              className="rounded-full text-xs font-bold gap-1 shadow-xs"
-            >
+            <Button size="sm" onClick={() => nav("/now")} className="rounded-full text-xs font-bold gap-1 shadow-xs">
               <Search size={13} />
               <span>Test Search</span>
             </Button>
@@ -398,9 +449,7 @@ export function SearchQueriesDashboardTab() {
                 onClick={() => setChartOrientation("horizontal")}
                 className={cn(
                   "rounded-lg px-2.5 py-1 text-xs transition cursor-pointer",
-                  chartOrientation === "horizontal"
-                    ? "bg-card text-ink font-bold shadow-2xs"
-                    : "hover:text-ink",
+                  chartOrientation === "horizontal" ? "bg-card text-ink font-bold shadow-2xs" : "hover:text-ink",
                 )}
               >
                 Horizontal Bars
@@ -410,9 +459,7 @@ export function SearchQueriesDashboardTab() {
                 onClick={() => setChartOrientation("vertical")}
                 className={cn(
                   "rounded-lg px-2.5 py-1 text-xs transition cursor-pointer",
-                  chartOrientation === "vertical"
-                    ? "bg-card text-ink font-bold shadow-2xs"
-                    : "hover:text-ink",
+                  chartOrientation === "vertical" ? "bg-card text-ink font-bold shadow-2xs" : "hover:text-ink",
                 )}
               >
                 Vertical Bars
@@ -491,9 +538,7 @@ export function SearchQueriesDashboardTab() {
       {/* 4 Metric Summary KPI Cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-mute">
-            {daysSpan}-Day Volume
-          </span>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-mute">{daysSpan}-Day Volume</span>
           <p className="font-display mt-1 text-2xl sm:text-3xl font-extrabold text-ink">
             {totalSearchCount.toLocaleString()}
           </p>
@@ -504,21 +549,18 @@ export function SearchQueriesDashboardTab() {
         </div>
 
         <div className="rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-mute">
-            #1 Top Query
-          </span>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-mute">#1 Top Query</span>
           <p className="font-display mt-1 text-lg sm:text-xl font-bold text-accent truncate" title={topQueryName}>
             &ldquo;{topQueryName}&rdquo;
           </p>
           <p className="mt-1 text-[11px] text-mute font-medium">
-            {topQueryCount.toLocaleString()} searches ({Math.round((topQueryCount / Math.max(1, totalSearchCount)) * 100)}% share)
+            {topQueryCount.toLocaleString()} searches (
+            {Math.round((topQueryCount / Math.max(1, totalSearchCount)) * 100)}% share)
           </p>
         </div>
 
         <div className="rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-mute">
-            Daily Average
-          </span>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-mute">Daily Average</span>
           <p className="font-display mt-1 text-2xl sm:text-3xl font-extrabold text-ink">
             {avgSearchesPerDay.toLocaleString()}
           </p>
@@ -526,12 +568,8 @@ export function SearchQueriesDashboardTab() {
         </div>
 
         <div className="rounded-2xl bg-card p-4 ring-1 ring-line shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-mute">
-            Unique Keywords
-          </span>
-          <p className="font-display mt-1 text-2xl sm:text-3xl font-extrabold text-ink">
-            {uniqueQueryCount}
-          </p>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-mute">Unique Keywords</span>
+          <p className="font-display mt-1 text-2xl sm:text-3xl font-extrabold text-ink">{uniqueQueryCount}</p>
           <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-accent">
             <Sparkles size={12} />
             <span>Top 10 charted below</span>
@@ -546,9 +584,7 @@ export function SearchQueriesDashboardTab() {
             <h3 className="font-display text-base sm:text-lg font-bold text-ink">
               Top 10 Search Query Volume ({daysSpan}-Day Window)
             </h3>
-            <p className="text-xs text-mute mt-0.5">
-              Ranked descending by query frequency count in Firestore
-            </p>
+            <p className="text-xs text-mute mt-0.5">Ranked descending by query frequency count in Firestore</p>
           </div>
           <div className="flex items-center gap-2 text-xs font-semibold text-mute">
             <span className="flex items-center gap-1.5">
@@ -563,18 +599,9 @@ export function SearchQueriesDashboardTab() {
           <ResponsiveContainer width="100%" height="100%">
             {chartOrientation === "horizontal" ? (
               // Horizontal Layout: query names on Y axis, bars extend horizontally to the right
-              <BarChart
-                layout="vertical"
-                data={top10Data}
-                margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
-              >
+              <BarChart layout="vertical" data={top10Data} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e4e7ee" />
-                <XAxis
-                  type="number"
-                  tick={{ fontSize: 11, fill: "#6a726c" }}
-                  axisLine={false}
-                  tickLine={false}
-                />
+                <XAxis type="number" tick={{ fontSize: 11, fill: "#6a726c" }} axisLine={false} tickLine={false} />
                 <YAxis
                   type="category"
                   dataKey="query"
@@ -585,10 +612,7 @@ export function SearchQueriesDashboardTab() {
                 />
                 <Tooltip
                   cursor={{ fill: "rgba(24, 5, 219, 0.05)" }}
-                  formatter={(val: unknown) => [
-                    `${String(val ?? 0)} searches`,
-                    "Search Volume",
-                  ]}
+                  formatter={(val: unknown) => [`${String(val ?? 0)} searches`, "Search Volume"]}
                   content={({ active, payload }) => {
                     if (!active || !payload || !payload.length) return null;
                     const item = payload[0].payload as {
@@ -597,9 +621,7 @@ export function SearchQueriesDashboardTab() {
                       searches: number;
                       category: string;
                     };
-                    const percent = Math.round(
-                      (item.searches / Math.max(1, totalSearchCount)) * 100,
-                    );
+                    const percent = Math.round((item.searches / Math.max(1, totalSearchCount)) * 100);
                     return (
                       <div className="rounded-2xl border border-line bg-card p-3 shadow-lg text-xs">
                         <div className="flex items-center gap-2 mb-1">
@@ -610,12 +632,10 @@ export function SearchQueriesDashboardTab() {
                         </div>
                         <div className="space-y-1 mt-1 text-[11px] text-mute">
                           <p>
-                            Volume:{" "}
-                            <strong className="text-ink font-bold">{item.searches}</strong> searches
+                            Volume: <strong className="text-ink font-bold">{item.searches}</strong> searches
                           </p>
                           <p>
-                            Share:{" "}
-                            <strong className="text-accent font-bold">{percent}%</strong> of top 10
+                            Share: <strong className="text-accent font-bold">{percent}%</strong> of top 10
                           </p>
                           <p className="capitalize">Vertical: {item.category}</p>
                         </div>
@@ -627,21 +647,14 @@ export function SearchQueriesDashboardTab() {
                   {top10Data.map((entry, index) => (
                     <Cell
                       key={`cell-${entry.query}-${index}`}
-                      fill={
-                        index === 0
-                          ? "#1805db"
-                          : CATEGORY_COLORS[entry.category] || "#1805db"
-                      }
+                      fill={index === 0 ? "#1805db" : CATEGORY_COLORS[entry.category] || "#1805db"}
                     />
                   ))}
                 </Bar>
               </BarChart>
             ) : (
               // Vertical Layout: queries on X axis, bars stand vertically
-              <BarChart
-                data={top10Data}
-                margin={{ top: 15, right: 15, left: -10, bottom: 45 }}
-              >
+              <BarChart data={top10Data} margin={{ top: 15, right: 15, left: -10, bottom: 45 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4e7ee" />
                 <XAxis
                   dataKey="shortQuery"
@@ -668,9 +681,7 @@ export function SearchQueriesDashboardTab() {
                       searches: number;
                       category: string;
                     };
-                    const percent = Math.round(
-                      (item.searches / Math.max(1, totalSearchCount)) * 100,
-                    );
+                    const percent = Math.round((item.searches / Math.max(1, totalSearchCount)) * 100);
                     return (
                       <div className="rounded-2xl border border-line bg-card p-3 shadow-lg text-xs">
                         <div className="flex items-center gap-2 mb-1">
@@ -681,12 +692,10 @@ export function SearchQueriesDashboardTab() {
                         </div>
                         <div className="space-y-1 mt-1 text-[11px] text-mute">
                           <p>
-                            Volume:{" "}
-                            <strong className="text-ink font-bold">{item.searches}</strong> searches
+                            Volume: <strong className="text-ink font-bold">{item.searches}</strong> searches
                           </p>
                           <p>
-                            Share:{" "}
-                            <strong className="text-accent font-bold">{percent}%</strong> of top 10
+                            Share: <strong className="text-accent font-bold">{percent}%</strong> of top 10
                           </p>
                           <p className="capitalize">Vertical: {item.category}</p>
                         </div>
@@ -698,11 +707,7 @@ export function SearchQueriesDashboardTab() {
                   {top10Data.map((entry, index) => (
                     <Cell
                       key={`v-cell-${entry.query}-${index}`}
-                      fill={
-                        index === 0
-                          ? "#1805db"
-                          : CATEGORY_COLORS[entry.category] || "#1805db"
-                      }
+                      fill={index === 0 ? "#1805db" : CATEGORY_COLORS[entry.category] || "#1805db"}
                     />
                   ))}
                 </Bar>
@@ -716,12 +721,8 @@ export function SearchQueriesDashboardTab() {
       <div className="rounded-3xl bg-card p-5 sm:p-6 ring-1 ring-line shadow-xs">
         <div className="flex items-center justify-between border-b border-line pb-4">
           <div>
-            <h3 className="font-display text-base font-bold text-ink">
-              Top 10 Ranked Keyword Breakdown
-            </h3>
-            <p className="text-xs text-mute mt-0.5">
-              Detailed list with volume share and direct search testing
-            </p>
+            <h3 className="font-display text-base font-bold text-ink">Top 10 Ranked Keyword Breakdown</h3>
+            <p className="text-xs text-mute mt-0.5">Detailed list with volume share and direct search testing</p>
           </div>
           <span className="text-xs font-bold text-mute">{top10Data.length} records</span>
         </div>
@@ -740,9 +741,7 @@ export function SearchQueriesDashboardTab() {
             </thead>
             <tbody className="divide-y divide-line/60">
               {top10Data.map((item) => {
-                const percent = Math.round(
-                  (item.searches / Math.max(1, top10Data[0]?.searches || 1)) * 100,
-                );
+                const percent = Math.round((item.searches / Math.max(1, top10Data[0]?.searches || 1)) * 100);
                 return (
                   <tr key={item.query} className="hover:bg-paper/40 transition">
                     <td className="py-3 pl-2 font-bold text-mute">
@@ -752,8 +751,8 @@ export function SearchQueriesDashboardTab() {
                           item.rank === 1
                             ? "bg-brand text-white"
                             : item.rank <= 3
-                            ? "bg-brand/10 text-accent"
-                            : "bg-paper text-mute",
+                              ? "bg-brand/10 text-accent"
+                              : "bg-paper text-mute",
                         )}
                       >
                         #{item.rank}
@@ -777,10 +776,7 @@ export function SearchQueriesDashboardTab() {
                     <td className="py-3 w-36">
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-20 rounded-full bg-paper ring-1 ring-line overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-brand"
-                            style={{ width: `${percent}%` }}
-                          />
+                          <div className="h-full rounded-full bg-brand" style={{ width: `${percent}%` }} />
                         </div>
                         <span className="text-[10px] text-mute font-medium">{percent}%</span>
                       </div>

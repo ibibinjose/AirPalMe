@@ -80,16 +80,19 @@ async function writeThread(input: {
     },
     { merge: true },
   );
-  await ref.collection("messages").doc(input.messageId).set({
-    id: input.messageId,
-    conversationId,
-    senderUid: AGENT_UID,
-    senderName: AGENT_NAME,
-    text: input.text,
-    isAi: true,
-    readBy: [] as string[],
-    createdAt: now,
-  });
+  await ref
+    .collection("messages")
+    .doc(input.messageId)
+    .set({
+      id: input.messageId,
+      conversationId,
+      senderUid: AGENT_UID,
+      senderName: AGENT_NAME,
+      text: input.text,
+      isAi: true,
+      readBy: [] as string[],
+      createdAt: now,
+    });
   return conversationId;
 }
 
@@ -190,7 +193,12 @@ export const scheduleCatchUp = onCall(CALLABLE, async (request) => {
   const slotId = str(data.slotId) || proposals[0]?.id || "";
   const chosen = proposals.find((slot) => slot.id === slotId);
   if (!chosen) throw new HttpsError("invalid-argument", "Pick one of the suggested times.");
-  if (row.status === "scheduled" && row.conversationId && str(row.date) === chosen.date && str(row.time) === chosen.time) {
+  if (
+    row.status === "scheduled" &&
+    row.conversationId &&
+    str(row.date) === chosen.date &&
+    str(row.time) === chosen.time
+  ) {
     return { ok: true, conversationId: row.conversationId, proposals, status: "scheduled", slot: chosen };
   }
   const text = catchUpThreadText({

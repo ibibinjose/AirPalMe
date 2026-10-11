@@ -21,15 +21,7 @@ export type TripStopDraft = {
  * the user's upcoming plans and appends the stop, confirming with the plan
  * name ("Added to Melbourne Trip") instead of a generic toast.
  */
-export function AddToTripSheet({
-  open,
-  onClose,
-  stop,
-}: {
-  open: boolean;
-  onClose: () => void;
-  stop: TripStopDraft;
-}) {
+export function AddToTripSheet({ open, onClose, stop }: { open: boolean; onClose: () => void; stop: TripStopDraft }) {
   const [, nav] = useLocation();
   const { myPlans, addStop } = usePlans();
   const guardRef = useRef(createSubmitGuard());

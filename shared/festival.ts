@@ -173,7 +173,9 @@ export function groupSessionsByDay<T extends FestivalSessionLike>(
   }
   return days.map((day) => ({
     day,
-    sessions: (byDate.get(day.date) || []).sort((a, b) => (a.startsAt < b.startsAt ? -1 : a.startsAt > b.startsAt ? 1 : 0)),
+    sessions: (byDate.get(day.date) || []).sort((a, b) =>
+      a.startsAt < b.startsAt ? -1 : a.startsAt > b.startsAt ? 1 : 0,
+    ),
   }));
 }
 
@@ -256,11 +258,7 @@ export function validateFestival(input: {
   if (!input.city.trim()) errors.push("City is required.");
   if (!isValidFestivalDate(input.startDate)) errors.push("Start date must be YYYY-MM-DD.");
   if (!isValidFestivalDate(input.endDate)) errors.push("End date must be YYYY-MM-DD.");
-  if (
-    isValidFestivalDate(input.startDate) &&
-    isValidFestivalDate(input.endDate) &&
-    input.endDate < input.startDate
-  ) {
+  if (isValidFestivalDate(input.startDate) && isValidFestivalDate(input.endDate) && input.endDate < input.startDate) {
     errors.push("End date cannot be before start date.");
   }
   return errors;

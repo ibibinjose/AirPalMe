@@ -141,7 +141,8 @@ function BizCircle({
   };
   const circle =
     "grid h-12 w-12 sm:h-14 sm:w-14 place-items-center rounded-[20px] sm:rounded-[24px] bg-card text-accent ring-1 ring-line/80 shadow-2xs transition-all duration-150 group-hover:ring-brand/40 group-hover:scale-105 active:scale-95";
-  const wrap = "flex min-w-[56px] sm:min-w-[64px] touch-manipulation flex-col items-center gap-1.5 group cursor-pointer";
+  const wrap =
+    "flex min-w-[56px] sm:min-w-[64px] touch-manipulation flex-col items-center gap-1.5 group cursor-pointer";
   const caption = "text-[11px] sm:text-xs font-semibold text-ink/90 group-hover:text-accent transition-colors";
 
   if (href) {
@@ -462,9 +463,7 @@ export function BioPublicPage() {
     (mine && mine.handle === bio.handle),
   );
 
-  const viewer = user
-    ? { uid: user.uid, email: user.email || undefined, handle: mine?.handle }
-    : null;
+  const viewer = user ? { uid: user.uid, email: user.email || undefined, handle: mine?.handle } : null;
   const canView =
     isStay ||
     canViewProfile(viewer, bio, {
@@ -930,7 +929,8 @@ export function BioPublicPage() {
               <p className="mt-2 text-xs font-bold text-ink tabular-nums flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span>
-                  {completedCount.toLocaleString("en-AU")} completed {completedCount === 1 ? "experience" : "experiences"}
+                  {completedCount.toLocaleString("en-AU")} completed{" "}
+                  {completedCount === 1 ? "experience" : "experiences"}
                 </span>
               </p>
             )}
@@ -988,8 +988,16 @@ export function BioPublicPage() {
 
           {/* Social Engagement Deck (Follow, Like, Website, QR Share) */}
           <div className="mt-5 flex items-center gap-2">
-            <FollowButton handle={bio.handle} name={bio.name} className="flex-1 min-w-0 min-h-[44px] text-xs font-semibold px-2.5 sm:px-4 rounded-full" />
-            <LikeButton handle={bio.handle} name={bio.name} className="flex-1 min-w-0 min-h-[44px] text-xs font-semibold px-2.5 sm:px-4 rounded-full" />
+            <FollowButton
+              handle={bio.handle}
+              name={bio.name}
+              className="flex-1 min-w-0 min-h-[44px] text-xs font-semibold px-2.5 sm:px-4 rounded-full"
+            />
+            <LikeButton
+              handle={bio.handle}
+              name={bio.name}
+              className="flex-1 min-w-0 min-h-[44px] text-xs font-semibold px-2.5 sm:px-4 rounded-full"
+            />
             {websiteUrl ? (
               <a
                 href={websiteUrl}
@@ -1065,7 +1073,10 @@ export function BioPublicPage() {
                 }}
                 className="group flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-amber-500/10 px-3 text-xs font-bold text-amber-700 ring-1 ring-amber-500/30 transition-all duration-200 hover:bg-amber-600 hover:text-white active:scale-95 shadow-2xs"
               >
-                <Phone size={16} className="text-amber-600 group-hover:text-white shrink-0 group-hover:scale-110 transition-transform" />
+                <Phone
+                  size={16}
+                  className="text-amber-600 group-hover:text-white shrink-0 group-hover:scale-110 transition-transform"
+                />
                 <span className="truncate">Call</span>
               </a>
             ) : (
@@ -1111,7 +1122,8 @@ export function BioPublicPage() {
 
               <div className="flex-1 min-w-0 w-full space-y-2.5">
                 <p className="text-xs text-mute leading-relaxed text-center sm:text-left">
-                  Scan to view this profile instantly on any phone, or add to Apple Wallet &amp; Google Wallet as a verified digital contact pass.
+                  Scan to view this profile instantly on any phone, or add to Apple Wallet &amp; Google Wallet as a
+                  verified digital contact pass.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
@@ -1558,7 +1570,12 @@ export function BioPublicPage() {
                     }}
                     className="group flex flex-col items-center justify-center min-h-[96px] rounded-[22px] bg-card p-3 sm:p-4 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98] cursor-pointer touch-manipulation"
                   >
-                    <span className={cn("mb-2 grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl transition-transform group-hover:scale-105", opt.tint)}>
+                    <span
+                      className={cn(
+                        "mb-2 grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl transition-transform group-hover:scale-105",
+                        opt.tint,
+                      )}
+                    >
                       <opt.Icon size={19} />
                     </span>
                     <span className="text-xs font-bold text-ink">{opt.label}</span>
@@ -1782,7 +1799,12 @@ export function BioPublicPage() {
                       }}
                       className="group flex flex-col items-center justify-center min-h-[96px] rounded-[22px] bg-card p-3 sm:p-4 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98] cursor-pointer touch-manipulation"
                     >
-                      <span className={cn("mb-2 grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl transition-transform group-hover:scale-105", opt.tint)}>
+                      <span
+                        className={cn(
+                          "mb-2 grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl transition-transform group-hover:scale-105",
+                          opt.tint,
+                        )}
+                      >
                         <opt.Icon size={19} />
                       </span>
                       <span className="text-xs font-bold text-ink">{opt.label}</span>
@@ -1961,7 +1983,9 @@ export function BioPublicPage() {
           {/* Custom Outbound Links Stack */}
           {stacked.length > 0 && (
             <div className="mt-8">
-              <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent mb-3 px-0.5">Featured Links</h3>
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent mb-3 px-0.5">
+                Featured Links
+              </h3>
               <ul className="space-y-2.5">
                 {stacked
                   .filter((link) => isSafeBioHref(link.href))
@@ -2077,8 +2101,12 @@ export function BioPublicPage() {
             >
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-accent">AirPal Guestlist</p>
-                <h4 className="font-display text-base sm:text-lg font-bold text-ink mt-0.5">VIP Invites &amp; Secret Spots</h4>
-                <p className="text-xs text-mute mt-0.5">Get notified for exclusive gatherings, door perks, and secret drops.</p>
+                <h4 className="font-display text-base sm:text-lg font-bold text-ink mt-0.5">
+                  VIP Invites &amp; Secret Spots
+                </h4>
+                <p className="text-xs text-mute mt-0.5">
+                  Get notified for exclusive gatherings, door perks, and secret drops.
+                </p>
               </div>
               <label htmlFor="guestlist-name" className="sr-only">
                 Your name

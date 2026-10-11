@@ -3,7 +3,12 @@ import { mergeSpeakerBio } from "./speakers";
 
 describe("mergeSpeakerBio", () => {
   it("prefers the live bio name and photo", () => {
-    expect(mergeSpeakerBio({ name: "Stored Name", role: "CEO", handle: "sarah" }, { name: "Sarah J", avatar: "https://img" })).toEqual({
+    expect(
+      mergeSpeakerBio(
+        { name: "Stored Name", role: "CEO", handle: "sarah" },
+        { name: "Sarah J", avatar: "https://img" },
+      ),
+    ).toEqual({
       name: "Stored Name",
       role: "CEO",
       handle: "sarah",

@@ -89,8 +89,7 @@ export function cleanSpeakers(value: unknown): Speaker[] | undefined {
     .map((s) => {
       const name = String(s.name).trim().slice(0, 80);
       const role = typeof s.role === "string" && s.role.trim() ? s.role.trim().slice(0, 120) : undefined;
-      const handle =
-        typeof s.handle === "string" && s.handle.trim() ? normalizeSpeakerHandle(s.handle) : undefined;
+      const handle = typeof s.handle === "string" && s.handle.trim() ? normalizeSpeakerHandle(s.handle) : undefined;
       return { name, ...(role ? { role } : {}), ...(handle ? { handle } : {}) };
     })
     .filter((s) => s.name.length > 0)
@@ -150,7 +149,12 @@ export function docToCalendarBase(
       flavour: doc.flavour,
       city: str(doc.city),
       venue: typeof doc.venue === "string" ? doc.venue : undefined,
-      coverImage: typeof doc.coverImage === "string" ? doc.coverImage : typeof doc.heroImage === "string" ? doc.heroImage : undefined,
+      coverImage:
+        typeof doc.coverImage === "string"
+          ? doc.coverImage
+          : typeof doc.heroImage === "string"
+            ? doc.heroImage
+            : undefined,
       startsAt: doc.startsAt,
       endsAt: typeof doc.endsAt === "string" ? doc.endsAt : doc.startsAt,
       stallCount: typeof doc.stallCount === "number" ? doc.stallCount : 0,
@@ -179,7 +183,12 @@ export function docToCalendarBase(
       room: str(doc.room) || undefined,
       category: asCategory(doc.category),
       categoryLabel: str(doc.categoryLabel) || "Event",
-      heroImage: typeof doc.heroImage === "string" ? doc.heroImage : typeof doc.coverImage === "string" ? doc.coverImage : undefined,
+      heroImage:
+        typeof doc.heroImage === "string"
+          ? doc.heroImage
+          : typeof doc.coverImage === "string"
+            ? doc.coverImage
+            : undefined,
       ticketPrice: typeof doc.ticketPrice === "string" ? doc.ticketPrice : undefined,
       ticketUrl: typeof doc.ticketUrl === "string" ? doc.ticketUrl : undefined,
       gatePath: typeof doc.gatePath === "string" ? doc.gatePath : undefined,
