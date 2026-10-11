@@ -202,7 +202,7 @@ export function PassPage() {
               />
               <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/20 px-3.5 py-1 text-xs font-bold text-amber-300 ring-1 ring-amber-400/30 backdrop-blur-md">
                 <Ticket size={13} />
-                <span>{effectiveCity} · Experiences &amp; Stays</span>
+                <span>{effectiveCity} · Events, Perks &amp; Access</span>
               </div>
             </div>
 
@@ -216,10 +216,10 @@ export function PassPage() {
           </div>
 
           <h1 className="font-display mt-4 text-3xl sm:text-5xl font-extrabold tracking-tight text-white max-w-2xl leading-[1.1]">
-            Your pass to experiences.
+            Your pass to concerts, festivals &amp; dining perks.
           </h1>
           <p className="mt-2 text-base sm:text-lg font-medium text-white/80 max-w-xl">
-            Ticket sales, festival access, hotel check-in &amp; partner dining perks.
+            Live concerts, cultural festivals, dining perks &amp; 1-tap Apple &amp; Google Wallet passes.
           </p>
 
           {/* Quick Search Input */}

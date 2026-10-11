@@ -187,6 +187,15 @@ async function guestNameFor(customerUid: string): Promise<string> {
 export const googleWalletPass = onRequest(
   { invoker: "public", secrets: [saJsonSecret, issuerIdSecret] },
   async (req, res) => {
+    if (typeof res.set === "function") {
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
+      res.set("Access-Control-Allow-Headers", "Content-Type");
+    }
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
+      return;
+    }
     if (req.method !== "GET") {
       res.status(405).send("Method not allowed");
       return;

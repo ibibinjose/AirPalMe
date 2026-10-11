@@ -36,6 +36,7 @@ import { cardSavePayload, googleWalletPass, sanitizeObjectId, ticketSavePayload 
 type Handler = (
   req: { method: string; path: string },
   res: {
+    set?: (k: string, v: string) => void;
     status: (c: number) => { send: (b: unknown) => void; json: (b: unknown) => void };
   },
 ) => Promise<void>;
@@ -43,8 +44,15 @@ type Handler = (
 const handler = googleWalletPass as unknown as Handler;
 
 function run(method: string, path: string) {
-  const out: { status: number; body: unknown } = { status: 0, body: undefined };
+  const out: { status: number; body: unknown; headers: Record<string, string> } = {
+    status: 0,
+    body: undefined,
+    headers: {},
+  };
   const res = {
+    set: (k: string, v: string) => {
+      out.headers[k.toLowerCase()] = v;
+    },
     status: (c: number) => ({
       send: (b: unknown) => {
         out.status = c;
@@ -79,6 +87,13 @@ function configure() {
 }
 
 describe("googleWalletPass", () => {
+  it("handles OPTIONS preflight with CORS headers", async () => {
+    const res = await run("OPTIONS", "/api/wallet/google/ticket/b1");
+    expect(res.status).toBe(204);
+    expect(res.headers["access-control-allow-origin"]).toBe("*");
+    expect(res.headers["access-control-allow-methods"]).toBe("GET, OPTIONS");
+  });
+
   it("rejects non-GET methods and malformed paths", async () => {
     expect((await run("POST", "/api/wallet/google/ticket/b1")).status).toBe(405);
     expect((await run("GET", "/api/wallet/google/other/b1")).status).toBe(400);

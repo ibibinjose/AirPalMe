@@ -279,6 +279,15 @@ export const walletPass = onRequest(
     secrets: [passTypeIdSecret, teamIdSecret, signerCertSecret, signerKeySecret, keyPassphraseSecret],
   },
   async (req, res) => {
+    if (typeof res.set === "function") {
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+      res.set("Access-Control-Allow-Headers", "Content-Type");
+    }
+    if (req.method === "OPTIONS") {
+      res.status(204).send("");
+      return;
+    }
     if (req.method !== "GET" && req.method !== "HEAD") {
       res.status(405).send("Method not allowed");
       return;

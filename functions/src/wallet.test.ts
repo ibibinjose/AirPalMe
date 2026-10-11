@@ -137,6 +137,13 @@ describe("pass content (Luma layout, AirPal Blue)", () => {
 });
 
 describe("walletPass", () => {
+  it("handles OPTIONS preflight with CORS headers", async () => {
+    const out = await run("OPTIONS", "/api/wallet/ticket/abc.pkpass");
+    expect(out.status).toBe(204);
+    expect(out.headers["Access-Control-Allow-Origin"]).toBe("*");
+    expect(out.headers["Access-Control-Allow-Methods"]).toBe("GET, HEAD, OPTIONS");
+  });
+
   it("rejects non-GET/HEAD methods", async () => {
     const out = await run("POST", "/api/wallet/ticket/abc.pkpass");
     expect(out.status).toBe(405);

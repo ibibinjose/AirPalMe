@@ -128,6 +128,13 @@ export default defineConfig({
     port: 3000,
     host: "0.0.0.0",
     allowedHosts: true,
+    proxy: {
+      "/api/wallet": {
+        target: "https://airpal.me",
+        changeOrigin: true,
+        secure: true,
+      },
+    },
     watch: {
       ignored: ["**/android/app/src/main/assets/public/**", "**/ios/App/App/public/**"],
     },
