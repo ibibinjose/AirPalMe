@@ -24,68 +24,68 @@ Always report numerator, denominator, and the per-context distribution — never
 | `visitorId`          | Optional 30-day random id; not derived from email or device fingerprint |
 | `uid`                | Firebase Auth uid when present                                          |
 | `tenantId`           | Operator organisation; server-resolved                                  |
-| `contextId`           | QR-enabled experience id                                                |
-| `contextType`         | `property` `room` `marker` `campus` `event` `business` `bio`            |
-| `qrCampaignId`        | Printed placement id when known                                         |
-| `source`              | `qr` `direct` `share` `referral` `internal` `unknown`                   |
-| `backendState`        | `live` `offline_queued` `local_demo` `failed`                           |
+| `contextId`          | QR-enabled experience id                                                |
+| `contextType`        | `property` `room` `marker` `campus` `event` `business` `bio`            |
+| `qrCampaignId`       | Printed placement id when known                                         |
+| `source`             | `qr` `direct` `share` `referral` `internal` `unknown`                   |
+| `backendState`       | `live` `offline_queued` `local_demo` `failed`                           |
 
 ## Events
 
-| Event                 | When it fires                                                                                                                          | Counts toward WQGA                    |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| `session_started`     | First page in a browser session; emitted once per session — route changes do not emit additional session events                       | No                                    |
-| `qr_scan`             | Printed QR or in-app scan landing                                                                                                      | No                                    |
-| `context_view`        | Stay / marker / campus / event / business / bio context loaded                                                                          | No                                    |
-| `context_load_failed` | Context failed to load                                                                                                                 | No                                    |
-| `first_value`         | First useful action in a session/context/day                                                                                           | Yes, max once per session/context/day |
-| `content_action`      | Map (`actionType=map_open`), Wi-Fi reveal, profile open, booking intent, place open, experience completed (`experience_completed`)     | Yes for allowlisted `actionType`      |
-| `ask_submitted`       | Guest submitted Ask AirPal                                                                                                             | No                                    |
-| `ask_answered`        | Answer shown                                                                                                                           | Yes if `answerStatus=shown` (WQGA)    |
-| `offer_view`          | Offer shown                                                                                                                            | No                                    |
-| `offer_claim`         | Claim succeeded; uses server `claimId`                                                                                                 | Yes                                   |
-| `offer_redeem`        | Staff redeemed; server `claimId`                                                                                                       | Yes                                   |
-| `event_save`          | Stall/event saved                                                                                                                      | Yes                                   |
-| `support_request`     | Guest ticket created                                                                                                                   | Yes                                   |
-| `support_resolved`    | Host closed a ticket                                                                                                                   | Yes                                   |
-| `host_activation`     | Host listed a property / listing / event                                                                                               | No                                    |
-| `content_publish`     | Operator published content                                                                                                             | No                                    |
-| `content_update`      | Operator updated published content                                                                                                     | No                                    |
-| `calendar_event_view` | Calendar event detail opened                                                                                                           | No                                    |
-| `calendar_event_share` | Share invoked from a calendar event                                                                                                   | No                                    |
-| `calendar_event_going` | Going RSVP from a calendar event                                                                                                      | No                                    |
-| `calendar_event_interested` | Interested RSVP from a calendar event                                                                                            | No                                    |
-| `calendar_event_liked` | Like toggled on a calendar event                                                                                                      | No                                    |
-| `calendar_event_directions` | Directions opened for a calendar event                                                                                         | No                                    |
-| `calendar_event_open` | Calendar event opened (source tile/link)                                                                                               | No                                    |
-| `calendar_month_navigate` | Month grid paged forward/back                                                                                                      | No                                    |
-| `calendar_jump_today` | Jumped back to today                                                                                                                   | No                                    |
-| `calendar_date_select` | Day cell selected                                                                                                                      | No                                    |
-| `calendar_view_change` | Calendar layout changed (month/agenda/…)                                                                                               | No                                    |
-| `calendar_filter_change` | Calendar filter changed                                                                                                               | No                                    |
-| `calendar_category_filter` | Calendar filtered by category                                                                                                    | No                                    |
-| `calendar_search`     | Calendar searched                                                                                                                      | No                                    |
-| `calendar_export_batch` | Batch export of calendar events                                                                                                     | No                                    |
-| `calendar_agenda_export_day` | Single agenda day exported                                                                                                      | No                                    |
-| `calendar_export_selected_day` | Selected day exported                                                                                                          | No                                    |
-| `calendar_event_reschedule` | Calendar event moved to a new date                                                                                              | No                                    |
-| `favorites_view`      | Local favorites list viewed                                                                                                            | No                                    |
-| `favorites_place_select` | Favorite place selected                                                                                                            | No                                    |
-| `favorites_filter_change` | Favorites filtered by category                                                                                                    | No                                    |
-| `companion_cta_viewed` | Mate application CTA shown                                                                                                            | No                                    |
-| `companion_application_started` | Mate application form opened                                                                                                | No                                    |
-| `companion_application_submitted` | Mate application submitted                                                                                              | No                                    |
-| `companion_application_reviewed` | Mate application reviewed (requires `status`)                                                                             | No                                    |
-| `rating_submitted`    | Guest rating stored                                                                                                                    | Yes                                   |
-| `share_created`       | Share sheet used                                                                                                                       | No                                    |
-| `pulse_viewed` | Public Pulse opened by token | No |
-| `pulse_response_completed` | Guest submitted Pulse answers (server) | Yes |
-| `pulse_issue_created` | Negative path created a Pulse issue (server) | Yes |
-| `pulse_issue_acknowledged` | Host/staff acknowledged a Pulse issue | No |
-| `pulse_issue_resolved` | Host/staff resolved a Pulse issue | Yes |
-| `pulse_followup_completed` | Guest completed optional post-resolve follow-up | No |
-| `pulse_status_changed` | Host changed a Pulse status (pause / resume / archive) | No |
-| `client_error`        | Uncaught window error, unhandled rejection, or React boundary. No stack, URL, or free text — `errorClass` + `errorSource` + path only. | No                                    |
+| Event                             | When it fires                                                                                                                          | Counts toward WQGA                    |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| `session_started`                 | First page in a browser session; emitted once per session — route changes do not emit additional session events                        | No                                    |
+| `qr_scan`                         | Printed QR or in-app scan landing                                                                                                      | No                                    |
+| `context_view`                    | Stay / marker / campus / event / business / bio context loaded                                                                         | No                                    |
+| `context_load_failed`             | Context failed to load                                                                                                                 | No                                    |
+| `first_value`                     | First useful action in a session/context/day                                                                                           | Yes, max once per session/context/day |
+| `content_action`                  | Map (`actionType=map_open`), Wi-Fi reveal, profile open, booking intent, place open, experience completed (`experience_completed`)     | Yes for allowlisted `actionType`      |
+| `ask_submitted`                   | Guest submitted Ask AirPal                                                                                                             | No                                    |
+| `ask_answered`                    | Answer shown                                                                                                                           | Yes if `answerStatus=shown` (WQGA)    |
+| `offer_view`                      | Offer shown                                                                                                                            | No                                    |
+| `offer_claim`                     | Claim succeeded; uses server `claimId`                                                                                                 | Yes                                   |
+| `offer_redeem`                    | Staff redeemed; server `claimId`                                                                                                       | Yes                                   |
+| `event_save`                      | Stall/event saved                                                                                                                      | Yes                                   |
+| `support_request`                 | Guest ticket created                                                                                                                   | Yes                                   |
+| `support_resolved`                | Host closed a ticket                                                                                                                   | Yes                                   |
+| `host_activation`                 | Host listed a property / listing / event                                                                                               | No                                    |
+| `content_publish`                 | Operator published content                                                                                                             | No                                    |
+| `content_update`                  | Operator updated published content                                                                                                     | No                                    |
+| `calendar_event_view`             | Calendar event detail opened                                                                                                           | No                                    |
+| `calendar_event_share`            | Share invoked from a calendar event                                                                                                    | No                                    |
+| `calendar_event_going`            | Going RSVP from a calendar event                                                                                                       | No                                    |
+| `calendar_event_interested`       | Interested RSVP from a calendar event                                                                                                  | No                                    |
+| `calendar_event_liked`            | Like toggled on a calendar event                                                                                                       | No                                    |
+| `calendar_event_directions`       | Directions opened for a calendar event                                                                                                 | No                                    |
+| `calendar_event_open`             | Calendar event opened (source tile/link)                                                                                               | No                                    |
+| `calendar_month_navigate`         | Month grid paged forward/back                                                                                                          | No                                    |
+| `calendar_jump_today`             | Jumped back to today                                                                                                                   | No                                    |
+| `calendar_date_select`            | Day cell selected                                                                                                                      | No                                    |
+| `calendar_view_change`            | Calendar layout changed (month/agenda/…)                                                                                               | No                                    |
+| `calendar_filter_change`          | Calendar filter changed                                                                                                                | No                                    |
+| `calendar_category_filter`        | Calendar filtered by category                                                                                                          | No                                    |
+| `calendar_search`                 | Calendar searched                                                                                                                      | No                                    |
+| `calendar_export_batch`           | Batch export of calendar events                                                                                                        | No                                    |
+| `calendar_agenda_export_day`      | Single agenda day exported                                                                                                             | No                                    |
+| `calendar_export_selected_day`    | Selected day exported                                                                                                                  | No                                    |
+| `calendar_event_reschedule`       | Calendar event moved to a new date                                                                                                     | No                                    |
+| `favorites_view`                  | Local favorites list viewed                                                                                                            | No                                    |
+| `favorites_place_select`          | Favorite place selected                                                                                                                | No                                    |
+| `favorites_filter_change`         | Favorites filtered by category                                                                                                         | No                                    |
+| `companion_cta_viewed`            | Mate application CTA shown                                                                                                             | No                                    |
+| `companion_application_started`   | Mate application form opened                                                                                                           | No                                    |
+| `companion_application_submitted` | Mate application submitted                                                                                                             | No                                    |
+| `companion_application_reviewed`  | Mate application reviewed (requires `status`)                                                                                          | No                                    |
+| `rating_submitted`                | Guest rating stored                                                                                                                    | Yes                                   |
+| `share_created`                   | Share sheet used                                                                                                                       | No                                    |
+| `pulse_viewed`                    | Public Pulse opened by token                                                                                                           | No                                    |
+| `pulse_response_completed`        | Guest submitted Pulse answers (server)                                                                                                 | Yes                                   |
+| `pulse_issue_created`             | Negative path created a Pulse issue (server)                                                                                           | Yes                                   |
+| `pulse_issue_acknowledged`        | Host/staff acknowledged a Pulse issue                                                                                                  | No                                    |
+| `pulse_issue_resolved`            | Host/staff resolved a Pulse issue                                                                                                      | Yes                                   |
+| `pulse_followup_completed`        | Guest completed optional post-resolve follow-up                                                                                        | No                                    |
+| `pulse_status_changed`            | Host changed a Pulse status (pause / resume / archive)                                                                                 | No                                    |
+| `client_error`                    | Uncaught window error, unhandled rejection, or React boundary. No stack, URL, or free text — `errorClass` + `errorSource` + path only. | No                                    |
 
 Not emitted until the product exists: `event_check_in`, `subscription_state`.
 
@@ -93,62 +93,62 @@ Not emitted until the product exists: `event_check_in`, `subscription_state`.
 
 Mirrors `EVENT_PROPERTY_ALLOWLIST` in `shared/analytics.ts`. `validateAnalyticsEvent` rejects events missing a required key (`missing:<key>`), drops unlisted keys, and rejects sensitive keys. Collectors must always send every required key for the event they emit — the typed helpers in `src/lib/analytics.ts` (`trackFirstValue`, `trackContentAction`, `trackPageView`) do this by signature; raw `track()` callers must pass them by hand.
 
-| Event | Required | Optional |
-| ----- | -------- | -------- |
-| `session_started` | `entryPath`, `source` | `referrerClass`, `locale` |
-| `qr_scan` | `contextType`, `contextId` | `qrCampaignId`, `placementType`, `source` |
-| `context_view` | `contextType`, `contextId`, `loadStatus` | `loadMs`, `backendState` |
-| `context_load_failed` | `contextType`, `contextId`, `errorClass` | `loadMs` |
-| `first_value` | `valueType`, `contextId` | `contentId`, `timeFromSessionStartMs`, `timeFromQrScanMs`, `loopTargetMet` |
-| `content_action` | `actionType`, `contextId` | `contentId`, `category`, `destination` |
-| `ask_submitted` | `contextId`, `questionCategory` | `answerSource`, `latencyMs` |
-| `ask_answered` | `contextId`, `answerStatus` | `questionCategory`, `helpful` |
-| `offer_view` | `offerId`, `partnerId`, `contextId` | `placement` |
-| `offer_claim` | `offerId`, `partnerId`, `claimId`, `contextId` | `expiryBucket` |
-| `offer_redeem` | `offerId`, `partnerId`, `claimId` | `redemptionChannel` |
-| `event_save` | `eventId`, `contextId` | `stallId`, `source`, `action` |
-| `event_check_in` | `eventId`, `contextId`, `checkInId` | `method` |
-| `support_request` | `contextId`, `requestId`, `category` | `priority` |
-| `support_resolved` | `contextId`, `requestId`, `resolutionStatus` | `resolutionTimeMs` |
-| `host_activation` | `tenantId`, `activationStep` | `contextId`, `actorRole` |
-| `content_publish` | `tenantId`, `contentType`, `contentId` | `contextId`, `actorRole` |
-| `content_update` | `tenantId`, `contentType`, `contentId` | `contextId`, `actorRole` |
-| `rating_submitted` | `targetType`, `targetId`, `contextId` | `ratingBucket` |
-| `share_created` | `shareType`, `contextId` | `contentId`, `destination` |
-| `subscription_state` | `tenantId`, `planState` | `planId` |
-| `calendar_event_view` | — | `eventId`, `slug`, `name`, `category`, `action` |
-| `calendar_event_share` | — | `eventId`, `name`, `action` |
-| `calendar_event_going` | — | `eventId`, `name`, `action` |
-| `calendar_event_interested` | — | `eventId`, `name`, `action` |
-| `calendar_event_liked` | — | `eventId`, `name`, `action` |
-| `calendar_event_directions` | — | `eventId`, `name`, `action` |
-| `calendar_event_open` | — | `eventId`, `name`, `action` |
-| `calendar_month_navigate` | — | `direction`, `year`, `month`, `action` |
-| `calendar_jump_today` | — | `date`, `action` |
-| `calendar_date_select` | — | `date`, `hasEvents`, `action` |
-| `calendar_view_change` | — | `view`, `action` |
-| `calendar_filter_change` | — | `filter`, `action` |
-| `calendar_category_filter` | — | `category`, `action` |
-| `calendar_search` | — | `query`, `queryLength`, `action` |
-| `calendar_export_batch` | — | `type`, `count`, `action` |
-| `calendar_agenda_export_day` | — | `date`, `count`, `action` |
-| `calendar_export_selected_day` | — | `date`, `count`, `action` |
-| `calendar_event_reschedule` | — | `eventId`, `fromDate`, `toDate`, `action` |
-| `favorites_view` | — | `contextId`, `lat`, `lng`, `category`, `action` |
-| `favorites_place_select` | — | `placeId`, `placeName`, `action` |
-| `favorites_filter_change` | — | `category`, `action` |
-| `companion_cta_viewed` | — | `source` |
-| `companion_application_started` | — | — |
-| `companion_application_submitted` | — | `roles` |
-| `companion_application_reviewed` | `status` | — |
-| `pulse_viewed` | `contextId`, `pulseId` | `deploymentId`, `template` |
-| `pulse_response_completed` | `contextId`, `pulseId`, `responseId` | `scoreBucket`, `issueCreated` |
-| `pulse_issue_created` | `contextId`, `pulseId`, `issueId`, `responseId` | `category` |
-| `pulse_issue_acknowledged` | `contextId`, `issueId` | `pulseId` |
-| `pulse_issue_resolved` | `contextId`, `issueId` | `pulseId`, `resolutionTimeMs` |
-| `pulse_followup_completed` | `contextId`, `issueId` | `scoreBucket` |
-| `pulse_status_changed` | `contextId`, `pulseId` | `from`, `to` |
-| `client_error` | `errorClass`, `errorSource` | `path`, `name` |
+| Event                             | Required                                        | Optional                                                                   |
+| --------------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------- |
+| `session_started`                 | `entryPath`, `source`                           | `referrerClass`, `locale`                                                  |
+| `qr_scan`                         | `contextType`, `contextId`                      | `qrCampaignId`, `placementType`, `source`                                  |
+| `context_view`                    | `contextType`, `contextId`, `loadStatus`        | `loadMs`, `backendState`                                                   |
+| `context_load_failed`             | `contextType`, `contextId`, `errorClass`        | `loadMs`                                                                   |
+| `first_value`                     | `valueType`, `contextId`                        | `contentId`, `timeFromSessionStartMs`, `timeFromQrScanMs`, `loopTargetMet` |
+| `content_action`                  | `actionType`, `contextId`                       | `contentId`, `category`, `destination`                                     |
+| `ask_submitted`                   | `contextId`, `questionCategory`                 | `answerSource`, `latencyMs`                                                |
+| `ask_answered`                    | `contextId`, `answerStatus`                     | `questionCategory`, `helpful`                                              |
+| `offer_view`                      | `offerId`, `partnerId`, `contextId`             | `placement`                                                                |
+| `offer_claim`                     | `offerId`, `partnerId`, `claimId`, `contextId`  | `expiryBucket`                                                             |
+| `offer_redeem`                    | `offerId`, `partnerId`, `claimId`               | `redemptionChannel`                                                        |
+| `event_save`                      | `eventId`, `contextId`                          | `stallId`, `source`, `action`                                              |
+| `event_check_in`                  | `eventId`, `contextId`, `checkInId`             | `method`                                                                   |
+| `support_request`                 | `contextId`, `requestId`, `category`            | `priority`                                                                 |
+| `support_resolved`                | `contextId`, `requestId`, `resolutionStatus`    | `resolutionTimeMs`                                                         |
+| `host_activation`                 | `tenantId`, `activationStep`                    | `contextId`, `actorRole`                                                   |
+| `content_publish`                 | `tenantId`, `contentType`, `contentId`          | `contextId`, `actorRole`                                                   |
+| `content_update`                  | `tenantId`, `contentType`, `contentId`          | `contextId`, `actorRole`                                                   |
+| `rating_submitted`                | `targetType`, `targetId`, `contextId`           | `ratingBucket`                                                             |
+| `share_created`                   | `shareType`, `contextId`                        | `contentId`, `destination`                                                 |
+| `subscription_state`              | `tenantId`, `planState`                         | `planId`                                                                   |
+| `calendar_event_view`             | —                                               | `eventId`, `slug`, `name`, `category`, `action`                            |
+| `calendar_event_share`            | —                                               | `eventId`, `name`, `action`                                                |
+| `calendar_event_going`            | —                                               | `eventId`, `name`, `action`                                                |
+| `calendar_event_interested`       | —                                               | `eventId`, `name`, `action`                                                |
+| `calendar_event_liked`            | —                                               | `eventId`, `name`, `action`                                                |
+| `calendar_event_directions`       | —                                               | `eventId`, `name`, `action`                                                |
+| `calendar_event_open`             | —                                               | `eventId`, `name`, `action`                                                |
+| `calendar_month_navigate`         | —                                               | `direction`, `year`, `month`, `action`                                     |
+| `calendar_jump_today`             | —                                               | `date`, `action`                                                           |
+| `calendar_date_select`            | —                                               | `date`, `hasEvents`, `action`                                              |
+| `calendar_view_change`            | —                                               | `view`, `action`                                                           |
+| `calendar_filter_change`          | —                                               | `filter`, `action`                                                         |
+| `calendar_category_filter`        | —                                               | `category`, `action`                                                       |
+| `calendar_search`                 | —                                               | `query`, `queryLength`, `action`                                           |
+| `calendar_export_batch`           | —                                               | `type`, `count`, `action`                                                  |
+| `calendar_agenda_export_day`      | —                                               | `date`, `count`, `action`                                                  |
+| `calendar_export_selected_day`    | —                                               | `date`, `count`, `action`                                                  |
+| `calendar_event_reschedule`       | —                                               | `eventId`, `fromDate`, `toDate`, `action`                                  |
+| `favorites_view`                  | —                                               | `contextId`, `lat`, `lng`, `category`, `action`                            |
+| `favorites_place_select`          | —                                               | `placeId`, `placeName`, `action`                                           |
+| `favorites_filter_change`         | —                                               | `category`, `action`                                                       |
+| `companion_cta_viewed`            | —                                               | `source`                                                                   |
+| `companion_application_started`   | —                                               | —                                                                          |
+| `companion_application_submitted` | —                                               | `roles`                                                                    |
+| `companion_application_reviewed`  | `status`                                        | —                                                                          |
+| `pulse_viewed`                    | `contextId`, `pulseId`                          | `deploymentId`, `template`                                                 |
+| `pulse_response_completed`        | `contextId`, `pulseId`, `responseId`            | `scoreBucket`, `issueCreated`                                              |
+| `pulse_issue_created`             | `contextId`, `pulseId`, `issueId`, `responseId` | `category`                                                                 |
+| `pulse_issue_acknowledged`        | `contextId`, `issueId`                          | `pulseId`                                                                  |
+| `pulse_issue_resolved`            | `contextId`, `issueId`                          | `pulseId`, `resolutionTimeMs`                                              |
+| `pulse_followup_completed`        | `contextId`, `issueId`                          | `scoreBucket`                                                              |
+| `pulse_status_changed`            | `contextId`, `pulseId`                          | `from`, `to`                                                               |
+| `client_error`                    | `errorClass`, `errorSource`                     | `path`, `name`                                                             |
 
 Enumerated values (enforced by `isQualifiedAction`, not by the validator — unknown values validate but never count):
 
@@ -180,7 +180,7 @@ Enumerated values (enforced by `isQualifiedAction`, not by the validator — unk
 | ------------------------------- | ---------------------------------- |
 | Raw ledger `analyticsEvents`    | 12 months (business facts)         |
 | Rejects `analyticsEventRejects` | 90 days                            |
-| Daily aggregates                | Commercial reporting period         |
+| Daily aggregates                | Commercial reporting period        |
 | GA4 diagnostics                 | Provider default; optional consent |
 
 ## Amplitude tracking plan (project `845386`)
