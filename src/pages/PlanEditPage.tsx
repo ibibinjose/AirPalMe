@@ -9,6 +9,7 @@ import { PLAN_TYPE_ICONS } from "@/components/plan/planTypeIcons";
 import { ItineraryStopsManager } from "@/components/plan/ItineraryStopsManager";
 import { ImageField } from "@/components/media/ImageField";
 import { NotFoundPage } from "./NotFoundPage";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
@@ -56,7 +57,7 @@ export function PlanEditPage() {
   }, [plan]);
 
   if (!authReady) {
-    return <div className="mx-auto max-w-md px-4 py-16 text-center text-sm text-mute">Loading…</div>;
+    return <PageLoading />;
   }
 
   if (!user) {

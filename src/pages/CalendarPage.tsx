@@ -548,11 +548,11 @@ function CalendarPageContent() {
           {/* Host Event link */}
           <button
             type="button"
-            onClick={() => nav("/event/new")}
+            onClick={() => nav("/event")}
             title="Create an event and invite your Circle"
-            className="inline-flex h-10 items-center gap-1.5 rounded-full bg-brand px-3.5 text-xs font-medium text-white hover:bg-brand-ink transition active:scale-95"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand px-4 text-xs font-semibold text-white hover:bg-brand-ink transition active:scale-95 cursor-pointer shadow-xs"
           >
-            <PlusCircle size={13} />
+            <PlusCircle size={14} />
             <span>Create</span>
           </button>
         </div>

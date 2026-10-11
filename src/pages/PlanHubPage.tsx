@@ -235,7 +235,7 @@ export function PlanHubPage() {
             )}
             <Link
               href="/pass"
-              className="inline-flex min-h-[28px] items-center gap-1 rounded-full bg-card px-3 py-1 text-xs font-bold text-ink ring-1 ring-line hover:bg-paper transition shadow-xs"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 py-1.5 text-xs font-bold text-ink ring-1 ring-line hover:bg-paper transition shadow-xs"
             >
               <Ticket size={12} className="text-amber-500" />
               <span>Events &amp; Deals on Pass →</span>
