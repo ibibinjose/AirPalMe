@@ -14,7 +14,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
 import { partnerAccountPath } from "@/lib/partner-account";
 import { BrowseMenu } from "@/components/layout/BrowseMenu";
-import { isPassApp } from "@/lib/app-flavor";
 import { NAMES } from "@shared/names";
 
 const LINKS = [
@@ -25,12 +24,15 @@ const LINKS = [
     label: "Plan",
     match: (p: string) => p.startsWith("/plan") || p.startsWith("/invite"),
   },
-  { href: "/pulse", label: "Pulse", match: (p: string) => p.startsWith("/pulse") },
   {
-    href: "/me/inbox",
-    label: "Inbox",
-    match: (p: string) =>
-      p.startsWith("/inbox") || p.startsWith("/chat") || p.startsWith("/messages") || p.startsWith("/me/inbox"),
+    href: "/pass",
+    label: "Pass",
+    match: (p: string) => p.startsWith("/pass") || p.startsWith("/events") || p.startsWith("/deals"),
+  },
+  {
+    href: "/me/tickets",
+    label: "Tickets",
+    match: (p: string) => p.startsWith("/me/tickets") || p.startsWith("/ticket"),
   },
 ];
 
@@ -73,7 +75,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
           <button
             onClick={() => {
               void triggerHaptic("light");
-              nav(isPassApp() || path.startsWith("/pass") ? "/pass" : "/");
+              nav("/");
             }}
             className="shrink-0 text-left transition hover:opacity-90 cursor-pointer"
             aria-label="AirPal Home"

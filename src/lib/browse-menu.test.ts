@@ -21,8 +21,8 @@ function matchedIn(links: typeof PLAN_LINKS, path: string) {
 
 describe("browse menu", () => {
   it("matches each parent category to its discovery surfaces", () => {
-    expect(matched("/stay")).toEqual(["Stay"]);
-    expect(matched("/stay/@harbour-hotel")).toEqual(["Stay"]);
+    expect(matched("/circle")).toEqual(["Circle"]);
+    expect(matched("/circle/members")).toEqual(["Circle"]);
     expect(matched("/pass")).toEqual(["AirPal Pass"]);
     expect(matched("/events")).toEqual(["Events"]);
     expect(matched("/calendar")).toEqual(["Events"]);
@@ -50,7 +50,7 @@ describe("browse menu", () => {
   });
 
   it("shows the mobile strip on Home and browse-context routes only", () => {
-    for (const path of ["/", "/explore", "/now", "/pass", "/stay", "/stay/@x", "/events", "/calendar", "/offers"]) {
+    for (const path of ["/", "/explore", "/now", "/pass", "/circle", "/stay", "/stay/@x", "/events", "/calendar", "/offers"]) {
       expect(showBrowseStrip(path)).toBe(true);
     }
     for (const path of ["/mate", "/plan", "/pulse", "/inbox", "/me", "/host", "/settings"]) {
@@ -62,8 +62,8 @@ describe("browse menu", () => {
     expect(matchedIn(PLAN_LINKS, "/plan")).toEqual(["My plans"]);
     expect(matchedIn(PLAN_LINKS, "/invite/abc")).toEqual(["My plans"]);
     expect(matchedIn(PLAN_LINKS, "/calendar")).toEqual(["Calendar"]);
-    expect(matchedIn(GUIDE_LINKS, "/concierge")).toEqual(["Concierge"]);
-    expect(matchedIn(GUIDE_LINKS, "/g/harbour-hotel")).toEqual(["Concierge"]);
+    expect(matchedIn(GUIDE_LINKS, "/bio/setup")).toEqual(["Personal Bio"]);
+    expect(matchedIn(GUIDE_LINKS, "/bio")).toEqual(["Personal Bio"]);
     expect(matchedIn(GUIDE_LINKS, "/tour/abc")).toEqual(["Guide"]);
     expect(matchedIn(GUIDE_LINKS, "/scan")).toEqual(["Scan code"]);
     expect(matchedIn(BUSINESS_LINKS, "/business")).toEqual(["Business hub"]);
@@ -83,7 +83,7 @@ describe("browse menu", () => {
     expect(titles).toEqual([
       "Browse AirPal",
       "Plan & Go",
-      "Stay & Guide",
+      "Discover & Connect",
       "Business",
       "Account",
       "Help & Trust",

@@ -1,4 +1,5 @@
 import type { PlanType } from "@shared/plan";
+import { DEFAULT_TZ, zonedParts } from "./local-time";
 import { NOW_MOODS, type NowMood, type NowWhen } from "./now-suggest";
 
 const MOOD_PLAN_TYPE: Record<NowMood, PlanType> = {
@@ -19,10 +20,11 @@ export function suggestionPlanTitle(mood: NowMood, placeName: string): string {
   return label ? `${label} at ${placeName}` : placeName;
 }
 
-/** "now" → next top of hour (device-local, the venue is nearby); "tonight" → 7pm. */
-export function defaultPlanTime(when: NowWhen, now: Date): string {
+/** "now" → next top of hour in target timezone; "tonight" → 7pm. */
+export function defaultPlanTime(when: NowWhen, now: Date, timeZone = DEFAULT_TZ): string {
   if (when === "tonight") return "19:00";
-  const next = (now.getHours() + 1) % 24;
+  const parts = zonedParts(now, timeZone);
+  const next = (parts.hour + 1) % 24;
   return `${String(next).padStart(2, "0")}:00`;
 }
 
@@ -36,6 +38,7 @@ export type NowPlanPrefill = {
   date: string;
   now: Date;
   geo: { lat: number; lng: number };
+  timeZone?: string;
 };
 
 /** Prefilled /plan/new link carrying the Now suggestion (title, time, meeting point). */
@@ -44,7 +47,7 @@ export function nowPlanHref(prefill: NowPlanPrefill): string {
     title: suggestionPlanTitle(prefill.mood, prefill.placeName),
     type: moodPlanType(prefill.mood),
     date: prefill.date,
-    time: defaultPlanTime(prefill.when, prefill.now),
+    time: defaultPlanTime(prefill.when, prefill.now, prefill.timeZone),
     dest: prefill.address || prefill.placeName,
     city: prefill.city,
     lat: String(prefill.geo.lat),

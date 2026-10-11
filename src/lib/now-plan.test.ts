@@ -24,6 +24,12 @@ describe("defaultPlanTime", () => {
     expect(defaultPlanTime("now", new Date("2026-09-14T14:20:00+10:00"))).toBe("15:00");
     expect(defaultPlanTime("now", new Date("2026-09-14T23:50:00+10:00"))).toBe("00:00");
   });
+
+  it("calculates next hour based on target timezone without runner dependency", () => {
+    const utcInstant = new Date("2026-09-14T04:20:00Z");
+    expect(defaultPlanTime("now", utcInstant, "Australia/Sydney")).toBe("15:00");
+    expect(defaultPlanTime("now", utcInstant, "America/New_York")).toBe("01:00");
+  });
 });
 
 describe("nowPlanHref", () => {

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useRoute } from "wouter";
 import { PlaceCard } from "@/components/discovery/PlaceCard";
 import { FilterChips } from "@/components/discovery/FilterChips";
 import { Sheet } from "@/components/ui/Sheet";
@@ -20,10 +20,26 @@ import { noteQrContext, track } from "@/lib/analytics";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
 export function MarkerPage() {
+  const [, paramsTwo] = useRoute("/q/:city/:handle");
+  const [, paramsOne] = useRoute("/q/:a");
   const [path, nav] = useLocation();
   const { setSession } = useStay();
   const { now, timeZone, city } = useLocalNow();
   const { calendarEvents, remoteNearby } = useEvents();
+
+  // Robust marker identifier resolution for /q/:city/:handle and /q/:a
+  const markerId = useMemo(() => {
+    if (paramsTwo?.city && paramsTwo?.handle) {
+      return `${paramsTwo.city}-${paramsTwo.handle}`;
+    }
+    if (paramsOne?.a) return paramsOne.a;
+    const parts = path.split("/").filter(Boolean);
+    if (parts.length >= 3 && parts[0] === "q") {
+      return `${parts[1]}-${parts[2]}`;
+    }
+    return parts[1] || "";
+  }, [paramsTwo, paramsOne, path]);
+
   // Live DB events around the guest — no bundled seed fallbacks.
   const tonight = useMemo(() => {
     const nearby = eventsTonight(remoteNearby, now, timeZone).map((ev) => ({
@@ -41,22 +57,41 @@ export function MarkerPage() {
     const seen = new Set(nearby.map((e) => e.id));
     return [...nearby, ...cal.filter((e) => !seen.has(e.id))];
   }, [remoteNearby, calendarEvents, now, timeZone, city]);
-  const markerId = path.split("/").filter(Boolean)[1] || "";
+
   const [marker, setMarker] = useState<MarkerDoc | undefined>(() => getMarker(markerId));
   const [markerChecked, setMarkerChecked] = useState(false);
+
   useEffect(() => {
     let alive = true;
-    setMarker(getMarker(markerId));
+    if (!markerId) {
+      setMarker(undefined);
+      setMarkerChecked(true);
+      return;
+    }
+    const initial = getMarker(markerId) || (paramsTwo?.handle ? getMarker(paramsTwo.handle) : undefined);
+    setMarker(initial);
     setMarkerChecked(false);
-    void fetchMarker(markerId).then((m) => {
+    void fetchMarker(markerId).then(async (m) => {
       if (!alive) return;
-      setMarker(m);
+      if (m) {
+        setMarker(m);
+        setMarkerChecked(true);
+        return;
+      }
+      if (paramsTwo?.handle) {
+        const fallback = await fetchMarker(paramsTwo.handle);
+        if (alive && fallback) {
+          setMarker(fallback);
+          setMarkerChecked(true);
+          return;
+        }
+      }
       setMarkerChecked(true);
     });
     return () => {
       alive = false;
     };
-  }, [markerId]);
+  }, [markerId, paramsTwo?.handle]);
   const [chip, setChip] = useState("all");
   const [askOpen, setAskOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -102,7 +137,7 @@ export function MarkerPage() {
           kicker="Unknown code"
           title="This QR isn’t listed"
           body="The code you scanned isn’t attached to any venue yet."
-          action={() => nav("/")}
+          action={() => nav("/now")}
           actionLabel="Explore nearby"
         />
       </div>
@@ -111,7 +146,7 @@ export function MarkerPage() {
 
   function goBack() {
     if (window.history.length > 1) window.history.back();
-    else nav("/");
+    else nav("/now");
   }
 
   return (
@@ -147,8 +182,9 @@ export function MarkerPage() {
           .map((x) => (
             <button
               key={x.label}
+              type="button"
               onClick={x.run}
-              className="h-11 rounded-2xl bg-card text-sm font-medium ring-1 ring-line"
+              className="min-h-[44px] h-11 rounded-2xl bg-card text-sm font-medium ring-1 ring-line hover:bg-paper active:scale-95 transition cursor-pointer"
             >
               {x.label}
             </button>

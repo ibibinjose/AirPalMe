@@ -35,6 +35,13 @@
     "summary": "Tell AirPal.Me your urge and time window — tonight, this weekend, right now — and get one suggestion for what to do, with the people you already know. Make it a plan in one tap."
   },
   {
+    "path": "/circle",
+    "title": "Networking Circle · AirPal.Me",
+    "description": "Check in, see who is around, and hang out with your trusted inner circle.",
+    "heading": "Networking Circle",
+    "summary": "Connect with your inner circle in real life. Check in at your building or local hub, share status, and plan spontaneous hangouts with people you know."
+  },
+  {
     "path": "/business",
     "title": "AirPal for Business",
     "description": "List your place, publish experiences and offers, take bookings on AirPal.Me.",

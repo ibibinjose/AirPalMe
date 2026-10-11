@@ -9,6 +9,7 @@ import { cn } from "@/lib/cn";
 
 const NAV_ME = [
   { href: "/now", label: "What now? (Day Planner)" },
+  { href: "/circle", label: "Networking Circle" },
   { href: "/plan", label: "Plans & Invites" },
   { href: "/me", label: "Me Cockpit" },
   { href: "/calendar", label: "Personal Calendar" },
@@ -23,8 +24,7 @@ const NAV_PASS = [
   { href: "/me/tickets", label: "Passbook & Tickets" },
   { href: "/deals", label: "Member Dining Deals" },
   { href: "/event", label: "Host an Event" },
-  { href: "/concierge", label: "Stay Concierge" },
-  { href: "/host", label: "Stay Host Workspace" },
+  { href: "/host", label: "Belonging & Host Hub" },
   { href: "/pulse", label: "AirPal Pulse" },
   { href: "/join", label: "Partner Account" },
 ];

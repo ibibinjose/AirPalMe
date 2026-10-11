@@ -1286,17 +1286,38 @@ match /dining_orders/{orderId} {
       allow create: if request.resource.data.query is string
         && request.resource.data.query.size() >= 2
         && request.resource.data.query.size() <= 120;
-      allow read: if true;
+      allow read: if platformAdmin();
       allow update, delete: if platformAdmin();
     }
 
     // Aggregated popular search terms (publicly readable for relevance improvements & suggestions)
     match /popular_searches/{termId} {
       allow read: if true;
-      allow create, update: if request.resource.data.term is string
+      allow create, update: if signedIn()
+        && request.resource.data.term is string
         && request.resource.data.term.size() >= 2
         && request.resource.data.term.size() <= 120;
       allow delete: if platformAdmin();
+    }
+
+    // Institutions & Cohorts (B2B2C Arrival Layer)
+    match /institutions/{instId} {
+      allow read: if true;
+      allow write: if platformAdmin();
+
+      match /belonging_reports/{reportId} {
+        allow read: if signedIn() && (
+          platformAdmin() ||
+          request.auth.uid in resource.data.hostUids ||
+          request.auth.token.email in resource.data.hostEmails
+        );
+        allow write: if platformAdmin();
+      }
+    }
+
+    match /cohorts/{cohortId} {
+      allow read: if true;
+      allow write: if platformAdmin();
     }
   }
 }

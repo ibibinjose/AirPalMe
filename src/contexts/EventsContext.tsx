@@ -9,6 +9,7 @@ import {
   parseStallCsv,
   type AttendanceStatus,
   type CalendarEvent,
+  type EventFlavour,
   type EventRecord,
   type SavedEvent,
   type SavedStall,
@@ -66,7 +67,7 @@ type EventsValue = {
   confirmEventSchedule: () => Promise<void>;
   importCsv: (eventId: string, csv: string) => Promise<number>;
   upsertStall: (stall: Omit<StallRecord, "id" | "status"> & { id?: string }) => Promise<StallRecord>;
-  saveStall: (stall: StallRecord, event: EventRecord) => Promise<void>;
+  saveStall: (stall: StallRecord, event: { id: string; name: string; flavour: EventFlavour }) => Promise<void>;
   unsaveStall: (stallId: string) => Promise<void>;
   isSaved: (stallId: string) => boolean;
   /**

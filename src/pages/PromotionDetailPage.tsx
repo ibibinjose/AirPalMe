@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearch } from "wouter";
 import { collection, doc, getDoc, getDocs, limit, query, where } from "firebase/firestore";
-import { ArrowLeft, BadgeCheck, CalendarDays, CheckCircle2, Gift, MapPin, Share2, Trophy, User } from "lucide-react";
+import { ArrowLeft, BadgeCheck, CalendarDays, CheckCircle2, Copy, Gift, MapPin, QrCode, Share2, Trophy, User } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { AirPalMascot } from "@/components/brand/AirPalMascot";
 import { ConfettiBurst } from "@/components/brand/ConfettiBurst";
 import { PromotionTerms } from "@/components/promotions/PromotionTerms";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { useAuth } from "@/contexts/AuthContext";
 import { getFirebaseDb } from "@/lib/firebase";
+import { makeQrDataUrl } from "@/lib/qr";
+import { triggerHaptic } from "@/lib/native";
 import {
   enterPromotionRemote,
   friendlyPromotionError,
@@ -21,7 +24,7 @@ import { targetHref, type Promotion } from "@shared/promotions";
 import { toPublicUrl } from "@/lib/public-origin";
 import { clearPendingIntent, peekPendingIntent } from "@/lib/pending-intent";
 
-export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }) {
+export function PromotionDetailPage({ kind }: { kind?: "giveaway" | "promotion" }) {
   const { id } = useParams<{ id: string }>();
   const search = useSearch();
   const { user, requireUser } = useAuth();
@@ -36,6 +39,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
   const [reference, setReference] = useState<string | null>(null);
   const [founderNumber, setFounderNumber] = useState<number | null>(null);
   const [celebrate, setCelebrate] = useState(0);
+  const [voucherQr, setVoucherQr] = useState<string>("");
 
   const refParam = new URLSearchParams(search).get("ref") || "";
 
@@ -53,7 +57,8 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
           return;
         }
         const data = { id: snap.id, ...(snap.data() as Omit<Promotion, "id">) };
-        if (data.kind !== kind || (data.status !== "live" && data.status !== "closed")) {
+        const validKind = data.kind === "giveaway" || data.kind === "promotion";
+        if (!validKind || (data.status !== "live" && data.status !== "closed")) {
           setNotFound(true);
           return;
         }
@@ -81,6 +86,24 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
   }, [id, kind]);
+
+  const activeVoucherCode = redeemCode || promo?.promoCode || (reference ? `REF-${reference}` : null);
+
+  useEffect(() => {
+    if (!activeVoucherCode) {
+      setVoucherQr("");
+      return;
+    }
+    let alive = true;
+    void makeQrDataUrl(`AIRPAL:DEAL:${promo?.id}:${activeVoucherCode}`, 240)
+      .then((url) => {
+        if (alive) setVoucherQr(url);
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, [activeVoucherCode, promo?.id]);
 
   useEffect(() => {
     const db = getFirebaseDb();
@@ -177,7 +200,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
     }
   }
 
-  if (loading) return <p className="mx-auto max-w-2xl px-4 py-12 text-center text-sm text-mute">Loading…</p>;
+  if (loading) return <PageLoading />;
   if (notFound || !promo) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-12 text-center">
@@ -334,6 +357,56 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
         ) : null}
       </div>
 
+      {/* Voucher Breakdown & In-Store Barcode */}
+      {activeVoucherCode && (
+        <div className="mt-4 rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
+          <div className="flex items-center justify-between pb-3 border-b border-line/60">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-accent">
+              Voucher Breakdown
+            </span>
+            <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+              Ready to Redeem
+            </span>
+          </div>
+
+          <div className="mt-4 flex flex-col items-center justify-center text-center">
+            {voucherQr ? (
+              <img
+                src={voucherQr}
+                alt={`Redemption code for ${promo.title}`}
+                className="h-40 w-40 rounded-2xl bg-white p-2 ring-1 ring-line/50 shadow-2xs"
+              />
+            ) : (
+              <div className="grid h-40 w-40 place-items-center rounded-2xl bg-paper">
+                <QrCode size={36} className="text-mute" />
+              </div>
+            )}
+
+            <div className="mt-3 flex items-center gap-2">
+              <span className="font-mono text-xl font-extrabold tracking-widest text-ink bg-paper px-4 py-1.5 rounded-xl ring-1 ring-line">
+                {activeVoucherCode}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(activeVoucherCode);
+                  void triggerHaptic("light");
+                  toast.success("Voucher code copied to clipboard");
+                }}
+                className="grid h-10 w-10 place-items-center rounded-xl bg-card ring-1 ring-line text-mute hover:text-ink active:scale-95 transition cursor-pointer"
+                title="Copy code"
+                aria-label="Copy code"
+              >
+                <Copy size={16} />
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-mute font-medium">
+              Show barcode or quote code to staff at {promo.sponsorName || "venue"}.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="mt-4">
         <PromotionTerms promotion={promo} />
       </div>
@@ -347,7 +420,7 @@ export function PromotionDetailPage({ kind }: { kind: "giveaway" | "promotion" }
             {related.map((r) => (
               <Link
                 key={r.id}
-                href={`/${r.kind === "giveaway" ? "giveaways" : "promotions"}/${r.id}`}
+                href={`/deals/${r.id}`}
                 className="flex items-center gap-3 rounded-2xl ring-1 ring-line bg-card p-3 transition hover:bg-paper active:scale-[0.99]"
               >
                 <span className="min-w-0 flex-1">

@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useLocation, useRoute } from "wouter";
-import { ArrowLeft, Share2 } from "lucide-react";
+import { ArrowLeft, Share2, Sparkles } from "lucide-react";
 import { getTour } from "@/lib/catalog";
 import { fetchTours } from "@/lib/tours-store";
 import { shareTour } from "@/lib/share";
 import type { WalkingTour } from "@shared/tours";
 import { mapsUrl } from "@/lib/geo";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
+import { triggerHaptic } from "@/lib/native";
 import { useAnalytics } from "@/contexts/AnalyticsContext";
 import { NotFoundPage } from "./NotFoundPage";
 
@@ -28,7 +30,7 @@ export function TourPage() {
     };
   }, [id]);
   if (!tour) {
-    if (!checked) return <div className="mx-auto max-w-lg px-4 py-16 text-center text-sm text-mute">Loading…</div>;
+    if (!checked) return <PageLoading />;
     return <NotFoundPage />;
   }
   const [, nav] = useLocation();
@@ -105,8 +107,21 @@ export function TourPage() {
           </Button>
         )}
       </div>
+      <button
+        type="button"
+        onClick={() => {
+          void triggerHaptic("medium");
+          nav(
+            `/plan/new?title=${encodeURIComponent(tour.title)}&dest=${encodeURIComponent(tour.stops[0]?.name || "Sydney")}&type=walk`,
+          );
+        }}
+        className="mt-4 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-full bg-brand text-sm font-semibold text-white shadow-xs transition hover:bg-brand/90 active:scale-95 cursor-pointer"
+      >
+        <Sparkles size={16} />
+        <span>Plan Hangout for this Walk</span>
+      </button>
       <a
-        className="mt-4 flex min-h-[48px] items-center justify-center rounded-full bg-card text-sm font-semibold text-accent ring-1 ring-line transition hover:bg-paper active:scale-[0.99]"
+        className="mt-3 flex min-h-[48px] items-center justify-center rounded-full bg-card text-sm font-semibold text-accent ring-1 ring-line transition hover:bg-paper active:scale-[0.99]"
         href={mapsUrl({ lat: stop.lat, lng: stop.lng }, stop.name)}
         target="_blank"
         rel="noreferrer"

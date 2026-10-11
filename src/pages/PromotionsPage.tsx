@@ -45,11 +45,12 @@ export function PromotionsPage() {
       const snap = await getDocs(
         query(
           collection(db, "promotions"),
-          where("kind", "==", "promotion"),
           where("status", "in", ["live", "closed", "approved"]),
         ),
       );
-      const list = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Promotion, "id">) }));
+      const list = snap.docs
+        .map((d) => ({ id: d.id, ...(d.data() as Omit<Promotion, "id">) }))
+        .filter((d) => d.kind === "promotion" || d.kind === "giveaway");
       list.sort((a, b) => (a.endAt || "").localeCompare(b.endAt || ""));
       setRows(list);
     } catch {

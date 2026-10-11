@@ -13,7 +13,6 @@ import {
   Compass,
   Footprints,
   HeartHandshake,
-  Hotel,
   TrendingUp,
 } from "lucide-react";
 import { useSearchQueryLogger, usePopularSearches } from "@/hooks/useSearchQueryLogger";
@@ -204,28 +203,35 @@ export function GlobalSearchModal() {
         }
         return items;
       }
-      if (activeCategory === "stay") {
+      if (activeCategory === "circle" || activeCategory === "stay") {
         items.push({
-          id: "stay-concierge",
-          category: "stay",
-          title: "Stay & Guide",
-          subtitle: "Stay guide, Wi-Fi & checkout",
-          badge: "Guide",
-          href: "/concierge",
+          id: "circle-hub",
+          category: "person",
+          title: "Networking Circle",
+          subtitle: "Check in, live presence & hang out",
+          badge: "Circle",
+          href: "/circle",
+          icon: Users,
+        });
+        items.push({
+          id: "bio-claim",
+          category: "person",
+          title: "Claim Personal Bio",
+          subtitle: "Your @handle link & vibes",
+          badge: "Bio",
+          href: "/bio/setup",
           icon: Sparkles,
         });
-        const stays = placesForLocation(activePlaces(), here, city, usingGps).filter(
-          (p) => p.category.toLowerCase().includes("stay") || p.category.toLowerCase().includes("hotel"),
-        );
-        for (const p of stays.slice(0, 8)) {
+        const people = listPeople();
+        for (const p of people.slice(0, 8)) {
           items.push({
-            id: `stay-place-${p.id}`,
-            category: "stay",
+            id: `circle-person-${p.id}`,
+            category: "person",
             title: p.name,
-            subtitle: p.shortWhy || p.address || "Boutique stay",
-            badge: "Stay",
-            href: hrefForPlace(p),
-            icon: Hotel,
+            subtitle: p.handle ? `@${p.handle}` : p.whereMet || "Member",
+            badge: "Person",
+            href: p.handle ? `/@${p.handle}` : `/circle`,
+            icon: Users,
           });
         }
         return items;
@@ -377,17 +383,17 @@ export function GlobalSearchModal() {
       }
     }
 
-    // 3. Match Stay / Guide actions
-    const stayKeywords = ["wifi", "wi-fi", "stay", "room", "concierge", "checkout", "breakfast", "towel", "key"];
-    if (stayKeywords.some((k) => q.includes(k))) {
+    // 3. Match Circle / Networking actions
+    const circleKeywords = ["circle", "network", "meet", "hangout", "catchup", "cohort", "campus", "presence", "here", "bio", "handle"];
+    if (circleKeywords.some((k) => q.includes(k))) {
       items.push({
-        id: "stay-concierge",
-        category: "stay",
-        title: "Stay & Guide",
-        subtitle: "Wi-Fi, front desk & checkout",
-        badge: "Guide",
-        href: "/concierge",
-        icon: Sparkles,
+        id: "circle-hub",
+        category: "person",
+        title: "Networking Circle",
+        subtitle: "Check in, live presence & hang out",
+        badge: "Circle",
+        href: "/circle",
+        icon: Users,
       });
     }
 
@@ -494,16 +500,8 @@ export function GlobalSearchModal() {
     if (activeCategory === "people") return items.filter((i) => i.category === "person");
     if (activeCategory === "places") return items.filter((i) => i.category === "place");
     if (activeCategory === "events") return items.filter((i) => i.category === "event");
-    if (activeCategory === "stay") {
-      return items.filter(
-        (i) =>
-          i.category === "stay" ||
-          (i.category === "place" &&
-            (i.badge?.toLowerCase().includes("stay") ||
-              i.badge?.toLowerCase().includes("hotel") ||
-              i.subtitle.toLowerCase().includes("hotel") ||
-              i.subtitle.toLowerCase().includes("stay"))),
-      );
+    if (activeCategory === "circle" || activeCategory === "stay") {
+      return items.filter((i) => i.category === "person");
     }
     if (activeCategory === "plan") return items.filter((i) => i.category === "plan");
 
@@ -625,7 +623,7 @@ export function GlobalSearchModal() {
               { id: "people", label: "People" },
               { id: "places", label: "Places" },
               { id: "events", label: "Events" },
-              { id: "stay", label: "Stays" },
+              { id: "circle", label: "Circle" },
               { id: "plan", label: "Plans" },
             ] as const
           ).map((c) => (

@@ -27,12 +27,13 @@ import { HostPrintPanel } from "@/components/host/HostPrintPanel";
 import { HostTodaySummary } from "@/components/host/HostTodaySummary";
 import { HostTicketBoard } from "@/components/host/HostTicketBoard";
 import { HostOrderBoard } from "@/components/host/HostOrderBoard";
+import { BelongingReportPanel } from "@/components/host/BelongingReportPanel";
 import { subscribePropertyTickets } from "@/lib/tickets-store";
 import { subscribePropertyDiningOrders } from "@/lib/dining-store";
 import { hostWorkspacePropertyId, roomTokenEntries } from "@/lib/host-workspace";
 import { getPropertyWifiRemote, liveBackendEnabled } from "@/lib/functions";
 
-type Tab = "today" | "facilities" | "dining" | "rooms" | "place" | "print";
+type Tab = "today" | "belonging" | "facilities" | "dining" | "rooms" | "place" | "print";
 
 export function HostPage() {
   const { user, isHost, isAdmin, authReady, createHostProperty, sendVerificationEmail } = useAuth();
@@ -242,10 +243,9 @@ export function HostPage() {
           <Button
             variant="ghost"
             className="h-11"
-            onClick={() => nav(`/g/${property.id}`)}
-            disabled={!property.id || property.id === "unknown"}
+            onClick={() => nav("/join")}
           >
-            Guest companion <ExternalLink size={14} className="opacity-70" />
+            Arrival Portal <ExternalLink size={14} className="opacity-70" />
           </Button>
         </header>
 
@@ -258,14 +258,14 @@ export function HostPage() {
             {business ? NAMES.yourPlace : NAMES.partnerAccount}
           </Button>
           <Button variant="ghost" className="h-11 px-4 text-xs" onClick={() => nav("/event")}>
-            Event
+            Event Host Console
           </Button>
           <Button
             variant="ghost"
             className="h-11 px-4 text-xs text-accent font-semibold"
-            onClick={() => nav(`/stay/${property.id}`)}
+            onClick={() => nav("/business")}
           >
-            Preview Guest Stay →
+            Business Hub →
           </Button>
         </div>
 
@@ -273,10 +273,12 @@ export function HostPage() {
           layout="contained"
           ariaLabel="Host sections"
           className="mt-5"
-          items={["today", "facilities", "dining", "rooms", "place", "print"].map((t) => ({ id: t as Tab, label: t }))}
+          items={["today", "belonging", "facilities", "dining", "rooms", "place", "print"].map((t) => ({ id: t as Tab, label: t === "belonging" ? "Belonging Report" : t }))}
           active={tab}
           onChange={setTab}
         />
+
+        {tab === "belonging" && <BelongingReportPanel />}
 
         {tab === "today" && (
           <>

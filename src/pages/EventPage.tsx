@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useRoute, useLocation, useSearch, Link } from "wouter";
-import { Check, ChevronDown, Heart, MapPin, Plus, Share2, Sparkles, Star, ArrowLeft, Ticket } from "lucide-react";
+import { Check, ChevronDown, Heart, MapPin, Plus, Share2, Sparkles, Star, ArrowLeft, ArrowRight, Ticket, Users } from "lucide-react";
 import { toast } from "sonner";
 import { StickyAction } from "@/components/design-system/companions";
 import { Button } from "@/components/ui/Button";
 import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
-import { SpeakerRow } from "@/components/event/SpeakerRow";
 import { createBookingForEvent } from "@/components/booking/BookingsSection";
 import { createBookingCheckoutSessionRemote } from "@/lib/functions";
 import { useAuth } from "@/contexts/AuthContext";
@@ -115,9 +114,24 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
   const { user, requireUser } = useAuth();
   const { toggleGoing, toggleInterested, toggleLiked, getEvent } = useEvents();
   const [buying, setBuying] = useState(false);
+  const [tier, setTier] = useState<"standard" | "vip" | "group">("standard");
+  const [spots, setSpots] = useState<number>(1);
 
   const paidCents = event.ticketPriceCents || 0;
   const isPaid = paidCents > 0;
+
+  const effectiveSpots = tier === "group" ? 4 : spots;
+  const unitPriceCents =
+    tier === "vip"
+      ? Math.round(paidCents * 1.5)
+      : tier === "group"
+        ? Math.round(paidCents * 0.9)
+        : paidCents;
+  const effectivePriceCents = isPaid
+    ? tier === "group"
+      ? Math.round(paidCents * 4 * 0.9)
+      : unitPriceCents * spots
+    : 0;
 
   async function buyTicket() {
     if (!requireUser("Sign in to get tickets.")) return;
@@ -144,12 +158,13 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
         eventId: event.id,
         providerUid,
         providerName: String(providerName),
-        title: event.title,
+        title: `${event.title}${tier === "vip" ? " (VIP Pass)" : tier === "group" ? " (Group Pass · 4 Tickets)" : ""}`,
         suburb: event.city,
         date,
         time,
-        priceCents: paidCents,
+        priceCents: effectivePriceCents,
         customerUid: user.uid,
+        spots: effectiveSpots,
       });
       const res = await createBookingCheckoutSessionRemote({ bookingId });
       if (res.checkoutUrl) {
@@ -157,7 +172,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
         return;
       }
       toast.success("Ticket reserved — added to your AirPal Pass wallet");
-      nav("/me/tickets");
+      nav(`/ticket/${bookingId}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't start checkout.");
     } finally {
@@ -191,7 +206,8 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
   };
 
   const openDirections = () => {
-    const query = encodeURIComponent(`${event.venue}, ${event.city}`);
+    const venueOrTitle = event.venue || event.title;
+    const query = encodeURIComponent(`${venueOrTitle}, ${event.city}`);
     window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
   };
 
@@ -285,22 +301,120 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
               {[event.venue, event.room].filter(Boolean).join(" · ")}, {event.city}
             </span>
           </button>
-          {event.speakers && event.speakers.length > 0 && (
-            <div className="border-t border-line/60 pt-2">
-              <SpeakerRow speakers={event.speakers} />
+          {/* Ticket Options & Tier Selection */}
+          <div className="border-t border-line/60 pt-3">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-accent mb-2">
+              Ticket Options &amp; Passes
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { id: "standard", label: "General", desc: isPaid ? `$${(paidCents / 100).toFixed(0)}` : "Free" },
+                { id: "vip", label: "VIP Pass", desc: isPaid ? `$${(Math.round(paidCents * 1.5) / 100).toFixed(0)}` : "VIP" },
+                { id: "group", label: "Group (4)", desc: isPaid ? "10% Off" : "4 Passes" },
+              ].map((t) => {
+                const active = tier === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setTier(t.id as any)}
+                    className={cn(
+                      "flex flex-col items-center justify-center rounded-xl p-2 text-center transition active:scale-95 cursor-pointer ring-1",
+                      active
+                        ? "bg-brand text-white ring-brand shadow-xs"
+                        : "bg-paper text-ink ring-line hover:bg-card",
+                    )}
+                  >
+                    <span className="text-xs font-bold">{t.label}</span>
+                    <span className={cn("text-[10px] mt-0.5", active ? "text-amber-300 font-semibold" : "text-mute")}>
+                      {t.desc}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-          )}
-          {event.ticketPrice && (
-            <p className="text-xs font-medium text-mute">
-              Admission: <strong className="text-accent">{event.ticketPrice}</strong>
-            </p>
-          )}
-          {isPaid && (
-            <p className="text-sm font-semibold text-ink">
-              ${(paidCents / 100).toFixed(2)} AUD
-              {event.capacity ? <span className="ml-2 text-xs font-medium text-mute">{event.capacity} tickets</span> : null}
-            </p>
-          )}
+
+            {tier !== "group" && (
+              <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-line/50">
+                <span className="text-xs font-semibold text-mute">Passes:</span>
+                <div className="flex items-center gap-1.5">
+                  {[1, 2, 4].map((qty) => (
+                    <button
+                      key={qty}
+                      type="button"
+                      onClick={() => setSpots(qty)}
+                      className={cn(
+                        "h-7 w-7 rounded-lg text-xs font-bold transition active:scale-95 ring-1",
+                        spots === qty
+                          ? "bg-brand text-white ring-brand"
+                          : "bg-paper text-ink ring-line hover:bg-card",
+                      )}
+                    >
+                      {qty}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {isPaid && (
+              <div className="mt-2 flex items-center justify-between text-xs font-semibold text-ink pt-2 border-t border-line/40">
+                <span className="text-mute">Total for {effectiveSpots} {effectiveSpots === 1 ? "pass" : "passes"}:</span>
+                <span className="text-sm font-bold text-accent">
+                  ${(effectivePriceCents / 100).toFixed(2)} AUD
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Guestlist Roster Preview */}
+        <div className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Users size={16} className="text-accent" />
+              <p className="text-sm font-bold text-ink">Guestlist &amp; Check-in</p>
+            </div>
+            <Link
+              href={`/e/${event.id}/guests`}
+              className="text-xs font-bold text-accent hover:underline flex items-center gap-1"
+            >
+              <span>View Roster</span>
+              <ArrowRight size={12} />
+            </Link>
+          </div>
+          <p className="mt-1 text-xs text-mute">
+            Live attendee guestlist and gate check-in roster for this experience.
+          </p>
+        </div>
+
+        {/* Venue Location Map */}
+        <div className="mt-4 rounded-2xl bg-card p-4 ring-1 ring-line overflow-hidden">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <MapPin size={16} className="text-accent" />
+              <p className="text-sm font-bold text-ink">Venue Location</p>
+            </div>
+            <button
+              type="button"
+              onClick={openDirections}
+              className="text-xs font-bold text-accent hover:underline flex items-center gap-1 cursor-pointer"
+            >
+              <span>Directions</span>
+              <ArrowRight size={12} />
+            </button>
+          </div>
+          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-paper ring-1 ring-line/50">
+            <iframe
+              title={`Map of ${event.venue || event.title}`}
+              src={`https://www.google.com/maps?q=${encodeURIComponent(`${event.venue || ""}, ${event.city}`)}&z=15&output=embed`}
+              className="h-full w-full border-0"
+              loading="lazy"
+            />
+          </div>
+          <p className="mt-2 text-xs text-mute font-medium truncate">
+            {[event.venue, event.room].filter(Boolean).join(" · ")}, {event.city}
+          </p>
         </div>
 
         {/* Secondary status — one quiet row, never competing with the primary */}
@@ -410,7 +524,7 @@ function CalendarEventDetailView({ event }: { event: CalendarEvent }) {
               disabled={buying}
               className="flex h-12 w-full cursor-pointer touch-manipulation items-center justify-center gap-2 rounded-full bg-brand text-[15px] font-semibold text-white transition active:scale-[0.99] disabled:opacity-60"
             >
-              <span>{buying ? "Starting checkout…" : `Get ticket · $${(paidCents / 100).toFixed(2)}`}</span>
+              <span>{buying ? "Starting checkout…" : `Get ${effectiveSpots > 1 ? `${effectiveSpots} tickets` : "ticket"} · $${(effectivePriceCents / 100).toFixed(2)}`}</span>
             </button>
           ) : (
             <button

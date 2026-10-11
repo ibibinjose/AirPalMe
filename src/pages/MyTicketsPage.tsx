@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Calendar, RefreshCw, Ticket, WifiOff } from "lucide-react";
+import { ArrowLeft, Calendar, RefreshCw, Ticket, WifiOff } from "lucide-react";
 import { PageLoading } from "@/components/ui/PageLoading";
 import { AirPalTicketPass } from "@/components/tickets/AirPalTicketPass";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,9 +26,19 @@ export function MyTicketsPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 pb-28 pt-4 md:px-6 md:pt-6">
+      <div className="flex items-center gap-2 mb-3">
+        <Link
+          href="/pass"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-mute hover:text-ink ring-1 ring-line hover:bg-paper transition"
+        >
+          <ArrowLeft size={13} />
+          <span>AirPal Pass</span>
+        </Link>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">Wallet &amp; Passbook</span>
+      </div>
+
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">AirPal Pass · Wallet</p>
           <h1 className="mt-0.5 font-display text-3xl font-bold text-ink">My event passes &amp; tickets</h1>
         </div>
         <div className="flex items-center gap-2">

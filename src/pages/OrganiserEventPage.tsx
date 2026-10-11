@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useLocation, useSearch } from "wouter";
+import { Link, useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { motion, useReducedMotion } from "framer-motion";
 import {
+  ArrowLeft,
   ArrowRight,
   AtSign,
   Building2,
@@ -449,6 +450,28 @@ export function OrganiserEventPage() {
           variants={reduce ? undefined : landing}
         >
           <motion.header variants={landingItem}>
+            <div className="flex items-center gap-2 mb-4 flex-wrap">
+              <Link
+                href="/pass"
+                className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-card px-3 text-xs font-semibold text-mute hover:text-ink ring-1 ring-line hover:bg-paper transition"
+              >
+                <ArrowLeft size={13} />
+                <span>AirPal Pass</span>
+              </Link>
+              <Link
+                href="/events"
+                className="inline-flex min-h-[36px] items-center gap-1 rounded-full bg-card px-3 text-xs font-semibold text-mute hover:text-ink ring-1 ring-line hover:bg-paper transition"
+              >
+                <span>Browse Events</span>
+              </Link>
+              <Link
+                href="/scan"
+                className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-card px-3 text-xs font-semibold text-mute hover:text-ink ring-1 ring-line hover:bg-paper transition"
+              >
+                <QrCode size={13} className="text-amber-500" />
+                <span>Door Scanner</span>
+              </Link>
+            </div>
             <div className="flex items-center gap-2">
               <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-accent">
                 AirPal Pass · Event Hosting
@@ -934,6 +957,41 @@ export function OrganiserEventPage() {
       />
 
       <div className="relative mx-auto max-w-4xl px-4 pb-24 pt-4">
+        {/* Breadcrumb Navigation Bar */}
+        <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Link
+              href="/pass"
+              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-card px-3 text-xs font-semibold text-mute hover:text-ink ring-1 ring-line hover:bg-paper transition"
+            >
+              <ArrowLeft size={13} />
+              <span>AirPal Pass</span>
+            </Link>
+            <Link
+              href="/events"
+              className="inline-flex min-h-[36px] items-center gap-1 rounded-full bg-card px-3 text-xs font-semibold text-mute hover:text-ink ring-1 ring-line hover:bg-paper transition"
+            >
+              <span>Browse Events</span>
+            </Link>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/e/${myEvent.id}/guests`}
+              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-card px-3 text-xs font-semibold text-accent ring-1 ring-line hover:bg-paper transition"
+            >
+              <Users size={13} />
+              <span>Door Guestlist</span>
+            </Link>
+            <Link
+              href="/scan"
+              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-neutral-900 text-white dark:bg-white dark:text-neutral-950 px-3 text-xs font-bold shadow-xs hover:opacity-90 transition"
+            >
+              <QrCode size={13} />
+              <span>Door Scanner</span>
+            </Link>
+          </div>
+        </div>
+
         {/* Top Header Card */}
         <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay overflow-hidden relative">
           {myEvent.coverImage && (

@@ -121,7 +121,7 @@ export function GuidePage() {
               ? "No walks published near you yet. The Rocks has walks you can browse."
               : "When a host publishes a walk, it shows up here. Explore places around you in the meantime."
           }
-          action={aroundYou ? () => chooseLocation(ROCKS_BROWSE) : () => nav("/")}
+          action={aroundYou ? () => chooseLocation(ROCKS_BROWSE) : () => nav("/now")}
           actionLabel={aroundYou ? "See The Rocks" : t("explore")}
         />
       ) : (

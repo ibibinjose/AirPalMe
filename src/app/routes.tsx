@@ -10,7 +10,7 @@ import { HomePage } from "@/pages/HomePage";
 // Phase 6 (Subtraction): only V1 routes ship. Deleted surfaces (Mate/strangers,
 // duplicate directories, P3/P4 verticals, vanity) redirect to their V1 owner or 404.
 const NowPage = lazy(() => import("@/pages/NowPage").then((m) => ({ default: m.NowPage })));
-const ConciergePage = lazy(() => import("@/pages/ConciergePage").then((m) => ({ default: m.ConciergePage })));
+const CirclePage = lazy(() => import("@/pages/CirclePage").then((m) => ({ default: m.CirclePage })));
 const GuidePage = lazy(() => import("@/pages/GuidePage").then((m) => ({ default: m.GuidePage })));
 const TourPage = lazy(() => import("@/pages/TourPage").then((m) => ({ default: m.TourPage })));
 const ScanPage = lazy(() => import("@/pages/ScanPage").then((m) => ({ default: m.ScanPage })));
@@ -33,9 +33,6 @@ const InboxPage = lazy(() => import("@/pages/InboxPage").then((m) => ({ default:
 const MemoryWallPage = lazy(() => import("@/pages/MemoryWallPage").then((m) => ({ default: m.MemoryWallPage })));
 const SettingsPage = lazy(() => import("@/pages/SettingsPage").then((m) => ({ default: m.SettingsPage })));
 const MarkerPage = lazy(() => import("@/pages/MarkerPage").then((m) => ({ default: m.MarkerPage })));
-const StayPage = lazy(() => import("@/pages/StayPage").then((m) => ({ default: m.StayPage })));
-const StayListPage = lazy(() => import("@/pages/StayListPage").then((m) => ({ default: m.StayListPage })));
-const StayProfilePage = lazy(() => import("@/pages/StayProfilePage").then((m) => ({ default: m.StayProfilePage })));
 const HostPage = lazy(() => import("@/pages/HostPage").then((m) => ({ default: m.HostPage })));
 const HostPulsePage = lazy(() => import("@/pages/HostPulsePage").then((m) => ({ default: m.HostPulsePage })));
 const PulseHubPage = lazy(() => import("@/pages/PulseHubPage").then((m) => ({ default: m.PulseHubPage })));
@@ -147,11 +144,20 @@ export function AppRoutes() {
           <Route path="/tour/:id" component={TourPage} />
           <Route path="/scan" component={ScanPage} />
           <Route path="/w/:code" component={WavePage} />
-          <Route path="/concierge" component={ConciergePage} />
-          <Route path="/stay" component={StayListPage} />
-          <Route path="/g/:id" component={StayPage} />
-          <Route path="/stay/@:handle" component={StayProfilePage} />
-          <Route path="/stay/:id" component={StayPage} />
+          <Route path="/circle" component={CirclePage} />
+          <Route path="/concierge">
+            <Redirect to="/now" />
+          </Route>
+          <Route path="/stay">
+            <Redirect to="/business" />
+          </Route>
+          <Route path="/g/:id">
+            <Redirect to="/now" />
+          </Route>
+          <Route path="/stay/@:handle">{(p) => <Redirect to={`/@${p.handle}`} />}</Route>
+          <Route path="/stay/:id">
+            <Redirect to="/business" />
+          </Route>
           <Route path="/q/:city/:handle" component={MarkerPage} />
           <Route path="/q/:a" component={MarkerPage} />
           <Route path="/q">
@@ -173,6 +179,9 @@ export function AppRoutes() {
           </Route>
           <Route path="/pass/tickets">
             <Redirect to="/me/tickets" />
+          </Route>
+          <Route path="/pass/scan">
+            <Redirect to="/scan" />
           </Route>
           <Route path="/plans">
             <Redirect to="/plan" />
@@ -211,7 +220,10 @@ export function AppRoutes() {
             <Redirect to="/start?tab=reset" />
           </Route>
           <Route path="/auth/action" component={AuthActionPage} />
+          <Route path="/join/:code" component={JoinPage} />
           <Route path="/join" component={JoinPage} />
+          <Route path="/arrival/:code" component={JoinPage} />
+          <Route path="/arrival" component={JoinPage} />
           <Route path="/founders" component={FoundersPage} />
           <Route path="/business/onboard" component={BusinessOnboardPage} />
           <Route path="/business/setup" component={BusinessShowcasePage} />
@@ -284,7 +296,7 @@ export function AppRoutes() {
             <Redirect to="/privacy" />
           </Route>
           <Route path="/os">
-            <Redirect to="/concierge" />
+            <Redirect to="/now" />
           </Route>
           <Route path={BIO_PUBLIC_PATH} component={BioPublicPage} />
           <Route component={NotFoundPage} />

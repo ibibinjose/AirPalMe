@@ -1,126 +1,191 @@
-import { useLocation } from "wouter";
-import { ArrowRight, CheckCircle2, Compass, Store, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useLocation, useParams } from "wouter";
+import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { useAuth } from "@/contexts/AuthContext";
-import { useBio } from "@/contexts/BioContext";
-import { partnerAccountPath } from "@/lib/partner-account";
-import { NAMES } from "@shared/names";
+import { useCohort } from "@/contexts/CohortContext";
+import { triggerHaptic } from "@/lib/native";
 
 export function JoinPage() {
+  const params = useParams<{ code?: string }>();
   const [, nav] = useLocation();
-  const { user, authReady } = useAuth();
-  const { mine, business } = useBio();
+  const { activeCohort, isCohortMember, joinCohort, leaveCohort, availableInstitutions } = useCohort();
 
-  if (!authReady) {
-    return <div className="mx-auto max-w-md px-4 py-16 text-center text-sm text-mute">Loading…</div>;
-  }
+  const [inputCode, setInputCode] = useState(params.code || "");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [joinedSuccess, setJoinedSuccess] = useState<string | null>(null);
 
-  const hasAccount = Boolean(user);
-  const hasPlace = Boolean(business);
+  // If URL has a cohort code, auto-join on mount
+  useEffect(() => {
+    if (params.code) {
+      const outcome = joinCohort(params.code);
+      if (outcome.success && outcome.institution) {
+        setJoinedSuccess(outcome.institution.name);
+      } else {
+        setErrorMessage(outcome.message);
+      }
+    }
+  }, [params.code, joinCohort]);
+
+  const handleJoin = (codeToJoin: string) => {
+    void triggerHaptic("medium");
+    setErrorMessage(null);
+    const outcome = joinCohort(codeToJoin);
+    if (outcome.success && outcome.institution) {
+      setJoinedSuccess(outcome.institution.name);
+      setTimeout(() => {
+        nav("/now");
+      }, 1200);
+    } else {
+      setErrorMessage(outcome.message);
+    }
+  };
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 pb-28 md:py-12">
-      <header>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl">Join AirPal</h1>
-        <p className="mt-3 text-base leading-relaxed text-mute">
-          Everyone on AirPal starts with an AirPal Me account. A partner account is the same login, plus a place guests can find.
+    <div className="mx-auto max-w-2xl px-4 py-8 pb-28 md:py-14">
+      {/* Header */}
+      <header className="text-center">
+        <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-brand/10 px-3.5 py-1 text-xs font-bold text-accent">
+          <Sparkles size={13} />
+          <span>AirPal Arrival Engine</span>
+        </div>
+        <h1 className="font-display mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+          I Just Got Here
+        </h1>
+        <p className="mt-2 text-base text-mute">
+          Enter your building or college code to connect with your verified cohort, join hosted events, and make plans in under a minute.
         </p>
       </header>
 
-      {user && (
-        <p className="mt-6 rounded-2xl bg-card px-4 py-3 text-sm ring-1 ring-line shadow-xs">
-          Signed in{mine?.handle ? ` as @${mine.handle}` : user.displayName ? ` as ${user.displayName}` : ""}.
-          {hasPlace ? " Your business profile is live." : " You can stay a user, or add a business profile below."}
-        </p>
+      {/* Active Cohort State */}
+      {isCohortMember && activeCohort && (
+        <div className="mt-6 overflow-hidden rounded-3xl bg-card p-6 ring-1 ring-line shadow-sm text-center">
+          <div className="text-4xl">{activeCohort.badgeEmoji}</div>
+          <h2 className="font-display mt-2 text-xl font-bold text-ink">{activeCohort.name}</h2>
+          <p className="mt-1 text-xs text-mute">{activeCohort.address}</p>
+          <p className="mt-3 text-sm text-ink/80">{activeCohort.welcomeMessage}</p>
+
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button
+              className="w-full sm:w-auto"
+              variant="primary"
+              onClick={() => {
+                void triggerHaptic("light");
+                nav("/now");
+              }}
+            >
+              <span>{activeCohort.shortName} Experiences</span>
+              <ArrowRight size={16} />
+            </Button>
+            <Button
+              className="w-full sm:w-auto"
+              variant="ghost"
+              onClick={() => {
+                void triggerHaptic("light");
+                nav("/circle");
+              }}
+            >
+              <span>View Building Circle</span>
+            </Button>
+            <Button
+              className="w-full sm:w-auto text-mute hover:text-ink"
+              variant="ghost"
+              onClick={() => {
+                leaveCohort();
+                setJoinedSuccess(null);
+              }}
+            >
+              Switch Building
+            </Button>
+          </div>
+        </div>
       )}
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col rounded-3xl ring-1 ring-line bg-card p-6">
-          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-brand/10 text-accent">
-            <User size={22} />
-          </span>
-          <h2 className="font-display mt-4 text-xl font-bold">Just use AirPal</h2>
-          <p className="mt-2 flex-1 text-sm leading-relaxed text-mute">Places, plans, and a Circle.</p>
-          <Button
-            className="mt-5 w-full justify-between"
-            variant={hasAccount ? "ghost" : "primary"}
-            onClick={() => nav(hasAccount ? "/" : "/start?tab=signup&next=/")}
-          >
-            <span>{hasAccount ? "Explore" : "Create my account"}</span>
-            <ArrowRight size={16} />
-          </Button>
-        </div>
-
-        <div className="flex flex-col rounded-3xl ring-1 ring-line bg-card p-6">
-          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-700">
-            <Store size={22} />
-          </span>
-          <h2 className="font-display mt-4 text-xl font-bold">{NAMES.partnerAccount}</h2>
-          <p className="mt-2 flex-1 text-sm leading-relaxed text-mute">
-            Same AirPal login. Guests find the place on What&apos;s on.
+      {/* Join Form */}
+      {(!isCohortMember || !activeCohort) && (
+        <div className="mt-8 rounded-3xl bg-card p-6 sm:p-8 ring-1 ring-line shadow-xs">
+          <h2 className="font-display text-lg font-bold text-ink">Enter Building or College Code</h2>
+          <p className="mt-1 text-xs text-mute">
+            Found on your room welcome card, move-in key pack, or lobby QR poster.
           </p>
-          <Button
-            className="mt-5 w-full justify-between"
-            onClick={() => nav(partnerAccountPath({ signedIn: hasAccount, hasPlace }))}
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleJoin(inputCode);
+            }}
+            className="mt-4 flex flex-col sm:flex-row gap-2.5"
           >
-            <span>{hasPlace ? NAMES.yourPlace : "Open a partner account"}</span>
-            <ArrowRight size={16} />
-          </Button>
+            <input
+              type="text"
+              value={inputCode}
+              onChange={(e) => {
+                setInputCode(e.target.value.toUpperCase());
+                setErrorMessage(null);
+              }}
+              placeholder="e.g. SCAPE26, STPAULS"
+              className="h-12 flex-1 rounded-2xl bg-paper px-4 text-sm font-semibold uppercase tracking-wider text-ink ring-1 ring-line/80 focus:outline-none focus:ring-2 focus:ring-brand"
+            />
+            <Button
+              type="submit"
+              className="h-12 min-w-[120px]"
+              variant="primary"
+            >
+              Join Cohort
+            </Button>
+          </form>
+
+          {errorMessage && (
+            <p className="mt-3 text-xs font-semibold text-rose-600 dark:text-rose-400">
+              {errorMessage}
+            </p>
+          )}
+
+          {joinedSuccess && (
+            <div className="mt-4 flex items-center gap-2 rounded-2xl bg-emerald-500/10 p-3 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+              <CheckCircle2 size={16} />
+              <span>Joined {joinedSuccess}! Taking you to your daily plans…</span>
+            </div>
+          )}
+
+          {/* Seed Beachhead Quick Selector */}
+          <div className="mt-8 border-t border-line/60 pt-6">
+            <span className="text-xs font-bold uppercase tracking-wider text-mute">
+              Or tap a featured Sydney partner
+            </span>
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {availableInstitutions.map((inst) => (
+                <button
+                  key={inst.id}
+                  type="button"
+                  onClick={() => handleJoin(inst.code)}
+                  className="flex items-center gap-3 rounded-2xl border border-line bg-paper/60 p-3 text-left transition hover:border-brand/40 hover:bg-card active:scale-[0.98] cursor-pointer"
+                >
+                  <span className="text-2xl shrink-0">{inst.badgeEmoji}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-ink truncate">{inst.name}</p>
+                    <p className="text-[11px] text-mute">{inst.code} · {inst.city}</p>
+                  </div>
+                  <ArrowRight size={14} className="text-mute shrink-0" />
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
-      <section className="mt-8 rounded-[28px] bg-card p-6 ring-1 ring-line">
-        <h2 className="font-display text-xl font-bold">Go live</h2>
-        <ol className="mt-4 space-y-3">
-          {[
-            {
-              n: "1",
-              t: "Open a partner account",
-              d: "Same login. Name the place and what it is — café, shop, stay, and so on.",
-            },
-            {
-              n: "2",
-              t: "You",
-              d: "Who we can contact. Featured needs a work email on the Google website, or an ABN.",
-            },
-            {
-              n: "3",
-              t: "Verify",
-              d: "Import the public Google listing. A checkbox is a directory claim, not Google ownership.",
-            },
-            {
-              n: "4",
-              t: "Go live, then add 3 things",
-              d: "One product, one service, one offer so people nearby can find you.",
-            },
-          ].map((row) => (
-            <li key={row.n} className="flex gap-3">
-              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand text-xs font-bold text-white">
-                {row.n}
-              </span>
-              <span>
-                <span className="block text-sm font-semibold text-ink">{row.t}</span>
-                <span className="block text-[13px] text-mute">{row.d}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
-        <p className="mt-4 flex items-start gap-2 text-[13px] text-mute">
-          <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-accent" />
-          Stay host tools, events, and experiences open after the profile is live. One thing at a time.
+      {/* General Public Link */}
+      <div className="mt-8 text-center">
+        <p className="text-xs text-mute">
+          Not staying in a partner college or hotel?{" "}
+          <button
+            type="button"
+            onClick={() => nav("/now")}
+            className="font-semibold text-accent underline cursor-pointer"
+          >
+            Explore Sydney as a general guest
+          </button>
         </p>
-      </section>
-
-      <p className="mt-6 text-center text-sm text-mute">
-        <button
-          type="button"
-          className="inline-flex min-h-[44px] items-center font-semibold text-accent hover:underline"
-          onClick={() => nav("/")}
-        >
-          <Compass size={14} className="mr-1 inline" />
-          Browse as a guest
-        </button>
-      </p>
+      </div>
     </div>
   );
 }

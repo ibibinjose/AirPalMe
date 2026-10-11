@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBio } from "@/contexts/BioContext";
+import { useCohort } from "@/contexts/CohortContext";
 import { usePlans } from "@/contexts/PlanContext";
 import { useLocalNow } from "@/contexts/LocalNowContext";
 import { useMyBookings } from "@/hooks/useMyBookings";
@@ -75,6 +76,7 @@ export function MePage() {
   const [, nav] = useLocation();
   const { user, logout, sendVerificationEmail, isHost } = useAuth();
   const { mine, business, biosReady, updateProfile } = useBio();
+  const { activeCohort } = useCohort();
   const { myPlans } = usePlans();
   const { today, weather, city, day } = useLocalNow();
   const { upcomingBookings } = useMyBookings();
@@ -253,6 +255,16 @@ export function MePage() {
                   <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-500/15 rounded-full px-2 py-0.5">
                     ● Active
                   </span>
+
+                  {activeCohort && (
+                    <Link
+                      href="/join"
+                      className="inline-flex items-center gap-1 text-[10px] font-bold text-accent bg-brand/10 rounded-full px-2 py-0.5 hover:bg-brand/20 transition"
+                    >
+                      <span>{activeCohort.badgeEmoji}</span>
+                      <span>{activeCohort.name} Cohort</span>
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
@@ -263,6 +275,16 @@ export function MePage() {
                 <Sparkles size={12} />
                 <span>Me Cockpit</span>
               </span>
+
+              <Button
+                size="sm"
+                variant="ghost"
+                className="min-h-[38px] rounded-full border border-line px-3.5 text-xs font-semibold text-ink hover:bg-paper active:scale-95"
+                onClick={() => nav("/circle")}
+              >
+                <Users size={13} className="text-accent mr-1" />
+                <span>My Circle</span>
+              </Button>
 
               {mine ? (
                 <Button

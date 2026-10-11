@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useListings } from "@/contexts/ListingsContext";
 import { useLocalNow } from "@/contexts/LocalNowContext";
+import { useCohort } from "@/contexts/CohortContext";
 import { discoverPlaces } from "@/lib/catalog";
 import { zonedWeekdayIndex } from "@/lib/local-time";
 import { NOW_MOODS, NOW_WHENS, pickSuggestion, type NowMood, type NowWhen } from "@/lib/now-suggest";
@@ -60,6 +61,7 @@ function openLabel(open: boolean | null, when: NowWhen): string {
 
 export function NowPage() {
   const { here, city, now, today, timeZone, usingGps, weather } = useLocalNow();
+  const { activeCohort, isCohortMember, hostedExperiences } = useCohort();
   const { version, remoteLoaded } = useListings();
   const [, navigate] = useLocation();
   const [mood, setMood] = useState<NowMood>("any");
@@ -160,7 +162,7 @@ export function NowPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/pass"
-              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-paper px-3 py-1 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card transition shadow-2xs"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card transition shadow-2xs"
             >
               <Ticket size={13} className="text-amber-500" />
               <span className="hidden sm:inline">AirPal</span>
@@ -192,6 +194,76 @@ export function NowPage() {
               <p className="text-mute mt-0.5 truncate">{outfitAdvice.outfit}</p>
             </div>
           </div>
+        )}
+
+        {/* B2B2C Arrival Layer: Institution Cohort Banner & Hosted Experiences */}
+        {isCohortMember && activeCohort ? (
+          <div className="mt-3 space-y-2.5">
+            <div className="flex items-center justify-between gap-3 rounded-2xl bg-card p-3.5 text-xs ring-1 ring-line/80 shadow-xs">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="text-xl shrink-0">{activeCohort.badgeEmoji}</span>
+                <div className="min-w-0">
+                  <span className="font-bold text-ink truncate block">{activeCohort.name} Cohort</span>
+                  <span className="text-[11px] text-mute">{activeCohort.address || "Building Hub"}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <Link
+                  href="/circle"
+                  className="rounded-full bg-brand/10 px-2.5 py-1 font-semibold text-accent hover:bg-brand/20 transition ring-1 ring-line text-[11px]"
+                >
+                  Circle Presence
+                </Link>
+                <Link
+                  href="/join"
+                  className="rounded-full bg-paper px-2.5 py-1 font-semibold text-ink hover:bg-card ring-1 ring-line text-[11px]"
+                >
+                  Hub
+                </Link>
+              </div>
+            </div>
+
+            {hostedExperiences.map((exp) => (
+              <div
+                key={exp.id}
+                className="overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-900 to-brand p-4 text-white shadow-md ring-1 ring-white/10"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">
+                    {exp.isTonight ? "🌙 Tonight in Building" : "🏛️ Hosted Experience"}
+                  </span>
+                  <span className="text-xs font-semibold text-white/90">{exp.timeStr}</span>
+                </div>
+                <h3 className="font-display mt-2 text-lg font-bold text-white leading-snug">{exp.title}</h3>
+                <p className="mt-1 text-xs text-white/80">{exp.description}</p>
+                <div className="mt-2 text-[11px] text-white/70">
+                  📍 {exp.location} · Host: {exp.hostName} · {exp.rsvpsCount} attending
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <Link
+                    href={`/plan/new?title=${encodeURIComponent(exp.title)}&dest=${encodeURIComponent(exp.location)}&type=catchup`}
+                    className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-xs font-bold text-neutral-950 transition hover:bg-neutral-100 active:scale-95"
+                  >
+                    <span>RSVP / Join with Neighbors</span>
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Link
+            href="/join"
+            className="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-card border border-brand/20 p-3.5 text-xs text-ink transition hover:bg-paper active:scale-[0.99] shadow-xs"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="text-xl">🏛️</span>
+              <div>
+                <span className="font-bold text-accent">Just arrived in Sydney?</span>
+                <p className="text-[11px] text-mute">Enter your building code to connect with your verified cohort.</p>
+              </div>
+            </div>
+            <span className="font-semibold text-accent shrink-0 text-xs">Enter Code →</span>
+          </Link>
         )}
 
         {/* AirPal Pass Integration: Active Event Passes */}
@@ -511,6 +583,7 @@ export function NowPage() {
                         date: today,
                         now,
                         geo: suggestion.place.geo,
+                        timeZone,
                       }),
                     );
                   }}

@@ -1,14 +1,12 @@
 import {
   Activity,
   BadgePercent,
-  Building2,
   CalendarDays,
   CalendarPlus,
   Compass,
   Gift,
   Handshake,
   Headphones,
-  Hotel,
   Images,
   Info,
   LayoutDashboard,
@@ -67,7 +65,7 @@ export const BROWSE_LINKS: BrowseLink[] = [
     icon: Sparkles,
     match: (p) => p.startsWith("/now"),
   },
-  { href: "/stay", label: "Stay", icon: Hotel, match: (p) => p.startsWith("/stay") },
+  { href: "/circle", label: "Circle", icon: Users, match: (p) => p.startsWith("/circle") },
 ];
 
 /** Host shortcuts: everything a host needs, one tap from the browse menu. */
@@ -99,13 +97,13 @@ export const PLAN_LINKS: BrowseLink[] = [
   { href: "/calendar", label: "Calendar", icon: CalendarDays, match: (p) => p.startsWith("/calendar") },
 ];
 
-/** Stay & Guide: guest concierge, guide, and scanning. */
+/** Discover & Connect: personal bio, guide, and scanning. */
 export const GUIDE_LINKS: BrowseLink[] = [
   {
-    href: "/concierge",
-    label: "Concierge",
-    icon: Building2,
-    match: (p) => p.startsWith("/concierge") || p.startsWith("/g/"),
+    href: "/bio/setup",
+    label: "Personal Bio",
+    icon: UserRound,
+    match: (p) => p.startsWith("/bio"),
   },
   {
     href: "/guide",
@@ -177,7 +175,7 @@ export const HELP_LINKS: BrowseLink[] = [
 export const BROWSE_SECTIONS: BrowseSection[] = [
   { title: "Browse AirPal", links: BROWSE_LINKS },
   { title: "Plan & Go", links: PLAN_LINKS },
-  { title: "Stay & Guide", links: GUIDE_LINKS },
+  { title: "Discover & Connect", links: GUIDE_LINKS },
   { title: "Business", links: BUSINESS_LINKS },
   { title: "Account", links: ACCOUNT_LINKS },
   { title: "Help & Trust", links: HELP_LINKS },
@@ -188,6 +186,7 @@ const STRIP_PREFIXES = [
   "/explore",
   "/now",
   "/pass",
+  "/circle",
   "/stay",
   "/events",
   "/calendar",

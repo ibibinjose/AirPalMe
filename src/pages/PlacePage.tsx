@@ -70,7 +70,7 @@ export function PlacePage() {
               if (document.referrer && document.referrer.includes(window.location.host)) {
                 window.history.back();
               } else {
-                nav("/");
+                nav("/now");
               }
             }}
             aria-label="Go back"

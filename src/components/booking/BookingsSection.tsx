@@ -522,6 +522,7 @@ export async function createBookingForEvent(args: {
   time: string;
   priceCents: number;
   customerUid: string;
+  spots?: number;
 }): Promise<string> {
   const db = getFirebaseDb();
   if (!db || !isFirebaseConfigured) throw new Error("Connect Firebase first.");
@@ -559,7 +560,7 @@ export async function createBookingForEvent(args: {
     status: "pending",
     cancelReason: "",
     eventId: args.eventId,
-    spots: 1,
+    spots: args.spots || 1,
     createdAt: now,
     updatedAt: now,
   });

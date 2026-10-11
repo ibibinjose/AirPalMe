@@ -3,7 +3,6 @@ import { Link, useLocation } from "wouter";
 import {
   ArrowRight,
   CalendarDays,
-  Hotel,
   MapPin,
   Plane,
   Plus,
@@ -44,24 +43,24 @@ type AroundFilter = "events" | "food" | "places" | "deals";
 const AROUND: { id: AroundFilter; label: string; color: string }[] = [
   { id: "events", label: "Events & Shows", color: "#c2410c" },
   { id: "food", label: "Dining & Drinks", color: "#b45309" },
-  { id: "places", label: "Places & Stays", color: "#2b7cd3" },
+  { id: "places", label: "Places & Venues", color: "#2b7cd3" },
   { id: "deals", label: "Deals & Offers", color: "#15803d" },
 ];
 
 const QUICK_PROMPTS = [
   { label: "⚡ What now?", href: "/now" },
-  { label: "☕ Coffee & Chat", query: "coffee" },
-  { label: "🎭 Live Tonight", href: "/calendar" },
-  { label: "🏨 Boutique Stays", href: "/stay" },
-  { label: "🗺️ Plan a Trip", href: "/plan/new" },
+  { label: "⭕ My Circle", href: "/circle" },
+  { label: "🎭 Live Events", href: "/pass" },
+  { label: "🗺️ Plan a Hangout", href: "/plan/new" },
   { label: "🎁 Deals", href: "/deals" },
+  { label: "🏢 Business Hub", href: "/business" },
 ];
 
 const VERTICALS = [
   {
     id: "pass",
     label: "AirPal Pass",
-    sub: "Events, access & perks",
+    sub: "Events, gigs & festivals",
     href: "/pass",
     icon: Ticket,
     iconBg: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
@@ -70,34 +69,34 @@ const VERTICALS = [
   {
     id: "now",
     label: "What now?",
-    sub: "One suggestion for now",
+    sub: "Curated 60s day planner",
     href: "/now",
-    icon: Users,
+    icon: Sparkles,
     iconBg: "bg-brand/10 text-accent",
-    badge: "Start",
+    badge: "Discovery",
+  },
+  {
+    id: "circle",
+    label: "Circle",
+    sub: "Network & live presence",
+    href: "/circle",
+    icon: Users,
+    iconBg: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400",
+    badge: "Network",
   },
   {
     id: "deals",
     label: "Deals",
-    sub: "Local offers & freebies",
+    sub: "Local dining perks & offers",
     href: "/deals",
     icon: Sparkles,
     iconBg: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-    badge: "Popular",
-  },
-  {
-    id: "stay",
-    label: "Stays",
-    sub: "Hotels & boutique rooms",
-    href: "/stay",
-    icon: Hotel,
-    iconBg: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
-    badge: "Verified",
+    badge: "Perks",
   },
   {
     id: "events",
     label: "What's On",
-    sub: "Live gigs & events",
+    sub: "Community gigs & calendar",
     href: "/calendar",
     icon: CalendarDays,
     iconBg: "bg-rose-500/10 text-rose-700 dark:text-rose-400",
@@ -105,12 +104,12 @@ const VERTICALS = [
   },
   {
     id: "trips",
-    label: "Trips",
-    sub: "Plans & itineraries",
+    label: "Plans",
+    sub: "Hangout threads & invites",
     href: "/plan",
     icon: Plane,
     iconBg: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400",
-    badge: "Trips",
+    badge: "Planning",
   },
   {
     id: "guide",
@@ -261,7 +260,7 @@ export function HomePage() {
             >
               <span className="flex items-center gap-2.5">
                 <Search size={18} className="text-accent" />
-                <span>Search places, events, plans, or stays…</span>
+                <span>Search places, events, plans, or circles…</span>
               </span>
               <kbd className="hidden rounded bg-paper/90 px-2 py-0.5 text-xs font-semibold text-mute ring-1 ring-line sm:inline-block">
                 ⌘K

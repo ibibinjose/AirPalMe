@@ -3,10 +3,10 @@ import { Link } from "wouter";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import {
   ArrowRight,
+  Building2,
   CalendarDays,
   Flame,
   Gift,
-  Hotel,
   MapPin,
   Plus,
   QrCode,
@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Sparkles,
   Ticket,
+  Users,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEvents } from "@/contexts/EventsContext";
@@ -29,13 +30,13 @@ import { mediaSrcSet } from "@/lib/media-srcset";
 import { type Promotion } from "@shared/promotions";
 import { promoArtFor } from "@/lib/promotions";
 
-type PassCategory = "all" | "cultural" | "music" | "hotels" | "deals" | "nightlife" | "community";
+type PassCategory = "all" | "cultural" | "music" | "festivals" | "deals" | "nightlife" | "community";
 
 const PASS_CATEGORIES: { id: PassCategory; label: string; icon: string }[] = [
   { id: "all", label: "All Access", icon: "🎟️" },
   { id: "cultural", label: "Cultural", icon: "🪔" },
   { id: "music", label: "Concerts & Gigs", icon: "🎵" },
-  { id: "hotels", label: "Hotels & Stays", icon: "🏨" },
+  { id: "festivals", label: "Festivals & Melas", icon: "🎪" },
   { id: "deals", label: "Dining Deals", icon: "🎁" },
   { id: "nightlife", label: "Nightlife & Clubs", icon: "🍸" },
   { id: "community", label: "Community & Expos", icon: "✨" },
@@ -60,13 +61,14 @@ export function PassPage() {
     void getDocs(
       query(
         collection(db, "promotions"),
-        where("kind", "==", "promotion"),
         where("status", "in", ["live", "approved"]),
       ),
     )
       .then((snap) => {
         if (!cancelled) {
-          const list = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Promotion, "id">) }));
+          const list = snap.docs
+            .map((d) => ({ id: d.id, ...(d.data() as Omit<Promotion, "id">) }))
+            .filter((d) => d.kind === "promotion" || d.kind === "giveaway");
           list.sort((a, b) => (a.endAt || "").localeCompare(b.endAt || ""));
           setPromotions(list);
         }
@@ -144,18 +146,34 @@ export function PassPage() {
           titleLower.includes("desi")
         );
       }
-      if (activeCategory === "hotels") {
+      if (activeCategory === "festivals") {
         return (
-          catLower.includes("hotel") ||
-          catLower.includes("stay") ||
-          titleLower.includes("hotel") ||
-          titleLower.includes("stay") ||
-          titleLower.includes("resort") ||
-          titleLower.includes("inn")
+          catLower.includes("festival") ||
+          catLower.includes("mela") ||
+          catLower.includes("fair") ||
+          titleLower.includes("festival") ||
+          titleLower.includes("mela") ||
+          titleLower.includes("carnival")
         );
       }
       if (activeCategory === "music") {
         return catLower.includes("music") || catLower.includes("concert") || titleLower.includes("live") || titleLower.includes("band");
+      }
+      if (activeCategory === "deals") {
+        return (
+          catLower.includes("dining") ||
+          catLower.includes("food") ||
+          catLower.includes("deal") ||
+          catLower.includes("bar") ||
+          catLower.includes("eat") ||
+          titleLower.includes("dining") ||
+          titleLower.includes("food") ||
+          titleLower.includes("brunch") ||
+          titleLower.includes("dinner") ||
+          titleLower.includes("tasting") ||
+          titleLower.includes("cocktail") ||
+          titleLower.includes("cafe")
+        );
       }
       if (activeCategory === "nightlife") {
         return catLower.includes("club") || catLower.includes("bar") || titleLower.includes("night") || titleLower.includes("party");
@@ -190,9 +208,9 @@ export function PassPage() {
 
             <Link
               href="/me/tickets"
-              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1 text-xs font-bold text-white ring-1 ring-white/25 backdrop-blur-md hover:bg-white/25 transition active:scale-95 shadow-2xs"
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-xs font-bold text-white ring-1 ring-white/25 backdrop-blur-md hover:bg-white/25 transition active:scale-95 shadow-2xs"
             >
-              <QrCode size={13} className="text-amber-400" />
+              <QrCode size={14} className="text-amber-400" />
               <span>My Passes ({myUpcomingBookings.length || myBookings.length})</span>
             </Link>
           </div>
@@ -228,11 +246,11 @@ export function PassPage() {
               Browse What's On
             </Link>
             <Link
-              href="/stay"
+              href="/join"
               className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-white/15 px-5 py-2.5 text-sm font-bold text-white ring-1 ring-white/30 backdrop-blur-md transition hover:bg-white/25 active:scale-95"
             >
-              <Hotel size={16} />
-              Hotel Check-In
+              <Building2 size={16} />
+              Arrival Check-In
             </Link>
             <Link
               href="/event"
@@ -357,7 +375,15 @@ export function PassPage() {
                 ? "Cultural Festivals"
                 : activeCategory === "music"
                   ? "Live Concerts & Gigs"
-                  : "Featured Events & Experiences"}
+                  : activeCategory === "festivals"
+                    ? "Festivals & Melas"
+                    : activeCategory === "deals"
+                      ? "Dining Deals & Food Experiences"
+                      : activeCategory === "nightlife"
+                        ? "Nightlife & Clubs"
+                        : activeCategory === "community"
+                          ? "Community & Expos"
+                          : "Featured Events & Experiences"}
             </h2>
             <p className="text-xs text-mute mt-0.5">Real events happening in {effectiveCity} · Guaranteed entry</p>
           </div>
@@ -567,32 +593,33 @@ export function PassPage() {
             </div>
           </div>
 
-          {/* Pillar 2: Hotel & Stay Check-In */}
+          {/* Pillar 2: Arrival Engine & Cohort Host */}
           <div className="group flex flex-col justify-between rounded-3xl bg-card p-6 ring-1 ring-line/80 shadow-xs hover:shadow-md hover:ring-emerald-500/30 transition">
             <div>
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/20">
-                <Hotel size={24} />
+                <Building2 size={24} />
               </div>
               <h3 className="font-display text-lg font-bold text-ink mt-4">
-                Hotel Check-In &amp; Stays
+                Arrival Engine &amp; Cohort Host
               </h3>
               <p className="text-xs sm:text-sm text-mute mt-2 leading-relaxed">
-                Digital guest compendium, room Wi-Fi credentials, staff maintenance tickets, in-room dining menus, and host property operations.
+                B2B2C Arrival Engine for PBSA student accommodation, colleges, and innovation hubs. Pre-verified resident onboarding, tonight's hosted events, and executive Belonging Reports.
               </p>
             </div>
             <div className="mt-6 flex flex-wrap items-center gap-2.5 pt-4 border-t border-line/50">
               <Link
-                href="/stay"
+                href="/join"
                 className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition active:scale-95"
               >
-                <Hotel size={14} />
-                Guest Stays
+                <Building2 size={14} />
+                Arrival Portal
               </Link>
               <Link
                 href="/host"
-                className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-card px-3.5 py-2 text-xs font-semibold text-mute ring-1 ring-line hover:text-ink hover:bg-paper transition"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 py-2 text-xs font-semibold text-mute ring-1 ring-line hover:text-ink hover:bg-paper transition"
               >
-                Host Dashboard
+                <Users size={14} />
+                Belonging Reports
               </Link>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { CalendarDays, CheckCircle2, Download, Share2, Ticket } from "lucide-rea
 import { Button } from "@/components/ui/Button";
 import { AppleWalletButton } from "@/components/ui/AppleWalletButton";
 import { GoogleWalletButton } from "@/components/ui/GoogleWalletButton";
+import { AddToCalendarMenu } from "@/components/calendar/AddToCalendarMenu";
 import { googleWalletTicketUrl, openAppleWalletPass, openGoogleWalletPass, ticketWalletPassUrl } from "@/lib/wallet";
 import { makeQrDataUrl } from "@/lib/qr";
 import { publicSiteOrigin } from "@/lib/public-origin";
@@ -148,12 +149,30 @@ export function AirPalTicketPass({ booking, guestName, hostName, showActions = t
               void openGoogleWalletPass(googleWalletTicketUrl(booking.id));
             }}
           />
+          <AddToCalendarMenu
+            event={{
+              id: booking.id,
+              title: booking.title,
+              venue: booking.suburb || "Sydney",
+              city: booking.suburb || "Sydney",
+              description: `AirPal Pass Ticket: ${booking.title}. Booking ID: ${booking.id}`,
+              startsAt: booking.date ? `${booking.date}T${booking.time ? booking.time : "19:00"}:00` : new Date().toISOString(),
+            }}
+            label="1-Tap Add to Calendar"
+            buttonClassName="w-full justify-center rounded-2xl bg-paper px-4 py-2 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card transition"
+          />
           <div className="flex gap-2">
+            <Link
+              href={`/ticket/${booking.id}`}
+              className="inline-flex min-h-[36px] flex-1 items-center justify-center gap-1.5 rounded-2xl bg-paper px-3 text-xs font-semibold text-accent ring-1 ring-line hover:bg-card transition"
+            >
+              <Ticket size={13} /> Full Pass
+            </Link>
             <Button size="sm" variant="ghost" className="flex-1 gap-1.5 ring-1 ring-line" onClick={print}>
-              <Download size={15} /> Save PDF
+              <Download size={14} /> PDF
             </Button>
             <Button size="sm" variant="ghost" className="flex-1 gap-1.5 ring-1 ring-line" onClick={() => void share()}>
-              <Share2 size={15} /> Share
+              <Share2 size={14} /> Share
             </Button>
           </div>
         </div>

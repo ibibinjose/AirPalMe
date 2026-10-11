@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import jsQR from "jsqr";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
-import { Image as ImageIcon, Upload } from "lucide-react";
+import { ArrowLeft, Image as ImageIcon, Ticket, Upload, Zap } from "lucide-react";
 import { decodeQrFromImageFile, parseQrPayload, pathForIntent } from "@/lib/qr";
+import { isTicketId } from "@shared/booking";
 import { useStay } from "@/contexts/StayContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -170,6 +171,12 @@ export function ScanPage() {
       go(`/${clean}`);
       return;
     }
+    // Handle ticket tokens / booking IDs
+    if (clean.toLowerCase().startsWith("tkt-") || clean.toLowerCase().startsWith("ticket-")) {
+      const tid = clean.replace(/^(tkt-|ticket-)/i, "");
+      go(`/ticket/${encodeURIComponent(tid)}`);
+      return;
+    }
     // Handle invite codes
     if (clean.toUpperCase().startsWith("INV-") || (clean.length === 6 && !clean.includes("/"))) {
       go(`/invite/${clean.toUpperCase()}`);
@@ -185,13 +192,40 @@ export function ScanPage() {
     const path = pathForIntent(intent);
     if (path) {
       go(path);
-    } else {
-      toast.error("Code not recognised. Try entering a room number, @handle, or invite code.");
+      return;
     }
+    // Fallback: if matches ticket ID format
+    if (isTicketId(clean) && clean.length >= 8) {
+      go(`/ticket/${encodeURIComponent(clean)}`);
+      return;
+    }
+    toast.error("Code not recognised. Try entering a ticket ID, room #, @handle, or invite code.");
   };
 
   return (
     <div className="mx-auto flex h-full max-w-lg flex-col px-4 pb-[max(5rem,calc(env(safe-area-inset-bottom,0px)+5rem))] pt-2">
+      {/* Pass & Offline Cache Status Header */}
+      <div className="flex items-center justify-between gap-2 py-1 mb-2">
+        <Link
+          href="/pass"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-mute hover:text-ink ring-1 ring-line hover:bg-paper transition"
+        >
+          <ArrowLeft size={13} />
+          <span>AirPal Pass</span>
+        </Link>
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-500/20">
+          <Zap size={12} className="text-emerald-600" />
+          <span>Offline Cache Validated</span>
+        </div>
+        <Link
+          href="/me/tickets"
+          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3 text-xs font-semibold text-mute hover:text-ink ring-1 ring-line hover:bg-paper transition"
+        >
+          <Ticket size={13} className="text-amber-500" />
+          <span>Passes</span>
+        </Link>
+      </div>
+
       <div className="relative mt-1 overflow-hidden rounded-[28px] bg-neutral-900 shadow-lg ring-1 ring-line">
         <video ref={videoRef} className="h-64 w-full object-cover md:h-80" playsInline muted />
         <canvas ref={canvasRef} className="hidden" />

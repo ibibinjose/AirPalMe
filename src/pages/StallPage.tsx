@@ -12,25 +12,93 @@ import { stallUnitDisplay } from "@shared/event";
 import { loadBios } from "@/lib/bio-store";
 import { EmojiRate } from "@/components/feedback/EmojiRate";
 import { NotFoundPage } from "./NotFoundPage";
+import { PageLoading } from "@/components/ui/PageLoading";
 
 export function StallPage() {
   const [, params] = useRoute("/e/:eventId/s/:stallId");
   const [, nav] = useLocation();
   const { requireUser } = useAuth();
-  const { getEvent, stallsFor, saveStall, unsaveStall, isSaved, fetchRemoteStalls } = useEvents();
+  const {
+    getEvent,
+    stallsFor,
+    saveStall,
+    unsaveStall,
+    isSaved,
+    fetchRemoteStalls,
+    calendarEvents,
+    remoteLoaded,
+    fetchRemoteEvent,
+  } = useEvents();
   const eventId = params?.eventId || "";
+  const stallId = params?.stallId || "";
   const [stallsReady, setStallsReady] = useState(false);
+  const [remoteEvent, setRemoteEvent] = useState<{
+    id: string;
+    name: string;
+    flavour: "expo" | "market" | "event_space";
+    gatePath: string;
+  } | null>(null);
+  const [eventFetchDone, setEventFetchDone] = useState(false);
+
   useEffect(() => {
     if (eventId) void fetchRemoteStalls(eventId).then(() => setStallsReady(true));
   }, [eventId, fetchRemoteStalls]);
-  const event = getEvent(eventId);
-  const stall = stallsFor(eventId).find((s) => s.id === params?.stallId);
-  if (!event || !stall) {
-    if (!stallsReady) {
-      return <div className="mx-auto max-w-lg px-4 py-16 text-center text-sm text-mute">Loading…</div>;
+
+  const localEvent = getEvent(eventId);
+  const calEvent = calendarEvents.find((e) => e.id === eventId);
+  const effectiveEvent =
+    localEvent ||
+    (calEvent
+      ? {
+          id: calEvent.id,
+          name: calEvent.title,
+          flavour: (calEvent.category === "market"
+            ? "market"
+            : calEvent.category === "expo"
+              ? "expo"
+              : "event_space") as "expo" | "market" | "event_space",
+          gatePath: `/e/${calEvent.id}`,
+        }
+      : null) ||
+    remoteEvent;
+
+  useEffect(() => {
+    if (effectiveEvent || !remoteLoaded || !eventId) {
+      if (effectiveEvent) setEventFetchDone(true);
+      return;
+    }
+    let alive = true;
+    void fetchRemoteEvent(eventId).then((ev) => {
+      if (!alive) return;
+      if (ev) {
+        setRemoteEvent({
+          id: ev.id,
+          name: ev.title,
+          flavour: (ev.category === "market"
+            ? "market"
+            : ev.category === "expo"
+              ? "expo"
+              : "event_space") as "expo" | "market" | "event_space",
+          gatePath: `/e/${ev.id}`,
+        });
+      }
+      setEventFetchDone(true);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [effectiveEvent, remoteLoaded, eventId, fetchRemoteEvent]);
+
+  const stall = stallsFor(eventId).find((s) => s.id === stallId);
+
+  if (!effectiveEvent || !stall) {
+    if (!stallsReady || !remoteLoaded || !eventFetchDone) {
+      return <PageLoading />;
     }
     return <NotFoundPage />;
   }
+
+  const event = effectiveEvent;
   const saved = isSaved(stall.id);
   const handle =
     stall.handle || loadBios().find((p) => p.stallId === stall.id)?.handle || handleFromPlaceId(stall.id) || undefined;

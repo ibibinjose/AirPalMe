@@ -23,6 +23,11 @@ const ROUTE_META: Array<{ match: RegExp; title: string; description: string }> =
       "Tell AirPal.Me your urge and time window — get one suggestion for what to do right now, then make it a plan.",
   },
   {
+    match: /^\/circle(\/|$)/,
+    title: "Networking Circle · AirPal.Me",
+    description: "Check in, see who is around, and hang out with your trusted inner circle.",
+  },
+  {
     match: /^\/events(\/|$)/,
     title: "Events · AirPal.Me",
     description: "Every upcoming event in one feed — at places, in the community, or from friends.",
