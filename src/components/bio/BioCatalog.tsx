@@ -1,6 +1,7 @@
 import { ExternalLink, Sparkles, Tag } from "lucide-react";
 import { isSafeBioHref, type BioCatalogItem } from "@shared/bio";
 import { cn } from "@/lib/cn";
+import { triggerHaptic } from "@/lib/native";
 
 function ItemCard({
   item,
@@ -14,7 +15,7 @@ function ItemCard({
   onClaim?: (item: BioCatalogItem) => void;
 }) {
   const inner = (
-    <div className="flex flex-col h-full justify-between gap-2.5">
+    <div className="flex flex-col h-full justify-between gap-3">
       <div>
         <div className="flex items-center justify-between gap-2">
           {item.badge ? (
@@ -36,19 +37,19 @@ function ItemCard({
           )}
         </div>
 
-        <div className="mt-2 flex items-start justify-between gap-2">
+        <div className="mt-2.5 flex items-start justify-between gap-2">
           <h4 className={cn("font-display font-bold text-ink tracking-tight leading-snug", featured ? "text-lg sm:text-xl" : "text-base")}>
             {item.title}
           </h4>
           {item.href && isSafeBioHref(item.href) && (
-            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-paper text-mute group-hover:bg-brand group-hover:text-white transition">
-              <ExternalLink size={12} />
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-paper text-mute group-hover:bg-brand group-hover:text-white transition shadow-2xs">
+              <ExternalLink size={13} />
             </span>
           )}
         </div>
 
         {item.detail && (
-          <p className="mt-1 text-xs sm:text-[13px] leading-relaxed text-ink/75 font-normal line-clamp-3">
+          <p className="mt-1.5 text-xs sm:text-[13px] leading-relaxed text-ink/75 font-normal line-clamp-3">
             {item.detail}
           </p>
         )}
@@ -57,14 +58,15 @@ function ItemCard({
       {onClaim && (
         <button
           type="button"
-          className="mt-2 flex h-9 w-full items-center justify-center gap-1.5 rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs transition hover:bg-brand-ink active:scale-[0.98]"
+          className="mt-2.5 flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full bg-brand px-4 text-xs font-bold text-white shadow-xs transition hover:bg-brand-ink active:scale-[0.98] cursor-pointer touch-manipulation"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
+            void triggerHaptic("medium");
             onClaim(item);
           }}
         >
-          <Sparkles size={12} className="text-accent" />
+          <Sparkles size={13} className="text-accent" />
           <span>Show code at till</span>
         </button>
       )}
@@ -72,7 +74,7 @@ function ItemCard({
   );
 
   const cardCls = cn(
-    "group block relative rounded-3xl bg-card p-4 sm:p-5 text-left ring-1 ring-line/80 shadow-xs transition-all duration-200 hover:shadow-md hover:ring-brand/30 active:scale-[0.99]",
+    "group block relative rounded-[26px] bg-card p-4 sm:p-5 text-left ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:shadow-xs hover:ring-brand/40 active:scale-[0.99] touch-manipulation",
     featured && "bg-gradient-to-br from-card via-card to-paper ring-gold/40 shadow-sm",
   );
 
@@ -82,7 +84,10 @@ function ItemCard({
         href={item.href}
         target={item.href.startsWith("http") ? "_blank" : undefined}
         rel="noreferrer"
-        onClick={() => onTap(item.kind)}
+        onClick={() => {
+          void triggerHaptic("light");
+          onTap(item.kind);
+        }}
         className={cardCls}
       >
         {inner}
@@ -91,7 +96,13 @@ function ItemCard({
   }
 
   return (
-    <div className={cardCls} onClick={() => onTap(item.kind)}>
+    <div
+      className={cardCls}
+      onClick={() => {
+        void triggerHaptic("light");
+        onTap(item.kind);
+      }}
+    >
       {inner}
     </div>
   );

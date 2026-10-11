@@ -14,6 +14,8 @@ import {
   openGoogleWalletPass,
 } from "@/lib/wallet";
 
+import { triggerHaptic } from "@/lib/native";
+
 type BioShareModalProps = {
   open: boolean;
   onClose: () => void;
@@ -51,6 +53,7 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
   if (!open || typeof document === "undefined") return null;
 
   async function handleCopy() {
+    void triggerHaptic("light");
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -63,6 +66,7 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
 
   function handleDownload() {
     if (!qrData) return;
+    void triggerHaptic("medium");
     const a = document.createElement("a");
     a.href = qrData;
     a.download = `airpal-${handle}-qr.png`;
@@ -73,6 +77,7 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
   }
 
   async function handleNativeShare() {
+    void triggerHaptic("light");
     if (navigator.share) {
       try {
         await navigator.share({
@@ -102,7 +107,10 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
       >
         <button
           type="button"
-          onClick={onClose}
+          onClick={() => {
+            void triggerHaptic("light");
+            onClose();
+          }}
           className="absolute right-4 top-4 grid h-10 w-10 min-h-[44px] min-w-[44px] place-items-center rounded-full text-mute transition hover:bg-black/5 hover:text-ink cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           aria-label="Close"
         >
@@ -127,38 +135,47 @@ export function BioShareModal({ open, onClose, handle, name, url }: BioShareModa
         <p className="mt-3 font-mono text-[13px] text-mute">{url.replace(/^https?:\/\//, "")}</p>
 
         <div className="mt-5 grid grid-cols-2 gap-2">
-          <Button variant="ghost" size="sm" onClick={handleCopy} className="gap-1.5">
+          <Button variant="ghost" size="sm" onClick={handleCopy} className="min-h-[44px] gap-1.5 rounded-full font-semibold">
             {copied ? <Check size={15} className="text-emerald-500" /> : <Copy size={15} />}
             {copied ? "Copied" : "Copy Link"}
           </Button>
-          <Button variant="ghost" size="sm" onClick={handleDownload} className="gap-1.5" disabled={!qrData}>
+          <Button variant="ghost" size="sm" onClick={handleDownload} className="min-h-[44px] gap-1.5 rounded-full font-semibold" disabled={!qrData}>
             <Download size={15} />
             Download
           </Button>
         </div>
 
         <AppleWalletButton
-          className="mt-3 w-full justify-center"
+          className="mt-3 w-full justify-center min-h-[44px]"
           onClick={() => {
+            void triggerHaptic("medium");
             const passUrl = businessCardWalletPassUrl(handle);
             void openAppleWalletPass(passUrl, "@" + handle + "-AirPal-BusinessCard");
           }}
         />
         <GoogleWalletButton
-          className="mt-2 w-full justify-center"
+          className="mt-2 w-full justify-center min-h-[44px]"
           onClick={() => {
+            void triggerHaptic("medium");
             void openGoogleWalletPass(googleWalletCardUrl(handle));
           }}
         />
 
         {typeof navigator !== "undefined" && "share" in navigator && (
-          <Button size="sm" onClick={handleNativeShare} className="mt-2 w-full gap-1.5 bg-brand text-white">
+          <Button size="sm" onClick={handleNativeShare} className="mt-2.5 w-full min-h-[44px] gap-1.5 rounded-full bg-brand text-white font-bold">
             <Share2 size={15} />
             Share via…
           </Button>
         )}
 
-        <button type="button" onClick={onClose} className="mt-4 text-xs font-medium text-mute hover:text-ink">
+        <button
+          type="button"
+          onClick={() => {
+            void triggerHaptic("light");
+            onClose();
+          }}
+          className="mt-4 min-h-[44px] inline-flex items-center justify-center text-xs font-semibold text-mute hover:text-ink cursor-pointer touch-manipulation"
+        >
           Done
         </button>
       </div>

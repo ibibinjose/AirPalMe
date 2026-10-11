@@ -135,14 +135,18 @@ function BizCircle({
   href?: string;
   onClick?: () => void;
 }) {
+  const handleClick = () => {
+    void triggerHaptic("light");
+    onClick?.();
+  };
   const circle =
-    "grid h-12 w-12 sm:h-14 sm:w-14 place-items-center rounded-2xl sm:rounded-full bg-card text-accent ring-1 ring-line/80 shadow-xs transition-shadow duration-150 hover:shadow-md active:scale-95";
-  const wrap = "flex min-w-[56px] sm:min-w-[64px] touch-manipulation flex-col items-center gap-1.5 group";
+    "grid h-12 w-12 sm:h-14 sm:w-14 place-items-center rounded-[20px] sm:rounded-[24px] bg-card text-accent ring-1 ring-line/80 shadow-2xs transition-all duration-150 group-hover:ring-brand/40 group-hover:scale-105 active:scale-95";
+  const wrap = "flex min-w-[56px] sm:min-w-[64px] touch-manipulation flex-col items-center gap-1.5 group cursor-pointer";
   const caption = "text-[11px] sm:text-xs font-semibold text-ink/90 group-hover:text-accent transition-colors";
 
   if (href) {
     return (
-      <a href={href} target="_blank" rel="noreferrer" onClick={onClick} className={wrap} aria-label={label}>
+      <a href={href} target="_blank" rel="noreferrer" onClick={handleClick} className={wrap} aria-label={label}>
         <span className={circle}>
           <Icon size={20} className="sm:w-[22px] sm:h-[22px]" />
         </span>
@@ -151,7 +155,7 @@ function BizCircle({
     );
   }
   return (
-    <button type="button" onClick={onClick} className={wrap} aria-label={label}>
+    <button type="button" onClick={handleClick} className={wrap} aria-label={label}>
       <span className={circle}>
         <Icon size={20} className="sm:w-[22px] sm:h-[22px]" />
       </span>
@@ -666,49 +670,55 @@ export function BioPublicPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl pb-20 pb-safe sm:py-6">
-      {/* Main Glass Card Wrapper */}
-      <div className="overflow-hidden bg-card/95 sm:rounded-[36px] sm:ring-1 sm:ring-line/80 sm:shadow-clay backdrop-blur-xl">
-        {/* Cover Hero Header */}
+    <div className="mx-auto max-w-2xl px-3 sm:px-4 md:px-0 pb-28 pb-safe pt-2 sm:pt-6">
+      {/* Main Apple Liquid Glass Card Wrapper */}
+      <div className="overflow-hidden bg-card/95 sm:rounded-[40px] sm:ring-1 sm:ring-line/80 sm:shadow-[0_24px_60px_rgba(0,0,0,0.08)] backdrop-blur-2xl">
+        {/* Cover Hero Header with Cinematic Vignette */}
         <div className="relative overflow-hidden">
           {bio.cover ? (
-            <Photo src={bio.cover} className="h-48 w-full object-cover sm:h-60" />
+            <div className="relative h-56 w-full sm:h-64 overflow-hidden">
+              <Photo src={bio.cover} className="h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
+            </div>
           ) : (
-            <div className="relative h-48 w-full overflow-hidden bg-gradient-to-br from-[#121829] via-[#1c2438] to-[#0f1424] sm:h-60">
-              <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#1805db_1.5px,transparent_1.5px)] [background-size:20px_20px]" />
+            <div className="relative h-56 w-full sm:h-64 overflow-hidden bg-gradient-to-br from-[#0c1024] via-[#141b38] to-[#0a0d1e]">
+              <div className="absolute inset-0 opacity-25 bg-[radial-gradient(#2563eb_1.5px,transparent_1.5px)] [background-size:22px_22px]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
             </div>
           )}
 
-          {/* Top Floating Glass Navigation Dock */}
-          <div className="absolute inset-x-3.5 top-3.5 z-10 flex items-center justify-between">
+          {/* Top Floating Liquid Glass Navigation Dock */}
+          <div className="absolute inset-x-3.5 sm:inset-x-5 top-3.5 sm:top-5 z-20 flex items-center justify-between gap-2">
             {/* Left Pill: Back & AirPal Logo */}
-            <div className="inline-flex items-center rounded-full bg-white/90 p-1 shadow-sm ring-1 ring-black/10 backdrop-blur-md">
+            <div className="inline-flex items-center rounded-full bg-white/85 dark:bg-black/60 p-1 shadow-clay ring-1 ring-white/60 dark:ring-white/15 backdrop-blur-2xl">
               <button
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
+                  void triggerHaptic("light");
                   if (window.history.length > 1) {
                     window.history.back();
                   } else {
                     nav("/");
                   }
                 }}
-                className="flex h-11 w-11 items-center justify-center rounded-full text-ink/75 transition hover:bg-black/5 hover:text-ink active:scale-95"
+                className="flex h-11 w-11 items-center justify-center rounded-full text-ink transition hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 cursor-pointer touch-manipulation"
                 aria-label="Go back"
                 title="Go back"
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
-              <span className="mx-0.5 h-3.5 w-[1px] bg-line" />
+              <span className="mx-0.5 h-4 w-[1px] bg-line/80" />
               <button
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
+                  void triggerHaptic("light");
                   nav("/");
                 }}
-                className="flex h-11 items-center rounded-full px-3 transition hover:bg-black/5 active:scale-95"
+                className="flex h-11 items-center rounded-full px-3 transition hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 cursor-pointer touch-manipulation"
                 aria-label="AirPal Home"
                 title="AirPal Home"
               >
@@ -716,111 +726,112 @@ export function BioPublicPage() {
               </button>
             </div>
 
-            {/* Right Controls: Quick Copy Link & Handle Badge */}
+            {/* Right Controls: Quick Share Pill & Handle Badge */}
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={handleQuickCopy}
-                className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full bg-white/90 px-4 text-xs font-semibold text-ink shadow-sm ring-1 ring-black/10 backdrop-blur-md transition hover:bg-white active:scale-95"
+                className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full bg-white/85 dark:bg-black/60 px-4 text-xs font-bold text-ink shadow-clay ring-1 ring-white/60 dark:ring-white/15 backdrop-blur-2xl transition hover:bg-white active:scale-95 cursor-pointer touch-manipulation"
                 title="Copy profile link"
                 aria-label="Copy profile link"
               >
                 {copiedLink ? (
                   <>
-                    <Check size={13} className="text-emerald-600" />
+                    <Check size={14} className="text-emerald-600 animate-in zoom-in" />
                     <span className="text-emerald-600 font-bold">Copied</span>
                   </>
                 ) : (
                   <>
-                    <Copy size={13} className="text-mute" />
+                    <Share2 size={13} className="text-ink/75" />
                     <span className="hidden xs:inline">Share</span>
                   </>
                 )}
               </button>
-              <BioHandleButton handle={bio.handle} className="shadow-sm" />
+              <BioHandleButton handle={bio.handle} className="shadow-clay backdrop-blur-2xl" />
             </div>
           </div>
         </div>
 
         {/* Profile Content Body */}
-        <div className="px-5 pb-8 sm:px-8">
+        <div className="px-4 sm:px-8 pb-10">
           {/* Avatar & Action Button Row */}
-          <div className="flex items-end justify-between">
-            {/* Avatar with Status Glow Ring & Kind Icon */}
+          <div className="flex items-end justify-between gap-3">
+            {/* Round Circular Profile Avatar */}
             <div className="relative">
-              <div
-                className={cn(
-                  "-mt-14 sm:-mt-16 relative z-10 h-24 w-24 sm:h-28 sm:w-28 overflow-hidden rounded-full bg-paper ring-4 ring-card transition-all duration-300 shadow-md",
-                  statusKey === "available" ? "ring-offset-2 ring-offset-emerald-500/30" : "",
-                )}
-              >
+              <div className="-mt-16 sm:-mt-20 relative z-10 h-28 w-28 sm:h-32 sm:w-32 overflow-hidden rounded-full bg-paper ring-4 ring-card transition-all duration-300 shadow-xl">
                 {avatar ? (
-                  <Photo src={avatar} className="h-full w-full object-cover" />
+                  <Photo src={avatar} className="h-full w-full object-cover rounded-full" />
                 ) : (
-                  <span className="grid h-full w-full place-items-center bg-neutral-900 font-display text-3xl font-bold text-white">
+                  <span className="grid h-full w-full place-items-center bg-gradient-to-br from-neutral-900 to-neutral-800 font-display text-3xl sm:text-4xl font-extrabold text-white">
                     {bio.name[0]}
                   </span>
                 )}
               </div>
 
-              {/* Status Pulse Indicator */}
+              {/* Status Indicator Badge */}
               <span
                 className={cn(
-                  "absolute bottom-0 right-0 z-20 h-5 w-5 rounded-full ring-2 ring-card shadow-sm grid place-items-center",
+                  "absolute bottom-0 right-0 z-20 h-6 w-6 rounded-full ring-2 ring-card shadow-sm grid place-items-center",
                   statusKey === "available" ? "bg-emerald-500" : statusKey === "busy" ? "bg-amber-500" : "bg-zinc-400",
                 )}
                 title={statusInfo.label}
               >
-                {statusKey === "available" && (
-                  <span className="absolute h-full w-full rounded-full bg-emerald-400 opacity-75 motion-safe:animate-ping" />
-                )}
-                <BioKindIcon kind={bio.kind} className="h-5 w-5 ring-0" />
+                <BioKindIcon kind={bio.kind} className="h-3.5 w-3.5 ring-0 text-white" />
               </span>
             </div>
 
-            {/* Profile Action Pill (Edit, Claim, Connect) */}
-            <div className="mb-1 flex items-center gap-2">
+            {/* Profile Action Deck (Open Me, Edit, Claim, Connect, Save Contact) */}
+            <div className="mb-2 flex items-center gap-2 flex-wrap justify-end">
               {isOwner ? (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   <Button
                     size="sm"
-                    className="gap-1.5 rounded-full bg-brand px-3.5 text-xs font-bold text-white shadow-xs hover:bg-brand-ink active:scale-95 cursor-pointer"
-                    onClick={() => nav("/me")}
+                    className="gap-2 rounded-full bg-brand px-5 min-h-[44px] text-xs font-bold text-white shadow-xs hover:bg-brand-ink active:scale-95 cursor-pointer touch-manipulation"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      nav("/me");
+                    }}
                   >
-                    <UserRound size={13} />
-                    Open Me
+                    <UserRound size={14} />
+                    <span>Open Me</span>
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="gap-1.5 rounded-full border border-line bg-paper/80 px-3 text-xs font-semibold text-ink shadow-2xs hover:bg-paper active:scale-95"
-                    onClick={() => nav("/bio/edit")}
+                    className="gap-1.5 rounded-full border border-line bg-card/90 px-4 min-h-[44px] text-xs font-semibold text-ink shadow-2xs hover:bg-paper active:scale-95 cursor-pointer touch-manipulation"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      nav("/bio/edit");
+                    }}
                   >
                     <Edit3 size={13} />
-                    Edit
+                    <span>Edit Bio</span>
                   </Button>
                 </div>
               ) : unclaimed ? (
                 <Button
                   size="sm"
-                  className="rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-sm hover:bg-brand-ink active:scale-95"
-                  onClick={() =>
-                    nav(`/bio/setup?handle=${bio.handle}${bio.kind === "business" || isStay ? "&kind=business" : ""}`)
-                  }
+                  className="rounded-full bg-brand px-5 min-h-[44px] text-xs font-bold text-white shadow-sm hover:bg-brand-ink active:scale-95 cursor-pointer touch-manipulation"
+                  onClick={() => {
+                    void triggerHaptic("medium");
+                    nav(`/bio/setup?handle=${bio.handle}${bio.kind === "business" || isStay ? "&kind=business" : ""}`);
+                  }}
                   title={
                     bio.kind === "business" || isStay
                       ? "Claim this place as its owner — business verification applies"
                       : `Claim @${bio.handle} as your AirPal Me handle`
                   }
                 >
-                  Claim @{bio.handle}
+                  <Sparkles size={14} />
+                  <span>Claim @{bio.handle}</span>
                 </Button>
               ) : bio.kind === "person" ? (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   <Button
                     size="sm"
-                    className="gap-1.5 rounded-full bg-brand px-3.5 text-xs font-semibold text-white shadow-sm hover:bg-brand-ink active:scale-95"
+                    className="gap-1.5 rounded-full bg-brand px-5 min-h-[44px] text-xs font-bold text-white shadow-sm hover:bg-brand-ink active:scale-95 cursor-pointer touch-manipulation"
                     onClick={() => {
+                      void triggerHaptic("light");
                       if (!requireUser("Sign in to keep the people you meet in one place.")) return;
                       upsertPerson({
                         handle: bio.handle,
@@ -832,7 +843,7 @@ export function BioPublicPage() {
                     }}
                   >
                     <UserPlus size={14} />
-                    Connect
+                    <span>Connect</span>
                   </Button>
                   {bio.ownerUid && (!user || bio.ownerUid !== user.uid) && (
                     <PingButton toUid={bio.ownerUid} toHandle={bio.handle} toName={bio.name} />
@@ -840,10 +851,11 @@ export function BioPublicPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="gap-1.5 rounded-full border border-line bg-paper/80 px-3 text-xs font-semibold text-ink shadow-2xs hover:bg-paper active:scale-95"
+                    className="gap-1.5 rounded-full border border-line bg-card/90 px-4 min-h-[44px] text-xs font-semibold text-ink shadow-2xs hover:bg-paper active:scale-95 cursor-pointer touch-manipulation"
                     aria-label={`Save ${bio.name} to phone contacts`}
                     title="Save contact to phone (.vcf)"
                     onClick={() => {
+                      void triggerHaptic("light");
                       void openVCardContact({
                         name: bio.name,
                         phone: bio.phone,
@@ -860,10 +872,11 @@ export function BioPublicPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="gap-1.5 rounded-full border border-line bg-paper/80 px-3 text-xs font-semibold text-ink shadow-2xs hover:bg-paper active:scale-95"
+                  className="gap-1.5 rounded-full border border-line bg-card/90 px-4 min-h-[44px] text-xs font-semibold text-ink shadow-2xs hover:bg-paper active:scale-95 cursor-pointer touch-manipulation"
                   aria-label={`Save ${bio.name} to phone contacts`}
                   title="Save contact to phone (.vcf)"
                   onClick={() => {
+                    void triggerHaptic("light");
                     void openVCardContact({
                       name: bio.name,
                       phone: bio.phone,
@@ -880,36 +893,21 @@ export function BioPublicPage() {
           </div>
 
           {/* Profile Name & Primary Identity */}
-          <div className="mt-3.5 text-left">
+          <div className="mt-4 text-left">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-ink">{bio.name}</h1>
+              <h1 className="font-display text-[26px] sm:text-[34px] font-extrabold tracking-tight text-ink leading-tight">
+                {bio.name}
+              </h1>
               {bio.categoryTag && (
-                <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-accent">
+                <span className="rounded-full bg-brand/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-accent ring-1 ring-brand/20">
                   {bio.categoryTag}
                 </span>
               )}
-              {bio.kind === "person" && bio.starTier && (
-                <span
-                  className="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-accent"
-                  title={`AirPal ${bio.starTier} — earned by bringing mates to real experiences`}
-                >
-                  <span aria-hidden>★</span> {bio.starTier}
-                </span>
-              )}
-              {bio.kind === "person" && (
-                <Link
-                  href="/pass"
-                  className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 dark:text-amber-400 ring-1 ring-amber-400/25 hover:bg-amber-500/20 transition"
-                  title="AirPal Passholder — access to events, cultural festivals & perks"
-                >
-                  <Ticket size={11} className="text-amber-500" /> Passholder
-                </Link>
-              )}
             </div>
 
-            {/* Handle & Subtitle */}
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs font-medium text-mute">
-              <span className="font-semibold text-ink/75">@{bio.handle}</span>
+            {/* Handle, Location & Subtitle Metadata Strip */}
+            <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs font-medium text-mute">
+              <span className="font-bold text-ink/80">@{bio.handle}</span>
               {bio.pronouns && <span>· {bio.pronouns}</span>}
               {bio.city && (
                 <span className="inline-flex items-center gap-1">
@@ -927,28 +925,35 @@ export function BioPublicPage() {
               )}
               {bio.languages && <span>· {bio.languages}</span>}
             </div>
+
             {bio.kind === "person" && completedCount > 0 && (
-              <p className="mt-1.5 text-xs font-semibold text-ink">
-                {completedCount} completed {completedCount === 1 ? "experience" : "experiences"}
+              <p className="mt-2 text-xs font-bold text-ink tabular-nums flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>
+                  {completedCount.toLocaleString("en-AU")} completed {completedCount === 1 ? "experience" : "experiences"}
+                </span>
               </p>
             )}
 
-            {/* Interactive Availability / Custom Status Pill */}
-            <div className="mt-2.5">
+            {/* Interactive Apple Availability / Focus Capsule without green frame */}
+            <div className="mt-3">
               <button
                 type="button"
-                onClick={() => isOwner && setStatusModalOpen(true)}
+                onClick={() => {
+                  if (isOwner) {
+                    void triggerHaptic("selection");
+                    setStatusModalOpen(true);
+                  }
+                }}
                 className={cn(
-                  "inline-flex min-h-[44px] items-center gap-2 rounded-full px-4 text-xs font-semibold border transition-all duration-200 shadow-2xs",
-                  statusInfo.badgeBg,
-                  statusInfo.textColor,
-                  isOwner ? "cursor-pointer hover:brightness-95 active:scale-95" : "cursor-default",
+                  "inline-flex min-h-[44px] items-center gap-2 rounded-full px-4 text-xs font-semibold ring-1 ring-line/80 bg-paper/70 text-ink transition-all duration-200 shadow-2xs",
+                  isOwner ? "cursor-pointer hover:bg-paper active:scale-95" : "cursor-default",
                 )}
                 title={isOwner ? "Click to change status" : statusInfo.description}
               >
-                <span className="h-2 w-2 rounded-full bg-current shrink-0" />
+                <span className={cn("h-2 w-2 rounded-full shrink-0", statusInfo.dotColor)} />
                 {bio.customStatus ? (
-                  <span className="font-bold text-ink truncate max-w-[320px] sm:max-w-md">
+                  <span className="font-bold text-ink truncate max-w-[300px] sm:max-w-md">
                     {bio.customStatusEmoji && `${bio.customStatusEmoji} `}
                     {bio.customStatus}
                   </span>
@@ -964,7 +969,7 @@ export function BioPublicPage() {
               bio.shortWhy.trim().toLowerCase() !== bio.customStatus?.trim().toLowerCase() &&
               bio.shortWhy.trim().toLowerCase() !==
                 `${bio.customStatusEmoji || ""} ${bio.customStatus || ""}`.trim().toLowerCase() && (
-                <p className="mt-3 text-[14px] sm:text-[15px] leading-relaxed text-ink/85 font-normal">
+                <p className="mt-3.5 text-[14px] sm:text-[15px] leading-relaxed text-ink/85 font-normal">
                   {bio.shortWhy}
                 </p>
               )}
@@ -973,7 +978,7 @@ export function BioPublicPage() {
             {bio.aboutText && (
               <div
                 id="bio-about"
-                className="mt-4 scroll-mt-24 rounded-3xl bg-paper/60 p-4 sm:p-5 border border-line/80 shadow-2xs"
+                className="mt-4 scroll-mt-24 rounded-[26px] bg-paper/70 p-4 sm:p-5 ring-1 ring-line/80 shadow-2xs"
               >
                 <p className="text-[10px] font-bold uppercase tracking-wider text-accent mb-1.5">About Story</p>
                 <p className="text-xs sm:text-sm leading-relaxed text-ink/80 whitespace-pre-line">{bio.aboutText}</p>
@@ -983,25 +988,32 @@ export function BioPublicPage() {
 
           {/* Social Engagement Deck (Follow, Like, Website, QR Share) */}
           <div className="mt-5 flex items-center gap-2">
-            <FollowButton handle={bio.handle} name={bio.name} className="flex-1 min-w-0 h-10 text-xs font-semibold px-2.5 sm:px-4" />
-            <LikeButton handle={bio.handle} name={bio.name} className="flex-1 min-w-0 h-10 text-xs font-semibold px-2.5 sm:px-4" />
+            <FollowButton handle={bio.handle} name={bio.name} className="flex-1 min-w-0 min-h-[44px] text-xs font-semibold px-2.5 sm:px-4 rounded-full" />
+            <LikeButton handle={bio.handle} name={bio.name} className="flex-1 min-w-0 min-h-[44px] text-xs font-semibold px-2.5 sm:px-4 rounded-full" />
             {websiteUrl ? (
               <a
                 href={websiteUrl}
                 target="_blank"
                 rel="noreferrer"
-                onClick={() => recordTap(bio.handle, websiteLink?.type || "website")}
-                className="inline-flex h-10 items-center justify-center rounded-full bg-paper px-3 sm:px-3.5 text-xs font-semibold text-ink shadow-2xs ring-1 ring-line/80 transition hover:bg-paper/80 active:scale-95 shrink-0"
+                onClick={() => {
+                  void triggerHaptic("light");
+                  recordTap(bio.handle, websiteLink?.type || "website");
+                }}
+                className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-paper px-4 text-xs font-bold text-ink shadow-2xs ring-1 ring-line/80 transition hover:bg-paper/80 active:scale-95 shrink-0"
                 title={`Visit ${bio.domain || "website"}`}
                 aria-label="Website"
               >
-                <span>www</span>
+                <Globe size={14} className="text-accent mr-1.5" />
+                <span>Website</span>
               </a>
             ) : null}
             <button
               type="button"
-              onClick={() => setShareModalOpen(true)}
-              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-paper px-3 sm:px-4 text-xs font-semibold text-ink shadow-2xs ring-1 ring-line/80 transition hover:bg-paper/80 active:scale-95 shrink-0"
+              onClick={() => {
+                void triggerHaptic("light");
+                setShareModalOpen(true);
+              }}
+              className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-full bg-paper px-4 text-xs font-bold text-ink shadow-2xs ring-1 ring-line/80 transition hover:bg-paper/80 active:scale-95 shrink-0 cursor-pointer"
               title="Share & QR Code"
             >
               <QrCode size={15} className="text-accent" />
@@ -1010,13 +1022,13 @@ export function BioPublicPage() {
           </div>
 
           {/* 1-Tap Quick Action Deck: [Chat], [WhatsApp], [Call] */}
-          <div className="mt-3 grid grid-cols-3 gap-1.5 sm:gap-2">
+          <div className="mt-3 grid grid-cols-3 gap-2">
             <button
               type="button"
               onClick={handleStartChat}
-              className="group flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-brand/10 px-2 text-xs font-bold text-accent ring-1 ring-brand/30 transition-all duration-200 hover:bg-brand hover:text-white active:scale-95 shadow-2xs"
+              className="group flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-brand/10 px-3 text-xs font-bold text-accent ring-1 ring-brand/30 transition-all duration-200 hover:bg-brand hover:text-white active:scale-95 shadow-2xs cursor-pointer"
             >
-              <MessageSquare size={15} className="shrink-0 group-hover:scale-110 transition-transform" />
+              <MessageSquare size={16} className="shrink-0 group-hover:scale-110 transition-transform" />
               <span className="truncate">Chat</span>
             </button>
 
@@ -1025,18 +1037,21 @@ export function BioPublicPage() {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noreferrer"
-                onClick={() => recordTap(bio.handle, "whatsapp")}
-                className="group flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-paper/70 px-2 text-xs font-semibold text-ink ring-1 ring-line/80 transition-all duration-200 hover:bg-paper hover:ring-emerald-500/40 active:scale-95 shadow-2xs"
+                onClick={() => {
+                  void triggerHaptic("light");
+                  recordTap(bio.handle, "whatsapp");
+                }}
+                className="group flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-emerald-500/10 px-3 text-xs font-bold text-emerald-700 ring-1 ring-emerald-500/30 transition-all duration-200 hover:bg-emerald-600 hover:text-white active:scale-95 shadow-2xs"
               >
                 <MessageCircle
-                  size={15}
-                  className="text-emerald-600 shrink-0 group-hover:scale-110 transition-transform"
+                  size={16}
+                  className="text-emerald-600 group-hover:text-white shrink-0 group-hover:scale-110 transition-transform"
                 />
                 <span className="truncate">WhatsApp</span>
               </a>
             ) : (
-              <div className="flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-paper/30 px-2 text-xs font-medium text-mute/50 ring-1 ring-line/40 cursor-not-allowed">
-                <MessageCircle size={15} className="opacity-40 shrink-0" />
+              <div className="flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-paper/30 px-3 text-xs font-medium text-mute/50 ring-1 ring-line/40 cursor-not-allowed">
+                <MessageCircle size={16} className="opacity-40 shrink-0" />
                 <span className="truncate">WhatsApp</span>
               </div>
             )}
@@ -1044,84 +1059,97 @@ export function BioPublicPage() {
             {tel ? (
               <a
                 href={tel}
-                onClick={() => recordTap(bio.handle, "call")}
-                className="group flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-paper/70 px-2 text-xs font-semibold text-ink ring-1 ring-line/80 transition-all duration-200 hover:bg-paper hover:ring-amber-500/40 active:scale-95 shadow-2xs"
+                onClick={() => {
+                  void triggerHaptic("light");
+                  recordTap(bio.handle, "call");
+                }}
+                className="group flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-amber-500/10 px-3 text-xs font-bold text-amber-700 ring-1 ring-amber-500/30 transition-all duration-200 hover:bg-amber-600 hover:text-white active:scale-95 shadow-2xs"
               >
-                <Phone size={15} className="text-amber-600 shrink-0 group-hover:scale-110 transition-transform" />
+                <Phone size={16} className="text-amber-600 group-hover:text-white shrink-0 group-hover:scale-110 transition-transform" />
                 <span className="truncate">Call</span>
               </a>
             ) : (
-              <div className="flex h-11 items-center justify-center gap-1.5 rounded-2xl bg-paper/30 px-2 text-xs font-medium text-mute/50 ring-1 ring-line/40 cursor-not-allowed">
-                <Phone size={15} className="opacity-40 shrink-0" />
+              <div className="flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-paper/30 px-3 text-xs font-medium text-mute/50 ring-1 ring-line/40 cursor-not-allowed">
+                <Phone size={16} className="opacity-40 shrink-0" />
                 <span className="truncate">Call</span>
               </div>
             )}
           </div>
 
           {/* 🪪 Digital ID · AirPal Bio Pass (QR + Apple & Google Wallet) */}
-          <div className="mt-5 rounded-3xl bg-gradient-to-br from-card via-card to-paper p-4 sm:p-5 ring-1 ring-line/80 shadow-xs">
-            <div className="flex items-center justify-between gap-2 mb-3">
-              <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-accent">
-                <QrCode size={14} className="text-accent" />
+          <div className="mt-6 rounded-[28px] bg-gradient-to-br from-card via-card to-paper p-5 sm:p-6 ring-1 ring-line/80 shadow-xs relative overflow-hidden">
+            <div className="flex items-center justify-between gap-2 mb-4">
+              <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-accent">
+                <QrCode size={15} className="text-accent" />
                 <span>AirPal Bio Pass · Digital ID</span>
               </div>
-              <span className="text-[11px] font-mono font-semibold text-mute">
+              <span className="text-[11px] font-mono font-bold text-mute bg-paper/80 px-2.5 py-0.5 rounded-full ring-1 ring-line/60">
                 @{bio.handle}
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-5">
               <div
-                onClick={() => setShareModalOpen(true)}
-                className="relative group cursor-pointer shrink-0 grid place-items-center h-32 w-32 rounded-2xl bg-white p-2 shadow-inner ring-1 ring-black/5 hover:ring-brand/50 transition-all duration-200"
+                onClick={() => {
+                  void triggerHaptic("light");
+                  setShareModalOpen(true);
+                }}
+                className="relative group cursor-pointer shrink-0 grid place-items-center h-36 w-36 rounded-[22px] bg-white p-2.5 shadow-inner ring-1 ring-black/10 hover:ring-brand/50 transition-all duration-200 active:scale-95"
                 title="Click to enlarge or download QR Code"
               >
                 {bioQrUrl ? (
                   <img src={bioQrUrl} alt={`QR Code for @${bio.handle}`} className="h-full w-full object-contain" />
                 ) : (
-                  <div className="text-[10px] text-mute animate-pulse">Loading QR…</div>
+                  <div className="text-[11px] text-mute animate-pulse">Loading QR…</div>
                 )}
-                <span className="absolute inset-0 bg-brand/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity grid place-items-center">
-                  <span className="text-[10px] font-bold bg-ink/80 text-white rounded-full px-2 py-0.5">Enlarge</span>
+                <span className="absolute inset-0 bg-brand/5 rounded-[22px] opacity-0 group-hover:opacity-100 transition-opacity grid place-items-center">
+                  <span className="text-[10px] font-bold bg-ink/85 text-white rounded-full px-2.5 py-1 shadow-sm">
+                    Enlarge QR
+                  </span>
                 </span>
               </div>
 
-              <div className="flex-1 min-w-0 w-full space-y-2">
+              <div className="flex-1 min-w-0 w-full space-y-2.5">
                 <p className="text-xs text-mute leading-relaxed text-center sm:text-left">
-                  Scan to view this profile instantly on any phone, or add to Apple Wallet &amp; Google Wallet as a digital contact pass.
+                  Scan to view this profile instantly on any phone, or add to Apple Wallet &amp; Google Wallet as a verified digital contact pass.
                 </p>
 
-                <div className="flex flex-col sm:flex-row items-center gap-2 pt-1">
+                <div className="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
                   <AppleWalletButton
-                    className="w-full sm:w-auto flex-1 justify-center min-h-[40px]"
+                    className="w-full sm:w-auto flex-1 justify-center min-h-[44px]"
                     onClick={() => {
+                      void triggerHaptic("medium");
                       const passUrl = businessCardWalletPassUrl(bio.handle);
                       void openAppleWalletPass(passUrl, "@" + bio.handle + "-AirPal-Pass");
                     }}
                   />
                   <GoogleWalletButton
-                    className="w-full sm:w-auto flex-1 justify-center min-h-[40px]"
+                    className="w-full sm:w-auto flex-1 justify-center min-h-[44px]"
                     onClick={() => {
+                      void triggerHaptic("medium");
                       void openGoogleWalletPass(googleWalletCardUrl(bio.handle));
                     }}
                   />
                 </div>
 
-                <div className="flex items-center justify-between sm:justify-start gap-3 pt-0.5 text-xs">
+                <div className="flex items-center justify-between sm:justify-start gap-4 pt-1 text-xs">
                   <button
                     type="button"
-                    onClick={() => setShareModalOpen(true)}
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-accent hover:underline cursor-pointer"
+                    onClick={() => {
+                      void triggerHaptic("light");
+                      setShareModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:underline cursor-pointer"
                   >
-                    <Share2 size={12} />
+                    <Share2 size={13} />
                     <span>Share or Print QR</span>
                   </button>
                   <button
                     type="button"
                     onClick={handleQuickCopy}
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-mute hover:text-ink cursor-pointer"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-mute hover:text-ink cursor-pointer"
                   >
-                    {copiedLink ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                    {copiedLink ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
                     <span>{copiedLink ? "Link Copied" : "Copy Link"}</span>
                   </button>
                 </div>
@@ -1149,21 +1177,27 @@ export function BioPublicPage() {
 
               {/* Section Tabs */}
               <div
-                className="mt-3.5 flex gap-2 overflow-x-auto pb-1 no-scrollbar"
+                className="mt-4 flex gap-2 overflow-x-auto pb-1 no-scrollbar"
                 role="navigation"
                 aria-label="Business sections"
               >
                 <button
                   type="button"
-                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                  className="min-h-[44px] shrink-0 rounded-full bg-neutral-900 px-4 text-xs font-semibold text-white transition active:scale-95"
+                  onClick={() => {
+                    void triggerHaptic("selection");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="min-h-[44px] shrink-0 rounded-full bg-neutral-900 px-4 text-xs font-bold text-white transition active:scale-95 shadow-2xs"
                 >
                   Overview
                 </button>
                 {isStay && (
                   <button
                     type="button"
-                    onClick={() => document.getElementById("bio-stay")?.scrollIntoView({ behavior: "smooth" })}
+                    onClick={() => {
+                      void triggerHaptic("selection");
+                      document.getElementById("bio-stay")?.scrollIntoView({ behavior: "smooth" });
+                    }}
                     className="min-h-[44px] shrink-0 rounded-full bg-brand/10 px-4 text-xs font-bold text-accent ring-1 ring-brand/30 transition hover:bg-brand/15 active:scale-95"
                   >
                     Stay &amp; AI
@@ -1172,7 +1206,10 @@ export function BioPublicPage() {
                 {isStay && stayFacilities.length > 0 && (
                   <button
                     type="button"
-                    onClick={() => document.getElementById("bio-facilities")?.scrollIntoView({ behavior: "smooth" })}
+                    onClick={() => {
+                      void triggerHaptic("selection");
+                      document.getElementById("bio-facilities")?.scrollIntoView({ behavior: "smooth" });
+                    }}
                     className="min-h-[44px] shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
                   >
                     Facilities
@@ -1181,7 +1218,10 @@ export function BioPublicPage() {
                 {liveOffer && (
                   <button
                     type="button"
-                    onClick={() => document.getElementById("bio-offers")?.scrollIntoView({ behavior: "smooth" })}
+                    onClick={() => {
+                      void triggerHaptic("selection");
+                      document.getElementById("bio-offers")?.scrollIntoView({ behavior: "smooth" });
+                    }}
                     className="min-h-[44px] shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
                   >
                     Offers
@@ -1190,7 +1230,10 @@ export function BioPublicPage() {
                 {(bio.products || []).length > 0 && (
                   <button
                     type="button"
-                    onClick={() => document.getElementById("bio-products")?.scrollIntoView({ behavior: "smooth" })}
+                    onClick={() => {
+                      void triggerHaptic("selection");
+                      document.getElementById("bio-products")?.scrollIntoView({ behavior: "smooth" });
+                    }}
                     className="min-h-[44px] shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
                   >
                     Products
@@ -1199,7 +1242,10 @@ export function BioPublicPage() {
                 {(bio.services || []).length > 0 && (
                   <button
                     type="button"
-                    onClick={() => document.getElementById("bio-services")?.scrollIntoView({ behavior: "smooth" })}
+                    onClick={() => {
+                      void triggerHaptic("selection");
+                      document.getElementById("bio-services")?.scrollIntoView({ behavior: "smooth" });
+                    }}
                     className="min-h-[44px] shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
                   >
                     Services
@@ -1208,7 +1254,10 @@ export function BioPublicPage() {
                 {bio.aboutText && (
                   <button
                     type="button"
-                    onClick={() => document.getElementById("bio-about")?.scrollIntoView({ behavior: "smooth" })}
+                    onClick={() => {
+                      void triggerHaptic("selection");
+                      document.getElementById("bio-about")?.scrollIntoView({ behavior: "smooth" });
+                    }}
                     className="min-h-[44px] shrink-0 rounded-full bg-paper px-4 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:ring-brand/40 active:scale-95"
                   >
                     About
@@ -1217,7 +1266,7 @@ export function BioPublicPage() {
               </div>
 
               {/* Action Circles */}
-              <div className="mt-4 flex gap-3 overflow-x-auto pb-1 no-scrollbar" aria-label="Contact actions">
+              <div className="mt-5 flex gap-3 overflow-x-auto pb-1 no-scrollbar" aria-label="Contact actions">
                 <BizCircle label="Chat" Icon={MessageSquare} onClick={handleStartChat} />
                 {propertyData?.bookingUrl ? (
                   <BizCircle
@@ -1266,9 +1315,9 @@ export function BioPublicPage() {
 
               {/* Stay / Hotel Companion & Facilities Deck */}
               {isStay && (
-                <div id="bio-stay" className="mt-5 scroll-mt-24 space-y-4">
+                <div id="bio-stay" className="mt-6 scroll-mt-24 space-y-4">
                   {/* Stay & Guide hero banner */}
-                  <div className="overflow-hidden rounded-3xl bg-card p-5 ring-1 ring-brand/30 shadow-xs">
+                  <div className="overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-card via-card to-paper p-5 sm:p-6 ring-1 ring-brand/30 shadow-xs">
                     <div className="flex items-center justify-between">
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-accent">
                         <Sparkles size={11} />
@@ -1279,7 +1328,7 @@ export function BioPublicPage() {
                       </span>
                     </div>
 
-                    <h3 className="font-display mt-2.5 text-lg sm:text-xl font-bold text-ink">
+                    <h3 className="font-display mt-3 text-lg sm:text-xl font-bold text-ink">
                       Room Companion &amp; 24/7 AirPal AI
                     </h3>
                     <p className="mt-1 text-xs sm:text-sm text-mute leading-relaxed">
@@ -1290,14 +1339,16 @@ export function BioPublicPage() {
                     <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <Link
                         href={`/stay/${stayTargetId}`}
-                        className="flex h-11 items-center justify-center gap-2 rounded-full bg-brand px-5 text-xs font-bold text-white shadow-xs transition hover:bg-brand-ink active:scale-95"
+                        onClick={() => void triggerHaptic("light")}
+                        className="flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-brand px-5 text-xs font-bold text-white shadow-xs transition hover:bg-brand-ink active:scale-95"
                       >
                         <DoorOpen size={15} />
                         <span>Open Stay & Guide</span>
                       </Link>
                       <Link
                         href={`/stay/${stayTargetId}?open=answers`}
-                        className="flex h-11 items-center justify-center gap-2 rounded-full bg-paper px-5 text-xs font-bold text-ink ring-1 ring-line/80 shadow-2xs transition hover:bg-paper/80 active:scale-95"
+                        onClick={() => void triggerHaptic("light")}
+                        className="flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-paper px-5 text-xs font-bold text-ink ring-1 ring-line/80 shadow-2xs transition hover:bg-paper/80 active:scale-95"
                       >
                         <Sparkles size={14} className="text-accent" />
                         <span>Ask AirPal AI 24/7</span>
@@ -1307,7 +1358,7 @@ export function BioPublicPage() {
 
                   {/* Stay Key Information & Policies Strip */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    <div className="rounded-2xl bg-paper/70 p-3.5 ring-1 ring-line/80 shadow-2xs">
+                    <div className="rounded-[22px] bg-paper/70 p-4 ring-1 ring-line/80 shadow-2xs">
                       <div className="flex items-center gap-1.5 text-mute text-[10px] font-bold uppercase tracking-wider">
                         <Clock size={12} className="text-accent" />
                         <span>Check-In</span>
@@ -1316,7 +1367,7 @@ export function BioPublicPage() {
                       <p className="text-[10px] text-mute mt-0.5">Digital keycard ready</p>
                     </div>
 
-                    <div className="rounded-2xl bg-paper/70 p-3.5 ring-1 ring-line/80 shadow-2xs">
+                    <div className="rounded-[22px] bg-paper/70 p-4 ring-1 ring-line/80 shadow-2xs">
                       <div className="flex items-center gap-1.5 text-mute text-[10px] font-bold uppercase tracking-wider">
                         <Clock size={12} className="text-amber-600" />
                         <span>Check-Out</span>
@@ -1325,7 +1376,7 @@ export function BioPublicPage() {
                       <p className="text-[10px] text-mute mt-0.5">Express folio checkout</p>
                     </div>
 
-                    <div className="rounded-2xl bg-paper/70 p-3.5 ring-1 ring-line/80 shadow-2xs">
+                    <div className="rounded-[22px] bg-paper/70 p-4 ring-1 ring-line/80 shadow-2xs">
                       <div className="flex items-center gap-1.5 text-mute text-[10px] font-bold uppercase tracking-wider">
                         <Wifi size={12} className="text-cyan-600" />
                         <span>Guest Wi-Fi</span>
@@ -1334,7 +1385,7 @@ export function BioPublicPage() {
                       <p className="text-[10px] text-mute mt-0.5 truncate">{stayWifiSpeed}</p>
                     </div>
 
-                    <div className="rounded-2xl bg-paper/70 p-3.5 ring-1 ring-line/80 shadow-2xs">
+                    <div className="rounded-[22px] bg-paper/70 p-4 ring-1 ring-line/80 shadow-2xs">
                       <div className="flex items-center gap-1.5 text-mute text-[10px] font-bold uppercase tracking-wider">
                         <Sparkles size={12} className="text-accent" />
                         <span>Front Desk</span>
@@ -1348,7 +1399,7 @@ export function BioPublicPage() {
                   {stayFacilities.length > 0 && (
                     <div
                       id="bio-facilities"
-                      className="scroll-mt-24 rounded-3xl bg-paper/60 p-5 ring-1 ring-line/80 shadow-2xs"
+                      className="scroll-mt-24 rounded-[28px] bg-paper/60 p-5 ring-1 ring-line/80 shadow-2xs"
                     >
                       <div className="flex items-center justify-between mb-3.5">
                         <div>
@@ -1368,7 +1419,7 @@ export function BioPublicPage() {
                         {stayFacilities.map((fac, idx) => (
                           <div
                             key={fac.id || fac.name || idx}
-                            className="group flex flex-col justify-between rounded-2xl bg-card p-4 ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/30 hover:shadow-xs"
+                            className="group flex flex-col justify-between rounded-[20px] bg-card p-4 ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/30 hover:shadow-xs"
                           >
                             <div>
                               <div className="flex items-start justify-between gap-2">
@@ -1405,19 +1456,22 @@ export function BioPublicPage() {
 
               {/* Business Location & Trading Hours Schedule Card */}
               {(bio.city || bio.hours || bio.phone) && (
-                <div className="mt-5 divide-y divide-line/70 rounded-3xl bg-paper/60 ring-1 ring-line/80 overflow-hidden shadow-2xs">
+                <div className="mt-5 divide-y divide-line/70 rounded-[28px] bg-paper/60 ring-1 ring-line/80 overflow-hidden shadow-2xs">
                   {bio.city && (
                     <a
                       href={maps || undefined}
                       target={maps ? "_blank" : undefined}
                       rel="noreferrer"
-                      onClick={() => maps && recordTap(bio.handle, "maps")}
-                      className="flex items-center gap-3 p-4 transition hover:bg-paper"
+                      onClick={() => {
+                        void triggerHaptic("light");
+                        if (maps) recordTap(bio.handle, "maps");
+                      }}
+                      className="flex min-h-[52px] items-center gap-3 p-4 transition hover:bg-paper active:scale-[0.99] touch-manipulation cursor-pointer"
                     >
                       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 text-accent">
                         <MapPin size={18} />
                       </span>
-                      <span className="min-w-0 flex-1 text-sm font-medium text-ink">{bio.city}</span>
+                      <span className="min-w-0 flex-1 text-sm font-semibold text-ink">{bio.city}</span>
                       {maps && <ChevronRight size={18} className="shrink-0 text-mute" />}
                     </a>
                   )}
@@ -1429,13 +1483,16 @@ export function BioPublicPage() {
                   {bio.phone && (
                     <a
                       href={tel || undefined}
-                      onClick={() => recordTap(bio.handle, "call")}
-                      className="flex items-center gap-3 p-4 transition hover:bg-paper"
+                      onClick={() => {
+                        void triggerHaptic("light");
+                        recordTap(bio.handle, "call");
+                      }}
+                      className="flex min-h-[52px] items-center gap-3 p-4 transition hover:bg-paper active:scale-[0.99] touch-manipulation cursor-pointer"
                     >
                       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-brand/10 text-accent">
                         <Phone size={18} />
                       </span>
-                      <span className="min-w-0 flex-1 text-sm font-medium text-ink">{bio.phone}</span>
+                      <span className="min-w-0 flex-1 text-sm font-semibold text-ink">{bio.phone}</span>
                       <ChevronRight size={18} className="shrink-0 text-mute" />
                     </a>
                   )}
@@ -1446,7 +1503,7 @@ export function BioPublicPage() {
 
           {/* Owner Meet & Hangout Hub and Proposals Inbox */}
           {isOwner && (
-            <div className="mt-6 rounded-3xl bg-gradient-to-br from-paper/90 via-card to-paper/60 p-5 ring-1 ring-brand/30 shadow-xs">
+            <div className="mt-7 rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-paper/90 via-card to-paper/60 p-5 sm:p-6 ring-1 ring-brand/30 shadow-xs">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent flex items-center gap-1.5">
                   <Sparkles size={12} className="text-accent" />
@@ -1456,16 +1513,16 @@ export function BioPublicPage() {
                   Live on @{bio.handle}
                 </span>
               </div>
-              <h3 className="font-display mt-2 text-lg font-bold text-ink">
+              <h3 className="font-display mt-2.5 text-lg sm:text-xl font-bold text-ink">
                 Meet &amp; Hangout with Friends &amp; Mates
               </h3>
-              <p className="mt-1 text-xs leading-relaxed text-mute">
+              <p className="mt-1 text-xs sm:text-sm leading-relaxed text-mute">
                 Anyone visiting your bio can request a 1-on-1 coffee, schedule a meeting, or invite you to a group
                 hangout.
               </p>
 
               {/* Format Launcher Options */}
-              <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+              <div className="mt-5 grid grid-cols-3 gap-2.5 sm:gap-3.5">
                 {(
                   [
                     {
@@ -1499,10 +1556,10 @@ export function BioPublicPage() {
                       setCatchUpInitialType(opt.type);
                       setCatchUpModalOpen(true);
                     }}
-                    className="flex flex-col items-center rounded-2xl bg-card p-3 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98] cursor-pointer"
+                    className="group flex flex-col items-center justify-center min-h-[96px] rounded-[22px] bg-card p-3 sm:p-4 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98] cursor-pointer touch-manipulation"
                   >
-                    <span className={cn("mb-2 grid h-10 w-10 place-items-center rounded-2xl", opt.tint)}>
-                      <opt.Icon size={18} />
+                    <span className={cn("mb-2 grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl transition-transform group-hover:scale-105", opt.tint)}>
+                      <opt.Icon size={19} />
                     </span>
                     <span className="text-xs font-bold text-ink">{opt.label}</span>
                     <span className="mt-0.5 text-[10px] text-mute">{opt.sub}</span>
@@ -1512,8 +1569,8 @@ export function BioPublicPage() {
 
               {/* Proposals Inbox when requests exist */}
               {catchUpsList.length > 0 && (
-                <div className="mt-5 border-t border-line/70 pt-4">
-                  <div className="flex items-center justify-between mb-3">
+                <div className="mt-6 border-t border-line/70 pt-5">
+                  <div className="flex items-center justify-between mb-3.5">
                     <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-amber-700">
                       <HeartHandshake size={14} className="text-amber-600" />
                       <span>Meetup Proposals ({catchUpsList.length})</span>
@@ -1523,7 +1580,7 @@ export function BioPublicPage() {
                     </span>
                   </div>
 
-                  <div className="space-y-2.5">
+                  <div className="space-y-3">
                     {catchUpsList.map((item) => {
                       const eventPayload = {
                         title: `${item.type === "meeting" ? "Meeting" : item.type === "nightout" ? "Hangout" : "Catch Up"}: ${item.requesterName}`,
@@ -1538,10 +1595,10 @@ export function BioPublicPage() {
                       return (
                         <div
                           key={item.id}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl bg-card p-3.5 ring-1 ring-line/80 shadow-2xs"
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 rounded-[22px] bg-card p-4 ring-1 ring-line/80 shadow-2xs"
                         >
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="h-10 w-10 overflow-hidden rounded-full ring-1 ring-line bg-paper shrink-0">
+                            <div className="h-11 w-11 overflow-hidden rounded-full ring-1 ring-line bg-paper shrink-0">
                               {item.requesterPhoto ? (
                                 <Photo src={item.requesterPhoto} className="h-full w-full object-cover" />
                               ) : (
@@ -1552,11 +1609,11 @@ export function BioPublicPage() {
                             </div>
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <p className="font-semibold text-xs text-ink truncate">{item.requesterName}</p>
+                                <p className="font-bold text-xs sm:text-sm text-ink truncate">{item.requesterName}</p>
                                 {item.requesterHandle && (
                                   <Link
                                     href={`/@${item.requesterHandle}`}
-                                    className="text-[11px] text-mute hover:text-accent truncate"
+                                    className="text-[11px] text-mute hover:text-accent truncate font-medium"
                                   >
                                     @{item.requesterHandle}
                                   </Link>
@@ -1575,13 +1632,13 @@ export function BioPublicPage() {
                               {item.notes && (
                                 <p className="text-[11px] text-ink/80 italic mt-0.5 truncate">"{item.notes}"</p>
                               )}
-                              <div className="mt-2">
+                              <div className="mt-2.5">
                                 <CatchUpSlotActions item={item} />
                               </div>
                             </div>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-1.5 shrink-0 self-end sm:self-center">
+                          <div className="flex flex-wrap items-center gap-2 shrink-0 self-end sm:self-center">
                             {item.meetingLink && (
                               <a
                                 href={item.meetingLink}
@@ -1617,19 +1674,20 @@ export function BioPublicPage() {
                               size="sm"
                               variant="ghost"
                               label="Sync to Phone"
-                              buttonClassName="min-h-[44px] px-4 text-xs rounded-full border border-line"
+                              buttonClassName="min-h-[44px] px-4 text-xs font-semibold rounded-full border border-line"
                             />
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="h-11 w-11 p-0 rounded-full text-mute hover:text-ink hover:bg-black/5"
+                              className="h-11 w-11 min-h-[44px] min-w-[44px] p-0 rounded-full text-mute hover:text-ink hover:bg-black/5"
                               onClick={() => {
+                                void triggerHaptic("light");
                                 updateCatchUpStatus(item.id, "dismissed");
                                 setCatchUpsList((prev) => prev.filter((i) => i.id !== item.id));
                                 toast.info("Request dismissed");
                               }}
                             >
-                              <X size={14} />
+                              <X size={15} />
                             </Button>
                           </div>
                         </div>
@@ -1644,7 +1702,7 @@ export function BioPublicPage() {
           {/* Catch Up & Hangout Deck for Visitors */}
           {!isOwner &&
             !(bio.kind === "business" && ((bio.products || []).length > 0 || (bio.services || []).length > 0)) && (
-              <div className="mt-6 rounded-3xl bg-gradient-to-br from-paper/90 via-card to-paper/60 p-5 ring-1 ring-line/80 shadow-xs">
+              <div className="mt-7 rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-paper/90 via-card to-paper/60 p-5 sm:p-6 ring-1 ring-line/80 shadow-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent flex items-center gap-1.5">
                     <Sparkles size={12} className="text-accent" />
@@ -1667,7 +1725,7 @@ export function BioPublicPage() {
                       setCatchUpsList(listCatchUpsForHandle(bio.handle));
                     }}
                     className={cn(
-                      "inline-flex min-h-[40px] items-center gap-1.5 rounded-full px-3.5 text-[11px] font-semibold ring-1 transition cursor-pointer active:scale-95",
+                      "inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-xs font-semibold ring-1 transition cursor-pointer active:scale-95 touch-manipulation",
                       hasCatchUpReminder(bio.handle)
                         ? "bg-amber-500/15 text-amber-800 ring-amber-500/40 font-bold"
                         : "bg-card text-mute ring-line hover:text-ink hover:bg-paper",
@@ -1676,19 +1734,19 @@ export function BioPublicPage() {
                   >
                     <span
                       className={cn(
-                        "h-1.5 w-1.5 rounded-full",
+                        "h-2 w-2 rounded-full",
                         hasCatchUpReminder(bio.handle) ? "bg-amber-500 motion-safe:animate-pulse" : "bg-mute/50",
                       )}
                     />
                     <span>{hasCatchUpReminder(bio.handle) ? "Reminder on ✓" : "Remind me"}</span>
                   </button>
                 </div>
-                <h3 className="font-display mt-2 text-lg font-bold text-ink">Catch up with {bio.name}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-mute">
+                <h3 className="font-display mt-2.5 text-lg sm:text-xl font-bold text-ink">Catch up with {bio.name}</h3>
+                <p className="mt-1 text-xs sm:text-sm leading-relaxed text-mute">
                   Propose a 1-on-1 coffee, schedule a sync meeting, or create a group hangout plan.
                 </p>
 
-                <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+                <div className="mt-5 grid grid-cols-3 gap-2.5 sm:gap-3.5">
                   {(
                     [
                       {
@@ -1722,10 +1780,10 @@ export function BioPublicPage() {
                         setCatchUpInitialType(opt.type);
                         setCatchUpModalOpen(true);
                       }}
-                      className="flex flex-col items-center rounded-2xl bg-card p-3 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98] cursor-pointer"
+                      className="group flex flex-col items-center justify-center min-h-[96px] rounded-[22px] bg-card p-3 sm:p-4 text-center ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs active:scale-[0.98] cursor-pointer touch-manipulation"
                     >
-                      <span className={cn("mb-2 grid h-10 w-10 place-items-center rounded-2xl", opt.tint)}>
-                        <opt.Icon size={18} />
+                      <span className={cn("mb-2 grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-2xl transition-transform group-hover:scale-105", opt.tint)}>
+                        <opt.Icon size={19} />
                       </span>
                       <span className="text-xs font-bold text-ink">{opt.label}</span>
                       <span className="mt-0.5 text-[10px] text-mute">{opt.sub}</span>
@@ -1737,8 +1795,8 @@ export function BioPublicPage() {
 
           {/* Public Plans & Hangouts created by this creator */}
           {userPlans.length > 0 && (
-            <div className="mt-7">
-              <div className="flex items-center justify-between mb-3 px-0.5">
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-3.5 px-0.5">
                 <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent flex items-center gap-1.5">
                   <Sparkles size={13} className="text-accent" />
                   <span>Public Plans &amp; Hangouts</span>
@@ -1748,7 +1806,7 @@ export function BioPublicPage() {
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
                 {userPlans.map((plan) => {
                   const planEventPayload = {
                     title: plan.title,
@@ -1761,19 +1819,19 @@ export function BioPublicPage() {
                   return (
                     <div
                       key={plan.id}
-                      className="group flex flex-col justify-between rounded-3xl bg-card p-4 ring-1 ring-line shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs"
+                      className="group flex flex-col justify-between rounded-[26px] bg-card p-4 ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:ring-brand/40 hover:shadow-xs"
                     >
                       <PlanGridCard plan={plan} />
                       <div className="mt-3 pt-3 border-t border-line/60 flex items-center justify-between gap-2">
-                        <span className="text-[11px] font-medium text-mute">
+                        <span className="text-xs font-medium text-mute truncate">
                           {plan.destination || plan.city || "Sydney"}
                         </span>
                         <AddToCalendarMenu
                           event={planEventPayload}
                           size="sm"
                           variant="ghost"
-                          label="Sync to Phone"
-                          buttonClassName="h-7 px-2.5 text-[10px] rounded-full border border-line"
+                          label="Sync"
+                          buttonClassName="min-h-[44px] px-3.5 text-xs font-semibold rounded-full border border-line"
                         />
                       </div>
                     </div>
@@ -1847,7 +1905,7 @@ export function BioPublicPage() {
           {liveOffer && (
             <div
               id="bio-offers"
-              className="mt-7 scroll-mt-24 overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card to-paper p-5 ring-1 ring-gold/40 shadow-sm"
+              className="mt-8 scroll-mt-24 overflow-hidden rounded-[28px] sm:rounded-[32px] bg-gradient-to-br from-card via-card to-paper p-5 sm:p-6 ring-1 ring-gold/40 shadow-sm"
             >
               <div className="flex items-center justify-between">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-accent">
@@ -1861,19 +1919,20 @@ export function BioPublicPage() {
               </h3>
               <p className="mt-1 text-xs sm:text-sm leading-relaxed text-mute">{liveOffer.detail}</p>
               <Button
-                className="mt-4 w-full gap-2 rounded-full bg-brand text-white shadow-sm hover:bg-brand-ink active:scale-[0.98]"
-                onClick={() =>
+                className="mt-4 min-h-[44px] h-12 w-full gap-2 rounded-full bg-brand text-xs sm:text-sm font-bold text-white shadow-xs hover:bg-brand-ink active:scale-[0.98] cursor-pointer"
+                onClick={() => {
+                  void triggerHaptic("medium");
                   onClaimDeal({
                     id: "live-offer",
                     kind: "deal",
                     title: liveOffer.title,
                     detail: liveOffer.detail,
                     badge: liveOffer.badge,
-                  })
-                }
+                  });
+                }}
               >
-                <Ticket size={15} className="text-accent" />
-                Claim Live Offer
+                <Ticket size={16} className="text-accent" />
+                <span>Claim Live Offer</span>
               </Button>
             </div>
           )}
@@ -1901,8 +1960,8 @@ export function BioPublicPage() {
 
           {/* Custom Outbound Links Stack */}
           {stacked.length > 0 && (
-            <div className="mt-7">
-              <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent mb-2.5">Featured Links</h3>
+            <div className="mt-8">
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent mb-3 px-0.5">Featured Links</h3>
               <ul className="space-y-2.5">
                 {stacked
                   .filter((link) => isSafeBioHref(link.href))
@@ -1912,8 +1971,11 @@ export function BioPublicPage() {
                         href={link.href}
                         target={link.href.startsWith("http") ? "_blank" : undefined}
                         rel="noreferrer"
-                        onClick={() => recordTap(bio.handle, link.type)}
-                        className="group flex h-13 sm:h-14 items-center justify-between rounded-full bg-brand px-6 text-sm sm:text-[15px] font-bold text-white shadow-xs transition-all duration-200 hover:bg-brand-ink hover:shadow-md active:scale-[0.99]"
+                        onClick={() => {
+                          void triggerHaptic("light");
+                          recordTap(bio.handle, link.type);
+                        }}
+                        className="group flex min-h-[52px] sm:min-h-[56px] items-center justify-between rounded-full bg-brand px-6 text-sm sm:text-[15px] font-bold text-white shadow-xs transition-all duration-200 hover:bg-brand-ink hover:shadow-md active:scale-[0.99] touch-manipulation cursor-pointer"
                       >
                         <span className="truncate">{link.label || link.type}</span>
                         <ChevronRight size={18} className="shrink-0 transition-transform group-hover:translate-x-1" />
@@ -1943,10 +2005,11 @@ export function BioPublicPage() {
                 target="_blank"
                 rel="noreferrer"
                 onClick={() => {
+                  void triggerHaptic("light");
                   recordTap(bio.handle, "maps");
                   trackMapClick({ source: "bio" });
                 }}
-                className="flex h-11 items-center justify-center gap-2 rounded-full bg-paper text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:bg-paper/80 shadow-2xs active:scale-95"
+                className="flex min-h-[44px] h-11 items-center justify-center gap-2 rounded-full bg-paper text-xs font-bold text-ink ring-1 ring-line/80 transition hover:bg-paper/80 shadow-2xs active:scale-95 touch-manipulation cursor-pointer"
               >
                 <MapPin size={15} className="text-accent" />
                 <span>Open in Maps</span>
@@ -1959,7 +2022,7 @@ export function BioPublicPage() {
               the local club copy stays for on-device perks. */}
           {(bio.kind === "business" || ["bar", "club", "events", "eat"].includes(bio.category)) && (
             <form
-              className="mt-8 rounded-3xl bg-paper/60 p-5 ring-1 ring-line/80 shadow-2xs space-y-2.5"
+              className="mt-8 rounded-[28px] sm:rounded-[32px] bg-paper/60 p-5 sm:p-6 ring-1 ring-line/80 shadow-2xs space-y-3"
               onSubmit={(e) => {
                 e.preventDefault();
                 if (listSending) return;
@@ -1978,6 +2041,7 @@ export function BioPublicPage() {
                   toast.error(problems[0] || "Check the form and try again.");
                   return;
                 }
+                void triggerHaptic("medium");
                 setListSending(true);
                 void (async () => {
                   try {
@@ -2013,8 +2077,8 @@ export function BioPublicPage() {
             >
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-accent">AirPal Guestlist</p>
-                <h4 className="font-display text-base font-bold text-ink mt-0.5">VIP Invites &amp; Secret Spots</h4>
-                <p className="text-[11.5px] text-mute mt-0.5">Get notified for exclusive gatherings, door perks, and secret drops.</p>
+                <h4 className="font-display text-base sm:text-lg font-bold text-ink mt-0.5">VIP Invites &amp; Secret Spots</h4>
+                <p className="text-xs text-mute mt-0.5">Get notified for exclusive gatherings, door perks, and secret drops.</p>
               </div>
               <label htmlFor="guestlist-name" className="sr-only">
                 Your name
@@ -2026,7 +2090,7 @@ export function BioPublicPage() {
                 placeholder="Your Name"
                 autoComplete="name"
                 maxLength={80}
-                className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand focus:border-brand shadow-2xs"
+                className="min-h-[44px] h-11 sm:h-12 w-full rounded-2xl sm:rounded-full bg-card px-4 text-xs sm:text-sm font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand focus:border-brand shadow-2xs"
               />
               <label htmlFor="guestlist-city" className="sr-only">
                 Your city
@@ -2035,7 +2099,7 @@ export function BioPublicPage() {
                 id="guestlist-city"
                 value={listCity}
                 onChange={(e) => setListCity(e.target.value)}
-                className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand focus:border-brand shadow-2xs"
+                className="min-h-[44px] h-11 sm:h-12 w-full rounded-2xl sm:rounded-full bg-card px-4 text-xs sm:text-sm font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand focus:border-brand shadow-2xs"
               >
                 <option value="">Your City</option>
                 {CITY_OPTIONS.map((c) => (
@@ -2058,7 +2122,7 @@ export function BioPublicPage() {
                     placeholder="Your city or town"
                     autoComplete="address-level2"
                     maxLength={60}
-                    className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand focus:border-brand shadow-2xs"
+                    className="min-h-[44px] h-11 sm:h-12 w-full rounded-2xl sm:rounded-full bg-card px-4 text-xs sm:text-sm font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand focus:border-brand shadow-2xs"
                   />
                 </>
               )}
@@ -2075,11 +2139,11 @@ export function BioPublicPage() {
                 value={listEmail}
                 onChange={(e) => setListEmail(e.target.value)}
                 placeholder="Your Email"
-                className="h-11 w-full rounded-full bg-card px-4 text-xs font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand focus:border-brand shadow-2xs"
+                className="min-h-[44px] h-11 sm:h-12 w-full rounded-2xl sm:rounded-full bg-card px-4 text-xs sm:text-sm font-medium text-ink border border-line outline-none focus-visible:ring-2 focus-visible:ring-brand focus:border-brand shadow-2xs"
               />
               <fieldset>
                 <legend className="text-[11px] font-semibold text-mute">I&apos;m into — pick any</legend>
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                <div className="mt-2 flex flex-wrap gap-2">
                   {GUESTLIST_INTERESTS.map((interest) => {
                     const on = listInterests.includes(interest.id);
                     return (
@@ -2087,15 +2151,16 @@ export function BioPublicPage() {
                         key={interest.id}
                         type="button"
                         aria-pressed={on}
-                        onClick={() =>
+                        onClick={() => {
+                          void triggerHaptic("light");
                           setListInterests((prev) =>
                             prev.includes(interest.id) ? prev.filter((v) => v !== interest.id) : [...prev, interest.id],
-                          )
-                        }
+                          );
+                        }}
                         className={
                           on
-                            ? "min-h-[44px] shrink-0 cursor-pointer rounded-full bg-brand px-3.5 text-xs font-bold text-white shadow-xs transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                            : "min-h-[44px] shrink-0 cursor-pointer rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                            ? "min-h-[44px] shrink-0 cursor-pointer rounded-full bg-brand px-4 text-xs font-bold text-white shadow-xs transition active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                            : "min-h-[44px] shrink-0 cursor-pointer rounded-full bg-card px-4 text-xs font-semibold text-ink ring-1 ring-line transition hover:ring-brand/40 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                         }
                       >
                         {interest.label}
@@ -2107,7 +2172,7 @@ export function BioPublicPage() {
               <button
                 type="submit"
                 disabled={listSending}
-                className="h-11 w-full rounded-full bg-brand text-xs font-bold text-white transition hover:bg-brand-ink active:scale-95 shadow-xs disabled:opacity-60 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                className="min-h-[48px] h-12 w-full rounded-full bg-brand text-xs sm:text-sm font-bold text-white transition hover:bg-brand-ink active:scale-95 shadow-xs disabled:opacity-60 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand touch-manipulation"
               >
                 {listSending ? "Joining VIP list…" : "Join the Guestlist (Free)"}
               </button>
@@ -2121,39 +2186,39 @@ export function BioPublicPage() {
 
           {/* Invite code — every bio carries its owner's code so any visitor can join under them */}
           {bio.ownerUid && (
-            <div className="mt-8 rounded-3xl bg-gold/10 p-4 ring-1 ring-gold/30 shadow-2xs">
-              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-accent">
-                <Ticket size={13} aria-hidden />
-                {isOwner ? "Your invite code" : `Join with ${bio.name.split(" ")[0]}'s code`}
+            <div className="mt-8 rounded-[28px] bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 p-5 ring-1 ring-amber-500/25 shadow-xs">
+              <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-accent">
+                <Ticket size={14} className="text-amber-500" aria-hidden />
+                <span>{isOwner ? "Your invite code" : `Join with ${bio.name.split(" ")[0]}'s code`}</span>
               </p>
-              <div className="mt-2.5 flex items-center gap-2">
-                <code className="min-w-0 flex-1 truncate rounded-xl bg-card px-3 py-2 text-sm font-bold text-ink ring-1 ring-line/70">
+              <div className="mt-3 flex items-center gap-2.5">
+                <code className="min-w-0 flex-1 truncate rounded-2xl bg-card px-4 py-2.5 text-sm font-bold text-ink ring-1 ring-line/80 shadow-2xs font-mono">
                   @{bio.handle}
                 </code>
                 <button
                   type="button"
                   onClick={() => void handleCopyInviteCode()}
-                  className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line/80 transition hover:bg-paper active:scale-95"
+                  className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-2xl bg-card px-4 text-xs font-semibold text-ink ring-1 ring-line/80 shadow-2xs transition hover:bg-paper active:scale-95 cursor-pointer touch-manipulation"
                   aria-label="Copy invite code"
                 >
                   {copiedCode ? (
-                    <Check size={14} className="text-emerald-600" />
+                    <Check size={14} className="text-emerald-600 animate-in zoom-in" />
                   ) : (
                     <Copy size={14} className="text-mute" />
                   )}
-                  {copiedCode ? "Copied" : "Copy"}
+                  <span>{copiedCode ? "Copied" : "Copy"}</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => void handleShareInvite()}
-                  className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-neutral-900 px-3.5 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95"
+                  className="inline-flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-2xl bg-brand px-4 text-xs font-bold text-white shadow-xs transition hover:bg-brand-ink active:scale-95 cursor-pointer touch-manipulation"
                   aria-label="Share invite link"
                 >
                   <Share2 size={14} />
-                  Invite
+                  <span>Invite</span>
                 </button>
               </div>
-              <p className="mt-1.5 text-[11px] leading-relaxed text-mute">
+              <p className="mt-2 text-xs leading-relaxed text-mute">
                 {isOwner
                   ? "Share your code — you both earn Stars when your mate completes their first experience."
                   : "Use this code when you join — you both earn Stars when you complete your first experience."}
@@ -2162,29 +2227,32 @@ export function BioPublicPage() {
           )}
 
           {/* Brand Footer & Viral @handle CTA */}
-          <footer className="mt-10 flex flex-col items-center justify-center gap-2 border-t border-line/60 pt-6 text-center">
-            <Link href="/" className="inline-flex items-center gap-2 transition hover:opacity-80">
+          <footer className="mt-12 flex flex-col items-center justify-center gap-2.5 border-t border-line/60 pt-8 text-center">
+            <Link href="/" className="inline-flex items-center gap-2 transition hover:opacity-80 active:scale-95">
               <BrandMark compact />
-              <span className="font-display text-base font-bold tracking-tight">
+              <span className="font-display text-lg font-extrabold tracking-tight">
                 AirPal<span className="text-accent">.me</span>
               </span>
             </Link>
-            <p className="text-xs text-mute">
+            <p className="text-xs text-mute leading-relaxed max-w-md">
               AirPal.Me · Plan your day, organise your life &amp; share who you are ·{" "}
-              <Link href="/bio/setup" className="font-semibold text-ink underline hover:text-accent">
+              <Link href="/bio/setup" className="font-bold text-ink underline hover:text-accent">
                 Claim your free @handle
               </Link>
             </p>
-            <p className="text-[11px] text-mute/80">
+            <p className="text-xs text-mute/80">
               Discover events, tickets &amp; perks on{" "}
-              <Link href="/pass" className="font-semibold text-ink underline hover:text-accent">
+              <Link href="/pass" className="font-bold text-ink underline hover:text-accent">
                 AirPal Pass →
               </Link>
             </p>
             <button
               type="button"
-              className="mt-1 text-xs text-mute/80 hover:text-ink font-mono"
-              onClick={() => setShareModalOpen(true)}
+              className="mt-1 text-xs text-mute/70 hover:text-ink font-mono px-3 py-1 rounded-full bg-paper/60 ring-1 ring-line/50 transition cursor-pointer"
+              onClick={() => {
+                void triggerHaptic("light");
+                setShareModalOpen(true);
+              }}
             >
               airpal.me/@{bio.handle}
             </button>
@@ -2210,8 +2278,11 @@ export function BioPublicPage() {
             </div>
             <button
               type="button"
-              className="mt-5 w-full rounded-full bg-brand py-3 text-xs font-bold text-white transition hover:bg-brand-ink active:scale-95"
-              onClick={() => setClaim(null)}
+              className="mt-5 min-h-[44px] w-full rounded-full bg-brand py-3 text-xs font-bold text-white transition hover:bg-brand-ink active:scale-95 cursor-pointer touch-manipulation shadow-xs"
+              onClick={() => {
+                void triggerHaptic("light");
+                setClaim(null);
+              }}
             >
               Done
             </button>

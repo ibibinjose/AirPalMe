@@ -20,7 +20,7 @@ export function ImageField({
   value,
   folder = "bios",
   onChange,
-  round = false,
+  round = kind === "avatar",
   previewClassName,
   align = "start",
   cornerBadge,

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { isSafeBioHref, socialLinks, type BioLink } from "@shared/bio";
 import { cn } from "@/lib/cn";
+import { triggerHaptic } from "@/lib/native";
 
 interface PlatformConfig {
   name: string;
@@ -183,10 +184,13 @@ export function BioSocials({
             href={link.href}
             target="_blank"
             rel="noreferrer"
-            onClick={() => onTap(link.type)}
+            onClick={() => {
+              void triggerHaptic("light");
+              onTap(link.type);
+            }}
             aria-label={`${title} (${cfg.action})`}
             className={cn(
-              "group flex w-full items-center justify-between rounded-2xl sm:rounded-[22px] bg-card p-3.5 sm:p-4 text-left ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:shadow-xs active:scale-[0.99]",
+              "group flex w-full items-center justify-between rounded-2xl sm:rounded-[22px] bg-card p-3.5 sm:p-4 text-left ring-1 ring-line/80 shadow-2xs transition-all duration-200 hover:shadow-xs active:scale-[0.99] touch-manipulation cursor-pointer",
               cfg.hoverBorder,
             )}
           >
