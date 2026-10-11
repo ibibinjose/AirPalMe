@@ -5,7 +5,6 @@ import {
   AlertCircle,
   ArrowLeft,
   BadgePercent,
-  BedDouble,
   Building2,
   CalendarDays,
   Check,
@@ -265,9 +264,9 @@ export function StartPage() {
       return {
         icon: Building2,
         kicker: "Host Portal",
-        title: "Sign in to Host Tools",
+        title: "Sign in to Host Console",
         signupTitle: "Create your Host Account",
-        desc: "Manage your hotel, venue, hostel, or campus companion, digital keys, and Wi-Fi.",
+        desc: "Manage your PBSA building cohort, 60s Arrival Engine, Belonging Reports, and resident support.",
         color: "text-amber-600 dark:text-amber-400",
         bg: "bg-amber-500/10",
       };
@@ -310,7 +309,7 @@ export function StartPage() {
       kicker: "AirPal.Me",
       title: "Welcome back",
       signupTitle: "Create your AirPal account",
-      desc: "One login for your Circle, plans, stays, and a public @handle.",
+      desc: "One universal login for your digital bio, Circle, hangout plans, and event passes.",
       color: "text-accent",
       bg: "bg-brand/10",
     };
@@ -563,7 +562,7 @@ export function StartPage() {
               <User size={16} />
             </Button>
             <Button variant="ghost" className="w-full justify-between" onClick={() => nav("/host")}>
-              <span>{isHostUser ? "Host Workspace (Hotel / Venue)" : "Become a Host · List Place"}</span>
+              <span>{isHostUser ? "Host Console · Belonging Reports" : "Host Console · PBSA & Venue"}</span>
               <Building2 size={16} />
             </Button>
             <Button variant="ghost" className="w-full justify-between" onClick={() => nav("/business")}>
@@ -575,7 +574,7 @@ export function StartPage() {
               <CalendarDays size={16} />
             </Button>
             <Button variant="ghost" className="w-full justify-between" onClick={() => nav("/me")}>
-              <span>Your Saved Stays & Passes</span>
+              <span>Your Tickets, Passes & Memories</span>
               <Sparkles size={16} />
             </Button>
           </div>
@@ -608,7 +607,7 @@ export function StartPage() {
             Find a place. Make&nbsp;a&nbsp;plan. Meet&nbsp;your&nbsp;people.
           </h1>
           <p className="mx-auto mt-2 max-w-sm text-sm text-mute">
-            Find places and experiences, make plans with family and friends, and use Stay & Guide — in one account.
+            Find places and experiences, make plans with family and friends, and use AirPal Pass & Guide — in one account.
           </p>
           <div className="mt-4 grid grid-cols-3 gap-2 text-left">
             {[
@@ -688,27 +687,27 @@ export function StartPage() {
       )}
       {isHostStart && (
         <RoleHero
-          kicker="For hosts"
-          title={<>Hosting changes everything.</>}
-          sub="List your rooms, approve every guest yourself, and get discovered by travellers staying nearby — you stay in control."
-          cta="List your space below — it takes a minute ↓"
+          kicker="For building operators & hosts"
+          title={<>Building community made easy.</>}
+          sub="Onboard residents via the 60s Arrival Engine, track Belonging Reports, and dispatch support — in one console."
+          cta="Access your operator console below ↓"
           items={[
             {
-              icon: BedDouble,
-              title: "List your rooms",
-              desc: "Rooms, bunks & crash pads",
+              icon: Building2,
+              title: "60s Arrival Engine",
+              desc: "Instant building cohort & room check-in",
               tint: "bg-emerald-500/10 text-emerald-700",
             },
             {
               icon: ShieldCheck,
-              title: "Approve every guest",
-              desc: "Manual approval, your rules",
+              title: "Belonging Reports",
+              desc: "Loneliness mitigation & cohort connectivity",
               tint: "bg-brand/10 text-accent",
             },
             {
-              icon: MapPin,
-              title: "Get discovered",
-              desc: "Show up in nearby stays",
+              icon: Users,
+              title: "Resident Support",
+              desc: "Quick helpdesk & staff dispatch",
               tint: "bg-amber-500/10 text-amber-700",
             },
           ]}

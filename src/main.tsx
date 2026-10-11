@@ -4,6 +4,9 @@ import App from "./App";
 import "./index.css";
 import { isNativeApp } from "./lib/native";
 import { initAppFlavor } from "./lib/app-flavor";
+import { initTheme } from "./lib/theme";
+
+initTheme();
 
 // Offline shell for mobile web only: skip in dev (stale caches) and inside the
 // Capacitor shell (custom schemes break service worker scope).

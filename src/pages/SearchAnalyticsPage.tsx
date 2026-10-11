@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { getFirebaseDb } from "@/lib/firebase";
 import { Button } from "@/components/ui/Button";
+import { openGlobalSearch } from "@/components/search/openSearch";
 import { useSearchQueryLogger } from "@/hooks/useSearchQueryLogger";
 import { triggerHaptic } from "@/lib/native";
 import { cn } from "@/lib/cn";
@@ -64,24 +65,24 @@ interface RawQueryLog {
 
 // Curated baseline data to provide seamless trend charts even before hundreds of real searches accumulate
 const SEED_POPULAR_TERMS: PopularItem[] = [
-  { id: "bondi-beach", term: "Bondi Beach", count: 48, category: "places", city: "Sydney" },
-  { id: "surry-hills", term: "Surry Hills Cafe", count: 42, category: "places", city: "Sydney" },
-  { id: "live-music", term: "Live Music Tonight", count: 35, category: "events", city: "Sydney" },
-  { id: "harbour-hotel", term: "Harbour View Hotel", count: 29, category: "stay", city: "Sydney" },
-  { id: "running-mate", term: "Morning Running Mate", count: 26, category: "people", city: "Sydney" },
-  { id: "coffee-walk", term: "Coffee & Walk", count: 23, category: "places", city: "Sydney" },
-  { id: "botanic-gardens", term: "Botanic Gardens Picnic", count: 19, category: "places", city: "Sydney" },
-  { id: "art-gallery", term: "Contemporary Art Gallery", count: 16, category: "events", city: "Sydney" },
-  { id: "manly-ferry", term: "Manly Ferry Sunset", count: 14, category: "experiences", city: "Sydney" },
-  { id: "dinner-companion", term: "Dinner Companion", count: 12, category: "people", city: "Sydney" },
+  { id: "bondi-beach", term: "Bondi Beach Coastal Walk", count: 48, category: "places", city: "Sydney" },
+  { id: "surry-hills", term: "Surry Hills Dining Perks", count: 42, category: "deals", city: "Sydney" },
+  { id: "live-music", term: "Live Music & Concerts Tonight", count: 35, category: "events", city: "Sydney" },
+  { id: "the-rocks", term: "The Rocks Historic Precinct", count: 29, category: "places", city: "Sydney" },
+  { id: "morning-run", term: "Morning Run & Coffee Hangout", count: 26, category: "plans", city: "Sydney" },
+  { id: "diwali-mela", term: "Diwali Mela Festival Passes", count: 23, category: "events", city: "Sydney" },
+  { id: "botanic-gardens", term: "Botanic Gardens Picnic Plan", count: 19, category: "plans", city: "Sydney" },
+  { id: "circle-meetup", term: "Networking Circle Check-in", count: 16, category: "circle", city: "Sydney" },
+  { id: "dining-perk", term: "Merchant Dining 20% Off Perk", count: 14, category: "deals", city: "Sydney" },
+  { id: "arrival-cohort", term: "PBSA Resident Arrival Cohort", count: 12, category: "circle", city: "Sydney" },
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
   places: "#1805db",
   events: "#e11d48",
-  people: "#059669",
-  stay: "#d97706",
-  experiences: "#7c3aed",
+  plans: "#7c3aed",
+  deals: "#d97706",
+  circle: "#059669",
   all: "#4b5563",
 };
 
@@ -208,11 +209,11 @@ export function SearchAnalyticsPage() {
   // Aggregate Category Breakdown for Pie Chart
   const categoryData = useMemo(() => {
     const counts: Record<string, number> = {
-      places: 0,
       events: 0,
-      people: 0,
-      stay: 0,
-      experiences: 0,
+      places: 0,
+      plans: 0,
+      deals: 0,
+      circle: 0,
     };
 
     for (const term of popularTerms) {
@@ -225,7 +226,7 @@ export function SearchAnalyticsPage() {
     }
 
     return Object.entries(counts).map(([name, value]) => ({
-      name: name.charAt(0).toUpperCase() + name.slice(1),
+      name: name === "circle" ? "Circle" : name === "plans" ? "Hangouts" : name === "deals" ? "Deals" : name.charAt(0).toUpperCase() + name.slice(1),
       key: name,
       value: Math.max(value, 5),
       color: CATEGORY_COLORS[name] || "#1805db",
@@ -255,10 +256,10 @@ export function SearchAnalyticsPage() {
       result.push({
         date: label,
         total: Math.max(12, baseSearches),
-        places: Math.round(baseSearches * 0.42),
-        events: Math.round(baseSearches * 0.28),
-        mates: Math.round(baseSearches * 0.18),
-        stays: Math.round(baseSearches * 0.12),
+        places: Math.round(baseSearches * 0.35),
+        events: Math.round(baseSearches * 0.30),
+        plans: Math.round(baseSearches * 0.20),
+        deals: Math.round(baseSearches * 0.15),
       });
     }
 
@@ -294,11 +295,11 @@ export function SearchAnalyticsPage() {
           <div>
             <button
               type="button"
-              onClick={() => nav("/search")}
+              onClick={() => nav("/admin")}
               className="mb-1.5 inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-card px-3.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-paper transition cursor-pointer"
             >
               <ArrowLeft size={14} />
-              <span>Back to Search</span>
+              <span>Back to Admin</span>
             </button>
             <div className="flex items-center gap-2">
               <span className="grid h-8 w-8 place-items-center rounded-xl bg-brand text-white shadow-xs">
@@ -332,11 +333,11 @@ export function SearchAnalyticsPage() {
             </Button>
             <Button
               size="sm"
-              onClick={() => nav("/search")}
+              onClick={() => openGlobalSearch()}
               className="rounded-full text-xs font-bold gap-1 shadow-xs"
             >
               <Search size={13} />
-              <span>Open Search</span>
+              <span>Live Search</span>
             </Button>
           </div>
         </div>
@@ -399,11 +400,11 @@ export function SearchAnalyticsPage() {
             </span>
             {[
               { id: "all", label: "All" },
-              { id: "places", label: "Places" },
-              { id: "events", label: "Events" },
-              { id: "people", label: "Mates" },
-              { id: "stay", label: "Stays" },
-              { id: "experiences", label: "Experiences" },
+              { id: "events", label: "Events & Access" },
+              { id: "places", label: "Places & Guide" },
+              { id: "plans", label: "Hangouts & Plans" },
+              { id: "deals", label: "Deals & Perks" },
+              { id: "circle", label: "Circle & People" },
             ].map((cat) => (
               <button
                 key={cat.id}
@@ -775,8 +776,8 @@ export function SearchAnalyticsPage() {
                       <td className="py-3 pr-2 text-right">
                         <button
                           type="button"
-                          onClick={() => nav(`/search?q=${encodeURIComponent(item.term)}`)}
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-accent hover:underline cursor-pointer"
+                          onClick={() => openGlobalSearch({ query: item.term })}
+                          className="inline-flex min-h-[44px] items-center gap-1 text-[11px] font-bold text-accent hover:underline cursor-pointer"
                         >
                           <span>Search</span>
                           <ArrowUpRight size={12} />

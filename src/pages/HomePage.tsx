@@ -214,9 +214,9 @@ export function HomePage() {
             <div className="flex items-center gap-2.5">
               <Link
                 href="/pass"
-                className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1 text-xs font-bold text-white ring-1 ring-white/25 backdrop-blur-md hover:bg-white/25 transition active:scale-95"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-white/15 px-4 py-2 text-xs font-bold text-white ring-1 ring-white/25 backdrop-blur-md hover:bg-white/25 transition active:scale-95"
               >
-                <Ticket size={13} className="text-amber-400" />
+                <Ticket size={14} className="text-amber-400" />
                 <span>AirPal Pass →</span>
               </Link>
               <img

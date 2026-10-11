@@ -18,8 +18,8 @@ export type AdminTab =
 
 export const ADMIN_TABS: { id: AdminTab; label: string }[] = [
   { id: "overview", label: "Overview" },
-  { id: "marketplace", label: "Marketplace" },
-  { id: "mates", label: "Mates" },
+  { id: "marketplace", label: "Bookings" },
+  { id: "mates", label: "Locals & Guides" },
   { id: "experiences", label: "Experiences" },
   { id: "search", label: "Search" },
   { id: "safety", label: "Safety" },

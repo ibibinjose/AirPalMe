@@ -631,6 +631,44 @@ body.keyboard-open .keyboard-hide {
     0 12px 32px -6px rgba(0, 0, 0, 0.4);
 }
 
+/* Explicit Theme Overrides (Dark / Light manual toggle) */
+.dark,
+[data-theme='dark'] {
+  --color-paper: #000000;
+  --color-card: #1c1c1e;
+  --color-ink: #ffffff;
+  --color-mute: #98989d;
+  --color-line: #38383a;
+  --color-surface-lowest: #0c0c0e;
+  --color-surface-low: #131316;
+  --color-surface: #1c1c1e;
+  --color-surface-high: #2c2c2e;
+  --color-surface-highest: #3a3a3c;
+  --color-primary-container: rgba(120, 110, 255, 0.22);
+  --color-on-primary-container: #cfc9ff;
+  --color-accent: #8b83ff;
+  --shadow-clay:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 12px 28px -16px rgba(0, 0, 0, 0.65);
+}
+
+.light,
+[data-theme='light'] {
+  --color-paper: #f2f2f7;
+  --color-card: #ffffff;
+  --color-ink: #1c1c1e;
+  --color-mute: #636366;
+  --color-line: #e5e5ea;
+  --color-surface-lowest: #ffffff;
+  --color-surface-low: #f2f2f7;
+  --color-surface: #e9e9ee;
+  --color-surface-high: #e5e5ea;
+  --color-surface-highest: #d1d1d6;
+  --color-primary-container: rgba(24, 5, 219, 0.08);
+  --color-on-primary-container: #0e0394;
+  --color-accent: #1805db;
+}
+
 /* Dedicated Solid Surfaces (High Legibility / Opaque Fallback) */
 .apple-solid-dock {
   background: var(--color-surface-lowest, #ffffff);
