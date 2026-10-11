@@ -52,7 +52,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
         }}
         aria-current={isActive ? "page" : undefined}
         className={cn(
-          "h-8.5 touch-manipulation rounded-full px-3.5 text-sm font-semibold transition-all duration-200 cursor-pointer active:scale-95",
+          "min-h-[40px] touch-manipulation rounded-full px-3.5 text-sm font-semibold transition-[background-color,color,box-shadow,transform] duration-200 cursor-pointer active:scale-[0.97]",
           isActive
             ? "bg-brand text-white shadow-[0_4px_12px_-4px_rgba(18,22,20,0.25)]"
             : "text-mute hover:bg-paper/80 hover:text-ink",
@@ -65,7 +65,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
 
   return (
     <motion.header
-      className="hidden border-b border-line/60 bg-paper/75 backdrop-blur-2xl lg:block transition-colors duration-300"
+      className="apple-liquid-glass-nav hidden lg:block transition-[background-color,border-color] duration-300"
       initial={enter ? { opacity: 0, y: -12 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease: enterEase, delay: 0.12 }}
@@ -83,7 +83,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
             <BrandMark />
           </button>
         </div>
-        <nav className="flex items-center justify-center gap-1 rounded-full bg-card/60 p-1 ring-1 ring-line/70 backdrop-blur-md">
+        <nav className="flex items-center justify-center gap-1 rounded-full bg-card/80 p-1 ring-1 ring-line/80 shadow-xs">
           {LINKS.slice(0, 2).map(renderLink)}
           <BrowseMenu path={path} isHost={isHost} />
           {LINKS.slice(2).map(renderLink)}
@@ -94,7 +94,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
               void triggerHaptic("light");
               openGlobalSearch();
             }}
-            className="flex h-10 sm:h-9 min-h-[44px] sm:min-h-0 items-center gap-2 rounded-full bg-card/80 px-3 sm:px-3.5 text-xs font-medium text-mute ring-1 ring-line/80 hover:text-ink hover:bg-card hover:ring-brand/30 transition-all shadow-xs lg:h-10 cursor-pointer touch-manipulation"
+            className="flex h-10 min-h-[44px] items-center gap-2 rounded-full bg-card px-3.5 text-xs font-medium text-mute ring-1 ring-line/80 hover:bg-paper hover:text-ink hover:ring-brand/30 transition-[background-color,color,box-shadow] shadow-xs cursor-pointer touch-manipulation"
             title="Search AirPal (⌘K)"
             aria-label="Search"
           >
@@ -110,7 +110,7 @@ export function TopNav({ path, enter = false }: { path: string; enter?: boolean 
               void triggerHaptic("medium");
               openGlobalCreate();
             }}
-            className="flex h-9 items-center gap-1.5 shrink-0 rounded-full bg-brand px-3.5 text-sm font-semibold text-white shadow-[0_4px_12px_-4px_rgba(18,22,20,0.22)] hover:bg-brand-ink transition active:scale-95 lg:h-10 cursor-pointer"
+            className="flex h-11 min-h-[44px] items-center gap-1.5 shrink-0 rounded-full bg-brand px-4 text-sm font-semibold text-white shadow-[0_6px_16px_-8px_rgba(24,5,219,0.45)] hover:bg-brand-ink transition-[background-color,box-shadow,transform] active:scale-[0.97] cursor-pointer"
             aria-label="Create something new"
           >
             <Plus size={16} strokeWidth={2.5} />

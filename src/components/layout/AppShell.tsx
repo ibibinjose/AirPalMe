@@ -246,7 +246,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
           <main id="main-content" className="flex-1 flex flex-col min-w-0" tabIndex={-1}>
             <PullToRefreshContainer state={pullToRefresh}>
-              <div className={cn("flex-1", !showFooter && !workspace && "pb-28 lg:pb-8")}>{children}</div>
+              <div className={cn("flex-1", !showFooter && !workspace && "app-bottom-clearance lg:pb-8")}>
+                {children}
+              </div>
               {showFooter && <SiteFooter hasTabBar={!workspace} />}
             </PullToRefreshContainer>
           </main>

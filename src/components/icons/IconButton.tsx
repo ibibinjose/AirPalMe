@@ -70,7 +70,7 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(f
       title={title || label}
       disabled={disabled || isLoading}
       className={cn(
-        "relative inline-flex items-center justify-center shrink-0 transition-all select-none touch-manipulation cursor-pointer",
+        "relative inline-flex items-center justify-center shrink-0 transition-[background-color,color,box-shadow,transform,ring] select-none touch-manipulation cursor-pointer",
         "focus-visible:outline-2 focus-visible:outline-brand focus-visible:outline-offset-2",
         "active:scale-95 disabled:pointer-events-none disabled:opacity-50",
         sizeClass,

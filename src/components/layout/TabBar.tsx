@@ -95,7 +95,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
       animate={{ opacity: isKeyboardOpen ? 0 : 1, y: isKeyboardOpen ? 32 : 0 }}
       transition={{ duration: 0.25, ease: enterEase }}
     >
-      <div className="relative mx-auto max-w-md pointer-events-auto px-4">
+      <div className="relative mx-auto max-w-md pointer-events-auto app-page-gutter">
         <div className="apple-liquid-glass-dock relative mb-[max(0.75rem,env(safe-area-inset-bottom,0px))] flex items-center justify-between rounded-full p-1.5 text-ink">
           {tabs.map((tab) => {
             const on = active === tab.id;
@@ -113,14 +113,14 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
                   nav(href);
                 }}
                 className={cn(
-                  "relative flex h-12 min-w-0 flex-1 touch-manipulation flex-col items-center justify-center gap-0.5 transition-[color,transform] duration-200 cursor-pointer active:scale-90",
+                  "apple-nav-item relative flex h-[52px] min-w-0 flex-1 touch-manipulation flex-col items-center justify-center gap-0.5 transition-[color,transform] duration-200 cursor-pointer active:scale-[0.94]",
                   on ? "font-bold text-white" : "font-medium text-ink/60 hover:text-ink",
                 )}
               >
                 {on && (
                   <motion.span
                     layoutId="activeTabBadge"
-                    className="absolute inset-x-1 inset-y-0.5 rounded-full bg-brand shadow-[0_8px_20px_-6px_rgba(18,22,20,0.28)]"
+                    className="absolute inset-x-1 inset-y-1 rounded-full bg-brand shadow-[0_8px_20px_-6px_rgba(24,5,219,0.32)]"
                     transition={{ type: "spring", stiffness: 420, damping: 32 }}
                     aria-hidden
                   />
@@ -132,7 +132,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
                     </span>
                   ) : (
                     <span className="relative">
-                      <Icon size={21} strokeWidth={on ? 2.3 : 1.75} fill="none" />
+                      <Icon size={20} strokeWidth={on ? 2.35 : 1.8} fill="none" />
                       {tab.id === "me" && inboxUnread > 0 && (
                         <span
                           className="absolute -right-2 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white"
@@ -143,7 +143,7 @@ export function TabBar({ path, enter = false }: { path: string; enter?: boolean 
                       )}
                     </span>
                   )}
-                  <span className="max-w-full truncate px-0.5 text-[11px] font-semibold tracking-tight">
+                  <span className="max-w-full truncate px-0.5 text-[10px] font-semibold leading-none tracking-tight">
                     {tab.label}
                   </span>
                 </span>

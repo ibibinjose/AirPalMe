@@ -15,10 +15,12 @@
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, ui-sans-serif, system-ui, sans-serif;
   --font-display:
     -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, ui-sans-serif, system-ui, sans-serif;
-  --color-paper: #f2f2f7;
-  --color-ink: #1c1c1e;
-  --color-mute: #636366;
-  --color-line: #e5e5ea;
+  /* AirPal's quiet base palette: surfaces carry hierarchy; blue is reserved
+   * for the one action or selected state that needs attention. */
+  --color-paper: #eef1f6;
+  --color-ink: #121614;
+  --color-mute: #6a726c;
+  --color-line: #e5e7eb;
   --color-card: #ffffff;
   --color-brand: #1805db;
   --color-brand-ink: #0e0394;
@@ -145,7 +147,7 @@ html {
 }
 body {
   margin: 0;
-  background: radial-gradient(1200px 480px at 50% -120px, rgba(24, 5, 219, 0.06), transparent 60%), var(--color-paper);
+  background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -353,6 +355,18 @@ body.keyboard-open .keyboard-hide {
   padding-left: max(1rem, env(safe-area-inset-left, 0px));
   padding-right: max(1rem, env(safe-area-inset-right, 0px));
 }
+
+/* Shared page rhythm. Use this on new full-width page roots rather than
+ * inventing per-page mobile gutters. It also keeps content clear of rounded
+ * mobile docks and the system gesture area. */
+.app-page-gutter {
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+}
+
+.app-bottom-clearance {
+  padding-bottom: max(6.75rem, calc(env(safe-area-inset-bottom, 0px) + 5.75rem));
+}
 .modal-safe {
   /* Full safe area padding for modals */
   padding-top: max(1rem, env(safe-area-inset-top, 0px));
@@ -550,6 +564,13 @@ body.keyboard-open .keyboard-hide {
     inset 0 -1px 1px 0 rgba(18, 22, 20, 0.03),
     0 18px 42px -12px rgba(24, 5, 219, 0.18),
     0 4px 16px -2px rgba(18, 22, 20, 0.06);
+}
+
+/* A single navigation material is intentional: content remains solid while
+ * only persistent controls use translucency. */
+.apple-nav-item {
+  min-height: 44px;
+  border-radius: 9999px;
 }
 
 .apple-liquid-glass-card {

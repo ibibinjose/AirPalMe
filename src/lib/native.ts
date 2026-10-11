@@ -167,7 +167,7 @@ export async function initNativeApp(
     // Light chrome to match the paper app theme (no dark flash on launch).
     await StatusBar.setStyle({ style: Style.Light });
     if (getNativePlatform() === "android") {
-      await StatusBar.setBackgroundColor({ color: "#ffffff" });
+      await StatusBar.setBackgroundColor({ color: "#eef1f6" });
       await StatusBar.setOverlaysWebView({ overlay: false });
     }
 
