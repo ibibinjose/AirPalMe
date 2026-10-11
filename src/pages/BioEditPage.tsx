@@ -646,7 +646,17 @@ export function BioEditPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-1.5 rounded-full border border-line bg-card px-4 font-semibold text-ink shadow-xs hover:bg-paper"
+            onClick={() => nav("/me")}
+          >
+            <UserRound size={14} className="text-accent" />
+            <span>Open Me</span>
+          </Button>
+
           {/* View Public Profile Link */}
           <Button
             variant="ghost"

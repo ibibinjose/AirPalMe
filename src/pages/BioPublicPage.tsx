@@ -3,7 +3,6 @@ import { useLocation, useRoute, Link } from "wouter";
 import { toast } from "sonner";
 import {
   ArrowLeft,
-  ArrowRight,
   Building2,
   Calendar,
   Check,
@@ -668,25 +667,6 @@ export function BioPublicPage() {
 
   return (
     <div className="mx-auto max-w-2xl pb-20 pb-safe sm:py-6">
-      {isOwner && (
-        <div className="mb-3 mx-3 sm:mx-0 flex items-center justify-between gap-3 rounded-2xl bg-brand/10 p-3 ring-1 ring-brand/25 shadow-2xs">
-          <div className="flex items-center gap-2 min-w-0">
-            <UserRound size={16} className="text-accent shrink-0" />
-            <p className="text-xs font-semibold text-ink truncate">
-              Public Bio view · Your appointments, tickets &amp; schedule live in Me
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => nav("/me")}
-            className="shrink-0 inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-brand px-3.5 py-1 text-xs font-bold text-white transition hover:bg-brand-ink active:scale-95 shadow-2xs cursor-pointer"
-          >
-            <span>Open Me</span>
-            <ArrowRight size={12} />
-          </button>
-        </div>
-      )}
-
       {/* Main Glass Card Wrapper */}
       <div className="overflow-hidden bg-card/95 sm:rounded-[36px] sm:ring-1 sm:ring-line/80 sm:shadow-clay backdrop-blur-xl">
         {/* Cover Hero Header */}
@@ -808,7 +788,7 @@ export function BioPublicPage() {
                     onClick={() => nav("/me")}
                   >
                     <UserRound size={13} />
-                    Me Dashboard
+                    Open Me
                   </Button>
                   <Button
                     variant="ghost"
