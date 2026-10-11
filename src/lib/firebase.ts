@@ -266,6 +266,13 @@ export function resetAnonymousSessionStateForTesting(): void {
   auth = null;
 }
 
+const ANON_DISABLED_CODES = new Set(["auth/admin-restricted-operation", "auth/operation-not-allowed"]);
+
+export function isAnonAuthDisabledError(err: unknown): boolean {
+  const code = err && typeof err === "object" && "code" in err ? String((err as { code?: unknown }).code) : "";
+  return ANON_DISABLED_CODES.has(code);
+}
+
 export async function ensureAnonymousSession(): Promise<string | null> {
   const firebaseAuth = getFirebaseAuth();
   if (!firebaseAuth) return null;
@@ -287,9 +294,11 @@ export async function ensureAnonymousSession(): Promise<string | null> {
       const credential = await signInAnonymously(firebaseAuth);
       if (hasRealAccount(firebaseAuth)) return signedInUid(firebaseAuth);
       return credential.user.uid;
-    } catch {
-      // Back off on error or rate-limiting (e.g. TOO_MANY_ATTEMPTS_TRY_LATER)
-      anonCooldownUntil = Date.now() + 30_000;
+    } catch (err) {
+      // Anonymous sign-in disabled for the project (ADMIN_ONLY_OPERATION): it will not
+      // start working this session, so stop retrying instead of failing every 30s.
+      // Otherwise back off on error or rate-limiting (e.g. TOO_MANY_ATTEMPTS_TRY_LATER).
+      anonCooldownUntil = isAnonAuthDisabledError(err) ? Number.POSITIVE_INFINITY : Date.now() + 30_000;
       return null;
     } finally {
       anonAuthPromise = null;
