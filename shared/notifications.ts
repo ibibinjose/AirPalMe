@@ -40,7 +40,7 @@ export interface Broadcast {
 export const PRIORITY_KINDS = ["winner_selected", "prize_available", "winner_verification"] as const;
 
 /** Marketing mail: only pushed/sent when the user kept marketing notifications on. */
-export const MARKETING_KINDS = ["giveaway_launched", "promotion_ending_soon"] as const;
+export const MARKETING_KINDS = ["giveaway_launched", "promotion_ending_soon", "birthday_month"] as const;
 
 export function isMarketingKind(kind: string): boolean {
   return (MARKETING_KINDS as readonly string[]).includes(kind);

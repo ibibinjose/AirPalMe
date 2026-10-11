@@ -3,8 +3,8 @@
  * Discover → redeem with a Mate. Not an events directory.
  */
 
-const BIRTHDAY_REGION_CODES = ["au", "in", "us", "uae", "eu"] as const;
-type BirthdayRegionCode = (typeof BIRTHDAY_REGION_CODES)[number];
+export const BIRTHDAY_REGION_CODES = ["au", "in", "us", "uae", "eu"] as const;
+export type BirthdayRegionCode = (typeof BIRTHDAY_REGION_CODES)[number];
 
 export const BIRTHDAY_REGIONS: Array<{
   code: BirthdayRegionCode;
@@ -154,3 +154,181 @@ export function validateBirthdayOfferDraft(input: Record<string, unknown>): stri
 
   return Array.from(new Set(errors));
 }
+
+
+export type CreateBirthdayOfferRequest = {
+  brand: string;
+  title: string;
+  description?: string;
+  rewardText: string;
+  category: BirthdayOfferCategory;
+  regions: string[];
+  birthdayMonths?: number[];
+  howToClaim: string;
+  claimUrl?: string;
+  businessId?: string;
+  placeId?: string;
+  featured?: boolean;
+  adultOnly?: boolean;
+  /** Business drafts default to draft; admins may create live. */
+  status?: BirthdayOfferStatus;
+};
+
+export type UpdateBirthdayOfferRequest = {
+  offerId: string;
+  patch: Partial<
+    Pick<
+      BirthdayOffer,
+      | "brand"
+      | "title"
+      | "description"
+      | "rewardText"
+      | "category"
+      | "regions"
+      | "birthdayMonths"
+      | "howToClaim"
+      | "claimUrl"
+      | "businessId"
+      | "placeId"
+      | "featured"
+      | "adultOnly"
+      | "status"
+    >
+  >;
+};
+
+export type ListBirthdayOffersRequest = {
+  region?: string;
+  month?: number;
+  status?: BirthdayOfferStatus | "any";
+};
+
+export type AdminSetBirthdayOfferStatusRequest = {
+  offerId: string;
+  status: BirthdayOfferStatus;
+};
+
+/** Mate meetup CTA — Life Made Easy framing. */
+export const BIRTHDAY_MATE_CTA = {
+  label: "Redeem with a Mate",
+  href: "https://airpal.me",
+  inAppHref: "/mate",
+  blurb: "Find someone to go with — Life Made Easy.",
+} as const;
+
+export const BIRTHDAY_DISCLAIMER =
+  "Offers change and may require joining a rewards programme before your birthday. Always confirm terms with the brand.";
+
+/** Prefs + tracking on users/{uid} for birthday-month freebie alerts. */
+export type SetBirthdayAlertPrefsRequest = {
+  birthdayAlertsEnabled?: boolean;
+  birthdayAlertsRegion?: string;
+};
+
+export type BirthdayAlertKind = "start" | "mid";
+
+export type BirthdayAlertCandidate = {
+  birthdayMonth?: number | null;
+  adultConsent?: boolean | null;
+  adultConfirmed?: boolean | null;
+  birthdayAlertsEnabled?: boolean | null;
+  birthdayAlertsRegion?: string | null;
+  lastBirthdayMonthAlertAt?: string | null;
+  lastBirthdayMidMonthAlertAt?: string | null;
+};
+
+/** Sydney calendar Y-M-D parts (never UTC-sliced for "this month"). */
+export function sydneyCalendarParts(now: Date = new Date()): {
+  year: number;
+  month: number;
+  day: number;
+  ymd: string;
+} {
+  const ymd = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Australia/Sydney",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+  const [year, month, day] = ymd.split("-").map(Number);
+  return { year, month, day, ymd };
+}
+
+function isoInSydneyMonth(iso: string | null | undefined, year: number, month: number): boolean {
+  if (!iso) return false;
+  const t = Date.parse(iso);
+  if (!Number.isFinite(t)) return false;
+  const parts = sydneyCalendarParts(new Date(t));
+  return parts.year === year && parts.month === month;
+}
+
+function isAdultForAlerts(user: BirthdayAlertCandidate): boolean {
+  return user.adultConsent === true || user.adultConfirmed === true;
+}
+
+function alertsEnabled(user: BirthdayAlertCandidate): boolean {
+  // Default on when birthdayMonth is set (enabled !== false).
+  return user.birthdayAlertsEnabled !== false;
+}
+
+/**
+ * Should we send the birthday-month arrival alert (Sydney calendar)?
+ * Requires matching birthdayMonth, adult consent, alerts enabled, and no
+ * alert already stamped this calendar month.
+ */
+export function shouldAlertBirthdayMonth(user: BirthdayAlertCandidate, now: Date = new Date()): boolean {
+  const { year, month } = sydneyCalendarParts(now);
+  const bm = Number(user.birthdayMonth);
+  if (!Number.isInteger(bm) || bm < 1 || bm > 12) return false;
+  if (bm !== month) return false;
+  if (!isAdultForAlerts(user)) return false;
+  if (!alertsEnabled(user)) return false;
+  if (isoInSydneyMonth(user.lastBirthdayMonthAlertAt, year, month)) return false;
+  return true;
+}
+
+/**
+ * Optional mid-month nudge (Sydney day >= 15). Fires once per birthday month
+ * after the start alert (or as a catch-up if start was skipped).
+ */
+export function shouldAlertBirthdayMidMonth(user: BirthdayAlertCandidate, now: Date = new Date()): boolean {
+  const { year, month, day } = sydneyCalendarParts(now);
+  if (day < 15) return false;
+  const bm = Number(user.birthdayMonth);
+  if (!Number.isInteger(bm) || bm < 1 || bm > 12) return false;
+  if (bm !== month) return false;
+  if (!isAdultForAlerts(user)) return false;
+  if (!alertsEnabled(user)) return false;
+  if (isoInSydneyMonth(user.lastBirthdayMidMonthAlertAt, year, month)) return false;
+  return true;
+}
+
+export function birthdayAlertsHref(region?: string | null): string {
+  const code = String(region || "au")
+    .trim()
+    .toLowerCase();
+  return `/birthday-freebies/${isBirthdayRegionCode(code) ? code : "au"}`;
+}
+
+export function buildBirthdayMonthAlert(kind: BirthdayAlertKind, region?: string | null): {
+  title: string;
+  body: string;
+  href: string;
+} {
+  const href = birthdayAlertsHref(region);
+  if (kind === "mid") {
+    return {
+      title: "Birthday freebies still waiting",
+      body: `${BIRTHDAY_MATE_CTA.blurb} Your month's freebies are live — redeem with a Mate.`,
+      href,
+    };
+  }
+  return {
+    title: "Your birthday month freebies are live",
+    body: `${BIRTHDAY_MATE_CTA.blurb} Open freebies and go with a Mate.`,
+    href,
+  };
+}
+
+/** Daily send cap for the scheduled birthday-month job. */
+export const BIRTHDAY_ALERT_DAILY_CAP = 500;

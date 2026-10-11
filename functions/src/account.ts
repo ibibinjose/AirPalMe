@@ -63,6 +63,8 @@ export const completeAccountSignup = onCall(CALLABLE, async (request) => {
         adultConsent: true,
         adultConsentAt: consentAt,
         birthdayMonth,
+        birthdayAlertsEnabled: true,
+        birthdayAlertsRegion: "au",
         updatedAt: FieldValue.serverTimestamp(),
       },
       { merge: true },

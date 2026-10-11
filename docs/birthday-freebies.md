@@ -15,10 +15,28 @@
 
 ## What remains (live)
 
-- `shared/birthday-freebies.ts` (+ `.test.ts`) — pure helpers only: `BIRTHDAY_REGIONS`, `BIRTHDAY_MONTHS`, `monthFromBirthDate`, `isBirthdayRegionCode`, `offerVisibleFor`, `validateBirthdayOfferDraft`.
+- `shared/birthday-freebies.ts` (+ `.test.ts`) — pure helpers: `BIRTHDAY_REGIONS`, `BIRTHDAY_MONTHS`, `monthFromBirthDate`, `isBirthdayRegionCode`, `offerVisibleFor`, `validateBirthdayOfferDraft`, `shouldAlertBirthdayMonth`, `shouldAlertBirthdayMidMonth`, `buildBirthdayMonthAlert`.
 - Signup age gate — `adultConsent` + `birthdayMonth` (1–12, full DOB not persisted) in `SignupFlow` / `AuthContext`. The 18+ checkbox stays regardless of this surface.
+- Account fields: on `completeAccountSignup`, stores `birthdayMonth`, `adultConsent`, `adultConsentAt`, default `birthdayAlertsEnabled: true` and `birthdayAlertsRegion: "au"`.
+- Callable: `setBirthdayAlertPrefs` (signed-in member) updates `birthdayAlertsEnabled`, `birthdayAlertsRegion`.
+- Scheduled alerts: `sendBirthdayMonthAlerts` daily (09:00 Australia/Sydney).
 
-## How to verify
+## Birthday month alerts
+
+Daily scheduled job `sendBirthdayMonthAlerts` (09:00 Australia/Sydney):
+
+- Targets users whose `birthdayMonth` matches the Sydney calendar month
+- Requires `adultConsent` or `adultConfirmed`, and `birthdayAlertsEnabled !== false` (default on when month is set)
+- Skips if `lastBirthdayMonthAlertAt` is already in the same Sydney calendar month
+- Optional mid-month nudge (day ≥ 15) via `lastBirthdayMidMonthAlertAt`
+- Push + inbox: “Your birthday month freebies are live” → `/birthday-freebies/{region}` with Mate / Life Made Easy CTA
+- Cap: 500 sends per run
+
+Prefs on `users/{uid}`: `birthdayAlertsEnabled`, `birthdayAlertsRegion` (default `au`), stamps above.
+
+Callable `setBirthdayAlertPrefs` (auth required) updates enabled + region. Settings UI: toggle + region picker.
+
+## How to test
 
 1. `npx vitest run shared/birthday-freebies.test.ts`
 2. Visit `/birthday-freebies/au` → lands on `/deals`.

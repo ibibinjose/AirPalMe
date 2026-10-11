@@ -101,6 +101,7 @@ export const CALLABLES = {
   resolvePulseIssue: "resolvePulseIssue",
   setPulseStatus: "setPulseStatus",
   recordPulseFollowup: "recordPulseFollowup",
+  setBirthdayAlertPrefs: "setBirthdayAlertPrefs",
   teardownDemoBusiness: "teardownDemoBusiness",
   verifyTicket: "verifyTicket",
   admitTicket: "admitTicket",

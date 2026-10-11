@@ -185,6 +185,14 @@ export interface UserProfile {
   adultConsent?: boolean;
   adultConsentAt?: string;
   adultConfirmed?: boolean;
+  /** Birthday-month freebie alerts; default on when birthdayMonth is set. */
+  birthdayAlertsEnabled?: boolean;
+  /** Preferred birthday freebies region (au|in|us|uae|eu). Default au. */
+  birthdayAlertsRegion?: string;
+  /** ISO timestamp of last birthday-month arrival alert (dupes guard). */
+  lastBirthdayMonthAlertAt?: string;
+  /** ISO timestamp of last mid-month birthday freebie nudge. */
+  lastBirthdayMidMonthAlertAt?: string;
 }
 
 export interface MenuItem {
