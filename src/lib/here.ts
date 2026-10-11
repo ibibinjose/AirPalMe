@@ -50,19 +50,28 @@ function asPin(id: string, data: Record<string, unknown>): HerePin {
 export async function fetchMyHerePin(handle: string): Promise<HerePin | null> {
   const db = getFirebaseDb();
   if (!db || !handle) return null;
-  const snap = await getDoc(doc(db, "here_pins", handle));
-  if (!snap.exists()) return null;
-  const pin = asPin(snap.id, snap.data() as Record<string, unknown>);
-  return herePinLive(pin) ? pin : null;
+  try {
+    const snap = await getDoc(doc(db, "here_pins", handle));
+    if (!snap.exists()) return null;
+    const pin = asPin(snap.id, snap.data() as Record<string, unknown>);
+    return herePinLive(pin) ? pin : null;
+  } catch {
+    // Permission denied or offline: no pin rather than an unhandled rejection.
+    return null;
+  }
 }
 
 export async function fetchHereAt(placeKey: string): Promise<HerePin[]> {
   const db = getFirebaseDb();
   if (!db || !placeKey) return [];
-  const snap = await getDocs(collection(db, "here_at", placeKey, "pins"));
-  return snap.docs
-    .map((d) => asPin(d.id, d.data() as Record<string, unknown>))
-    .filter((p) => herePinLive(p) && p.pinOnMap);
+  try {
+    const snap = await getDocs(collection(db, "here_at", placeKey, "pins"));
+    return snap.docs
+      .map((d) => asPin(d.id, d.data() as Record<string, unknown>))
+      .filter((p) => herePinLive(p) && p.pinOnMap);
+  } catch {
+    return [];
+  }
 }
 
 export async function fetchHerePinsForHandles(handles: string[]): Promise<HerePin[]> {

@@ -404,6 +404,7 @@ export function EventsPage() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            aria-label="Search events and venues"
             placeholder="Search events, venues…"
             className="h-10 w-full rounded-2xl border border-line bg-card pl-9 pr-8 text-xs font-medium text-ink outline-none placeholder:text-mute focus:border-brand focus:ring-1 focus:ring-brand"
           />

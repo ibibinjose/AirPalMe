@@ -236,6 +236,7 @@ export function PassPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search events, deals and experiences"
                 placeholder="Search concerts, Bollywood nights, hotels, food deals, festivals…"
                 className="w-full bg-transparent py-3.5 pl-11 pr-4 text-sm font-medium text-white placeholder-white/50 focus:outline-none"
               />

@@ -3,6 +3,7 @@ import { Link, useRoute } from "wouter";
 import { doc, getDoc } from "firebase/firestore";
 import { ArrowLeft, ShieldCheck, Sun, SunMedium, Ticket } from "lucide-react";
 import { toast } from "sonner";
+import { AuthGate } from "@/components/auth/AuthGate";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMyBookings } from "@/hooks/useMyBookings";
 import { AirPalTicketPass } from "@/components/tickets/AirPalTicketPass";
@@ -102,6 +103,18 @@ export function TicketPage() {
 
   if (!isTicketId(id)) return <NotFoundPage />;
   if (!authReady || loading) return <PageLoading />;
+  // Passes and door checks need an account (verifyTicket rejects guests); offer sign-in
+  // instead of a dead-end "access denied" panel.
+  if (!user && !booking) {
+    return (
+      <AuthGate
+        next={`/ticket/${id}`}
+        kicker="AirPal Pass"
+        title="Sign in to open this pass"
+        lede="Ticket holders and event organisers can open this pass after signing in."
+      />
+    );
+  }
 
   // Whether the viewer is the ticket holder
   const isHolder = Boolean(user && booking && booking.customerUid === user.uid);

@@ -63,6 +63,8 @@ export function ContactPage() {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
+            aria-label="Name"
+            autoComplete="name"
             placeholder="Name"
             required
             className={fieldInput}
@@ -74,6 +76,7 @@ export function ContactPage() {
             autoCapitalize="none"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            aria-label="Email"
             placeholder="Email"
             required
             className={fieldInput}
@@ -83,6 +86,7 @@ export function ContactPage() {
               <button
                 key={t.id}
                 type="button"
+                aria-pressed={topic === t.id}
                 onClick={() => {
                   void triggerHaptic("light");
                   setTopic(t.id);
@@ -98,6 +102,7 @@ export function ContactPage() {
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            aria-label="Message"
             placeholder="Message"
             required
             className={`h-36 ${fieldTextarea}`}

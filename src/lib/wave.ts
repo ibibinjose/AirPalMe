@@ -51,19 +51,28 @@ export async function fetchWaveByCode(code: string): Promise<WaveSession | null>
   const db = getFirebaseDb();
   const id = waveCodeFrom(code);
   if (!db || !id) return null;
-  const snap = await getDoc(doc(db, "waves", id));
-  if (!snap.exists()) return null;
-  const session = asSession(snap.data() as Record<string, unknown>);
-  return waveLive(session) ? session : null;
+  try {
+    const snap = await getDoc(doc(db, "waves", id));
+    if (!snap.exists()) return null;
+    const session = asSession(snap.data() as Record<string, unknown>);
+    return waveLive(session) ? session : null;
+  } catch {
+    // Permission denied (signed out) or offline: treat as no live Wave.
+    return null;
+  }
 }
 
 export async function fetchWaveHere(placeKey: string): Promise<WaveSession | null> {
   const db = getFirebaseDb();
   if (!db || !placeKey) return null;
-  const snap = await getDoc(doc(db, "wave_here", placeKey));
-  if (!snap.exists()) return null;
-  const session = asSession(snap.data() as Record<string, unknown>);
-  return waveLive(session) ? session : null;
+  try {
+    const snap = await getDoc(doc(db, "wave_here", placeKey));
+    if (!snap.exists()) return null;
+    const session = asSession(snap.data() as Record<string, unknown>);
+    return waveLive(session) ? session : null;
+  } catch {
+    return null;
+  }
 }
 
 export function listenWaveByCode(code: string, onSession: (s: WaveSession | null) => void): () => void {

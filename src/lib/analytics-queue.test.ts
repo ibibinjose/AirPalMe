@@ -95,6 +95,24 @@ describe("Firebase Anonymous Session & Analytics Queue", () => {
     expect(signInAnonymously).toHaveBeenCalledTimes(1);
   });
 
+  it("stops retrying anonymous sign-in when the provider is disabled for the project", async () => {
+    vi.mocked(signInAnonymously).mockRejectedValueOnce(
+      Object.assign(new Error("Firebase: Error (auth/admin-restricted-operation)."), {
+        code: "auth/admin-restricted-operation",
+      }),
+    );
+
+    expect(await ensureAnonymousSession()).toBeNull();
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(Date.now() + 10 * 60_000);
+      expect(await ensureAnonymousSession()).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(signInAnonymously).toHaveBeenCalledTimes(1);
+  });
+
   it("gracefully queues events as offline without triggering 401 when anonymous session is unavailable", async () => {
     vi.mocked(signInAnonymously).mockRejectedValue(new Error("Network offline"));
 
