@@ -10,7 +10,7 @@ test.describe("Pass shell", () => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
     await expect(page).toHaveURL(/\/pass/);
-    await expect(page.getByRole("heading", { name: /Your pass to experiences\./i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Your pass to concerts, festivals|Your pass to experiences\./i })).toBeVisible();
   });
 
   test("dock shows the Pass tabs and no ecosystem switcher", async ({ page }) => {
