@@ -1,6 +1,5 @@
 import { AuthProvider } from "@/contexts/AuthContext";
 import { StayProvider } from "@/contexts/StayContext";
-import { StayUiProvider } from "@/contexts/StayUiContext";
 import { LocaleProvider } from "@/contexts/LocaleContext";
 import { BatteryProvider } from "@/contexts/BatteryContext";
 import { ListingsProvider } from "@/contexts/ListingsContext";
@@ -25,7 +24,6 @@ const PROVIDERS: ProviderComponent[] = [
   SyncProvider,
   StayProvider,
   LocalNowProvider,
-  StayUiProvider,
   AnalyticsProvider,
   ListingsProvider,
   EventsProvider,

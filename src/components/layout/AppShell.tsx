@@ -27,7 +27,6 @@ const GlobalSearchModal = lazy(() =>
 );
 import { trackPageView } from "@/lib/analytics";
 import { forceUnlockBodyScroll } from "@/hooks/useScrollLock";
-import { GuestStayTools } from "@/components/stay/GuestStayTools";
 import { BrandMark } from "@/components/brand/BrandMark";
 import { ProfileMenu } from "@/components/auth/ProfileMenu";
 
@@ -259,7 +258,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           <CreateFab />
           <PresencePublisher />
           <DeviceMirror />
-          <GuestStayTools />
           {searchArmed && (
             <Suspense fallback={null}>
               <GlobalSearchModal />
