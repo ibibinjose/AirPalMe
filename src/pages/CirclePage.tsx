@@ -85,12 +85,11 @@ export function CirclePage() {
 
         <div className="flex items-center gap-2">
           <Button
-            size="sm"
             variant="primary"
             onClick={handleShareCircleInvite}
-            className="gap-1.5"
+            className="min-h-[44px] gap-1.5 px-4 text-xs font-semibold shadow-xs active:scale-95"
           >
-            <UserPlus size={14} />
+            <UserPlus size={15} />
             <span>Invite to Circle</span>
           </Button>
         </div>
@@ -214,7 +213,7 @@ export function CirclePage() {
           </div>
           <Link
             href="/join"
-            className="shrink-0 rounded-full bg-paper px-3 py-1 text-xs font-semibold text-accent hover:bg-card ring-1 ring-line"
+            className="shrink-0 inline-flex min-h-[44px] items-center rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold text-accent hover:bg-card ring-1 ring-line active:scale-95 transition"
           >
             Building Hub →
           </Link>
@@ -249,16 +248,16 @@ export function CirclePage() {
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2.5">
               <Button
-                size="sm"
                 variant="primary"
                 onClick={handleShareCircleInvite}
+                className="min-h-[44px] px-4 text-xs font-semibold shadow-xs active:scale-95"
               >
                 Share My Handle Link
               </Button>
               <Button
-                size="sm"
                 variant="ghost"
                 onClick={() => nav("/now")}
+                className="min-h-[44px] px-4 text-xs font-semibold active:scale-95"
               >
                 Find Experiences
               </Button>
@@ -289,7 +288,7 @@ export function CirclePage() {
                 <div className="flex items-center gap-2 shrink-0">
                   <Link
                     href={`/plan/new?dest=@${handle}&title=${encodeURIComponent(`Hangout with @${handle}`)}`}
-                    className="rounded-full bg-paper px-3 py-1.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card transition"
+                    className="inline-flex min-h-[44px] items-center rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold text-ink ring-1 ring-line hover:bg-card active:scale-95 transition shadow-2xs"
                   >
                     Plan Hangout
                   </Link>
@@ -309,7 +308,7 @@ export function CirclePage() {
         <Button
           variant="primary"
           onClick={() => nav("/plan/new")}
-          className="shrink-0"
+          className="shrink-0 min-h-[44px] px-5 text-xs font-semibold shadow-xs active:scale-95"
         >
           Create Hangout Plan
         </Button>

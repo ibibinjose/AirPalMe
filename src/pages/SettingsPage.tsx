@@ -136,7 +136,7 @@ export function SettingsPage() {
           <Link
             key={l.href}
             href={l.href}
-            className="inline-flex min-h-[38px] items-center rounded-full bg-paper px-3.5 py-1.5 text-xs font-semibold text-accent ring-1 ring-line hover:bg-card active:scale-95"
+            className="inline-flex min-h-[44px] items-center rounded-full bg-paper px-4 py-2 text-xs font-semibold text-accent ring-1 ring-line hover:bg-card active:scale-95 transition"
           >
             {l.label}
           </Link>

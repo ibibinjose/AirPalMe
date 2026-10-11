@@ -84,7 +84,7 @@ export function HereCheckIn({
       <button
         type="button"
         onClick={() => (hereNow ? void stop() : mine?.handle ? setOpen(true) : nav("/bio/setup"))}
-        className="flex w-full items-center gap-3 rounded-[20px] bg-paper px-4 py-3.5 text-left"
+        className="flex w-full items-center gap-3 rounded-[20px] bg-paper px-4 py-3.5 text-left ring-1 ring-line/80 shadow-2xs hover:bg-card active:scale-[0.99] transition cursor-pointer"
       >
         <span className="grid h-10 w-10 place-items-center rounded-full bg-brand/10 text-accent">
           <MapPin size={18} />

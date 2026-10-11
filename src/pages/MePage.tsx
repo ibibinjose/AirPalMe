@@ -209,7 +209,7 @@ export function MePage() {
           <div className="absolute top-3.5 right-3.5 flex items-center gap-2">
             <Link
               href="/pass"
-              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur-md shadow-xs hover:bg-white/25 transition active:scale-95"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-bold text-white ring-1 ring-white/20 backdrop-blur-md shadow-xs hover:bg-white/25 transition active:scale-95"
             >
               <Ticket size={13} className="text-amber-400" />
               <span>AirPal Pass ({upcomingTickets.length}) →</span>
@@ -270,38 +270,35 @@ export function MePage() {
             </div>
 
             {/* Quick Action Pill Bar */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="inline-flex min-h-[38px] items-center gap-1.5 rounded-full bg-brand px-3.5 text-xs font-bold text-white shadow-xs">
-                <Sparkles size={12} />
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-brand px-4 text-xs font-bold text-white shadow-xs">
+                <Sparkles size={13} />
                 <span>Me Cockpit</span>
               </span>
 
               <Button
-                size="sm"
                 variant="ghost"
-                className="min-h-[38px] rounded-full border border-line px-3.5 text-xs font-semibold text-ink hover:bg-paper active:scale-95"
+                className="min-h-[44px] rounded-full border border-line px-4 text-xs font-semibold text-ink hover:bg-paper active:scale-95"
                 onClick={() => nav("/circle")}
               >
-                <Users size={13} className="text-accent mr-1" />
+                <Users size={14} className="text-accent mr-1.5" />
                 <span>My Circle</span>
               </Button>
 
               {mine ? (
                 <Button
-                  size="sm"
                   variant="ghost"
-                  className="min-h-[38px] rounded-full border border-line px-3.5 text-xs font-semibold text-ink hover:bg-paper active:scale-95"
+                  className="min-h-[44px] rounded-full border border-line px-4 text-xs font-semibold text-ink hover:bg-paper active:scale-95"
                   onClick={() => nav(bioPath(mine.handle))}
                 >
-                  <UserRound size={13} className="text-accent mr-1" />
+                  <UserRound size={14} className="text-accent mr-1.5" />
                   <span>@{mine.handle} Bio</span>
-                  <ExternalLink size={11} className="text-mute ml-1" />
+                  <ExternalLink size={12} className="text-mute ml-1" />
                 </Button>
               ) : (
                 <Button
-                  size="sm"
                   variant="ghost"
-                  className="min-h-[38px] rounded-full border border-line px-3.5 text-xs font-semibold text-ink hover:bg-paper active:scale-95"
+                  className="min-h-[44px] rounded-full border border-line px-4 text-xs font-semibold text-ink hover:bg-paper active:scale-95"
                   onClick={() => nav("/bio/setup")}
                 >
                   Claim @handle
@@ -309,22 +306,20 @@ export function MePage() {
               )}
 
               <Button
-                size="sm"
                 variant="ghost"
-                className="min-h-[38px] rounded-full border border-line px-3 text-xs font-semibold text-ink hover:bg-paper active:scale-95"
+                className="min-h-[44px] rounded-full border border-line px-3.5 text-xs font-semibold text-ink hover:bg-paper active:scale-95"
                 onClick={() => nav(mine ? "/bio/edit" : "/bio/setup")}
               >
-                <Edit3 size={12} className="mr-1 text-mute" />
+                <Edit3 size={13} className="mr-1 text-mute" />
                 <span>Edit Bio</span>
               </Button>
 
               <Button
-                size="sm"
                 variant="ghost"
-                className="min-h-[38px] rounded-full border border-line px-3 text-xs font-semibold text-ink hover:bg-paper active:scale-95"
+                className="min-h-[44px] rounded-full border border-line px-3.5 text-xs font-semibold text-ink hover:bg-paper active:scale-95"
                 onClick={() => nav("/settings")}
               >
-                <Settings size={12} className="mr-1 text-mute" />
+                <Settings size={13} className="mr-1 text-mute" />
                 <span>Settings</span>
               </Button>
             </div>

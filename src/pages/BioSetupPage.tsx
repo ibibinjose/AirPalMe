@@ -16,6 +16,7 @@ import {
 import { authErrorMessage } from "@shared/auth-email";
 import { isEmail, passwordOk } from "@shared/validate";
 import { Button } from "@/components/ui/Button";
+import { PageLoading } from "@/components/ui/PageLoading";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { ValidField, fieldInput } from "@/components/forms/ValidField";
 import { AddressFields } from "@/components/forms/AddressFields";
@@ -180,7 +181,7 @@ export function BioSetupPage() {
   }
 
   if (!authReady) {
-    return <div className="mx-auto max-w-md px-4 py-16 text-center text-sm text-mute">Loading…</div>;
+    return <PageLoading />;
   }
 
   if (!user) {

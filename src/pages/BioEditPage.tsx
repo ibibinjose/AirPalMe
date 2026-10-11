@@ -66,7 +66,7 @@ import { ChangeHandleForm } from "@/components/bio/ChangeHandleForm";
 
 // Personal Profile Category / Vibe Presets
 const PERSONAL_CATEGORY_PRESETS = [
-  { id: "AirPal Mate", label: "AirPal Mate 🤝" },
+  { id: "Explorer & Local", label: "Explorer & Local 🧭" },
   { id: "Travel Companion", label: "Travel Companion ✈️" },
   { id: "Creator & Artist", label: "Creator & Artist 🎨" },
   { id: "Food & Coffee Lover", label: "Food & Coffee Lover ☕" },
@@ -93,7 +93,7 @@ const BUSINESS_CATEGORY_PRESETS = [
 const PERSONAL_CTA_PRESETS = [
   "Catch Up",
   "Say Hello",
-  "Book Mate",
+  "Plan Hangout",
   "Message WhatsApp",
   "Connect",
   "Follow Me",
@@ -284,7 +284,7 @@ export function BioEditPage() {
     setShortWhy(activeProfile.shortWhy || "");
     setAboutText(activeProfile.aboutText || "");
     setCategoryTag(
-      activeProfile.categoryTag || (isBusinessKind(activeProfile.kind) ? "Local Business" : "AirPal Mate"),
+      activeProfile.categoryTag || (isBusinessKind(activeProfile.kind) ? "Local Business" : "Explorer & Local"),
     );
     setPronouns(activeProfile.pronouns || "");
     setLanguages(activeProfile.languages || "");
