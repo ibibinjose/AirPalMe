@@ -253,5 +253,12 @@
         ]
       }
     ]
+  },
+  {
+    "path": "/explore/attractions",
+    "title": "DayPasses · AirPal.Me",
+    "description": "Sydney DayPasses — compare, bundle and book SEA LIFE, WILD LIFE, Madame Tussauds, Sydney Tower Eye and Taronga. Life Made Easy.",
+    "heading": "Sydney DayPasses",
+    "summary": "AirPal DayPasses are how you book a Sydney day: compare a short cluster, bundle it, and book. The first cluster is SEA LIFE Sydney, WILD LIFE Sydney, Madame Tussauds Sydney, Sydney Tower Eye and Taronga Zoo. Booking links stay placeholders until partner tracking links exist."
   }
 ]

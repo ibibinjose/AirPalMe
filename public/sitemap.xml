@@ -6,6 +6,7 @@
   <url><loc>https://airpal.me/concierge</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://airpal.me/plan</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://airpal.me/getAirPalApp</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://airpal.me/explore/attractions</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://airpal.me/guide</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://airpal.me/events</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
   <url><loc>https://airpal.me/calendar</loc><changefreq>weekly</changefreq><priority>0.5</priority></url>
