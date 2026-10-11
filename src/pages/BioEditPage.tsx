@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLocation, useSearch } from "wouter";
 import { toast } from "sonner";
 import { nanoid } from "nanoid";
@@ -7,7 +7,6 @@ import {
   Building2,
   Camera,
   Check,
-  Clock,
   Copy,
   Download,
   Edit3,
