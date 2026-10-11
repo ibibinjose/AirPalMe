@@ -550,6 +550,7 @@ export function SearchPage() {
               setQuery(val);
               updateUrlParams(val, activeCategory);
             }}
+            aria-label="Search AirPal"
             placeholder="Search places, events, deals, circles, plans…"
             className="h-13 min-h-[48px] w-full rounded-2xl bg-card pl-12 pr-12 text-[16px] font-medium text-ink ring-1 ring-line/90 shadow-sm placeholder:text-mute focus:outline-none focus:ring-2 focus:ring-brand/40"
           />

@@ -594,6 +594,8 @@ export function StartPage() {
   }
 
   const RoleIcon = roleContext.icon;
+  // Guest /start already renders the page <h1> above; keep a single h1 per page.
+  const RoleHeading = isGuestStart ? "h2" : "h1";
 
   return (
     <div
@@ -767,13 +769,13 @@ export function StartPage() {
             <p className={cn("text-[10px] font-semibold uppercase tracking-[0.18em]", roleContext.color)}>
               {roleContext.kicker}
             </p>
-            <h1 className="font-display text-lg font-semibold leading-tight text-ink">
+            <RoleHeading className="font-display text-lg font-semibold leading-tight text-ink">
               {mode === "reset"
                 ? "Reset your password"
                 : mode === "signup"
                   ? roleContext.signupTitle
                   : roleContext.title}
-            </h1>
+            </RoleHeading>
           </div>
         </div>
         <p className="mt-2 text-xs text-mute leading-relaxed">{roleContext.desc}</p>

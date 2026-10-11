@@ -122,6 +122,7 @@ export function JoinPage() {
                 setInputCode(e.target.value.toUpperCase());
                 setErrorMessage(null);
               }}
+              aria-label="Building or college code"
               placeholder="e.g. SCAPE26, STPAULS"
               className="h-12 flex-1 rounded-2xl bg-paper px-4 text-sm font-semibold uppercase tracking-wider text-ink ring-1 ring-line/80 focus:outline-none focus:ring-2 focus:ring-brand"
             />
