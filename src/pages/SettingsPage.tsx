@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
-import { Check, MapPin, Monitor, Moon, Sun } from "lucide-react";
+import { Calendar, Check, ExternalLink, MapPin, Monitor, Moon, Sun } from "lucide-react";
 import { authErrorMessage } from "@shared/auth-email";
 import { BIRTHDAY_REGIONS, isBirthdayRegionCode, type BirthdayRegionCode } from "@shared/birthday-freebies";
 import { Button } from "@/components/ui/Button";
@@ -78,6 +78,48 @@ export function SettingsPage() {
     }
   });
   const [pushStatus, setPushStatus] = useState<string>("default");
+  const [searchIndexing, setSearchIndexing] = useState(() => {
+    try {
+      return localStorage.getItem("airpal_privacy_search_indexing") !== "false";
+    } catch {
+      return true;
+    }
+  });
+  const [circlePresence, setCirclePresence] = useState(() => {
+    try {
+      return localStorage.getItem("airpal_privacy_circle_presence") !== "false";
+    } catch {
+      return true;
+    }
+  });
+
+  const handleSearchIndexingToggle = () => {
+    void triggerHaptic("light");
+    setSearchIndexing((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("airpal_privacy_search_indexing", String(next));
+      } catch {
+        /* ignore */
+      }
+      toast.success(next ? "Profile directory indexing enabled" : "Profile hidden from search indexing");
+      return next;
+    });
+  };
+
+  const handleCirclePresenceToggle = () => {
+    void triggerHaptic("light");
+    setCirclePresence((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("airpal_privacy_circle_presence", String(next));
+      } catch {
+        /* ignore */
+      }
+      toast.success(next ? "Live presence check-ins visible to Circle" : "Circle presence set to private");
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
@@ -356,6 +398,90 @@ export function SettingsPage() {
               />
             </button>
           </div>
+        </div>
+      </section>
+
+      {/* Privacy Controls */}
+      <section className="mt-8">
+        <h2 className="font-display text-xl font-bold">Privacy & Visibility</h2>
+        <p className="mt-1 text-xs text-mute">Control your discoverability across AirPal and public web searches.</p>
+        <div className="mt-3 space-y-2">
+          <div className="flex min-h-[52px] items-center justify-between rounded-2xl bg-card px-4 py-3 ring-1 ring-line">
+            <div className="min-w-0 pr-3">
+              <span className="block text-sm font-medium text-ink">Public Search & Directory Indexing</span>
+              <span className="block text-xs text-mute">Allow your @handle bio to be discovered in search</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleSearchIndexingToggle}
+              className={cn(
+                "relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+                searchIndexing ? "bg-brand" : "bg-line",
+              )}
+              role="switch"
+              aria-checked={searchIndexing}
+              aria-label="Toggle search indexing"
+            >
+              <span
+                className={cn(
+                  "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out mt-1 ml-1",
+                  searchIndexing ? "translate-x-5" : "translate-x-0",
+                )}
+              />
+            </button>
+          </div>
+
+          <div className="flex min-h-[52px] items-center justify-between rounded-2xl bg-card px-4 py-3 ring-1 ring-line">
+            <div className="min-w-0 pr-3">
+              <span className="block text-sm font-medium text-ink">Circle Presence & Check-in Badge</span>
+              <span className="block text-xs text-mute">
+                Display live check-in badge on your bio during active events
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleCirclePresenceToggle}
+              className={cn(
+                "relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
+                circlePresence ? "bg-brand" : "bg-line",
+              )}
+              role="switch"
+              aria-checked={circlePresence}
+              aria-label="Toggle circle presence"
+            >
+              <span
+                className={cn(
+                  "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out mt-1 ml-1",
+                  circlePresence ? "translate-x-5" : "translate-x-0",
+                )}
+              />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* External Calendar & Account Sync */}
+      <section className="mt-8">
+        <h2 className="font-display text-xl font-bold">Connected Calendars & Sync</h2>
+        <p className="mt-1 text-xs text-mute">
+          Synchronize your joined Huddles, hangouts, and passes with external schedules.
+        </p>
+        <div className="mt-3">
+          <Link
+            href="/account-sync"
+            className="flex min-h-[56px] items-center justify-between rounded-2xl bg-card px-4 py-3 ring-1 ring-line hover:bg-paper active:scale-[0.99] transition cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                <Calendar size={18} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-ink">External Calendar & Contacts Sync</p>
+                <p className="text-xs text-mute">Google Calendar, Apple Calendar (.ics), Outlook & Address Book</p>
+              </div>
+            </div>
+            <ExternalLink size={16} className="text-mute shrink-0" />
+          </Link>
         </div>
       </section>
 

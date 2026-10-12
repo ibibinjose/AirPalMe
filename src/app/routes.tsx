@@ -99,6 +99,33 @@ const PlanCreatePage = lazy(() => import("@/pages/PlanCreatePage").then((m) => (
 const PlanDetailPage = lazy(() => import("@/pages/PlanDetailPage").then((m) => ({ default: m.PlanDetailPage })));
 const PlanEditPage = lazy(() => import("@/pages/PlanEditPage").then((m) => ({ default: m.PlanEditPage })));
 const HelpDeskPage = lazy(() => import("@/pages/HelpDeskPage").then((m) => ({ default: m.HelpDeskPage })));
+const EventAnalyticsPage = lazy(() =>
+  import("@/pages/EventAnalyticsPage").then((m) => ({ default: m.EventAnalyticsPage })),
+);
+const SavedExperiencesPage = lazy(() =>
+  import("@/pages/SavedExperiencesPage").then((m) => ({ default: m.SavedExperiencesPage })),
+);
+const SupportCenterPage = lazy(() =>
+  import("@/pages/SupportCenterPage").then((m) => ({ default: m.SupportCenterPage })),
+);
+const NotificationsPage = lazy(() =>
+  import("@/pages/NotificationsPage").then((m) => ({ default: m.NotificationsPage })),
+);
+const WalletPage = lazy(() => import("@/pages/WalletPage").then((m) => ({ default: m.WalletPage })));
+const EventCategoriesPage = lazy(() =>
+  import("@/pages/EventCategoriesPage").then((m) => ({ default: m.EventCategoriesPage })),
+);
+const VenueDirectoryPage = lazy(() =>
+  import("@/pages/VenueDirectoryPage").then((m) => ({ default: m.VenueDirectoryPage })),
+);
+const CheckInHistoryPage = lazy(() =>
+  import("@/pages/CheckInHistoryPage").then((m) => ({ default: m.CheckInHistoryPage })),
+);
+const ExperienceDetailsPage = lazy(() =>
+  import("@/pages/ExperienceDetailsPage").then((m) => ({ default: m.ExperienceDetailsPage })),
+);
+const AccountSyncPage = lazy(() => import("@/pages/AccountSyncPage").then((m) => ({ default: m.AccountSyncPage })));
+const QrScannerPage = lazy(() => import("@/pages/QrScannerPage").then((m) => ({ default: m.QrScannerPage })));
 
 function RouteFallback() {
   // Full-viewport reserve: keeps the footer below the fold while the route
@@ -142,8 +169,10 @@ export function AppRoutes() {
             <Redirect to="/admin/search-analytics" />
           </Route>
           <Route path="/guide" component={GuidePage} />
+          <Route path="/venues" component={VenueDirectoryPage} />
           <Route path="/tour/:id" component={TourPage} />
           <Route path="/scan" component={ScanPage} />
+          <Route path="/qr-scanner" component={QrScannerPage} />
           <Route path="/w/:code" component={WavePage} />
           <Route path="/circle" component={CirclePage} />
           <Route path="/concierge">
@@ -173,7 +202,9 @@ export function AppRoutes() {
           <Route path="/e/:eventId/s/:stallId" component={StallPage} />
           <Route path="/e/:id/guests" component={GuestlistPage} />
           <Route path="/e/:id/manage">{(p) => <Redirect to={`/e/${p.id}/guests`} />}</Route>
-          <Route path="/events/:id/manage">{(p) => <Redirect to={`/e/${p.id}/guests`} />}</Route>
+          <Route path="/experience-details/:id" component={ExperienceDetailsPage} />
+          <Route path="/experience-details" component={ExperienceDetailsPage} />
+          <Route path="/saved-experiences" component={SavedExperiencesPage} />
           <Route path="/e/:id" component={EventPage} />
           <Route path="/ticket/:id" component={TicketPage} />
           <Route path="/calendar" component={CalendarPage} />
@@ -184,6 +215,7 @@ export function AppRoutes() {
           <Route path="/f">
             <Redirect to="/events" />
           </Route>
+          <Route path="/event-categories" component={EventCategoriesPage} />
           <Route path="/events" component={EventsPage} />
           <Route path="/pass" component={PassPage} />
           <Route path="/pass/events">
@@ -216,8 +248,10 @@ export function AppRoutes() {
           <Route path="/event/new">
             <Redirect to="/event" />
           </Route>
+          <Route path="/event-analytics" component={EventAnalyticsPage} />
           <Route path="/event" component={OrganiserEventPage} />
           <Route path="/me/memories" component={MemoryWallPage} />
+          <Route path="/notifications" component={NotificationsPage} />
           <Route path="/me/inbox" component={InboxPage} />
           <Route path="/inbox">
             <Redirect to="/me/inbox" />
@@ -228,9 +262,12 @@ export function AppRoutes() {
           <Route path="/messages">
             <Redirect to="/me/inbox" />
           </Route>
+          <Route path="/wallet" component={WalletPage} />
+          <Route path="/check-in-history" component={CheckInHistoryPage} />
           <Route path="/me/tickets" component={MyTicketsPage} />
           <Route path="/me" component={MePage} />
           <Route path="/bio" component={MePage} />
+          <Route path="/account-sync" component={AccountSyncPage} />
           <Route path="/settings" component={SettingsPage} />
           <Route path="/host/pulse" component={HostPulsePage} />
           <Route path="/host" component={HostPage} />
@@ -308,6 +345,7 @@ export function AppRoutes() {
           <Route path="/alternatives/:slug" component={AlternativePage} />
           <Route path="/contact" component={ContactPage} />
           <Route path="/help" component={HelpPage} />
+          <Route path="/support" component={SupportCenterPage} />
           <Route path="/assist" component={AssistPage} />
           <Route path="/unsubscribe" component={UnsubscribePage} />
           <Route path="/privacy" component={PrivacyPage} />
