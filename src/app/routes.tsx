@@ -207,6 +207,12 @@ export function AppRoutes() {
           <Route path="/plan/:id" component={PlanDetailPage} />
           <Route path="/plan" component={PlanHubPage} />
           <Route path="/invite/:code" component={PlanDetailPage} />
+          <Route path="/events/new">
+            <Redirect to="/event" />
+          </Route>
+          <Route path="/create">
+            <Redirect to="/event" />
+          </Route>
           <Route path="/event/new">
             <Redirect to="/event" />
           </Route>

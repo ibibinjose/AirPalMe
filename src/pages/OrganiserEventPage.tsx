@@ -13,18 +13,28 @@ import {
   Download,
   Edit3,
   ExternalLink,
+  Eye,
   FileText,
+  Globe,
   LayoutGrid,
+  Lock,
   MapPin,
   Plus,
   QrCode,
+  ShieldCheck,
   Sparkles,
   Store,
   Upload,
   User,
   Users,
+  Video,
   X,
 } from "lucide-react";
+import { EventCoverPresetSelector } from "@/components/event/EventCoverPresets";
+import { EventLivePreviewCard } from "@/components/event/EventLivePreviewCard";
+import { EventCreationTemplates, type EventTemplateConfig } from "@/components/event/EventCreationTemplates";
+import { EventScheduleQuickPicks } from "@/components/event/EventScheduleQuickPicks";
+import { EventCreatedCelebrationModal } from "@/components/event/EventCreatedCelebrationModal";
 import {
   EVENT_FLAVOURS,
   EVENT_FLAVOUR_LABELS,
@@ -33,6 +43,7 @@ import {
   stallFieldLabels,
   stallUnitDisplay,
   type EventFlavour,
+  type EventLocationType,
   type StallCategoryId,
   type StallRecord,
 } from "@shared/event";
@@ -138,6 +149,10 @@ export function OrganiserEventPage() {
   const [mapsPlaceId, setMapsPlaceId] = useState("");
   const [geo, setGeo] = useState<{ lat: number; lng: number } | undefined>();
   const [coverImage, setCoverImage] = useState("");
+  const [themeColor, setThemeColor] = useState("#6366f1");
+  const [locationType, setLocationType] = useState<EventLocationType>("in_person");
+  const [virtualUrl, setVirtualUrl] = useState("");
+  const [requireApproval, setRequireApproval] = useState(false);
   const [startsLocal, setStartsLocal] = useState(() => toLocalInput(nextSaturdayNine().toISOString()));
   const [endsLocal, setEndsLocal] = useState(() => toLocalInput(sameDayFifteen(nextSaturdayNine()).toISOString()));
   const [status, setStatus] = useState<"draft" | "live" | "ended">("live");
@@ -176,6 +191,9 @@ export function OrganiserEventPage() {
   const [qr, setQr] = useState("");
   const [creating, setCreating] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [mobilePreview, setMobilePreview] = useState(false);
+  const [celebrationEventId, setCelebrationEventId] = useState<string | null>(null);
+  const [celebrationEventName, setCelebrationEventName] = useState<string>("");
 
   const stalls = viewEvent ? stallsFor(viewEvent.id) : [];
   const feedback = viewEvent ? ratingsForEvent(viewEvent.id) : [];
@@ -216,6 +234,10 @@ export function OrganiserEventPage() {
     setMapsPlaceId(myEvent.mapsPlaceId || "");
     setGeo(myEvent.geo);
     setCoverImage(myEvent.coverImage || "");
+    setThemeColor(myEvent.themeColor || "#6366f1");
+    setLocationType(myEvent.locationType || "in_person");
+    setVirtualUrl(myEvent.virtualUrl || "");
+    setRequireApproval(Boolean(myEvent.requireApproval));
     setHostType(myEvent.hostType || (myEvent.businessHandle ? "business" : "individual"));
     setHostName(myEvent.hostName || myEvent.businessName || "");
     setHostHandle(myEvent.hostHandle || myEvent.businessHandle || "");
@@ -259,6 +281,29 @@ export function OrganiserEventPage() {
     setCollaboratorHandles((prev) => prev.filter((h) => h !== handle));
   }
 
+  function applyTemplate(tmpl: EventTemplateConfig) {
+    setName(tmpl.suggestedName);
+    setShortWhy(tmpl.suggestedWhy);
+    setFlavour(tmpl.flavour);
+    setCoverImage(tmpl.coverImage);
+    if (tmpl.themeColor) setThemeColor(tmpl.themeColor);
+    if (tmpl.locationType) setLocationType(tmpl.locationType);
+    if (tmpl.requireApproval !== undefined) setRequireApproval(tmpl.requireApproval);
+    const d = new Date();
+    d.setDate(d.getDate() + tmpl.daysAhead);
+    d.setHours(tmpl.startHour, 0, 0, 0);
+    const end = new Date(d);
+    end.setHours(d.getHours() + tmpl.durationHours);
+    setStartsLocal(toLocalInput(d.toISOString()));
+    setEndsLocal(toLocalInput(end.toISOString()));
+    setTicketFields({
+      paid: tmpl.paid,
+      price: tmpl.price,
+      capacity: tmpl.capacity,
+    });
+    toast.success(`Applied template: ${tmpl.label}`);
+  }
+
   async function onCreate(e: FormEvent) {
     e.preventDefault();
     const trimmed = name.trim();
@@ -280,7 +325,7 @@ export function OrganiserEventPage() {
     setCreating(true);
     try {
       const cleanHostHandle = hostHandle.trim().replace(/^@+/, "").toLowerCase() || undefined;
-      await upsertEvent({
+      const created = await upsertEvent({
         ...(demoMode ? { id: DEMO_EVENT_ID, demo: true as const } : {}),
         name: trimmed,
         flavour,
@@ -293,6 +338,10 @@ export function OrganiserEventPage() {
         mapsPlaceId: mapsPlaceId.trim() || undefined,
         geo,
         coverImage: coverImage.trim() || undefined,
+        themeColor,
+        locationType,
+        virtualUrl: locationType === "virtual" ? virtualUrl.trim() || undefined : undefined,
+        requireApproval,
         hostType,
         hostName: hostName.trim() || undefined,
         hostHandle: cleanHostHandle,
@@ -309,8 +358,10 @@ export function OrganiserEventPage() {
         registrationNote: festivalFields.registrationNote.trim() || undefined,
         speakers: festivalFields.speakers.length > 0 ? festivalFields.speakers : undefined,
       });
-      toast.success("Event created and live — add your stalls/exhibitors next");
-      setTab("stalls");
+      setCelebrationEventId(created.id);
+      setCelebrationEventName(created.name);
+      toast.success("Event created and officially live! 🎉");
+      setTab(flavour === "market" || flavour === "expo" ? "stalls" : "today");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn’t create event");
     } finally {
@@ -401,6 +452,10 @@ export function OrganiserEventPage() {
         mapsPlaceId: mapsPlaceId.trim() || undefined,
         geo,
         coverImage: coverImage.trim() || undefined,
+        themeColor,
+        locationType,
+        virtualUrl: locationType === "virtual" ? virtualUrl.trim() || undefined : undefined,
+        requireApproval,
         hostType,
         hostName: hostName.trim() || undefined,
         hostHandle: cleanHostHandle,
@@ -445,7 +500,7 @@ export function OrganiserEventPage() {
     return (
       <div className="relative isolate overflow-hidden min-h-[85vh]">
         <motion.div
-          className="relative mx-auto max-w-2xl px-4 py-8 pb-24"
+          className="relative mx-auto max-w-6xl px-4 py-8 pb-24"
           initial={reduce ? false : "hidden"}
           animate="show"
           variants={reduce ? undefined : landing}
@@ -473,471 +528,877 @@ export function OrganiserEventPage() {
                 <span>Door Scanner</span>
               </Link>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-accent">
-                AirPal Pass · Event Hosting
-              </span>
-              <span className="text-xs text-mute font-medium">Tickets &amp; Passes</span>
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-accent">
+                    AirPal Pass · Event Studio
+                  </span>
+                  <span className="text-xs text-mute font-medium">Tickets &amp; Passes</span>
+                </div>
+                <h1 className="font-display mt-2 text-3xl font-bold tracking-tight text-ink md:text-4xl">
+                  Create a Market, Expo or Event
+                </h1>
+                <p className="mt-2 text-sm leading-relaxed text-mute max-w-xl">
+                  Pick a format, search Google Place for the venue, and set your schedule. Guests scan the entrance Gate
+                  QR into a live directory.
+                </p>
+              </div>
+
+              {/* Mobile View Toggle */}
+              <div className="flex lg:hidden items-center rounded-2xl bg-paper p-1 ring-1 ring-line shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setMobilePreview(false)}
+                  className={cn(
+                    "px-3 py-1.5 text-xs font-bold rounded-xl transition",
+                    !mobilePreview ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
+                  )}
+                >
+                  Edit Details
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMobilePreview(true)}
+                  className={cn(
+                    "px-3 py-1.5 text-xs font-bold rounded-xl transition flex items-center gap-1",
+                    mobilePreview ? "bg-brand text-white shadow-xs" : "text-mute hover:text-ink",
+                  )}
+                >
+                  <Eye size={12} />
+                  <span>Preview</span>
+                </button>
+              </div>
             </div>
-            <h1 className="font-display mt-2 text-3xl font-bold tracking-tight text-ink md:text-4xl">
-              Create a Market, Expo or Event
-            </h1>
-            <p className="mt-2 text-sm leading-relaxed text-mute">
-              Pick a format, search Google Place for the venue, and set your schedule. Guests scan the entrance Gate QR
-              into a live directory.
-            </p>
           </motion.header>
 
-          <motion.form variants={landingItem} className="mt-6 space-y-6" onSubmit={onCreate}>
-            {/* Flavour Card Selector */}
-            <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-accent">1. What kind of event?</p>
-              <div className="grid gap-2.5 sm:grid-cols-2">
-                {EVENT_FLAVOURS.map((id) => {
-                  const meta = FLAVOUR_META[id];
-                  const Icon = meta.icon;
-                  const on = flavour === id;
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      aria-pressed={on}
-                      onClick={() => setFlavour(id)}
-                      className={cn(
-                        "rounded-2xl p-4 text-left ring-1 transition duration-200 active:scale-[0.98]",
-                        on
-                          ? "bg-brand text-white ring-brand shadow-md"
-                          : "bg-paper ring-line hover:ring-brand/30 hover:bg-card",
+          <div className="mt-6 lg:grid lg:grid-cols-12 lg:gap-8 lg:items-start">
+            {/* Left: Editor Form */}
+            <div className={cn("lg:col-span-7", mobilePreview ? "hidden lg:block" : "block")}>
+              <motion.form variants={landingItem} className="space-y-6" onSubmit={onCreate}>
+                {/* 1-Tap Quick-Start Templates */}
+                <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay">
+                  <EventCreationTemplates onApplyTemplate={applyTemplate} />
+                </div>
+
+                {/* Flavour Card Selector */}
+                <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-3">
+                  <p className="text-xs font-bold uppercase tracking-wider text-accent">1. What kind of event?</p>
+                  <div className="grid gap-2.5 sm:grid-cols-2">
+                    {EVENT_FLAVOURS.map((id) => {
+                      const meta = FLAVOUR_META[id];
+                      const Icon = meta.icon;
+                      const on = flavour === id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          aria-pressed={on}
+                          onClick={() => setFlavour(id)}
+                          className={cn(
+                            "rounded-2xl p-4 text-left ring-1 transition duration-200 active:scale-[0.98]",
+                            on
+                              ? "bg-brand text-white ring-brand shadow-md"
+                              : "bg-paper ring-line hover:ring-brand/30 hover:bg-card",
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              "grid h-10 w-10 place-items-center rounded-xl ring-1",
+                              on ? "bg-white/15 text-white ring-white/25" : "bg-brand/10 text-accent ring-brand/20",
+                            )}
+                          >
+                            <Icon size={18} />
+                          </span>
+                          <span className="mt-3 block text-sm font-bold">{EVENT_FLAVOUR_LABELS[id]}</span>
+                          <span
+                            className={cn("mt-1 block text-[11px] leading-snug", on ? "text-white/80" : "text-mute")}
+                          >
+                            {meta.blurb}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Basic Info & Media */}
+                <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-accent">2. Name & Banner</p>
+
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                      Event Name
+                    </label>
+                    <input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="e.g. The Rocks Weekend Market or Sydney Design Expo"
+                      required
+                      className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                      Tagline / 1-Line Highlight
+                    </label>
+                    <input
+                      value={shortWhy}
+                      maxLength={100}
+                      onChange={(e) => setShortWhy(e.target.value)}
+                      placeholder="e.g. 80+ artisanal stalls, food trucks, and live music by the harbour"
+                      className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                      Cover Banner Image (Optional)
+                    </label>
+                    <ImageField kind="cover" value={coverImage} onChange={(src) => setCoverImage(src || "")} />
+                    <EventCoverPresetSelector
+                      currentUrl={coverImage}
+                      onSelect={(url) => setCoverImage(url)}
+                      className="pt-2"
+                    />
+                  </div>
+
+                  {/* Ambient Theme Accent Selector (Luma-style) */}
+                  <div className="pt-2 border-t border-line/60">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-2 block">
+                      Ambient Page Accent
+                    </label>
+                    <div className="flex flex-wrap items-center gap-3">
+                      {[
+                        { id: "#6366f1", label: "Indigo", bg: "bg-indigo-500", ring: "ring-indigo-500" },
+                        { id: "#8b5cf6", label: "Violet", bg: "bg-purple-500", ring: "ring-purple-500" },
+                        { id: "#10b981", label: "Emerald", bg: "bg-emerald-500", ring: "ring-emerald-500" },
+                        { id: "#f59e0b", label: "Amber", bg: "bg-amber-500", ring: "ring-amber-500" },
+                        { id: "#f43f5e", label: "Rose", bg: "bg-rose-500", ring: "ring-rose-500" },
+                        { id: "#06b6d4", label: "Cyan", bg: "bg-cyan-500", ring: "ring-cyan-500" },
+                      ].map((swatch) => (
+                        <button
+                          key={swatch.id}
+                          type="button"
+                          onClick={() => setThemeColor(swatch.id)}
+                          title={swatch.label}
+                          className={cn(
+                            "h-8 w-8 sm:h-9 sm:w-9 rounded-full transition transform active:scale-90 flex items-center justify-center ring-2 ring-offset-2 ring-offset-card cursor-pointer",
+                            themeColor === swatch.id
+                              ? `${swatch.ring} scale-110 shadow-md`
+                              : "ring-transparent hover:scale-105 opacity-80 hover:opacity-100",
+                            swatch.bg,
+                          )}
+                        >
+                          {themeColor === swatch.id && <Check size={16} className="text-white stroke-[3]" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Google Place & Location Pinning */}
+                {/* Venue & Location Mode Capsule */}
+                <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-bold uppercase tracking-wider text-accent">3. Venue & Location</p>
+                    <span className="text-[11px] text-mute flex items-center gap-1">
+                      {locationType === "in_person" ? (
+                        <>
+                          <MapPin size={12} className="text-accent" /> Google Maps Linked
+                        </>
+                      ) : locationType === "virtual" ? (
+                        <>
+                          <Globe size={12} className="text-accent" /> Online Gathering
+                        </>
+                      ) : (
+                        <>
+                          <Lock size={12} className="text-amber-500" /> Private Venue
+                        </>
                       )}
-                    >
-                      <span
+                    </span>
+                  </div>
+
+                  {/* 3-way Capsule Selector */}
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                      Location Format
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { id: "in_person", label: "In Person", icon: MapPin },
+                        { id: "virtual", label: "Virtual", icon: Video },
+                        { id: "secret", label: "Secret TBA", icon: Lock },
+                      ].map((mode) => {
+                        const on = locationType === mode.id;
+                        const Icon = mode.icon;
+                        return (
+                          <button
+                            key={mode.id}
+                            type="button"
+                            onClick={() => setLocationType(mode.id as EventLocationType)}
+                            className={cn(
+                              "flex items-center justify-center gap-1.5 rounded-2xl py-3 px-2 text-xs font-bold transition active:scale-95 ring-1 cursor-pointer",
+                              on
+                                ? "bg-brand text-white ring-brand shadow-sm"
+                                : "bg-paper text-mute ring-line hover:text-ink hover:bg-card",
+                            )}
+                          >
+                            <Icon size={14} />
+                            <span>{mode.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* IN PERSON MODE */}
+                  {locationType === "in_person" && (
+                    <>
+                      <div>
+                        <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                          Search Venue on Google Maps
+                        </label>
+                        <PlaceAddressField
+                          value={venue || address}
+                          placeholder="Search venue (e.g. Overseas Passenger Terminal, Sydney)"
+                          onChange={(val) => {
+                            setVenue(val);
+                            setAddress(val);
+                          }}
+                          onPick={(picked: PickedPlace) => {
+                            setVenue(picked.label.split(",")[0] || picked.label);
+                            setAddress(picked.label);
+                            setGeo(picked.geo);
+                            if (picked.city) setCity(picked.city);
+                            toast.success(`Pinned venue: ${picked.label}`);
+                          }}
+                        />
+                      </div>
+
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div>
+                          <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                            City
+                          </label>
+                          <input
+                            value={city}
+                            list="event-cities"
+                            onChange={(e) => setCity(e.target.value)}
+                            placeholder="e.g. Sydney"
+                            className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                          />
+                          <datalist id="event-cities">
+                            {CITY_OPTIONS.map((c) => (
+                              <option key={c.id} value={c.label} />
+                            ))}
+                          </datalist>
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                            Venue Short Label
+                          </label>
+                          <input
+                            value={venue}
+                            onChange={(e) => setVenue(e.target.value)}
+                            placeholder="e.g. Argyle Precinct"
+                            className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                          Room / Hall / Stage (Optional)
+                        </label>
+                        <input
+                          value={room}
+                          onChange={(e) => setRoom(e.target.value)}
+                          placeholder="e.g. Boardroom 5+6, Great Hall, Main stage"
+                          className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                        />
+                      </div>
+
+                      {geo && (
+                        <div className="flex items-center justify-between rounded-2xl bg-paper px-3 py-2 text-xs text-mute border border-line/70">
+                          <span className="flex items-center gap-1.5 text-ink font-medium">
+                            <Check size={14} className="text-emerald-600" />
+                            GPS Pinned: {geo.lat.toFixed(4)}, {geo.lng.toFixed(4)}
+                          </span>
+                          <a
+                            href={mapsPlaceUrl(geo, venue || name)}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-accent font-semibold hover:underline inline-flex items-center gap-1"
+                          >
+                            View map <ExternalLink size={12} />
+                          </a>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* VIRTUAL MODE */}
+                  {locationType === "virtual" && (
+                    <div className="space-y-3.5">
+                      <div>
+                        <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                          Stream or Video Meeting URL
+                        </label>
+                        <input
+                          value={virtualUrl}
+                          onChange={(e) => setVirtualUrl(e.target.value)}
+                          placeholder="e.g. https://zoom.us/j/... or https://meet.google.com/..."
+                          className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                        />
+                      </div>
+
+                      {/* Quick platform chips */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-[11px] text-mute">Quick links:</span>
+                        {[
+                          { label: "Zoom", prefix: "https://zoom.us/j/" },
+                          { label: "Google Meet", prefix: "https://meet.google.com/" },
+                          { label: "YouTube Live", prefix: "https://youtube.com/live/" },
+                        ].map((p) => (
+                          <button
+                            key={p.label}
+                            type="button"
+                            onClick={() => {
+                              if (!virtualUrl.startsWith("http")) setVirtualUrl(p.prefix);
+                            }}
+                            className="rounded-full bg-paper px-2.5 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-accent transition active:scale-95 shadow-2xs"
+                          >
+                            {p.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div>
+                          <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                            Timezone City Anchor
+                          </label>
+                          <input
+                            value={city}
+                            list="event-cities"
+                            onChange={(e) => setCity(e.target.value)}
+                            placeholder="e.g. Sydney"
+                            className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                            Virtual Platform Label
+                          </label>
+                          <input
+                            value={venue}
+                            onChange={(e) => setVenue(e.target.value)}
+                            placeholder="e.g. Zoom Interactive Room or YouTube Stream"
+                            className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="rounded-2xl bg-brand/5 p-3 text-[11px] text-mute border border-brand/15 leading-relaxed">
+                        🔒 <strong>Pass Protected:</strong> The stream URL is guarded and only revealed to registered
+                        guests on their AirPal Pass or calendar ticket.
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SECRET TBA MODE */}
+                  {locationType === "secret" && (
+                    <div className="space-y-3.5">
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div>
+                          <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                            City / Vicinity
+                          </label>
+                          <input
+                            value={city}
+                            list="event-cities"
+                            onChange={(e) => setCity(e.target.value)}
+                            placeholder="e.g. Sydney"
+                            className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                            Neighborhood / Suburb Hint
+                          </label>
+                          <input
+                            value={venue}
+                            onChange={(e) => setVenue(e.target.value)}
+                            placeholder="e.g. Surry Hills / Secret Rooftop"
+                            className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                          Arrival / Door Secret Code (Announced on Pass)
+                        </label>
+                        <input
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                          placeholder="e.g. 42 Reservoir St (Buzzer 3), Sydney NSW 2010"
+                          className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                        />
+                      </div>
+
+                      <div className="rounded-2xl bg-amber-500/10 p-3 text-[11px] text-amber-900 dark:text-amber-200 border border-amber-500/20 leading-relaxed">
+                        🔒 <strong>Confidential Venue:</strong> The exact street address is kept hidden from public
+                        discovery pages and sent directly to approved ticket holders.
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Schedule & Timing */}
+                <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-accent">4. Date & Times</p>
+
+                  <EventScheduleQuickPicks
+                    onSelect={({ startsLocal: s, endsLocal: e }) => {
+                      setStartsLocal(s);
+                      setEndsLocal(e);
+                      toast.success("Schedule shortcut applied");
+                    }}
+                  />
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                        Starts At
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={startsLocal}
+                        onChange={(e) => setStartsLocal(e.target.value)}
+                        required
+                        className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                        Ends At
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={endsLocal}
+                        onChange={(e) => setEndsLocal(e.target.value)}
+                        className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Host & Collaborators Section */}
+                <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-bold uppercase tracking-wider text-accent">5. Host & Collaborators</p>
+                    <span className="text-[11px] text-mute flex items-center gap-1">
+                      <Users size={12} className="text-accent" /> AirPal Handles
+                    </span>
+                  </div>
+                  <p className="text-xs text-mute leading-relaxed">
+                    Specify whether this event is run by a business or an individual with their AirPal @handle, plus any
+                    co-hosts or collaborators.
+                  </p>
+
+                  {/* Host Type Selector */}
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                      Organised By
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setHostType("business")}
                         className={cn(
-                          "grid h-10 w-10 place-items-center rounded-xl ring-1",
-                          on ? "bg-white/15 text-white ring-white/25" : "bg-brand/10 text-accent ring-brand/20",
+                          "flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-xs sm:text-sm font-semibold ring-1 transition",
+                          hostType === "business"
+                            ? "bg-brand text-white ring-brand shadow-sm"
+                            : "bg-paper text-mute ring-line hover:text-ink hover:bg-card",
                         )}
                       >
-                        <Icon size={18} />
-                      </span>
-                      <span className="mt-3 block text-sm font-bold">{EVENT_FLAVOUR_LABELS[id]}</span>
-                      <span className={cn("mt-1 block text-[11px] leading-snug", on ? "text-white/80" : "text-mute")}>
-                        {meta.blurb}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Basic Info & Media */}
-            <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-accent">2. Name & Banner</p>
-
-              <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                  Event Name
-                </label>
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. The Rocks Weekend Market or Sydney Design Expo"
-                  required
-                  className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                  Tagline / 1-Line Highlight
-                </label>
-                <input
-                  value={shortWhy}
-                  maxLength={100}
-                  onChange={(e) => setShortWhy(e.target.value)}
-                  placeholder="e.g. 80+ artisanal stalls, food trucks, and live music by the harbour"
-                  className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                  Cover Banner Image (Optional)
-                </label>
-                <ImageField kind="cover" value={coverImage} onChange={(src) => setCoverImage(src || "")} />
-              </div>
-            </div>
-
-            {/* Google Place & Location Pinning */}
-            <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-bold uppercase tracking-wider text-accent">3. Google Place & Venue</p>
-                <span className="text-[11px] text-mute flex items-center gap-1">
-                  <MapPin size={12} className="text-accent" /> Google Maps Linked
-                </span>
-              </div>
-
-              {/* Google Place Search Input */}
-              <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                  Search Venue on Google Maps
-                </label>
-                <PlaceAddressField
-                  value={venue || address}
-                  placeholder="Search venue (e.g. Overseas Passenger Terminal, Sydney)"
-                  onChange={(val) => {
-                    setVenue(val);
-                    setAddress(val);
-                  }}
-                  onPick={(picked: PickedPlace) => {
-                    setVenue(picked.label.split(",")[0] || picked.label);
-                    setAddress(picked.label);
-                    setGeo(picked.geo);
-                    if (picked.city) setCity(picked.city);
-                    toast.success(`Pinned venue: ${picked.label}`);
-                  }}
-                />
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">City</label>
-                  <input
-                    value={city}
-                    list="event-cities"
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="e.g. Sydney"
-                    className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                  />
-                  <datalist id="event-cities">
-                    {CITY_OPTIONS.map((c) => (
-                      <option key={c.id} value={c.label} />
-                    ))}
-                  </datalist>
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                    Venue Short Label
-                  </label>
-                  <input
-                    value={venue}
-                    onChange={(e) => setVenue(e.target.value)}
-                    placeholder="e.g. Argyle Precinct"
-                    className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                  Room / Hall / Stage (Optional)
-                </label>
-                <input
-                  value={room}
-                  onChange={(e) => setRoom(e.target.value)}
-                  placeholder="e.g. Boardroom 5+6, Great Hall, Main stage"
-                  className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                />
-              </div>
-
-              {geo && (
-                <div className="flex items-center justify-between rounded-2xl bg-paper px-3 py-2 text-xs text-mute border border-line/70">
-                  <span className="flex items-center gap-1.5 text-ink font-medium">
-                    <Check size={14} className="text-emerald-600" />
-                    GPS Pinned: {geo.lat.toFixed(4)}, {geo.lng.toFixed(4)}
-                  </span>
-                  <a
-                    href={mapsPlaceUrl(geo, venue || name)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-accent font-semibold hover:underline inline-flex items-center gap-1"
-                  >
-                    View map <ExternalLink size={12} />
-                  </a>
-                </div>
-              )}
-            </div>
-
-            {/* Schedule & Timing */}
-            <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
-              <p className="text-xs font-bold uppercase tracking-wider text-accent">4. Date & Times</p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                    Starts At
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={startsLocal}
-                    onChange={(e) => setStartsLocal(e.target.value)}
-                    required
-                    className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                    Ends At
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={endsLocal}
-                    onChange={(e) => setEndsLocal(e.target.value)}
-                    className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Host & Collaborators Section */}
-            <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-4">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-bold uppercase tracking-wider text-accent">5. Host & Collaborators</p>
-                <span className="text-[11px] text-mute flex items-center gap-1">
-                  <Users size={12} className="text-accent" /> AirPal Handles
-                </span>
-              </div>
-              <p className="text-xs text-mute leading-relaxed">
-                Specify whether this event is run by a business or an individual with their AirPal @handle, plus any
-                co-hosts or collaborators.
-              </p>
-
-              {/* Host Type Selector */}
-              <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                  Organised By
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setHostType("business")}
-                    className={cn(
-                      "flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-xs sm:text-sm font-semibold ring-1 transition",
-                      hostType === "business"
-                        ? "bg-brand text-white ring-brand shadow-sm"
-                        : "bg-paper text-mute ring-line hover:text-ink hover:bg-card",
-                    )}
-                  >
-                    <Building2 size={16} />
-                    <span>Business / Place</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setHostType("individual")}
-                    className={cn(
-                      "flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-xs sm:text-sm font-semibold ring-1 transition",
-                      hostType === "individual"
-                        ? "bg-brand text-white ring-brand shadow-sm"
-                        : "bg-paper text-mute ring-line hover:text-ink hover:bg-card",
-                    )}
-                  >
-                    <User size={16} />
-                    <span>Individual Host</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Host Name & Handle Inputs */}
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                    {hostType === "business" ? "Business / Organiser Name" : "Host Full Name"}
-                  </label>
-                  <input
-                    value={hostName}
-                    onChange={(e) => setHostName(e.target.value)}
-                    placeholder={hostType === "business" ? "e.g. The Rocks Markets" : "e.g. Sarah Jenkins"}
-                    className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                    AirPal @handle (Optional)
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-mute">@</span>
-                    <input
-                      value={hostHandle}
-                      onChange={(e) => setHostHandle(e.target.value.replace(/^@+/, ""))}
-                      placeholder={hostType === "business" ? "therocksmarkets" : "sarah"}
-                      className="h-12 w-full rounded-2xl border border-line bg-paper pl-8 pr-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick autofill buttons from user bios if available */}
-              {(business?.handle || mine?.handle) && (
-                <div className="flex flex-wrap items-center gap-2 pt-1">
-                  <span className="text-[11px] font-medium text-mute">Autofill:</span>
-                  {business?.handle && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setHostType("business");
-                        setHostName(business.name);
-                        setHostHandle(business.handle);
-                        toast.success(`Filled business: ${business.name} (@${business.handle})`);
-                      }}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-accent transition shadow-xs"
-                    >
-                      <Building2 size={12} className="text-accent" />
-                      <span>Business (@{business.handle})</span>
-                    </button>
-                  )}
-                  {mine?.handle && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setHostType("individual");
-                        setHostName(mine.name);
-                        setHostHandle(mine.handle);
-                        toast.success(`Filled personal: ${mine.name} (@${mine.handle})`);
-                      }}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-accent transition shadow-xs"
-                    >
-                      <User size={12} className="text-accent" />
-                      <span>My Handle (@{mine.handle})</span>
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* Collaborators & Co-hosts */}
-              <div className="pt-3 border-t border-line/60 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute block">
-                    Co-hosts & Collaborators
-                  </label>
-                  <span className="text-[11px] text-mute">{collaboratorHandles.length} added</span>
-                </div>
-                <p className="text-[11px] text-mute">
-                  Type any AirPal @handle and press Enter or click Add to link co-hosts, sponsors, or partner venues.
-                </p>
-
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-mute">@</span>
-                    <input
-                      value={collaboratorInput}
-                      onChange={(e) => setCollaboratorInput(e.target.value.replace(/^@+/, ""))}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          addCollaborator(collaboratorInput);
-                        }
-                      }}
-                      placeholder="collab_handle"
-                      className="h-11 w-full rounded-2xl border border-line bg-paper pl-8 pr-3 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="tonal"
-                    size="sm"
-                    onClick={() => addCollaborator(collaboratorInput)}
-                    disabled={!collaboratorInput.trim()}
-                    className="h-11 px-4 gap-1.5 rounded-2xl"
-                  >
-                    <Plus size={15} />
-                    <span>Add</span>
-                  </Button>
-                </div>
-
-                {/* Collaborator Chips */}
-                {collaboratorHandles.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {collaboratorHandles.map((handle) => (
-                      <div
-                        key={handle}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-xs font-semibold text-ink border border-line shadow-xs group"
+                        <Building2 size={16} />
+                        <span>Business / Place</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setHostType("individual")}
+                        className={cn(
+                          "flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-xs sm:text-sm font-semibold ring-1 transition",
+                          hostType === "individual"
+                            ? "bg-brand text-white ring-brand shadow-sm"
+                            : "bg-paper text-mute ring-line hover:text-ink hover:bg-card",
+                        )}
                       >
-                        <AtSign size={12} className="text-accent" />
-                        <span>{handle}</span>
-                        <a
-                          href={bioPath(handle)}
-                          target="_blank"
-                          rel="noreferrer"
-                          title="Preview profile"
-                          className="text-mute hover:text-accent transition p-0.5"
-                        >
-                          <ExternalLink size={11} />
-                        </a>
+                        <User size={16} />
+                        <span>Individual Host</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Host Name & Handle Inputs */}
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                        {hostType === "business" ? "Business / Organiser Name" : "Host Full Name"}
+                      </label>
+                      <input
+                        value={hostName}
+                        onChange={(e) => setHostName(e.target.value)}
+                        placeholder={hostType === "business" ? "e.g. The Rocks Markets" : "e.g. Sarah Jenkins"}
+                        className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                        AirPal @handle (Optional)
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-mute">
+                          @
+                        </span>
+                        <input
+                          value={hostHandle}
+                          onChange={(e) => setHostHandle(e.target.value.replace(/^@+/, ""))}
+                          placeholder={hostType === "business" ? "therocksmarkets" : "sarah"}
+                          className="h-12 w-full rounded-2xl border border-line bg-paper pl-8 pr-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Quick autofill buttons from user bios if available */}
+                  {(business?.handle || mine?.handle) && (
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <span className="text-[11px] font-medium text-mute">Autofill:</span>
+                      {business?.handle && (
                         <button
                           type="button"
-                          onClick={() => removeCollaborator(handle)}
-                          title="Remove collaborator"
-                          className="ml-0.5 rounded-full p-0.5 text-mute hover:bg-rose-100 hover:text-rose-700 transition"
+                          onClick={() => {
+                            setHostType("business");
+                            setHostName(business.name);
+                            setHostHandle(business.handle);
+                            toast.success(`Filled business: ${business.name} (@${business.handle})`);
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-accent transition shadow-xs"
                         >
-                          <X size={13} />
+                          <Building2 size={12} className="text-accent" />
+                          <span>Business (@{business.handle})</span>
                         </button>
+                      )}
+                      {mine?.handle && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setHostType("individual");
+                            setHostName(mine.name);
+                            setHostHandle(mine.handle);
+                            toast.success(`Filled personal: ${mine.name} (@${mine.handle})`);
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-accent transition shadow-xs"
+                        >
+                          <User size={12} className="text-accent" />
+                          <span>My Handle (@{mine.handle})</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Collaborators & Co-hosts */}
+                  <div className="pt-3 border-t border-line/60 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute block">
+                        Co-hosts & Collaborators
+                      </label>
+                      <span className="text-[11px] text-mute">{collaboratorHandles.length} added</span>
+                    </div>
+                    <p className="text-[11px] text-mute">
+                      Type any AirPal @handle and press Enter or click Add to link co-hosts, sponsors, or partner
+                      venues.
+                    </p>
+
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-mute">
+                          @
+                        </span>
+                        <input
+                          value={collaboratorInput}
+                          onChange={(e) => setCollaboratorInput(e.target.value.replace(/^@+/, ""))}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addCollaborator(collaboratorInput);
+                            }
+                          }}
+                          placeholder="collab_handle"
+                          className="h-11 w-full rounded-2xl border border-line bg-paper pl-8 pr-3 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                        />
                       </div>
+                      <Button
+                        type="button"
+                        variant="tonal"
+                        size="sm"
+                        onClick={() => addCollaborator(collaboratorInput)}
+                        disabled={!collaboratorInput.trim()}
+                        className="h-11 px-4 gap-1.5 rounded-2xl"
+                      >
+                        <Plus size={15} />
+                        <span>Add</span>
+                      </Button>
+                    </div>
+
+                    {/* Collaborator Chips */}
+                    {collaboratorHandles.length > 0 && (
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {collaboratorHandles.map((handle) => (
+                          <div
+                            key={handle}
+                            className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-xs font-semibold text-ink border border-line shadow-xs group"
+                          >
+                            <AtSign size={12} className="text-accent" />
+                            <span>{handle}</span>
+                            <a
+                              href={bioPath(handle)}
+                              target="_blank"
+                              rel="noreferrer"
+                              title="Preview profile"
+                              className="text-mute hover:text-accent transition p-0.5"
+                            >
+                              <ExternalLink size={11} />
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => removeCollaborator(handle)}
+                              title="Remove collaborator"
+                              className="ml-0.5 rounded-full p-0.5 text-mute hover:bg-rose-100 hover:text-rose-700 transition"
+                            >
+                              <X size={13} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Rich Description Option with Luma Starter Prompts */}
+                <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-3">
+                  <div className="flex justify-between items-center">
+                    <p className="text-xs font-bold uppercase tracking-wider text-accent">
+                      6. Event Description & Story
+                    </p>
+                    <span className="text-[11px] text-mute">{description.length}/1000</span>
+                  </div>
+
+                  {/* Luma Description Starter Prompt Chips */}
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <span className="text-[11px] font-medium text-mute mr-1">Insert Starter:</span>
+                    {[
+                      {
+                        label: "+ Agenda",
+                        snippet:
+                          "\n\n### 🗓️ Agenda & Schedule\n• 6:00 PM – Doors open & arrivals\n• 6:45 PM – Main session & announcements\n• 7:30 PM – Networking & refreshments\n",
+                      },
+                      {
+                        label: "+ What to Bring",
+                        snippet:
+                          "\n\n### 🎒 What to Bring\n• Valid photo ID\n• Digital ticket pass on your phone\n• Good vibes!\n",
+                      },
+                      {
+                        label: "+ Food & Drinks",
+                        snippet:
+                          "\n\n### 🍸 Food & Refreshments\n• Curated drinks & canapés available\n• Vegetarian & gluten-free options provided\n",
+                      },
+                      {
+                        label: "+ Getting There",
+                        snippet:
+                          "\n\n### 🚗 Getting There & Parking\n• Short 3-minute walk from the station\n• Street and venue parking bays available\n",
+                      },
+                      {
+                        label: "+ Dress Code",
+                        snippet: "\n\n### 👗 Dress Code\n• Smart casual / festive\n",
+                      },
+                    ].map((chip) => (
+                      <button
+                        key={chip.label}
+                        type="button"
+                        onClick={() => {
+                          setDescription((prev) => (prev ? `${prev.trim()}${chip.snippet}` : chip.snippet.trim()));
+                          toast.success(`Appended ${chip.label.replace("+ ", "")} section`);
+                        }}
+                        className="rounded-full bg-paper px-2.5 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-accent transition active:scale-95 shadow-2xs cursor-pointer"
+                      >
+                        {chip.label}
+                      </button>
                     ))}
                   </div>
-                )}
-              </div>
+
+                  <textarea
+                    value={description}
+                    maxLength={1000}
+                    rows={4}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Describe your market, expo, or gathering. What can attendees expect? Highlight special guests, parking tips, food & drink, entry details…"
+                    className="w-full rounded-2xl border border-line bg-paper p-3.5 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-brand focus:border-brand placeholder:text-mute/60 resize-none leading-relaxed"
+                  />
+                </div>
+
+                {/* Publish Status */}
+                <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-3">
+                  <p className="text-xs font-bold uppercase tracking-wider text-accent">7. Status</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(
+                      [
+                        ["live", "Go live now · Public Gate QR active"],
+                        ["draft", "Save as draft · Private preview"],
+                      ] as const
+                    ).map(([id, label]) => {
+                      const on = status === id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          aria-pressed={on}
+                          onClick={() => setStatus(id)}
+                          className={cn(
+                            "rounded-2xl px-4 py-3 text-xs sm:text-sm font-semibold ring-1 transition text-left",
+                            on
+                              ? "bg-brand text-white ring-brand shadow-sm"
+                              : "bg-paper text-mute ring-line hover:text-ink",
+                          )}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <EventFestivalFields values={festivalFields} onChange={setFestivalFields} />
+
+                <EventTicketFields values={ticketFields} onChange={setTicketFields} />
+
+                {/* Guest Screening & Approval Mode (Luma-style) */}
+                <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="grid h-8 w-8 place-items-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 ring-1 ring-amber-400/20">
+                        <ShieldCheck size={16} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-wider text-ink">Guest Screening</p>
+                        <p className="text-[11px] text-mute">Review and approve attendees before passes unlock</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <label className="flex items-start gap-3 rounded-2xl bg-paper p-3.5 border border-line/80 cursor-pointer group hover:border-brand/40 transition">
+                    <input
+                      type="checkbox"
+                      checked={requireApproval}
+                      onChange={(e) => {
+                        setRequireApproval(e.target.checked);
+                        toast.success(
+                          e.target.checked ? "Enabled host approval requirement" : "Disabled host approval requirement",
+                        );
+                      }}
+                      className="mt-0.5 h-4 w-4 rounded text-brand focus:ring-brand accent-brand cursor-pointer"
+                    />
+                    <div className="space-y-0.5">
+                      <span className="text-xs font-bold text-ink group-hover:text-accent transition">
+                        Require Host Approval for Registrations
+                      </span>
+                      <p className="text-[11px] text-mute leading-relaxed">
+                        Curate your attendee roster. Guests request to join, and you confirm them from your live
+                        guestlist before dynamic QR tickets and passes are issued.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full h-12 text-base font-semibold shadow-md gap-2"
+                  disabled={creating}
+                >
+                  <span>
+                    {creating ? "Creating Event…" : status === "draft" ? "Save Draft" : "Create Event & Open Gate"}
+                  </span>
+                  <ArrowRight size={18} />
+                </Button>
+              </motion.form>
             </div>
 
-            {/* Rich Description Option */}
-            <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-3">
-              <div className="flex justify-between items-center">
-                <p className="text-xs font-bold uppercase tracking-wider text-accent">6. Event Description & Story</p>
-                <span className="text-[11px] text-mute">{description.length}/1000</span>
-              </div>
-              <textarea
-                value={description}
-                maxLength={1000}
-                rows={4}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe your market, expo, or gathering. What can attendees expect? Highlight special guests, parking tips, food & drink, entry details…"
-                className="w-full rounded-2xl border border-line bg-paper p-3.5 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-brand focus:border-brand placeholder:text-mute/60 resize-none leading-relaxed"
-              />
-            </div>
-
-            {/* Publish Status */}
-            <div className="rounded-[28px] bg-card p-5 ring-1 ring-line shadow-clay space-y-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-accent">7. Status</p>
-              <div className="grid grid-cols-2 gap-2">
-                {(
-                  [
-                    ["live", "Go live now · Public Gate QR active"],
-                    ["draft", "Save as draft · Private preview"],
-                  ] as const
-                ).map(([id, label]) => {
-                  const on = status === id;
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      aria-pressed={on}
-                      onClick={() => setStatus(id)}
-                      className={cn(
-                        "rounded-2xl px-4 py-3 text-xs sm:text-sm font-semibold ring-1 transition text-left",
-                        on ? "bg-brand text-white ring-brand shadow-sm" : "bg-paper text-mute ring-line hover:text-ink",
-                      )}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <EventFestivalFields values={festivalFields} onChange={setFestivalFields} />
-
-            <EventTicketFields values={ticketFields} onChange={setTicketFields} />
-
-            <Button
-              type="submit"
-              size="lg"
-              className="w-full h-12 text-base font-semibold shadow-md gap-2"
-              disabled={creating}
+            {/* Right: Sticky Live Attendee Preview Card */}
+            <div
+              className={cn(
+                "lg:col-span-5 lg:sticky lg:top-6 space-y-3",
+                mobilePreview ? "block mt-4 lg:mt-0" : "hidden lg:block",
+              )}
             >
-              <span>
-                {creating ? "Creating Event…" : status === "draft" ? "Save Draft" : "Create Event & Open Gate"}
-              </span>
-              <ArrowRight size={18} />
-            </Button>
-          </motion.form>
+              <EventLivePreviewCard
+                title={name}
+                coverImage={coverImage}
+                flavour={flavour}
+                shortWhy={shortWhy}
+                description={description}
+                startsAt={fromLocalInput(startsLocal)}
+                endsAt={fromLocalInput(endsLocal)}
+                venue={venue}
+                address={address}
+                city={city}
+                geo={geo}
+                locationType={locationType}
+                virtualUrl={virtualUrl}
+                requireApproval={requireApproval}
+                themeColor={themeColor}
+                hostName={hostName}
+                hostHandle={hostHandle}
+                hostType={hostType}
+                collaboratorHandles={collaboratorHandles}
+                ticketPriceCents={ticketFields.paid ? Math.round(Number(ticketFields.price || 0) * 100) : 0}
+                capacity={Number(ticketFields.capacity) || undefined}
+              />
+
+              {mobilePreview && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full lg:hidden rounded-2xl h-11 text-xs font-bold border border-line"
+                  onClick={() => setMobilePreview(false)}
+                >
+                  Back to Editing Form
+                </Button>
+              )}
+            </div>
+          </div>
         </motion.div>
+
+        <EventCreatedCelebrationModal
+          open={Boolean(celebrationEventId)}
+          onClose={() => {
+            setCelebrationEventId(null);
+            setTab("today");
+          }}
+          eventId={celebrationEventId || ""}
+          name={celebrationEventName || name}
+          flavour={flavour}
+          venue={venue}
+          city={city}
+          onOpenStalls={() => setTab("stalls")}
+        />
       </div>
     );
   }
@@ -1107,6 +1568,30 @@ export function OrganiserEventPage() {
                 toast.success("Schedule confirmed");
               }}
             />
+
+            {/* Live Attendee Page Link Card */}
+            <div className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-clay flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-2.5 py-0.5 text-[11px] font-bold text-accent uppercase tracking-wider">
+                  <Eye size={12} />
+                  <span>Public Event Page</span>
+                </span>
+                <h3 className="font-display text-lg font-bold text-ink">Attendee Hub &amp; Passbook Gate</h3>
+                <p className="text-xs text-mute leading-relaxed max-w-md">
+                  View your event exactly as attendees see it: ambient glow cover, calendar block, Apple Wallet passbook
+                  checkout, and host bio.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Link
+                  href={`/e/${myEvent.id}`}
+                  className="inline-flex min-h-[44px] items-center gap-2 rounded-2xl bg-brand text-white px-4 text-xs font-bold shadow-md hover:bg-brand/90 transition active:scale-95"
+                >
+                  <ExternalLink size={14} />
+                  <span>View Public Page</span>
+                </Link>
+              </div>
+            </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div className="rounded-3xl bg-card p-5 ring-1 ring-line shadow-xs">
@@ -1524,6 +2009,44 @@ export function OrganiserEventPage() {
                   Cover Banner Image
                 </label>
                 <ImageField kind="cover" value={coverImage} onChange={(src) => setCoverImage(src || "")} />
+                <EventCoverPresetSelector
+                  currentUrl={coverImage}
+                  onSelect={(url) => setCoverImage(url)}
+                  className="pt-2"
+                />
+              </div>
+
+              {/* Ambient Theme Accent Selector in Settings */}
+              <div className="pt-2 border-t border-line/60">
+                <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-2 block">
+                  Ambient Page Accent
+                </label>
+                <div className="flex flex-wrap items-center gap-3">
+                  {[
+                    { id: "#6366f1", label: "Indigo", bg: "bg-indigo-500", ring: "ring-indigo-500" },
+                    { id: "#8b5cf6", label: "Violet", bg: "bg-purple-500", ring: "ring-purple-500" },
+                    { id: "#10b981", label: "Emerald", bg: "bg-emerald-500", ring: "ring-emerald-500" },
+                    { id: "#f59e0b", label: "Amber", bg: "bg-amber-500", ring: "ring-amber-500" },
+                    { id: "#f43f5e", label: "Rose", bg: "bg-rose-500", ring: "ring-rose-500" },
+                    { id: "#06b6d4", label: "Cyan", bg: "bg-cyan-500", ring: "ring-cyan-500" },
+                  ].map((swatch) => (
+                    <button
+                      key={swatch.id}
+                      type="button"
+                      onClick={() => setThemeColor(swatch.id)}
+                      title={swatch.label}
+                      className={cn(
+                        "h-8 w-8 sm:h-9 sm:w-9 rounded-full transition transform active:scale-90 flex items-center justify-center ring-2 ring-offset-2 ring-offset-card cursor-pointer",
+                        themeColor === swatch.id
+                          ? `${swatch.ring} scale-110 shadow-md`
+                          : "ring-transparent hover:scale-105 opacity-80 hover:opacity-100",
+                        swatch.bg,
+                      )}
+                    >
+                      {themeColor === swatch.id && <Check size={16} className="text-white stroke-[3]" />}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -1549,89 +2072,257 @@ export function OrganiserEventPage() {
               </div>
             </div>
 
-            {/* Google Place & Location Search */}
+            {/* Venue & Location Mode Capsule in Settings */}
             <div className="space-y-4 pt-2 border-t border-line/60">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-bold uppercase tracking-wider text-accent">Google Place & Venue Pinning</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-accent">Venue & Location Mode</p>
                 <span className="text-[11px] text-mute flex items-center gap-1">
-                  <MapPin size={12} className="text-accent" /> Verified Location
+                  {locationType === "in_person" ? (
+                    <>
+                      <MapPin size={12} className="text-accent" /> Google Maps Linked
+                    </>
+                  ) : locationType === "virtual" ? (
+                    <>
+                      <Globe size={12} className="text-accent" /> Online Gathering
+                    </>
+                  ) : (
+                    <>
+                      <Lock size={12} className="text-amber-500" /> Private Venue
+                    </>
+                  )}
                 </span>
               </div>
 
+              {/* 3-way Capsule Selector */}
               <div>
                 <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                  Search Venue on Google Maps
+                  Location Format
                 </label>
-                <PlaceAddressField
-                  value={venue || address}
-                  placeholder="Search venue (e.g. The Rocks, Sydney)"
-                  onChange={(val) => {
-                    setVenue(val);
-                    setAddress(val);
-                  }}
-                  onPick={(picked: PickedPlace) => {
-                    setVenue(picked.label.split(",")[0] || picked.label);
-                    setAddress(picked.label);
-                    setGeo(picked.geo);
-                    if (picked.city) setCity(picked.city);
-                    toast.success(`Pinned venue: ${picked.label}`);
-                  }}
-                />
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: "in_person", label: "In Person", icon: MapPin },
+                    { id: "virtual", label: "Virtual", icon: Video },
+                    { id: "secret", label: "Secret TBA", icon: Lock },
+                  ].map((mode) => {
+                    const on = locationType === mode.id;
+                    const Icon = mode.icon;
+                    return (
+                      <button
+                        key={mode.id}
+                        type="button"
+                        onClick={() => setLocationType(mode.id as EventLocationType)}
+                        className={cn(
+                          "flex items-center justify-center gap-1.5 rounded-2xl py-3 px-2 text-xs font-bold transition active:scale-95 ring-1 cursor-pointer",
+                          on
+                            ? "bg-brand text-white ring-brand shadow-sm"
+                            : "bg-paper text-mute ring-line hover:text-ink hover:bg-card",
+                        )}
+                      >
+                        <Icon size={14} />
+                        <span>{mode.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">City</label>
-                  <input
-                    value={city}
-                    list="event-cities-edit"
-                    onChange={(e) => setCity(e.target.value)}
-                    className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                  />
-                  <datalist id="event-cities-edit">
-                    {CITY_OPTIONS.map((c) => (
-                      <option key={c.id} value={c.label} />
+              {/* IN PERSON MODE */}
+              {locationType === "in_person" && (
+                <>
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                      Search Venue on Google Maps
+                    </label>
+                    <PlaceAddressField
+                      value={venue || address}
+                      placeholder="Search venue (e.g. Overseas Passenger Terminal, Sydney)"
+                      onChange={(val) => {
+                        setVenue(val);
+                        setAddress(val);
+                      }}
+                      onPick={(picked: PickedPlace) => {
+                        setVenue(picked.label.split(",")[0] || picked.label);
+                        setAddress(picked.label);
+                        setGeo(picked.geo);
+                        if (picked.city) setCity(picked.city);
+                        toast.success(`Pinned venue: ${picked.label}`);
+                      }}
+                    />
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                        City
+                      </label>
+                      <input
+                        value={city}
+                        list="event-cities-edit"
+                        onChange={(e) => setCity(e.target.value)}
+                        className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                      />
+                      <datalist id="event-cities-edit">
+                        {CITY_OPTIONS.map((c) => (
+                          <option key={c.id} value={c.label} />
+                        ))}
+                      </datalist>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                        Venue Name / Precinct
+                      </label>
+                      <input
+                        value={venue}
+                        onChange={(e) => setVenue(e.target.value)}
+                        className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                      Room / Hall / Stage (Optional)
+                    </label>
+                    <input
+                      value={room}
+                      onChange={(e) => setRoom(e.target.value)}
+                      placeholder="e.g. Boardroom 5+6, Great Hall, Main stage"
+                      className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                    />
+                  </div>
+
+                  {geo && (
+                    <div className="flex items-center justify-between rounded-2xl bg-paper px-3 py-2 text-xs text-mute border border-line/70">
+                      <span className="flex items-center gap-1.5 text-ink font-medium">
+                        <Check size={14} className="text-emerald-600" />
+                        GPS Pinned: {geo.lat.toFixed(4)}, {geo.lng.toFixed(4)}
+                      </span>
+                      <a
+                        href={mapsPlaceUrl(geo, venue || name)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-accent font-semibold hover:underline inline-flex items-center gap-1"
+                      >
+                        Directions map <ExternalLink size={12} />
+                      </a>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* VIRTUAL MODE */}
+              {locationType === "virtual" && (
+                <div className="space-y-3.5">
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                      Stream or Video Meeting URL
+                    </label>
+                    <input
+                      value={virtualUrl}
+                      onChange={(e) => setVirtualUrl(e.target.value)}
+                      placeholder="e.g. https://zoom.us/j/... or https://meet.google.com/..."
+                      className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[11px] text-mute">Quick links:</span>
+                    {[
+                      { label: "Zoom", prefix: "https://zoom.us/j/" },
+                      { label: "Google Meet", prefix: "https://meet.google.com/" },
+                      { label: "YouTube Live", prefix: "https://youtube.com/live/" },
+                    ].map((p) => (
+                      <button
+                        key={p.label}
+                        type="button"
+                        onClick={() => {
+                          if (!virtualUrl.startsWith("http")) setVirtualUrl(p.prefix);
+                        }}
+                        className="rounded-full bg-paper px-2.5 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-accent transition active:scale-95 shadow-2xs"
+                      >
+                        {p.label}
+                      </button>
                     ))}
-                  </datalist>
-                </div>
+                  </div>
 
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                    Venue Name / Precinct
-                  </label>
-                  <input
-                    value={venue}
-                    onChange={(e) => setVenue(e.target.value)}
-                    className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
-                  Room / Hall / Stage (Optional)
-                </label>
-                <input
-                  value={room}
-                  onChange={(e) => setRoom(e.target.value)}
-                  placeholder="e.g. Boardroom 5+6, Great Hall, Main stage"
-                  className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
-                />
-              </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                        Timezone City Anchor
+                      </label>
+                      <input
+                        value={city}
+                        list="event-cities-edit"
+                        onChange={(e) => setCity(e.target.value)}
+                        placeholder="e.g. Sydney"
+                        className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                        Virtual Platform Label
+                      </label>
+                      <input
+                        value={venue}
+                        onChange={(e) => setVenue(e.target.value)}
+                        placeholder="e.g. Zoom Interactive Room or YouTube Stream"
+                        className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                      />
+                    </div>
+                  </div>
 
-              {geo && (
-                <div className="flex items-center justify-between rounded-2xl bg-paper px-3 py-2 text-xs text-mute border border-line/70">
-                  <span className="flex items-center gap-1.5 text-ink font-medium">
-                    <Check size={14} className="text-emerald-600" />
-                    GPS Pinned: {geo.lat.toFixed(4)}, {geo.lng.toFixed(4)}
-                  </span>
-                  <a
-                    href={mapsPlaceUrl(geo, venue || name)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-accent font-semibold hover:underline inline-flex items-center gap-1"
-                  >
-                    Directions map <ExternalLink size={12} />
-                  </a>
+                  <div className="rounded-2xl bg-brand/5 p-3 text-[11px] text-mute border border-brand/15 leading-relaxed">
+                    🔒 <strong>Pass Protected:</strong> The stream URL is guarded and only revealed to registered guests
+                    on their AirPal Pass or calendar ticket.
+                  </div>
+                </div>
+              )}
+
+              {/* SECRET TBA MODE */}
+              {locationType === "secret" && (
+                <div className="space-y-3.5">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                        City / Vicinity
+                      </label>
+                      <input
+                        value={city}
+                        list="event-cities-edit"
+                        onChange={(e) => setCity(e.target.value)}
+                        placeholder="e.g. Sydney"
+                        className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                        Neighborhood / Suburb Hint
+                      </label>
+                      <input
+                        value={venue}
+                        onChange={(e) => setVenue(e.target.value)}
+                        placeholder="e.g. Surry Hills / Secret Rooftop"
+                        className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-mute mb-1.5 block">
+                      Arrival / Door Secret Code (Announced on Pass)
+                    </label>
+                    <input
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder="e.g. 42 Reservoir St (Buzzer 3), Sydney NSW 2010"
+                      className="h-12 w-full rounded-2xl border border-line bg-paper px-4 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+                    />
+                  </div>
+
+                  <div className="rounded-2xl bg-amber-500/10 p-3 text-[11px] text-amber-900 dark:text-amber-200 border border-amber-500/20 leading-relaxed">
+                    🔒 <strong>Confidential Venue:</strong> The exact street address is kept hidden from public
+                    discovery pages and sent directly to approved ticket holders.
+                  </div>
                 </div>
               )}
             </div>
@@ -1826,12 +2517,56 @@ export function OrganiserEventPage() {
               </div>
             </div>
 
-            {/* Rich Description & Story Option */}
+            {/* Rich Description & Story Option with Luma Starters */}
             <div className="space-y-3 pt-2 border-t border-line/60">
               <div className="flex justify-between items-center">
                 <p className="text-xs font-bold uppercase tracking-wider text-accent">Event Description & Details</p>
                 <span className="text-[11px] text-mute">{description.length}/1000</span>
               </div>
+
+              {/* Luma Description Starter Prompt Chips */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <span className="text-[11px] font-medium text-mute mr-1">Insert Starter:</span>
+                {[
+                  {
+                    label: "+ Agenda",
+                    snippet:
+                      "\n\n### 🗓️ Agenda & Schedule\n• 6:00 PM – Doors open & arrivals\n• 6:45 PM – Main session & announcements\n• 7:30 PM – Networking & refreshments\n",
+                  },
+                  {
+                    label: "+ What to Bring",
+                    snippet:
+                      "\n\n### 🎒 What to Bring\n• Valid photo ID\n• Digital ticket pass on your phone\n• Good vibes!\n",
+                  },
+                  {
+                    label: "+ Food & Drinks",
+                    snippet:
+                      "\n\n### 🍸 Food & Refreshments\n• Curated drinks & canapés available\n• Vegetarian & gluten-free options provided\n",
+                  },
+                  {
+                    label: "+ Getting There",
+                    snippet:
+                      "\n\n### 🚗 Getting There & Parking\n• Short 3-minute walk from the station\n• Street and venue parking bays available\n",
+                  },
+                  {
+                    label: "+ Dress Code",
+                    snippet: "\n\n### 👗 Dress Code\n• Smart casual / festive\n",
+                  },
+                ].map((chip) => (
+                  <button
+                    key={chip.label}
+                    type="button"
+                    onClick={() => {
+                      setDescription((prev) => (prev ? `${prev.trim()}${chip.snippet}` : chip.snippet.trim()));
+                      toast.success(`Appended ${chip.label.replace("+ ", "")} section`);
+                    }}
+                    className="rounded-full bg-paper px-2.5 py-1 text-[11px] font-semibold text-ink border border-line hover:border-brand hover:text-accent transition active:scale-95 shadow-2xs cursor-pointer"
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+
               <textarea
                 value={description}
                 maxLength={1000}
@@ -1894,12 +2629,62 @@ export function OrganiserEventPage() {
 
             <EventTicketFields values={ticketFields} onChange={setTicketFields} />
 
+            {/* Guest Screening & Approval Mode in Settings */}
+            <div className="rounded-[28px] bg-paper p-4 border border-line/80 space-y-2.5">
+              <div className="flex items-center gap-2">
+                <div className="grid h-7 w-7 place-items-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 ring-1 ring-amber-400/20">
+                  <ShieldCheck size={15} />
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-ink">Guest Screening</p>
+                  <p className="text-[11px] text-mute">Require host approval for reservations</p>
+                </div>
+              </div>
+
+              <label className="flex items-start gap-3 rounded-2xl bg-card p-3 border border-line/60 cursor-pointer group hover:border-brand/40 transition">
+                <input
+                  type="checkbox"
+                  checked={requireApproval}
+                  onChange={(e) => {
+                    setRequireApproval(e.target.checked);
+                    toast.success(
+                      e.target.checked ? "Enabled host approval requirement" : "Disabled host approval requirement",
+                    );
+                  }}
+                  className="mt-0.5 h-4 w-4 rounded text-brand focus:ring-brand accent-brand cursor-pointer"
+                />
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-ink group-hover:text-accent transition">
+                    Require Host Approval for Registrations
+                  </span>
+                  <p className="text-[11px] text-mute leading-relaxed">
+                    Attendees submit a request to join and are screened before dynamic tickets and gate passes are
+                    issued.
+                  </p>
+                </div>
+              </label>
+            </div>
+
             <Button type="submit" className="w-full h-12 text-base font-semibold shadow-md" disabled={saving}>
               {saving ? "Saving Changes…" : "Save All Event Details"}
             </Button>
           </form>
         )}
       </div>
+
+      <EventCreatedCelebrationModal
+        open={Boolean(celebrationEventId)}
+        onClose={() => {
+          setCelebrationEventId(null);
+          setTab("today");
+        }}
+        eventId={celebrationEventId || ""}
+        name={celebrationEventName || name}
+        flavour={flavour}
+        venue={venue}
+        city={city}
+        onOpenStalls={() => setTab("stalls")}
+      />
     </div>
   );
 }

@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  EVENT_LOCATION_TYPES,
   cleanCapacity,
   cleanStallLocation,
   cleanTicketCents,
+  isEventLocationType,
   isExpoEventId,
   parseStallCsv,
   stallCsvTemplate,
@@ -77,5 +79,15 @@ Harbour Linen,B04,,shops
     expect(cleanCapacity(0)).toBeUndefined();
     expect(cleanCapacity(2001)).toBeUndefined();
     expect(cleanCapacity(2.5)).toBeUndefined();
+  });
+
+  it("validates event location types", () => {
+    expect(isEventLocationType("in_person")).toBe(true);
+    expect(isEventLocationType("virtual")).toBe(true);
+    expect(isEventLocationType("secret")).toBe(true);
+    expect(isEventLocationType("metaverse")).toBe(false);
+    expect(isEventLocationType(undefined)).toBe(false);
+    expect(isEventLocationType(null)).toBe(false);
+    expect(EVENT_LOCATION_TYPES).toEqual(["in_person", "virtual", "secret"]);
   });
 });

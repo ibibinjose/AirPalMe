@@ -37,6 +37,13 @@ export function normalizeSpeakerHandle(raw: string): string {
   return raw.trim().replace(/^@+/, "").toLowerCase().slice(0, 30);
 }
 
+export const EVENT_LOCATION_TYPES = ["in_person", "virtual", "secret"] as const;
+export type EventLocationType = (typeof EVENT_LOCATION_TYPES)[number];
+
+export function isEventLocationType(value: unknown): value is EventLocationType {
+  return typeof value === "string" && (EVENT_LOCATION_TYPES as readonly string[]).includes(value);
+}
+
 export type EventRecord = {
   id: string;
   name: string;
@@ -46,11 +53,17 @@ export type EventRecord = {
   /** Room, hall, or stage inside the venue — festivals run concurrent rooms. */
   room?: string;
   address?: string;
+  /** Venue mode: in-person, online/virtual stream, or secret/TBA. */
+  locationType?: EventLocationType;
+  /** Stream / meeting URL when locationType is virtual (Zoom, Google Meet, YouTube). */
+  virtualUrl?: string;
   description?: string;
   shortWhy?: string;
   mapsPlaceId?: string;
   geo?: { lat: number; lng: number };
   coverImage?: string;
+  /** Ambient theme hue tint (hex, e.g. #6366f1) for specular halo and accents. */
+  themeColor?: string;
   hostName?: string;
   hostHandle?: string;
   hostType?: "business" | "individual";
@@ -64,6 +77,8 @@ export type EventRecord = {
   ticketPriceCents?: number;
   /** Total tickets available. Undefined = unlimited free entry. */
   capacity?: number;
+  /** Whether attendees require host approval before passes/tickets are confirmed. */
+  requireApproval?: boolean;
   gatePath: string;
   /** Festival program this session belongs to (festivals/{slug}). */
   festivalSlug?: string;
@@ -187,6 +202,21 @@ export type CalendarEvent = {
   ticketPriceCents?: number;
   capacity?: number;
   organiserUid?: string;
+  hostName?: string;
+  hostHandle?: string;
+  hostType?: "business" | "individual";
+  businessName?: string;
+  businessHandle?: string;
+  collaboratorHandles?: string[];
+  address?: string;
+  geo?: { lat: number; lng: number };
+  registrationUrl?: string;
+  registrationNote?: string;
+  shortWhy?: string;
+  locationType?: EventLocationType;
+  virtualUrl?: string;
+  requireApproval?: boolean;
+  themeColor?: string;
 };
 
 export function isEventFlavour(value: string): value is EventFlavour {

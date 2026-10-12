@@ -109,7 +109,7 @@ export function recordToCalendarBase(e: EventRecord): Omit<CalendarEvent, "isGoi
   return {
     id: e.id,
     title: e.name,
-    description: `${e.flavour} with ${e.stallCount || 0} stalls at ${e.venue || e.city}`,
+    description: e.description || `${e.flavour} with ${e.stallCount || 0} stalls at ${e.venue || e.city}`,
     heroImage: e.coverImage,
     startsAt: e.startsAt,
     endsAt: e.endsAt,
@@ -118,9 +118,24 @@ export function recordToCalendarBase(e: EventRecord): Omit<CalendarEvent, "isGoi
     city: e.city,
     venue: e.venue || e.city,
     room: e.room,
+    address: e.address,
+    geo: e.geo,
     ticketPriceCents: e.ticketPriceCents,
     capacity: e.capacity,
     organiserUid: e.organiserUid,
+    hostName: e.hostName,
+    hostHandle: e.hostHandle,
+    hostType: e.hostType,
+    businessName: e.businessName,
+    businessHandle: e.businessHandle,
+    collaboratorHandles: e.collaboratorHandles,
+    registrationUrl: e.registrationUrl,
+    registrationNote: e.registrationNote,
+    shortWhy: e.shortWhy,
+    locationType: e.locationType,
+    virtualUrl: e.virtualUrl,
+    requireApproval: e.requireApproval,
+    themeColor: e.themeColor,
     category,
     categoryLabel: e.flavour === "market" ? "Market" : e.flavour === "expo" ? "Expo" : "Event",
     gatePath: e.gatePath,
@@ -149,6 +164,11 @@ export function docToCalendarBase(
       flavour: doc.flavour,
       city: str(doc.city),
       venue: typeof doc.venue === "string" ? doc.venue : undefined,
+      room: typeof doc.room === "string" ? doc.room : undefined,
+      address: typeof doc.address === "string" ? doc.address : undefined,
+      description: typeof doc.description === "string" ? doc.description : undefined,
+      shortWhy: typeof doc.shortWhy === "string" ? doc.shortWhy : undefined,
+      geo: typeof doc.geo === "object" && doc.geo ? (doc.geo as { lat: number; lng: number }) : undefined,
       coverImage:
         typeof doc.coverImage === "string"
           ? doc.coverImage
@@ -163,6 +183,23 @@ export function docToCalendarBase(
       ticketPriceCents: cleanTicketCents(doc.ticketPriceCents),
       capacity: cleanCapacity(doc.capacity),
       organiserUid: str(doc.organiserUid) || undefined,
+      hostName: typeof doc.hostName === "string" ? doc.hostName : undefined,
+      hostHandle: typeof doc.hostHandle === "string" ? doc.hostHandle : undefined,
+      hostType: doc.hostType === "individual" || doc.hostType === "business" ? doc.hostType : undefined,
+      businessName: typeof doc.businessName === "string" ? doc.businessName : undefined,
+      businessHandle: typeof doc.businessHandle === "string" ? doc.businessHandle : undefined,
+      collaboratorHandles: Array.isArray(doc.collaboratorHandles)
+        ? (doc.collaboratorHandles as unknown[]).filter((h): h is string => typeof h === "string")
+        : undefined,
+      registrationUrl: typeof doc.registrationUrl === "string" ? doc.registrationUrl : undefined,
+      registrationNote: typeof doc.registrationNote === "string" ? doc.registrationNote : undefined,
+      locationType:
+        doc.locationType === "virtual" || doc.locationType === "secret" || doc.locationType === "in_person"
+          ? doc.locationType
+          : undefined,
+      virtualUrl: typeof doc.virtualUrl === "string" ? doc.virtualUrl : undefined,
+      requireApproval: typeof doc.requireApproval === "boolean" ? doc.requireApproval : undefined,
+      themeColor: typeof doc.themeColor === "string" ? doc.themeColor : undefined,
     } as EventRecord;
     if (!rec.name.trim() || !rec.city.trim()) return null;
     return recordToCalendarBase(rec);
@@ -199,6 +236,13 @@ export function docToCalendarBase(
       ticketPriceCents: cleanTicketCents(doc.ticketPriceCents),
       capacity: cleanCapacity(doc.capacity),
       organiserUid: str(doc.organiserUid) || undefined,
+      locationType:
+        doc.locationType === "virtual" || doc.locationType === "secret" || doc.locationType === "in_person"
+          ? doc.locationType
+          : undefined,
+      virtualUrl: typeof doc.virtualUrl === "string" ? doc.virtualUrl : undefined,
+      requireApproval: typeof doc.requireApproval === "boolean" ? doc.requireApproval : undefined,
+      themeColor: typeof doc.themeColor === "string" ? doc.themeColor : undefined,
     };
   }
   return null;
@@ -274,6 +318,13 @@ export function docToEventRecord(doc: Record<string, unknown>, id: string): Even
     track: str(doc.track) || undefined,
     registrationUrl: str(doc.registrationUrl) || undefined,
     registrationNote: str(doc.registrationNote) || undefined,
+    locationType:
+      doc.locationType === "virtual" || doc.locationType === "secret" || doc.locationType === "in_person"
+        ? doc.locationType
+        : undefined,
+    virtualUrl: str(doc.virtualUrl) || undefined,
+    requireApproval: typeof doc.requireApproval === "boolean" ? doc.requireApproval : undefined,
+    themeColor: str(doc.themeColor) || undefined,
     speakers: cleanSpeakers(doc.speakers),
     organiserUid: str(doc.organiserUid) || undefined,
     categoryChips: Array.isArray(doc.categoryChips)

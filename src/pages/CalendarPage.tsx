@@ -13,6 +13,7 @@ import {
   LayoutGrid,
   Download,
   List,
+  Plus,
   PlusCircle,
   SlidersHorizontal,
 } from "lucide-react";
@@ -389,13 +390,22 @@ function CalendarPageContent() {
               <Sparkles size={13} />
               <span>{city} · What’s On</span>
             </div>
-            <Link
-              href="/pass"
-              className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1 text-xs font-bold text-white ring-1 ring-white/25 backdrop-blur-md hover:bg-white/25 transition active:scale-95"
-            >
-              <Ticket size={13} className="text-amber-400" />
-              <span>AirPal Pass →</span>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/event"
+                className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-brand px-3.5 py-1 text-xs font-bold text-white shadow-xs hover:bg-brand/90 transition active:scale-95"
+              >
+                <Plus size={13} />
+                <span>Host Event</span>
+              </Link>
+              <Link
+                href="/pass"
+                className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1 text-xs font-bold text-white ring-1 ring-white/25 backdrop-blur-md hover:bg-white/25 transition active:scale-95"
+              >
+                <Ticket size={13} className="text-amber-400" />
+                <span>AirPal Pass →</span>
+              </Link>
+            </div>
           </div>
           <h1 className="font-display mt-2 text-3xl font-bold tracking-tight text-white md:text-4xl">Event Calendar</h1>
           <p className="mt-1 text-[14px] font-medium text-white/80">
@@ -406,8 +416,15 @@ function CalendarPageContent() {
 
       {/* Top Header / tools */}
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div className="shrink-0">
+        <div className="shrink-0 flex items-center gap-3">
           <h2 className="font-display text-xl font-bold tracking-tight text-ink whitespace-nowrap">Browse events</h2>
+          <Link
+            href="/event"
+            className="inline-flex min-h-[34px] items-center gap-1 rounded-full bg-card px-3 text-xs font-bold text-accent ring-1 ring-line hover:bg-paper transition active:scale-95 shadow-2xs"
+          >
+            <Plus size={12} />
+            <span>Host Event</span>
+          </Link>
         </div>
 
         {/* View Switcher & Action Tools */}

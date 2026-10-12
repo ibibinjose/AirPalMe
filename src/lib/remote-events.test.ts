@@ -62,11 +62,25 @@ describe("toNearbyEvent", () => {
 describe("docToEventRecord", () => {
   it("accepts organiser docs and rejects curated/junk docs", () => {
     const rec = docToEventRecord(
-      { name: "Night Market", flavour: "market", city: "Sydney", startsAt: "2026-09-15T18:00:00+10:00" },
+      {
+        name: "Night Market",
+        flavour: "market",
+        city: "Sydney",
+        startsAt: "2026-09-15T18:00:00+10:00",
+        locationType: "virtual",
+        virtualUrl: "https://zoom.us/j/12345",
+        requireApproval: true,
+        themeColor: "#8b5cf6",
+      },
       "e9",
     );
     expect(rec?.id).toBe("e9");
     expect(rec?.gatePath).toContain("e9");
+    expect(rec?.locationType).toBe("virtual");
+    expect(rec?.virtualUrl).toBe("https://zoom.us/j/12345");
+    expect(rec?.requireApproval).toBe(true);
+    expect(rec?.themeColor).toBe("#8b5cf6");
+
     expect(docToEventRecord({ title: "Curated", when: "Tonight", status: "live" }, "e10")).toBeNull();
     expect(
       docToEventRecord({ name: "No city", flavour: "market", startsAt: "2026-09-15T18:00:00+10:00" }, "e11"),
@@ -83,18 +97,40 @@ describe("docToEventRecord", () => {
 describe("docToCalendarBase", () => {
   it("maps EventRecord-shaped docs and rejects nameless ones", () => {
     const base = docToCalendarBase(
-      { name: "Night Market", flavour: "market", city: "Sydney", startsAt: "2026-09-15T18:00:00+10:00" },
+      {
+        name: "Night Market",
+        flavour: "market",
+        city: "Sydney",
+        startsAt: "2026-09-15T18:00:00+10:00",
+        locationType: "secret",
+        requireApproval: true,
+        themeColor: "#10b981",
+      },
       "e1",
     );
     expect(base?.title).toBe("Night Market");
     expect(base?.category).toBe("market");
+    expect(base?.locationType).toBe("secret");
+    expect(base?.requireApproval).toBe(true);
+    expect(base?.themeColor).toBe("#10b981");
     expect(docToCalendarBase({ name: "", flavour: "market", city: "Sydney", startsAt: "x" }, "e2")).toBeNull();
   });
 
   it("maps CalendarEvent-shaped docs and rejects junk", () => {
-    const base = docToCalendarBase({ title: "Jazz", startsAt: "2026-09-15T18:00:00+10:00", date: "2026-09-15" }, "e3");
+    const base = docToCalendarBase(
+      {
+        title: "Jazz",
+        startsAt: "2026-09-15T18:00:00+10:00",
+        date: "2026-09-15",
+        locationType: "virtual",
+        virtualUrl: "https://youtube.com/live/123",
+      },
+      "e3",
+    );
     expect(base?.id).toBe("e3");
     expect(base?.city).toBe("");
+    expect(base?.locationType).toBe("virtual");
+    expect(base?.virtualUrl).toBe("https://youtube.com/live/123");
     expect(docToCalendarBase({ title: "x" }, "e4")).toBeNull();
   });
 });
