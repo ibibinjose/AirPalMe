@@ -8,7 +8,35 @@ import {
   type ConfirmationResult,
 } from "firebase/auth";
 import { phoneReady, toE164 } from "@shared/phone-auth";
-import { getFirebaseAuth } from "./firebase";
+import { awaitPendingAnonymousSession, getFirebaseAuth } from "./firebase";
+
+/** Max time an SMS send may take before the UI gives up and shows an error. */
+export const PHONE_SEND_TIMEOUT_MS = 45_000;
+
+export function withTimeout<T>(work: Promise<T>, ms: number, message: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const t = setTimeout(() => reject(Object.assign(new Error(message), { code: "auth/timeout" })), ms);
+    work.then(
+      (v) => {
+        clearTimeout(t);
+        resolve(v);
+      },
+      (e) => {
+        clearTimeout(t);
+        reject(e);
+      },
+    );
+  });
+}
+
+/** Phone sign-in never depends on a guest session: a failed or disabled anonymous sign-in is ignored. */
+async function settleAnonymousSession(): Promise<void> {
+  try {
+    await withTimeout(awaitPendingAnonymousSession(), 5_000, "anonymous session timed out");
+  } catch {
+    /* anonymous auth disabled or failing: continue with phone auth */
+  }
+}
 
 export const PHONE_RECAPTCHA_ID = "airpal-phone-recaptcha";
 
@@ -97,7 +125,15 @@ export async function sendPhoneCode(phone: string): Promise<void> {
   sending = true;
   const e164 = toE164(phone);
   try {
-    confirmation = await withVerifier((appVerifier) => signInWithPhoneNumber(auth, e164, appVerifier));
+    await settleAnonymousSession();
+    confirmation = await withTimeout(
+      withVerifier((appVerifier) => signInWithPhoneNumber(auth, e164, appVerifier)),
+      PHONE_SEND_TIMEOUT_MS,
+      "Sending the SMS code took too long. Check your connection and try again.",
+    );
+  } catch (err) {
+    resetPhoneLogin();
+    throw err;
   } finally {
     sending = false;
   }
@@ -122,8 +158,10 @@ export async function sendAccountPhoneCode(phone: string): Promise<void> {
   if (sending) throw new Error("Already sending a code. Wait a moment.");
   sending = true;
   try {
-    accountVerificationId = await withVerifier((appVerifier) =>
-      new PhoneAuthProvider(auth).verifyPhoneNumber(toE164(phone), appVerifier),
+    accountVerificationId = await withTimeout(
+      withVerifier((appVerifier) => new PhoneAuthProvider(auth).verifyPhoneNumber(toE164(phone), appVerifier)),
+      PHONE_SEND_TIMEOUT_MS,
+      "Sending the SMS code took too long. Check your connection and try again.",
     );
   } finally {
     sending = false;

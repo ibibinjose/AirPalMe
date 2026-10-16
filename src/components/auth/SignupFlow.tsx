@@ -43,6 +43,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
   const [enableBiometrics, setEnableBiometrics] = useState(true);
   const [busy, setBusy] = useState(false);
   const [wait, setWait] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   const handleStatus = useHandleStatus(handle, mine?.id);
 
   const handleOk = handleStatus.ok;
@@ -71,13 +72,16 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
       return;
     }
     setBusy(true);
+    setError(null);
     try {
       await sendPhoneCode(phone);
       setStep("code");
       setWait(30);
       toast.success("SMS code sent");
     } catch (err) {
-      toast.error(authErrorMessage(err, "Could not send the code."));
+      const msg = authErrorMessage(err, "Could not send the code. Please try again.");
+      setError(msg);
+      toast.error(msg);
       resetPhoneLogin();
     } finally {
       setBusy(false);
@@ -90,6 +94,7 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
       return;
     }
     setBusy(true);
+    setError(null);
     try {
       await confirmPhoneCode(normalizeOtp(code));
       resetPhoneLogin();
@@ -108,7 +113,9 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
       setStep("account");
       toast.success("Mobile confirmed");
     } catch (err) {
-      toast.error(authErrorMessage(err, "Invalid code. Try again."));
+      const msg = authErrorMessage(err, "Invalid code. Try again.");
+      setError(msg);
+      toast.error(msg);
     } finally {
       setBusy(false);
     }
@@ -220,6 +227,11 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
       </div>
 
       <form className="space-y-3.5" onSubmit={(e) => void onSubmit(e)}>
+        {error && (
+          <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-700">
+            {error}
+          </p>
+        )}
         {step === "handle" && (
           <>
             <ValidField
@@ -234,10 +246,9 @@ export function SignupFlow({ onDone }: { onDone: () => void }) {
                 placeholder="maya"
                 autoComplete="username"
                 className={fieldInput}
-                autoFocus
               />
             </ValidField>
-            <PhoneField value={phone} onChange={setPhone} stacked label="Mobile Number" />
+            <PhoneField value={phone} onChange={setPhone} stacked label="Mobile Number" autoFocus />
             <Button type="submit" className="w-full" disabled={busy || !handleOk || !phoneOk} loading={busy}>
               {busy ? "Sending…" : "Send SMS code"}
             </Button>

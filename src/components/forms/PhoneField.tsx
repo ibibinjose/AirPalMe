@@ -18,12 +18,14 @@ export function PhoneField({
   required,
   label = "Mobile Number",
   stacked = false,
+  autoFocus = false,
 }: {
   value: string;
   onChange: (next: string) => void;
   required?: boolean;
   label?: string;
   stacked?: boolean;
+  autoFocus?: boolean;
 }) {
   const initialCountry = countryFromPhone(value)?.code || "AU";
   const [selectedCountry, setSelectedCountry] = useState<string>(initialCountry);
@@ -125,6 +127,7 @@ export function PhoneField({
               value={national}
               onChange={(e) => handleNumberChange(e.target.value)}
               inputMode="tel"
+              autoFocus={autoFocus}
               autoComplete="tel-national"
               placeholder={placeholder}
               className={cn(fieldInput, "pl-14 w-full")}
@@ -163,6 +166,7 @@ export function PhoneField({
           value={national}
           onChange={(e) => handleNumberChange(e.target.value)}
           inputMode="tel"
+          autoFocus={autoFocus}
           autoComplete="tel-national"
           enterKeyHint="next"
           placeholder={placeholder}
